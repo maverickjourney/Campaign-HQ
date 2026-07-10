@@ -1,0 +1,94 @@
+:root {
+
+  /* ========================================
+     COLORS
+  ======================================== */
+
+  --color-primary: #071B35;
+  --color-primary-light: #123A6D;
+
+  --color-accent: #D71920;
+
+  --color-background: #F7F9FC;
+
+  --color-surface: #FFFFFF;
+
+  --color-border: #E5E7EB;
+
+  --color-text: #111827;
+
+  --color-text-light: #6B7280;
+
+  --color-success: #22C55E;
+
+  --color-warning: #F59E0B;
+
+  --color-danger: #DC2626;
+
+
+
+  /* ========================================
+     BORDER RADIUS
+  ======================================== */
+
+  --radius-xs: 6px;
+
+  --radius-sm: 10px;
+
+  --radius-md: 16px;
+
+  --radius-lg: 24px;
+
+  --radius-xl: 32px;
+
+
+
+  /* ========================================
+     SHADOWS
+  ======================================== */
+
+  --shadow-sm:
+      0 2px 8px rgba(0,0,0,.04);
+
+  --shadow:
+      0 10px 30px rgba(7,27,53,.08);
+
+  --shadow-lg:
+      0 25px 60px rgba(7,27,53,.12);
+
+
+
+  /* ========================================
+     SPACING
+  ======================================== */
+
+  --space-1:4px;
+
+  --space-2:8px;
+
+  --space-3:12px;
+
+  --space-4:16px;
+
+  --space-5:20px;
+
+  --space-6:24px;
+
+  --space-8:32px;
+
+  --space-10:40px;
+
+  --space-12:48px;
+
+  --space-16:64px;
+
+
+
+  /* ========================================
+     TRANSITIONS
+  ======================================== */
+
+  --transition:
+      all .25s ease;
+
+}
