@@ -1,0 +1,386 @@
+.wrapper {
+  width: min(100%, 560px);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.loginCard {
+  position: relative;
+  width: 100%;
+  padding: clamp(42px, 4.5vw, 68px);
+  overflow: hidden;
+  border-radius: 30px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  background:
+    linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.99),
+      rgba(248, 250, 252, 0.98)
+    );
+  box-shadow:
+    0 38px 100px rgba(1, 12, 30, 0.32),
+    0 10px 28px rgba(1, 12, 30, 0.12);
+}
+
+.accentBars {
+  position: absolute;
+  top: 0;
+  right: 12%;
+  display: flex;
+}
+
+.accentBars span {
+  display: block;
+  height: 7px;
+}
+
+.accentBars span:nth-child(1) {
+  width: 92px;
+  background: #e51b36;
+}
+
+.accentBars span:nth-child(2) {
+  width: 30px;
+  background: #ff6979;
+}
+
+.accentBars span:nth-child(3) {
+  width: 16px;
+  background: #ffd0d6;
+}
+
+.security {
+  display: flex;
+  justify-content: flex-end;
+  align-items: flex-start;
+  gap: 10px;
+  margin-bottom: 54px;
+  color: #70798a;
+  text-align: right;
+}
+
+.security svg {
+  flex-shrink: 0;
+  margin-top: 2px;
+  color: #536176;
+}
+
+.security strong {
+  display: block;
+  color: #4a5567;
+  font-size: 13px;
+  font-weight: 750;
+}
+
+.security span {
+  display: block;
+  margin-top: 3px;
+  font-size: 12px;
+}
+
+.heading {
+  margin-bottom: 42px;
+}
+
+.eyebrow {
+  margin-bottom: 12px;
+  color: #d71920;
+  font-size: 11px;
+  font-weight: 850;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+}
+
+.heading h2 {
+  margin: 0;
+  color: #0b172a;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(50px, 4.5vw, 72px);
+  font-weight: 600;
+  line-height: 0.93;
+  letter-spacing: -0.055em;
+}
+
+.heading > p:last-child {
+  max-width: 460px;
+  margin-top: 20px;
+  color: #6b7484;
+  font-size: 16px;
+  line-height: 1.6;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+}
+
+.fieldGroup {
+  margin-bottom: 24px;
+}
+
+.fieldGroup label {
+  display: block;
+  margin-bottom: 10px;
+  color: #1a2435;
+  font-size: 13px;
+  font-weight: 750;
+}
+
+.inputWrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.inputWrap > svg {
+  position: absolute;
+  left: 18px;
+  color: #7d8797;
+  pointer-events: none;
+}
+
+.inputWrap input {
+  width: 100%;
+  height: 64px;
+  padding: 0 54px 0 50px;
+  color: #101828;
+  border: 1px solid #d8dee8;
+  border-radius: 14px;
+  outline: none;
+  background: #ffffff;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.2s ease;
+}
+
+.inputWrap input::placeholder {
+  color: #98a1af;
+}
+
+.inputWrap input:focus {
+  border-color: #6b9ed7;
+  box-shadow: 0 0 0 4px rgba(47, 128, 237, 0.11);
+}
+
+.passwordButton {
+  position: absolute;
+  right: 15px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 7px;
+  color: #7d8797;
+  border-radius: 9px;
+  transition:
+    color 0.2s ease,
+    background 0.2s ease;
+}
+
+.passwordButton:hover {
+  color: #071b35;
+  background: #edf3fa;
+}
+
+.options {
+  margin: 2px 0 28px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+}
+
+.remember {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  color: #344054;
+  font-size: 13px;
+  font-weight: 650;
+  cursor: pointer;
+}
+
+.remember input {
+  width: 18px;
+  height: 18px;
+  accent-color: #d71920;
+}
+
+.textButton {
+  color: #d71920;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.textButton:hover {
+  text-decoration: underline;
+}
+
+.submitButton {
+  width: 100%;
+  min-height: 66px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 28px;
+  color: #ffffff;
+  border-radius: 13px;
+  background: linear-gradient(90deg, #d71920, #f2344b);
+  box-shadow: 0 18px 38px rgba(215, 25, 32, 0.24);
+  font-size: 13px;
+  font-weight: 850;
+  letter-spacing: 0.17em;
+  text-transform: uppercase;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    filter 0.2s ease;
+}
+
+.submitButton:hover {
+  transform: translateY(-3px);
+  filter: brightness(1.04);
+  box-shadow: 0 24px 44px rgba(215, 25, 32, 0.3);
+}
+
+.submitButton:active {
+  transform: translateY(0);
+}
+
+.divider {
+  margin: 30px 0;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  color: #8b94a3;
+  font-size: 11px;
+  font-weight: 750;
+}
+
+.divider::before,
+.divider::after {
+  content: "";
+  height: 1px;
+  flex: 1;
+  background: #dde2e9;
+}
+
+.googleButton {
+  width: 100%;
+  min-height: 62px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 15px;
+  color: #202939;
+  border: 1px solid #d8dee8;
+  border-radius: 13px;
+  background: #ffffff;
+  font-size: 14px;
+  font-weight: 750;
+  transition:
+    border-color 0.2s ease,
+    background 0.2s ease,
+    transform 0.2s ease;
+}
+
+.googleButton:hover {
+  transform: translateY(-2px);
+  border-color: #b7c1cf;
+  background: #fbfcfe;
+}
+
+.googleIcon {
+  width: 24px;
+  height: 24px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #4285f4;
+  font-size: 21px;
+  font-weight: 900;
+}
+
+.message {
+  margin: 18px 0 0;
+  padding: 12px 14px;
+  color: #8d2631;
+  border: 1px solid #f1c4ca;
+  border-radius: 10px;
+  background: #fff5f6;
+  font-size: 12px;
+  line-height: 1.45;
+  text-align: center;
+}
+
+.help {
+  margin-top: 38px;
+  display: flex;
+  justify-content: center;
+  gap: 5px;
+  color: #7b8493;
+  font-size: 12px;
+}
+
+.help button {
+  color: #d71920;
+  font-size: inherit;
+  font-weight: 700;
+}
+
+.help button:hover {
+  text-decoration: underline;
+}
+
+.footer {
+  padding: 0 8px;
+  display: flex;
+  justify-content: space-between;
+  gap: 18px;
+  color: rgba(255, 255, 255, 0.55);
+  font-size: 10px;
+  letter-spacing: 0.04em;
+}
+
+@media (max-width: 980px) {
+  .wrapper {
+    width: min(100%, 650px);
+    margin-top: -28px;
+  }
+}
+
+@media (max-width: 600px) {
+  .loginCard {
+    padding: 36px 22px;
+    border-radius: 24px;
+  }
+
+  .security {
+    margin-bottom: 34px;
+  }
+
+  .heading h2 {
+    font-size: 48px;
+  }
+
+  .options {
+    align-items: flex-start;
+  }
+
+  .submitButton {
+    min-height: 60px;
+    gap: 16px;
+    font-size: 12px;
+  }
+
+  .help {
+    flex-wrap: wrap;
+  }
+
+  .footer {
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+  }
+}
