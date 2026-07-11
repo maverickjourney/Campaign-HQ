@@ -1,17 +1,18 @@
 .wrapper {
-  width: min(100%, 560px);
+  width: min(100%, 520px);
+  max-height: calc(100vh - 28px);
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 10px;
 }
 
 .loginCard {
   position: relative;
   width: 100%;
-  padding: clamp(42px, 4.5vw, 68px);
+  padding: clamp(28px, 3.3vh, 45px) clamp(32px, 3.3vw, 52px);
   overflow: hidden;
-  border-radius: 30px;
   border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 27px;
   background:
     linear-gradient(
       180deg,
@@ -19,8 +20,8 @@
       rgba(248, 250, 252, 0.98)
     );
   box-shadow:
-    0 38px 100px rgba(1, 12, 30, 0.32),
-    0 10px 28px rgba(1, 12, 30, 0.12);
+    0 34px 85px rgba(1, 12, 30, 0.31),
+    0 8px 24px rgba(1, 12, 30, 0.12);
 }
 
 .accentBars {
@@ -32,63 +33,63 @@
 
 .accentBars span {
   display: block;
-  height: 7px;
+  height: 6px;
 }
 
 .accentBars span:nth-child(1) {
-  width: 92px;
+  width: 82px;
   background: #e51b36;
 }
 
 .accentBars span:nth-child(2) {
-  width: 30px;
+  width: 27px;
   background: #ff6979;
 }
 
 .accentBars span:nth-child(3) {
-  width: 16px;
+  width: 14px;
   background: #ffd0d6;
 }
 
 .security {
   display: flex;
-  justify-content: flex-end;
   align-items: flex-start;
-  gap: 10px;
-  margin-bottom: 54px;
+  justify-content: flex-end;
+  gap: 9px;
+  margin-bottom: clamp(22px, 3vh, 36px);
   color: #70798a;
   text-align: right;
 }
 
 .security svg {
   flex-shrink: 0;
-  margin-top: 2px;
+  margin-top: 1px;
   color: #536176;
 }
 
 .security strong {
   display: block;
   color: #4a5567;
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 750;
 }
 
 .security span {
   display: block;
-  margin-top: 3px;
-  font-size: 12px;
+  margin-top: 2px;
+  font-size: 11px;
 }
 
 .heading {
-  margin-bottom: 42px;
+  margin-bottom: clamp(22px, 3vh, 34px);
 }
 
 .eyebrow {
-  margin-bottom: 12px;
+  margin: 0 0 9px;
   color: #d71920;
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 850;
-  letter-spacing: 0.24em;
+  letter-spacing: 0.23em;
   text-transform: uppercase;
 }
 
@@ -96,18 +97,18 @@
   margin: 0;
   color: #0b172a;
   font-family: Georgia, "Times New Roman", serif;
-  font-size: clamp(50px, 4.5vw, 72px);
+  font-size: clamp(47px, 4vw, 64px);
   font-weight: 600;
-  line-height: 0.93;
+  line-height: 0.9;
   letter-spacing: -0.055em;
 }
 
 .heading > p:last-child {
-  max-width: 460px;
-  margin-top: 20px;
+  max-width: 440px;
+  margin: 14px 0 0;
   color: #6b7484;
-  font-size: 16px;
-  line-height: 1.6;
+  font-size: 14px;
+  line-height: 1.48;
 }
 
 .form {
@@ -116,14 +117,14 @@
 }
 
 .fieldGroup {
-  margin-bottom: 24px;
+  margin-bottom: 16px;
 }
 
 .fieldGroup label {
   display: block;
-  margin-bottom: 10px;
+  margin-bottom: 7px;
   color: #1a2435;
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 750;
 }
 
@@ -135,24 +136,23 @@
 
 .inputWrap > svg {
   position: absolute;
-  left: 18px;
+  left: 17px;
   color: #7d8797;
   pointer-events: none;
 }
 
 .inputWrap input {
   width: 100%;
-  height: 64px;
-  padding: 0 54px 0 50px;
+  height: 55px;
+  padding: 0 50px 0 47px;
   color: #101828;
   border: 1px solid #d8dee8;
-  border-radius: 14px;
+  border-radius: 13px;
   outline: none;
   background: #ffffff;
   transition:
     border-color 0.2s ease,
-    box-shadow 0.2s ease,
-    transform 0.2s ease;
+    box-shadow 0.2s ease;
 }
 
 .inputWrap input::placeholder {
@@ -166,16 +166,14 @@
 
 .passwordButton {
   position: absolute;
-  right: 15px;
+  right: 14px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 7px;
+  padding: 6px;
   color: #7d8797;
-  border-radius: 9px;
-  transition:
-    color 0.2s ease,
-    background 0.2s ease;
+  border-radius: 8px;
+  background: transparent;
 }
 
 .passwordButton:hover {
@@ -184,32 +182,34 @@
 }
 
 .options {
-  margin: 2px 0 28px;
+  margin: 1px 0 19px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 18px;
+  gap: 16px;
 }
 
 .remember {
   display: inline-flex;
   align-items: center;
-  gap: 9px;
+  gap: 8px;
   color: #344054;
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 650;
   cursor: pointer;
 }
 
 .remember input {
-  width: 18px;
-  height: 18px;
+  width: 17px;
+  height: 17px;
   accent-color: #d71920;
 }
 
 .textButton {
+  padding: 0;
   color: #d71920;
-  font-size: 13px;
+  background: none;
+  font-size: 12px;
   font-weight: 700;
 }
 
@@ -219,18 +219,18 @@
 
 .submitButton {
   width: 100%;
-  min-height: 66px;
+  min-height: 58px;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 28px;
+  gap: 24px;
   color: #ffffff;
-  border-radius: 13px;
+  border-radius: 12px;
   background: linear-gradient(90deg, #d71920, #f2344b);
-  box-shadow: 0 18px 38px rgba(215, 25, 32, 0.24);
-  font-size: 13px;
+  box-shadow: 0 16px 32px rgba(215, 25, 32, 0.23);
+  font-size: 12px;
   font-weight: 850;
-  letter-spacing: 0.17em;
+  letter-spacing: 0.16em;
   text-transform: uppercase;
   transition:
     transform 0.2s ease,
@@ -239,9 +239,9 @@
 }
 
 .submitButton:hover {
-  transform: translateY(-3px);
+  transform: translateY(-2px);
   filter: brightness(1.04);
-  box-shadow: 0 24px 44px rgba(215, 25, 32, 0.3);
+  box-shadow: 0 21px 39px rgba(215, 25, 32, 0.3);
 }
 
 .submitButton:active {
@@ -249,12 +249,12 @@
 }
 
 .divider {
-  margin: 30px 0;
+  margin: 20px 0;
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 14px;
   color: #8b94a3;
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 750;
 }
 
@@ -268,16 +268,16 @@
 
 .googleButton {
   width: 100%;
-  min-height: 62px;
+  min-height: 54px;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 15px;
+  gap: 14px;
   color: #202939;
   border: 1px solid #d8dee8;
-  border-radius: 13px;
+  border-radius: 12px;
   background: #ffffff;
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 750;
   transition:
     border-color 0.2s ease,
@@ -286,45 +286,47 @@
 }
 
 .googleButton:hover {
-  transform: translateY(-2px);
+  transform: translateY(-1px);
   border-color: #b7c1cf;
   background: #fbfcfe;
 }
 
 .googleIcon {
-  width: 24px;
-  height: 24px;
+  width: 22px;
+  height: 22px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   color: #4285f4;
-  font-size: 21px;
+  font-size: 19px;
   font-weight: 900;
 }
 
 .message {
-  margin: 18px 0 0;
-  padding: 12px 14px;
+  margin: 13px 0 0;
+  padding: 9px 12px;
   color: #8d2631;
   border: 1px solid #f1c4ca;
-  border-radius: 10px;
+  border-radius: 9px;
   background: #fff5f6;
-  font-size: 12px;
-  line-height: 1.45;
+  font-size: 11px;
+  line-height: 1.4;
   text-align: center;
 }
 
 .help {
-  margin-top: 38px;
+  margin-top: 24px;
   display: flex;
   justify-content: center;
-  gap: 5px;
+  gap: 4px;
   color: #7b8493;
-  font-size: 12px;
+  font-size: 11px;
 }
 
 .help button {
+  padding: 0;
   color: #d71920;
+  background: none;
   font-size: inherit;
   font-weight: 700;
 }
@@ -334,48 +336,91 @@
 }
 
 .footer {
-  padding: 0 8px;
+  padding: 0 6px;
   display: flex;
   justify-content: space-between;
-  gap: 18px;
+  gap: 16px;
   color: rgba(255, 255, 255, 0.55);
-  font-size: 10px;
+  font-size: 9px;
   letter-spacing: 0.04em;
+}
+
+@media (max-height: 790px) and (min-width: 981px) {
+  .loginCard {
+    padding-top: 24px;
+    padding-bottom: 24px;
+  }
+
+  .security {
+    margin-bottom: 18px;
+  }
+
+  .heading {
+    margin-bottom: 20px;
+  }
+
+  .heading h2 {
+    font-size: 45px;
+  }
+
+  .heading > p:last-child {
+    margin-top: 10px;
+    font-size: 12px;
+  }
+
+  .fieldGroup {
+    margin-bottom: 12px;
+  }
+
+  .inputWrap input {
+    height: 49px;
+  }
+
+  .options {
+    margin-bottom: 14px;
+  }
+
+  .submitButton {
+    min-height: 52px;
+  }
+
+  .divider {
+    margin: 14px 0;
+  }
+
+  .googleButton {
+    min-height: 49px;
+  }
+
+  .help {
+    margin-top: 17px;
+  }
 }
 
 @media (max-width: 980px) {
   .wrapper {
-    width: min(100%, 650px);
-    margin-top: -28px;
+    width: min(100%, 640px);
+    max-height: none;
+    margin-top: -26px;
   }
 }
 
 @media (max-width: 600px) {
   .loginCard {
-    padding: 36px 22px;
-    border-radius: 24px;
+    padding: 34px 22px;
+    border-radius: 23px;
   }
 
   .security {
-    margin-bottom: 34px;
+    margin-bottom: 30px;
   }
 
   .heading h2 {
-    font-size: 48px;
+    font-size: 46px;
   }
 
   .options {
     align-items: flex-start;
-  }
-
-  .submitButton {
-    min-height: 60px;
-    gap: 16px;
-    font-size: 12px;
-  }
-
-  .help {
-    flex-wrap: wrap;
   }
 
   .footer {

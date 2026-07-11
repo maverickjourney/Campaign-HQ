@@ -1,7 +1,8 @@
 .hero {
   position: relative;
-  min-height: 100vh;
-  padding: 38px 40px 24px;
+  height: 100vh;
+  padding: clamp(22px, 2.1vw, 34px) clamp(24px, 2.5vw, 40px)
+    clamp(18px, 1.8vw, 28px);
   display: flex;
   flex-direction: column;
   color: white;
@@ -20,13 +21,13 @@
   background:
     linear-gradient(
       90deg,
-      rgba(3, 15, 34, 0.38),
-      transparent 62%
+      rgba(3, 15, 34, 0.43),
+      transparent 64%
     ),
     linear-gradient(
       180deg,
-      transparent 58%,
-      rgba(3, 15, 34, 0.62)
+      rgba(3, 15, 34, 0.05) 48%,
+      rgba(3, 15, 34, 0.7)
     );
 }
 
@@ -41,59 +42,60 @@
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  gap: 24px;
+  gap: 22px;
 }
 
 .brand {
-  font-size: clamp(40px, 3.2vw, 58px);
+  display: block;
+  font-size: clamp(34px, 2.8vw, 52px);
   font-weight: 800;
-  letter-spacing: -0.04em;
-  line-height: 1;
+  letter-spacing: -0.045em;
+  line-height: 0.96;
 }
 
 .campaign {
-  margin-top: 10px;
+  margin: 7px 0 0;
   color: #ff5b6f;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 800;
+  letter-spacing: 0.19em;
+  text-transform: uppercase;
 }
 
 .office {
+  color: rgba(255, 255, 255, 0.82);
+  font-size: 13px;
+  line-height: 1.35;
   text-align: right;
-  font-size: 14px;
-  color: rgba(255, 255, 255, 0.8);
 }
 
 .office span {
   display: block;
+  margin-top: 3px;
   color: white;
   font-weight: 750;
-  margin-top: 4px;
 }
 
 .content {
-  width: min(610px, 100%);
-  margin-top: clamp(72px, 10vh, 130px);
-  padding: 22px 0;
+  width: min(590px, 100%);
+  margin-top: clamp(34px, 5.7vh, 78px);
 }
 
 .eyebrow {
-  margin-bottom: 18px;
+  margin: 0 0 12px;
   color: #a8d2ff;
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 800;
-  letter-spacing: 0.24em;
+  letter-spacing: 0.22em;
   text-transform: uppercase;
 }
 
 .content h1 {
   margin: 0;
-  font-size: clamp(58px, 6vw, 92px);
-  line-height: 0.9;
+  font-size: clamp(50px, 5.15vw, 82px);
+  line-height: 0.88;
   letter-spacing: -0.055em;
-  text-shadow: 0 10px 36px rgba(0, 0, 0, 0.35);
+  text-shadow: 0 9px 30px rgba(0, 0, 0, 0.38);
 }
 
 .content h1 span {
@@ -101,32 +103,32 @@
 }
 
 .description {
-  max-width: 560px;
-  margin-top: 28px;
-  font-size: clamp(17px, 1.4vw, 22px);
-  line-height: 1.55;
-  color: rgba(255, 255, 255, 0.9);
-  text-shadow: 0 5px 22px rgba(0, 0, 0, 0.35);
+  max-width: 550px;
+  margin: 20px 0 0;
+  color: rgba(255, 255, 255, 0.92);
+  font-size: clamp(15px, 1.18vw, 19px);
+  line-height: 1.48;
+  text-shadow: 0 5px 20px rgba(0, 0, 0, 0.38);
 }
 
 .countdown {
-  width: min(430px, 100%);
-  margin-top: 28px;
-  padding: 18px 22px;
-  border-radius: 18px;
+  width: min(420px, 100%);
+  margin-top: 20px;
+  padding: 14px 20px;
   border: 1px solid rgba(255, 255, 255, 0.14);
-  background: rgba(8, 25, 49, 0.58);
+  border-radius: 16px;
+  background: rgba(8, 25, 49, 0.6);
   backdrop-filter: blur(18px);
-  box-shadow: 0 18px 45px rgba(1, 10, 24, 0.18);
+  box-shadow: 0 16px 38px rgba(1, 10, 24, 0.18);
 }
 
 .countdown > span {
   display: block;
-  margin-bottom: 15px;
+  margin-bottom: 11px;
   color: #a8d2ff;
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 800;
-  letter-spacing: 0.18em;
+  letter-spacing: 0.17em;
   text-transform: uppercase;
 }
 
@@ -136,7 +138,7 @@
 }
 
 .timeGrid div {
-  padding: 0 18px;
+  padding: 0 16px;
   border-right: 1px solid rgba(255, 255, 255, 0.13);
 }
 
@@ -145,22 +147,23 @@
 }
 
 .timeGrid div:last-child {
+  padding-right: 0;
   border-right: 0;
 }
 
 .timeGrid strong {
   display: block;
-  font-size: 32px;
+  font-size: 29px;
   line-height: 1;
 }
 
 .timeGrid small {
   display: block;
-  margin-top: 6px;
+  margin-top: 4px;
   color: rgba(255, 255, 255, 0.7);
-  font-size: 10px;
+  font-size: 9px;
   font-weight: 750;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.09em;
   text-transform: uppercase;
 }
 
@@ -169,25 +172,25 @@
   margin-top: auto;
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 14px;
+  gap: 11px;
 }
 
 .card {
-  min-height: 118px;
-  padding: 20px;
-  border-radius: 18px;
+  min-height: 94px;
+  padding: 15px 17px;
   border: 1px solid rgba(255, 255, 255, 0.12);
-  background: rgba(8, 25, 49, 0.56);
+  border-radius: 16px;
+  background: rgba(8, 25, 49, 0.59);
   backdrop-filter: blur(18px);
-  box-shadow: 0 18px 46px rgba(0, 0, 0, 0.14);
+  box-shadow: 0 14px 36px rgba(0, 0, 0, 0.14);
   transition:
     transform 0.2s ease,
     background 0.2s ease;
 }
 
 .card:hover {
-  transform: translateY(-3px);
-  background: rgba(8, 25, 49, 0.68);
+  transform: translateY(-2px);
+  background: rgba(8, 25, 49, 0.7);
 }
 
 .card svg {
@@ -195,15 +198,15 @@
 }
 
 .card h3 {
-  margin: 14px 0 0;
-  font-size: 17px;
+  margin: 9px 0 0;
+  font-size: 15px;
 }
 
 .card p {
-  margin: 7px 0 0;
+  margin: 5px 0 0;
   color: rgba(255, 255, 255, 0.72);
-  font-size: 12px;
-  line-height: 1.45;
+  font-size: 11px;
+  line-height: 1.35;
 }
 
 @media (max-width: 1200px) {
@@ -212,14 +215,43 @@
   }
 }
 
+@media (max-height: 790px) and (min-width: 981px) {
+  .content {
+    margin-top: 24px;
+  }
+
+  .content h1 {
+    font-size: clamp(46px, 4.6vw, 70px);
+  }
+
+  .description {
+    margin-top: 15px;
+    font-size: 15px;
+  }
+
+  .countdown {
+    margin-top: 14px;
+    padding: 12px 18px;
+  }
+
+  .card {
+    min-height: 82px;
+    padding: 12px 15px;
+  }
+
+  .card p {
+    font-size: 10px;
+  }
+}
+
 @media (max-width: 980px) {
   .hero {
-    min-height: 430px;
-    padding: 28px;
+    height: 430px;
+    padding: 27px;
   }
 
   .content {
-    margin-top: 52px;
+    margin-top: 46px;
   }
 
   .description,
@@ -231,7 +263,7 @@
 
 @media (max-width: 600px) {
   .hero {
-    min-height: 350px;
+    height: 350px;
     padding: 22px 20px;
   }
 
@@ -240,6 +272,6 @@
   }
 
   .content h1 {
-    font-size: 50px;
+    font-size: 49px;
   }
 }
