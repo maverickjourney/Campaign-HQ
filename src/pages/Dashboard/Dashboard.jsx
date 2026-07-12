@@ -31,9 +31,11 @@ import {
   clearCampaignSession,
   getAccessMode,
   getCurrentUser,
+  getCurrentWorkspace,
   getRoleLabel,
   getUserInitials,
 } from "../../utils/campaignSession";
+import { useCampaignDashboard } from "../../hooks/useCampaignDashboard";
 import elizabethPhoto from "../../assets/images/dashboard/elizabeth.jpg";
 import styles from "./Dashboard.module.css";
 
@@ -52,169 +54,166 @@ const administratorNavigation = [
   { label: "Workspace settings", icon: Settings },
 ];
 
-const priorities = [
-  {
-    title: "Review Monday event guest list",
-    category: "Events",
-    time: "Due today",
-  },
-  {
-    title: "Approve volunteer welcome email",
-    category: "Communications",
-    time: "Waiting for approval",
-  },
-  {
-    title: "Confirm canvassing materials",
-    category: "Field",
-    time: "Due tomorrow",
-  },
-];
+function formatRelativeTime(value) {
+  if (!value) {
+    return "just now";
+  }
 
-const urgentItems = [
-  {
-    title: "3 approvals waiting for review",
-    detail: "Volunteer form, social copy and event materials",
-    level: "urgent",
-  },
-  {
-    title: "Guest list due today",
-    detail: "Wellington reception must be finalized by 4:00 PM",
-    level: "today",
-  },
-  {
-    title: "Volunteer coverage is 75%",
-    detail: "7 more shifts need to be filled before Saturday",
-    level: "watch",
-  },
-  {
-    title: "1 team message needs a reply",
-    detail: "Field team is waiting for direction",
-    level: "info",
-  },
-];
+  const date =
+    value instanceof Date
+      ? value
+      : new Date(value);
 
-const liveFeed = [
-  {
-    title: "New RSVP received",
-    detail: "Wellington campaign reception",
-    time: "4 min ago",
-  },
-  {
-    title: "Volunteer added to weekend canvass",
-    detail: "Field team schedule updated",
-    time: "11 min ago",
-  },
-  {
-    title: "Approval completed",
-    detail: "Volunteer welcome form is ready to share",
-    time: "22 min ago",
-  },
-  {
-    title: "Campaign file uploaded",
-    detail: "Reception signage folder",
-    time: "41 min ago",
-  },
-];
+  if (Number.isNaN(date.getTime())) {
+    return "recently";
+  }
 
-const metrics = [
-  {
-    label: "Volunteer shifts",
-    value: "21 / 28",
-    note: "75% filled",
-    delta: "+4 today",
-    tone: "blue",
-    bars: [34, 48, 52, 61, 66, 75],
-  },
-  {
-    label: "Event RSVPs",
-    value: "84",
-    note: "12 new this week",
-    delta: "+18%",
-    tone: "red",
-    bars: [24, 38, 44, 58, 72, 84],
-  },
-  {
-    label: "Doors knocked",
-    value: "428",
-    note: "Across target precincts",
-    delta: "+18%",
-    tone: "blue",
-    bars: [28, 40, 55, 63, 74, 82],
-  },
-  {
-    label: "Open approvals",
-    value: "3",
-    note: "Needs attention",
-    delta: "Urgent",
-    tone: "red",
-    bars: [18, 20, 20, 30, 36, 42],
-  },
-  {
-    label: "Contacts added",
-    value: "1,248",
-    note: "+37 this week",
-    delta: "+37",
-    tone: "blue",
-    bars: [26, 30, 42, 55, 64, 78],
-  },
-  {
-    label: "Response rate",
-    value: "62%",
-    note: "Messages opened",
-    delta: "+6%",
-    tone: "blue",
-    bars: [32, 36, 44, 48, 58, 62],
-  },
-];
+  const difference = Date.now() - date.getTime();
+  const minutes = Math.max(
+    0,
+    Math.floor(difference / (1000 * 60)),
+  );
 
-const upcomingEvents = [
-  {
-    month: "JUL",
-    day: "13",
-    title: "Wellington campaign reception",
-    time: "6:00 PM – 8:00 PM",
-    type: "Fundraiser",
-  },
-  {
-    month: "JUL",
-    day: "15",
-    title: "Campaign leadership check-in",
-    time: "9:30 AM – 10:15 AM",
-    type: "Team meeting",
-  },
-  {
-    month: "JUL",
-    day: "18",
-    title: "Weekend canvassing launch",
-    time: "8:30 AM – 12:30 PM",
-    type: "Field event",
-  },
-];
+  if (minutes < 1) {
+    return "just now";
+  }
 
-const recentActivity = [
-  {
-    title: "New event materials uploaded",
-    detail: "Wellington reception folder",
-    time: "12 minutes ago",
-  },
-  {
-    title: "Volunteer form approved",
-    detail: "Ready to share with the team",
-    time: "48 minutes ago",
-  },
-  {
-    title: "Three volunteers added",
-    detail: "Field and events teams",
-    time: "2 hours ago",
-  },
-];
+  if (minutes < 60) {
+    return `${minutes} min ago`;
+  }
 
-const healthBreakdown = [
-  { label: "Field", value: 82 },
-  { label: "Events", value: 76 },
-  { label: "Communications", value: 64 },
-  { label: "Volunteers", value: 71 },
-];
+  const hours = Math.floor(minutes / 60);
+
+  if (hours < 24) {
+    return `${hours} ${hours === 1 ? "hour" : "hours"} ago`;
+  }
+
+  const days = Math.floor(hours / 24);
+
+  if (days < 7) {
+    return `${days} ${days === 1 ? "day" : "days"} ago`;
+  }
+
+  return new Intl.DateTimeFormat("en-US", {
+    month: "short",
+    day: "numeric",
+  }).format(date);
+}
+
+function formatDueLabel(value) {
+  if (!value) {
+    return "No due date";
+  }
+
+  const dueDate = new Date(value);
+
+  if (Number.isNaN(dueDate.getTime())) {
+    return "Due date unavailable";
+  }
+
+  const today = new Date();
+  const tomorrow = new Date();
+  tomorrow.setDate(tomorrow.getDate() + 1);
+
+  const isSameDay = (left, right) =>
+    left.getFullYear() === right.getFullYear() &&
+    left.getMonth() === right.getMonth() &&
+    left.getDate() === right.getDate();
+
+  const time = new Intl.DateTimeFormat("en-US", {
+    hour: "numeric",
+    minute: "2-digit",
+  }).format(dueDate);
+
+  if (dueDate.getTime() < Date.now()) {
+    return `Overdue · ${time}`;
+  }
+
+  if (isSameDay(dueDate, today)) {
+    return `Due today · ${time}`;
+  }
+
+  if (isSameDay(dueDate, tomorrow)) {
+    return `Due tomorrow · ${time}`;
+  }
+
+  return `Due ${new Intl.DateTimeFormat("en-US", {
+    month: "short",
+    day: "numeric",
+  }).format(dueDate)}`;
+}
+
+function formatEventDate(value) {
+  const date = new Date(value);
+
+  return {
+    month: new Intl.DateTimeFormat("en-US", {
+      month: "short",
+    })
+      .format(date)
+      .toUpperCase(),
+    day: new Intl.DateTimeFormat("en-US", {
+      day: "2-digit",
+    }).format(date),
+  };
+}
+
+function formatEventTime(startsAt, endsAt) {
+  const start = new Date(startsAt);
+
+  const formatter = new Intl.DateTimeFormat("en-US", {
+    hour: "numeric",
+    minute: "2-digit",
+  });
+
+  if (!endsAt) {
+    return formatter.format(start);
+  }
+
+  return `${formatter.format(start)} – ${formatter.format(
+    new Date(endsAt),
+  )}`;
+}
+
+function formatEventType(value = "campaign") {
+  return value
+    .split("_")
+    .map((part) => {
+      return (
+        part.charAt(0).toUpperCase() +
+        part.slice(1).toLowerCase()
+      );
+    })
+    .join(" ");
+}
+
+function createBars(values) {
+  const safeValues = values.map((value) =>
+    Number(value || 0),
+  );
+
+  if (!safeValues.length) {
+    return [18, 18, 18, 18, 18, 18];
+  }
+
+  const maximum = Math.max(...safeValues, 1);
+
+  return safeValues.map((value) =>
+    Math.max(18, Math.round((value / maximum) * 100)),
+  );
+}
+
+function formatChange(current, previous, suffix = "") {
+  const change =
+    Number(current || 0) - Number(previous || 0);
+
+  if (change === 0) {
+    return `No change${suffix}`;
+  }
+
+  return `${change > 0 ? "+" : ""}${change}${suffix}`;
+}
+
 
 function getGreeting() {
   const currentHour = new Date().getHours();
@@ -230,8 +229,10 @@ function getGreeting() {
   return "Good evening";
 }
 
-function getDaysUntilElection() {
-  const electionDate = new Date("2026-08-18T00:00:00");
+function getDaysUntilElection(electionDateRaw) {
+  const electionDate = new Date(
+    `${electionDateRaw || "2026-08-18"}T00:00:00`,
+  );
   const today = new Date();
   const difference = electionDate.getTime() - today.getTime();
 
@@ -250,18 +251,407 @@ function getFormattedDate() {
 export default function Dashboard() {
   const navigate = useNavigate();
   const user = getCurrentUser();
+  const workspace = getCurrentWorkspace();
   const accessMode = getAccessMode();
   const roleLabel = getRoleLabel(accessMode);
   const isAdmin = accessMode === "admin";
 
-  const [activeNavigation, setActiveNavigation] = useState("Overview");
-  const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [completedTasks, setCompletedTasks] = useState([]);
+  const {
+    data: dashboardData,
+    isLoading,
+    error,
+    lastUpdated,
+    updateTaskStatus,
+  } = useCampaignDashboard(workspace.id);
 
-  const daysUntilElection = useMemo(getDaysUntilElection, []);
+  const [activeNavigation, setActiveNavigation] =
+    useState("Overview");
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [taskUpdatingId, setTaskUpdatingId] = useState("");
+
+  const daysUntilElection = useMemo(
+    () => getDaysUntilElection(workspace.electionDateRaw),
+    [workspace.electionDateRaw],
+  );
+
   const formattedDate = useMemo(getFormattedDate, []);
   const firstName = user.name.split(" ")[0] || "there";
-  const campaignHealth = 82;
+
+  const {
+    tasks,
+    events,
+    approvals,
+    activity,
+    metrics: metricHistory,
+    volunteerCount,
+  } = dashboardData;
+
+  const latestMetric =
+    metricHistory[metricHistory.length - 1] || {};
+
+  const previousMetric =
+    metricHistory[metricHistory.length - 2] || {};
+
+  const campaignHealth =
+    latestMetric.campaign_health || 0;
+
+  const campaignReadiness =
+    latestMetric.campaign_readiness || 0;
+
+  const shiftsFilled =
+    latestMetric.volunteer_shifts_filled || 0;
+
+  const shiftsGoal =
+    latestMetric.volunteer_shifts_goal || 0;
+
+  const volunteerCoverage =
+    shiftsGoal > 0
+      ? Math.round((shiftsFilled / shiftsGoal) * 100)
+      : 0;
+
+  const messagesSent =
+    latestMetric.messages_sent || 0;
+
+  const messagesOpened =
+    latestMetric.messages_opened || 0;
+
+  const responseRate =
+    messagesSent > 0
+      ? Math.round((messagesOpened / messagesSent) * 100)
+      : 0;
+
+  const previousResponseRate =
+    previousMetric.messages_sent > 0
+      ? Math.round(
+          (
+            previousMetric.messages_opened /
+            previousMetric.messages_sent
+          ) * 100,
+        )
+      : 0;
+
+  const openTasks = tasks.filter((task) =>
+    ["open", "in_progress"].includes(task.status),
+  );
+
+  const visibleTasks = isAdmin
+    ? openTasks
+    : openTasks.filter(
+        (task) =>
+          task.assigned_to === user.id ||
+          task.created_by === user.id,
+      );
+
+  const priorities = visibleTasks
+    .slice(0, 3)
+    .map((task) => ({
+      ...task,
+      time: formatDueLabel(task.due_at),
+    }));
+
+  const openApprovals = approvals.filter((approval) =>
+    ["draft", "pending", "changes_requested"].includes(
+      approval.status,
+    ),
+  );
+
+  const upcomingEvents = events
+    .slice(0, 3)
+    .map((event) => {
+      const eventDate = formatEventDate(event.starts_at);
+
+      return {
+        ...event,
+        month: eventDate.month,
+        day: eventDate.day,
+        time: formatEventTime(
+          event.starts_at,
+          event.ends_at,
+        ),
+        type: formatEventType(event.event_type),
+      };
+    });
+
+  const recentActivity = activity
+    .slice(0, 3)
+    .map((item) => ({
+      ...item,
+      time: formatRelativeTime(item.occurred_at),
+    }));
+
+  const liveFeed = activity
+    .slice(0, 4)
+    .map((item) => ({
+      ...item,
+      time: formatRelativeTime(item.occurred_at),
+    }));
+
+  const healthBreakdown = [
+    {
+      label: "Field",
+      value: latestMetric.field_health || 0,
+    },
+    {
+      label: "Events",
+      value: latestMetric.events_health || 0,
+    },
+    {
+      label: "Communications",
+      value:
+        latestMetric.communications_health || 0,
+    },
+    {
+      label: "Volunteers",
+      value: latestMetric.volunteers_health || 0,
+    },
+  ];
+
+  const sortedHealth = [...healthBreakdown].sort(
+    (left, right) => right.value - left.value,
+  );
+
+  const strongestHealth = sortedHealth[0];
+  const weakestHealth =
+    sortedHealth[sortedHealth.length - 1];
+
+  const healthSummary =
+    campaignHealth > 0
+      ? `${strongestHealth.label} is strongest. ${weakestHealth.label} needs the most attention.`
+      : "Campaign health metrics are ready for an update.";
+
+  const metrics = [
+    {
+      label: "Volunteer shifts",
+      value: `${shiftsFilled} / ${shiftsGoal}`,
+      note: `${volunteerCoverage}% filled`,
+      delta: formatChange(
+        shiftsFilled,
+        previousMetric.volunteer_shifts_filled,
+      ),
+      tone:
+        volunteerCoverage < 75 ? "red" : "blue",
+      bars: createBars(
+        metricHistory.map(
+          (metric) =>
+            metric.volunteer_shifts_filled,
+        ),
+      ),
+    },
+    {
+      label: "Event RSVPs",
+      value: (
+        latestMetric.event_rsvps || 0
+      ).toLocaleString(),
+      note: `${events.length} upcoming events`,
+      delta: formatChange(
+        latestMetric.event_rsvps,
+        previousMetric.event_rsvps,
+      ),
+      tone: "red",
+      bars: createBars(
+        metricHistory.map(
+          (metric) => metric.event_rsvps,
+        ),
+      ),
+    },
+    {
+      label: "Doors knocked",
+      value: (
+        latestMetric.doors_knocked || 0
+      ).toLocaleString(),
+      note: "Across target precincts",
+      delta: formatChange(
+        latestMetric.doors_knocked,
+        previousMetric.doors_knocked,
+      ),
+      tone: "blue",
+      bars: createBars(
+        metricHistory.map(
+          (metric) => metric.doors_knocked,
+        ),
+      ),
+    },
+    {
+      label: "Open approvals",
+      value: openApprovals.length.toLocaleString(),
+      note:
+        openApprovals.length === 1
+          ? "Needs review"
+          : "Need review",
+      delta:
+        openApprovals.length > 0
+          ? "Action needed"
+          : "Clear",
+      tone:
+        openApprovals.length > 0 ? "red" : "blue",
+      bars: createBars([
+        1,
+        1,
+        2,
+        2,
+        2,
+        openApprovals.length,
+      ]),
+    },
+    {
+      label: "Campaign contacts",
+      value: (
+        latestMetric.contacts_total || 0
+      ).toLocaleString(),
+      note: `${volunteerCount} active volunteers`,
+      delta: formatChange(
+        latestMetric.contacts_total,
+        previousMetric.contacts_total,
+      ),
+      tone: "blue",
+      bars: createBars(
+        metricHistory.map(
+          (metric) => metric.contacts_total,
+        ),
+      ),
+    },
+    {
+      label: "Response rate",
+      value: `${responseRate}%`,
+      note: "Messages opened",
+      delta: formatChange(
+        responseRate,
+        previousResponseRate,
+        "%",
+      ),
+      tone: responseRate < 50 ? "red" : "blue",
+      bars: createBars(
+        metricHistory.map((metric) => {
+          if (!metric.messages_sent) {
+            return 0;
+          }
+
+          return Math.round(
+            (
+              metric.messages_opened /
+              metric.messages_sent
+            ) * 100,
+          );
+        }),
+      ),
+    },
+  ];
+
+  const urgentItems = [];
+
+  if (openApprovals.length > 0) {
+    urgentItems.push({
+      title: `${openApprovals.length} ${
+        openApprovals.length === 1
+          ? "approval"
+          : "approvals"
+      } waiting for review`,
+      detail: openApprovals
+        .slice(0, 3)
+        .map((approval) => approval.title)
+        .join(", "),
+      level: "urgent",
+    });
+  }
+
+  const overdueTasks = openTasks.filter(
+    (task) =>
+      task.due_at &&
+      new Date(task.due_at).getTime() < Date.now(),
+  );
+
+  if (overdueTasks.length > 0) {
+    urgentItems.push({
+      title: `${overdueTasks.length} ${
+        overdueTasks.length === 1
+          ? "task is"
+          : "tasks are"
+      } overdue`,
+      detail: overdueTasks
+        .slice(0, 2)
+        .map((task) => task.title)
+        .join(", "),
+      level: "today",
+    });
+  }
+
+  if (
+    shiftsGoal > 0 &&
+    volunteerCoverage < 100
+  ) {
+    const remainingShifts = Math.max(
+      0,
+      shiftsGoal - shiftsFilled,
+    );
+
+    urgentItems.push({
+      title: `Volunteer coverage is ${volunteerCoverage}%`,
+      detail: `${remainingShifts} more ${
+        remainingShifts === 1 ? "shift" : "shifts"
+      } need to be filled`,
+      level:
+        volunteerCoverage < 70 ? "urgent" : "watch",
+    });
+  }
+
+  if (events[0]) {
+    urgentItems.push({
+      title: `Next event: ${events[0].title}`,
+      detail: `${formatEventTime(
+        events[0].starts_at,
+        events[0].ends_at,
+      )} · ${events[0].location || "Location pending"}`,
+      level: "info",
+    });
+  }
+
+  if (!urgentItems.length) {
+    urgentItems.push({
+      title: "No urgent campaign items",
+      detail:
+        "The campaign workspace is currently on track.",
+      level: "info",
+    });
+  }
+
+  const navigationItems = primaryNavigation.map(
+    (item) => {
+      if (item.label === "Tasks") {
+        return {
+          ...item,
+          count: openTasks.length,
+        };
+      }
+
+      if (item.label === "Approvals") {
+        return {
+          ...item,
+          count: openApprovals.length,
+        };
+      }
+
+      return {
+        ...item,
+        count: null,
+      };
+    },
+  );
+
+  const dashboardStatus = isLoading
+    ? "Synchronizing campaign data…"
+    : error
+      ? "Live connection needs attention"
+      : lastUpdated
+        ? `Live · updated ${formatRelativeTime(
+            lastUpdated,
+          )}`
+        : "Live campaign data";
+
+  const campaignRaceLabel =
+    workspace.description?.split(",").pop()?.trim() ||
+    workspace.description ||
+    "Campaign";
+
 
   const quickActions = isAdmin
     ? [
@@ -277,9 +667,9 @@ export default function Dashboard() {
         { label: "Message team", icon: Mail },
       ];
 
-  const handleLogout = () => {
-    clearCampaignSession();
-    navigate("/");
+  const handleLogout = async () => {
+    await clearCampaignSession();
+    navigate("/", { replace: true });
   };
 
   const handleWorkspaceChange = () => {
@@ -291,14 +681,28 @@ export default function Dashboard() {
     setSidebarOpen(false);
   };
 
-  const toggleTask = (title) => {
-    setCompletedTasks((currentTasks) => {
-      if (currentTasks.includes(title)) {
-        return currentTasks.filter((task) => task !== title);
-      }
+  const toggleTask = async (task) => {
+    if (taskUpdatingId) {
+      return;
+    }
 
-      return [...currentTasks, title];
-    });
+    const nextStatus =
+      task.status === "completed"
+        ? "open"
+        : "completed";
+
+    setTaskUpdatingId(task.id);
+
+    try {
+      await updateTaskStatus(task.id, nextStatus);
+    } catch (taskError) {
+      console.error(
+        "Task status could not be updated:",
+        taskError,
+      );
+    } finally {
+      setTaskUpdatingId("");
+    }
   };
 
   return (
@@ -322,13 +726,13 @@ export default function Dashboard() {
             onClick={handleWorkspaceChange}
           >
             <div className={styles.campaignMark}>
-              <span>EA</span>
+              <span>{getUserInitials(workspace.name)}</span>
               <Vote size={20} strokeWidth={1.8} />
             </div>
 
             <div>
-              <strong>Elizabeth Accomando</strong>
-              <span>County Commission · District 6</span>
+              <strong>{workspace.name}</strong>
+              <span>{workspace.description}</span>
             </div>
           </button>
 
@@ -359,7 +763,7 @@ export default function Dashboard() {
         <nav className={styles.navigation}>
           <span className={styles.navigationLabel}>Campaign</span>
 
-          {primaryNavigation.map((item) => {
+          {navigationItems.map((item) => {
             const Icon = item.icon;
 
             return (
@@ -518,7 +922,7 @@ export default function Dashboard() {
 
                 <div>
                   <span>Dashboard status</span>
-                  <strong>Preview campaign data</strong>
+                  <strong>{dashboardStatus}</strong>
                 </div>
               </div>
             </div>
@@ -535,7 +939,7 @@ export default function Dashboard() {
                 <h2>
                   Building momentum for
                   <br />
-                  <strong>District 6.</strong>
+                  <strong>{campaignRaceLabel}.</strong>
                 </h2>
 
                 <p>
@@ -553,17 +957,21 @@ export default function Dashboard() {
                   <div className={styles.heroElection}>
                     <small>Election Day</small>
                     <strong>{daysUntilElection}</strong>
-                    <span>days to August 18, 2026</span>
+                    <span>days to {workspace.electionDate}</span>
                   </div>
 
                   <div className={styles.heroReadiness}>
                     <div className={styles.progressHeader}>
                       <span>Campaign readiness</span>
-                      <strong>72%</strong>
+                      <strong>{campaignReadiness}%</strong>
                     </div>
 
                     <div className={styles.progressTrack}>
-                      <span style={{ width: "72%" }} />
+                      <span
+                        style={{
+                          width: `${campaignReadiness}%`,
+                        }}
+                      />
                     </div>
 
                     <div className={styles.progressFooter}>
@@ -591,7 +999,7 @@ export default function Dashboard() {
                 <img
                   className={styles.heroPortrait}
                   src={elizabethPhoto}
-                  alt="Elizabeth Accomando"
+                  alt={workspace.name}
                 />
               </div>
             </article>
@@ -606,13 +1014,13 @@ export default function Dashboard() {
 
                   <div className={styles.liveBadge}>
                     <span />
-                    PREVIEW
+                    {isLoading ? "SYNCING" : error ? "CHECK" : "LIVE"}
                   </div>
                 </div>
 
                 <div className={styles.attentionList}>
                   {urgentItems.map((item) => (
-                    <div key={item.title} className={styles.attentionItem}>
+                    <div key={item.id} className={styles.attentionItem}>
                       <span
                         className={`${styles.levelDot} ${styles[item.level]}`}
                         aria-hidden="true"
@@ -659,7 +1067,7 @@ export default function Dashboard() {
 
                   <div className={styles.healthSummary}>
                     <strong>Campaign Health</strong>
-                    <p>Field and events are strong. Communications needs attention.</p>
+                    <p>{healthSummary}</p>
                   </div>
                 </div>
 
@@ -727,14 +1135,18 @@ export default function Dashboard() {
 
               <div className={styles.priorityList}>
                 {priorities.map((priority) => {
-                  const isComplete = completedTasks.includes(priority.title);
+                  const isComplete =
+                      priority.status === "completed";
 
                   return (
                     <button
-                      key={priority.title}
+                      key={priority.id}
                       className={isComplete ? styles.completedPriority : ""}
                       type="button"
-                      onClick={() => toggleTask(priority.title)}
+                      disabled={
+                        taskUpdatingId === priority.id
+                      }
+                      onClick={() => toggleTask(priority)}
                     >
                       <span className={styles.taskCheck}>
                         {isComplete && <CheckCircle2 size={18} strokeWidth={2.3} />}
@@ -772,7 +1184,7 @@ export default function Dashboard() {
 
               <div className={styles.eventList}>
                 {upcomingEvents.map((event) => (
-                  <div key={event.title} className={styles.eventItem}>
+                  <div key={event.id} className={styles.eventItem}>
                     <div className={styles.eventDate}>
                       <span>{event.month}</span>
                       <strong>{event.day}</strong>
@@ -805,7 +1217,7 @@ export default function Dashboard() {
 
               <div className={styles.activityList}>
                 {recentActivity.map((activity) => (
-                  <div key={activity.title} className={styles.activityItem}>
+                  <div key={activity.id} className={styles.activityItem}>
                     <div className={styles.activityIcon}>
                       <CheckCircle2 size={16} strokeWidth={2} />
                     </div>
@@ -823,19 +1235,19 @@ export default function Dashboard() {
 
               <div className={styles.cardHeading}>
                 <div>
-                  <span>Activity preview</span>
+                  <span>Live activity</span>
                   <h3>Recent campaign updates</h3>
                 </div>
 
                 <div className={styles.liveBadge}>
                   <span />
-                  PREVIEW
+                  {isLoading ? "SYNCING" : error ? "CHECK" : "LIVE"}
                 </div>
               </div>
 
               <div className={styles.feedList}>
                 {liveFeed.map((item) => (
-                  <div key={item.title} className={styles.feedItem}>
+                  <div key={item.id} className={styles.feedItem}>
                     <span className={styles.feedPulse} aria-hidden="true" />
                     <div>
                       <strong>{item.title}</strong>

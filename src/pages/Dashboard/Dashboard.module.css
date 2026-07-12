@@ -2023,3 +2023,26 @@
 }
 
 /* === COMMAND CENTER FINAL POLISH END === */
+
+/* =========================================================
+   LIVE SUPABASE DASHBOARD STATES
+   ========================================================= */
+
+.priorityList button:disabled {
+  cursor: wait;
+  opacity: 0.58;
+}
+
+.liveBadge {
+  white-space: nowrap;
+}
+
+.previewCard strong {
+  max-width: 230px;
+}
+
+@media (max-width: 620px) {
+  .previewCard strong {
+    max-width: 160px;
+  }
+}
