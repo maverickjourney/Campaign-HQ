@@ -590,3 +590,38 @@
     gap: 4px;
   }
 }
+
+/* === REAL AUTHENTICATION STATES START === */
+
+.submitButton:disabled,
+.googleButton:disabled,
+.portalOption:disabled,
+.passwordButton:disabled,
+.textButton:disabled {
+  cursor: wait;
+}
+
+.submitButton:disabled,
+.googleButton:disabled,
+.portalOption:disabled {
+  opacity: 0.68;
+  transform: none;
+}
+
+.inputWrap input:disabled {
+  cursor: wait;
+  color: #7b8493;
+  background: #f4f6f8;
+}
+
+.loadingSpinner {
+  animation: loginSpinner 0.8s linear infinite;
+}
+
+@keyframes loginSpinner {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* === REAL AUTHENTICATION STATES END === */

@@ -328,7 +328,7 @@ export default function Dashboard() {
 
             <div>
               <strong>Elizabeth Accomando</strong>
-              <span>Wellington Council</span>
+              <span>County Commission · District 6</span>
             </div>
           </button>
 
@@ -535,7 +535,7 @@ export default function Dashboard() {
                 <h2>
                   Building momentum for
                   <br />
-                  <strong>Wellington.</strong>
+                  <strong>District 6.</strong>
                 </h2>
 
                 <p>
@@ -546,7 +546,7 @@ export default function Dashboard() {
                 <div className={styles.heroTags}>
                   <span>Community</span>
                   <span>Leadership</span>
-                  <span>Wellington First</span>
+                  <span>Palm Beach County</span>
                 </div>
 
                 <div className={styles.heroStatsRow}>

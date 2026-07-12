@@ -1,51 +1,97 @@
+import { supabase } from "../lib/supabase";
+
 const USER_KEY = "campaignHQ.user";
 const MODE_KEY = "campaignHQ.mode";
 const WORKSPACE_KEY = "campaignHQ.workspace";
 
 export const CAMPAIGN_WORKSPACE = {
-  id: "elizabeth-accomando-2026",
+  id: "11111111-1111-1111-1111-111111111111",
   name: "Elizabeth Accomando",
-  description: "Wellington Council Campaign",
-  location: "Wellington, Florida",
+  description: "Palm Beach County Commission, District 6",
+  location: "Palm Beach County, Florida",
   electionDate: "August 18, 2026",
+  electionDateRaw: "2026-08-18",
 };
 
-function formatNameFromEmail(email) {
-  const emailName = email.split("@")[0] || "campaign user";
+function formatElectionDate(dateValue) {
+  if (!dateValue) {
+    return CAMPAIGN_WORKSPACE.electionDate;
+  }
 
-  return emailName
-    .split(/[._-\s]+/)
-    .filter(Boolean)
-    .map((part) => {
-      return part.charAt(0).toUpperCase() + part.slice(1).toLowerCase();
-    })
-    .join(" ");
+  const [year, month, day] = dateValue
+    .split("-")
+    .map((part) => Number(part));
+
+  if (!year || !month || !day) {
+    return CAMPAIGN_WORKSPACE.electionDate;
+  }
+
+  return new Intl.DateTimeFormat("en-US", {
+    month: "long",
+    day: "numeric",
+    year: "numeric",
+  }).format(new Date(year, month - 1, day));
 }
 
-export function saveLoginSession(email, mode) {
-  const accessMode = mode === "admin" ? "admin" : "client";
+export function saveAuthenticatedSession({
+  authUser,
+  profile,
+  membership,
+  workspace,
+  portalMode,
+}) {
+  const safePortalMode =
+    membership.role === "admin" && portalMode === "admin"
+      ? "admin"
+      : "client";
 
   const user = {
-    name: formatNameFromEmail(email),
-    email: email.trim().toLowerCase(),
-    accessMode,
+    id: authUser.id,
+    name: profile.full_name || "Campaign User",
+    email: profile.email || authUser.email || "",
+    accessMode: safePortalMode,
+    assignedRole: membership.role,
     role:
-      accessMode === "admin"
+      safePortalMode === "admin"
         ? "Campaign Administrator"
         : "Campaign Client",
   };
 
-  sessionStorage.setItem(USER_KEY, JSON.stringify(user));
-  sessionStorage.setItem(MODE_KEY, accessMode);
+  const campaignWorkspace = {
+    id: workspace.id,
+    name: workspace.name,
+    description:
+      workspace.description ||
+      CAMPAIGN_WORKSPACE.description,
+    location:
+      workspace.location ||
+      CAMPAIGN_WORKSPACE.location,
+    electionDate: formatElectionDate(workspace.election_date),
+    electionDateRaw:
+      workspace.election_date ||
+      CAMPAIGN_WORKSPACE.electionDateRaw,
+    status: workspace.status,
+  };
 
-  return user;
+  sessionStorage.setItem(USER_KEY, JSON.stringify(user));
+  sessionStorage.setItem(MODE_KEY, safePortalMode);
+  sessionStorage.setItem(
+    WORKSPACE_KEY,
+    JSON.stringify(campaignWorkspace),
+  );
+
+  return {
+    user,
+    workspace: campaignWorkspace,
+    membership,
+  };
 }
 
 export function getCurrentUser() {
   try {
     const savedUser = JSON.parse(sessionStorage.getItem(USER_KEY));
 
-    if (savedUser?.name && savedUser?.email) {
+    if (savedUser?.id && savedUser?.name && savedUser?.email) {
       return savedUser;
     }
   } catch {
@@ -53,11 +99,29 @@ export function getCurrentUser() {
   }
 
   return {
-    name: "Campaign Client",
-    email: "client@campaign.com",
+    id: "",
+    name: "Campaign User",
+    email: "",
     accessMode: "client",
+    assignedRole: "client",
     role: "Campaign Client",
   };
+}
+
+export function getCurrentWorkspace() {
+  try {
+    const savedWorkspace = JSON.parse(
+      sessionStorage.getItem(WORKSPACE_KEY),
+    );
+
+    if (savedWorkspace?.id && savedWorkspace?.name) {
+      return savedWorkspace;
+    }
+  } catch {
+    sessionStorage.removeItem(WORKSPACE_KEY);
+  }
+
+  return CAMPAIGN_WORKSPACE;
 }
 
 export function getAccessMode() {
@@ -72,7 +136,7 @@ export function getRoleLabel(mode = getAccessMode()) {
     : "Campaign Client";
 }
 
-export function getUserInitials(name) {
+export function getUserInitials(name = "") {
   const nameParts = name
     .trim()
     .split(/\s+/)
@@ -91,15 +155,25 @@ export function getUserInitials(name) {
   }`.toUpperCase();
 }
 
-export function saveWorkspace() {
+export function saveWorkspace(workspace = getCurrentWorkspace()) {
   sessionStorage.setItem(
     WORKSPACE_KEY,
-    JSON.stringify(CAMPAIGN_WORKSPACE),
+    JSON.stringify(workspace),
   );
 }
 
-export function clearCampaignSession() {
+export function clearLocalCampaignSession() {
   sessionStorage.removeItem(USER_KEY);
   sessionStorage.removeItem(MODE_KEY);
   sessionStorage.removeItem(WORKSPACE_KEY);
+}
+
+export async function clearCampaignSession() {
+  clearLocalCampaignSession();
+
+  try {
+    await supabase.auth.signOut();
+  } catch (error) {
+    console.error("Supabase sign-out failed:", error);
+  }
 }

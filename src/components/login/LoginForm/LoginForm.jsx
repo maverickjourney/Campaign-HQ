@@ -5,13 +5,14 @@ import {
   CheckCircle2,
   Eye,
   EyeOff,
+  LoaderCircle,
   LockKeyhole,
   Mail,
   ShieldCheck,
   UserRound,
 } from "lucide-react";
 
-import { saveLoginSession } from "../../../utils/campaignSession";
+import { signInToCampaign } from "../../../services/auth";
 import styles from "./LoginForm.module.css";
 
 export default function LoginForm() {
@@ -26,6 +27,7 @@ export default function LoginForm() {
 
   const [showPassword, setShowPassword] = useState(false);
   const [message, setMessage] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   const isAdmin = accessMode === "admin";
 
@@ -39,11 +41,15 @@ export default function LoginForm() {
   };
 
   const handleModeChange = (mode) => {
+    if (isLoading) {
+      return;
+    }
+
     setAccessMode(mode);
     setMessage("");
   };
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
 
     if (!formData.email.trim() || !formData.password.trim()) {
@@ -51,24 +57,38 @@ export default function LoginForm() {
       return;
     }
 
-    saveLoginSession(formData.email, accessMode);
+    setIsLoading(true);
     setMessage("");
 
-    // Supabase will later verify whether the account
-    // is authorized for Client or Administrator access.
-    navigate("/workspaces");
+    try {
+      await signInToCampaign({
+        email: formData.email,
+        password: formData.password,
+        portalMode: accessMode,
+      });
+
+      navigate("/workspaces", { replace: true });
+    } catch (error) {
+      setMessage(
+        error instanceof Error
+          ? error.message
+          : "Campaign HQ could not sign you in.",
+      );
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleGoogleSignIn = () => {
     setMessage(
-      `Google sign-in for ${
-        isAdmin ? "Administrator" : "Client"
-      } access will be connected through Supabase.`,
+      "Google sign-in will be connected after email access is fully tested.",
     );
   };
 
   const handleForgotPassword = () => {
-    setMessage("Password recovery will be connected through Supabase.");
+    setMessage(
+      "Password recovery will be connected in the next authentication step.",
+    );
   };
 
   return (
@@ -94,8 +114,8 @@ export default function LoginForm() {
           <h2>Welcome back</h2>
 
           <p>
-            Choose your access type, then sign in to enter your campaign
-            workspace.
+            Choose your assigned access type, then sign in to enter
+            the Elizabeth Accomando campaign workspace.
           </p>
         </div>
 
@@ -119,6 +139,7 @@ export default function LoginForm() {
               type="button"
               role="radio"
               aria-checked={accessMode === "client"}
+              disabled={isLoading}
               onClick={() => handleModeChange("client")}
             >
               <span className={styles.portalIcon}>
@@ -128,7 +149,9 @@ export default function LoginForm() {
               <span className={styles.portalCopy}>
                 <small>Client Login</small>
                 <strong>Client</strong>
-                <span>Campaign updates, files, events and approvals.</span>
+                <span>
+                  Campaign updates, files, events and approvals.
+                </span>
               </span>
 
               {accessMode === "client" && (
@@ -149,6 +172,7 @@ export default function LoginForm() {
               type="button"
               role="radio"
               aria-checked={accessMode === "admin"}
+              disabled={isLoading}
               onClick={() => handleModeChange("admin")}
             >
               <span className={styles.portalIcon}>
@@ -158,7 +182,9 @@ export default function LoginForm() {
               <span className={styles.portalCopy}>
                 <small>Admin Login</small>
                 <strong>Admin</strong>
-                <span>Team access, settings and campaign controls.</span>
+                <span>
+                  Team access, settings and campaign controls.
+                </span>
               </span>
 
               {accessMode === "admin" && (
@@ -187,6 +213,7 @@ export default function LoginForm() {
                 onChange={handleChange}
                 placeholder="you@campaign.com"
                 autoComplete="email"
+                disabled={isLoading}
               />
             </div>
           </div>
@@ -205,12 +232,16 @@ export default function LoginForm() {
                 onChange={handleChange}
                 placeholder="Enter your password"
                 autoComplete="current-password"
+                disabled={isLoading}
               />
 
               <button
                 className={styles.passwordButton}
                 type="button"
-                onClick={() => setShowPassword((current) => !current)}
+                disabled={isLoading}
+                onClick={() => {
+                  setShowPassword((current) => !current);
+                }}
                 aria-label={
                   showPassword ? "Hide password" : "Show password"
                 }
@@ -231,6 +262,7 @@ export default function LoginForm() {
                 type="checkbox"
                 checked={formData.remember}
                 onChange={handleChange}
+                disabled={isLoading}
               />
 
               <span>Remember me</span>
@@ -239,6 +271,7 @@ export default function LoginForm() {
             <button
               className={styles.textButton}
               type="button"
+              disabled={isLoading}
               onClick={handleForgotPassword}
             >
               Forgot password?
@@ -250,12 +283,26 @@ export default function LoginForm() {
               isAdmin ? styles.adminSubmitButton : ""
             }`}
             type="submit"
+            disabled={isLoading}
           >
-            <span>
-              Enter {isAdmin ? "Admin" : "Client"} Portal
-            </span>
+            {isLoading ? (
+              <>
+                <LoaderCircle
+                  className={styles.loadingSpinner}
+                  size={19}
+                  strokeWidth={2}
+                />
+                <span>Verifying Access</span>
+              </>
+            ) : (
+              <>
+                <span>
+                  Enter {isAdmin ? "Admin" : "Client"} Portal
+                </span>
 
-            <ArrowRight size={20} strokeWidth={2} />
+                <ArrowRight size={20} strokeWidth={2} />
+              </>
+            )}
           </button>
 
           <div className={styles.divider}>
@@ -265,16 +312,18 @@ export default function LoginForm() {
           <button
             className={styles.googleButton}
             type="button"
+            disabled={isLoading}
             onClick={handleGoogleSignIn}
           >
             <span className={styles.googleIcon}>G</span>
+
             <span>
               Continue as {isAdmin ? "Admin" : "Client"} with Google
             </span>
           </button>
 
           {message && (
-            <p className={styles.message} role="status">
+            <p className={styles.message} role="alert">
               {message}
             </p>
           )}

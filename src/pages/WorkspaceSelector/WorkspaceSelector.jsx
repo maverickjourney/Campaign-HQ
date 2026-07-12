@@ -176,7 +176,7 @@ export default function WorkspaceSelector() {
                         </span>
                       </div>
 
-                      <p>Wellington Council Campaign</p>
+                      <p>Palm Beach County Commission, District 6</p>
                     </div>
                   </div>
                 </div>
@@ -220,7 +220,7 @@ export default function WorkspaceSelector() {
 
                 <div className={styles.enterRow}>
                   <div>
-                    <span>Wellington, Florida</span>
+                    <span>Palm Beach County, Florida</span>
                     <strong>
                       Open {isAdmin ? "admin" : "client"} workspace
                     </strong>

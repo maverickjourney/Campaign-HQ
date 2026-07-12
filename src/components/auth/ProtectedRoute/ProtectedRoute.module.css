@@ -1,0 +1,56 @@
+.loadingPage {
+  display: grid;
+  width: 100%;
+  min-height: 100vh;
+  place-items: center;
+  align-content: center;
+  gap: 9px;
+  color: #071b35;
+  background:
+    radial-gradient(
+      circle at 15% 12%,
+      rgba(18, 58, 109, 0.1),
+      transparent 30%
+    ),
+    radial-gradient(
+      circle at 88% 86%,
+      rgba(215, 25, 32, 0.08),
+      transparent 26%
+    ),
+    #f4f7fb;
+}
+
+.loadingMark {
+  display: grid;
+  width: 58px;
+  height: 58px;
+  margin-bottom: 7px;
+  place-items: center;
+  border-radius: 18px;
+  color: #ffffff;
+  background: #071b35;
+  box-shadow: 0 16px 34px rgba(7, 27, 53, 0.2);
+  animation: pulse 1.4s ease-in-out infinite;
+}
+
+.loadingPage strong {
+  font-size: 18px;
+}
+
+.loadingPage span {
+  color: #758196;
+  font-size: 12px;
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    transform: scale(1);
+    box-shadow: 0 16px 34px rgba(7, 27, 53, 0.2);
+  }
+
+  50% {
+    transform: scale(1.04);
+    box-shadow: 0 20px 42px rgba(7, 27, 53, 0.27);
+  }
+}
