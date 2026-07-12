@@ -1,16 +1,16 @@
 .wrapper {
-  width: min(100%, 520px);
-  max-height: calc(100vh - 28px);
   display: flex;
+  width: min(100%, 540px);
+  max-height: calc(100vh - 28px);
   flex-direction: column;
-  gap: 10px;
+  gap: 9px;
 }
 
 .loginCard {
   position: relative;
   width: 100%;
-  padding: clamp(28px, 3.3vh, 45px) clamp(32px, 3.3vw, 52px);
   overflow: hidden;
+  padding: clamp(25px, 2.8vh, 38px) clamp(31px, 3.1vw, 48px);
   border: 1px solid rgba(255, 255, 255, 0.18);
   border-radius: 27px;
   background:
@@ -56,7 +56,7 @@
   align-items: flex-start;
   justify-content: flex-end;
   gap: 9px;
-  margin-bottom: clamp(22px, 3vh, 36px);
+  margin-bottom: clamp(17px, 2.1vh, 26px);
   color: #70798a;
   text-align: right;
 }
@@ -70,24 +70,24 @@
 .security strong {
   display: block;
   color: #4a5567;
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 750;
 }
 
 .security span {
   display: block;
   margin-top: 2px;
-  font-size: 11px;
+  font-size: 10px;
 }
 
 .heading {
-  margin-bottom: clamp(22px, 3vh, 34px);
+  margin-bottom: clamp(15px, 2vh, 23px);
 }
 
 .eyebrow {
-  margin: 0 0 9px;
+  margin: 0 0 8px;
   color: #d71920;
-  font-size: 10px;
+  font-size: 9px;
   font-weight: 850;
   letter-spacing: 0.23em;
   text-transform: uppercase;
@@ -97,7 +97,7 @@
   margin: 0;
   color: #0b172a;
   font-family: Georgia, "Times New Roman", serif;
-  font-size: clamp(47px, 4vw, 64px);
+  font-size: clamp(44px, 3.8vw, 59px);
   font-weight: 600;
   line-height: 0.9;
   letter-spacing: -0.055em;
@@ -105,10 +105,140 @@
 
 .heading > p:last-child {
   max-width: 440px;
-  margin: 14px 0 0;
+  margin: 12px 0 0;
   color: #6b7484;
-  font-size: 14px;
-  line-height: 1.48;
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.portalSection {
+  margin-bottom: 16px;
+}
+
+.portalHeader {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.portalHeader strong {
+  color: #1a2435;
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.portalHeader span {
+  color: #8a94a4;
+  font-size: 9px;
+}
+
+.portalGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 9px;
+}
+
+.portalOption {
+  position: relative;
+  display: flex;
+  min-width: 0;
+  min-height: 79px;
+  align-items: flex-start;
+  gap: 9px;
+  padding: 11px;
+  border: 1px solid #dce2ea;
+  border-radius: 12px;
+  color: #263247;
+  text-align: left;
+  background: #f8fafc;
+  transition:
+    border-color 0.2s ease,
+    background 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.2s ease;
+}
+
+.portalOption:hover {
+  border-color: #b9c5d3;
+  background: #ffffff;
+  transform: translateY(-1px);
+}
+
+.portalIcon {
+  display: grid;
+  width: 31px;
+  height: 31px;
+  flex: 0 0 31px;
+  place-items: center;
+  border-radius: 9px;
+  color: #123a6d;
+  background: #e8eef6;
+}
+
+.portalCopy {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+}
+
+.portalCopy small {
+  color: #8a95a5;
+  font-size: 7px;
+  font-weight: 850;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.portalCopy strong {
+  margin-top: 2px;
+  color: #0b1d35;
+  font-size: 13px;
+  font-weight: 850;
+}
+
+.portalCopy > span {
+  margin-top: 3px;
+  color: #7b8696;
+  font-size: 8px;
+  line-height: 1.3;
+}
+
+.portalCheck {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+}
+
+.clientSelected {
+  border-color: #123a6d;
+  background: #f3f7fc;
+  box-shadow: 0 0 0 3px rgba(18, 58, 109, 0.08);
+}
+
+.clientSelected .portalIcon {
+  color: #ffffff;
+  background: #123a6d;
+}
+
+.clientSelected .portalCheck {
+  color: #123a6d;
+}
+
+.adminSelected {
+  border-color: #d71920;
+  background: #fff6f7;
+  box-shadow: 0 0 0 3px rgba(215, 25, 32, 0.08);
+}
+
+.adminSelected .portalIcon {
+  color: #ffffff;
+  background: #d71920;
+}
+
+.adminSelected .portalCheck {
+  color: #d71920;
 }
 
 .form {
@@ -117,14 +247,14 @@
 }
 
 .fieldGroup {
-  margin-bottom: 16px;
+  margin-bottom: 12px;
 }
 
 .fieldGroup label {
   display: block;
-  margin-bottom: 7px;
+  margin-bottom: 6px;
   color: #1a2435;
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 750;
 }
 
@@ -136,20 +266,21 @@
 
 .inputWrap > svg {
   position: absolute;
-  left: 17px;
+  left: 16px;
   color: #7d8797;
   pointer-events: none;
 }
 
 .inputWrap input {
   width: 100%;
-  height: 55px;
-  padding: 0 50px 0 47px;
-  color: #101828;
+  height: 49px;
+  padding: 0 48px 0 45px;
   border: 1px solid #d8dee8;
-  border-radius: 13px;
+  border-radius: 12px;
   outline: none;
+  color: #101828;
   background: #ffffff;
+  font-size: 13px;
   transition:
     border-color 0.2s ease,
     box-shadow 0.2s ease;
@@ -166,13 +297,13 @@
 
 .passwordButton {
   position: absolute;
-  right: 14px;
+  right: 13px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   padding: 6px;
-  color: #7d8797;
   border-radius: 8px;
+  color: #7d8797;
   background: transparent;
 }
 
@@ -182,11 +313,11 @@
 }
 
 .options {
-  margin: 1px 0 19px;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 16px;
+  margin: 0 0 14px;
 }
 
 .remember {
@@ -194,14 +325,14 @@
   align-items: center;
   gap: 8px;
   color: #344054;
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 650;
   cursor: pointer;
 }
 
 .remember input {
-  width: 17px;
-  height: 17px;
+  width: 16px;
+  height: 16px;
   accent-color: #d71920;
 }
 
@@ -209,8 +340,8 @@
   padding: 0;
   color: #d71920;
   background: none;
-  font-size: 12px;
-  font-weight: 700;
+  font-size: 11px;
+  font-weight: 750;
 }
 
 .textButton:hover {
@@ -218,19 +349,19 @@
 }
 
 .submitButton {
-  width: 100%;
-  min-height: 58px;
   display: flex;
+  width: 100%;
+  min-height: 52px;
   align-items: center;
   justify-content: center;
-  gap: 24px;
-  color: #ffffff;
+  gap: 22px;
   border-radius: 12px;
-  background: linear-gradient(90deg, #d71920, #f2344b);
-  box-shadow: 0 16px 32px rgba(215, 25, 32, 0.23);
-  font-size: 12px;
+  color: #ffffff;
+  background: linear-gradient(90deg, #123a6d, #071b35);
+  box-shadow: 0 15px 30px rgba(7, 27, 53, 0.22);
+  font-size: 11px;
   font-weight: 850;
-  letter-spacing: 0.16em;
+  letter-spacing: 0.15em;
   text-transform: uppercase;
   transition:
     transform 0.2s ease,
@@ -238,10 +369,14 @@
     filter 0.2s ease;
 }
 
+.adminSubmitButton {
+  background: linear-gradient(90deg, #d71920, #f2344b);
+  box-shadow: 0 15px 30px rgba(215, 25, 32, 0.23);
+}
+
 .submitButton:hover {
   transform: translateY(-2px);
   filter: brightness(1.04);
-  box-shadow: 0 21px 39px rgba(215, 25, 32, 0.3);
 }
 
 .submitButton:active {
@@ -249,35 +384,35 @@
 }
 
 .divider {
-  margin: 20px 0;
   display: flex;
   align-items: center;
-  gap: 14px;
+  gap: 13px;
+  margin: 13px 0;
   color: #8b94a3;
-  font-size: 10px;
+  font-size: 9px;
   font-weight: 750;
 }
 
 .divider::before,
 .divider::after {
-  content: "";
   height: 1px;
   flex: 1;
+  content: "";
   background: #dde2e9;
 }
 
 .googleButton {
-  width: 100%;
-  min-height: 54px;
   display: flex;
+  width: 100%;
+  min-height: 47px;
   align-items: center;
   justify-content: center;
-  gap: 14px;
-  color: #202939;
+  gap: 12px;
   border: 1px solid #d8dee8;
   border-radius: 12px;
+  color: #202939;
   background: #ffffff;
-  font-size: 13px;
+  font-size: 11px;
   font-weight: 750;
   transition:
     border-color 0.2s ease,
@@ -286,41 +421,41 @@
 }
 
 .googleButton:hover {
-  transform: translateY(-1px);
   border-color: #b7c1cf;
   background: #fbfcfe;
+  transform: translateY(-1px);
 }
 
 .googleIcon {
-  width: 22px;
-  height: 22px;
   display: inline-flex;
+  width: 21px;
+  height: 21px;
   align-items: center;
   justify-content: center;
   color: #4285f4;
-  font-size: 19px;
+  font-size: 18px;
   font-weight: 900;
 }
 
 .message {
-  margin: 13px 0 0;
-  padding: 9px 12px;
-  color: #8d2631;
+  margin: 11px 0 0;
+  padding: 8px 11px;
   border: 1px solid #f1c4ca;
   border-radius: 9px;
-  background: #fff5f6;
-  font-size: 11px;
-  line-height: 1.4;
+  color: #8d2631;
   text-align: center;
+  background: #fff5f6;
+  font-size: 10px;
+  line-height: 1.4;
 }
 
 .help {
-  margin-top: 24px;
   display: flex;
   justify-content: center;
   gap: 4px;
+  margin-top: 14px;
   color: #7b8493;
-  font-size: 11px;
+  font-size: 10px;
 }
 
 .help button {
@@ -336,64 +471,76 @@
 }
 
 .footer {
-  padding: 0 6px;
   display: flex;
   justify-content: space-between;
   gap: 16px;
+  padding: 0 6px;
   color: rgba(255, 255, 255, 0.55);
   font-size: 9px;
   letter-spacing: 0.04em;
 }
 
-@media (max-height: 790px) and (min-width: 981px) {
+@media (max-height: 900px) and (min-width: 981px) {
   .loginCard {
-    padding-top: 24px;
-    padding-bottom: 24px;
+    padding: 21px 36px;
   }
 
   .security {
-    margin-bottom: 18px;
-  }
-
-  .heading {
-    margin-bottom: 20px;
-  }
-
-  .heading h2 {
-    font-size: 45px;
-  }
-
-  .heading > p:last-child {
-    margin-top: 10px;
-    font-size: 12px;
-  }
-
-  .fieldGroup {
     margin-bottom: 12px;
   }
 
+  .heading {
+    margin-bottom: 12px;
+  }
+
+  .heading h2 {
+    font-size: 43px;
+  }
+
+  .heading > p:last-child {
+    margin-top: 8px;
+    font-size: 10px;
+  }
+
+  .portalSection {
+    margin-bottom: 11px;
+  }
+
+  .portalOption {
+    min-height: 66px;
+    padding: 8px;
+  }
+
+  .portalCopy > span {
+    display: none;
+  }
+
+  .fieldGroup {
+    margin-bottom: 9px;
+  }
+
   .inputWrap input {
-    height: 49px;
+    height: 44px;
   }
 
   .options {
-    margin-bottom: 14px;
+    margin-bottom: 10px;
   }
 
   .submitButton {
-    min-height: 52px;
+    min-height: 46px;
   }
 
   .divider {
-    margin: 14px 0;
+    margin: 9px 0;
   }
 
   .googleButton {
-    min-height: 49px;
+    min-height: 43px;
   }
 
   .help {
-    margin-top: 17px;
+    margin-top: 10px;
   }
 }
 
@@ -407,16 +554,30 @@
 
 @media (max-width: 600px) {
   .loginCard {
-    padding: 34px 22px;
+    padding: 31px 21px;
     border-radius: 23px;
   }
 
   .security {
-    margin-bottom: 30px;
+    margin-bottom: 25px;
   }
 
   .heading h2 {
-    font-size: 46px;
+    font-size: 44px;
+  }
+
+  .portalHeader {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .portalGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .portalOption {
+    min-height: 76px;
   }
 
   .options {
@@ -424,8 +585,8 @@
   }
 
   .footer {
-    flex-direction: column;
     align-items: center;
+    flex-direction: column;
     gap: 4px;
   }
 }

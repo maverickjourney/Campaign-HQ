@@ -2,18 +2,22 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   ArrowRight,
+  CheckCircle2,
   Eye,
   EyeOff,
   LockKeyhole,
   Mail,
   ShieldCheck,
+  UserRound,
 } from "lucide-react";
 
+import { saveLoginSession } from "../../../utils/campaignSession";
 import styles from "./LoginForm.module.css";
 
 export default function LoginForm() {
   const navigate = useNavigate();
 
+  const [accessMode, setAccessMode] = useState("client");
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -22,6 +26,8 @@ export default function LoginForm() {
 
   const [showPassword, setShowPassword] = useState(false);
   const [message, setMessage] = useState("");
+
+  const isAdmin = accessMode === "admin";
 
   const handleChange = (event) => {
     const { name, value, type, checked } = event.target;
@@ -32,6 +38,11 @@ export default function LoginForm() {
     }));
   };
 
+  const handleModeChange = (mode) => {
+    setAccessMode(mode);
+    setMessage("");
+  };
+
   const handleSubmit = (event) => {
     event.preventDefault();
 
@@ -40,15 +51,20 @@ export default function LoginForm() {
       return;
     }
 
+    saveLoginSession(formData.email, accessMode);
     setMessage("");
 
-    // Temporary demo navigation.
-    // Supabase authentication will replace this next.
-    navigate("/dashboard");
+    // Supabase will later verify whether the account
+    // is authorized for Client or Administrator access.
+    navigate("/workspaces");
   };
 
   const handleGoogleSignIn = () => {
-    setMessage("Google sign-in will be connected through Supabase.");
+    setMessage(
+      `Google sign-in for ${
+        isAdmin ? "Administrator" : "Client"
+      } access will be connected through Supabase.`,
+    );
   };
 
   const handleForgotPassword = () => {
@@ -65,7 +81,7 @@ export default function LoginForm() {
         </div>
 
         <div className={styles.security}>
-          <ShieldCheck size={22} strokeWidth={1.8} />
+          <ShieldCheck size={21} strokeWidth={1.8} />
 
           <div>
             <strong>Secure Campaign Access</strong>
@@ -75,13 +91,85 @@ export default function LoginForm() {
 
         <div className={styles.heading}>
           <p className={styles.eyebrow}>Campaign HQ</p>
-
           <h2>Welcome back</h2>
 
           <p>
-            Sign in to access campaign files, events, tasks, approvals,
-            messages and team updates.
+            Choose your access type, then sign in to enter your campaign
+            workspace.
           </p>
+        </div>
+
+        <div className={styles.portalSection}>
+          <div className={styles.portalHeader}>
+            <strong>Choose your access</strong>
+            <span>Select the portal assigned to your account.</span>
+          </div>
+
+          <div
+            className={styles.portalGrid}
+            role="radiogroup"
+            aria-label="Choose login access"
+          >
+            <button
+              className={`${styles.portalOption} ${
+                accessMode === "client"
+                  ? styles.clientSelected
+                  : ""
+              }`}
+              type="button"
+              role="radio"
+              aria-checked={accessMode === "client"}
+              onClick={() => handleModeChange("client")}
+            >
+              <span className={styles.portalIcon}>
+                <UserRound size={19} strokeWidth={1.9} />
+              </span>
+
+              <span className={styles.portalCopy}>
+                <small>Client Login</small>
+                <strong>Client</strong>
+                <span>Campaign updates, files, events and approvals.</span>
+              </span>
+
+              {accessMode === "client" && (
+                <CheckCircle2
+                  className={styles.portalCheck}
+                  size={17}
+                  strokeWidth={2.3}
+                />
+              )}
+            </button>
+
+            <button
+              className={`${styles.portalOption} ${
+                accessMode === "admin"
+                  ? styles.adminSelected
+                  : ""
+              }`}
+              type="button"
+              role="radio"
+              aria-checked={accessMode === "admin"}
+              onClick={() => handleModeChange("admin")}
+            >
+              <span className={styles.portalIcon}>
+                <ShieldCheck size={19} strokeWidth={1.9} />
+              </span>
+
+              <span className={styles.portalCopy}>
+                <small>Admin Login</small>
+                <strong>Admin</strong>
+                <span>Team access, settings and campaign controls.</span>
+              </span>
+
+              {accessMode === "admin" && (
+                <CheckCircle2
+                  className={styles.portalCheck}
+                  size={17}
+                  strokeWidth={2.3}
+                />
+              )}
+            </button>
+          </div>
         </div>
 
         <form className={styles.form} onSubmit={handleSubmit}>
@@ -157,8 +245,16 @@ export default function LoginForm() {
             </button>
           </div>
 
-          <button className={styles.submitButton} type="submit">
-            <span>Enter Campaign HQ</span>
+          <button
+            className={`${styles.submitButton} ${
+              isAdmin ? styles.adminSubmitButton : ""
+            }`}
+            type="submit"
+          >
+            <span>
+              Enter {isAdmin ? "Admin" : "Client"} Portal
+            </span>
+
             <ArrowRight size={20} strokeWidth={2} />
           </button>
 
@@ -172,7 +268,9 @@ export default function LoginForm() {
             onClick={handleGoogleSignIn}
           >
             <span className={styles.googleIcon}>G</span>
-            <span>Continue with Google</span>
+            <span>
+              Continue as {isAdmin ? "Admin" : "Client"} with Google
+            </span>
           </button>
 
           {message && (
