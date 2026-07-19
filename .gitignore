@@ -22,3 +22,32 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# BEGIN CAMPAIGN HQ LOCAL SAFETY
+# Local environment files must never be committed.
+.env
+.env.*
+!.env.example
+
+# Generated production output and local process files.
+dist/
+.vite-*.pid
+*.log
+
+# Installer snapshots and local audit artifacts.
+.*-backups/
+*-Audit.txt
+*-Diagnostic.txt
+*-Build-Output.txt
+*-Recovery-Inventory.txt
+*-Recovery-Candidates.txt
+responsive-layout-audit.txt
+campaign-font-audit.txt
+# END CAMPAIGN HQ LOCAL SAFETY
+
+# BEGIN CAMPAIGN HQ VERCEL LOCAL LINK SAFETY
+# Vercel writes local project-link metadata here after `vercel link`.
+.vercel/
+# END CAMPAIGN HQ VERCEL LOCAL LINK SAFETY
+.vercel
+.env*
