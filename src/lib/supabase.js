@@ -9,10 +9,28 @@ if (!supabaseUrl || !supabaseKey) {
   );
 }
 
-export const supabase = createClient(supabaseUrl, supabaseKey, {
-  auth: {
-    persistSession: true,
-    autoRefreshToken: true,
-    detectSessionInUrl: true,
+const isInstalledCampaignApp =
+  window.matchMedia?.(
+    "(display-mode: standalone)",
+  )?.matches ||
+  window.navigator.standalone ===
+    true;
+
+const authStorageKey =
+  isInstalledCampaignApp
+    ? "campaign-hq-auth-installed-app"
+    : "campaign-hq-auth-browser";
+
+export const supabase = createClient(
+  supabaseUrl,
+  supabaseKey,
+  {
+    auth: {
+      storageKey:
+        authStorageKey,
+      persistSession: true,
+      autoRefreshToken: true,
+      detectSessionInUrl: true,
+    },
   },
-});
+);

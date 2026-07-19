@@ -1,0 +1,70 @@
+.dateTime {
+  display: inline-flex;
+  min-height: 40px;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 9px;
+  padding: 0 11px;
+  border: 1px solid #dce4ed;
+  border-radius: 12px;
+  color: #607086;
+  background:
+    linear-gradient(
+      135deg,
+      #ffffff,
+      #f7f9fc
+    );
+  box-shadow:
+    0 4px 12px
+    rgba(18, 44, 76, 0.04);
+  white-space: nowrap;
+}
+
+.date,
+.time {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.date {
+  padding-right: 9px;
+  border-right:
+    1px solid #e1e7ee;
+  font-size: 11px;
+  font-weight: 750;
+}
+
+.date svg {
+  color: #326da8;
+}
+
+.time {
+  color: #183654;
+}
+
+.time svg {
+  color: #e4232e;
+}
+
+.time strong {
+  font-size: 11px;
+  font-weight: 900;
+}
+
+@media (max-width: 1320px) {
+  .date {
+    display: none;
+  }
+
+  .time {
+    min-width: 77px;
+    justify-content: center;
+  }
+}
+
+@media (max-width: 930px) {
+  .dateTime {
+    display: none;
+  }
+}

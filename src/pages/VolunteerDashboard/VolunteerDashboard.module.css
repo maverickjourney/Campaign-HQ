@@ -1,0 +1,1459 @@
+:root {
+  --volunteer-navy: #071f3c;
+  --volunteer-red: #e51f2a;
+  --volunteer-blue: #235f9e;
+  --volunteer-border: #dce5ef;
+  --volunteer-muted: #738196;
+}
+
+.app {
+  min-height: 100vh;
+  background: #f3f6fa;
+}
+
+.workspace {
+  min-height: 100vh;
+  margin-left: 280px;
+}
+
+.topbar {
+  position: sticky;
+  z-index: 20;
+  top: 0;
+  display: flex;
+  min-height: 82px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  padding: 0 28px;
+  border-bottom: 1px solid
+    var(--volunteer-border);
+  background:
+    rgba(255, 255, 255, 0.94);
+  backdrop-filter: blur(18px);
+}
+
+.topbarLeft,
+.topbarRight {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.topbarLeft > div {
+  display: grid;
+  gap: 5px;
+}
+
+.topbarLeft span {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #8290a4;
+  font-size: 12px;
+  font-weight: 750;
+}
+
+.topbarLeft strong {
+  color: var(--volunteer-navy);
+  font-size: 17px;
+}
+
+.menuButton {
+  display: none;
+  width: 42px;
+  height: 42px;
+  place-items: center;
+  border: 1px solid
+    var(--volunteer-border);
+  border-radius: 11px;
+  color: var(--volunteer-navy);
+  background: #ffffff;
+}
+
+.secureBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  color: #237053;
+  background: #eaf7f0;
+  font-size: 11px;
+  font-weight: 850;
+}
+
+.main {
+  display: grid;
+  gap: 20px;
+  padding: 30px;
+}
+
+.welcome {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 22px;
+}
+
+.welcome > div > span,
+.tasksPanel header span,
+.nextFoundation span {
+  color: var(--volunteer-red);
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+}
+
+.welcome h1 {
+  margin: 8px 0 5px;
+  color: var(--volunteer-navy);
+  font-size: clamp(34px, 4vw, 54px);
+  letter-spacing: -0.055em;
+}
+
+.welcome h1 strong {
+  color: var(--volunteer-red);
+}
+
+.welcome p {
+  max-width: 690px;
+  margin: 0;
+  color: var(--volunteer-muted);
+  line-height: 1.6;
+}
+
+.welcome > button,
+.tasksPanel header button {
+  display: inline-flex;
+  min-height: 43px;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 0 16px;
+  border: 1px solid
+    #cfdbe8;
+  border-radius: 11px;
+  color: #315b88;
+  background: #ffffff;
+  font-weight: 850;
+}
+
+.error {
+  padding: 13px 15px;
+  border: 1px solid #efc5ca;
+  border-radius: 11px;
+  color: #942c36;
+  background: #fff4f5;
+  font-size: 13px;
+}
+
+.campaignHero {
+  position: relative;
+  display: grid;
+  min-height: 440px;
+  grid-template-columns:
+    minmax(0, 1.15fr)
+    minmax(360px, 0.85fr);
+  overflow: hidden;
+  border: 1px solid
+    rgba(7, 31, 60, 0.2);
+  border-radius: 24px;
+  color: #ffffff;
+  background:
+    radial-gradient(
+      circle at 58% 10%,
+      rgba(70, 129, 189, 0.32),
+      transparent 32%
+    ),
+    linear-gradient(
+      125deg,
+      #071f3c 0%,
+      #0c315b 55%,
+      #091d36 100%
+    );
+  box-shadow:
+    0 24px 48px
+    rgba(7, 31, 60, 0.18);
+}
+
+.campaignHero::before {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  content: "";
+  opacity: 0.22;
+  background-image:
+    radial-gradient(
+      circle,
+      #ffffff 1.1px,
+      transparent 1.3px
+    );
+  background-size: 82px 82px;
+}
+
+.heroCopy {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  justify-content: center;
+  padding: 34px 0 28px 34px;
+}
+
+.heroEyebrow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #a9d3f8;
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.heroCopy h2 {
+  max-width: 700px;
+  margin: 18px 0 12px;
+  font-size: clamp(38px, 4.4vw, 66px);
+  line-height: 0.98;
+  letter-spacing: -0.055em;
+}
+
+.heroCopy h2 strong {
+  display: block;
+  color: #ff4c5b;
+}
+
+.heroCopy > p {
+  max-width: 650px;
+  margin: 0;
+  color:
+    rgba(255, 255, 255, 0.74);
+  font-size: 15px;
+  line-height: 1.55;
+}
+
+.heroTags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 18px;
+}
+
+.heroTags span {
+  padding: 7px 11px;
+  border: 1px solid
+    rgba(255, 255, 255, 0.18);
+  border-radius: 999px;
+  background:
+    rgba(255, 255, 255, 0.09);
+  color:
+    rgba(255, 255, 255, 0.86);
+  font-size: 11px;
+  font-weight: 850;
+}
+
+.heroProgress {
+  display: grid;
+  grid-template-columns:
+    minmax(125px, 0.34fr)
+    minmax(0, 1fr);
+  gap: 20px;
+  align-items: end;
+  margin-top: 22px;
+}
+
+.countdown {
+  display: grid;
+  gap: 2px;
+}
+
+.countdown span,
+.readiness span {
+  color:
+    rgba(255, 255, 255, 0.64);
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+}
+
+.countdown strong {
+  font-size: 56px;
+  line-height: 0.92;
+}
+
+.countdown small,
+.readiness small {
+  color:
+    rgba(255, 255, 255, 0.65);
+  font-size: 11px;
+}
+
+.readiness {
+  display: grid;
+  gap: 9px;
+}
+
+.readiness > div:first-child {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.readiness strong {
+  font-size: 15px;
+}
+
+.progressTrack {
+  height: 10px;
+  overflow: hidden;
+  border-radius: 999px;
+  background:
+    rgba(255, 255, 255, 0.18);
+}
+
+.progressTrack span {
+  display: block;
+  height: 100%;
+  min-width: 0;
+  border-radius: inherit;
+  background:
+    linear-gradient(
+      90deg,
+      #ff4050,
+      #ff7380
+    );
+}
+
+.heroActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 9px;
+  margin-top: 22px;
+}
+
+.heroActions button {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  gap: 8px;
+  padding: 0 13px;
+  border: 1px solid
+    rgba(255, 255, 255, 0.17);
+  border-radius: 10px;
+  color: #ffffff;
+  background:
+    rgba(255, 255, 255, 0.09);
+  font-size: 12px;
+  font-weight: 850;
+}
+
+.heroActions button:first-child {
+  color: #ffffff;
+  background:
+    rgba(229, 31, 42, 0.94);
+}
+
+.heroActions button:disabled {
+  cursor: default;
+  opacity: 0.58;
+}
+
+.heroActions small {
+  margin-left: 2px;
+  font-size: 8px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.heroPortrait {
+  position: relative;
+  z-index: 1;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.flagGlow {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  opacity: 0.95;
+  background:
+    linear-gradient(
+      14deg,
+      transparent 0 20%,
+      rgba(255, 255, 255, 0.9) 21% 31%,
+      rgba(195, 23, 37, 0.92) 32% 43%,
+      rgba(255, 255, 255, 0.86) 44% 55%,
+      rgba(195, 23, 37, 0.9) 56% 67%,
+      transparent 68%
+    ),
+    linear-gradient(
+      150deg,
+      #154f86,
+      #081e38
+    );
+  clip-path:
+    polygon(
+      10% 0,
+      100% 0,
+      100% 100%,
+      0 100%
+    );
+}
+
+.heroPortrait::after {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  content: "";
+  background:
+    linear-gradient(
+      90deg,
+      #0b2b50 0%,
+      transparent 28%,
+      transparent 78%,
+      rgba(7, 31, 60, 0.15)
+    );
+}
+
+.heroPortrait img {
+  position: absolute;
+  z-index: 1;
+  right: -2%;
+  bottom: 0;
+  width: 102%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 50% 16%;
+  mix-blend-mode: normal;
+}
+
+.portraitCaption {
+  position: absolute;
+  z-index: 3;
+  right: 18px;
+  bottom: 18px;
+  display: grid;
+  max-width: 245px;
+  gap: 4px;
+  padding: 13px 14px;
+  border: 1px solid
+    rgba(255, 255, 255, 0.18);
+  border-radius: 12px;
+  background:
+    rgba(7, 31, 60, 0.76);
+  backdrop-filter: blur(12px);
+}
+
+.portraitCaption span {
+  color: #9fd0fa;
+  font-size: 9px;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.portraitCaption strong {
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.assignmentGrid {
+  display: grid;
+  grid-template-columns:
+    minmax(0, 1.7fr)
+    repeat(2, minmax(210px, 0.65fr));
+  gap: 16px;
+}
+
+.primaryAssignment,
+.statusCard,
+.summaryGrid article,
+.tasksPanel,
+.nextFoundation {
+  border: 1px solid
+    var(--volunteer-border);
+  border-radius: 18px;
+  background: #ffffff;
+  box-shadow:
+    0 14px 35px
+    rgba(12, 36, 64, 0.055);
+}
+
+.primaryAssignment {
+  padding: 24px;
+  color: #ffffff;
+  background:
+    radial-gradient(
+      circle at 90% 8%,
+      rgba(229, 31, 42, 0.34),
+      transparent 35%
+    ),
+    linear-gradient(
+      145deg,
+      #071f3c,
+      #164f87
+    );
+}
+
+.cardLabel {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #a9d3f8;
+  font-size: 12px;
+  font-weight: 850;
+  text-transform: uppercase;
+}
+
+.primaryAssignment h2 {
+  margin: 15px 0 8px;
+  font-size: 30px;
+  letter-spacing: -0.035em;
+}
+
+.primaryAssignment > p {
+  max-width: 580px;
+  margin: 0;
+  color:
+    rgba(255, 255, 255, 0.7);
+  line-height: 1.55;
+}
+
+.assignmentFacts {
+  display: grid;
+  grid-template-columns:
+    repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 22px;
+}
+
+.assignmentFacts div {
+  display: grid;
+  gap: 5px;
+  padding: 13px;
+  border: 1px solid
+    rgba(255, 255, 255, 0.12);
+  border-radius: 11px;
+  background:
+    rgba(255, 255, 255, 0.07);
+}
+
+.assignmentFacts span {
+  color:
+    rgba(255, 255, 255, 0.55);
+  font-size: 10px;
+  font-weight: 850;
+  text-transform: uppercase;
+}
+
+.assignmentFacts strong {
+  font-size: 13px;
+}
+
+.primaryAssignment > button {
+  display: inline-flex;
+  min-height: 42px;
+  align-items: center;
+  gap: 8px;
+  margin-top: 18px;
+  padding: 0 14px;
+  border: 1px solid
+    rgba(255, 255, 255, 0.13);
+  border-radius: 10px;
+  color:
+    rgba(255, 255, 255, 0.7);
+  background:
+    rgba(255, 255, 255, 0.08);
+  font-weight: 800;
+}
+
+.statusCard {
+  display: grid;
+  align-content: start;
+  gap: 10px;
+  padding: 22px;
+}
+
+.statusCard > svg {
+  color: var(--volunteer-blue);
+}
+
+.statusCard span {
+  color: #748399;
+  font-size: 11px;
+  font-weight: 850;
+  text-transform: uppercase;
+}
+
+.statusCard strong {
+  color: var(--volunteer-navy);
+  font-size: 23px;
+}
+
+.statusCard p {
+  margin: 0;
+  color: #8290a4;
+  font-size: 12px;
+  line-height: 1.55;
+}
+
+.summaryGrid {
+  display: grid;
+  grid-template-columns:
+    repeat(3, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.summaryGrid article {
+  display: flex;
+  min-height: 112px;
+  align-items: center;
+  gap: 15px;
+  padding: 20px;
+}
+
+.summaryGrid svg {
+  width: 45px;
+  height: 45px;
+  padding: 11px;
+  border-radius: 12px;
+  color: var(--volunteer-blue);
+  background: #edf4fb;
+}
+
+.summaryGrid div {
+  display: grid;
+  gap: 5px;
+}
+
+.summaryGrid span {
+  color: #7a8799;
+  font-size: 11px;
+  font-weight: 850;
+  text-transform: uppercase;
+}
+
+.summaryGrid strong {
+  color: var(--volunteer-navy);
+  font-size: 21px;
+}
+
+.tasksPanel {
+  overflow: hidden;
+}
+
+.tasksPanel header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 15px;
+  padding: 21px 23px;
+  border-bottom: 1px solid
+    #e4eaf1;
+}
+
+.tasksPanel h2 {
+  margin: 5px 0 0;
+  color: var(--volunteer-navy);
+  font-size: 24px;
+}
+
+.tasksPanel header button {
+  min-height: 40px;
+}
+
+.taskList {
+  display: grid;
+}
+
+.taskList article {
+  display: flex;
+  min-height: 92px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  padding: 17px 23px;
+  border-bottom: 1px solid
+    #edf1f5;
+}
+
+.taskList article:last-child {
+  border-bottom: 0;
+}
+
+.taskList article > div:first-child {
+  min-width: 0;
+}
+
+.taskList span {
+  color: var(--volunteer-blue);
+  font-size: 10px;
+  font-weight: 850;
+  text-transform: uppercase;
+}
+
+.taskList h3 {
+  margin: 5px 0;
+  color: var(--volunteer-navy);
+  font-size: 16px;
+}
+
+.taskList p {
+  margin: 0;
+  color: #8491a2;
+  font-size: 11px;
+}
+
+.taskActions {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 10px;
+}
+
+.taskActions small {
+  color: #778699;
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.taskActions button {
+  min-height: 37px;
+  padding: 0 13px;
+  border: 0;
+  border-radius: 9px;
+  color: #ffffff;
+  background: var(--volunteer-red);
+  font-weight: 850;
+}
+
+.loading,
+.empty {
+  display: grid;
+  min-height: 190px;
+  place-items: center;
+  align-content: center;
+  gap: 9px;
+  padding: 25px;
+  color: #7d8b9e;
+  text-align: center;
+}
+
+.empty svg {
+  color: #2b7b59;
+}
+
+.empty strong {
+  color: var(--volunteer-navy);
+}
+
+.empty p {
+  max-width: 430px;
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.55;
+}
+
+.nextFoundation {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 22px 24px;
+}
+
+.nextFoundation h2 {
+  margin: 5px 0;
+  color: var(--volunteer-navy);
+}
+
+.nextFoundation p {
+  max-width: 720px;
+  margin: 0;
+  color: #7b899c;
+  line-height: 1.55;
+}
+
+.nextFoundation small {
+  flex: 0 0 auto;
+  color: #8491a2;
+}
+
+.spinning {
+  animation:
+    volunteerSpin
+    0.9s linear infinite;
+}
+
+@keyframes volunteerSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (max-width: 1250px) {
+  .campaignHero {
+    grid-template-columns:
+      minmax(0, 1.2fr)
+      minmax(320px, 0.8fr);
+  }
+
+  .heroCopy {
+    padding-left: 28px;
+  }
+
+  .heroCopy h2 {
+    font-size: 48px;
+  }
+
+  .assignmentGrid {
+    grid-template-columns:
+      minmax(0, 1fr)
+      minmax(220px, 0.55fr);
+  }
+
+  .primaryAssignment {
+    grid-row: span 2;
+  }
+}
+
+@media (max-width: 980px) {
+  .campaignHero {
+    min-height: auto;
+    grid-template-columns: 1fr;
+  }
+
+  .heroCopy {
+    padding: 30px;
+  }
+
+  .heroPortrait {
+    min-height: 380px;
+  }
+}
+
+@media (max-width: 900px) {
+  .workspace {
+    margin-left: 0;
+  }
+
+  .menuButton {
+    display: grid;
+  }
+
+  .topbar {
+    padding: 0 18px;
+  }
+
+  .secureBadge {
+    display: none;
+  }
+
+  .main {
+    padding: 22px 16px;
+  }
+
+  .assignmentGrid,
+  .summaryGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .primaryAssignment {
+    grid-row: auto;
+  }
+}
+
+@media (max-width: 650px) {
+  .topbarRight {
+    display: none;
+  }
+
+  .welcome {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .welcome > button {
+    width: 100%;
+  }
+
+  .heroCopy {
+    padding: 24px 20px;
+  }
+
+  .heroCopy h2 {
+    font-size: 39px;
+  }
+
+  .heroProgress {
+    grid-template-columns: 1fr;
+  }
+
+  .heroActions {
+    display: grid;
+  }
+
+  .heroActions button {
+    justify-content: flex-start;
+  }
+
+  .heroPortrait {
+    min-height: 330px;
+  }
+
+  .assignmentFacts {
+    grid-template-columns: 1fr;
+  }
+
+  .tasksPanel header,
+  .taskList article,
+  .nextFoundation {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .taskActions {
+    justify-content: space-between;
+  }
+}
+
+/* ==========================================================
+
+/* ==========================================================
+   CAMPAIGN HQ — VOLUNTEER CONSOLIDATED RESPONSIVE REPAIR
+
+   One authoritative layout layer:
+   • Shared sidebar width: 272px
+   • Shared mobile breakpoint: 850px
+   • Main content owns vertical scrolling
+   • No stacked legacy breakpoint overrides
+   ========================================================== */
+
+.app {
+  width: 100%;
+  height: 100dvh;
+  min-height: 100dvh;
+  overflow: hidden;
+}
+
+.workspace {
+  display: flex;
+  width: calc(100vw - 272px);
+  max-width: calc(100vw - 272px);
+  height: 100dvh;
+  min-width: 0;
+  min-height: 0;
+  margin-left: 272px;
+  flex-direction: column;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+.topbar {
+  flex: 0 0 auto;
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+.main {
+  display: grid;
+  width: 100%;
+  min-width: 0;
+  min-height: 0;
+  max-width: 100%;
+  flex: 1 1 auto;
+  overflow-x: hidden;
+  overflow-y: auto;
+  box-sizing: border-box;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+}
+
+.welcome,
+.campaignHero,
+.volunteerActionBar,
+.assignmentGrid,
+.summaryGrid,
+.tasksPanel,
+.nextFoundation {
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+/* Final campaign spotlight */
+.campaignHero {
+  height: 340px;
+  min-height: 340px;
+  grid-template-columns:
+    minmax(0, 1.16fr)
+    minmax(340px, 0.84fr);
+  align-items: stretch;
+  border-radius: 20px;
+}
+
+.heroCopy {
+  min-width: 0;
+  overflow: hidden;
+  padding:
+    20px
+    0
+    18px
+    28px;
+}
+
+.heroEyebrow {
+  font-size: 10px;
+  letter-spacing: 0.13em;
+}
+
+.heroCopy h2 {
+  max-width: 620px;
+  margin:
+    9px
+    0
+    8px;
+  font-size:
+    clamp(
+      36px,
+      3.65vw,
+      52px
+    );
+  line-height: 0.98;
+  overflow-wrap: anywhere;
+}
+
+.heroCopy > p {
+  max-width: 600px;
+  font-size: 12px;
+  line-height: 1.42;
+  overflow-wrap: anywhere;
+}
+
+.heroTags {
+  gap: 7px;
+  margin-top: 10px;
+}
+
+.heroTags span {
+  padding: 5px 9px;
+  font-size: 10px;
+}
+
+.heroProgress {
+  min-width: 0;
+  grid-template-columns:
+    minmax(112px, 0.3fr)
+    minmax(0, 1fr);
+  gap: 17px;
+  margin-top: 12px;
+}
+
+.readiness {
+  min-width: 0;
+}
+
+.countdown strong {
+  font-size: 46px;
+}
+
+.countdown small,
+.readiness small {
+  font-size: 10px;
+}
+
+.progressTrack {
+  height: 8px;
+}
+
+.heroActions {
+  display: none;
+}
+
+.heroPortrait {
+  min-width: 0;
+  min-height: 340px;
+}
+
+.heroPortrait img {
+  inset: 0;
+  width: 100%;
+  max-width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position:
+    center
+    bottom;
+  transform: none;
+}
+
+.portraitCaption {
+  right: 12px;
+  bottom: 12px;
+  max-width: 210px;
+  padding: 10px 11px;
+}
+
+/* Volunteer actions beneath the campaign spotlight */
+.volunteerActionBar {
+  display: grid;
+  grid-template-columns:
+    repeat(
+      4,
+      minmax(0, 1fr)
+    );
+  gap: 10px;
+}
+
+.volunteerActionBar button {
+  display: flex;
+  min-width: 0;
+  min-height: 74px;
+  align-items: center;
+  gap: 12px;
+  padding:
+    13px
+    15px;
+  border: 1px solid
+    var(--volunteer-border);
+  border-radius: 14px;
+  color: #234f7f;
+  background: #ffffff;
+  box-shadow:
+    0 10px 24px
+    rgba(12, 36, 64, 0.05);
+  text-align: left;
+}
+
+.volunteerActionBar button:first-child {
+  border-color:
+    rgba(229, 31, 42, 0.2);
+  color: #ffffff;
+  background:
+    linear-gradient(
+      135deg,
+      #e51f2a,
+      #c91522
+    );
+  box-shadow:
+    0 12px 26px
+    rgba(229, 31, 42, 0.18);
+}
+
+.volunteerActionBar button:disabled {
+  cursor: default;
+  opacity: 0.68;
+}
+
+.volunteerActionBar button > svg {
+  flex: 0 0 auto;
+}
+
+.volunteerActionBar button > span {
+  display: grid;
+  min-width: 0;
+  gap: 4px;
+}
+
+.volunteerActionBar strong,
+.volunteerActionBar small {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.volunteerActionBar strong {
+  font-size: 12px;
+}
+
+.volunteerActionBar small {
+  color: #8190a4;
+  font-size: 9px;
+  font-weight: 750;
+}
+
+.volunteerActionBar button:first-child small {
+  color:
+    rgba(255, 255, 255, 0.72);
+}
+
+.assignmentGrid {
+  grid-template-columns:
+    minmax(0, 1.6fr)
+    repeat(
+      2,
+      minmax(180px, 0.7fr)
+    );
+}
+
+/*
+  Desktop sidebar is visible above 850px.
+  The remaining content width becomes narrow before the viewport itself
+  looks mobile, so stack the hero and supporting cards in this range.
+*/
+@media (
+  min-width: 851px
+) and (
+  max-width: 1180px
+) {
+  .workspace {
+    width: calc(100vw - 272px);
+    max-width: calc(100vw - 272px);
+    margin-left: 272px;
+  }
+
+  .menuButton {
+    display: none;
+  }
+
+  .main {
+    padding:
+      20px
+      16px;
+  }
+
+  .welcome {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .welcome > button {
+    width: 100%;
+  }
+
+  .campaignHero {
+    height: auto;
+    min-height: 0;
+    grid-template-columns: 1fr;
+  }
+
+  .heroCopy {
+    padding:
+      25px
+      23px
+      21px;
+  }
+
+  .heroCopy h2 {
+    font-size:
+      clamp(
+        34px,
+        5vw,
+        46px
+      );
+  }
+
+  .heroPortrait {
+    min-height: 310px;
+  }
+
+  .volunteerActionBar {
+    grid-template-columns:
+      repeat(
+        2,
+        minmax(0, 1fr)
+      );
+  }
+
+  .assignmentGrid,
+  .summaryGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .primaryAssignment {
+    grid-row: auto;
+  }
+}
+
+/*
+  This exactly matches the shared CampaignSidebar breakpoint.
+  At 850px and below the sidebar slides off-canvas, so the Volunteer
+  workspace must immediately occupy the entire app width.
+*/
+@media (
+  max-width: 850px
+) {
+  .workspace {
+    width: 100vw;
+    max-width: 100vw;
+    margin-left: 0;
+  }
+
+  .menuButton {
+    display: grid;
+  }
+
+  .topbar {
+    padding:
+      0
+      18px;
+  }
+
+  .secureBadge {
+    display: none;
+  }
+
+  .main {
+    padding:
+      20px
+      14px;
+  }
+
+  .welcome {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .welcome > button {
+    width: 100%;
+  }
+
+  .campaignHero {
+    height: auto;
+    min-height: 0;
+    grid-template-columns: 1fr;
+  }
+
+  .heroCopy {
+    padding:
+      24px
+      21px
+      20px;
+  }
+
+  .heroCopy h2 {
+    font-size:
+      clamp(
+        34px,
+        7vw,
+        45px
+      );
+  }
+
+  .heroPortrait {
+    min-height: 300px;
+  }
+
+  .volunteerActionBar {
+    grid-template-columns:
+      repeat(
+        2,
+        minmax(0, 1fr)
+      );
+  }
+
+  .assignmentGrid,
+  .summaryGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .primaryAssignment {
+    grid-row: auto;
+  }
+}
+
+@media (
+  max-width: 650px
+) {
+  .topbarRight {
+    display: none;
+  }
+
+  .heroCopy {
+    padding:
+      22px
+      18px
+      19px;
+  }
+
+  .heroCopy h2 {
+    font-size: 34px;
+  }
+
+  .heroProgress {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .heroPortrait {
+    min-height: 280px;
+  }
+
+  .portraitCaption {
+    display: none;
+  }
+
+  .volunteerActionBar {
+    grid-template-columns: 1fr;
+  }
+
+  .volunteerActionBar button {
+    min-height: 66px;
+  }
+
+  .assignmentFacts {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ==========================================================
+   CAMPAIGN HQ — GLOBAL RESPONSIVE SHELL FOUNDATION
+   Fixed shared sidebar: 272px | Mobile breakpoint: 850px
+   ========================================================== */
+.app {
+  width: 100% !important;
+  height: 100dvh !important;
+  min-height: 100dvh !important;
+  overflow: hidden !important;
+}
+.workspace {
+  display: flex !important;
+  width: calc(100vw - 272px) !important;
+  max-width: calc(100vw - 272px) !important;
+  height: 100dvh !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+  margin-left: 272px !important;
+  flex: 1 1 auto !important;
+  flex-direction: column !important;
+  overflow: hidden !important;
+  box-sizing: border-box !important;
+}
+.topbar {
+  width: 100% !important;
+  min-width: 0 !important;
+  max-width: 100% !important;
+  flex: 0 0 auto !important;
+  box-sizing: border-box !important;
+}
+.main {
+  min-width: 0 !important;
+  min-height: 0 !important;
+  flex: 1 1 auto !important;
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable;
+  -webkit-overflow-scrolling: touch;
+}
+@media (max-width: 850px) {
+  .workspace {
+    width: 100vw !important;
+    max-width: 100vw !important;
+    margin-left: 0 !important;
+  }
+  .menuButton {
+    display: grid !important;
+  }
+}

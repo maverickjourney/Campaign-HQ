@@ -1,0 +1,395 @@
+/* CAMPAIGN HQ PARTY-AWARE SIDEBAR THEME */
+
+aside[data-campaign-party] {
+  border-right:
+    1px solid
+    rgba(255, 255, 255, 0.12) !important;
+  color: #ffffff;
+  transition:
+    background 180ms ease,
+    box-shadow 180ms ease;
+}
+
+aside[data-campaign-party="republican"] {
+  background:
+    radial-gradient(
+      circle at 18% 6%,
+      rgba(255, 255, 255, 0.13),
+      transparent 31%
+    ),
+    linear-gradient(
+      180deg,
+      #a5151d 0%,
+      #791016 53%,
+      #4f0a0f 100%
+    ) !important;
+  box-shadow:
+    12px 0 34px
+    rgba(91, 8, 14, 0.2) !important;
+}
+
+aside[data-campaign-party="democratic"] {
+  background:
+    radial-gradient(
+      circle at 18% 6%,
+      rgba(255, 255, 255, 0.13),
+      transparent 31%
+    ),
+    linear-gradient(
+      180deg,
+      #174f86 0%,
+      #123a6d 53%,
+      #071f3f 100%
+    ) !important;
+  box-shadow:
+    12px 0 34px
+    rgba(7, 31, 63, 0.2) !important;
+}
+
+aside[data-campaign-party="neutral"] {
+  background:
+    linear-gradient(
+      180deg,
+      #334155,
+      #172033
+    ) !important;
+}
+
+aside[data-campaign-party] nav button {
+  color:
+    rgba(255, 255, 255, 0.76) !important;
+}
+
+aside[data-campaign-party] nav button:not(:disabled):hover,
+aside[data-campaign-party] nav button[aria-current="page"] {
+  color: #ffffff !important;
+  transform:
+    translateX(2px);
+}
+
+aside[data-campaign-party="republican"]
+  nav button:not(:disabled):hover,
+aside[data-campaign-party="republican"]
+  nav button[aria-current="page"] {
+  background:
+    linear-gradient(
+      90deg,
+      rgba(18, 58, 109, 0.97),
+      rgba(31, 86, 143, 0.82)
+    ) !important;
+  box-shadow:
+    inset 3px 0 #7fb1e4,
+    0 9px 22px
+    rgba(7, 31, 63, 0.18) !important;
+}
+
+aside[data-campaign-party="democratic"]
+  nav button:not(:disabled):hover,
+aside[data-campaign-party="democratic"]
+  nav button[aria-current="page"] {
+  background:
+    linear-gradient(
+      90deg,
+      rgba(215, 25, 32, 0.97),
+      rgba(239, 43, 55, 0.82)
+    ) !important;
+  box-shadow:
+    inset 3px 0 #ff929a,
+    0 9px 22px
+    rgba(91, 8, 14, 0.18) !important;
+}
+
+aside[data-campaign-party="neutral"]
+  nav button:not(:disabled):hover,
+aside[data-campaign-party="neutral"]
+  nav button[aria-current="page"] {
+  background:
+    rgba(255, 255, 255, 0.12) !important;
+  box-shadow:
+    inset 3px 0
+    rgba(255, 255, 255, 0.72) !important;
+}
+
+aside[data-campaign-party="republican"]
+  nav button small {
+  background: #123a6d !important;
+}
+
+aside[data-campaign-party="democratic"]
+  nav button small {
+  background: #d71920 !important;
+}
+
+
+/* CAMPAIGN HQ SIDEBAR READABILITY REFINEMENT */
+aside[data-campaign-party]
+  [data-sidebar-muted="true"] {
+  color:
+    rgba(
+      255,
+      255,
+      255,
+      0.74
+    ) !important;
+}
+
+aside[data-campaign-party]
+  [data-sidebar-section="true"] {
+  color:
+    rgba(
+      255,
+      255,
+      255,
+      0.62
+    ) !important;
+}
+
+aside[data-campaign-party="republican"]
+  nav button[aria-current="page"],
+aside[data-campaign-party="republican"]
+  nav button:not(:disabled):hover {
+  color: #ffffff !important;
+  background:
+    linear-gradient(
+      90deg,
+      rgba(18, 58, 109, 0.98),
+      rgba(31, 86, 143, 0.84)
+    ) !important;
+}
+
+
+/* CAMPAIGN HQ CONSOLIDATED CANDIDATE IDENTITY */
+aside[data-campaign-party] button[data-candidate-identity="true"] {
+  align-items: flex-start;
+  gap: 11px;
+  padding: 9px;
+  border-radius: 14px;
+  transition:
+    background 160ms ease,
+    box-shadow 160ms ease,
+    transform 160ms ease;
+}
+
+aside[data-campaign-party] button[data-candidate-identity="true"]:hover,
+aside[data-campaign-party]
+  button[data-candidate-identity="true"][data-profile-active="true"] {
+  background: rgba(255, 255, 255, 0.1) !important;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.11);
+  transform: translateY(-1px);
+}
+
+aside[data-campaign-party] [data-candidate-copy="true"] {
+  display: grid !important;
+  min-width: 0;
+  gap: 3px !important;
+}
+
+aside[data-campaign-party] [data-candidate-copy="true"] > strong {
+  overflow: hidden;
+  color: #ffffff;
+  font-size: 14px;
+  line-height: 1.2;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+aside[data-campaign-party] [data-candidate-office="true"] {
+  display: -webkit-box;
+  overflow: hidden;
+  color: rgba(255, 255, 255, 0.76) !important;
+  font-size: 11px !important;
+  line-height: 1.35;
+  text-overflow: initial !important;
+  white-space: normal !important;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+aside[data-campaign-party] [data-candidate-role="true"] {
+  width: max-content;
+  max-width: 100%;
+  margin-top: 2px;
+  padding: 3px 7px;
+  overflow: hidden;
+  border-radius: 999px;
+  color: #ffffff;
+  background: rgba(18, 58, 109, 0.96);
+  font-size: 9px;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  line-height: 1.2;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+aside[data-campaign-party="democratic"] [data-candidate-role="true"] {
+  background: rgba(215, 25, 32, 0.96);
+}
+
+aside[data-campaign-party] [data-sidebar-signout="true"] {
+  display: flex !important;
+  width: 100% !important;
+  min-height: 40px;
+  height: 40px !important;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 0 12px;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  color: rgba(255, 255, 255, 0.76) !important;
+  background: rgba(255, 255, 255, 0.06) !important;
+  font-size: 11px;
+  font-weight: 850;
+}
+
+aside[data-campaign-party] [data-sidebar-signout="true"]:hover {
+  color: #ffffff !important;
+  background: rgba(255, 255, 255, 0.12) !important;
+}
+
+/* CAMPAIGN HQ WORKSPACE AND SIGNED-IN IDENTITY CLARITY */
+aside[data-campaign-party]
+  [data-campaign-workspace-label="true"] {
+  display: block;
+  margin-bottom: 1px;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 8px;
+  font-weight: 900;
+  letter-spacing: 0.11em;
+  line-height: 1.2;
+  text-transform: uppercase;
+}
+
+aside[data-campaign-party]
+  [data-campaign-workspace-copy="true"] {
+  gap: 2px !important;
+}
+
+aside[data-campaign-party]
+  [data-signed-in-panel="true"] {
+  display: grid !important;
+  min-height: 72px;
+  height: auto !important;
+  align-content: center;
+  gap: 5px;
+  padding: 9px 13px 10px !important;
+}
+
+aside[data-campaign-party]
+  [data-signed-in-label="true"] {
+  color: rgba(255, 255, 255, 0.52);
+  font-size: 8px;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+aside[data-campaign-party]
+  [data-signed-in-row="true"] {
+  display: grid;
+  min-width: 0;
+  grid-template-columns: minmax(0, 1fr) 36px;
+  align-items: center;
+  gap: 7px;
+}
+
+aside[data-campaign-party]
+  [data-signed-in-profile="true"] {
+  display: grid !important;
+  min-width: 0;
+  min-height: 40px;
+  grid-template-columns: 34px minmax(0, 1fr);
+  align-items: center;
+  gap: 8px;
+  padding: 3px !important;
+  border: 0 !important;
+  border-radius: 10px;
+  color: #ffffff !important;
+  text-align: left;
+  background: transparent !important;
+}
+
+aside[data-campaign-party]
+  [data-signed-in-profile="true"]:hover {
+  background: rgba(255, 255, 255, 0.08) !important;
+}
+
+aside[data-campaign-party]
+  [data-signed-in-avatar="true"] {
+  display: grid;
+  width: 34px;
+  height: 34px;
+  place-items: center;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 10px;
+  color: #ffffff;
+  background: rgba(18, 58, 109, 0.94);
+  font-size: 11px;
+  font-weight: 900;
+}
+
+aside[data-campaign-party="democratic"]
+  [data-signed-in-avatar="true"] {
+  background: rgba(215, 25, 32, 0.94);
+}
+
+aside[data-campaign-party]
+  [data-signed-in-copy="true"] {
+  display: grid;
+  min-width: 0;
+  gap: 2px;
+}
+
+aside[data-campaign-party]
+  [data-signed-in-copy="true"] strong,
+aside[data-campaign-party]
+  [data-signed-in-copy="true"] span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+aside[data-campaign-party]
+  [data-signed-in-copy="true"] strong {
+  color: #ffffff;
+  font-size: 11px;
+  line-height: 1.2;
+}
+
+aside[data-campaign-party]
+  [data-signed-in-copy="true"] span {
+  color: rgba(255, 255, 255, 0.62);
+  font-size: 9px;
+  line-height: 1.2;
+}
+
+aside[data-campaign-party]
+  [data-signed-in-row="true"]
+  [data-sidebar-signout="true"] {
+  display: grid !important;
+  width: 36px !important;
+  min-height: 36px;
+  height: 36px !important;
+  place-items: center;
+  padding: 0 !important;
+  border-radius: 10px;
+}
+
+@media (min-width: 851px) and (max-height: 780px) {
+  aside[data-campaign-party]
+    [data-campaign-workspace-label="true"] {
+    display: block;
+    font-size: 7px;
+    letter-spacing: 0.09em;
+  }
+
+  aside[data-campaign-party]
+    [data-signed-in-panel="true"] {
+    min-height: 62px;
+    padding-top: 6px !important;
+    padding-bottom: 7px !important;
+  }
+}
+

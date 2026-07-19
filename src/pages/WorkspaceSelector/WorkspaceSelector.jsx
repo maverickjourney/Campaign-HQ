@@ -1,243 +1,669 @@
-import { useMemo, useState } from "react";
+import {
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 import { useNavigate } from "react-router-dom";
 import {
   ArrowRight,
+  BriefcaseBusiness,
   CalendarDays,
   CheckCircle2,
-  FolderKanban,
+  Clock3,
+  Layers3,
   LockKeyhole,
   LogOut,
+  MapPin,
   Search,
   ShieldCheck,
+  Sparkles,
   UsersRound,
   Vote,
 } from "lucide-react";
 
+import campaignHero1 from "../../assets/images/login/hero.jpg";
+import campaignHero2 from "../../assets/images/login/hero2.jpg";
+import campaignHero3 from "../../assets/images/login/hero3.jpg";
+
 import {
-  CAMPAIGN_WORKSPACE,
   clearCampaignSession,
-  getAccessMode,
+  getCampaignMemberships,
   getCurrentUser,
-  getRoleLabel,
+  getDashboardRoute,
   getUserInitials,
-  saveWorkspace,
+  selectCampaignWorkspace,
 } from "../../utils/campaignSession";
+
 import styles from "./WorkspaceSelector.module.css";
+
+const ELIZABETH_WORKSPACE_ID =
+  "11111111-1111-1111-1111-111111111111";
+
+const campaignImagesByWorkspace = {
+  [ELIZABETH_WORKSPACE_ID]: [
+    campaignHero1,
+    campaignHero2,
+    campaignHero3,
+  ],
+};
+
+const fallbackCampaignImages = [
+  campaignHero1,
+  campaignHero2,
+  campaignHero3,
+];
+
+function getCampaignImages(workspaceId) {
+  return (
+    campaignImagesByWorkspace[workspaceId] ||
+    fallbackCampaignImages
+  );
+}
+
+function getDashboardLabel(dashboardType) {
+  const labels = {
+    candidate: "Candidate Dashboard",
+    command: "Campaign Command Center",
+    department: "Department Workspace",
+    captain: "Team Captain Portal",
+    volunteer: "Volunteer Portal",
+    reviewer: "Reviewer Portal",
+  };
+
+  return (
+    labels[dashboardType] ||
+    "Campaign Workspace"
+  );
+}
+
+function getSeatLabel(seatType) {
+  const labels = {
+    command: "Command Access",
+    staff: "Staff Access",
+    volunteer: "Volunteer Access",
+    reviewer: "Reviewer Access",
+  };
+
+  return labels[seatType] || "Campaign Access";
+}
+
+function getGreeting() {
+  const currentHour =
+    new Date().getHours();
+
+  if (currentHour < 12) {
+    return "Good morning";
+  }
+
+  if (currentHour < 18) {
+    return "Good afternoon";
+  }
+
+  return "Good evening";
+}
+
+function getDaysUntilElection(dateValue) {
+  if (!dateValue) {
+    return null;
+  }
+
+  const electionDate =
+    new Date(`${dateValue}T00:00:00`);
+
+  if (
+    Number.isNaN(
+      electionDate.getTime(),
+    )
+  ) {
+    return null;
+  }
+
+  const today = new Date();
+
+  today.setHours(0, 0, 0, 0);
+
+  const milliseconds =
+    electionDate.getTime() -
+    today.getTime();
+
+  return Math.max(
+    0,
+    Math.ceil(
+      milliseconds /
+        (1000 * 60 * 60 * 24),
+    ),
+  );
+}
 
 export default function WorkspaceSelector() {
   const navigate = useNavigate();
-  const [searchTerm, setSearchTerm] = useState("");
+
+  const [searchTerm, setSearchTerm] =
+    useState("");
+
+  const [activeSlide, setActiveSlide] =
+    useState(0);
 
   const user = getCurrentUser();
-  const accessMode = getAccessMode();
-  const roleLabel = getRoleLabel(accessMode);
-  const isAdmin = accessMode === "admin";
 
-  const workspaceMatchesSearch = useMemo(() => {
-    const normalizedSearch = searchTerm.trim().toLowerCase();
+  const memberships =
+    getCampaignMemberships();
 
-    if (!normalizedSearch) {
-      return true;
-    }
+  const primaryMembership =
+    memberships[0] || null;
 
-    return [
-      CAMPAIGN_WORKSPACE.name,
-      CAMPAIGN_WORKSPACE.description,
-      CAMPAIGN_WORKSPACE.location,
-      user.name,
-      roleLabel,
-    ].some((value) => {
-      return value.toLowerCase().includes(normalizedSearch);
-    });
-  }, [searchTerm, user.name, roleLabel]);
+  useEffect(() => {
+    const interval =
+      window.setInterval(() => {
+        setActiveSlide((current) => {
+          return (
+            (current + 1) %
+            fallbackCampaignImages.length
+          );
+        });
+      }, 6000);
 
-  const handleSelectWorkspace = () => {
-    saveWorkspace();
-    navigate("/dashboard");
+    return () => {
+      window.clearInterval(interval);
+    };
+  }, []);
+
+  const filteredMemberships =
+    useMemo(() => {
+      const normalizedSearch =
+        searchTerm
+          .trim()
+          .toLowerCase();
+
+      if (!normalizedSearch) {
+        return memberships;
+      }
+
+      return memberships.filter(
+        (membership) => {
+          const workspace =
+            membership.workspace;
+
+          return [
+            workspace?.name,
+            workspace?.description,
+            workspace?.location,
+            membership.roleName,
+            membership.displayTitle,
+          ]
+            .filter(Boolean)
+            .some((value) =>
+              value
+                .toLowerCase()
+                .includes(
+                  normalizedSearch,
+                ),
+            );
+        },
+      );
+    }, [memberships, searchTerm]);
+
+  const electionCountdown =
+    getDaysUntilElection(
+      primaryMembership?.workspace
+        ?.electionDateRaw,
+    );
+
+  const firstName =
+    user.name?.split(" ")[0] ||
+    "there";
+
+  const handleSelectWorkspace = (
+    membership,
+  ) => {
+    const selectedMembership =
+      selectCampaignWorkspace(
+        membership,
+      );
+
+    navigate(
+      getDashboardRoute(
+        selectedMembership.dashboardType,
+      ),
+      {
+        replace: true,
+      },
+    );
   };
 
-  const handleLogout = () => {
-    clearCampaignSession();
-    navigate("/");
+  const handleLogout = async () => {
+    await clearCampaignSession();
+
+    navigate("/", {
+      replace: true,
+    });
   };
 
   return (
     <div className={styles.page}>
-      <div className={styles.backgroundGlow} aria-hidden="true" />
-      <div className={styles.backgroundGrid} aria-hidden="true" />
+      <div
+        className={styles.backgroundGlow}
+        aria-hidden="true"
+      />
+
+      <div
+        className={styles.backgroundGrid}
+        aria-hidden="true"
+      />
 
       <header className={styles.header}>
         <div className={styles.headerInner}>
           <div className={styles.brand}>
-            <div className={styles.brandMark} aria-hidden="true">
+            <div
+              className={styles.brandMark}
+              aria-hidden="true"
+            >
               <span>HQ</span>
             </div>
 
             <div className={styles.brandCopy}>
-              <strong>Campaign HQ</strong>
-              <span>Campaign Operations Center</span>
+              <strong>
+                Campaign HQ
+              </strong>
+
+              <span>
+                Campaign Operations Center
+              </span>
             </div>
           </div>
 
-          <div className={styles.profile}>
-            <div className={styles.avatar} aria-hidden="true">
-              {getUserInitials(user.name)}
-            </div>
-
-            <div className={styles.profileCopy}>
-              <strong>{user.name}</strong>
-              <span>{roleLabel}</span>
-            </div>
-
-            <button
-              className={styles.logoutButton}
-              type="button"
-              onClick={handleLogout}
-              aria-label="Sign out"
-              title="Sign out"
+          <div className={styles.headerActions}>
+            <div
+              className={
+                styles.membershipBadge
+              }
             >
-              <LogOut size={19} strokeWidth={1.9} />
-            </button>
+              <Layers3
+                size={16}
+                strokeWidth={1.9}
+              />
+
+              <span>
+                {memberships.length}{" "}
+                {memberships.length === 1
+                  ? "Active Campaign"
+                  : "Active Campaigns"}
+              </span>
+            </div>
+
+            <div className={styles.profile}>
+              <div
+                className={styles.avatar}
+                aria-hidden="true"
+              >
+                {getUserInitials(
+                  user.name,
+                )}
+              </div>
+
+              <div
+                className={
+                  styles.profileCopy
+                }
+              >
+                <strong>
+                  {user.name}
+                </strong>
+
+                <span>
+                  {primaryMembership
+                    ?.displayTitle ||
+                    "Campaign HQ Account"}
+                </span>
+              </div>
+
+              <button
+                className={
+                  styles.logoutButton
+                }
+                type="button"
+                onClick={handleLogout}
+                aria-label="Sign out"
+              >
+                <LogOut
+                  size={18}
+                  strokeWidth={1.9}
+                />
+              </button>
+            </div>
           </div>
         </div>
       </header>
 
       <main className={styles.main}>
-        <section className={styles.primaryContent}>
+        <section
+          className={
+            styles.workspaceSection
+          }
+        >
           <div className={styles.intro}>
             <div>
-              <p className={styles.eyebrow}>
-                {isAdmin
-                  ? "Administrative campaign access"
-                  : "Your campaign workspace"}
-              </p>
-
-              <h1>Select a workspace</h1>
-
-              <p className={styles.description}>
-                Welcome, {user.name}. Choose the campaign you want to
-                enter. Your {isAdmin ? "administrator" : "client"} access
-                will be applied automatically.
-              </p>
-            </div>
-
-            <div className={styles.workspaceCount}>
-              <span>1</span>
-
-              <div>
-                <strong>Active workspace</strong>
-                <small>Ready to open</small>
-              </div>
-            </div>
-          </div>
-
-          <div className={styles.toolbar}>
-            <div className={styles.searchWrap}>
-              <Search size={19} strokeWidth={1.8} />
-
-              <input
-                type="search"
-                value={searchTerm}
-                onChange={(event) => setSearchTerm(event.target.value)}
-                placeholder="Search your workspaces"
-                aria-label="Search campaign workspaces"
-              />
-            </div>
-
-            <div className={styles.accessBadge}>
-              <ShieldCheck size={18} strokeWidth={1.8} />
-              <span>{roleLabel} access</span>
-            </div>
-          </div>
-
-          <div className={styles.workspaceArea}>
-            {workspaceMatchesSearch ? (
-              <button
-                className={styles.workspaceCard}
-                type="button"
-                onClick={handleSelectWorkspace}
+              <div
+                className={styles.eyebrow}
               >
-                <div className={styles.cardTopLine} aria-hidden="true" />
+                <Sparkles
+                  size={14}
+                  strokeWidth={2}
+                />
 
-                <div className={styles.cardHeader}>
-                  <div className={styles.campaignIdentity}>
-                    <div className={styles.campaignMark} aria-hidden="true">
-                      <span>EA</span>
-                      <Vote size={21} strokeWidth={1.8} />
-                    </div>
+                Your Campaign Portfolio
+              </div>
 
-                    <div>
-                      <div className={styles.titleRow}>
-                        <h2>Elizabeth Accomando</h2>
+              <h1>
+                {getGreeting()},{" "}
+                {firstName}.
+              </h1>
 
-                        <span className={styles.activeStatus}>
-                          <CheckCircle2 size={15} strokeWidth={2.2} />
-                          Active
-                        </span>
+              <p>
+                Choose the campaign workspace
+                you want to enter. Your role,
+                permissions and dashboard will
+                be applied automatically.
+              </p>
+            </div>
+
+            {memberships.length > 1 && (
+              <div
+                className={
+                  styles.searchWrap
+                }
+              >
+                <Search
+                  size={19}
+                  strokeWidth={1.8}
+                />
+
+                <input
+                  type="search"
+                  value={searchTerm}
+                  onChange={(event) =>
+                    setSearchTerm(
+                      event.target.value,
+                    )
+                  }
+                  placeholder="Search campaigns"
+                  aria-label="Search campaigns"
+                />
+              </div>
+            )}
+          </div>
+
+          <div className={styles.workspaceGrid}>
+            {filteredMemberships.length ? (
+              filteredMemberships.map(
+                (membership) => {
+                  const workspace =
+                    membership.workspace;
+
+                  const campaignImages =
+                    getCampaignImages(
+                      membership.workspaceId,
+                    );
+
+                  const currentImage =
+                    campaignImages[
+                      activeSlide %
+                        campaignImages.length
+                    ];
+
+                  return (
+                    <article
+                      key={
+                        membership.membershipId
+                      }
+                      className={
+                        styles.campaignCard
+                      }
+                      style={{
+                        backgroundImage: `
+                          linear-gradient(
+                            90deg,
+                            rgba(3, 16, 35, 0.96),
+                            rgba(3, 16, 35, 0.76) 52%,
+                            rgba(3, 16, 35, 0.25)
+                          ),
+                          linear-gradient(
+                            180deg,
+                            transparent 42%,
+                            rgba(2, 13, 30, 0.8)
+                          ),
+                          url(${currentImage})
+                        `,
+                      }}
+                    >
+                      <div
+                        className={
+                          styles.cardTop
+                        }
+                      >
+                        <div
+                          className={
+                            styles.campaignIdentity
+                          }
+                        >
+                          <div
+                            className={
+                              styles.campaignMark
+                            }
+                          >
+                            <span>
+                              {getUserInitials(
+                                workspace.name,
+                              )}
+                            </span>
+
+                            <Vote
+                              size={18}
+                              strokeWidth={1.8}
+                            />
+                          </div>
+
+                          <div>
+                            <span>
+                              Campaign Workspace
+                            </span>
+
+                            <strong>
+                              {workspace.status ===
+                              "active"
+                                ? "Active Campaign"
+                                : workspace.status}
+                            </strong>
+                          </div>
+                        </div>
+
+                        <div
+                          className={
+                            styles.roleBadge
+                          }
+                        >
+                          <ShieldCheck
+                            size={15}
+                            strokeWidth={2}
+                          />
+
+                          {
+                            membership.displayTitle
+                          }
+                        </div>
                       </div>
 
-                      <p>Palm Beach County Commission, District 6</p>
-                    </div>
-                  </div>
-                </div>
+                      <div
+                        className={
+                          styles.cardContent
+                        }
+                      >
+                        <p>
+                          Palm Beach County,
+                          Florida
+                        </p>
 
-                <div className={styles.detailsGrid}>
-                  <div className={styles.detail}>
-                    <CalendarDays size={19} strokeWidth={1.8} />
+                        <h2>
+                          {workspace.name}
+                        </h2>
 
-                    <div>
-                      <span>Election Day</span>
-                      <strong>August 18, 2026</strong>
-                    </div>
-                  </div>
+                        <h3>
+                          {
+                            workspace.description
+                          }
+                        </h3>
 
-                  <div className={styles.detail}>
-                    <ShieldCheck size={19} strokeWidth={1.8} />
+                        <div
+                          className={
+                            styles.campaignDetails
+                          }
+                        >
+                          <div>
+                            <CalendarDays
+                              size={18}
+                              strokeWidth={1.8}
+                            />
 
-                    <div>
-                      <span>Your access</span>
-                      <strong>{roleLabel}</strong>
-                    </div>
-                  </div>
-                </div>
+                            <span>
+                              Election Day
+                            </span>
 
-                <div className={styles.workspaceTools}>
-                  <span>
-                    <FolderKanban size={16} strokeWidth={1.8} />
-                    Campaign files
-                  </span>
+                            <strong>
+                              {
+                                workspace.electionDate
+                              }
+                            </strong>
+                          </div>
 
-                  <span>
-                    <UsersRound size={16} strokeWidth={1.8} />
-                    Team activity
-                  </span>
+                          <div>
+                            <BriefcaseBusiness
+                              size={18}
+                              strokeWidth={1.8}
+                            />
 
-                  <span>
-                    <CalendarDays size={16} strokeWidth={1.8} />
-                    Events
-                  </span>
-                </div>
+                            <span>
+                              Your Role
+                            </span>
 
-                <div className={styles.enterRow}>
-                  <div>
-                    <span>Palm Beach County, Florida</span>
-                    <strong>
-                      Open {isAdmin ? "admin" : "client"} workspace
-                    </strong>
-                  </div>
+                            <strong>
+                              {
+                                membership.displayTitle
+                              }
+                            </strong>
+                          </div>
 
-                  <div className={styles.arrowButton} aria-hidden="true">
-                    <ArrowRight size={21} strokeWidth={2} />
-                  </div>
-                </div>
-              </button>
+                          <div>
+                            <UsersRound
+                              size={18}
+                              strokeWidth={1.8}
+                            />
+
+                            <span>
+                              Access Level
+                            </span>
+
+                            <strong>
+                              {getSeatLabel(
+                                membership.seatType,
+                              )}
+                            </strong>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div
+                        className={
+                          styles.cardFooter
+                        }
+                      >
+                        <div
+                          className={
+                            styles.slideDots
+                          }
+                          aria-label="Campaign images"
+                        >
+                          {campaignImages.map(
+                            (
+                              image,
+                              index,
+                            ) => (
+                              <button
+                                key={image}
+                                className={
+                                  index ===
+                                  activeSlide %
+                                    campaignImages.length
+                                    ? styles.activeDot
+                                    : ""
+                                }
+                                type="button"
+                                onClick={() =>
+                                  setActiveSlide(
+                                    index,
+                                  )
+                                }
+                                aria-label={`Show campaign image ${
+                                  index + 1
+                                }`}
+                              />
+                            ),
+                          )}
+                        </div>
+
+                        <button
+                          className={
+                            styles.enterButton
+                          }
+                          type="button"
+                          onClick={() =>
+                            handleSelectWorkspace(
+                              membership,
+                            )
+                          }
+                        >
+                          <span>
+                            Enter{" "}
+                            {getDashboardLabel(
+                              membership.dashboardType,
+                            )}
+                          </span>
+
+                          <ArrowRight
+                            size={19}
+                            strokeWidth={2}
+                          />
+                        </button>
+                      </div>
+                    </article>
+                  );
+                },
+              )
             ) : (
-              <div className={styles.emptyState}>
-                <Search size={30} strokeWidth={1.5} />
-                <h2>No workspaces found</h2>
-                <p>Try searching for Elizabeth, Wellington or campaign.</p>
+              <div
+                className={
+                  styles.emptyState
+                }
+              >
+                <Search
+                  size={30}
+                  strokeWidth={1.6}
+                />
 
-                <button type="button" onClick={() => setSearchTerm("")}>
+                <h2>
+                  No campaigns found
+                </h2>
+
+                <p>
+                  Try another campaign name,
+                  location or role.
+                </p>
+
+                <button
+                  type="button"
+                  onClick={() =>
+                    setSearchTerm("")
+                  }
+                >
                   Clear search
                 </button>
               </div>
@@ -246,72 +672,167 @@ export default function WorkspaceSelector() {
         </section>
 
         <aside className={styles.sidePanel}>
-          <div className={styles.sidePanelHeader}>
-            <div className={styles.lockIcon}>
-              {isAdmin ? (
-                <ShieldCheck size={22} strokeWidth={1.8} />
-              ) : (
-                <LockKeyhole size={22} strokeWidth={1.8} />
-              )}
+          <div
+            className={styles.accessCard}
+          >
+            <div
+              className={
+                styles.accessHeader
+              }
+            >
+              <div
+                className={
+                  styles.accessIcon
+                }
+              >
+                <LockKeyhole
+                  size={21}
+                  strokeWidth={1.8}
+                />
+              </div>
+
+              <div>
+                <span>
+                  Your Campaign Access
+                </span>
+
+                <h2>
+                  {
+                    primaryMembership
+                      ?.displayTitle
+                  }
+                </h2>
+              </div>
             </div>
-
-            <div>
-              <p>{isAdmin ? "Administrator access" : "Secure access"}</p>
-
-              <h2>
-                {isAdmin
-                  ? "Campaign controls are available"
-                  : "Your campaign data is protected"}
-              </h2>
-            </div>
-          </div>
-
-          <p className={styles.sideDescription}>
-            {isAdmin
-              ? "You signed in through the Administrator Portal. Your account can access campaign-wide management controls."
-              : "You signed in through the Client Portal. You will see the campaign tools and information assigned to you."}
-          </p>
-
-          <div className={styles.securityList}>
-            <div>
-              <CheckCircle2 size={18} strokeWidth={2} />
-              <span>Role-based campaign access</span>
-            </div>
-
-            <div>
-              <CheckCircle2 size={18} strokeWidth={2} />
-              <span>Protected files and contacts</span>
-            </div>
-
-            <div>
-              <CheckCircle2 size={18} strokeWidth={2} />
-              <span>
-                {isAdmin
-                  ? "Administrative campaign controls"
-                  : "Centralized campaign activity"}
-              </span>
-            </div>
-          </div>
-
-          <div className={styles.supportBox}>
-            <span>Need different access?</span>
 
             <p>
-              Sign out and choose the correct portal, or contact the
-              campaign administrator for permission.
+              Campaign HQ automatically applies
+              the correct tools and permissions
+              whenever you enter this workspace.
+            </p>
+
+            <div
+              className={styles.accessList}
+            >
+              <div>
+                <CheckCircle2
+                  size={17}
+                  strokeWidth={2}
+                />
+
+                <span>
+                  {getDashboardLabel(
+                    primaryMembership
+                      ?.dashboardType,
+                  )}
+                </span>
+              </div>
+
+              <div>
+                <CheckCircle2
+                  size={17}
+                  strokeWidth={2}
+                />
+
+                <span>
+                  {getSeatLabel(
+                    primaryMembership
+                      ?.seatType,
+                  )}
+                </span>
+              </div>
+
+              <div>
+                <CheckCircle2
+                  size={17}
+                  strokeWidth={2}
+                />
+
+                <span>
+                  {
+                    primaryMembership
+                      ?.permissions?.length ||
+                    0
+                  }{" "}
+                  verified permissions
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <div
+            className={
+              styles.countdownCard
+            }
+          >
+            <div>
+              <Clock3
+                size={20}
+                strokeWidth={1.8}
+              />
+
+              <span>
+                Election Countdown
+              </span>
+            </div>
+
+            <strong>
+              {electionCountdown ?? "—"}
+            </strong>
+
+            <p>
+              Days until{" "}
+              {
+                primaryMembership
+                  ?.workspace
+                  ?.electionDate
+              }
             </p>
           </div>
 
-          <div className={styles.authorizedUse}>
-            <ShieldCheck size={17} strokeWidth={1.8} />
-            <span>Authorized campaign use only</span>
+          <div className={styles.locationCard}>
+            <MapPin
+              size={19}
+              strokeWidth={1.8}
+            />
+
+            <div>
+              <span>
+                Campaign Location
+              </span>
+
+              <strong>
+                {
+                  primaryMembership
+                    ?.workspace
+                    ?.location
+                }
+              </strong>
+            </div>
+          </div>
+
+          <div className={styles.inviteCard}>
+            <span>
+              Working on another campaign?
+            </span>
+
+            <p>
+              The campaign owner or authorized
+              leadership team can invite this
+              same Campaign HQ account.
+            </p>
           </div>
         </aside>
       </main>
 
       <footer className={styles.footer}>
-        <span>© 2026 Campaign HQ</span>
-        <span>Secure campaign operations platform</span>
+        <span>
+          © 2026 Campaign HQ
+        </span>
+
+        <span>
+          Secure campaign operations platform
+        </span>
       </footer>
     </div>
   );

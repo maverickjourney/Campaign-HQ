@@ -1,0 +1,408 @@
+.activityRoot {
+  position: relative;
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+}
+
+.bellButton {
+  position: relative;
+  display: grid;
+  width: 40px;
+  height: 40px;
+  flex: 0 0 40px;
+  place-items: center;
+  border: 1px solid #dce4ed;
+  border-radius: 12px;
+  color: #526279;
+  background: #ffffff;
+  box-shadow: 0 4px 12px rgba(18, 44, 76, 0.045);
+}
+
+.bellButton:hover {
+  color: #1f568f;
+  border-color: #bfd0e2;
+  background: #f8fbfe;
+}
+
+.unreadBadge {
+  position: absolute;
+  top: -6px;
+  right: -7px;
+  display: grid;
+  min-width: 20px;
+  height: 20px;
+  place-items: center;
+  padding: 0 5px;
+  border: 2px solid #ffffff;
+  border-radius: 999px;
+  color: #ffffff;
+  background: #e4232e;
+  font-size: 10px;
+  font-weight: 900;
+  line-height: 1;
+}
+
+.overlay {
+  position: fixed;
+  z-index: 210;
+  inset: 0;
+  border: 0;
+  background: rgba(4, 18, 37, 0.48);
+  backdrop-filter: blur(3px);
+}
+
+.drawer {
+  position: fixed;
+  z-index: 220;
+  top: 0;
+  right: 0;
+  display: flex;
+  width: min(440px, 100vw);
+  height: 100dvh;
+  flex-direction: column;
+  border-left: 1px solid #dce4ed;
+  color: #12243d;
+  background: #f5f8fc;
+  box-shadow: -24px 0 70px rgba(4, 18, 37, 0.22);
+  animation: activityDrawerIn 0.22s ease-out;
+}
+
+.drawerHeader {
+  display: flex;
+  min-height: 82px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  padding: 17px 19px;
+  border-bottom: 1px solid #dfe6ef;
+  background: #ffffff;
+}
+
+.drawerHeader span {
+  color: #e4232e;
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+}
+
+.drawerHeader h2 {
+  margin: 4px 0 0;
+  color: #071b35;
+  font-size: 22px;
+  letter-spacing: -0.03em;
+}
+
+.drawerHeader > button {
+  display: grid;
+  width: 38px;
+  height: 38px;
+  place-items: center;
+  border: 1px solid #d9e2ec;
+  border-radius: 11px;
+  color: #607086;
+  background: #ffffff;
+}
+
+.drawerControls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 15px;
+  border-bottom: 1px solid #e1e7ef;
+  background: #ffffff;
+}
+
+.filters,
+.controlActions {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.filters {
+  padding: 3px;
+  border-radius: 10px;
+  background: #eef2f7;
+}
+
+.filters button {
+  display: inline-flex;
+  min-height: 33px;
+  align-items: center;
+  gap: 6px;
+  padding: 0 11px;
+  border: 0;
+  border-radius: 8px;
+  color: #68768a;
+  background: transparent;
+  font-size: 12px;
+  font-weight: 850;
+}
+
+.filters .activeFilter {
+  color: #123a6d;
+  background: #ffffff;
+  box-shadow: 0 3px 10px rgba(18, 44, 76, 0.08);
+}
+
+.filters button span {
+  display: grid;
+  min-width: 18px;
+  height: 18px;
+  place-items: center;
+  padding: 0 4px;
+  border-radius: 999px;
+  color: #ffffff;
+  background: #e4232e;
+  font-size: 10px;
+}
+
+.controlActions > button {
+  display: inline-flex;
+  min-height: 36px;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 0 10px;
+  border: 1px solid #d8e1eb;
+  border-radius: 10px;
+  color: #5a6a80;
+  background: #ffffff;
+  font-size: 11px;
+  font-weight: 850;
+}
+
+.controlActions > button:first-child {
+  width: 36px;
+  padding: 0;
+}
+
+.controlActions button:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+
+.errorBanner {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin: 13px 14px 0;
+  padding: 12px;
+  border: 1px solid #f0c2c7;
+  border-radius: 12px;
+  color: #8a2831;
+  background: #fff4f5;
+}
+
+.errorBanner > div {
+  min-width: 0;
+}
+
+.errorBanner strong {
+  display: block;
+  font-size: 12px;
+}
+
+.errorBanner p {
+  margin: 4px 0 0;
+  font-size: 11px;
+  line-height: 1.45;
+}
+
+.activityList {
+  min-height: 0;
+  flex: 1;
+  padding: 12px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.activityItem {
+  display: flex;
+  width: 100%;
+  align-items: flex-start;
+  gap: 11px;
+  margin-bottom: 8px;
+  padding: 13px;
+  border: 1px solid #dfe6ef;
+  border-radius: 14px;
+  color: inherit;
+  background: #ffffff;
+  text-align: left;
+  box-shadow: 0 5px 16px rgba(18, 44, 76, 0.04);
+}
+
+.activityItem:hover {
+  border-color: #bfd0e2;
+  transform: translateY(-1px);
+}
+
+.unreadItem {
+  border-color: #c7d9ec;
+  background:
+    linear-gradient(
+      90deg,
+      rgba(50, 109, 168, 0.075),
+      rgba(255, 255, 255, 0.98)
+    );
+  box-shadow:
+    inset 3px 0 #326da8,
+    0 5px 16px rgba(18, 44, 76, 0.045);
+}
+
+.activityIcon {
+  display: grid;
+  width: 40px;
+  height: 40px;
+  flex: 0 0 40px;
+  place-items: center;
+  border-radius: 12px;
+  color: #326da8;
+  background: #edf4fb;
+}
+
+.activityCopy {
+  min-width: 0;
+  flex: 1;
+}
+
+.activityCopy > div {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.activityCopy strong {
+  min-width: 0;
+  overflow: hidden;
+  color: #152a46;
+  font-size: 13px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.unreadDot {
+  width: 7px;
+  height: 7px;
+  flex: 0 0 7px;
+  border-radius: 50%;
+  background: #e4232e;
+  box-shadow: 0 0 0 3px rgba(228, 35, 46, 0.1);
+}
+
+.activityCopy p {
+  display: -webkit-box;
+  margin: 5px 0 7px;
+  overflow: hidden;
+  color: #66758a;
+  font-size: 12px;
+  line-height: 1.45;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.activityCopy small {
+  color: #98a2b1;
+  font-size: 11px;
+}
+
+.loadingState,
+.emptyState {
+  display: grid;
+  min-height: 310px;
+  place-items: center;
+  align-content: center;
+  gap: 10px;
+  padding: 28px;
+  color: #718095;
+  text-align: center;
+}
+
+.emptyState svg {
+  color: #2b8b67;
+}
+
+.emptyState h3,
+.emptyState p {
+  margin: 0;
+}
+
+.emptyState h3 {
+  color: #10243e;
+  font-size: 17px;
+}
+
+.emptyState p {
+  max-width: 310px;
+  color: #7d899a;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.drawerFooter {
+  display: flex;
+  min-height: 48px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 0 17px;
+  border-top: 1px solid #dfe6ef;
+  color: #8793a4;
+  background: #ffffff;
+  font-size: 11px;
+  font-weight: 750;
+}
+
+.spinning {
+  animation: activitySpin 0.9s linear infinite;
+}
+
+@keyframes activityDrawerIn {
+  from {
+    transform: translateX(100%);
+  }
+
+  to {
+    transform: translateX(0);
+  }
+}
+
+@keyframes activitySpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (max-width: 680px) {
+  .bellButton {
+    width: 36px;
+    height: 36px;
+    flex-basis: 36px;
+  }
+
+  .drawer {
+    width: 100vw;
+  }
+
+  .drawerControls {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .filters,
+  .controlActions {
+    justify-content: space-between;
+  }
+
+  .filters button {
+    flex: 1;
+    justify-content: center;
+  }
+
+  .controlActions > button:last-child {
+    flex: 1;
+  }
+}

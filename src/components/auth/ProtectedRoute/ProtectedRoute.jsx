@@ -1,36 +1,55 @@
 import { useEffect, useState } from "react";
-import {
-  Navigate,
-  useLocation,
-} from "react-router-dom";
+import { Navigate, useLocation } from "react-router-dom";
 import { ShieldCheck } from "lucide-react";
 
 import { restoreCampaignSession } from "../../../services/auth";
+import { getCampaignExperience } from "../../../utils/campaignSession";
 import styles from "./ProtectedRoute.module.css";
 
-export default function ProtectedRoute({ children }) {
+export default function ProtectedRoute({
+  children,
+  allowedExperiences = [],
+}) {
   const location = useLocation();
   const [status, setStatus] = useState("checking");
+  const allowedKey = allowedExperiences.join("|");
 
   useEffect(() => {
-    let isMounted = true;
+    let mounted = true;
 
-    const verifyAccess = async () => {
+    const verify = async () => {
       const session = await restoreCampaignSession();
 
-      if (!isMounted) {
+      if (!mounted) {
         return;
       }
 
-      setStatus(session ? "authorized" : "signed-out");
+      if (!session) {
+        setStatus("signed-out");
+        return;
+      }
+
+      const allowed = allowedKey
+        ? allowedKey.split("|")
+        : [];
+
+      if (
+        allowed.length &&
+        !allowed.includes(getCampaignExperience().key)
+      ) {
+        setStatus("forbidden");
+        return;
+      }
+
+      setStatus("authorized");
     };
 
-    verifyAccess();
+    verify();
 
     return () => {
-      isMounted = false;
+      mounted = false;
     };
-  }, []);
+  }, [allowedKey]);
 
   if (status === "checking") {
     return (
@@ -38,7 +57,6 @@ export default function ProtectedRoute({ children }) {
         <div className={styles.loadingMark}>
           <ShieldCheck size={28} strokeWidth={1.8} />
         </div>
-
         <strong>Opening Campaign HQ</strong>
         <span>Verifying your secure campaign access…</span>
       </div>
@@ -53,6 +71,10 @@ export default function ProtectedRoute({ children }) {
         state={{ from: location.pathname }}
       />
     );
+  }
+
+  if (status === "forbidden") {
+    return <Navigate to="/dashboard" replace />;
   }
 
   return children;

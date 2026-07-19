@@ -1,34 +1,51 @@
 .hero {
   position: relative;
-  height: 100vh;
-  padding: clamp(22px, 2.1vw, 34px) clamp(24px, 2.5vw, 40px)
-    clamp(18px, 1.8vw, 28px);
   display: flex;
+  height: 100dvh;
   flex-direction: column;
-  color: white;
+  padding:
+    clamp(22px, 2.1vw, 34px)
+    clamp(24px, 2.5vw, 40px)
+    clamp(18px, 1.8vw, 28px);
   overflow: hidden;
-  background-size: cover;
-  background-position: center;
+  color: #ffffff;
   background-repeat: no-repeat;
-  transition: background-image 0.6s ease;
+  background-position: center;
+  background-size: cover;
+  transition:
+    background-image 0.7s ease,
+    background-position 0.7s ease;
 }
 
-.hero::after {
-  content: "";
+.hero::before {
   position: absolute;
   inset: 0;
+  content: "";
   pointer-events: none;
   background:
-    linear-gradient(
-      90deg,
-      rgba(3, 15, 34, 0.43),
-      transparent 64%
+    radial-gradient(
+      circle at 72% 33%,
+      rgba(61, 132, 207, 0.12),
+      transparent 35%
     ),
     linear-gradient(
       180deg,
-      rgba(3, 15, 34, 0.05) 48%,
-      rgba(3, 15, 34, 0.7)
+      rgba(2, 12, 29, 0.07) 42%,
+      rgba(2, 12, 29, 0.82)
     );
+}
+
+.hero::after {
+  position: absolute;
+  right: -100px;
+  bottom: -180px;
+  width: 420px;
+  height: 420px;
+  border-radius: 50%;
+  content: "";
+  pointer-events: none;
+  background: rgba(224, 28, 42, 0.13);
+  filter: blur(45px);
 }
 
 .header,
@@ -40,62 +57,91 @@
 
 .header {
   display: flex;
-  justify-content: space-between;
   align-items: flex-start;
+  justify-content: space-between;
   gap: 22px;
 }
 
 .brand {
   display: block;
   font-size: clamp(34px, 2.8vw, 52px);
-  font-weight: 800;
-  letter-spacing: -0.045em;
+  font-weight: 850;
+  letter-spacing: -0.05em;
   line-height: 0.96;
+  text-shadow:
+    0 8px 25px rgba(0, 0, 0, 0.26);
 }
 
-.campaign {
-  margin: 7px 0 0;
-  color: #ff5b6f;
-  font-size: 11px;
-  font-weight: 800;
-  letter-spacing: 0.19em;
+.platform {
+  margin: 8px 0 0;
+  color: #ff6674;
+  font-size: 12px;
+  font-weight: 850;
+  letter-spacing: 0.2em;
   text-transform: uppercase;
 }
 
-.office {
-  color: rgba(255, 255, 255, 0.82);
-  font-size: 13px;
-  line-height: 1.35;
+.securityMessage {
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+  padding: 10px 12px;
+  border: 1px solid
+    rgba(255, 255, 255, 0.14);
+  border-radius: 12px;
+  background:
+    rgba(7, 25, 50, 0.42);
+  backdrop-filter: blur(15px);
+}
+
+.securityMessage > svg {
+  flex: 0 0 auto;
+  color: #a8d2ff;
+}
+
+.securityMessage div {
+  display: grid;
+  gap: 2px;
   text-align: right;
 }
 
-.office span {
-  display: block;
-  margin-top: 3px;
-  color: white;
+.securityMessage span {
+  color:
+    rgba(255, 255, 255, 0.67);
+  font-size: 12px;
   font-weight: 750;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.securityMessage strong {
+  color: #ffffff;
+  font-size: 12px;
 }
 
 .content {
-  width: min(590px, 100%);
-  margin-top: clamp(34px, 5.7vh, 78px);
+  width: min(610px, 100%);
+  margin-top:
+    clamp(32px, 5.2vh, 70px);
 }
 
 .eyebrow {
   margin: 0 0 12px;
   color: #a8d2ff;
-  font-size: 11px;
-  font-weight: 800;
+  font-size: 12px;
+  font-weight: 850;
   letter-spacing: 0.22em;
   text-transform: uppercase;
 }
 
 .content h1 {
   margin: 0;
-  font-size: clamp(50px, 5.15vw, 82px);
+  font-size:
+    clamp(51px, 5.2vw, 84px);
   line-height: 0.88;
-  letter-spacing: -0.055em;
-  text-shadow: 0 9px 30px rgba(0, 0, 0, 0.38);
+  letter-spacing: -0.057em;
+  text-shadow:
+    0 10px 32px rgba(0, 0, 0, 0.38);
 }
 
 .content h1 span {
@@ -103,86 +149,177 @@
 }
 
 .description {
-  max-width: 550px;
+  max-width: 565px;
   margin: 20px 0 0;
-  color: rgba(255, 255, 255, 0.92);
-  font-size: clamp(15px, 1.18vw, 19px);
-  line-height: 1.48;
-  text-shadow: 0 5px 20px rgba(0, 0, 0, 0.38);
+  color:
+    rgba(255, 255, 255, 0.9);
+  font-size:
+    clamp(14px, 1.12vw, 18px);
+  line-height: 1.5;
+  text-shadow:
+    0 5px 20px rgba(0, 0, 0, 0.38);
 }
 
-.countdown {
-  width: min(420px, 100%);
+.platformPulse {
+  width: min(510px, 100%);
   margin-top: 20px;
-  padding: 14px 20px;
-  border: 1px solid rgba(255, 255, 255, 0.14);
+  padding: 14px 16px 13px;
+  border: 1px solid
+    rgba(255, 255, 255, 0.15);
   border-radius: 16px;
-  background: rgba(8, 25, 49, 0.6);
-  backdrop-filter: blur(18px);
-  box-shadow: 0 16px 38px rgba(1, 10, 24, 0.18);
+  background:
+    linear-gradient(
+      135deg,
+      rgba(7, 25, 50, 0.78),
+      rgba(7, 25, 50, 0.55)
+    );
+  backdrop-filter: blur(20px);
+  box-shadow:
+    0 18px 42px
+    rgba(0, 0, 0, 0.2);
 }
 
-.countdown > span {
-  display: block;
-  margin-bottom: 11px;
+.pulseHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding-bottom: 11px;
+  border-bottom: 1px solid
+    rgba(255, 255, 255, 0.11);
+}
+
+.pulseHeader > div:first-child {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.pulseHeader svg {
+  color: #ff6674;
+}
+
+.pulseHeader span {
   color: #a8d2ff;
-  font-size: 10px;
-  font-weight: 800;
-  letter-spacing: 0.17em;
+  font-size: 12px;
+  font-weight: 850;
+  letter-spacing: 0.13em;
   text-transform: uppercase;
 }
 
-.timeGrid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-}
-
-.timeGrid div {
-  padding: 0 16px;
-  border-right: 1px solid rgba(255, 255, 255, 0.13);
-}
-
-.timeGrid div:first-child {
-  padding-left: 0;
-}
-
-.timeGrid div:last-child {
-  padding-right: 0;
-  border-right: 0;
-}
-
-.timeGrid strong {
-  display: block;
-  font-size: 29px;
-  line-height: 1;
-}
-
-.timeGrid small {
-  display: block;
-  margin-top: 4px;
-  color: rgba(255, 255, 255, 0.7);
-  font-size: 9px;
+.platformStatus {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color:
+    rgba(255, 255, 255, 0.62);
+  font-size: 12px;
   font-weight: 750;
-  letter-spacing: 0.09em;
+}
+
+.platformStatus span {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #53d792;
+  box-shadow:
+    0 0 0 4px
+    rgba(83, 215, 146, 0.12);
+}
+
+.pulseContent {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 12px;
+  padding-top: 12px;
+}
+
+.pulseIcon {
+  display: grid;
+  width: 39px;
+  height: 39px;
+  place-items: center;
+  border: 1px solid
+    rgba(255, 255, 255, 0.13);
+  border-radius: 11px;
+  color: #ffffff;
+  background:
+    rgba(255, 255, 255, 0.08);
+}
+
+.pulseContent > div:last-child {
+  display: grid;
+  gap: 3px;
+}
+
+.pulseContent span {
+  color: #ff8390;
+  font-size: 12px;
+  font-weight: 850;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
+}
+
+.pulseContent strong {
+  font-size: 14px;
+}
+
+.pulseContent p {
+  margin: 0;
+  color:
+    rgba(255, 255, 255, 0.68);
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.slideDots {
+  display: flex;
+  gap: 6px;
+  margin-top: 12px;
+}
+
+.slideDots button {
+  width: 19px;
+  height: 4px;
+  padding: 0;
+  border: 0;
+  border-radius: 10px;
+  cursor: pointer;
+  background:
+    rgba(255, 255, 255, 0.24);
+  transition:
+    width 0.2s ease,
+    background 0.2s ease;
+}
+
+.slideDots button.activeDot {
+  width: 38px;
+  background: #ff5b6f;
 }
 
 .cards {
-  width: min(820px, 100%);
-  margin-top: auto;
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  width: min(850px, 100%);
+  grid-template-columns:
+    repeat(4, minmax(0, 1fr));
   gap: 11px;
+  margin-top: auto;
 }
 
 .card {
-  min-height: 94px;
-  padding: 15px 17px;
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  position: relative;
+  min-height: 100px;
+  padding: 14px 15px;
+  overflow: hidden;
+  border: 1px solid
+    rgba(255, 255, 255, 0.12);
   border-radius: 16px;
-  background: rgba(8, 25, 49, 0.59);
+  background:
+    rgba(7, 25, 50, 0.62);
   backdrop-filter: blur(18px);
-  box-shadow: 0 14px 36px rgba(0, 0, 0, 0.14);
+  box-shadow:
+    0 15px 38px
+    rgba(0, 0, 0, 0.15);
   transition:
     transform 0.2s ease,
     background 0.2s ease;
@@ -190,57 +327,86 @@
 
 .card:hover {
   transform: translateY(-2px);
-  background: rgba(8, 25, 49, 0.7);
+  background:
+    rgba(7, 25, 50, 0.75);
 }
 
-.card svg {
-  color: #ff5b6f;
+.cardIcon {
+  display: grid;
+  width: 31px;
+  height: 31px;
+  place-items: center;
+  border-radius: 9px;
+  color: #ff6674;
+  background:
+    rgba(255, 91, 111, 0.1);
 }
 
 .card h3 {
-  margin: 9px 0 0;
-  font-size: 15px;
+  margin: 10px 0 0;
+  font-size: 14px;
 }
 
 .card p {
-  margin: 5px 0 0;
-  color: rgba(255, 255, 255, 0.72);
-  font-size: 11px;
-  line-height: 1.35;
+  margin: 4px 0 0;
+  color:
+    rgba(255, 255, 255, 0.67);
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.cardCheck {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  color:
+    rgba(115, 222, 166, 0.8);
 }
 
 @media (max-width: 1200px) {
   .cards {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
   }
 }
 
-@media (max-height: 790px) and (min-width: 981px) {
+@media (
+  max-height: 790px
+) and (
+  min-width: 981px
+) {
   .content {
-    margin-top: 24px;
+    margin-top: 22px;
   }
 
   .content h1 {
-    font-size: clamp(46px, 4.6vw, 70px);
+    font-size:
+      clamp(46px, 4.5vw, 69px);
   }
 
   .description {
-    margin-top: 15px;
-    font-size: 15px;
+    margin-top: 14px;
+    font-size: 14px;
   }
 
-  .countdown {
-    margin-top: 14px;
-    padding: 12px 18px;
+  .platformPulse {
+    margin-top: 13px;
+    padding: 11px 13px;
   }
 
   .card {
     min-height: 82px;
-    padding: 12px 15px;
+    padding: 11px 13px;
   }
 
-  .card p {
-    font-size: 10px;
+  .cardIcon {
+    width: 26px;
+    height: 26px;
+  }
+
+  .card h3 {
+    margin-top: 7px;
+    font-size: 14px;
   }
 }
 
@@ -251,11 +417,11 @@
   }
 
   .content {
-    margin-top: 46px;
+    margin-top: 44px;
   }
 
   .description,
-  .countdown,
+  .platformPulse,
   .cards {
     display: none;
   }
@@ -267,11 +433,256 @@
     padding: 22px 20px;
   }
 
-  .office {
+  .securityMessage {
     display: none;
   }
 
   .content h1 {
     font-size: 49px;
+  }
+}
+
+/* =========================================================
+   CAMPAIGN HQ RESPONSIVE FOUNDATION — STAGE 1
+   ========================================================= */
+
+.hero {
+  height: 100dvh;
+  min-height: 0;
+}
+
+/*
+ * Short laptop screens:
+ * preserve the core identity and login context,
+ * but remove secondary cards before anything clips.
+ */
+
+@media (
+  max-height: 840px
+) and (
+  min-width: 981px
+) {
+  .hero {
+    padding-top:
+      clamp(18px, 2.2vh, 24px);
+    padding-bottom:
+      clamp(16px, 2vh, 22px);
+  }
+
+  .content {
+    margin-top:
+      clamp(20px, 3.5vh, 34px);
+  }
+
+  .content h1 {
+    font-size:
+      clamp(48px, 4.7vw, 72px);
+  }
+
+  .description {
+    margin-top: 14px;
+  }
+
+  .platformPulse {
+    margin-top: 14px;
+  }
+
+  .cards {
+    display: none;
+  }
+}
+
+@media (
+  max-height: 700px
+) and (
+  min-width: 981px
+) {
+  .content {
+    margin-top: 18px;
+  }
+
+  .content h1 {
+    font-size:
+      clamp(44px, 4.2vw, 64px);
+  }
+
+  .platformPulse {
+    display: none;
+  }
+}
+
+@media (max-width: 980px) {
+  .hero {
+    height: auto;
+    min-height: clamp(
+      320px,
+      46svh,
+      430px
+    );
+  }
+
+  .content {
+    margin-top:
+      clamp(30px, 7svh, 44px);
+  }
+}
+
+@media (max-width: 600px) {
+  .hero {
+    height: auto;
+    min-height: clamp(
+      300px,
+      42svh,
+      360px
+    );
+  }
+
+  .content {
+    margin-top:
+      clamp(25px, 6svh, 38px);
+  }
+
+  .content h1 {
+    font-size:
+      clamp(43px, 13vw, 49px);
+  }
+}
+
+
+/* =========================================================
+   CAMPAIGN HQ LOGIN CONTENT RESTORATION
+   ========================================================= */
+
+/*
+ * Keep the complete approved login experience visible.
+ * Short screens may scroll vertically rather than hiding
+ * the Platform Overview panel or feature cards.
+ */
+
+.hero {
+  overscroll-behavior: contain;
+}
+
+/* Standard shorter laptop windows */
+
+@media (
+  max-height: 840px
+) and (
+  min-width: 981px
+) {
+  .hero {
+    overflow-x: hidden;
+    overflow-y: auto;
+    scrollbar-width: thin;
+  }
+
+  .content {
+    margin-top:
+      clamp(18px, 2.8vh, 28px);
+  }
+
+  .content h1 {
+    font-size:
+      clamp(46px, 4.4vw, 67px);
+  }
+
+  .description {
+    display: block;
+    margin-top: 12px;
+  }
+
+  .platformPulse {
+    display: block;
+    margin-top: 12px;
+    padding: 11px 13px;
+  }
+
+  .cards {
+    display: grid;
+    grid-template-columns:
+      repeat(4, minmax(0, 1fr));
+    flex: 0 0 auto;
+    margin-top: 16px;
+  }
+
+  .card {
+    min-height: 88px;
+    padding: 11px 12px;
+  }
+
+  .cardIcon {
+    width: 27px;
+    height: 27px;
+  }
+
+  .card h3 {
+    margin-top: 7px;
+  }
+
+  .card p {
+    display: block;
+    margin-top: 3px;
+    line-height: 1.35;
+  }
+}
+
+/* Very short laptop windows */
+
+@media (
+  max-height: 700px
+) and (
+  min-width: 981px
+) {
+  .hero {
+    overflow-y: auto;
+  }
+
+  .header {
+    flex: 0 0 auto;
+  }
+
+  .content {
+    flex: 0 0 auto;
+    margin-top: 16px;
+  }
+
+  .content h1 {
+    font-size:
+      clamp(42px, 4vw, 59px);
+  }
+
+  .description {
+    display: block;
+    margin-top: 10px;
+  }
+
+  .platformPulse {
+    display: block;
+    margin-top: 10px;
+  }
+
+  .cards {
+    display: grid;
+    grid-template-columns:
+      repeat(4, minmax(0, 1fr));
+    margin-top: 14px;
+    padding-bottom: 4px;
+  }
+
+  .card {
+    min-height: 82px;
+  }
+}
+
+/* Medium-width laptops */
+
+@media (
+  max-width: 1200px
+) and (
+  min-width: 981px
+) {
+  .cards {
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
   }
 }

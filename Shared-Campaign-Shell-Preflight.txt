@@ -1,0 +1,1730 @@
+================================================================================
+CAMPAIGN HQ — SHARED CAMPAIGN SHELL PREFLIGHT
+Generated: 2026-07-13T00:50:37
+================================================================================
+
+================================================================================
+RELEVANT PROJECT STRUCTURE
+================================================================================
+src/components/navigation/Sidebar/Sidebar.jsx
+src/components/navigation/Sidebar/Sidebar.module.css
+src/components/navigation/Sidebar/index.js
+src/components/navigation/Topbar/Topbar.jsx
+src/components/navigation/Topbar/Topbar.module.css
+src/components/navigation/Topbar/index.js
+src/config/constants.js
+src/config/navigation.js
+src/config/roles.js
+src/layouts/DashboardLayout/DashboardLayout.jsx
+src/layouts/DashboardLayout/DashboardLayout.module.css
+src/layouts/DashboardLayout/index.js
+src/layouts/LoginLayout/LoginLayout.jsx
+src/layouts/LoginLayout/LoginLayout.module.css
+src/layouts/LoginLayout/index.js
+
+================================================================================
+EXISTING SHARED COMPONENT CONTENTS
+================================================================================
+
+--------------------------------------------------------------------------------
+FILE: src/layouts/DashboardLayout/DashboardLayout.jsx
+--------------------------------------------------------------------------------
+FILE IS EMPTY
+
+--------------------------------------------------------------------------------
+FILE: src/layouts/DashboardLayout/DashboardLayout.module.css
+--------------------------------------------------------------------------------
+FILE IS EMPTY
+
+--------------------------------------------------------------------------------
+FILE: src/layouts/DashboardLayout/index.js
+--------------------------------------------------------------------------------
+FILE IS EMPTY
+
+--------------------------------------------------------------------------------
+FILE: src/components/navigation/Sidebar/Sidebar.jsx
+--------------------------------------------------------------------------------
+FILE IS EMPTY
+
+--------------------------------------------------------------------------------
+FILE: src/components/navigation/Sidebar/Sidebar.module.css
+--------------------------------------------------------------------------------
+FILE IS EMPTY
+
+--------------------------------------------------------------------------------
+FILE: src/components/navigation/Sidebar/index.js
+--------------------------------------------------------------------------------
+FILE IS EMPTY
+
+--------------------------------------------------------------------------------
+FILE: src/config/navigation.js
+--------------------------------------------------------------------------------
+FILE IS EMPTY
+
+================================================================================
+CURRENT USAGE OF SHARED COMPONENTS
+================================================================================
+
+FILE: src/pages/Calendar/Calendar.jsx
+  102 | const NAVIGATION = [
+  641 |     setSidebarOpen,
+ 1220 |         setSidebarOpen(false);
+ 1507 |               styles.closeSidebar
+ 1511 |               setSidebarOpen(false)
+ 1552 |           {NAVIGATION.map(
+ 1647 |             setSidebarOpen(false)
+ 1674 |                 setSidebarOpen(true)
+
+FILE: src/pages/Dashboard/Dashboard.jsx
+   45 | const primaryNavigation = [
+  312 |   const [sidebarOpen, setSidebarOpen] = useState(false);
+  660 |   const navigationItems = primaryNavigation.map(
+  725 |       setSidebarOpen(false);
+  731 |       setSidebarOpen(false);
+  737 |       setSidebarOpen(false);
+  742 |     setSidebarOpen(false);
+  783 |         } ${isAdmin ? styles.adminSidebar : ""}`}
+  803 |             className={styles.closeSidebar}
+  805 |             onClick={() => setSidebarOpen(false)}
+  908 |           onClick={() => setSidebarOpen(false)}
+  919 |               onClick={() => setSidebarOpen(true)}
+
+FILE: src/pages/Tasks/Tasks.jsx
+  109 | const NAVIGATION = [
+  493 |   const [sidebarOpen, setSidebarOpen] =
+ 1129 |             className={styles.closeSidebar}
+ 1131 |             onClick={() => setSidebarOpen(false)}
+ 1155 |           {NAVIGATION.map((item) => {
+ 1177 |                   setSidebarOpen(false);
+ 1252 |           onClick={() => setSidebarOpen(false)}
+ 1263 |               onClick={() => setSidebarOpen(true)}
+
+FILE: src/pages/Team/Invitations.jsx
+   58 | const NAVIGATION = [
+  294 |     setSidebarOpen,
+  445 |         setSidebarOpen(false);
+  651 |               teamStyles.closeSidebar
+  655 |               setSidebarOpen(false)
+  696 |           {NAVIGATION.map(
+  794 |             setSidebarOpen(false)
+  821 |                 setSidebarOpen(true)
+
+FILE: src/pages/Team/Team.jsx
+   50 | const NAVIGATION = [
+  371 |     setSidebarOpen,
+  500 |         setSidebarOpen(false);
+  573 |               styles.closeSidebar
+  577 |               setSidebarOpen(false)
+  618 |           {NAVIGATION.map(
+  716 |             setSidebarOpen(false)
+  743 |                 setSidebarOpen(true)
+
+================================================================================
+SHELL WINDOWS: src/pages/Dashboard/Dashboard.jsx
+================================================================================
+
+WINDOW 1: lines 167-203 | return (
+  167 |   const formatter = new Intl.DateTimeFormat("en-US", {
+  168 |     hour: "numeric",
+  169 |     minute: "2-digit",
+  170 |   });
+  171 | 
+  172 |   if (!endsAt) {
+  173 |     return formatter.format(start);
+  174 |   }
+  175 | 
+  176 |   return `${formatter.format(start)} – ${formatter.format(
+  177 |     new Date(endsAt),
+  178 |   )}`;
+  179 | }
+  180 | 
+  181 | function formatEventType(value = "campaign") {
+  182 |   return value
+  183 |     .split("_")
+  184 |     .map((part) => {
+  185 |       return (
+  186 |         part.charAt(0).toUpperCase() +
+  187 |         part.slice(1).toLowerCase()
+  188 |       );
+  189 |     })
+  190 |     .join(" ");
+  191 | }
+  192 | 
+  193 | function createBars(values) {
+  194 |   const safeValues = values.map((value) =>
+  195 |     Number(value || 0),
+  196 |   );
+  197 | 
+  198 |   if (!safeValues.length) {
+  199 |     return [18, 18, 18, 18, 18, 18];
+  200 |   }
+  201 | 
+  202 |   const maximum = Math.max(...safeValues, 1);
+  203 | 
+
+WINDOW 2: lines 751-803 | <aside, return (, styles.app, styles.sidebar
+  751 |       task.status === "completed"
+  752 |         ? "open"
+  753 |         : "completed";
+  754 | 
+  755 |     setTaskUpdatingId(task.id);
+  756 | 
+  757 |     try {
+  758 |       await updateTaskStatus(task.id, nextStatus);
+  759 |     } catch (taskError) {
+  760 |       console.error(
+  761 |         "Task status could not be updated:",
+  762 |         taskError,
+  763 |       );
+  764 |     } finally {
+  765 |       setTaskUpdatingId("");
+  766 |     }
+  767 |   };
+  768 | 
+  769 |   return (
+  770 |     <div className={styles.app}>
+  771 |       {isAdmin && (
+  772 |         <div className={styles.adminBanner}>
+  773 |           <ShieldCheck size={15} strokeWidth={2} />
+  774 |           <span>
+  775 |             {roleLabel} — campaign-wide controls are active.
+  776 |           </span>
+  777 |         </div>
+  778 |       )}
+  779 | 
+  780 |       <aside
+  781 |         className={`${styles.sidebar} ${
+  782 |           sidebarOpen ? styles.sidebarOpen : ""
+  783 |         } ${isAdmin ? styles.adminSidebar : ""}`}
+  784 |       >
+  785 |         <div className={styles.sidebarHeader}>
+  786 |           <button
+  787 |             className={styles.campaignIdentity}
+  788 |             type="button"
+  789 |             onClick={handleWorkspaceChange}
+  790 |           >
+  791 |             <div className={styles.campaignMark}>
+  792 |               <span>{getUserInitials(workspace.name)}</span>
+  793 |               <Vote size={20} strokeWidth={1.8} />
+  794 |             </div>
+  795 | 
+  796 |             <div>
+  797 |               <strong>{workspace.name}</strong>
+  798 |               <span>{workspace.description}</span>
+  799 |             </div>
+  800 |           </button>
+  801 | 
+  802 |           <button
+  803 |             className={styles.closeSidebar}
+
+WINDOW 3: lines 820-977 | </aside>, return (, styles.main, styles.mobileOverlay, styles.sidebar, styles.topbar, styles.workspace
+  820 | 
+  821 |           <strong>
+  822 |             {roleLabel}
+  823 |           </strong>
+  824 | 
+  825 |           <p>
+  826 |             {isCampaignLeadership
+  827 |               ? "Campaign-wide visibility, decisions, approvals and leadership controls."
+  828 |               : "View assigned campaign work, events, files and updates."}
+  829 |           </p>
+  830 |         </div>
+  831 | 
+  832 |         <nav className={styles.navigation}>
+  833 |           <span className={styles.navigationLabel}>Campaign</span>
+  834 | 
+  835 |           {navigationItems.map((item) => {
+  836 |             const Icon = item.icon;
+  837 | 
+  838 |             return (
+  839 |               <button
+  840 |                 key={item.label}
+  841 |                 className={
+  842 |                   activeNavigation === item.label
+  843 |                     ? styles.activeNavigation
+  844 |                     : ""
+  845 |                 }
+  846 |                 type="button"
+  847 |                 onClick={() => handleNavigation(item.label)}
+  848 |               >
+  849 |                 <Icon size={18} strokeWidth={1.8} />
+  850 |                 <span>{item.label}</span>
+  851 |                 {item.count && <small>{item.count}</small>}
+  852 |               </button>
+  853 |             );
+  854 |           })}
+  855 | 
+  856 |           {isAdmin && (
+  857 |             <>
+  858 |               <span className={styles.navigationLabel}>Leadership</span>
+  859 | 
+  860 |               {administratorNavigation.map((item) => {
+  861 |                 const Icon = item.icon;
+  862 | 
+  863 |                 return (
+  864 |                   <button
+  865 |                     key={item.label}
+  866 |                     className={
+  867 |                       activeNavigation === item.label
+  868 |                         ? styles.activeNavigation
+  869 |                         : ""
+  870 |                     }
+  871 |                     type="button"
+  872 |                     onClick={() => handleNavigation(item.label)}
+  873 |                   >
+  874 |                     <Icon size={18} strokeWidth={1.8} />
+  875 |                     <span>{item.label}</span>
+  876 |                   </button>
+  877 |                 );
+  878 |               })}
+  879 |             </>
+  880 |           )}
+  881 |         </nav>
+  882 | 
+  883 |         <div className={styles.sidebarFooter}>
+  884 |           <div className={styles.sidebarProfile}>
+  885 |             <div className={styles.avatar}>{getUserInitials(user.name)}</div>
+  886 | 
+  887 |             <div>
+  888 |               <strong>{user.name}</strong>
+  889 |               <span>{roleLabel}</span>
+  890 |             </div>
+  891 |           </div>
+  892 | 
+  893 |           <button
+  894 |             type="button"
+  895 |             onClick={handleLogout}
+  896 |             aria-label="Sign out"
+  897 |             title="Sign out and change portal"
+  898 |           >
+  899 |             <LogOut size={18} />
+  900 |           </button>
+  901 |         </div>
+  902 |       </aside>
+  903 | 
+  904 |       {sidebarOpen && (
+  905 |         <button
+  906 |           className={styles.mobileOverlay}
+  907 |           type="button"
+  908 |           onClick={() => setSidebarOpen(false)}
+  909 |           aria-label="Close navigation"
+  910 |         />
+  911 |       )}
+  912 | 
+  913 |       <div className={styles.workspace}>
+  914 |         <header className={styles.topbar}>
+  915 |           <div className={styles.topbarLeft}>
+  916 |             <button
+  917 |               className={styles.menuButton}
+  918 |               type="button"
+  919 |               onClick={() => setSidebarOpen(true)}
+  920 |               aria-label="Open navigation"
+  921 |             >
+  922 |               <Menu size={21} />
+  923 |             </button>
+  924 | 
+  925 |             <div>
+  926 |               <span className={styles.breadcrumb}>
+  927 |                 Campaign HQ
+  928 |                 <ChevronRight size={13} />
+  929 |                 {activeNavigation}
+  930 |               </span>
+  931 | 
+  932 |               <strong>
+  933 |                 {`${roleLabel} dashboard`}
+  934 |               </strong>
+  935 |             </div>
+  936 |           </div>
+  937 | 
+  938 |           <div className={styles.topbarActions}>
+  939 |             <button
+  940 |               className={styles.notificationButton}
+  941 |               type="button"
+  942 |               aria-label="Notifications"
+  943 |             >
+  944 |               <Bell size={19} strokeWidth={1.8} />
+  945 |               <span />
+  946 |             </button>
+  947 | 
+  948 |             <div className={styles.topbarProfile}>
+  949 |               <div className={styles.avatar}>{getUserInitials(user.name)}</div>
+  950 | 
+  951 |               <div>
+  952 |                 <strong>{user.name}</strong>
+  953 |                 <span>{roleLabel}</span>
+  954 |               </div>
+  955 |             </div>
+  956 |           </div>
+  957 |         </header>
+  958 | 
+  959 |         <main className={styles.main}>
+  960 |           <section className={styles.welcomeSection}>
+  961 |             <div className={styles.welcomeCopy}>
+  962 |               <div className={styles.welcomeBadge}>
+  963 |                 <Sparkles size={15} strokeWidth={2} />
+  964 |                 <span>Campaign command center</span>
+  965 |               </div>
+  966 | 
+  967 |               <h1>
+  968 |                 {getGreeting()}, <span>{firstName}.</span>
+  969 |               </h1>
+  970 | 
+  971 |               <p>
+  972 |                 See what needs attention, what changed and what to do next —
+  973 |                 all in one place.
+  974 |               </p>
+  975 |             </div>
+  976 | 
+  977 |             <div className={styles.topInfoCards}>
+
+WINDOW 4: lines 1039-1075 | return (
+ 1039 |                       <span
+ 1040 |                         style={{
+ 1041 |                           width: `${campaignReadiness}%`,
+ 1042 |                         }}
+ 1043 |                       />
+ 1044 |                     </div>
+ 1045 | 
+ 1046 |                     <div className={styles.progressFooter}>
+ 1047 |                       <span>Strong progress this week</span>
+ 1048 |                       <span>Momentum is rising</span>
+ 1049 |                     </div>
+ 1050 |                   </div>
+ 1051 |                 </div>
+ 1052 | 
+ 1053 |                 <div className={styles.quickActionRow}>
+ 1054 |                   {quickActions.map((action) => {
+ 1055 |                     const Icon = action.icon;
+ 1056 | 
+ 1057 |                     return (
+ 1058 |                       <button
+ 1059 |                         key={action.label}
+ 1060 |                         type="button"
+ 1061 |                         onClick={() => {
+ 1062 |                           if (
+ 1063 |                             action.label === "Add event" ||
+ 1064 |                             action.label === "View calendar"
+ 1065 |                           ) {
+ 1066 |                             navigate("/calendar");
+ 1067 |                           }
+ 1068 |                         }}
+ 1069 |                       >
+ 1070 |                         <Icon size={16} strokeWidth={1.9} />
+ 1071 |                         <span>{action.label}</span>
+ 1072 |                       </button>
+ 1073 |                     );
+ 1074 |                   })}
+ 1075 |                 </div>
+
+WINDOW 5: lines 1207-1243 | return (
+ 1207 |                   <h3>Your priorities</h3>
+ 1208 |                 </div>
+ 1209 | 
+ 1210 |                 <button
+ 1211 |                   type="button"
+ 1212 |                   className={styles.inlineButton}
+ 1213 |                   onClick={() => navigate("/tasks")}
+ 1214 |                 >
+ 1215 |                   View all
+ 1216 |                   <ArrowRight size={14} />
+ 1217 |                 </button>
+ 1218 |               </div>
+ 1219 | 
+ 1220 |               <div className={styles.priorityList}>
+ 1221 |                 {priorities.map((priority) => {
+ 1222 |                   const isComplete =
+ 1223 |                       priority.status === "completed";
+ 1224 | 
+ 1225 |                   return (
+ 1226 |                     <button
+ 1227 |                       key={priority.id}
+ 1228 |                       className={isComplete ? styles.completedPriority : ""}
+ 1229 |                       type="button"
+ 1230 |                       disabled={
+ 1231 |                         taskUpdatingId === priority.id
+ 1232 |                       }
+ 1233 |                       onClick={() => toggleTask(priority)}
+ 1234 |                     >
+ 1235 |                       <span className={styles.taskCheck}>
+ 1236 |                         {isComplete && <CheckCircle2 size={18} strokeWidth={2.3} />}
+ 1237 |                       </span>
+ 1238 | 
+ 1239 |                       <div className={styles.priorityCopy}>
+ 1240 |                         <strong>{priority.title}</strong>
+ 1241 | 
+ 1242 |                         <span>
+ 1243 |                           {priority.category}
+
+WINDOW 6: lines 1369-1391 | </main>
+ 1369 |                 </button>
+ 1370 | 
+ 1371 |                 <button type="button">
+ 1372 |                   <Settings size={16} />
+ 1373 |                   Workspace settings
+ 1374 |                 </button>
+ 1375 |               </div>
+ 1376 |             </section>
+ 1377 |           )}
+ 1378 | 
+ 1379 |           <footer className={styles.footer}>
+ 1380 |             <span>© 2026 Campaign HQ</span>
+ 1381 | 
+ 1382 |             <div>
+ 1383 |               <ShieldCheck size={14} />
+ 1384 |               Authorized campaign use only
+ 1385 |             </div>
+ 1386 |           </footer>
+ 1387 |         </main>
+ 1388 |       </div>
+ 1389 |     </div>
+ 1390 |   );
+ 1391 | }
+
+================================================================================
+SHELL WINDOWS: src/pages/Tasks/Tasks.jsx
+================================================================================
+
+WINDOW 1: lines 226-270 | return (
+  226 |   ).padStart(2, "0");
+  227 |   const day = String(
+  228 |     date.getDate(),
+  229 |   ).padStart(2, "0");
+  230 |   const hours = String(
+  231 |     date.getHours(),
+  232 |   ).padStart(2, "0");
+  233 |   const minutes = String(
+  234 |     date.getMinutes(),
+  235 |   ).padStart(2, "0");
+  236 | 
+  237 |   return {
+  238 |     date: `${year}-${month}-${day}`,
+  239 |     time: `${hours}:${minutes}`,
+  240 |   };
+  241 | }
+  242 | 
+  243 | function isSameCalendarDay(left, right) {
+  244 |   return (
+  245 |     left.getFullYear() === right.getFullYear() &&
+  246 |     left.getMonth() === right.getMonth() &&
+  247 |     left.getDate() === right.getDate()
+  248 |   );
+  249 | }
+  250 | 
+  251 | function isTaskOverdue(task) {
+  252 |   return (
+  253 |     task.due_at &&
+  254 |     !["completed", "archived"].includes(task.status) &&
+  255 |     new Date(task.due_at).getTime() < Date.now()
+  256 |   );
+  257 | }
+  258 | 
+  259 | function getAssignee(task, team) {
+  260 |   if (!task.assigned_to) {
+  261 |     return null;
+  262 |   }
+  263 | 
+  264 |   return team.find(
+  265 |     (member) => member.id === task.assigned_to,
+  266 |   );
+  267 | }
+  268 | 
+  269 | function getCreator(task, team) {
+  270 |   return team.find(
+
+WINDOW 2: lines 320-356 | return (
+  320 |   }
+  321 | 
+  322 |   return "Entire campaign team";
+  323 | }
+  324 | 
+  325 | function TaskCard({
+  326 |   task,
+  327 |   team,
+  328 |   onOpen,
+  329 |   onStatusChange,
+  330 |   isSaving,
+  331 | }) {
+  332 |   const assignee = getAssignee(task, team);
+  333 |   const priority =
+  334 |     PRIORITY_META[task.priority] ||
+  335 |     PRIORITY_META.normal;
+  336 |   const overdue = isTaskOverdue(task);
+  337 | 
+  338 |   return (
+  339 |     <article
+  340 |       className={`${styles.taskCard} ${
+  341 |         overdue ? styles.overdueTask : ""
+  342 |       }`}
+  343 |     >
+  344 |       <button
+  345 |         className={styles.taskMainButton}
+  346 |         type="button"
+  347 |         onClick={() => onOpen(task.id)}
+  348 |       >
+  349 |         <div className={styles.taskCardTop}>
+  350 |           <span
+  351 |             className={`${styles.priorityBadge} ${
+  352 |               styles[priority.className]
+  353 |             }`}
+  354 |           >
+  355 |             {priority.label}
+  356 |           </span>
+
+WINDOW 3: lines 544-580 | return (
+  544 |   const selectedTask = tasks.find(
+  545 |     (task) => task.id === selectedTaskId,
+  546 |   );
+  547 | 
+  548 | 
+  549 |   useEffect(() => {
+  550 |     if (!selectedTaskId) {
+  551 |       return;
+  552 |     }
+  553 | 
+  554 |     const frame = window.requestAnimationFrame(() => {
+  555 |       drawerBodyRef.current?.scrollTo({
+  556 |         top: 0,
+  557 |         left: 0,
+  558 |         behavior: "auto",
+  559 |       });
+  560 |     });
+  561 | 
+  562 |     return () => {
+  563 |       window.cancelAnimationFrame(frame);
+  564 |     };
+  565 |   }, [selectedTaskId]);
+  566 |   const categories = useMemo(() => {
+  567 |     return [
+  568 |       ...new Set([
+  569 |         ...CATEGORY_OPTIONS,
+  570 |         ...tasks.map((task) => task.category),
+  571 |       ]),
+  572 |     ].filter(Boolean);
+  573 |   }, [tasks]);
+  574 | 
+  575 |   const activeTasks = tasks.filter(
+  576 |     (task) =>
+  577 |       !["completed", "archived"].includes(
+  578 |         task.status,
+  579 |       ),
+  580 |   );
+
+WINDOW 4: lines 586-622 | return (
+  586 |   const dueTodayTasks = activeTasks.filter(
+  587 |     (task) =>
+  588 |       task.due_at &&
+  589 |       isSameCalendarDay(
+  590 |         new Date(task.due_at),
+  591 |         new Date(),
+  592 |       ),
+  593 |   );
+  594 | 
+  595 |   const recentlyCompleted = tasks.filter(
+  596 |     (task) => {
+  597 |       if (
+  598 |         task.status !== "completed" ||
+  599 |         !task.completed_at
+  600 |       ) {
+  601 |         return false;
+  602 |       }
+  603 | 
+  604 |       return (
+  605 |         (lastUpdated?.getTime() || 0) -
+  606 |           new Date(task.completed_at).getTime() <=
+  607 |         7 * 24 * 60 * 60 * 1000
+  608 |       );
+  609 |     },
+  610 |   );
+  611 | 
+  612 |   const unassignedTasks = activeTasks.filter(
+  613 |     (task) => !task.assigned_to,
+  614 |   );
+  615 | 
+  616 |   const overdueTaskIds =
+  617 |     new Set(
+  618 |       overdueTasks.map(
+  619 |         (task) => task.id,
+  620 |       ),
+  621 |     );
+  622 | 
+
+WINDOW 5: lines 758-801 | return (
+  758 |         const priorityOrder = {
+  759 |           urgent: 0,
+  760 |           high: 1,
+  761 |           normal: 2,
+  762 |           low: 3,
+  763 |         };
+  764 | 
+  765 |         const leftOverdue = isTaskOverdue(left);
+  766 |         const rightOverdue = isTaskOverdue(right);
+  767 | 
+  768 |         if (leftOverdue !== rightOverdue) {
+  769 |           return leftOverdue ? -1 : 1;
+  770 |         }
+  771 | 
+  772 |         if (
+  773 |           priorityOrder[left.priority] !==
+  774 |           priorityOrder[right.priority]
+  775 |         ) {
+  776 |           return (
+  777 |             priorityOrder[left.priority] -
+  778 |             priorityOrder[right.priority]
+  779 |           );
+  780 |         }
+  781 | 
+  782 |         if (left.due_at && right.due_at) {
+  783 |           return (
+  784 |             new Date(left.due_at).getTime() -
+  785 |             new Date(right.due_at).getTime()
+  786 |           );
+  787 |         }
+  788 | 
+  789 |         return left.due_at ? -1 : 1;
+  790 |       });
+  791 |   })();
+  792 | 
+  793 |   const applySummaryFilter =
+  794 |     (value) => {
+  795 |       setSummaryFilter(
+  796 |         value,
+  797 |       );
+  798 | 
+  799 |       setSearch("");
+  800 |       setPriorityFilter("all");
+  801 |       setCategoryFilter("all");
+
+WINDOW 6: lines 1034-1070 | return (
+ 1034 |       );
+ 1035 | 
+ 1036 |       setCommentBody("");
+ 1037 |     } catch (commentError) {
+ 1038 |       console.error(
+ 1039 |         "Comment could not be added:",
+ 1040 |         commentError,
+ 1041 |       );
+ 1042 |     }
+ 1043 |   };
+ 1044 | 
+ 1045 |   const handleLogout = async () => {
+ 1046 |     await clearCampaignSession();
+ 1047 |     navigate("/", { replace: true });
+ 1048 |   };
+ 1049 | 
+ 1050 |   const renderTaskCollection = (collection) => {
+ 1051 |     if (!collection.length) {
+ 1052 |       return (
+ 1053 |         <div className={styles.emptyTasks}>
+ 1054 |           <CheckCircle2 size={30} />
+ 1055 |           <strong>No tasks match this view</strong>
+ 1056 |           <p>
+ 1057 |             Adjust the filters or create a new campaign
+ 1058 |             responsibility.
+ 1059 |           </p>
+ 1060 |         </div>
+ 1061 |       );
+ 1062 |     }
+ 1063 | 
+ 1064 |     return collection.map((task) => (
+ 1065 |       <TaskCard
+ 1066 |         key={task.id}
+ 1067 |         task={task}
+ 1068 |         team={team}
+ 1069 |         onOpen={setSelectedTaskId}
+ 1070 |         onStatusChange={handleStatusChange}
+
+WINDOW 7: lines 1076-1127 | <aside, return (, styles.app, styles.sidebar
+ 1076 |   const boardColumns = [
+ 1077 |     {
+ 1078 |       status: "open",
+ 1079 |       title: "Open",
+ 1080 |       description: "Ready to begin",
+ 1081 |     },
+ 1082 |     {
+ 1083 |       status: "in_progress",
+ 1084 |       title: "In progress",
+ 1085 |       description: "Campaign work underway",
+ 1086 |     },
+ 1087 |     {
+ 1088 |       status: "completed",
+ 1089 |       title: "Completed",
+ 1090 |       description: "Finished responsibilities",
+ 1091 |     },
+ 1092 |   ];
+ 1093 | 
+ 1094 |   return (
+ 1095 |     <div className={styles.app}>
+ 1096 |       {isCampaignLeadership && (
+ 1097 |         <div className={styles.adminBanner}>
+ 1098 |           <ShieldCheck size={15} />
+ 1099 |           {roleLabel} — task assignment and
+ 1100 |           campaign-wide controls are active.
+ 1101 |         </div>
+ 1102 |       )}
+ 1103 | 
+ 1104 |       <aside
+ 1105 |         className={`${styles.sidebar} ${
+ 1106 |           sidebarOpen ? styles.sidebarOpen : ""
+ 1107 |         }`}
+ 1108 |       >
+ 1109 |         <div className={styles.sidebarHeader}>
+ 1110 |           <button
+ 1111 |             className={styles.campaignIdentity}
+ 1112 |             type="button"
+ 1113 |             onClick={() => navigate("/workspaces")}
+ 1114 |           >
+ 1115 |             <div className={styles.campaignMark}>
+ 1116 |               <span>
+ 1117 |                 {getUserInitials(workspace.name)}
+ 1118 |               </span>
+ 1119 |               <Vote size={19} />
+ 1120 |             </div>
+ 1121 | 
+ 1122 |             <div>
+ 1123 |               <strong>{workspace.name}</strong>
+ 1124 |               <span>{workspace.description}</span>
+ 1125 |             </div>
+ 1126 |           </button>
+ 1127 | 
+
+WINDOW 8: lines 1141-1177 | return (
+ 1141 |           </strong>
+ 1142 | 
+ 1143 |           <p>
+ 1144 |             {isCampaignLeadership
+ 1145 |               ? "Assign work, manage deadlines and monitor campaign execution."
+ 1146 |               : "Review your assigned responsibilities, updates and campaign deadlines."}
+ 1147 |           </p>
+ 1148 |         </div>
+ 1149 | 
+ 1150 |         <nav className={styles.navigation}>
+ 1151 |           <span className={styles.navigationLabel}>
+ 1152 |             Campaign
+ 1153 |           </span>
+ 1154 | 
+ 1155 |           {NAVIGATION.map((item) => {
+ 1156 |             const Icon = item.icon;
+ 1157 |             const active = item.label === "Tasks";
+ 1158 | 
+ 1159 |             return (
+ 1160 |               <button
+ 1161 |                 key={item.label}
+ 1162 |                 className={
+ 1163 |                   active ? styles.activeNavigation : ""
+ 1164 |                 }
+ 1165 |                 type="button"
+ 1166 |                 disabled={item.comingSoon}
+ 1167 |                 title={
+ 1168 |                   item.comingSoon
+ 1169 |                     ? "This campaign module is coming next."
+ 1170 |                     : item.label
+ 1171 |                 }
+ 1172 |                 onClick={() => {
+ 1173 |                   if (item.route) {
+ 1174 |                     navigate(item.route);
+ 1175 |                   }
+ 1176 | 
+ 1177 |                   setSidebarOpen(false);
+
+WINDOW 9: lines 1208-1325 | </aside>, styles.main, styles.mobileOverlay, styles.sidebar, styles.topbar, styles.workspace
+ 1208 |               >
+ 1209 |                 <UserCog size={18} />
+ 1210 |                 <span>Team access</span>
+ 1211 |                 <em>Soon</em>
+ 1212 |               </button>
+ 1213 | 
+ 1214 |               <button
+ 1215 |                 type="button"
+ 1216 |                 disabled
+ 1217 |               >
+ 1218 |                 <Settings size={18} />
+ 1219 |                 <span>Workspace settings</span>
+ 1220 |                 <em>Soon</em>
+ 1221 |               </button>
+ 1222 |             </>
+ 1223 |           )}
+ 1224 |         </nav>
+ 1225 | 
+ 1226 |         <div className={styles.sidebarFooter}>
+ 1227 |           <div className={styles.profile}>
+ 1228 |             <div className={styles.avatar}>
+ 1229 |               {getUserInitials(user.name)}
+ 1230 |             </div>
+ 1231 | 
+ 1232 |             <div>
+ 1233 |               <strong>{user.name}</strong>
+ 1234 |               <span>{roleLabel}</span>
+ 1235 |             </div>
+ 1236 |           </div>
+ 1237 | 
+ 1238 |           <button
+ 1239 |             type="button"
+ 1240 |             onClick={handleLogout}
+ 1241 |             aria-label="Sign out"
+ 1242 |           >
+ 1243 |             <LogOut size={18} />
+ 1244 |           </button>
+ 1245 |         </div>
+ 1246 |       </aside>
+ 1247 | 
+ 1248 |       {sidebarOpen && (
+ 1249 |         <button
+ 1250 |           className={styles.mobileOverlay}
+ 1251 |           type="button"
+ 1252 |           onClick={() => setSidebarOpen(false)}
+ 1253 |           aria-label="Close navigation"
+ 1254 |         />
+ 1255 |       )}
+ 1256 | 
+ 1257 |       <div className={styles.workspace}>
+ 1258 |         <header className={styles.topbar}>
+ 1259 |           <div className={styles.topbarLeft}>
+ 1260 |             <button
+ 1261 |               className={styles.menuButton}
+ 1262 |               type="button"
+ 1263 |               onClick={() => setSidebarOpen(true)}
+ 1264 |             >
+ 1265 |               <Menu size={21} />
+ 1266 |             </button>
+ 1267 | 
+ 1268 |             <div>
+ 1269 |               <span className={styles.breadcrumb}>
+ 1270 |                 Campaign HQ
+ 1271 |                 <ChevronRight size={13} />
+ 1272 |                 Tasks
+ 1273 |               </span>
+ 1274 | 
+ 1275 |               <strong>
+ 1276 |                 Task Command Center
+ 1277 |               </strong>
+ 1278 |             </div>
+ 1279 |           </div>
+ 1280 | 
+ 1281 |           <div className={styles.topbarActions}>
+ 1282 |             <button
+ 1283 |               className={styles.notificationButton}
+ 1284 |               type="button"
+ 1285 |               aria-label="Notifications"
+ 1286 |             >
+ 1287 |               <Bell size={19} />
+ 1288 |               {(overdueTasks.length > 0 ||
+ 1289 |                 dueTodayTasks.length > 0) && (
+ 1290 |                 <span />
+ 1291 |               )}
+ 1292 |             </button>
+ 1293 | 
+ 1294 |             <div className={styles.topbarProfile}>
+ 1295 |               <div className={styles.avatar}>
+ 1296 |                 {getUserInitials(user.name)}
+ 1297 |               </div>
+ 1298 | 
+ 1299 |               <div>
+ 1300 |                 <strong>{user.name}</strong>
+ 1301 |                 <span>{roleLabel}</span>
+ 1302 |               </div>
+ 1303 |             </div>
+ 1304 |           </div>
+ 1305 |         </header>
+ 1306 | 
+ 1307 |         <main className={styles.main}>
+ 1308 |           <section className={styles.pageHeader}>
+ 1309 |             <div>
+ 1310 |               <span className={styles.eyebrow}>
+ 1311 |                 Campaign execution
+ 1312 |               </span>
+ 1313 | 
+ 1314 |               <h1>
+ 1315 |                 Every task.
+ 1316 |                 <span> One accountable owner.</span>
+ 1317 |               </h1>
+ 1318 | 
+ 1319 |               <p>
+ 1320 |                 Assign work, identify delays and keep the
+ 1321 |                 campaign moving without relying on scattered
+ 1322 |                 texts, emails or verbal reminders.
+ 1323 |               </p>
+ 1324 | 
+ 1325 |               <div className={styles.liveStatus}>
+
+WINDOW 10: lines 1794-1830 | return (
+ 1794 |                 size={30}
+ 1795 |               />
+ 1796 |               <strong>
+ 1797 |                 Opening the Task Command Center
+ 1798 |               </strong>
+ 1799 |               <span>
+ 1800 |                 Loading campaign responsibilities…
+ 1801 |               </span>
+ 1802 |             </div>
+ 1803 |           ) : viewMode === "board" ? (
+ 1804 |             <section className={styles.board}>
+ 1805 |               {boardColumns.map((column) => {
+ 1806 |                 const columnTasks =
+ 1807 |                   filteredTasks.filter(
+ 1808 |                     (task) =>
+ 1809 |                       task.status === column.status,
+ 1810 |                   );
+ 1811 | 
+ 1812 |                 return (
+ 1813 |                   <div
+ 1814 |                     key={column.status}
+ 1815 |                     className={styles.boardColumn}
+ 1816 |                   >
+ 1817 |                     <div
+ 1818 |                       className={styles.boardColumnHeader}
+ 1819 |                     >
+ 1820 |                       <div>
+ 1821 |                         <span>
+ 1822 |                           {column.description}
+ 1823 |                         </span>
+ 1824 |                         <h2>{column.title}</h2>
+ 1825 |                       </div>
+ 1826 | 
+ 1827 |                       <strong>
+ 1828 |                         {columnTasks.length}
+ 1829 |                       </strong>
+ 1830 |                     </div>
+
+WINDOW 11: lines 1836-1884 | </main>, <aside
+ 1836 |                     </div>
+ 1837 |                   </div>
+ 1838 |                 );
+ 1839 |               })}
+ 1840 |             </section>
+ 1841 |           ) : (
+ 1842 |             <section className={styles.taskGrid}>
+ 1843 |               {renderTaskCollection(filteredTasks)}
+ 1844 |             </section>
+ 1845 |           )}
+ 1846 | 
+ 1847 |           <footer className={styles.footer}>
+ 1848 |             <span>© 2026 Campaign HQ</span>
+ 1849 |             <div>
+ 1850 |               <ShieldCheck size={14} />
+ 1851 |               Authorized campaign use only
+ 1852 |             </div>
+ 1853 |           </footer>
+ 1854 |         </main>
+ 1855 |       </div>
+ 1856 | 
+ 1857 |       {selectedTask && (
+ 1858 |         <>
+ 1859 |           <button
+ 1860 |             className={styles.drawerOverlay}
+ 1861 |             type="button"
+ 1862 |             onClick={() => setSelectedTaskId("")}
+ 1863 |             aria-label="Close task details"
+ 1864 |           />
+ 1865 | 
+ 1866 |           <aside className={styles.taskDrawer}>
+ 1867 |             <div className={styles.drawerHeader}>
+ 1868 |               <div>
+ 1869 |                 <span>Campaign responsibility</span>
+ 1870 |                 <strong>Task details</strong>
+ 1871 |               </div>
+ 1872 | 
+ 1873 |               <button
+ 1874 |                 type="button"
+ 1875 |                 onClick={() =>
+ 1876 |                   setSelectedTaskId("")
+ 1877 |                 }
+ 1878 |               >
+ 1879 |                 <X size={21} />
+ 1880 |               </button>
+ 1881 |             </div>
+ 1882 | 
+ 1883 |             <div
+ 1884 |               ref={drawerBodyRef}
+
+WINDOW 12: lines 2159-2195 | </aside>
+ 2159 |                     Add comment
+ 2160 |                   </button>
+ 2161 |                 </form>
+ 2162 |               </section>
+ 2163 |             </div>
+ 2164 | 
+ 2165 |             {canEditSelectedTask && (
+ 2166 |               <div className={styles.drawerFooter}>
+ 2167 |                 <button
+ 2168 |                   type="button"
+ 2169 |                   disabled={isSaving}
+ 2170 |                   onClick={handleArchive}
+ 2171 |                 >
+ 2172 |                   <Archive size={16} />
+ 2173 |                   Archive task
+ 2174 |                 </button>
+ 2175 |               </div>
+ 2176 |             )}
+ 2177 |           </aside>
+ 2178 |         </>
+ 2179 |       )}
+ 2180 | 
+ 2181 |       {modalMode && (
+ 2182 |         <div className={styles.modalLayer}>
+ 2183 |           <button
+ 2184 |             className={styles.modalOverlay}
+ 2185 |             type="button"
+ 2186 |             onClick={closeModal}
+ 2187 |             aria-label="Close task form"
+ 2188 |           />
+ 2189 | 
+ 2190 |           <section className={styles.taskModal}>
+ 2191 |             <header className={styles.modalHeader}>
+ 2192 |               <div>
+ 2193 |                 <span>
+ 2194 |                   {modalMode === "edit"
+ 2195 |                     ? "Update responsibility"
+
+================================================================================
+PAGE IMPORT SECTIONS
+================================================================================
+
+--------------------------------------------------------------------------------
+FILE: src/pages/Dashboard/Dashboard.jsx
+--------------------------------------------------------------------------------
+    1 | import { useMemo, useState } from "react";
+    2 | import { useNavigate } from "react-router-dom";
+    3 | import {
+    4 |   Activity,
+    5 |   ArrowRight,
+    6 |   Bell,
+    7 |   CalendarDays,
+    8 |   CheckCircle2,
+    9 |   ChevronRight,
+   10 |   ClipboardCheck,
+   11 |   Clock3,
+   12 |   FileCheck2,
+   13 |   Files,
+   14 |   FolderKanban,
+   15 |   LayoutDashboard,
+   16 |   LogOut,
+   17 |   Mail,
+   18 |   Menu,
+   19 |   MessageSquareText,
+   20 |   Settings,
+   21 |   ShieldCheck,
+   22 |   Sparkles,
+   23 |   TrendingUp,
+   24 |   UserCog,
+   25 |   UsersRound,
+   26 |   Vote,
+   27 |   X,
+   28 | } from "lucide-react";
+   29 | 
+   30 | import {
+   31 |   clearCampaignSession,
+   32 |   getActiveCampaignMembership,
+   33 |   getCurrentUser,
+   34 |   getCurrentWorkspace,
+   35 |   getRoleLabel,
+   36 |   getUserInitials,
+   37 |   hasCampaignPermission,
+   38 | } from "../../utils/campaignSession";
+   39 | import { useCampaignDashboard } from "../../hooks/useCampaignDashboard";
+   40 | import elizabethPhoto from "../../assets/images/dashboard/elizabeth.jpg";
+   41 | import styles from "./Dashboard.module.css";
+   42 | 
+   43 | // CAMPAIGN HQ CALENDAR LINT COMPLETION
+   44 | 
+   45 | const primaryNavigation = [
+   46 |   { label: "Overview", icon: LayoutDashboard },
+   47 |   { label: "Tasks", icon: ClipboardCheck, count: 8 },
+   48 |   { label: "Calendar", icon: CalendarDays },
+   49 |   { label: "Team", icon: UsersRound },
+   50 |   { label: "Files", icon: FolderKanban },
+   51 |   { label: "Communications", icon: MessageSquareText },
+   52 |   { label: "Approvals", icon: FileCheck2, count: 3 },
+   53 | ];
+   54 | 
+   55 | const administratorNavigation = [
+   56 |   { label: "User access", icon: UserCog },
+   57 |   { label: "Workspace settings", icon: Settings },
+   58 | ];
+   59 | 
+   60 | function formatRelativeTime(value) {
+   61 |   if (!value) {
+   62 |     return "just now";
+   63 |   }
+   64 | 
+   65 |   const date =
+   66 |     value instanceof Date
+   67 |       ? value
+   68 |       : new Date(value);
+   69 | 
+   70 |   if (Number.isNaN(date.getTime())) {
+   71 |     return "recently";
+   72 |   }
+   73 | 
+   74 |   const difference = Date.now() - date.getTime();
+   75 |   const minutes = Math.max(
+   76 |     0,
+   77 |     Math.floor(difference / (1000 * 60)),
+   78 |   );
+   79 | 
+   80 |   if (minutes < 1) {
+   81 |     return "just now";
+   82 |   }
+   83 | 
+   84 |   if (minutes < 60) {
+   85 |     return `${minutes} min ago`;
+   86 |   }
+   87 | 
+   88 |   const hours = Math.floor(minutes / 60);
+   89 | 
+   90 |   if (hours < 24) {
+   91 |     return `${hours} ${hours === 1 ? "hour" : "hours"} ago`;
+   92 |   }
+   93 | 
+   94 |   const days = Math.floor(hours / 24);
+   95 | 
+   96 |   if (days < 7) {
+   97 |     return `${days} ${days === 1 ? "day" : "days"} ago`;
+   98 |   }
+   99 | 
+  100 |   return new Intl.DateTimeFormat("en-US", {
+  101 |     month: "short",
+  102 |     day: "numeric",
+  103 |   }).format(date);
+  104 | }
+  105 | 
+  106 | function formatDueLabel(value) {
+  107 |   if (!value) {
+  108 |     return "No due date";
+  109 |   }
+  110 | 
+  111 |   const dueDate = new Date(value);
+  112 | 
+  113 |   if (Number.isNaN(dueDate.getTime())) {
+  114 |     return "Due date unavailable";
+  115 |   }
+  116 | 
+  117 |   const today = new Date();
+  118 |   const tomorrow = new Date();
+  119 |   tomorrow.setDate(tomorrow.getDate() + 1);
+  120 | 
+  121 |   const isSameDay = (left, right) =>
+  122 |     left.getFullYear() === right.getFullYear() &&
+  123 |     left.getMonth() === right.getMonth() &&
+  124 |     left.getDate() === right.getDate();
+  125 | 
+  126 |   const time = new Intl.DateTimeFormat("en-US", {
+  127 |     hour: "numeric",
+  128 |     minute: "2-digit",
+  129 |   }).format(dueDate);
+  130 | 
+  131 |   if (dueDate.getTime() < Date.now()) {
+  132 |     return `Overdue · ${time}`;
+  133 |   }
+  134 | 
+  135 |   if (isSameDay(dueDate, today)) {
+  136 |     return `Due today · ${time}`;
+  137 |   }
+  138 | 
+  139 |   if (isSameDay(dueDate, tomorrow)) {
+  140 |     return `Due tomorrow · ${time}`;
+  141 |   }
+  142 | 
+  143 |   return `Due ${new Intl.DateTimeFormat("en-US", {
+  144 |     month: "short",
+  145 |     day: "numeric",
+  146 |   }).format(dueDate)}`;
+  147 | }
+  148 | 
+  149 | function formatEventDate(value) {
+  150 |   const date = new Date(value);
+  151 | 
+  152 |   return {
+  153 |     month: new Intl.DateTimeFormat("en-US", {
+  154 |       month: "short",
+  155 |     })
+  156 |       .format(date)
+  157 |       .toUpperCase(),
+  158 |     day: new Intl.DateTimeFormat("en-US", {
+  159 |       day: "2-digit",
+  160 |     }).format(date),
+  161 |   };
+  162 | }
+  163 | 
+  164 | function formatEventTime(startsAt, endsAt) {
+  165 |   const start = new Date(startsAt);
+  166 | 
+  167 |   const formatter = new Intl.DateTimeFormat("en-US", {
+  168 |     hour: "numeric",
+  169 |     minute: "2-digit",
+  170 |   });
+  171 | 
+  172 |   if (!endsAt) {
+  173 |     return formatter.format(start);
+  174 |   }
+  175 | 
+  176 |   return `${formatter.format(start)} – ${formatter.format(
+  177 |     new Date(endsAt),
+  178 |   )}`;
+  179 | }
+  180 | 
+
+--------------------------------------------------------------------------------
+FILE: src/pages/Tasks/Tasks.jsx
+--------------------------------------------------------------------------------
+    1 | import {
+    2 |   useEffect,
+    3 |   useMemo,
+    4 |   useRef,
+    5 |   useState,
+    6 | } from "react";
+    7 | import { useNavigate } from "react-router-dom";
+    8 | import {
+    9 |   AlertTriangle,
+   10 |   Archive,
+   11 |   Bell,
+   12 |   CalendarDays,
+   13 |   CheckCircle2,
+   14 |   ChevronRight,
+   15 |   CircleDot,
+   16 |   ClipboardCheck,
+   17 |   Clock3,
+   18 |   Columns3,
+   19 |   FileCheck2,
+   20 |   Filter,
+   21 |   FolderKanban,
+   22 |   LayoutDashboard,
+   23 |   List,
+   24 |   LoaderCircle,
+   25 |   LogOut,
+   26 |   Menu,
+   27 |   MessageSquare,
+   28 |   MessageSquareText,
+   29 |   Pencil,
+   30 |   Plus,
+   31 |   Save,
+   32 |   Search,
+   33 |   Settings,
+   34 |   ShieldCheck,
+   35 |   Tag,
+   36 |   UserCog,
+   37 |   UserRound,
+   38 |   UsersRound,
+   39 |   Vote,
+   40 |   X,
+   41 | } from "lucide-react";
+   42 | 
+   43 | import { useTasksCommandCenter } from "../../hooks/useTasksCommandCenter";
+   44 | import {
+   45 |   clearCampaignSession,
+   46 |   getCurrentUser,
+   47 |   getCurrentWorkspace,
+   48 |   getRoleLabel,
+   49 |   getUserInitials,
+   50 |   hasCampaignPermission,
+   51 | } from "../../utils/campaignSession";
+   52 | import styles from "./Tasks.module.css";
+   53 | 
+   54 | // CAMPAIGN HQ CALENDAR LINT COMPLETION
+   55 | 
+   56 | const STATUS_META = {
+   57 |   open: {
+   58 |     label: "Open",
+   59 |     description: "Ready to begin",
+   60 |   },
+   61 |   in_progress: {
+   62 |     label: "In progress",
+   63 |     description: "Currently being worked",
+   64 |   },
+   65 |   completed: {
+   66 |     label: "Completed",
+   67 |     description: "Finished campaign work",
+   68 |   },
+   69 |   archived: {
+   70 |     label: "Archived",
+   71 |     description: "No longer active",
+   72 |   },
+   73 | };
+   74 | 
+   75 | const PRIORITY_META = {
+   76 |   urgent: {
+   77 |     label: "Urgent",
+   78 |     className: "urgent",
+   79 |   },
+   80 |   high: {
+   81 |     label: "High",
+   82 |     className: "high",
+   83 |   },
+   84 |   normal: {
+   85 |     label: "Normal",
+   86 |     className: "normal",
+   87 |   },
+   88 |   low: {
+   89 |     label: "Low",
+   90 |     className: "low",
+   91 |   },
+   92 | };
+   93 | 
+   94 | const CATEGORY_OPTIONS = [
+   95 |   "General",
+   96 |   "Candidate",
+   97 |   "Field",
+   98 |   "Events",
+   99 |   "Communications",
+  100 |   "Digital",
+  101 |   "Fundraising",
+  102 |   "Finance",
+  103 |   "Compliance",
+  104 |   "Volunteer",
+  105 |   "Research",
+  106 |   "Operations",
+  107 | ];
+  108 | 
+  109 | const NAVIGATION = [
+  110 |   {
+  111 |     label: "Overview",
+  112 |     icon: LayoutDashboard,
+  113 |     route: "/dashboard",
+  114 |   },
+  115 |   {
+  116 |     label: "Tasks",
+  117 |     icon: ClipboardCheck,
+  118 |     route: "/tasks",
+  119 |   },
+  120 |   {
+  121 |     label: "Calendar",
+  122 |     icon: CalendarDays,
+  123 |     route: "/calendar",
+  124 |   },
+  125 |   {
+  126 |     label: "Team",
+  127 |     icon: UsersRound,
+  128 |     route: "/team",
+  129 |   },
+  130 |   {
+  131 |     label: "Files",
+  132 |     icon: FolderKanban,
+  133 |     comingSoon: true,
+  134 |   },
+  135 |   {
+  136 |     label: "Communications",
+  137 |     icon: MessageSquareText,
+  138 |     comingSoon: true,
+  139 |   },
+  140 |   {
+  141 |     label: "Approvals",
+  142 |     icon: FileCheck2,
+  143 |     comingSoon: true,
+  144 |   },
+  145 | ];
+  146 | 
+  147 | const EMPTY_FORM = {
+  148 |   title: "",
+  149 |   description: "",
+  150 |   category: "General",
+  151 |   priority: "normal",
+  152 |   status: "open",
+  153 |   assignedTo: "",
+  154 |   dueDate: "",
+  155 |   dueTime: "17:00",
+  156 |   visibility: "workspace",
+  157 |   tags: "",
+  158 |   estimatedMinutes: "",
+  159 | };
+  160 | 
+  161 | function formatRelativeTime(value) {
+  162 |   if (!value) {
+  163 |     return "Recently";
+  164 |   }
+  165 | 
+  166 |   const date = new Date(value);
+  167 |   const difference = Date.now() - date.getTime();
+  168 |   const minutes = Math.max(
+  169 |     0,
+  170 |     Math.floor(difference / 60000),
+  171 |   );
+  172 | 
+  173 |   if (minutes < 1) {
+  174 |     return "Just now";
+  175 |   }
+  176 | 
+  177 |   if (minutes < 60) {
+  178 |     return `${minutes} min ago`;
+  179 |   }
+  180 | 
+
+================================================================================
+PAGE-LEVEL NAVIGATION DEFINITIONS
+================================================================================
+
+FILE: src/pages/Dashboard/Dashboard.jsx
+
+PATTERN: const primaryNavigation | starting near line 45
+   43 | // CAMPAIGN HQ CALENDAR LINT COMPLETION
+   44 | 
+   45 | const primaryNavigation = [
+   46 |   { label: "Overview", icon: LayoutDashboard },
+   47 |   { label: "Tasks", icon: ClipboardCheck, count: 8 },
+   48 |   { label: "Calendar", icon: CalendarDays },
+   49 |   { label: "Team", icon: UsersRound },
+   50 |   { label: "Files", icon: FolderKanban },
+   51 |   { label: "Communications", icon: MessageSquareText },
+   52 |   { label: "Approvals", icon: FileCheck2, count: 3 },
+   53 | ];
+   54 | 
+   55 | const administratorNavigation = [
+   56 |   { label: "User access", icon: UserCog },
+   57 |   { label: "Workspace settings", icon: Settings },
+   58 | ];
+   59 | 
+   60 | function formatRelativeTime(value) {
+   61 |   if (!value) {
+   62 |     return "just now";
+   63 |   }
+   64 | 
+   65 |   const date =
+   66 |     value instanceof Date
+   67 |       ? value
+   68 |       : new Date(value);
+   69 | 
+   70 |   if (Number.isNaN(date.getTime())) {
+   71 |     return "recently";
+   72 |   }
+   73 | 
+   74 |   const difference = Date.now() - date.getTime();
+   75 |   const minutes = Math.max(
+   76 |     0,
+   77 |     Math.floor(difference / (1000 * 60)),
+   78 |   );
+   79 | 
+   80 |   if (minutes < 1) {
+   81 |     return "just now";
+   82 |   }
+   83 | 
+   84 |   if (minutes < 60) {
+   85 |     return `${minutes} min ago`;
+   86 |   }
+   87 | 
+   88 |   const hours = Math.floor(minutes / 60);
+   89 | 
+   90 |   if (hours < 24) {
+   91 |     return `${hours} ${hours === 1 ? "hour" : "hours"} ago`;
+   92 |   }
+   93 | 
+   94 |   const days = Math.floor(hours / 24);
+   95 | 
+   96 |   if (days < 7) {
+   97 |     return `${days} ${days === 1 ? "day" : "days"} ago`;
+   98 |   }
+   99 | 
+  100 |   return new Intl.DateTimeFormat("en-US", {
+  101 |     month: "short",
+  102 |     day: "numeric",
+  103 |   }).format(date);
+  104 | }
+  105 | 
+  106 | function formatDueLabel(value) {
+  107 |   if (!value) {
+  108 |     return "No due date";
+  109 |   }
+  110 | 
+  111 |   const dueDate = new Date(value);
+  112 | 
+  113 |   if (Number.isNaN(dueDate.getTime())) {
+  114 |     return "Due date unavailable";
+  115 |   }
+
+PATTERN: const administratorNavigation | starting near line 55
+   53 | ];
+   54 | 
+   55 | const administratorNavigation = [
+   56 |   { label: "User access", icon: UserCog },
+   57 |   { label: "Workspace settings", icon: Settings },
+   58 | ];
+   59 | 
+   60 | function formatRelativeTime(value) {
+   61 |   if (!value) {
+   62 |     return "just now";
+   63 |   }
+   64 | 
+   65 |   const date =
+   66 |     value instanceof Date
+   67 |       ? value
+   68 |       : new Date(value);
+   69 | 
+   70 |   if (Number.isNaN(date.getTime())) {
+   71 |     return "recently";
+   72 |   }
+   73 | 
+   74 |   const difference = Date.now() - date.getTime();
+   75 |   const minutes = Math.max(
+   76 |     0,
+   77 |     Math.floor(difference / (1000 * 60)),
+   78 |   );
+   79 | 
+   80 |   if (minutes < 1) {
+   81 |     return "just now";
+   82 |   }
+   83 | 
+   84 |   if (minutes < 60) {
+   85 |     return `${minutes} min ago`;
+   86 |   }
+   87 | 
+   88 |   const hours = Math.floor(minutes / 60);
+   89 | 
+   90 |   if (hours < 24) {
+   91 |     return `${hours} ${hours === 1 ? "hour" : "hours"} ago`;
+   92 |   }
+   93 | 
+   94 |   const days = Math.floor(hours / 24);
+   95 | 
+   96 |   if (days < 7) {
+   97 |     return `${days} ${days === 1 ? "day" : "days"} ago`;
+   98 |   }
+   99 | 
+  100 |   return new Intl.DateTimeFormat("en-US", {
+  101 |     month: "short",
+  102 |     day: "numeric",
+  103 |   }).format(date);
+  104 | }
+  105 | 
+  106 | function formatDueLabel(value) {
+  107 |   if (!value) {
+  108 |     return "No due date";
+  109 |   }
+  110 | 
+  111 |   const dueDate = new Date(value);
+  112 | 
+  113 |   if (Number.isNaN(dueDate.getTime())) {
+  114 |     return "Due date unavailable";
+  115 |   }
+  116 | 
+  117 |   const today = new Date();
+  118 |   const tomorrow = new Date();
+  119 |   tomorrow.setDate(tomorrow.getDate() + 1);
+  120 | 
+  121 |   const isSameDay = (left, right) =>
+  122 |     left.getFullYear() === right.getFullYear() &&
+  123 |     left.getMonth() === right.getMonth() &&
+  124 |     left.getDate() === right.getDate();
+  125 | 
+
+FILE: src/pages/Tasks/Tasks.jsx
+
+PATTERN: const NAVIGATION | starting near line 109
+  107 | ];
+  108 | 
+  109 | const NAVIGATION = [
+  110 |   {
+  111 |     label: "Overview",
+  112 |     icon: LayoutDashboard,
+  113 |     route: "/dashboard",
+  114 |   },
+  115 |   {
+  116 |     label: "Tasks",
+  117 |     icon: ClipboardCheck,
+  118 |     route: "/tasks",
+  119 |   },
+  120 |   {
+  121 |     label: "Calendar",
+  122 |     icon: CalendarDays,
+  123 |     route: "/calendar",
+  124 |   },
+  125 |   {
+  126 |     label: "Team",
+  127 |     icon: UsersRound,
+  128 |     route: "/team",
+  129 |   },
+  130 |   {
+  131 |     label: "Files",
+  132 |     icon: FolderKanban,
+  133 |     comingSoon: true,
+  134 |   },
+  135 |   {
+  136 |     label: "Communications",
+  137 |     icon: MessageSquareText,
+  138 |     comingSoon: true,
+  139 |   },
+  140 |   {
+  141 |     label: "Approvals",
+  142 |     icon: FileCheck2,
+  143 |     comingSoon: true,
+  144 |   },
+  145 | ];
+  146 | 
+  147 | const EMPTY_FORM = {
+  148 |   title: "",
+  149 |   description: "",
+  150 |   category: "General",
+  151 |   priority: "normal",
+  152 |   status: "open",
+  153 |   assignedTo: "",
+  154 |   dueDate: "",
+  155 |   dueTime: "17:00",
+  156 |   visibility: "workspace",
+  157 |   tags: "",
+  158 |   estimatedMinutes: "",
+  159 | };
+  160 | 
+  161 | function formatRelativeTime(value) {
+  162 |   if (!value) {
+  163 |     return "Recently";
+  164 |   }
+  165 | 
+  166 |   const date = new Date(value);
+  167 |   const difference = Date.now() - date.getTime();
+  168 |   const minutes = Math.max(
+  169 |     0,
+  170 |     Math.floor(difference / 60000),
+  171 |   );
+  172 | 
+  173 |   if (minutes < 1) {
+  174 |     return "Just now";
+  175 |   }
+  176 | 
+  177 |   if (minutes < 60) {
+  178 |     return `${minutes} min ago`;
+  179 |   }
+
+================================================================================
+PAGE CSS SHELL OWNERSHIP
+================================================================================
+
+src/pages/Dashboard/Dashboard.module.css
+  .app: 4
+  .sidebar: 13
+  .sidebarHeader: 2
+  .campaignIdentity: 8
+  .navigation: 10
+  .sidebarFooter: 5
+  .workspace: 9
+  .topbar: 10
+  .topbarProfile: 12
+  .main: 13
+
+src/pages/Tasks/Tasks.module.css
+  .app: 3
+  .sidebar: 6
+  .sidebarHeader: 1
+  .campaignIdentity: 4
+  .navigation: 8
+  .sidebarFooter: 2
+  .workspace: 9
+  .topbar: 5
+  .topbarProfile: 6
+  .main: 9
+
+================================================================================
+CURRENT APPROVED OVERVIEW MARKERS
+================================================================================
+CAMPAIGN HQ CLEAN OVERVIEW DESIGN V2: FOUND
+CAMPAIGN HQ OVERVIEW MEMBERSHIP ROLE FIX: FOUND
+CAMPAIGN HQ ACTIVE CAMPAIGN MEMBERSHIP HELPER: FOUND
+
+================================================================================
+MIGRATION DECISION CHECKLIST
+================================================================================
+1. Determine whether existing DashboardLayout is reusable.
+2. Determine whether existing Sidebar is reusable.
+3. Determine whether navigation.js reflects current routes.
+4. Preserve the approved Overview V2 visual system.
+5. Move Overview first without altering dashboard content.
+6. Move Tasks second without altering task functionality.
+
+================================================================================
+END OF SHARED SHELL PREFLIGHT
+================================================================================

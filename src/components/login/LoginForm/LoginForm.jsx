@@ -2,14 +2,12 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   ArrowRight,
-  CheckCircle2,
   Eye,
   EyeOff,
   LoaderCircle,
   LockKeyhole,
   Mail,
   ShieldCheck,
-  UserRound,
 } from "lucide-react";
 
 import { signInToCampaign } from "../../../services/auth";
@@ -18,42 +16,49 @@ import styles from "./LoginForm.module.css";
 export default function LoginForm() {
   const navigate = useNavigate();
 
-  const [accessMode, setAccessMode] = useState("client");
-  const [formData, setFormData] = useState({
-    email: "",
-    password: "",
-    remember: false,
-  });
+  const [formData, setFormData] =
+    useState({
+      email: "",
+      password: "",
+      remember: false,
+    });
 
-  const [showPassword, setShowPassword] = useState(false);
-  const [message, setMessage] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
+  const [showPassword, setShowPassword] =
+    useState(false);
 
-  const isAdmin = accessMode === "admin";
+  const [message, setMessage] =
+    useState("");
+
+  const [isLoading, setIsLoading] =
+    useState(false);
 
   const handleChange = (event) => {
-    const { name, value, type, checked } = event.target;
+    const {
+      name,
+      value,
+      type,
+      checked,
+    } = event.target;
 
     setFormData((current) => ({
       ...current,
-      [name]: type === "checkbox" ? checked : value,
+      [name]:
+        type === "checkbox"
+          ? checked
+          : value,
     }));
-  };
-
-  const handleModeChange = (mode) => {
-    if (isLoading) {
-      return;
-    }
-
-    setAccessMode(mode);
-    setMessage("");
   };
 
   const handleSubmit = async (event) => {
     event.preventDefault();
 
-    if (!formData.email.trim() || !formData.password.trim()) {
-      setMessage("Enter your email address and password.");
+    if (
+      !formData.email.trim() ||
+      !formData.password.trim()
+    ) {
+      setMessage(
+        "Enter your email address and password.",
+      );
       return;
     }
 
@@ -64,10 +69,11 @@ export default function LoginForm() {
       await signInToCampaign({
         email: formData.email,
         password: formData.password,
-        portalMode: accessMode,
       });
 
-      navigate("/workspaces", { replace: true });
+      navigate("/workspaces", {
+        replace: true,
+      });
     } catch (error) {
       setMessage(
         error instanceof Error
@@ -79,131 +85,57 @@ export default function LoginForm() {
     }
   };
 
-  const handleGoogleSignIn = () => {
-    setMessage(
-      "Google sign-in will be connected after email access is fully tested.",
-    );
-  };
-
-  const handleForgotPassword = () => {
-    setMessage(
-      "Password recovery will be connected in the next authentication step.",
-    );
-  };
-
   return (
     <div className={styles.wrapper}>
       <section className={styles.loginCard}>
-        <div className={styles.accentBars} aria-hidden="true">
+        <div
+          className={styles.accentBars}
+          aria-hidden="true"
+        >
           <span />
           <span />
           <span />
         </div>
 
         <div className={styles.security}>
-          <ShieldCheck size={21} strokeWidth={1.8} />
+          <ShieldCheck size={21} />
 
           <div>
-            <strong>Secure Campaign Access</strong>
-            <span>Your campaign information is protected.</span>
+            <strong>
+              Secure Campaign Access
+            </strong>
+
+            <span>
+              Your role is verified automatically.
+            </span>
           </div>
         </div>
 
         <div className={styles.heading}>
-          <p className={styles.eyebrow}>Campaign HQ</p>
+          <p className={styles.eyebrow}>
+            Campaign HQ
+          </p>
+
           <h2>Welcome back</h2>
 
           <p>
-            Choose your assigned access type, then sign in to enter
-            the Elizabeth Accomando campaign workspace.
+            Sign in once. Campaign HQ will
+            automatically open your assigned
+            campaigns, role and permissions.
           </p>
         </div>
 
-        <div className={styles.portalSection}>
-          <div className={styles.portalHeader}>
-            <strong>Choose your access</strong>
-            <span>Select the portal assigned to your account.</span>
-          </div>
-
-          <div
-            className={styles.portalGrid}
-            role="radiogroup"
-            aria-label="Choose login access"
-          >
-            <button
-              className={`${styles.portalOption} ${
-                accessMode === "client"
-                  ? styles.clientSelected
-                  : ""
-              }`}
-              type="button"
-              role="radio"
-              aria-checked={accessMode === "client"}
-              disabled={isLoading}
-              onClick={() => handleModeChange("client")}
-            >
-              <span className={styles.portalIcon}>
-                <UserRound size={19} strokeWidth={1.9} />
-              </span>
-
-              <span className={styles.portalCopy}>
-                <small>Client Login</small>
-                <strong>Client</strong>
-                <span>
-                  Campaign updates, files, events and approvals.
-                </span>
-              </span>
-
-              {accessMode === "client" && (
-                <CheckCircle2
-                  className={styles.portalCheck}
-                  size={17}
-                  strokeWidth={2.3}
-                />
-              )}
-            </button>
-
-            <button
-              className={`${styles.portalOption} ${
-                accessMode === "admin"
-                  ? styles.adminSelected
-                  : ""
-              }`}
-              type="button"
-              role="radio"
-              aria-checked={accessMode === "admin"}
-              disabled={isLoading}
-              onClick={() => handleModeChange("admin")}
-            >
-              <span className={styles.portalIcon}>
-                <ShieldCheck size={19} strokeWidth={1.9} />
-              </span>
-
-              <span className={styles.portalCopy}>
-                <small>Admin Login</small>
-                <strong>Admin</strong>
-                <span>
-                  Team access, settings and campaign controls.
-                </span>
-              </span>
-
-              {accessMode === "admin" && (
-                <CheckCircle2
-                  className={styles.portalCheck}
-                  size={17}
-                  strokeWidth={2.3}
-                />
-              )}
-            </button>
-          </div>
-        </div>
-
-        <form className={styles.form} onSubmit={handleSubmit}>
+        <form
+          className={styles.form}
+          onSubmit={handleSubmit}
+        >
           <div className={styles.fieldGroup}>
-            <label htmlFor="email">Email address</label>
+            <label htmlFor="email">
+              Email address
+            </label>
 
             <div className={styles.inputWrap}>
-              <Mail size={19} strokeWidth={1.8} />
+              <Mail size={19} />
 
               <input
                 id="email"
@@ -219,15 +151,21 @@ export default function LoginForm() {
           </div>
 
           <div className={styles.fieldGroup}>
-            <label htmlFor="password">Password</label>
+            <label htmlFor="password">
+              Password
+            </label>
 
             <div className={styles.inputWrap}>
-              <LockKeyhole size={19} strokeWidth={1.8} />
+              <LockKeyhole size={19} />
 
               <input
                 id="password"
                 name="password"
-                type={showPassword ? "text" : "password"}
+                type={
+                  showPassword
+                    ? "text"
+                    : "password"
+                }
                 value={formData.password}
                 onChange={handleChange}
                 placeholder="Enter your password"
@@ -236,20 +174,21 @@ export default function LoginForm() {
               />
 
               <button
-                className={styles.passwordButton}
+                className={
+                  styles.passwordButton
+                }
                 type="button"
                 disabled={isLoading}
-                onClick={() => {
-                  setShowPassword((current) => !current);
-                }}
-                aria-label={
-                  showPassword ? "Hide password" : "Show password"
+                onClick={() =>
+                  setShowPassword(
+                    (current) => !current,
+                  )
                 }
               >
                 {showPassword ? (
-                  <EyeOff size={19} strokeWidth={1.8} />
+                  <EyeOff size={19} />
                 ) : (
-                  <Eye size={19} strokeWidth={1.8} />
+                  <Eye size={19} />
                 )}
               </button>
             </div>
@@ -271,36 +210,41 @@ export default function LoginForm() {
             <button
               className={styles.textButton}
               type="button"
-              disabled={isLoading}
-              onClick={handleForgotPassword}
+              onClick={() =>
+                setMessage(
+                  "Password recovery will be connected next.",
+                )
+              }
             >
               Forgot password?
             </button>
           </div>
 
           <button
-            className={`${styles.submitButton} ${
-              isAdmin ? styles.adminSubmitButton : ""
-            }`}
+            className={styles.submitButton}
             type="submit"
             disabled={isLoading}
           >
             {isLoading ? (
               <>
                 <LoaderCircle
-                  className={styles.loadingSpinner}
+                  className={
+                    styles.loadingSpinner
+                  }
                   size={19}
-                  strokeWidth={2}
                 />
-                <span>Verifying Access</span>
+
+                <span>
+                  Verifying Campaign Access
+                </span>
               </>
             ) : (
               <>
                 <span>
-                  Enter {isAdmin ? "Admin" : "Client"} Portal
+                  Enter Campaign HQ
                 </span>
 
-                <ArrowRight size={20} strokeWidth={2} />
+                <ArrowRight size={20} />
               </>
             )}
           </button>
@@ -312,18 +256,26 @@ export default function LoginForm() {
           <button
             className={styles.googleButton}
             type="button"
-            disabled={isLoading}
-            onClick={handleGoogleSignIn}
+            onClick={() =>
+              setMessage(
+                "Google sign-in will be connected later.",
+              )
+            }
           >
-            <span className={styles.googleIcon}>G</span>
+            <span className={styles.googleIcon}>
+              G
+            </span>
 
             <span>
-              Continue as {isAdmin ? "Admin" : "Client"} with Google
+              Continue with Google
             </span>
           </button>
 
           {message && (
-            <p className={styles.message} role="alert">
+            <p
+              className={styles.message}
+              role="alert"
+            >
               {message}
             </p>
           )}
@@ -333,14 +285,17 @@ export default function LoginForm() {
           <span>Need help?</span>
 
           <button type="button">
-            Contact your campaign administrator
+            Contact campaign leadership
           </button>
         </div>
       </section>
 
       <footer className={styles.footer}>
         <span>© 2026 Campaign HQ</span>
-        <span>Authorized campaign use only</span>
+
+        <span>
+          Authorized campaign use only
+        </span>
       </footer>
     </div>
   );

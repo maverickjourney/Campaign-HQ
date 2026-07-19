@@ -1,0 +1,522 @@
+:root {
+  --invite-navy: #071b35;
+  --invite-blue: #245f9a;
+  --invite-red: #e4232e;
+  --invite-border: #dce5ef;
+  --invite-muted: #748196;
+}
+
+.page {
+  display: grid;
+  min-height: 100dvh;
+  grid-template-columns:
+    minmax(330px, 0.82fr)
+    minmax(520px, 1.18fr);
+  color: #12243d;
+  background: #f4f7fb;
+}
+
+.brandPanel {
+  position: relative;
+  display: flex;
+  min-height: 100dvh;
+  flex-direction: column;
+  justify-content: center;
+  padding: clamp(36px, 6vw, 86px);
+  overflow: hidden;
+  color: #ffffff;
+  background:
+    radial-gradient(
+      circle at 82% 12%,
+      rgba(228, 35, 46, 0.4),
+      transparent 34%
+    ),
+    linear-gradient(
+      145deg,
+      #071b35,
+      #123f71
+    );
+}
+
+.brandPanel::after {
+  position: absolute;
+  right: -120px;
+  bottom: -160px;
+  width: 390px;
+  height: 390px;
+  border: 58px solid
+    rgba(255, 255, 255, 0.035);
+  border-radius: 50%;
+  content: "";
+}
+
+.brandMark {
+  display: grid;
+  width: 62px;
+  height: 62px;
+  place-items: center;
+  border: 1px solid
+    rgba(255, 255, 255, 0.18);
+  border-radius: 18px;
+  background:
+    rgba(255, 255, 255, 0.1);
+  box-shadow:
+    0 18px 40px
+    rgba(1, 14, 31, 0.22);
+}
+
+.eyebrow {
+  margin-top: 28px;
+  color: #ff7f89;
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+}
+
+.brandPanel h1 {
+  max-width: 500px;
+  margin: 8px 0 0;
+  font-size:
+    clamp(42px, 5vw, 72px);
+  line-height: 0.98;
+  letter-spacing: -0.055em;
+}
+
+.brandPanel > p {
+  max-width: 520px;
+  margin: 18px 0 0;
+  color:
+    rgba(255, 255, 255, 0.7);
+  font-size: 16px;
+  line-height: 1.65;
+}
+
+.securityCard {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  max-width: 520px;
+  align-items: flex-start;
+  gap: 12px;
+  margin-top: 32px;
+  padding: 16px;
+  border: 1px solid
+    rgba(255, 255, 255, 0.13);
+  border-radius: 15px;
+  background:
+    rgba(255, 255, 255, 0.07);
+  backdrop-filter: blur(12px);
+}
+
+.securityCard svg {
+  flex: 0 0 auto;
+  color: #79b9f3;
+}
+
+.securityCard div {
+  display: grid;
+  gap: 4px;
+}
+
+.securityCard strong {
+  font-size: 14px;
+}
+
+.securityCard span {
+  color:
+    rgba(255, 255, 255, 0.66);
+  font-size: 12px;
+  line-height: 1.55;
+}
+
+.brandPanel > small {
+  position: absolute;
+  bottom: 25px;
+  color:
+    rgba(255, 255, 255, 0.42);
+  font-size: 11px;
+  font-weight: 750;
+}
+
+.formPanel {
+  display: grid;
+  min-height: 100dvh;
+  place-items: center;
+  padding: 34px;
+}
+
+.formShell {
+  width: min(580px, 100%);
+  padding: clamp(25px, 4vw, 42px);
+  border: 1px solid
+    var(--invite-border);
+  border-radius: 22px;
+  background: #ffffff;
+  box-shadow:
+    0 28px 80px
+    rgba(7, 27, 53, 0.11);
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  margin-bottom: 23px;
+}
+
+.headerIcon {
+  display: grid;
+  width: 48px;
+  height: 48px;
+  flex: 0 0 48px;
+  place-items: center;
+  border-radius: 14px;
+  color: #ffffff;
+  background:
+    linear-gradient(
+      145deg,
+      var(--invite-blue),
+      #174a80
+    );
+}
+
+.header > div:last-child {
+  min-width: 0;
+}
+
+.header span {
+  color: var(--invite-red);
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.header h2 {
+  margin: 4px 0 0;
+  color: var(--invite-navy);
+  font-size: 28px;
+  letter-spacing: -0.035em;
+}
+
+.modeSwitch {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px;
+  margin-bottom: 20px;
+  padding: 4px;
+  border-radius: 12px;
+  background: #edf2f7;
+}
+
+.modeSwitch button {
+  min-height: 40px;
+  border: 0;
+  border-radius: 9px;
+  color: #69778a;
+  background: transparent;
+  font-size: 12px;
+  font-weight: 850;
+}
+
+.modeSwitch .activeMode {
+  color: #174f86;
+  background: #ffffff;
+  box-shadow:
+    0 4px 12px
+    rgba(18, 44, 76, 0.08);
+}
+
+.form {
+  display: grid;
+  gap: 15px;
+}
+
+.form label {
+  display: grid;
+  gap: 7px;
+}
+
+.form label > span {
+  color: #5f6f83;
+  font-size: 12px;
+  font-weight: 850;
+}
+
+.inputWrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.inputWrap > svg {
+  position: absolute;
+  left: 13px;
+  color: #8593a6;
+  pointer-events: none;
+}
+
+.inputWrap input {
+  width: 100%;
+  min-height: 48px;
+  padding: 0 45px 0 42px;
+  border: 1px solid #d4deea;
+  border-radius: 11px;
+  outline: 0;
+  color: #142a45;
+  background: #ffffff;
+  font: inherit;
+}
+
+.inputWrap input:focus {
+  border-color: #7ea2c7;
+  box-shadow:
+    0 0 0 4px
+    rgba(36, 95, 154, 0.09);
+}
+
+.inputWrap button {
+  position: absolute;
+  right: 8px;
+  display: grid;
+  width: 34px;
+  height: 34px;
+  place-items: center;
+  border: 0;
+  border-radius: 8px;
+  color: #718095;
+  background: transparent;
+}
+
+.primaryButton,
+.stateCard button {
+  display: inline-flex;
+  min-height: 48px;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border: 0;
+  border-radius: 11px;
+  color: #ffffff;
+  background:
+    linear-gradient(
+      90deg,
+      #d71920,
+      #ef2b37
+    );
+  box-shadow:
+    0 13px 26px
+    rgba(215, 25, 32, 0.2);
+  font-size: 13px;
+  font-weight: 900;
+}
+
+.primaryButton:disabled,
+.currentAccount button:disabled {
+  cursor: not-allowed;
+  opacity: 0.58;
+}
+
+.error {
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+  margin-bottom: 16px;
+  padding: 12px 13px;
+  border: 1px solid #efc5ca;
+  border-radius: 11px;
+  color: #922a34;
+  background: #fff5f6;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.error svg {
+  flex: 0 0 auto;
+}
+
+.currentAccount {
+  display: grid;
+  grid-template-columns:
+    42px minmax(0, 1fr);
+  gap: 12px;
+  align-items: center;
+}
+
+.currentAccount > svg {
+  display: grid;
+  width: 42px;
+  height: 42px;
+  padding: 9px;
+  border-radius: 12px;
+  color: #245f9a;
+  background: #edf4fb;
+}
+
+.currentAccount > div {
+  display: grid;
+  min-width: 0;
+  gap: 3px;
+}
+
+.currentAccount span {
+  color: #8793a4;
+  font-size: 11px;
+  font-weight: 850;
+  text-transform: uppercase;
+}
+
+.currentAccount strong {
+  overflow: hidden;
+  color: #17304e;
+  font-size: 14px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.currentAccount > button {
+  grid-column: 1 / -1;
+  display: inline-flex;
+  min-height: 43px;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  border: 1px solid #d5dfea;
+  border-radius: 10px;
+  color: #52657c;
+  background: #ffffff;
+  font-size: 12px;
+  font-weight: 850;
+}
+
+.currentAccount .primaryButton {
+  border: 0;
+  color: #ffffff;
+  background:
+    linear-gradient(
+      90deg,
+      #d71920,
+      #ef2b37
+    );
+}
+
+.privacy {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin-top: 19px;
+  padding-top: 17px;
+  border-top: 1px solid #e6ebf1;
+  color: #7a8798;
+  font-size: 11px;
+  line-height: 1.55;
+}
+
+.privacy svg {
+  flex: 0 0 auto;
+  color: #2b815f;
+}
+
+.stateCard {
+  display: grid;
+  min-height: 330px;
+  place-items: center;
+  align-content: center;
+  gap: 10px;
+  color: #718095;
+  text-align: center;
+}
+
+.stateCard > svg {
+  color: #245f9a;
+}
+
+.stateCard h2,
+.stateCard p {
+  margin: 0;
+}
+
+.stateCard h2 {
+  color: var(--invite-navy);
+  font-size: 25px;
+}
+
+.stateCard p {
+  max-width: 420px;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.stateCard button {
+  min-width: 180px;
+  margin-top: 8px;
+  padding: 0 18px;
+}
+
+.spinning {
+  animation:
+    inviteSpin
+    0.9s
+    linear
+    infinite;
+}
+
+@keyframes inviteSpin {
+  to {
+    transform:
+      rotate(360deg);
+  }
+}
+
+@media (max-width: 920px) {
+  .page {
+    grid-template-columns: 1fr;
+  }
+
+  .brandPanel {
+    min-height: auto;
+    padding: 34px 24px;
+  }
+
+  .brandPanel h1 {
+    font-size: 42px;
+  }
+
+  .brandPanel > p {
+    font-size: 14px;
+  }
+
+  .brandPanel > small {
+    position: static;
+    margin-top: 22px;
+  }
+
+  .formPanel {
+    min-height: auto;
+    padding: 24px;
+  }
+}
+
+@media (max-width: 560px) {
+  .formPanel {
+    padding: 12px;
+  }
+
+  .formShell {
+    padding: 21px 16px;
+    border-radius: 17px;
+  }
+
+  .header h2 {
+    font-size: 24px;
+  }
+
+  .brandPanel {
+    padding: 27px 19px;
+  }
+
+  .securityCard {
+    margin-top: 22px;
+  }
+}

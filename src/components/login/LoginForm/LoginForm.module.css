@@ -1,7 +1,7 @@
 .wrapper {
   display: flex;
   width: min(100%, 540px);
-  max-height: calc(100vh - 28px);
+  max-height: calc(100dvh - 28px);
   flex-direction: column;
   gap: 9px;
 }
@@ -70,14 +70,14 @@
 .security strong {
   display: block;
   color: #4a5567;
-  font-size: 11px;
+  font-size: 13px;
   font-weight: 750;
 }
 
 .security span {
   display: block;
   margin-top: 2px;
-  font-size: 10px;
+  font-size: 12px;
 }
 
 .heading {
@@ -87,7 +87,7 @@
 .eyebrow {
   margin: 0 0 8px;
   color: #d71920;
-  font-size: 9px;
+  font-size: 12px;
   font-weight: 850;
   letter-spacing: 0.23em;
   text-transform: uppercase;
@@ -107,7 +107,7 @@
   max-width: 440px;
   margin: 12px 0 0;
   color: #6b7484;
-  font-size: 12px;
+  font-size: 14px;
   line-height: 1.45;
 }
 
@@ -125,13 +125,13 @@
 
 .portalHeader strong {
   color: #1a2435;
-  font-size: 11px;
+  font-size: 13px;
   font-weight: 800;
 }
 
 .portalHeader span {
   color: #8a94a4;
-  font-size: 9px;
+  font-size: 12px;
 }
 
 .portalGrid {
@@ -185,7 +185,7 @@
 
 .portalCopy small {
   color: #8a95a5;
-  font-size: 7px;
+  font-size: 12px;
   font-weight: 850;
   letter-spacing: 0.12em;
   text-transform: uppercase;
@@ -194,14 +194,14 @@
 .portalCopy strong {
   margin-top: 2px;
   color: #0b1d35;
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 850;
 }
 
 .portalCopy > span {
   margin-top: 3px;
   color: #7b8696;
-  font-size: 8px;
+  font-size: 12px;
   line-height: 1.3;
 }
 
@@ -254,7 +254,7 @@
   display: block;
   margin-bottom: 6px;
   color: #1a2435;
-  font-size: 11px;
+  font-size: 13px;
   font-weight: 750;
 }
 
@@ -280,7 +280,7 @@
   outline: none;
   color: #101828;
   background: #ffffff;
-  font-size: 13px;
+  font-size: 14px;
   transition:
     border-color 0.2s ease,
     box-shadow 0.2s ease;
@@ -325,7 +325,7 @@
   align-items: center;
   gap: 8px;
   color: #344054;
-  font-size: 11px;
+  font-size: 13px;
   font-weight: 650;
   cursor: pointer;
 }
@@ -340,7 +340,7 @@
   padding: 0;
   color: #d71920;
   background: none;
-  font-size: 11px;
+  font-size: 13px;
   font-weight: 750;
 }
 
@@ -359,7 +359,7 @@
   color: #ffffff;
   background: linear-gradient(90deg, #123a6d, #071b35);
   box-shadow: 0 15px 30px rgba(7, 27, 53, 0.22);
-  font-size: 11px;
+  font-size: 13px;
   font-weight: 850;
   letter-spacing: 0.15em;
   text-transform: uppercase;
@@ -389,7 +389,7 @@
   gap: 13px;
   margin: 13px 0;
   color: #8b94a3;
-  font-size: 9px;
+  font-size: 12px;
   font-weight: 750;
 }
 
@@ -412,7 +412,7 @@
   border-radius: 12px;
   color: #202939;
   background: #ffffff;
-  font-size: 11px;
+  font-size: 13px;
   font-weight: 750;
   transition:
     border-color 0.2s ease,
@@ -445,7 +445,7 @@
   color: #8d2631;
   text-align: center;
   background: #fff5f6;
-  font-size: 10px;
+  font-size: 12px;
   line-height: 1.4;
 }
 
@@ -455,7 +455,7 @@
   gap: 4px;
   margin-top: 14px;
   color: #7b8493;
-  font-size: 10px;
+  font-size: 12px;
 }
 
 .help button {
@@ -476,7 +476,7 @@
   gap: 16px;
   padding: 0 6px;
   color: rgba(255, 255, 255, 0.55);
-  font-size: 9px;
+  font-size: 12px;
   letter-spacing: 0.04em;
 }
 
@@ -499,7 +499,7 @@
 
   .heading > p:last-child {
     margin-top: 8px;
-    font-size: 10px;
+    font-size: 12px;
   }
 
   .portalSection {
@@ -625,3 +625,165 @@
 }
 
 /* === REAL AUTHENTICATION STATES END === */
+
+.automaticAccess {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  gap: 11px;
+  margin-bottom: 17px;
+  padding: 12px 13px;
+  border: 1px solid #dce4ed;
+  border-radius: 13px;
+  background: linear-gradient(120deg, #f1f6fc, #ffffff);
+}
+
+.automaticAccessIcon {
+  display: grid;
+  width: 36px;
+  height: 36px;
+  place-items: center;
+  border-radius: 10px;
+  color: #ffffff;
+  background: #123a6d;
+}
+
+.automaticAccess > div:last-child {
+  display: grid;
+  gap: 3px;
+}
+
+.automaticAccess strong {
+  color: #17243a;
+  font-size: 13px;
+}
+
+.automaticAccess span {
+  color: #738095;
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+/* =========================================================
+   CAMPAIGN HQ RESPONSIVE FOUNDATION — STAGE 1
+   ========================================================= */
+
+.wrapper {
+  max-height: none;
+  margin-block: auto;
+  padding-block: 14px;
+}
+
+.loginCard,
+.footer {
+  flex: 0 0 auto;
+}
+
+/*
+ * Reduce spacing—not readable text—on shorter laptops.
+ */
+
+@media (
+  max-height: 840px
+) and (
+  min-width: 981px
+) {
+  .wrapper {
+    padding-block: 10px;
+  }
+
+  .loginCard {
+    padding:
+      18px
+      clamp(28px, 2.6vw, 36px);
+  }
+
+  .security {
+    margin-bottom: 10px;
+  }
+
+  .heading {
+    margin-bottom: 11px;
+  }
+
+  .heading h2 {
+    font-size:
+      clamp(39px, 3.2vw, 45px);
+  }
+
+  .heading > p:last-child {
+    margin-top: 8px;
+  }
+
+  .fieldGroup {
+    margin-bottom: 9px;
+  }
+
+  .options {
+    margin-bottom: 10px;
+  }
+
+  .divider {
+    margin: 9px 0;
+  }
+
+  .help {
+    margin-top: 9px;
+  }
+}
+
+@media (
+  max-height: 700px
+) and (
+  min-width: 981px
+) {
+  .security {
+    display: none;
+  }
+
+  .heading h2 {
+    font-size: 38px;
+  }
+
+  .heading > p:last-child {
+    margin-top: 6px;
+  }
+
+  .loginCard {
+    padding-top: 16px;
+    padding-bottom: 16px;
+  }
+}
+
+@media (max-width: 980px) {
+  .wrapper {
+    width: min(100%, 640px);
+    max-height: none;
+    margin:
+      -24px
+      auto
+      0;
+    padding-block: 0;
+  }
+}
+
+@media (max-width: 600px) {
+  .wrapper {
+    margin-top: -18px;
+  }
+
+  .loginCard {
+    padding:
+      29px
+      clamp(18px, 5vw, 24px);
+  }
+
+  .heading h2 {
+    font-size:
+      clamp(40px, 12vw, 44px);
+  }
+
+  .options {
+    flex-wrap: wrap;
+  }
+}

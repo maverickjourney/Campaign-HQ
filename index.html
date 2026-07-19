@@ -3,11 +3,48 @@
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>campaign-hq</title>
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <link rel="apple-touch-icon" href="/pwa/apple-touch-icon.png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="theme-color" content="#a5151d" />
+    <meta name="application-name" content="Campaign HQ" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="Campaign HQ" />
+    <title>Campaign HQ</title>
   </head>
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
+    <script>
+      window.__campaignHQInstallPrompt = null;
+
+      window.addEventListener(
+        "beforeinstallprompt",
+        (event) => {
+          event.preventDefault();
+          window.__campaignHQInstallPrompt = event;
+          window.dispatchEvent(
+            new Event("campaignhq-install-ready"),
+          );
+        },
+      );
+
+      if ("serviceWorker" in navigator) {
+        window.addEventListener(
+          "load",
+          () => {
+            navigator.serviceWorker
+              .register("/campaign-hq-sw.js")
+              .catch((error) => {
+                console.error(
+                  "Campaign HQ service worker registration failed:",
+                  error,
+                );
+              });
+          },
+        );
+      }
+    </script>
   </body>
 </html>

@@ -1,0 +1,424 @@
+:root {
+  --vol-task-navy: #071f3c;
+  --vol-task-red: #e51f2a;
+  --vol-task-blue: #235f9e;
+  --vol-task-border: #dce5ef;
+}
+
+.app {
+  min-height: 100vh;
+  background: #f3f6fa;
+}
+
+.workspace {
+  min-height: 100vh;
+  margin-left: 280px;
+}
+
+.topbar {
+  position: sticky;
+  z-index: 20;
+  top: 0;
+  display: flex;
+  min-height: 82px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  padding: 0 28px;
+  border-bottom: 1px solid var(--vol-task-border);
+  background: rgba(255, 255, 255, 0.94);
+  backdrop-filter: blur(18px);
+}
+
+.topbarLeft,
+.topbarRight {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.topbarLeft > div {
+  display: grid;
+  gap: 5px;
+}
+
+.topbarLeft span {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #8290a4;
+  font-size: 12px;
+  font-weight: 750;
+}
+
+.topbarLeft strong {
+  color: var(--vol-task-navy);
+  font-size: 17px;
+}
+
+.menuButton {
+  display: none;
+  width: 42px;
+  height: 42px;
+  place-items: center;
+  border: 1px solid var(--vol-task-border);
+  border-radius: 11px;
+  color: var(--vol-task-navy);
+  background: #ffffff;
+}
+
+.secureBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  color: #237053;
+  background: #eaf7f0;
+  font-size: 11px;
+  font-weight: 850;
+}
+
+.main {
+  display: grid;
+  gap: 20px;
+  padding: 30px;
+}
+
+.pageHeader {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 22px;
+}
+
+.pageHeader > div > span,
+.taskPanel header span {
+  color: var(--vol-task-red);
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+}
+
+.pageHeader h1 {
+  margin: 7px 0 5px;
+  color: var(--vol-task-navy);
+  font-size: clamp(38px, 5vw, 58px);
+  letter-spacing: -0.055em;
+}
+
+.pageHeader p {
+  max-width: 650px;
+  margin: 0;
+  color: #748297;
+  line-height: 1.6;
+}
+
+.pageHeader > button {
+  display: inline-flex;
+  min-height: 43px;
+  align-items: center;
+  gap: 8px;
+  padding: 0 16px;
+  border: 1px solid #cfdbe8;
+  border-radius: 11px;
+  color: #315b88;
+  background: #ffffff;
+  font-weight: 850;
+}
+
+.error {
+  padding: 13px 15px;
+  border: 1px solid #efc5ca;
+  border-radius: 11px;
+  color: #942c36;
+  background: #fff4f5;
+}
+
+.summary {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.summary button {
+  display: flex;
+  min-height: 105px;
+  align-items: center;
+  gap: 14px;
+  padding: 20px;
+  border: 1px solid var(--vol-task-border);
+  border-radius: 16px;
+  color: var(--vol-task-blue);
+  background: #ffffff;
+  text-align: left;
+}
+
+.summary button > div {
+  display: grid;
+  gap: 4px;
+}
+
+.summary span {
+  color: #78869a;
+  font-size: 11px;
+  font-weight: 850;
+  text-transform: uppercase;
+}
+
+.summary strong {
+  color: var(--vol-task-navy);
+  font-size: 24px;
+}
+
+.summary .activeSummary {
+  border-color: #99b9dc;
+  box-shadow: 0 0 0 3px rgba(35, 95, 158, 0.1);
+}
+
+.taskPanel {
+  overflow: hidden;
+  border: 1px solid var(--vol-task-border);
+  border-radius: 18px;
+  background: #ffffff;
+  box-shadow: 0 14px 35px rgba(12, 36, 64, 0.055);
+}
+
+.taskPanel header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  padding: 21px 23px;
+  border-bottom: 1px solid #e4eaf1;
+}
+
+.taskPanel h2 {
+  margin: 5px 0 0;
+  color: var(--vol-task-navy);
+  font-size: 24px;
+}
+
+.taskPanel header small {
+  color: #8592a3;
+}
+
+.taskList {
+  display: grid;
+}
+
+.taskList article {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 21px 23px;
+  border-bottom: 1px solid #edf1f5;
+}
+
+.taskList article:last-child {
+  border-bottom: 0;
+}
+
+.taskMain {
+  min-width: 0;
+}
+
+.taskBadges {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.taskBadges span,
+.taskBadges small {
+  padding: 5px 8px;
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 850;
+}
+
+.taskBadges span {
+  color: var(--vol-task-blue);
+  background: #edf4fb;
+}
+
+.taskBadges small {
+  color: #8d6515;
+  background: #fff4dc;
+}
+
+.taskMain h3 {
+  margin: 10px 0 6px;
+  color: var(--vol-task-navy);
+  font-size: 18px;
+}
+
+.taskMain p {
+  max-width: 720px;
+  margin: 0 0 10px;
+  color: #758399;
+  line-height: 1.55;
+}
+
+.dueLine {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #8390a2;
+  font-size: 11px;
+}
+
+.taskActions {
+  flex: 0 0 auto;
+}
+
+.taskActions button {
+  display: inline-flex;
+  min-height: 39px;
+  align-items: center;
+  gap: 7px;
+  padding: 0 14px;
+  border: 0;
+  border-radius: 9px;
+  color: #ffffff;
+  background: var(--vol-task-red);
+  font-weight: 850;
+}
+
+.loading,
+.empty {
+  display: grid;
+  min-height: 260px;
+  place-items: center;
+  align-content: center;
+  gap: 10px;
+  padding: 30px;
+  color: #7d8b9e;
+  text-align: center;
+}
+
+.empty svg {
+  color: #2b7b59;
+}
+
+.empty strong {
+  color: var(--vol-task-navy);
+  font-size: 17px;
+}
+
+.empty p {
+  max-width: 430px;
+  margin: 0;
+  line-height: 1.55;
+}
+
+.spinning {
+  animation: volunteerTaskSpin 0.9s linear infinite;
+}
+
+@keyframes volunteerTaskSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (max-width: 900px) {
+  .workspace {
+    margin-left: 0;
+  }
+
+  .menuButton {
+    display: grid;
+  }
+
+  .topbar {
+    padding: 0 18px;
+  }
+
+  .secureBadge {
+    display: none;
+  }
+
+  .main {
+    padding: 22px 16px;
+  }
+}
+
+@media (max-width: 650px) {
+  .topbarRight {
+    display: none;
+  }
+
+  .pageHeader,
+  .taskPanel header,
+  .taskList article {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .pageHeader > button {
+    justify-content: center;
+  }
+
+  .summary {
+    grid-template-columns: 1fr;
+  }
+
+  .taskActions button {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+/* ==========================================================
+   CAMPAIGN HQ — GLOBAL RESPONSIVE SHELL FOUNDATION
+   Fixed shared sidebar: 272px | Mobile breakpoint: 850px
+   ========================================================== */
+.app {
+  width: 100% !important;
+  height: 100dvh !important;
+  min-height: 100dvh !important;
+  overflow: hidden !important;
+}
+.workspace {
+  display: flex !important;
+  width: calc(100vw - 272px) !important;
+  max-width: calc(100vw - 272px) !important;
+  height: 100dvh !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+  margin-left: 272px !important;
+  flex: 1 1 auto !important;
+  flex-direction: column !important;
+  overflow: hidden !important;
+  box-sizing: border-box !important;
+}
+.topbar {
+  width: 100% !important;
+  min-width: 0 !important;
+  max-width: 100% !important;
+  flex: 0 0 auto !important;
+  box-sizing: border-box !important;
+}
+.main {
+  min-width: 0 !important;
+  min-height: 0 !important;
+  flex: 1 1 auto !important;
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable;
+  -webkit-overflow-scrolling: touch;
+}
+@media (max-width: 850px) {
+  .workspace {
+    width: 100vw !important;
+    max-width: 100vw !important;
+    margin-left: 0 !important;
+  }
+  .menuButton {
+    display: grid !important;
+  }
+}

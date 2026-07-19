@@ -3,56 +3,39 @@ import { useNavigate } from "react-router-dom";
 import {
   Activity,
   ArrowRight,
-  Bell,
   CalendarDays,
   CheckCircle2,
   ChevronRight,
-  ClipboardCheck,
   Clock3,
   FileCheck2,
   Files,
   FolderKanban,
-  LayoutDashboard,
-  LogOut,
   Mail,
+  MapPin,
   Menu,
-  MessageSquareText,
   Settings,
   ShieldCheck,
   Sparkles,
   TrendingUp,
   UserCog,
-  UsersRound,
-  Vote,
-  X,
 } from "lucide-react";
 
 import {
-  clearCampaignSession,
   getAccessMode,
+  getCampaignExperience,
   getCurrentUser,
   getCurrentWorkspace,
-  getRoleLabel,
-  getUserInitials,
 } from "../../utils/campaignSession";
 import { useCampaignDashboard } from "../../hooks/useCampaignDashboard";
+
 import elizabethPhoto from "../../assets/images/dashboard/elizabeth.jpg";
+import { CampaignSidebar } from "../../components/CampaignSidebar/CampaignSidebar";
+import { ActivityCenter } from "../../components/ActivityCenter/ActivityCenter";
+import { CampaignSearch } from "../../components/CampaignSearch/CampaignSearch";
+import { CampaignDateTime } from "../../components/CampaignDateTime/CampaignDateTime";
 import styles from "./Dashboard.module.css";
 
-const primaryNavigation = [
-  { label: "Overview", icon: LayoutDashboard },
-  { label: "Tasks", icon: ClipboardCheck, count: 8 },
-  { label: "Calendar", icon: CalendarDays },
-  { label: "Team", icon: UsersRound },
-  { label: "Files", icon: FolderKanban },
-  { label: "Communications", icon: MessageSquareText },
-  { label: "Approvals", icon: FileCheck2, count: 3 },
-];
-
-const administratorNavigation = [
-  { label: "User access", icon: UserCog },
-  { label: "Workspace settings", icon: Settings },
-];
+// CAMPAIGN HQ CALENDAR LINT COMPLETION
 
 function formatRelativeTime(value) {
   if (!value) {
@@ -239,33 +222,23 @@ function getDaysUntilElection(electionDateRaw) {
   return Math.max(0, Math.ceil(difference / (1000 * 60 * 60 * 24)));
 }
 
-function getFormattedDate() {
-  return new Intl.DateTimeFormat("en-US", {
-    weekday: "long",
-    month: "long",
-    day: "numeric",
-    year: "numeric",
-  }).format(new Date());
-}
-
 export default function Dashboard() {
   const navigate = useNavigate();
   const user = getCurrentUser();
   const workspace = getCurrentWorkspace();
   const accessMode = getAccessMode();
-  const roleLabel = getRoleLabel(accessMode);
-  const isAdmin = accessMode === "admin";
-
-  const {
+  const campaignExperience =
+    getCampaignExperience();
+  const isAdmin =
+    accessMode === "admin";
+const {
     data: dashboardData,
     isLoading,
     error,
     lastUpdated,
     updateTaskStatus,
   } = useCampaignDashboard(workspace.id);
-
-  const [activeNavigation, setActiveNavigation] =
-    useState("Overview");
+  const activeNavigation = "Overview";
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [taskUpdatingId, setTaskUpdatingId] = useState("");
 
@@ -274,7 +247,6 @@ export default function Dashboard() {
     [workspace.electionDateRaw],
   );
 
-  const formattedDate = useMemo(getFormattedDate, []);
   const firstName = user.name.split(" ")[0] || "there";
 
   const {
@@ -557,7 +529,7 @@ export default function Dashboard() {
   const overdueTasks = openTasks.filter(
     (task) =>
       task.due_at &&
-      new Date(task.due_at).getTime() < Date.now(),
+      new Date(task.due_at).getTime() < (lastUpdated?.getTime() || 0),
   );
 
   if (overdueTasks.length > 0) {
@@ -614,29 +586,6 @@ export default function Dashboard() {
     });
   }
 
-  const navigationItems = primaryNavigation.map(
-    (item) => {
-      if (item.label === "Tasks") {
-        return {
-          ...item,
-          count: openTasks.length,
-        };
-      }
-
-      if (item.label === "Approvals") {
-        return {
-          ...item,
-          count: openApprovals.length,
-        };
-      }
-
-      return {
-        ...item,
-        count: null,
-      };
-    },
-  );
-
   const dashboardStatus = isLoading
     ? "Synchronizing campaign data…"
     : error
@@ -653,35 +602,104 @@ export default function Dashboard() {
     "Campaign";
 
 
-  const quickActions = isAdmin
-    ? [
-        { label: "Manage users", icon: UserCog },
-        { label: "Review approvals", icon: FileCheck2 },
-        { label: "Add event", icon: CalendarDays },
-        { label: "Upload file", icon: Files },
-      ]
-    : [
-        { label: "Review approvals", icon: FileCheck2 },
-        { label: "View calendar", icon: CalendarDays },
-        { label: "Open files", icon: FolderKanban },
-        { label: "Message team", icon: Mail },
-      ];
-
-  const handleLogout = async () => {
-    await clearCampaignSession();
-    navigate("/", { replace: true });
+  const quickActionsByExperience = {
+    owner: [
+      {
+        label: "Manage users",
+        icon: UserCog,
+        route: "/team/access",
+      },
+      {
+        label: "Review approvals",
+        icon: FileCheck2,
+        route: "/approvals",
+      },
+      {
+        label: "Add event",
+        icon: CalendarDays,
+        route: "/calendar",
+      },
+      {
+        label: "Upload file",
+        icon: Files,
+        route: "/files",
+      },
+    ],
+    manager: [
+      {
+        label: "Field operations",
+        icon: MapPin,
+        route: "/field-operations",
+      },
+      {
+        label: "View calendar",
+        icon: CalendarDays,
+        route: "/calendar",
+      },
+      {
+        label: "Message team",
+        icon: Mail,
+        route: "/communications",
+      },
+      {
+        label: "Manage team",
+        icon: UserCog,
+        route: "/team",
+      },
+    ],
+    candidate: [
+      {
+        label: "Review approvals",
+        icon: FileCheck2,
+        route: "/approvals",
+      },
+      {
+        label: "View calendar",
+        icon: CalendarDays,
+        route: "/calendar",
+      },
+      {
+        label: "Open files",
+        icon: FolderKanban,
+        route: "/files",
+      },
+      {
+        label: "Message managers",
+        icon: Mail,
+        route: "/communications",
+      },
+    ],
+    volunteer: [
+      {
+        label: "My tasks",
+        icon: CheckCircle2,
+        route: "/tasks",
+      },
+      {
+        label: "My schedule",
+        icon: CalendarDays,
+        route: "/calendar",
+      },
+      {
+        label: "Campaign files",
+        icon: FolderKanban,
+        route: "/files",
+      },
+      {
+        label: "Message coordinator",
+        icon: Mail,
+        route: "/communications",
+      },
+    ],
   };
 
-  const handleWorkspaceChange = () => {
-    navigate("/workspaces");
-  };
-
-  const handleNavigation = (label) => {
-    setActiveNavigation(label);
-    setSidebarOpen(false);
-  };
-
-  const toggleTask = async (task) => {
+  const quickActions =
+    quickActionsByExperience[
+      campaignExperience.key
+    ] ||
+    quickActionsByExperience
+      .volunteer;
+const toggleTask = async (task) => {
     if (taskUpdatingId) {
       return;
     }
@@ -714,132 +732,24 @@ export default function Dashboard() {
         </div>
       )}
 
-      <aside
-        className={`${styles.sidebar} ${
-          sidebarOpen ? styles.sidebarOpen : ""
-        } ${isAdmin ? styles.adminSidebar : ""}`}
-      >
-        <div className={styles.sidebarHeader}>
-          <button
-            className={styles.campaignIdentity}
-            type="button"
-            onClick={handleWorkspaceChange}
-          >
-            <div className={styles.campaignMark}>
-              <span>{getUserInitials(workspace.name)}</span>
-              <Vote size={20} strokeWidth={1.8} />
-            </div>
-
-            <div>
-              <strong>{workspace.name}</strong>
-              <span>{workspace.description}</span>
-            </div>
-          </button>
-
-          <button
-            className={styles.closeSidebar}
-            type="button"
-            onClick={() => setSidebarOpen(false)}
-            aria-label="Close navigation"
-          >
-            <X size={21} />
-          </button>
-        </div>
-
-        <div
-          className={`${styles.modeCard} ${
-            isAdmin ? styles.adminModeCard : ""
-          }`}
-        >
-          <span className={styles.modeLabel}>Current access</span>
-          <strong>{isAdmin ? "Administrator Portal" : "Client Portal"}</strong>
-          <p>
-            {isAdmin
-              ? "Manage team access, campaign settings and workspace controls."
-              : "View campaign progress, events, files, tasks and approvals."}
-          </p>
-        </div>
-
-        <nav className={styles.navigation}>
-          <span className={styles.navigationLabel}>Campaign</span>
-
-          {navigationItems.map((item) => {
-            const Icon = item.icon;
-
-            return (
-              <button
-                key={item.label}
-                className={
-                  activeNavigation === item.label
-                    ? styles.activeNavigation
-                    : ""
-                }
-                type="button"
-                onClick={() => handleNavigation(item.label)}
-              >
-                <Icon size={18} strokeWidth={1.8} />
-                <span>{item.label}</span>
-                {item.count && <small>{item.count}</small>}
-              </button>
-            );
-          })}
-
-          {isAdmin && (
-            <>
-              <span className={styles.navigationLabel}>Administration</span>
-
-              {administratorNavigation.map((item) => {
-                const Icon = item.icon;
-
-                return (
-                  <button
-                    key={item.label}
-                    className={
-                      activeNavigation === item.label
-                        ? styles.activeNavigation
-                        : ""
-                    }
-                    type="button"
-                    onClick={() => handleNavigation(item.label)}
-                  >
-                    <Icon size={18} strokeWidth={1.8} />
-                    <span>{item.label}</span>
-                  </button>
-                );
-              })}
-            </>
-          )}
-        </nav>
-
-        <div className={styles.sidebarFooter}>
-          <div className={styles.sidebarProfile}>
-            <div className={styles.avatar}>{getUserInitials(user.name)}</div>
-
-            <div>
-              <strong>{user.name}</strong>
-              <span>{roleLabel}</span>
-            </div>
-          </div>
-
-          <button
-            type="button"
-            onClick={handleLogout}
-            aria-label="Sign out"
-            title="Sign out and change portal"
-          >
-            <LogOut size={18} />
-          </button>
-        </div>
-      </aside>
-
-      {sidebarOpen && (
-        <button
-          className={styles.mobileOverlay}
-          type="button"
-          onClick={() => setSidebarOpen(false)}
-          aria-label="Close navigation"
-        />
-      )}
+      <CampaignSidebar
+        activePage="Overview"
+        sidebarOpen={sidebarOpen}
+        onClose={() =>
+          setSidebarOpen(false)
+        }
+        styles={styles}
+        accessDescription={
+          isAdmin
+            ? "Monitor campaign execution, deadlines and leadership controls."
+            : "Review campaign progress, responsibilities and upcoming deadlines."
+        }
+        showLeadership={
+          campaignExperience
+            .showLeadership
+        }
+        adminAccent={isAdmin}
+      />
 
       <div className={styles.workspace}>
         <header className={styles.topbar}>
@@ -861,29 +771,22 @@ export default function Dashboard() {
               </span>
 
               <strong>
-                {isAdmin ? "Administrator dashboard" : "Client dashboard"}
+                {
+                  campaignExperience
+                    .dashboardTitle
+                }
               </strong>
             </div>
           </div>
 
           <div className={styles.topbarActions}>
-            <button
-              className={styles.notificationButton}
-              type="button"
-              aria-label="Notifications"
-            >
-              <Bell size={19} strokeWidth={1.8} />
-              <span />
-            </button>
+            <CampaignDateTime />
 
-            <div className={styles.topbarProfile}>
-              <div className={styles.avatar}>{getUserInitials(user.name)}</div>
+            <CampaignSearch />
 
-              <div>
-                <strong>{user.name}</strong>
-                <span>{roleLabel}</span>
-              </div>
-            </div>
+            <ActivityCenter />
+            
+
           </div>
         </header>
 
@@ -892,7 +795,12 @@ export default function Dashboard() {
             <div className={styles.welcomeCopy}>
               <div className={styles.welcomeBadge}>
                 <Sparkles size={15} strokeWidth={2} />
-                <span>Campaign command center</span>
+                <span>
+                  {
+                    campaignExperience
+                      .badge
+                  }
+                </span>
               </div>
 
               <h1>
@@ -900,18 +808,34 @@ export default function Dashboard() {
               </h1>
 
               <p>
-                See what needs attention, what changed and what to do next —
-                all in one place.
+                {
+                  campaignExperience
+                    .description
+                }
               </p>
             </div>
 
             <div className={styles.topInfoCards}>
-              <div className={styles.topMiniCard}>
-                <CalendarDays size={18} strokeWidth={1.8} />
+              {/* CAMPAIGN HQ NEXT DEADLINE DASHBOARD REFINEMENT */}
+              <div
+                className={`${styles.topMiniCard} ${styles.deadlineMiniCard}`}
+              >
+                <Clock3 size={18} strokeWidth={1.8} />
 
                 <div>
-                  <span>Today</span>
-                  <strong>{formattedDate}</strong>
+                  <span>Next deadline</span>
+
+                  <strong>
+                    {priorities[0]
+                      ? priorities[0].time
+                      : "All clear"}
+                  </strong>
+
+                  <small>
+                    {priorities[0]
+                      ? priorities[0].title
+                      : "No active campaign deadlines"}
+                  </small>
                 </div>
               </div>
 
@@ -986,7 +910,19 @@ export default function Dashboard() {
                     const Icon = action.icon;
 
                     return (
-                      <button key={action.label} type="button">
+                      <button
+                        key={action.label}
+                        type="button"
+                        onClick={() => {
+                          if (
+                            action.route
+                          ) {
+                            navigate(
+                              action.route,
+                            );
+                          }
+                        }}
+                      >
                         <Icon size={16} strokeWidth={1.9} />
                         <span>{action.label}</span>
                       </button>
@@ -1103,7 +1039,11 @@ export default function Dashboard() {
                   </small>
                 </div>
 
-                <div className={styles.metricValue}>{metric.value}</div>
+                <div className={styles.metricValue}>
+                  {isLoading
+                    ? "—"
+                    : metric.value}
+                </div>
                 <p>{metric.note}</p>
 
                 <div className={styles.sparkline}>
@@ -1127,7 +1067,11 @@ export default function Dashboard() {
                   <h3>Your priorities</h3>
                 </div>
 
-                <button type="button" className={styles.inlineButton}>
+                <button
+                  type="button"
+                  className={styles.inlineButton}
+                  onClick={() => navigate("/tasks")}
+                >
                   View all
                   <ArrowRight size={14} />
                 </button>
@@ -1176,7 +1120,11 @@ export default function Dashboard() {
                   <h3>Today and upcoming</h3>
                 </div>
 
-                <button type="button" className={styles.inlineButton}>
+                <button
+                  type="button"
+                  className={styles.inlineButton}
+                  onClick={() => navigate("/calendar")}
+                >
                   Calendar
                   <ArrowRight size={14} />
                 </button>
