@@ -447,9 +447,101 @@ export function useInvitationManagement({
             );
           }
 
+          const normalizedRecipient =
+            email
+              .trim()
+              .toLowerCase();
+
+          let emailDelivery = {
+            emailSent: false,
+            emailRecipient:
+              normalizedRecipient,
+            emailId: null,
+            emailError: "",
+          };
+
+          try {
+            const {
+              data:
+                emailData,
+              error:
+                emailFunctionError,
+            } =
+              await supabase
+                .functions
+                .invoke(
+                  "send-workspace-invitation",
+                  {
+                    body: {
+                      invitationId:
+                        result
+                          .invitationId,
+
+                      invitationToken:
+                        result
+                          .invitationToken,
+                    },
+                  },
+                );
+
+            if (
+              emailFunctionError
+            ) {
+              throw emailFunctionError;
+            }
+
+            if (
+              emailData?.success !==
+              true
+            ) {
+              throw new Error(
+                emailData?.error ||
+                  "The invitation email provider did not confirm delivery.",
+              );
+            }
+
+            emailDelivery = {
+              emailSent: true,
+
+              emailRecipient:
+                emailData
+                  .recipient ||
+                normalizedRecipient,
+
+              emailId:
+                emailData
+                  .emailId ||
+                null,
+
+              emailError: "",
+            };
+          } catch (
+            emailFailure
+          ) {
+            console.error(
+              "Invitation email delivery failed:",
+              emailFailure,
+            );
+
+            emailDelivery = {
+              emailSent: false,
+
+              emailRecipient:
+                normalizedRecipient,
+
+              emailId: null,
+
+              emailError:
+                "The invitation was created, but automatic email delivery did not complete. Copy and send the secure link manually.",
+            };
+          }
+
           await loadInvitationManager();
 
-          return result;
+          return {
+            ...result,
+            ...emailDelivery,
+          };
         } catch (createError) {
           console.error(
             "Invitation creation failed:",

@@ -1182,17 +1182,30 @@ export default function Invitations() {
                     }
                   >
                     <span>
-                      Secure invitation created
+                      {result
+                        .emailSent
+                        ? "Invitation emailed securely"
+                        : "Secure invitation created"}
                     </span>
 
                     <h2>
-                      Copy this link now
+                      {result
+                        .emailSent
+                        ? "Email sent successfully"
+                        : "Copy this link now"}
                     </h2>
 
                     <p>
-                      The database stores only the
-                      protected token hash. This secure
-                      acceptance link is shown once.
+                      {result
+                        .emailSent
+                        ? `Campaign Seat emailed the secure invitation to ${
+                            result
+                              .emailRecipient ||
+                            "the invited address"
+                          }. Keep the link below as a backup until the invitation is accepted.`
+                        : result
+                            .emailError ||
+                          "The invitation was created, but email delivery did not complete. Copy and send the secure link manually."}
                     </p>
 
                     <div
@@ -1248,10 +1261,10 @@ export default function Invitations() {
                       />
 
                       <span>
-                        Use a test email during this stage.
-                        The public account-creation and
-                        acceptance screen is the next
-                        module.
+                        {result
+                          .emailSent
+                          ? "The recipient must use the invited email address. The secure link expires at the time shown above."
+                          : "Email delivery did not complete. Copy the secure link and send it directly; the invitation remains active until it expires or is cancelled."}
                       </span>
                     </div>
                   </div>
