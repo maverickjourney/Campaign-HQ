@@ -514,6 +514,69 @@ Deno.serve(
       );
     }
 
+    const {
+      error:
+        auditError,
+    } =
+      await adminClient
+        .from(
+          "activity_log",
+        )
+        .insert({
+          workspace_id:
+            workspaceId,
+
+          actor_user_id:
+            authenticatedUser.id,
+
+          activity_type:
+            "member_account_deleted",
+
+          title:
+            "Member account permanently deleted",
+
+          detail:
+            preparedDeletion
+              .target_email,
+
+          entity_type:
+            "member",
+
+          entity_id:
+            preparedDeletion
+              .revoked_membership_id,
+
+          route:
+            "/team/access",
+
+          metadata: {
+            operation:
+              "DELETE_AUTH_USER",
+
+            target_user_id:
+              preparedDeletion
+                .target_user_id,
+
+            target_email:
+              preparedDeletion
+                .target_email,
+
+            access_revoked:
+              true,
+          },
+
+          occurred_at:
+            new Date()
+              .toISOString(),
+        });
+
+    if (auditError) {
+      console.error(
+        "Permanent deletion succeeded but its Activity Center record could not be created:",
+        auditError,
+      );
+    }
+
     return jsonResponse(
       {
         ok:
@@ -522,6 +585,8 @@ Deno.serve(
           true,
         accessRevoked:
           true,
+        auditRecorded:
+          !auditError,
         message:
           "The Campaign Seat account and workspace access were permanently deleted.",
       },
