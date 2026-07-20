@@ -1113,3 +1113,231 @@
     z-index: 70 !important;
   }
 }
+
+/* ==========================================================
+   MEMBER REMOVAL AND PERMANENT ACCOUNT DELETION
+   ========================================================== */
+
+.memberActions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 7px;
+  min-width: 0;
+}
+
+.memberActions button {
+  display: inline-flex;
+  min-height: 36px;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  padding: 0 11px;
+  border-radius: 10px;
+  font-size: 12px;
+  font-weight: 850;
+  white-space: nowrap;
+}
+
+.accessButton {
+  border: 1px solid #d8e0e9;
+  background: #fff;
+}
+
+.removeAccessButton {
+  border-color: #e6c7cb;
+  color: #8b3942;
+  background: #fff8f8;
+}
+
+.restoreAccessButton {
+  border-color: #bfe0d0;
+  color: #257154;
+  background: #f2fbf7;
+}
+
+.deleteButton {
+  border: 1px solid #e4232e;
+  color: #fff;
+  background: #e4232e;
+  box-shadow: 0 8px 18px rgba(228, 35, 46, 0.16);
+}
+
+.memberActions button:disabled {
+  cursor: not-allowed;
+  opacity: 0.46;
+}
+
+.deleteModal {
+  width: min(620px, 100%);
+}
+
+.deleteForm {
+  display: grid;
+  max-height: calc(92dvh - 74px);
+  gap: 16px;
+  padding: 20px;
+  overflow-y: auto;
+}
+
+.dangerNotice {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 15px;
+  border: 1px solid #efb8bd;
+  border-radius: 13px;
+  color: #87242d;
+  background: #fff3f4;
+}
+
+.dangerNotice svg {
+  flex: 0 0 auto;
+  margin-top: 1px;
+}
+
+.dangerNotice strong {
+  display: block;
+  font-size: 14px;
+}
+
+.dangerNotice p {
+  margin: 5px 0 0;
+  color: #8a4a51;
+  font-size: 12px;
+  line-height: 1.55;
+}
+
+.deleteIdentity {
+  display: grid;
+  gap: 5px;
+  padding: 14px;
+  border: 1px solid #dde5ee;
+  border-radius: 12px;
+  background: #f7f9fc;
+}
+
+.deleteIdentity span {
+  color: #78869a;
+  font-size: 11px;
+  font-weight: 850;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.deleteIdentity strong {
+  color: var(--access-navy);
+  font-size: 15px;
+}
+
+.deleteIdentity code {
+  color: #53647a;
+  font-family: inherit;
+  font-size: 13px;
+}
+
+.confirmField {
+  display: grid;
+  gap: 7px;
+}
+
+.confirmField > span {
+  color: #5e6d82;
+  font-size: 12px;
+  font-weight: 850;
+}
+
+.confirmField input {
+  width: 100%;
+  min-height: 44px;
+  padding: 0 12px;
+  border: 1px solid #d2dce8;
+  border-radius: 11px;
+  color: var(--access-text);
+  background: #fff;
+  box-sizing: border-box;
+}
+
+.confirmField input:focus {
+  border-color: #d84a53;
+  outline: 3px solid rgba(228, 35, 46, 0.1);
+}
+
+.deleteFooter {
+  display: flex;
+  justify-content: flex-end;
+  gap: 9px;
+  padding-top: 2px;
+}
+
+.deleteFooter button {
+  display: inline-flex;
+  min-height: 43px;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 0 16px;
+  border-radius: 11px;
+  font-weight: 850;
+}
+
+.cancelDeleteButton {
+  border: 1px solid #d4dee9;
+  color: #5c6b80;
+  background: #fff;
+}
+
+.permanentDeleteButton {
+  border: 1px solid #c91621;
+  color: #fff;
+  background: linear-gradient(135deg, #e4232e, #bd111c);
+  box-shadow: 0 10px 22px rgba(228, 35, 46, 0.2);
+}
+
+.deleteFooter button:disabled {
+  cursor: not-allowed;
+  opacity: 0.48;
+}
+
+@media (max-width: 1180px) {
+  .memberActions {
+    grid-column: 2 / -1;
+    justify-self: start;
+    flex-wrap: wrap;
+  }
+
+  .editButton {
+    grid-column: auto;
+  }
+}
+
+@media (max-width: 680px) {
+  .memberActions {
+    grid-column: 2 / -1;
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+  .memberActions button {
+    flex: 1 1 auto;
+  }
+
+  .deleteForm {
+    max-height: calc(100dvh - 74px);
+    padding: 16px 15px;
+  }
+}
+
+@media (max-width: 430px) {
+  .memberActions,
+  .deleteFooter {
+    display: grid;
+    width: 100%;
+    grid-template-columns: 1fr;
+  }
+
+  .memberActions button,
+  .deleteFooter button {
+    width: 100%;
+  }
+}

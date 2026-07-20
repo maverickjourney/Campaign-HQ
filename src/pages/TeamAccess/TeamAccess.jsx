@@ -17,6 +17,7 @@ import {
   RefreshCw,
   Search,
   ShieldCheck,
+  Trash2,
   UserCog,
   UserMinus,
   UserPlus,
@@ -212,6 +213,26 @@ export default function TeamAccess() {
     setFormError,
   ] = useState("");
 
+  const [
+    deleteTarget,
+    setDeleteTarget,
+  ] = useState(null);
+
+  const [
+    deleteConfirmation,
+    setDeleteConfirmation,
+  ] = useState("");
+
+  const [
+    deleteFormError,
+    setDeleteFormError,
+  ] = useState("");
+
+  const [
+    busyMembershipId,
+    setBusyMembershipId,
+  ] = useState("");
+
   const {
     members,
     isLoading:
@@ -253,6 +274,11 @@ export default function TeamAccess() {
     actionError,
     clearActionError,
     updateMemberAccess,
+
+    isDeleting,
+    deletionError,
+    clearDeletionError,
+    permanentlyDeleteMember,
   } =
     useMemberAccessManagement({
       workspaceId:
@@ -296,6 +322,9 @@ export default function TeamAccess() {
         member.status ===
         "inactive",
     );
+
+  const canPermanentlyDelete =
+    canManageAccess;
 
   const leadershipMembers =
     activeMembers.filter(
@@ -466,6 +495,148 @@ export default function TeamAccess() {
           error?.message ||
             "Member access could not be saved.",
         );
+      }
+    };
+
+  const handleAccessToggle =
+    async (member) => {
+      const removing =
+        member.status ===
+        "active";
+
+      const confirmed =
+        window.confirm(
+          removing
+            ? `Remove ${member.fullName}'s access to this campaign? Their account and campaign history will remain.`
+            : `Restore ${member.fullName}'s access to this campaign?`,
+        );
+
+      if (!confirmed) {
+        return;
+      }
+
+      setBusyMembershipId(
+        member.membershipId,
+      );
+
+      clearActionError();
+
+      try {
+        await updateMemberAccess({
+          membershipId:
+            member.membershipId,
+          roleKey:
+            member.roleKey,
+          displayTitle:
+            member.displayTitle,
+          status:
+            removing
+              ? "inactive"
+              : "active",
+        });
+
+        await Promise.all([
+          refreshMembers(),
+          refreshInvitations(),
+        ]);
+      } catch {
+        // The hook exposes the user-facing error.
+      } finally {
+        setBusyMembershipId("");
+      }
+    };
+
+  const openDeleteModal =
+    (member) => {
+      clearDeletionError();
+      setDeleteFormError("");
+      setDeleteConfirmation("");
+      setDeleteTarget(
+        member,
+      );
+    };
+
+  const closeDeleteModal =
+    () => {
+      if (isDeleting) {
+        return;
+      }
+
+      clearDeletionError();
+      setDeleteFormError("");
+      setDeleteConfirmation("");
+      setDeleteTarget(null);
+    };
+
+  const handlePermanentDelete =
+    async (event) => {
+      event.preventDefault();
+      setDeleteFormError("");
+
+      if (!deleteTarget) {
+        return;
+      }
+
+      const expectedEmail =
+        String(
+          deleteTarget.email ||
+            "",
+        )
+          .trim()
+          .toLowerCase();
+
+      const enteredEmail =
+        String(
+          deleteConfirmation ||
+            "",
+        )
+          .trim()
+          .toLowerCase();
+
+      if (
+        !expectedEmail ||
+        enteredEmail !==
+          expectedEmail
+      ) {
+        setDeleteFormError(
+          "Type the member's complete email address exactly as shown.",
+        );
+        return;
+      }
+
+      setBusyMembershipId(
+        deleteTarget.membershipId,
+      );
+
+      try {
+        await permanentlyDeleteMember({
+          membershipId:
+            deleteTarget.membershipId,
+          confirmationEmail:
+            enteredEmail,
+        });
+
+        await Promise.all([
+          refreshMembers(),
+          refreshInvitations(),
+        ]);
+
+        closeDeleteModal();
+      } catch (error) {
+        setDeleteFormError(
+          error?.message ||
+            "The account could not be permanently deleted.",
+        );
+
+        /*
+         * The server revokes access before attempting
+         * the final Auth deletion. Refresh so that an
+         * unsuccessful final deletion still displays
+         * the member as inactive.
+         */
+        await refreshMembers();
+      } finally {
+        setBusyMembershipId("");
       }
     };
 
@@ -1060,33 +1231,117 @@ export default function TeamAccess() {
                               )}
                             </span>
 
-                            <button
+                            <div
                               className={
-                                styles.editButton
-                              }
-                              type="button"
-                              onClick={() =>
-                                openEditor(
-                                  member,
-                                )
-                              }
-                              disabled={
-                                !canManageAccess ||
-                                locked
-                              }
-                              title={
-                                locked
-                                  ? "Owner access and your own access are protected."
-                                  : canManageAccess
-                                    ? "Edit member access"
-                                    : "Your role cannot edit access."
+                                styles.memberActions
                               }
                             >
-                              <Pencil
-                                size={16}
-                              />
-                              Edit
-                            </button>
+                              <button
+                                className={
+                                  styles.editButton
+                                }
+                                type="button"
+                                onClick={() =>
+                                  openEditor(
+                                    member,
+                                  )
+                                }
+                                disabled={
+                                  !canManageAccess ||
+                                  locked ||
+                                  isSaving ||
+                                  isDeleting
+                                }
+                                title={
+                                  locked
+                                    ? "Owner access and your own access are protected."
+                                    : canManageAccess
+                                      ? "Edit member access"
+                                      : "Your role cannot edit access."
+                                }
+                              >
+                                <Pencil
+                                  size={16}
+                                />
+                                Edit
+                              </button>
+
+                              <button
+                                className={`${styles.accessButton} ${
+                                  member.status ===
+                                  "active"
+                                    ? styles.removeAccessButton
+                                    : styles.restoreAccessButton
+                                }`}
+                                type="button"
+                                onClick={() =>
+                                  handleAccessToggle(
+                                    member,
+                                  )
+                                }
+                                disabled={
+                                  !canManageAccess ||
+                                  locked ||
+                                  isSaving ||
+                                  isDeleting
+                                }
+                              >
+                                {busyMembershipId ===
+                                  member.membershipId &&
+                                isSaving ? (
+                                  <LoaderCircle
+                                    className={
+                                      styles.spinning
+                                    }
+                                    size={16}
+                                  />
+                                ) : member.status ===
+                                  "active" ? (
+                                  <UserMinus
+                                    size={16}
+                                  />
+                                ) : (
+                                  <UserPlus
+                                    size={16}
+                                  />
+                                )}
+
+                                {member.status ===
+                                "active"
+                                  ? "Remove access"
+                                  : "Restore access"}
+                              </button>
+
+                              {canPermanentlyDelete && (
+                                <button
+                                  className={
+                                    styles.deleteButton
+                                  }
+                                  type="button"
+                                  onClick={() =>
+                                    openDeleteModal(
+                                      member,
+                                    )
+                                  }
+                                  disabled={
+                                    locked ||
+                                    !member.email ||
+                                    isSaving ||
+                                    isDeleting
+                                  }
+                                  title={
+                                    member.email
+                                      ? "Permanently delete this Campaign Seat account"
+                                      : "An account email is required before permanent deletion."
+                                  }
+                                >
+                                  <Trash2
+                                    size={16}
+                                  />
+                                  Delete
+                                </button>
+                              )}
+                            </div>
                           </article>
                         );
                       },
@@ -1548,6 +1803,240 @@ export default function TeamAccess() {
           </section>
         </div>
       )}
+      {deleteTarget && (
+        <div
+          className={
+            styles.modalLayer
+          }
+          role="presentation"
+        >
+          <button
+            className={
+              styles.modalOverlay
+            }
+            type="button"
+            onClick={
+              closeDeleteModal
+            }
+            aria-label="Close permanent deletion confirmation"
+          />
+
+          <section
+            className={`${styles.modal} ${styles.deleteModal}`}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="permanent-delete-title"
+          >
+            <header
+              className={
+                styles.modalHeader
+              }
+            >
+              <div>
+                <span>
+                  Danger zone
+                </span>
+
+                <h2
+                  id="permanent-delete-title"
+                >
+                  Permanently delete account
+                </h2>
+              </div>
+
+              <button
+                type="button"
+                onClick={
+                  closeDeleteModal
+                }
+                aria-label="Close deletion confirmation"
+                disabled={
+                  isDeleting
+                }
+              >
+                <X
+                  size={20}
+                />
+              </button>
+            </header>
+
+            <form
+              className={
+                styles.deleteForm
+              }
+              onSubmit={
+                handlePermanentDelete
+              }
+            >
+              <div
+                className={
+                  styles.dangerNotice
+                }
+              >
+                <AlertTriangle
+                  size={24}
+                />
+
+                <div>
+                  <strong>
+                    This cannot be undone
+                  </strong>
+
+                  <p>
+                    The member's Campaign
+                    Seat login and personal
+                    profile will be
+                    permanently deleted.
+                    Historical campaign
+                    records will remain
+                    without their personal
+                    account attached.
+                  </p>
+                </div>
+              </div>
+
+              <div
+                className={
+                  styles.deleteIdentity
+                }
+              >
+                <span>
+                  Account selected
+                </span>
+
+                <strong>
+                  {
+                    deleteTarget.fullName
+                  }
+                </strong>
+
+                <code>
+                  {
+                    deleteTarget.email
+                  }
+                </code>
+              </div>
+
+              <label
+                className={
+                  styles.confirmField
+                }
+              >
+                <span>
+                  Type the complete email
+                  address to confirm
+                </span>
+
+                <input
+                  type="email"
+                  value={
+                    deleteConfirmation
+                  }
+                  onChange={(
+                    event,
+                  ) => {
+                    setDeleteConfirmation(
+                      event.target.value,
+                    );
+
+                    setDeleteFormError(
+                      "",
+                    );
+
+                    clearDeletionError();
+                  }}
+                  placeholder={
+                    deleteTarget.email
+                  }
+                  autoComplete="off"
+                  spellCheck="false"
+                  required
+                />
+              </label>
+
+              {(deleteFormError ||
+                deletionError) && (
+                <div
+                  className={
+                    styles.formError
+                  }
+                  role="alert"
+                >
+                  <AlertTriangle
+                    size={17}
+                  />
+
+                  {deleteFormError ||
+                    deletionError}
+                </div>
+              )}
+
+              <div
+                className={
+                  styles.deleteFooter
+                }
+              >
+                <button
+                  className={
+                    styles.cancelDeleteButton
+                  }
+                  type="button"
+                  onClick={
+                    closeDeleteModal
+                  }
+                  disabled={
+                    isDeleting
+                  }
+                >
+                  Cancel
+                </button>
+
+                <button
+                  className={
+                    styles.permanentDeleteButton
+                  }
+                  type="submit"
+                  disabled={
+                    isDeleting ||
+                    String(
+                      deleteConfirmation ||
+                        "",
+                    )
+                      .trim()
+                      .toLowerCase() !==
+                      String(
+                        deleteTarget.email ||
+                          "",
+                      )
+                        .trim()
+                        .toLowerCase()
+                  }
+                >
+                  {isDeleting ? (
+                    <>
+                      <LoaderCircle
+                        className={
+                          styles.spinning
+                        }
+                        size={17}
+                      />
+                      Deleting account…
+                    </>
+                  ) : (
+                    <>
+                      <Trash2
+                        size={17}
+                      />
+                      Permanently delete
+                    </>
+                  )}
+                </button>
+              </div>
+            </form>
+          </section>
+        </div>
+      )}
+
     </div>
   );
 }

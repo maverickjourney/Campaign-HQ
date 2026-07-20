@@ -33,6 +33,32 @@ function getMemberAccessErrorMessage(error) {
   return message;
 }
 
+async function getFunctionErrorMessage(
+  error,
+  fallback,
+) {
+  let detail = "";
+
+  try {
+    const payload =
+      await error?.context?.json();
+
+    detail =
+      payload?.error ||
+      payload?.message ||
+      payload?.detail ||
+      "";
+  } catch {
+    // Use the SDK error message below.
+  }
+
+  return (
+    detail ||
+    error?.message ||
+    fallback
+  );
+}
+
 export function useMemberAccessManagement({
   workspaceId,
 }) {
@@ -41,6 +67,16 @@ export function useMemberAccessManagement({
 
   const [actionError, setActionError] =
     useState("");
+
+  const [
+    isDeleting,
+    setIsDeleting,
+  ] = useState(false);
+
+  const [
+    deletionError,
+    setDeletionError,
+  ] = useState("");
 
   const updateMemberAccess =
     useCallback(
@@ -119,11 +155,111 @@ export function useMemberAccessManagement({
       [workspaceId],
     );
 
+  const permanentlyDeleteMember =
+    useCallback(
+      async ({
+        membershipId,
+        confirmationEmail,
+      }) => {
+        const cleanEmail =
+          String(
+            confirmationEmail ||
+              "",
+          )
+            .trim()
+            .toLowerCase();
+
+        if (
+          !workspaceId ||
+          !membershipId ||
+          !cleanEmail
+        ) {
+          throw new Error(
+            "The workspace, membership and confirmation email are required.",
+          );
+        }
+
+        setIsDeleting(true);
+        setDeletionError("");
+
+        try {
+          const {
+            data,
+            error,
+          } =
+            await supabase
+              .functions
+              .invoke(
+                "delete-workspace-account",
+                {
+                  body: {
+                    workspaceId,
+                    membershipId,
+                    confirmationEmail:
+                      cleanEmail,
+                  },
+                },
+              );
+
+          if (error) {
+            const message =
+              await getFunctionErrorMessage(
+                error,
+                "The account-deletion service could not be reached.",
+              );
+
+            throw new Error(
+              message,
+              {
+                cause: error,
+              },
+            );
+          }
+
+          if (
+            data?.ok !== true ||
+            data?.deleted !== true
+          ) {
+            throw new Error(
+              data?.error ||
+                "The account was not permanently deleted.",
+            );
+          }
+
+          return data;
+        } catch (error) {
+          const message =
+            error?.message ||
+            "The account could not be permanently deleted.";
+
+          setDeletionError(
+            message,
+          );
+
+          throw new Error(
+            message,
+            {
+              cause: error,
+            },
+          );
+        } finally {
+          setIsDeleting(false);
+        }
+      },
+      [workspaceId],
+    );
+
   return {
     isSaving,
     actionError,
     clearActionError: () =>
       setActionError(""),
     updateMemberAccess,
+
+    isDeleting,
+    deletionError,
+    clearDeletionError: () =>
+      setDeletionError(""),
+    permanentlyDeleteMember,
   };
 }
