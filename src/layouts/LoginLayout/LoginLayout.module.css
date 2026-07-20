@@ -144,3 +144,12 @@
       24px;
   }
 }
+
+
+/* PASSWORD RECOVERY VIEWPORT SCROLL FIX */
+.formPanel {
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable;
+}

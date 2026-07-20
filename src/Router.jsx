@@ -15,6 +15,8 @@ import Files from "./pages/Files/Files";
 import VolunteerFieldAssignment from "./pages/VolunteerFieldAssignment/VolunteerFieldAssignment";
 import FieldOperations from "./pages/FieldOperations/FieldOperations";
 import Login from "./pages/Login/Login";
+import ForgotPassword from "./pages/PasswordRecovery/ForgotPassword";
+import ResetPassword from "./pages/PasswordRecovery/ResetPassword";
 import InvitationAccept from "./pages/InvitationAccept/InvitationAccept";
 import ProfileSettings from "./pages/ProfileSettings/ProfileSettings";
 import Invitations from "./pages/Team/Invitations";
@@ -39,6 +41,16 @@ export default function Router() {
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<Login />} />
+
+        <Route
+          path="/forgot-password"
+          element={<ForgotPassword />}
+        />
+
+        <Route
+          path="/reset-password"
+          element={<ResetPassword />}
+        />
         <Route path="/invite" element={<InvitationAccept />} />
 
         <Route

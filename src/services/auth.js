@@ -340,6 +340,244 @@ export async function signInToCampaign({
   }
 }
 
+
+export async function requestCampaignPasswordReset({
+  email,
+}) {
+  const normalizedEmail =
+    String(email || "")
+      .trim()
+      .toLowerCase();
+
+  if (!normalizedEmail) {
+    throw new Error(
+      "Enter the email address used for your Campaign Seat account.",
+    );
+  }
+
+  const redirectTo =
+    new URL(
+      "/reset-password",
+      window.location.origin,
+    ).toString();
+
+  const {
+    error,
+  } =
+    await supabase.auth
+      .resetPasswordForEmail(
+        normalizedEmail,
+        {
+          redirectTo,
+        },
+      );
+
+  if (error) {
+    const message =
+      String(
+        error.message || "",
+      ).toLowerCase();
+
+    if (
+      message.includes(
+        "rate limit",
+      ) ||
+      message.includes(
+        "too many",
+      )
+    ) {
+      throw new Error(
+        "Too many recovery requests were submitted. Wait a few minutes before trying again.",
+      );
+    }
+
+    throw new Error(
+      "Campaign Seat could not send the recovery email. Check your connection and try again.",
+    );
+  }
+
+  return {
+    email:
+      normalizedEmail,
+    redirectTo,
+  };
+}
+
+export async function establishPasswordRecoverySession() {
+  const currentUrl =
+    new URL(
+      window.location.href,
+    );
+
+  const queryError =
+    currentUrl.searchParams.get(
+      "error_description",
+    );
+
+  const hashParameters =
+    new URLSearchParams(
+      currentUrl.hash.replace(
+        /^#/,
+        "",
+      ),
+    );
+
+  const hashError =
+    hashParameters.get(
+      "error_description",
+    );
+
+  if (
+    queryError ||
+    hashError
+  ) {
+    throw new Error(
+      decodeURIComponent(
+        queryError ||
+          hashError,
+      ),
+    );
+  }
+
+  const authorizationCode =
+    currentUrl.searchParams.get(
+      "code",
+    );
+
+  const accessToken =
+    hashParameters.get(
+      "access_token",
+    );
+
+  const refreshToken =
+    hashParameters.get(
+      "refresh_token",
+    );
+
+  let recoveryError = null;
+
+  if (authorizationCode) {
+    const {
+      error,
+    } =
+      await supabase.auth
+        .exchangeCodeForSession(
+          authorizationCode,
+        );
+
+    recoveryError =
+      error;
+  } else if (
+    accessToken &&
+    refreshToken
+  ) {
+    const {
+      error,
+    } =
+      await supabase.auth
+        .setSession({
+          access_token:
+            accessToken,
+
+          refresh_token:
+            refreshToken,
+        });
+
+    recoveryError =
+      error;
+  }
+
+  const {
+    data: {
+      session,
+    },
+    error:
+      sessionError,
+  } =
+    await supabase.auth
+      .getSession();
+
+  if (
+    sessionError ||
+    !session
+  ) {
+    console.error(
+      "Password recovery session could not be established:",
+      recoveryError ||
+        sessionError,
+    );
+
+    throw new Error(
+      "This password-reset link is invalid or has expired. Request a new recovery email.",
+    );
+  }
+
+  if (
+    currentUrl.search ||
+    currentUrl.hash
+  ) {
+    window.history.replaceState(
+      {},
+      document.title,
+      currentUrl.pathname,
+    );
+  }
+
+  return session;
+}
+
+export async function updateCampaignPassword({
+  password,
+}) {
+  const normalizedPassword =
+    String(password || "");
+
+  if (
+    normalizedPassword.length <
+    12
+  ) {
+    throw new Error(
+      "The new password must contain at least 12 characters.",
+    );
+  }
+
+  if (
+    !/[A-Za-z]/.test(
+      normalizedPassword,
+    ) ||
+    !/\d/.test(
+      normalizedPassword,
+    )
+  ) {
+    throw new Error(
+      "The new password must contain at least one letter and one number.",
+    );
+  }
+
+  const {
+    error,
+  } =
+    await supabase.auth
+      .updateUser({
+        password:
+          normalizedPassword,
+      });
+
+  if (error) {
+    throw new Error(
+      error.message ||
+        "The new password could not be saved.",
+    );
+  }
+
+  await supabase.auth
+    .signOut();
+
+  clearLocalCampaignSession();
+
+  return true;
+}
+
 export async function restoreCampaignSession() {
   const {
     data: { user },

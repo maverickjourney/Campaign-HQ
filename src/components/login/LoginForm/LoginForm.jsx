@@ -211,8 +211,14 @@ export default function LoginForm() {
               className={styles.textButton}
               type="button"
               onClick={() =>
-                setMessage(
-                  "Password recovery will be connected next.",
+                navigate(
+                  "/forgot-password",
+                  {
+                    state: {
+                      email:
+                        formData.email,
+                    },
+                  },
                 )
               }
             >
