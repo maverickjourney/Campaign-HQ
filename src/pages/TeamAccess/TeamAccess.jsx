@@ -323,8 +323,17 @@ export default function TeamAccess() {
         "inactive",
     );
 
+  const currentMembership =
+    members.find(
+      (member) =>
+        member.userId ===
+        user.id,
+    );
+
   const canPermanentlyDelete =
-    canManageAccess;
+    canManageAccess &&
+    currentMembership?.roleKey ===
+      "campaign_owner";
 
   const leadershipMembers =
     activeMembers.filter(
