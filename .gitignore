@@ -51,3 +51,6 @@ campaign-font-audit.txt
 # END CAMPAIGN HQ VERCEL LOCAL LINK SAFETY
 .vercel
 .env*
+
+# Supabase CLI temporary state
+supabase/.temp/
