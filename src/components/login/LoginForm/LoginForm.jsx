@@ -66,14 +66,62 @@ export default function LoginForm() {
     setMessage("");
 
     try {
-      await signInToCampaign({
-        email: formData.email,
-        password: formData.password,
-      });
+      const result =
+        await signInToCampaign({
+          email:
+            formData.email,
 
-      navigate("/workspaces", {
-        replace: true,
-      });
+          password:
+            formData.password,
+        });
+
+      if (
+        result?.status ===
+        "mfa-setup"
+      ) {
+        navigate(
+          "/mfa/setup",
+          {
+            replace:
+              true,
+
+            state: {
+              from:
+                "/workspaces",
+            },
+          },
+        );
+
+        return;
+      }
+
+      if (
+        result?.status ===
+        "mfa-challenge"
+      ) {
+        navigate(
+          "/mfa/challenge",
+          {
+            replace:
+              true,
+
+            state: {
+              from:
+                "/workspaces",
+            },
+          },
+        );
+
+        return;
+      }
+
+      navigate(
+        "/workspaces",
+        {
+          replace:
+            true,
+        },
+      );
     } catch (error) {
       setMessage(
         error instanceof Error

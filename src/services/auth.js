@@ -1,4 +1,9 @@
 import { supabase } from "../lib/supabase";
+
+import {
+  getMfaState,
+  membershipsRequireMfa,
+} from "./mfa";
 import {
   clearLocalCampaignSession,
   saveAuthenticatedSession,
@@ -298,6 +303,108 @@ export async function loadCampaignAccess(
   };
 }
 
+
+async function resolveCampaignMfaRequirement(
+  access,
+) {
+  const mfaRequired =
+    membershipsRequireMfa(
+      access.memberships,
+    );
+
+  if (!mfaRequired) {
+    return {
+      status:
+        "ready",
+
+      mfaRequired:
+        false,
+
+      mfaState:
+        null,
+
+      access,
+    };
+  }
+
+  const mfaState =
+    await getMfaState();
+
+  if (mfaState.isAal2) {
+    return {
+      status:
+        "ready",
+
+      mfaRequired:
+        true,
+
+      mfaState,
+      access,
+    };
+  }
+
+  if (
+    mfaState
+      .verifiedFactors
+      .length
+  ) {
+    return {
+      status:
+        "mfa-challenge",
+
+      mfaRequired:
+        true,
+
+      mfaState,
+      access,
+    };
+  }
+
+  return {
+    status:
+      "mfa-setup",
+
+    mfaRequired:
+      true,
+
+    mfaState,
+    access,
+  };
+}
+
+async function finalizeCampaignAuthentication(
+  access,
+) {
+  const decision =
+    await resolveCampaignMfaRequirement(
+      access,
+    );
+
+  if (
+    decision.status !==
+    "ready"
+  ) {
+    /*
+     * Keep the Supabase aal1 session alive so the
+     * user can enroll or verify MFA, but remove
+     * Campaign Seat's local workspace session.
+     */
+    clearLocalCampaignSession();
+
+    return decision;
+  }
+
+  const campaignSession =
+    saveAuthenticatedSession(
+      access,
+    );
+
+  return {
+    ...decision,
+    campaignSession,
+  };
+}
+
 export async function signInToCampaign({
   email,
   password,
@@ -329,7 +436,7 @@ export async function signInToCampaign({
       );
     }
 
-    return saveAuthenticatedSession(
+    return finalizeCampaignAuthentication(
       access,
     );
   } catch (accessError) {
@@ -598,9 +705,9 @@ export async function restoreCampaignSession() {
       return null;
     }
 
-    saveAuthenticatedSession(access);
-
-    return access;
+    return finalizeCampaignAuthentication(
+      access,
+    );
   } catch (accessError) {
     console.error(
       "Campaign session restoration failed:",

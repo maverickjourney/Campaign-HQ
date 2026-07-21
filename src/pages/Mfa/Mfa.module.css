@@ -1,0 +1,421 @@
+.wrapper {
+  width: min(100%, 610px);
+  padding: 26px 32px;
+}
+
+.card {
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+  border: 1px solid rgba(19, 43, 82, 0.13);
+  border-radius: 27px;
+  background: #ffffff;
+  box-shadow:
+    0 30px 80px rgba(12, 30, 61, 0.14),
+    0 4px 18px rgba(12, 30, 61, 0.08);
+  padding: 31px;
+}
+
+.accentBars {
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: grid;
+  grid-template-columns: 1.25fr 0.6fr 1fr;
+  width: 100%;
+  height: 7px;
+}
+
+.accentBars span:nth-child(1),
+.accentBars span:nth-child(3) {
+  background: #d71f2b;
+}
+
+.accentBars span:nth-child(2) {
+  background: #173d78;
+}
+
+.security {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 25px;
+  border: 1px solid rgba(23, 61, 120, 0.12);
+  border-radius: 15px;
+  background: #f5f8fd;
+  padding: 13px 15px;
+  color: #173d78;
+}
+
+.security > svg {
+  flex: 0 0 auto;
+}
+
+.security div {
+  display: grid;
+  gap: 2px;
+}
+
+.security strong {
+  color: #152d55;
+  font-size: 0.89rem;
+}
+
+.security span {
+  color: #64738c;
+  font-size: 0.76rem;
+  line-height: 1.4;
+}
+
+.heading {
+  margin-bottom: 21px;
+}
+
+.eyebrow {
+  display: block;
+  margin-bottom: 8px;
+  color: #d71f2b;
+  font-size: 0.72rem;
+  font-weight: 850;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.heading h1,
+.statusPanel h1 {
+  margin: 0;
+  color: #12284c;
+  font-size: clamp(1.75rem, 4vw, 2.3rem);
+  line-height: 1.08;
+}
+
+.heading p,
+.statusPanel p {
+  margin: 12px 0 0;
+  color: #66748a;
+  font-size: 0.93rem;
+  line-height: 1.6;
+}
+
+.statusPanel {
+  display: grid;
+  justify-items: center;
+  padding: 18px 0;
+  text-align: center;
+}
+
+.spinner,
+.buttonSpinner {
+  animation: mfaSpin 0.9s linear infinite;
+}
+
+.spinner {
+  margin-bottom: 22px;
+  color: #173d78;
+}
+
+.successIcon,
+.challengeIcon {
+  display: grid;
+  place-items: center;
+  width: 64px;
+  height: 64px;
+  margin: 0 auto 20px;
+  border-radius: 20px;
+}
+
+.successIcon {
+  color: #19724c;
+  background: #edf8f2;
+}
+
+.challengeIcon {
+  color: #173d78;
+  background: #edf3fb;
+}
+
+.featureList {
+  display: grid;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.featureList div {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  border: 1px solid #e0e7f0;
+  border-radius: 13px;
+  background: #f8fafc;
+  padding: 13px 14px;
+  color: #425a77;
+  font-size: 0.84rem;
+  font-weight: 700;
+}
+
+.featureList svg {
+  flex: 0 0 auto;
+  color: #24558e;
+}
+
+.qrPanel {
+  display: grid;
+  grid-template-columns: 178px minmax(0, 1fr);
+  align-items: center;
+  gap: 18px;
+  margin-bottom: 19px;
+  border: 1px solid #dbe4ef;
+  border-radius: 17px;
+  background: #f8fafc;
+  padding: 16px;
+}
+
+.qrPanel img {
+  display: block;
+  width: 178px;
+  height: 178px;
+  border: 8px solid #ffffff;
+  border-radius: 13px;
+  background: #ffffff;
+}
+
+.qrPanel > div {
+  display: grid;
+  min-width: 0;
+  gap: 8px;
+}
+
+.qrPanel strong {
+  color: #203957;
+  font-size: 0.9rem;
+}
+
+.qrPanel span {
+  color: #6e7d91;
+  font-size: 0.77rem;
+  line-height: 1.45;
+}
+
+.qrPanel code {
+  overflow-wrap: anywhere;
+  border: 1px solid #d4deea;
+  border-radius: 9px;
+  background: #ffffff;
+  padding: 9px;
+  color: #213a58;
+  font-size: 0.72rem;
+}
+
+.qrPanel button {
+  display: inline-flex;
+  width: max-content;
+  align-items: center;
+  gap: 6px;
+  border: 0;
+  background: transparent;
+  padding: 0;
+  color: #24558e;
+  font: inherit;
+  font-size: 0.75rem;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.form {
+  display: grid;
+  gap: 14px;
+}
+
+.form label {
+  display: grid;
+  gap: 7px;
+}
+
+.form label > span {
+  color: #263d5a;
+  font-size: 0.82rem;
+  font-weight: 800;
+}
+
+.codeInput {
+  display: flex;
+  min-height: 53px;
+  align-items: center;
+  gap: 10px;
+  border: 1px solid #d3ddea;
+  border-radius: 14px;
+  background: #fbfcfe;
+  padding: 0 15px;
+}
+
+.codeInput:focus-within {
+  border-color: #315c9b;
+  background: #ffffff;
+  box-shadow:
+    0 0 0 4px rgba(49, 92, 155, 0.1);
+}
+
+.codeInput svg {
+  color: #71809a;
+}
+
+.codeInput input {
+  min-width: 0;
+  flex: 1;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: #172b49;
+  font: inherit;
+  font-size: 1.15rem;
+  font-weight: 800;
+  letter-spacing: 0.22em;
+}
+
+.primaryButton,
+.secondaryButton,
+.signOutButton {
+  display: flex;
+  min-height: 50px;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border-radius: 13px;
+  padding: 0 18px;
+  font: inherit;
+  font-size: 0.86rem;
+  font-weight: 850;
+  cursor: pointer;
+}
+
+.primaryButton {
+  border: 1px solid #173d78;
+  background: #173d78;
+  color: #ffffff;
+  box-shadow:
+    0 13px 28px rgba(23, 61, 120, 0.19);
+}
+
+.primaryButton:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.secondaryButton {
+  border: 1px solid #ccd7e5;
+  background: #ffffff;
+  color: #36506f;
+}
+
+.signOutButton {
+  border: 0;
+  background: transparent;
+  color: #65758b;
+}
+
+.errorMessage {
+  margin: 0;
+  border: 1px solid rgba(183, 31, 44, 0.2);
+  border-radius: 11px;
+  background: #fff5f6;
+  padding: 10px 12px;
+  color: #a71d2a;
+  font-size: 0.79rem;
+  line-height: 1.45;
+}
+
+.footer {
+  display: flex;
+  justify-content: space-between;
+  gap: 18px;
+  padding: 13px 6px 0;
+  color: #7a8799;
+  font-size: 0.71rem;
+}
+
+.footer a {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  color: inherit;
+  font-weight: 750;
+  text-decoration: none;
+}
+
+@keyframes mfaSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (max-width: 700px) {
+  .wrapper {
+    padding: 18px;
+  }
+
+  .card {
+    border-radius: 22px;
+    padding: 27px 21px;
+  }
+
+  .qrPanel {
+    grid-template-columns: 1fr;
+    justify-items: center;
+    text-align: center;
+  }
+
+  .qrPanel > div {
+    justify-items: center;
+  }
+
+  .footer {
+    display: grid;
+    justify-content: center;
+    text-align: center;
+  }
+}
+
+@media (min-width: 901px) and (max-height: 900px) {
+  .wrapper {
+    padding-top: 14px;
+    padding-bottom: 14px;
+  }
+
+  .card {
+    padding: 23px 28px;
+  }
+
+  .security {
+    margin-bottom: 16px;
+    padding: 10px 13px;
+  }
+
+  .heading {
+    margin-bottom: 14px;
+  }
+
+  .qrPanel {
+    grid-template-columns: 145px minmax(0, 1fr);
+    margin-bottom: 13px;
+    padding: 12px;
+  }
+
+  .qrPanel img {
+    width: 145px;
+    height: 145px;
+  }
+
+  .form {
+    gap: 10px;
+  }
+
+  .codeInput {
+    min-height: 47px;
+  }
+
+  .primaryButton,
+  .secondaryButton,
+  .signOutButton {
+    min-height: 45px;
+  }
+}

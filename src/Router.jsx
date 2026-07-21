@@ -17,6 +17,8 @@ import FieldOperations from "./pages/FieldOperations/FieldOperations";
 import Login from "./pages/Login/Login";
 import ForgotPassword from "./pages/PasswordRecovery/ForgotPassword";
 import ResetPassword from "./pages/PasswordRecovery/ResetPassword";
+import MfaChallenge from "./pages/Mfa/MfaChallenge";
+import MfaSetup from "./pages/Mfa/MfaSetup";
 import InvitationAccept from "./pages/InvitationAccept/InvitationAccept";
 import ProfileSettings from "./pages/ProfileSettings/ProfileSettings";
 import Invitations from "./pages/Team/Invitations";
@@ -50,6 +52,16 @@ export default function Router() {
         <Route
           path="/reset-password"
           element={<ResetPassword />}
+        />
+
+        <Route
+          path="/mfa/challenge"
+          element={<MfaChallenge />}
+        />
+
+        <Route
+          path="/mfa/setup"
+          element={<MfaSetup />}
         />
         <Route path="/invite" element={<InvitationAccept />} />
 
