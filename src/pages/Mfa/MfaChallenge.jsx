@@ -1,10 +1,12 @@
 import {
   useEffect,
+  useMemo,
   useState,
 } from "react";
 
 import {
   ArrowLeft,
+  CheckCircle2,
   KeyRound,
   LoaderCircle,
   LogOut,
@@ -37,6 +39,31 @@ import { supabase } from "../../lib/supabase";
 
 import styles from "./Mfa.module.css";
 
+function getFactorLabel(
+  factor,
+  index,
+) {
+  const storedName =
+    String(
+      factor?.friendly_name ||
+        factor?.friendlyName ||
+        "",
+    )
+      .replace(
+        /\s+\d{14}$/,
+        "",
+      )
+      .trim();
+
+  if (storedName) {
+    return storedName;
+  }
+
+  return index === 0
+    ? "Primary authenticator"
+    : `Backup authenticator ${index}`;
+}
+
 export default function MfaChallenge() {
   const navigate =
     useNavigate();
@@ -56,9 +83,14 @@ export default function MfaChallenge() {
   );
 
   const [
-    factor,
-    setFactor,
-  ] = useState(null);
+    factors,
+    setFactors,
+  ] = useState([]);
+
+  const [
+    selectedFactorId,
+    setSelectedFactorId,
+  ] = useState("");
 
   const [
     code,
@@ -69,6 +101,22 @@ export default function MfaChallenge() {
     errorMessage,
     setErrorMessage,
   ] = useState("");
+
+  const selectedFactor =
+    useMemo(
+      () =>
+        factors.find(
+          (factor) =>
+            factor.id ===
+            selectedFactorId,
+        ) ||
+        factors[0] ||
+        null,
+      [
+        factors,
+        selectedFactorId,
+      ],
+    );
 
   useEffect(() => {
     let active = true;
@@ -104,8 +152,7 @@ export default function MfaChallenge() {
             await getMfaState();
 
           if (
-            mfaState
-              .isAal2
+            mfaState.isAal2
           ) {
             await restoreCampaignSession();
 
@@ -120,12 +167,13 @@ export default function MfaChallenge() {
             return;
           }
 
-          const selectedFactor =
+          const verifiedFactors =
             mfaState
-              .verifiedFactors[0];
+              .verifiedFactors ||
+            [];
 
           if (
-            !selectedFactor
+            !verifiedFactors.length
           ) {
             navigate(
               "/mfa/setup",
@@ -143,8 +191,12 @@ export default function MfaChallenge() {
             return;
           }
 
-          setFactor(
-            selectedFactor,
+          setFactors(
+            verifiedFactors,
+          );
+
+          setSelectedFactorId(
+            verifiedFactors[0].id,
           );
 
           setStatus(
@@ -175,11 +227,35 @@ export default function MfaChallenge() {
     navigate,
   ]);
 
+  const selectFactor =
+    (factorId) => {
+      setSelectedFactorId(
+        factorId,
+      );
+
+      setCode("");
+
+      setErrorMessage(
+        "",
+      );
+    };
+
   const handleSubmit =
     async (
       event,
     ) => {
       event.preventDefault();
+
+      if (
+        !selectedFactor ||
+        code.length !== 6
+      ) {
+        setErrorMessage(
+          "Choose an authenticator and enter its complete six-digit code.",
+        );
+
+        return;
+      }
 
       setStatus(
         "verifying",
@@ -192,7 +268,7 @@ export default function MfaChallenge() {
       try {
         await verifyTotpFactor({
           factorId:
-            factor?.id,
+            selectedFactor.id,
 
           code,
         });
@@ -273,8 +349,8 @@ export default function MfaChallenge() {
 
               <span>
                 Password accepted. Verify
-                the authenticator code to
-                continue.
+                an enrolled authenticator
+                to continue.
               </span>
             </div>
           </div>
@@ -302,7 +378,7 @@ export default function MfaChallenge() {
               </span>
 
               <h1>
-                Checking authenticator
+                Checking authenticators
               </h1>
 
               <p>
@@ -342,11 +418,89 @@ export default function MfaChallenge() {
                 </h1>
 
                 <p>
-                  Open the authenticator
-                  app connected to this
-                  Campaign Seat account.
+                  Use a code from one of
+                  the trusted authenticators
+                  connected to this account.
                 </p>
               </div>
+
+              {factors.length >
+                1 && (
+                <div
+                  className={
+                    styles.factorChoices
+                  }
+                >
+                  <span>
+                    Choose authenticator
+                  </span>
+
+                  <div
+                    className={
+                      styles.factorChoiceList
+                    }
+                  >
+                    {factors.map(
+                      (
+                        factor,
+                        index,
+                      ) => {
+                        const selected =
+                          factor.id ===
+                          selectedFactor
+                            ?.id;
+
+                        return (
+                          <button
+                            className={[
+                              styles.factorChoice,
+
+                              selected
+                                ? styles.factorChoiceSelected
+                                : "",
+                            ]
+                              .filter(Boolean)
+                              .join(" ")}
+                            type="button"
+                            key={
+                              factor.id
+                            }
+                            aria-pressed={
+                              selected
+                            }
+                            onClick={() =>
+                              selectFactor(
+                                factor.id,
+                              )
+                            }
+                            disabled={
+                              status ===
+                              "verifying"
+                            }
+                          >
+                            <Smartphone
+                              size={18}
+                            />
+
+                            <span>
+                              {getFactorLabel(
+                                factor,
+                                index,
+                              )}
+                            </span>
+
+                            {selected && (
+                              <CheckCircle2
+                                size={17}
+                              />
+                            )}
+                          </button>
+                        );
+                      },
+                    )}
+                  </div>
+                </div>
+              )}
 
               <form
                 className={
@@ -429,7 +583,8 @@ export default function MfaChallenge() {
                     status ===
                       "verifying" ||
                     code.length !==
-                      6
+                      6 ||
+                    !selectedFactor
                   }
                 >
                   {status ===
@@ -441,6 +596,7 @@ export default function MfaChallenge() {
                         }
                         size={18}
                       />
+
                       Verifying…
                     </>
                   ) : (
@@ -448,6 +604,7 @@ export default function MfaChallenge() {
                       <ShieldCheck
                         size={18}
                       />
+
                       Verify and continue
                     </>
                   )}
@@ -465,6 +622,7 @@ export default function MfaChallenge() {
                   <LogOut
                     size={17}
                   />
+
                   Use another account
                 </button>
               </form>
@@ -483,6 +641,7 @@ export default function MfaChallenge() {
             <ArrowLeft
               size={15}
             />
+
             Sign in
           </Link>
 

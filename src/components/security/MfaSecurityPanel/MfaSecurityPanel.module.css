@@ -1,0 +1,523 @@
+.securityCard {
+  margin-top: 20px;
+  overflow: hidden;
+  border: 1px solid #dce4ed;
+  border-radius: 18px;
+  background: #ffffff;
+  box-shadow:
+    0 14px 34px
+    rgba(18, 44, 76, 0.06);
+}
+
+.cardHeader {
+  display: grid;
+  grid-template-columns:
+    auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 13px;
+  padding: 19px 20px;
+  border-bottom:
+    1px solid #e5ebf2;
+}
+
+.headerIcon {
+  display: grid;
+  width: 44px;
+  height: 44px;
+  place-items: center;
+  border-radius: 13px;
+  color: #ffffff;
+  background:
+    linear-gradient(
+      145deg,
+      #326da8,
+      #1f568f
+    );
+}
+
+.cardHeader > div:nth-child(2) {
+  min-width: 0;
+}
+
+.cardHeader span {
+  color: #e4232e;
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.cardHeader h2 {
+  margin: 3px 0 0;
+  color: #071b35;
+  font-size: 19px;
+}
+
+.cardHeader p {
+  margin: 5px 0 0;
+  color: #748196;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.secureBadge,
+.warningBadge {
+  display: inline-flex;
+  min-height: 38px;
+  align-items: center;
+  gap: 7px;
+  padding: 0 12px;
+  border-radius: 11px;
+  font-size: 11px;
+  font-weight: 850;
+}
+
+.secureBadge {
+  border: 1px solid #bfe2d2;
+  color: #1f7457;
+  background: #f0fbf6;
+}
+
+.warningBadge {
+  border: 1px solid #efd5aa;
+  color: #98611b;
+  background: #fff9ed;
+}
+
+.loadingState {
+  display: flex;
+  min-height: 150px;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  color: #63738a;
+  font-size: 13px;
+}
+
+.cardBody {
+  display: grid;
+  gap: 17px;
+  padding: 20px;
+}
+
+.errorBanner,
+.successBanner {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 12px 13px;
+  border-radius: 12px;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.errorBanner {
+  border: 1px solid #efc2c7;
+  color: #8c2d35;
+  background: #fff4f5;
+}
+
+.successBanner {
+  border: 1px solid #bfe2d2;
+  color: #1f7457;
+  background: #f0fbf6;
+}
+
+.backupNotice {
+  display: grid;
+  grid-template-columns:
+    auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 13px;
+  padding: 15px;
+  border: 1px solid #efd5aa;
+  border-radius: 14px;
+  color: #75501c;
+  background:
+    linear-gradient(
+      135deg,
+      #fffaf0,
+      #fff6e4
+    );
+}
+
+.backupNotice > svg {
+  color: #b67822;
+}
+
+.backupNotice strong {
+  color: #624015;
+  font-size: 13px;
+}
+
+.backupNotice p {
+  margin: 4px 0 0;
+  color: #896d47;
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+.backupNotice button,
+.addButton {
+  display: inline-flex;
+  min-height: 39px;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  border: 1px solid #326da8;
+  border-radius: 10px;
+  color: #ffffff;
+  background: #326da8;
+  padding: 0 13px;
+  font: inherit;
+  font-size: 11px;
+  font-weight: 850;
+  cursor: pointer;
+}
+
+.factorSection {
+  overflow: hidden;
+  border: 1px solid #dfe7f0;
+  border-radius: 14px;
+}
+
+.sectionHeading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 13px;
+  padding: 13px 15px;
+  border-bottom: 1px solid #e7edf3;
+  background: #f8fafc;
+}
+
+.sectionHeading > div {
+  display: grid;
+  gap: 2px;
+}
+
+.sectionHeading span {
+  color: #8793a3;
+  font-size: 9px;
+  font-weight: 850;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.sectionHeading strong {
+  color: #29415e;
+  font-size: 12px;
+}
+
+.factorList {
+  display: grid;
+}
+
+.factorRow {
+  display: grid;
+  grid-template-columns:
+    auto minmax(0, 1fr)
+    auto auto;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 15px;
+  border-bottom: 1px solid #e8edf3;
+}
+
+.factorRow:last-child {
+  border-bottom: 0;
+}
+
+.factorIcon {
+  display: grid;
+  width: 39px;
+  height: 39px;
+  place-items: center;
+  border-radius: 11px;
+  color: #326da8;
+  background: #eef5fd;
+}
+
+.factorDetails {
+  display: grid;
+  min-width: 0;
+  gap: 3px;
+}
+
+.factorDetails strong {
+  color: #233b58;
+  font-size: 12px;
+}
+
+.factorDetails span {
+  color: #8793a3;
+  font-size: 10px;
+}
+
+.verifiedStatus {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  color: #1f7457;
+  font-size: 10px;
+  font-weight: 850;
+}
+
+.removeButton {
+  display: inline-flex;
+  min-height: 37px;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  border: 1px solid #efcbd0;
+  border-radius: 9px;
+  color: #a52a35;
+  background: #fff7f8;
+  padding: 0 10px;
+  font: inherit;
+  font-size: 10px;
+  font-weight: 850;
+  cursor: pointer;
+}
+
+.removeButton:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+
+.enrollmentPanel {
+  display: grid;
+  gap: 15px;
+  padding: 17px;
+  border: 1px solid #cfddeb;
+  border-radius: 15px;
+  background: #f7faff;
+}
+
+.enrollmentHeading {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  color: #326da8;
+}
+
+.enrollmentHeading > div {
+  display: grid;
+  gap: 3px;
+}
+
+.enrollmentHeading strong {
+  color: #203957;
+  font-size: 13px;
+}
+
+.enrollmentHeading span {
+  color: #718197;
+  font-size: 11px;
+  line-height: 1.45;
+}
+
+.qrGrid {
+  display: grid;
+  grid-template-columns:
+    168px minmax(0, 1fr);
+  align-items: center;
+  gap: 16px;
+}
+
+.qrGrid img {
+  display: block;
+  width: 168px;
+  height: 168px;
+  border: 7px solid #ffffff;
+  border-radius: 12px;
+  background: #ffffff;
+}
+
+.manualSetup {
+  display: grid;
+  min-width: 0;
+  gap: 8px;
+}
+
+.manualSetup strong {
+  color: #29415e;
+  font-size: 12px;
+}
+
+.manualSetup span {
+  color: #718197;
+  font-size: 10px;
+}
+
+.manualSetup code {
+  overflow-wrap: anywhere;
+  padding: 9px;
+  border: 1px solid #d4deea;
+  border-radius: 9px;
+  color: #29415e;
+  background: #ffffff;
+  font-size: 10px;
+}
+
+.manualSetup button {
+  display: inline-flex;
+  width: max-content;
+  align-items: center;
+  gap: 6px;
+  border: 0;
+  color: #326da8;
+  background: transparent;
+  padding: 0;
+  font: inherit;
+  font-size: 10px;
+  font-weight: 850;
+  cursor: pointer;
+}
+
+.verificationForm {
+  display: grid;
+  gap: 11px;
+}
+
+.verificationForm label {
+  display: grid;
+  gap: 7px;
+}
+
+.verificationForm label > span {
+  color: #314963;
+  font-size: 11px;
+  font-weight: 850;
+}
+
+.codeInput {
+  display: flex;
+  min-height: 47px;
+  align-items: center;
+  gap: 10px;
+  border: 1px solid #d4deea;
+  border-radius: 11px;
+  background: #ffffff;
+  padding: 0 13px;
+}
+
+.codeInput:focus-within {
+  border-color: #83a4c6;
+  box-shadow:
+    0 0 0 4px
+    rgba(50, 109, 168, 0.08);
+}
+
+.codeInput svg {
+  color: #718197;
+}
+
+.codeInput input {
+  min-width: 0;
+  flex: 1;
+  border: 0;
+  outline: 0;
+  color: #12243d;
+  background: transparent;
+  font: inherit;
+  font-size: 15px;
+  font-weight: 800;
+  letter-spacing: 0.2em;
+}
+
+.enrollmentActions {
+  display: flex;
+  gap: 9px;
+}
+
+.verifyButton,
+.cancelButton {
+  display: inline-flex;
+  min-height: 42px;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  border-radius: 10px;
+  padding: 0 14px;
+  font: inherit;
+  font-size: 11px;
+  font-weight: 850;
+  cursor: pointer;
+}
+
+.verifyButton {
+  border: 1px solid #326da8;
+  color: #ffffff;
+  background: #326da8;
+}
+
+.cancelButton {
+  border: 1px solid #ccd7e5;
+  color: #425a77;
+  background: #ffffff;
+}
+
+.verifyButton:disabled,
+.cancelButton:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.spinner {
+  animation:
+    mfaPanelSpin
+    0.85s linear infinite;
+}
+
+@keyframes mfaPanelSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (max-width: 760px) {
+  .cardHeader {
+    grid-template-columns:
+      auto minmax(0, 1fr);
+  }
+
+  .secureBadge,
+  .warningBadge {
+    grid-column: 1 / -1;
+    justify-content: center;
+  }
+
+  .backupNotice {
+    grid-template-columns:
+      auto minmax(0, 1fr);
+  }
+
+  .backupNotice button {
+    grid-column: 1 / -1;
+  }
+
+  .factorRow {
+    grid-template-columns:
+      auto minmax(0, 1fr);
+  }
+
+  .verifiedStatus,
+  .removeButton {
+    grid-column: 2;
+    width: max-content;
+  }
+
+  .qrGrid {
+    grid-template-columns: 1fr;
+    justify-items: center;
+  }
+
+  .manualSetup {
+    width: 100%;
+  }
+
+  .enrollmentActions {
+    display: grid;
+  }
+}

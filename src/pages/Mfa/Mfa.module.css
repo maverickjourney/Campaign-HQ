@@ -419,3 +419,79 @@
     min-height: 45px;
   }
 }
+
+
+/* MULTIPLE AUTHENTICATOR CHOICE */
+.factorChoices {
+  display: grid;
+  gap: 8px;
+  margin-bottom: 15px;
+}
+
+.factorChoices > span {
+  color: #263d5a;
+  font-size: 0.78rem;
+  font-weight: 800;
+}
+
+.factorChoiceList {
+  display: grid;
+  grid-template-columns:
+    repeat(
+      2,
+      minmax(0, 1fr)
+    );
+  gap: 8px;
+}
+
+.factorChoice {
+  display: grid;
+  grid-template-columns:
+    auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 8px;
+  min-height: 48px;
+  border: 1px solid #d5dfeb;
+  border-radius: 12px;
+  color: #405874;
+  background: #f8fafc;
+  padding: 8px 11px;
+  font: inherit;
+  font-size: 0.73rem;
+  font-weight: 800;
+  text-align: left;
+  cursor: pointer;
+}
+
+.factorChoice:hover {
+  border-color: #9db5d0;
+  background: #f3f7fc;
+}
+
+.factorChoiceSelected {
+  border-color: #326da8;
+  color: #173d78;
+  background: #edf4fc;
+  box-shadow:
+    0 0 0 3px
+    rgba(50, 109, 168, 0.09);
+}
+
+.factorChoice > svg:first-child {
+  color: #326da8;
+}
+
+.factorChoice > svg:last-child {
+  color: #1f7457;
+}
+
+.factorChoice:disabled {
+  cursor: not-allowed;
+  opacity: 0.65;
+}
+
+@media (max-width: 620px) {
+  .factorChoiceList {
+    grid-template-columns: 1fr;
+  }
+}

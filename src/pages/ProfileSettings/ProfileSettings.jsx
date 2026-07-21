@@ -25,6 +25,7 @@ import {
   getUserInitials,
 } from "../../utils/campaignSession";
 import { useProfileSettings } from "../../hooks/useProfileSettings";
+import MfaSecurityPanel from "../../components/security/MfaSecurityPanel/MfaSecurityPanel";
 
 import sidebarStyles from "../Team/Team.module.css";
 import styles from "./ProfileSettings.module.css";
@@ -282,6 +283,10 @@ export default function ProfileSettings() {
               )}
             </section>
           </div>
+
+          {leadershipAccess && (
+            <MfaSecurityPanel />
+          )}
 
           <CampaignMobileSetup
             userId={user.id}
