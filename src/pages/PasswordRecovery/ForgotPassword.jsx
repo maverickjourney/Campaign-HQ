@@ -1,10 +1,12 @@
 import {
+  useRef,
   useState,
 } from "react";
 
 import {
   ArrowLeft,
   CheckCircle2,
+  KeyRound,
   LoaderCircle,
   Mail,
   ShieldCheck,
@@ -17,6 +19,8 @@ import {
 
 import LoginLayout from "../../layouts/LoginLayout/LoginLayout";
 
+import TurnstileChallenge from "../../components/security/TurnstileChallenge/TurnstileChallenge";
+
 import {
   requestCampaignPasswordReset,
 } from "../../services/auth";
@@ -27,39 +31,61 @@ export default function ForgotPassword() {
   const location =
     useLocation();
 
-  const [email, setEmail] =
-    useState(
-      String(
-        location.state?.email ||
-          "",
-      ),
-    );
+  const turnstileRef =
+    useRef(null);
 
   const [
-    isSubmitting,
-    setIsSubmitting,
-  ] = useState(false);
+    email,
+    setEmail,
+  ] = useState(
+    String(
+      location.state
+        ?.email ||
+        "",
+    ),
+  );
 
   const [
-    submitted,
-    setSubmitted,
-  ] = useState(false);
+    captchaToken,
+    setCaptchaToken,
+  ] = useState("");
+
+  const [
+    status,
+    setStatus,
+  ] = useState(
+    "ready",
+  );
 
   const [
     errorMessage,
     setErrorMessage,
   ] = useState("");
 
+  const isSending =
+    status ===
+    "sending";
+
   const handleSubmit =
-    async (event) => {
+    async (
+      event,
+    ) => {
       event.preventDefault();
+
+      setErrorMessage(
+        "",
+      );
 
       const normalizedEmail =
         email
           .trim()
           .toLowerCase();
 
-      if (!normalizedEmail) {
+      if (
+        !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(
+          normalizedEmail,
+        )
+      ) {
         setErrorMessage(
           "Enter the email address used for your Campaign Seat account.",
         );
@@ -67,24 +93,50 @@ export default function ForgotPassword() {
         return;
       }
 
-      setIsSubmitting(true);
-      setErrorMessage("");
+      if (
+        !captchaToken
+      ) {
+        setErrorMessage(
+          "Wait for the browser security check to finish.",
+        );
+
+        return;
+      }
+
+      setStatus(
+        "sending",
+      );
 
       try {
         await requestCampaignPasswordReset({
           email:
             normalizedEmail,
+
+          captchaToken,
         });
 
-        setSubmitted(true);
-      } catch (error) {
+        setStatus(
+          "sent",
+        );
+      } catch (
+        error
+      ) {
+        setStatus(
+          "ready",
+        );
+
         setErrorMessage(
           error instanceof Error
             ? error.message
-            : "The recovery request could not be completed.",
+            : "Campaign Seat could not send the recovery email.",
         );
       } finally {
-        setIsSubmitting(false);
+        setCaptchaToken(
+          "",
+        );
+
+        turnstileRef
+          .current?.reset();
       }
     };
 
@@ -122,18 +174,17 @@ export default function ForgotPassword() {
 
             <div>
               <strong>
-                Secure account recovery
+                Protected account recovery
               </strong>
 
               <span>
-                Recovery links are sent
-                only through Campaign
-                Seat authentication.
+                Recovery requests are checked before an email is sent.
               </span>
             </div>
           </div>
 
-          {submitted ? (
+          {status ===
+          "sent" ? (
             <div
               className={
                 styles.statusPanel
@@ -154,58 +205,29 @@ export default function ForgotPassword() {
                   styles.eyebrow
                 }
               >
-                Check your inbox
+                Recovery email sent
               </span>
 
               <h1>
-                Recovery email requested
+                Check your inbox
               </h1>
 
               <p>
-                If an eligible Campaign
-                Seat account exists for
+                A secure password-reset link was sent to{" "}
                 <strong>
-                  {" "}
-                  {email.trim()}
+                  {email
+                    .trim()
+                    .toLowerCase()}
                 </strong>
-                , a secure password-reset
-                link will arrive shortly.
+                .
               </p>
-
-              <p
-                className={
-                  styles.supportingCopy
-                }
-              >
-                Check spam or junk mail
-                before requesting another
-                link. Only the newest
-                recovery link should be
-                used.
-              </p>
-
-              <button
-                className={
-                  styles.secondaryButton
-                }
-                type="button"
-                onClick={() => {
-                  setSubmitted(false);
-                  setErrorMessage("");
-                }}
-              >
-                Send another request
-              </button>
 
               <Link
                 className={
-                  styles.backLink
+                  styles.submitButton
                 }
                 to="/"
               >
-                <ArrowLeft
-                  size={17}
-                />
                 Return to sign in
               </Link>
             </div>
@@ -229,10 +251,7 @@ export default function ForgotPassword() {
                 </h1>
 
                 <p>
-                  Enter the email address
-                  assigned to your campaign
-                  account. We will send a
-                  secure recovery link.
+                  Enter your Campaign Seat email and we will send a protected recovery link.
                 </p>
               </div>
 
@@ -251,7 +270,7 @@ export default function ForgotPassword() {
                   htmlFor="recovery-email"
                 >
                   <span>
-                    Campaign email address
+                    Email address
                   </span>
 
                   <div
@@ -266,7 +285,9 @@ export default function ForgotPassword() {
                     <input
                       id="recovery-email"
                       type="email"
-                      value={email}
+                      value={
+                        email
+                      }
                       onChange={(
                         event,
                       ) => {
@@ -283,12 +304,22 @@ export default function ForgotPassword() {
                       autoComplete="email"
                       autoFocus
                       disabled={
-                        isSubmitting
+                        isSending
                       }
                       required
                     />
                   </div>
                 </label>
+
+                <TurnstileChallenge
+                  ref={
+                    turnstileRef
+                  }
+                  action="password_reset"
+                  onTokenChange={
+                    setCaptchaToken
+                  }
+                />
 
                 {errorMessage && (
                   <p
@@ -307,10 +338,11 @@ export default function ForgotPassword() {
                   }
                   type="submit"
                   disabled={
-                    isSubmitting
+                    isSending ||
+                    !captchaToken
                   }
                 >
-                  {isSubmitting ? (
+                  {isSending ? (
                     <>
                       <LoaderCircle
                         className={
@@ -318,14 +350,15 @@ export default function ForgotPassword() {
                         }
                         size={19}
                       />
-                      Sending recovery
-                      email…
+
+                      Sending securely…
                     </>
                   ) : (
                     <>
-                      <Mail
+                      <KeyRound
                         size={19}
                       />
+
                       Send recovery email
                     </>
                   )}
@@ -340,6 +373,7 @@ export default function ForgotPassword() {
                   <ArrowLeft
                     size={17}
                   />
+
                   Return to sign in
                 </Link>
               </form>

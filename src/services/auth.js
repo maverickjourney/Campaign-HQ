@@ -408,17 +408,60 @@ async function finalizeCampaignAuthentication(
 export async function signInToCampaign({
   email,
   password,
+  captchaToken,
 }) {
   const normalizedEmail =
     email.trim().toLowerCase();
+
+  const normalizedCaptchaToken =
+    String(
+      captchaToken ||
+      "",
+    ).trim();
+
+  if (!normalizedCaptchaToken) {
+    throw new Error(
+      "Wait for the browser security check to finish.",
+    );
+  }
 
   const { data, error } =
     await supabase.auth.signInWithPassword({
       email: normalizedEmail,
       password,
+
+      options: {
+        captchaToken:
+          normalizedCaptchaToken,
+      },
     });
 
-  if (error || !data.user) {
+  if (error) {
+    const message =
+      String(
+        error.message ||
+        "",
+      ).toLowerCase();
+
+    if (
+      message.includes(
+        "captcha",
+      ) ||
+      message.includes(
+        "challenge",
+      )
+    ) {
+      throw new Error(
+        "The browser security check expired. Complete it again and retry.",
+      );
+    }
+
+    throw new Error(
+      "The email or password is incorrect.",
+    );
+  }
+
+  if (!data.user) {
     throw new Error(
       "The email or password is incorrect.",
     );
@@ -450,6 +493,7 @@ export async function signInToCampaign({
 
 export async function requestCampaignPasswordReset({
   email,
+  captchaToken,
 }) {
   const normalizedEmail =
     String(email || "")
@@ -459,6 +503,18 @@ export async function requestCampaignPasswordReset({
   if (!normalizedEmail) {
     throw new Error(
       "Enter the email address used for your Campaign Seat account.",
+    );
+  }
+
+  const normalizedCaptchaToken =
+    String(
+      captchaToken ||
+      "",
+    ).trim();
+
+  if (!normalizedCaptchaToken) {
+    throw new Error(
+      "Wait for the browser security check to finish.",
     );
   }
 
@@ -476,6 +532,9 @@ export async function requestCampaignPasswordReset({
         normalizedEmail,
         {
           redirectTo,
+
+          captchaToken:
+            normalizedCaptchaToken,
         },
       );
 
@@ -484,6 +543,19 @@ export async function requestCampaignPasswordReset({
       String(
         error.message || "",
       ).toLowerCase();
+
+    if (
+      message.includes(
+        "captcha",
+      ) ||
+      message.includes(
+        "challenge",
+      )
+    ) {
+      throw new Error(
+        "The browser security check expired. Complete it again and retry.",
+      );
+    }
 
     if (
       message.includes(

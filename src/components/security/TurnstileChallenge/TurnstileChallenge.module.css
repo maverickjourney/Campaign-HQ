@@ -1,0 +1,48 @@
+.wrapper {
+  display: grid;
+  width: 100%;
+  min-width: 0;
+  gap: 5px;
+  margin: 1px 0 12px;
+}
+
+.widget {
+  width: 100%;
+  min-width: 0;
+}
+
+.status {
+  display: flex;
+  min-height: 22px;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  color: #68778b;
+  font-size: 10px;
+  font-weight: 750;
+  line-height: 1.35;
+  text-align: center;
+}
+
+.status svg {
+  flex: 0 0 auto;
+  color: #326da8;
+}
+
+.status_verified {
+  color: #247255;
+}
+
+.status_verified svg {
+  color: #247255;
+}
+
+.status_error,
+.status_misconfigured {
+  color: #a33138;
+}
+
+.status_error svg,
+.status_misconfigured svg {
+  color: #a33138;
+}

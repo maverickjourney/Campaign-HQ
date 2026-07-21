@@ -1,4 +1,7 @@
-import { useState } from "react";
+import {
+  useState,
+  useRef,
+} from "react";
 import { useNavigate } from "react-router-dom";
 import {
   ArrowRight,
@@ -11,10 +14,21 @@ import {
 } from "lucide-react";
 
 import { signInToCampaign } from "../../../services/auth";
+
+import TurnstileChallenge from "../../security/TurnstileChallenge/TurnstileChallenge";
+
 import styles from "./LoginForm.module.css";
 
 export default function LoginForm() {
   const navigate = useNavigate();
+
+  const turnstileRef =
+    useRef(null);
+
+  const [
+    captchaToken,
+    setCaptchaToken,
+  ] = useState("");
 
   const [formData, setFormData] =
     useState({
@@ -62,6 +76,14 @@ export default function LoginForm() {
       return;
     }
 
+    if (!captchaToken) {
+      setMessage(
+        "Wait for the browser security check to finish.",
+      );
+
+      return;
+    }
+
     setIsLoading(true);
     setMessage("");
 
@@ -73,6 +95,8 @@ export default function LoginForm() {
 
           password:
             formData.password,
+
+          captchaToken,
         });
 
       if (
@@ -129,6 +153,11 @@ export default function LoginForm() {
           : "Campaign HQ could not sign you in.",
       );
     } finally {
+      setCaptchaToken("");
+
+      turnstileRef
+        .current?.reset();
+
       setIsLoading(false);
     }
   };
@@ -274,10 +303,23 @@ export default function LoginForm() {
             </button>
           </div>
 
+          <TurnstileChallenge
+            ref={
+              turnstileRef
+            }
+            action="campaign_signin"
+            onTokenChange={
+              setCaptchaToken
+            }
+          />
+
           <button
             className={styles.submitButton}
             type="submit"
-            disabled={isLoading}
+            disabled={
+              isLoading ||
+              !captchaToken
+            }
           >
             {isLoading ? (
               <>

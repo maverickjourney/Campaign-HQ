@@ -2,6 +2,7 @@ import {
   useEffect,
   useMemo,
   useState,
+  useRef,
 } from "react";
 
 import {
@@ -30,6 +31,8 @@ import {
   restoreCampaignSession,
 } from "../../services/auth";
 
+import TurnstileChallenge from "../../components/security/TurnstileChallenge/TurnstileChallenge";
+
 import styles from "./InvitationAccept.module.css";
 
 const TOKEN_PATTERN =
@@ -41,6 +44,17 @@ function getAuthMessage(error) {
       error?.message ||
       "",
     ).toLowerCase();
+
+  if (
+    message.includes(
+      "captcha",
+    ) ||
+    message.includes(
+      "challenge",
+    )
+  ) {
+    return "The browser security check expired. Complete it again and retry.";
+  }
 
   if (
     message.includes(
@@ -118,6 +132,14 @@ function getInvitationMessage(error) {
 }
 
 export default function InvitationAccept() {
+  const turnstileRef =
+    useRef(null);
+
+  const [
+    captchaToken,
+    setCaptchaToken,
+  ] = useState("");
+
   const navigate =
     useNavigate();
 
@@ -422,10 +444,22 @@ export default function InvitationAccept() {
 
       if (
         password.length <
-        8
+        12 ||
+        !/[a-z]/.test(
+          password,
+        ) ||
+        !/[A-Z]/.test(
+          password,
+        ) ||
+        !/\d/.test(
+          password,
+        ) ||
+        !/[^A-Za-z0-9\s]/.test(
+          password,
+        )
       ) {
         setError(
-          "Use a password with at least 8 characters.",
+          "Use at least 12 characters with uppercase and lowercase letters, a number and a symbol.",
         );
         return;
       }
@@ -437,6 +471,14 @@ export default function InvitationAccept() {
         setError(
           "The passwords do not match.",
         );
+        return;
+      }
+
+      if (!captchaToken) {
+        setError(
+          "Wait for the browser security check to finish.",
+        );
+
         return;
       }
 
@@ -456,6 +498,8 @@ export default function InvitationAccept() {
                 normalizedEmail,
               password,
               options: {
+                captchaToken,
+
                 data: {
                   full_name:
                     normalizedName,
@@ -466,6 +510,11 @@ export default function InvitationAccept() {
                   window.location.href,
               },
             });
+
+        setCaptchaToken("");
+
+        turnstileRef
+          .current?.reset();
 
         if (
           signUpError
@@ -524,6 +573,14 @@ export default function InvitationAccept() {
         return;
       }
 
+      if (!captchaToken) {
+        setError(
+          "Wait for the browser security check to finish.",
+        );
+
+        return;
+      }
+
       setStatus(
         "submitting",
       );
@@ -539,7 +596,16 @@ export default function InvitationAccept() {
               email:
                 normalizedEmail,
               password,
+
+              options: {
+                captchaToken,
+              },
             });
+
+        setCaptchaToken("");
+
+        turnstileRef
+          .current?.reset();
 
         if (
           signInError ||
@@ -889,7 +955,7 @@ export default function InvitationAccept() {
                           }
                           placeholder={
                             mode === "create"
-                              ? "At least 8 characters"
+                              ? "12+ characters, upper/lower, number and symbol"
                               : "Your password"
                           }
                           required
@@ -944,10 +1010,31 @@ export default function InvitationAccept() {
                       </label>
                     )}
 
+                    <TurnstileChallenge
+                      key={
+                        mode
+                      }
+                      ref={
+                        turnstileRef
+                      }
+                      action={
+                        mode ===
+                        "create"
+                          ? "invite_signup"
+                          : "invite_signin"
+                      }
+                      onTokenChange={
+                        setCaptchaToken
+                      }
+                    />
+
                     <button
                       className={styles.primaryButton}
                       type="submit"
-                      disabled={isBusy}
+                      disabled={
+                        isBusy ||
+                        !captchaToken
+                      }
                     >
                       {isBusy ? (
                         <LoaderCircle
