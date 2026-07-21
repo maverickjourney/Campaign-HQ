@@ -10,6 +10,23 @@ function getMemberAccessErrorMessage(error) {
     error?.message ||
     "Campaign member access could not be updated.";
 
+  const normalizedMessage =
+    message.toLowerCase();
+
+  if (
+    normalizedMessage.includes(
+      "two-step verification",
+    ) ||
+    normalizedMessage.includes(
+      "mfa",
+    ) ||
+    normalizedMessage.includes(
+      "aal2",
+    )
+  ) {
+    return "Complete two-step verification before changing campaign member access.";
+  }
+
   if (
     error?.code === "PGRST202" ||
     message

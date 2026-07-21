@@ -61,6 +61,23 @@ function getWorkspaceErrorMessage(
     error?.message ||
     "Workspace settings could not be saved.";
 
+  const normalizedMessage =
+    message.toLowerCase();
+
+  if (
+    normalizedMessage.includes(
+      "two-step verification",
+    ) ||
+    normalizedMessage.includes(
+      "mfa",
+    ) ||
+    normalizedMessage.includes(
+      "aal2",
+    )
+  ) {
+    return "Complete two-step verification before changing campaign workspace settings.";
+  }
+
   if (
     error?.code === "PGRST202" ||
     message

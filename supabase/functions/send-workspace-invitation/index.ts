@@ -602,6 +602,62 @@ Deno.serve(
         );
       }
 
+      const accessToken =
+        authorization
+          .slice(
+            "Bearer ".length,
+          )
+          .trim();
+
+      const {
+        data:
+          verifiedClaimsResult,
+        error:
+          verifiedClaimsError,
+      } =
+        await supabase.auth
+          .getClaims(
+            accessToken,
+          );
+
+      const verifiedClaims =
+        verifiedClaimsResult
+          ?.claims;
+
+      if (
+        verifiedClaimsError ||
+        !verifiedClaims ||
+        verifiedClaims.sub !==
+          user.id
+      ) {
+        return jsonResponse(
+          {
+            error:
+              "The signed-in session claims could not be verified.",
+          },
+          401,
+        );
+      }
+
+      if (
+        verifiedClaims.aal !==
+        "aal2"
+      ) {
+        return jsonResponse(
+          {
+            error:
+              "Complete two-step verification before sending a campaign invitation.",
+
+            code:
+              "MFA_REQUIRED",
+
+            mfaRequired:
+              true,
+          },
+          403,
+        );
+      }
+
       let body:
         InvitationRequest;
 

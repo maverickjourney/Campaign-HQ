@@ -405,6 +405,64 @@ Deno.serve(
       );
     }
 
+    const accessToken =
+      authorization
+        .slice(
+          "Bearer ".length,
+        )
+        .trim();
+
+    const {
+      data:
+        verifiedClaimsResult,
+      error:
+        verifiedClaimsError,
+    } =
+      await userClient.auth
+        .getClaims(
+          accessToken,
+        );
+
+    const verifiedClaims =
+      verifiedClaimsResult
+        ?.claims;
+
+    if (
+      verifiedClaimsError ||
+      !verifiedClaims ||
+      verifiedClaims.sub !==
+        authenticatedUser.id
+    ) {
+      return jsonResponse(
+        {
+          error:
+            "Your Campaign Seat session claims could not be verified.",
+        },
+        401,
+        corsHeaders,
+      );
+    }
+
+    if (
+      verifiedClaims.aal !==
+        "aal2"
+    ) {
+      return jsonResponse(
+        {
+          error:
+            "Complete two-step verification before permanently deleting a Campaign Seat account.",
+
+          code:
+            "MFA_REQUIRED",
+
+          mfaRequired:
+            true,
+        },
+        403,
+        corsHeaders,
+      );
+    }
+
     const {
       data:
         preparationData,
