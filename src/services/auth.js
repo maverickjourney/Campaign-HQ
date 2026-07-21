@@ -649,15 +649,21 @@ export async function updateCampaignPassword({
   }
 
   if (
-    !/[A-Za-z]/.test(
+    !/[a-z]/.test(
+      normalizedPassword,
+    ) ||
+    !/[A-Z]/.test(
       normalizedPassword,
     ) ||
     !/\d/.test(
       normalizedPassword,
+    ) ||
+    !/[^A-Za-z0-9\s]/.test(
+      normalizedPassword,
     )
   ) {
     throw new Error(
-      "The new password must contain at least one letter and one number.",
+      "The new password must contain uppercase and lowercase letters, a number and a symbol.",
     );
   }
 

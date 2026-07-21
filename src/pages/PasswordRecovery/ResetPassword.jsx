@@ -17,6 +17,7 @@ import {
 
 import {
   Link,
+  useNavigate,
 } from "react-router-dom";
 
 import LoginLayout from "../../layouts/LoginLayout/LoginLayout";
@@ -26,9 +27,16 @@ import {
   updateCampaignPassword,
 } from "../../services/auth";
 
+import {
+  getMfaState,
+} from "../../services/mfa";
+
 import styles from "./PasswordRecovery.module.css";
 
 export default function ResetPassword() {
+  const navigate =
+    useNavigate();
+
   const [
     recoveryStatus,
     setRecoveryStatus,
@@ -75,13 +83,23 @@ export default function ResetPassword() {
         length:
           password.length >= 12,
 
-        letter:
-          /[A-Za-z]/.test(
+        lowercase:
+          /[a-z]/.test(
+            password,
+          ),
+
+        uppercase:
+          /[A-Z]/.test(
             password,
           ),
 
         number:
           /\d/.test(
+            password,
+          ),
+
+        symbol:
+          /[^A-Za-z0-9\s]/.test(
             password,
           ),
 
@@ -109,11 +127,36 @@ export default function ResetPassword() {
         try {
           await establishPasswordRecoverySession();
 
-          if (active) {
-            setRecoveryStatus(
-              "ready",
-            );
+          const mfaState =
+            await getMfaState();
+
+          if (!active) {
+            return;
           }
+
+          if (
+            mfaState.verifiedFactors
+              .length > 0 &&
+            !mfaState.isAal2
+          ) {
+            navigate(
+              "/mfa/challenge",
+              {
+                replace: true,
+
+                state: {
+                  from:
+                    "/reset-password",
+                },
+              },
+            );
+
+            return;
+          }
+
+          setRecoveryStatus(
+            "ready",
+          );
         } catch (error) {
           if (!active) {
             return;
@@ -136,7 +179,9 @@ export default function ResetPassword() {
     return () => {
       active = false;
     };
-  }, []);
+  }, [
+    navigate,
+  ]);
 
   const handleSubmit =
     async (event) => {
@@ -550,7 +595,7 @@ export default function ResetPassword() {
 
               <p
                 className={
-                  requirements.letter
+                  requirements.lowercase
                     ? styles.requirementMet
                     : ""
                 }
@@ -558,7 +603,20 @@ export default function ResetPassword() {
                 <CheckCircle2
                   size={15}
                 />
-                Contains a letter
+                Contains a lowercase letter
+              </p>
+
+              <p
+                className={
+                  requirements.uppercase
+                    ? styles.requirementMet
+                    : ""
+                }
+              >
+                <CheckCircle2
+                  size={15}
+                />
+                Contains an uppercase letter
               </p>
 
               <p
@@ -572,6 +630,19 @@ export default function ResetPassword() {
                   size={15}
                 />
                 Contains a number
+              </p>
+
+              <p
+                className={
+                  requirements.symbol
+                    ? styles.requirementMet
+                    : ""
+                }
+              >
+                <CheckCircle2
+                  size={15}
+                />
+                Contains a symbol
               </p>
 
               <p
