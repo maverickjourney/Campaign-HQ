@@ -131,8 +131,7 @@ begin
         current_definition
 
         placing
-          E'\nbegin\n'
-          E'  perform public.require_aal2();\n'
+          E'\nbegin\n  perform public.require_aal2();\n'
 
         from begin_position
 
