@@ -7,6 +7,32 @@ const MEMBERSHIPS_KEY = "campaignHQ.memberships";
 const CURRENT_MEMBERSHIP_KEY =
   "campaignHQ.currentMembership";
 
+/*
+ * Campaign profile, workspace, role and permission data must not be
+ * persisted in browser storage. Protected routes restore this data
+ * from Supabase whenever the application is opened or refreshed.
+ */
+const campaignMemory = new Map();
+
+const campaignMemoryStore = {
+  getItem(key) {
+    return campaignMemory.has(key)
+      ? campaignMemory.get(key)
+      : null;
+  },
+
+  setItem(key, value) {
+    campaignMemory.set(
+      key,
+      String(value),
+    );
+  },
+
+  removeItem(key) {
+    campaignMemory.delete(key);
+  },
+};
+
 export const CAMPAIGN_WORKSPACE = {
   id: "11111111-1111-1111-1111-111111111111",
   name: "Elizabeth Accomando",
@@ -21,11 +47,11 @@ export const CAMPAIGN_WORKSPACE = {
 
 function readSessionValue(key, fallback = null) {
   try {
-    const value = sessionStorage.getItem(key);
+    const value = campaignMemoryStore.getItem(key);
 
     return value ? JSON.parse(value) : fallback;
   } catch {
-    sessionStorage.removeItem(key);
+    campaignMemoryStore.removeItem(key);
     return fallback;
   }
 }
@@ -158,7 +184,7 @@ export function saveAuthenticatedSession({
   const normalizedMemberships =
     memberships.map(normalizeMembership);
 
-  sessionStorage.setItem(
+  campaignMemoryStore.setItem(
     USER_KEY,
     JSON.stringify({
       id: authUser.id,
@@ -181,7 +207,7 @@ export function saveAuthenticatedSession({
     }),
   );
 
-  sessionStorage.setItem(
+  campaignMemoryStore.setItem(
     MEMBERSHIPS_KEY,
     JSON.stringify(normalizedMemberships),
   );
@@ -227,7 +253,7 @@ export function selectCampaignWorkspace(
       email: "",
     });
 
-  sessionStorage.setItem(
+  campaignMemoryStore.setItem(
     USER_KEY,
     JSON.stringify({
       ...account,
@@ -250,17 +276,17 @@ export function selectCampaignWorkspace(
     }),
   );
 
-  sessionStorage.setItem(
+  campaignMemoryStore.setItem(
     CURRENT_MEMBERSHIP_KEY,
     JSON.stringify(normalized),
   );
 
-  sessionStorage.setItem(
+  campaignMemoryStore.setItem(
     WORKSPACE_KEY,
     JSON.stringify(normalized.workspace),
   );
 
-  sessionStorage.setItem(
+  campaignMemoryStore.setItem(
     MODE_KEY,
     accessMode,
   );
@@ -273,7 +299,7 @@ export function clearSelectedCampaign() {
     readSessionValue(USER_KEY, null);
 
   if (user) {
-    sessionStorage.setItem(
+    campaignMemoryStore.setItem(
       USER_KEY,
       JSON.stringify({
         id: user.id,
@@ -296,9 +322,9 @@ export function clearSelectedCampaign() {
     );
   }
 
-  sessionStorage.removeItem(MODE_KEY);
-  sessionStorage.removeItem(WORKSPACE_KEY);
-  sessionStorage.removeItem(
+  campaignMemoryStore.removeItem(MODE_KEY);
+  campaignMemoryStore.removeItem(WORKSPACE_KEY);
+  campaignMemoryStore.removeItem(
     CURRENT_MEMBERSHIP_KEY,
   );
 }
@@ -344,7 +370,7 @@ export function saveCurrentUserProfile({
       "",
   };
 
-  sessionStorage.setItem(
+  campaignMemoryStore.setItem(
     USER_KEY,
     JSON.stringify(
       updated,
@@ -378,7 +404,7 @@ export function getCurrentWorkspace() {
 }
 
 export function getAccessMode() {
-  return sessionStorage.getItem(MODE_KEY) ===
+  return campaignMemoryStore.getItem(MODE_KEY) ===
     "admin"
     ? "admin"
     : "client";
@@ -683,7 +709,7 @@ export function saveWorkspace(
       workspace,
     );
 
-  sessionStorage.setItem(
+  campaignMemoryStore.setItem(
     WORKSPACE_KEY,
     JSON.stringify(
       normalized,
@@ -702,7 +728,7 @@ export function saveWorkspace(
         normalized.id
     )
   ) {
-    sessionStorage.setItem(
+    campaignMemoryStore.setItem(
       CURRENT_MEMBERSHIP_KEY,
       JSON.stringify({
         ...currentMembership,
@@ -735,7 +761,7 @@ export function saveWorkspace(
       },
     );
 
-  sessionStorage.setItem(
+  campaignMemoryStore.setItem(
     MEMBERSHIPS_KEY,
     JSON.stringify(
       updatedMemberships,
@@ -746,11 +772,11 @@ export function saveWorkspace(
 }
 
 export function clearLocalCampaignSession() {
-  sessionStorage.removeItem(USER_KEY);
-  sessionStorage.removeItem(MODE_KEY);
-  sessionStorage.removeItem(WORKSPACE_KEY);
-  sessionStorage.removeItem(MEMBERSHIPS_KEY);
-  sessionStorage.removeItem(
+  campaignMemoryStore.removeItem(USER_KEY);
+  campaignMemoryStore.removeItem(MODE_KEY);
+  campaignMemoryStore.removeItem(WORKSPACE_KEY);
+  campaignMemoryStore.removeItem(MEMBERSHIPS_KEY);
+  campaignMemoryStore.removeItem(
     CURRENT_MEMBERSHIP_KEY,
   );
 }
