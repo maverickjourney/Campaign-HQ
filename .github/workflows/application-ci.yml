@@ -1,0 +1,55 @@
+name: Campaign Seat Application CI
+
+on:
+  workflow_dispatch:
+
+  pull_request:
+    branches:
+      - main
+
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+concurrency:
+  group: campaign-seat-ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  application-ci:
+    name: Build and security checks
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          cache: npm
+
+      - name: Check repository for exposed secrets
+        shell: bash
+        run: bash scripts/operations/check-repository-safety.sh
+
+      - name: Install locked dependencies
+        shell: bash
+        run: npm ci
+
+      - name: Run lint checks when configured
+        shell: bash
+        run: npm run lint --if-present
+
+      - name: Build Campaign Seat
+        shell: bash
+        run: npm run build
+
+      - name: Block critical production dependency vulnerabilities
+        shell: bash
+        run: npm audit --omit=dev --audit-level=high
