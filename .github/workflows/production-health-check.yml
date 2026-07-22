@@ -1,0 +1,28 @@
+name: Campaign Seat Production Health
+
+on:
+  workflow_dispatch:
+
+  schedule:
+    - cron: "23 */6 * * *"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: campaign-seat-production-health
+  cancel-in-progress: false
+
+jobs:
+  production-health:
+    name: Check production
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Run Campaign Seat production health check
+        shell: bash
+        run: bash scripts/operations/check-production-health.sh
