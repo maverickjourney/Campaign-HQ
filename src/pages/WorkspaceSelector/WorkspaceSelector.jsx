@@ -36,6 +36,102 @@ import {
 
 import styles from "./WorkspaceSelector.module.css";
 
+const LAST_OPENED_KEY =
+  "campaignSeat.workspaceLastOpened";
+
+function readLastOpenedWorkspaces() {
+  try {
+    const value =
+      window.localStorage.getItem(
+        LAST_OPENED_KEY,
+      );
+
+    const parsed =
+      value
+        ? JSON.parse(value)
+        : {};
+
+    return parsed &&
+      typeof parsed === "object"
+      ? parsed
+      : {};
+  } catch {
+    return {};
+  }
+}
+
+function saveLastOpenedWorkspace(
+  current,
+  workspaceId,
+) {
+  if (!workspaceId) {
+    return current;
+  }
+
+  const next = {
+    ...current,
+    [workspaceId]:
+      new Date().toISOString(),
+  };
+
+  try {
+    window.localStorage.setItem(
+      LAST_OPENED_KEY,
+      JSON.stringify(next),
+    );
+  } catch {
+    // Opening the workspace still works when storage is unavailable.
+  }
+
+  return next;
+}
+
+function formatLastOpened(value) {
+  if (!value) {
+    return "Not opened yet";
+  }
+
+  const date = new Date(value);
+
+  if (Number.isNaN(date.getTime())) {
+    return "Not opened yet";
+  }
+
+  const today = new Date();
+
+  const sameDay =
+    date.getFullYear() ===
+      today.getFullYear() &&
+    date.getMonth() ===
+      today.getMonth() &&
+    date.getDate() ===
+      today.getDate();
+
+  const time =
+    new Intl.DateTimeFormat(
+      "en-US",
+      {
+        hour: "numeric",
+        minute: "2-digit",
+      },
+    ).format(date);
+
+  if (sameDay) {
+    return `Today at ${time}`;
+  }
+
+  return new Intl.DateTimeFormat(
+    "en-US",
+    {
+      month: "short",
+      day: "numeric",
+      hour: "numeric",
+      minute: "2-digit",
+    },
+  ).format(date);
+}
+
+
 const ELIZABETH_WORKSPACE_ID =
   "11111111-1111-1111-1111-111111111111";
 
@@ -62,12 +158,12 @@ function getCampaignImages(workspaceId) {
 
 function getDashboardLabel(dashboardType) {
   const labels = {
-    candidate: "Candidate Dashboard",
-    command: "Campaign Command Center",
-    department: "Department Workspace",
-    captain: "Team Captain Portal",
-    volunteer: "Volunteer Portal",
-    reviewer: "Reviewer Portal",
+    candidate: "Candidate HQ",
+    command: "Campaign HQ",
+    department: "Department HQ",
+    captain: "Team Captain HQ",
+    volunteer: "Volunteer HQ",
+    reviewer: "Review HQ",
   };
 
   return (
@@ -78,10 +174,10 @@ function getDashboardLabel(dashboardType) {
 
 function getSeatLabel(seatType) {
   const labels = {
-    command: "Command Access",
+    command: "Campaign Management Access",
     staff: "Staff Access",
     volunteer: "Volunteer Access",
-    reviewer: "Reviewer Access",
+    reviewer: "Review Access",
   };
 
   return labels[seatType] || "Campaign Access";
@@ -140,6 +236,13 @@ export default function WorkspaceSelector() {
 
   const [searchTerm, setSearchTerm] =
     useState("");
+
+  const [
+    lastOpenedByWorkspace,
+    setLastOpenedByWorkspace,
+  ] = useState(
+    readLastOpenedWorkspaces,
+  );
 
   const [activeSlide, setActiveSlide] =
     useState(0);
@@ -203,6 +306,40 @@ export default function WorkspaceSelector() {
       );
     }, [memberships, searchTerm]);
 
+  const visibleMemberships =
+    useMemo(() => {
+      return [
+        ...filteredMemberships,
+      ].sort((left, right) => {
+        const leftId =
+          left.workspaceId ||
+          left.workspace?.id;
+
+        const rightId =
+          right.workspaceId ||
+          right.workspace?.id;
+
+        const leftTime =
+          Date.parse(
+            lastOpenedByWorkspace[
+              leftId
+            ] || "",
+          ) || 0;
+
+        const rightTime =
+          Date.parse(
+            lastOpenedByWorkspace[
+              rightId
+            ] || "",
+          ) || 0;
+
+        return rightTime - leftTime;
+      });
+    }, [
+      filteredMemberships,
+      lastOpenedByWorkspace,
+    ]);
+
   const electionCountdown =
     getDaysUntilElection(
       primaryMembership?.workspace
@@ -216,6 +353,18 @@ export default function WorkspaceSelector() {
   const handleSelectWorkspace = (
     membership,
   ) => {
+    const workspaceId =
+      membership.workspaceId ||
+      membership.workspace?.id;
+
+    setLastOpenedByWorkspace(
+      (current) =>
+        saveLastOpenedWorkspace(
+          current,
+          workspaceId,
+        ),
+    );
+
     const selectedMembership =
       selectCampaignWorkspace(
         membership,
@@ -263,11 +412,11 @@ export default function WorkspaceSelector() {
 
             <div className={styles.brandCopy}>
               <strong>
-                Campaign HQ
+                Campaign Seat
               </strong>
 
               <span>
-                Campaign Operations Center
+                Campaign Access
               </span>
             </div>
           </div>
@@ -286,8 +435,8 @@ export default function WorkspaceSelector() {
               <span>
                 {memberships.length}{" "}
                 {memberships.length === 1
-                  ? "Active Campaign"
-                  : "Active Campaigns"}
+                  ? "Campaign Workspace"
+                  : "Campaign Workspaces"}
               </span>
             </div>
 
@@ -335,7 +484,16 @@ export default function WorkspaceSelector() {
         </div>
       </header>
 
-      <main className={styles.main}>
+      <main
+        className={[
+          styles.main,
+          memberships.length > 1
+            ? styles.multipleMain
+            : "",
+        ]
+          .filter(Boolean)
+          .join(" ")}
+      >
         <section
           className={
             styles.workspaceSection
@@ -351,7 +509,9 @@ export default function WorkspaceSelector() {
                   strokeWidth={2}
                 />
 
-                Your Campaign Portfolio
+                {memberships.length === 1
+                  ? "Your Campaign Workspace"
+                  : "Your Campaign Workspaces"}
               </div>
 
               <h1>
@@ -360,10 +520,9 @@ export default function WorkspaceSelector() {
               </h1>
 
               <p>
-                Choose the campaign workspace
-                you want to enter. Your role,
-                permissions and dashboard will
-                be applied automatically.
+                {memberships.length === 1
+                  ? "Confirm your campaign and access, then open Campaign HQ."
+                  : "Choose the campaign you want to manage. Each workspace keeps its own team, access, data and dashboard."}
               </p>
             </div>
 
@@ -386,7 +545,7 @@ export default function WorkspaceSelector() {
                       event.target.value,
                     )
                   }
-                  placeholder="Search campaigns"
+                  placeholder="Search campaign workspaces"
                   aria-label="Search campaigns"
                 />
               </div>
@@ -395,7 +554,7 @@ export default function WorkspaceSelector() {
 
           <div className={styles.workspaceGrid}>
             {filteredMemberships.length ? (
-              filteredMemberships.map(
+              visibleMemberships.map(
                 (membership) => {
                   const workspace =
                     membership.workspace;
@@ -469,11 +628,23 @@ export default function WorkspaceSelector() {
                             </span>
 
                             <strong>
-                              {workspace.status ===
-                              "active"
-                                ? "Active Campaign"
+                              {workspace.status === "active"
+                                ? "Active"
                                 : workspace.status}
                             </strong>
+
+                            <small
+                              className={
+                                styles.lastOpened
+                              }
+                            >
+                              Last opened:{" "}
+                              {formatLastOpened(
+                                lastOpenedByWorkspace[
+                                  workspace.id
+                                ],
+                              )}
+                            </small>
                           </div>
                         </div>
 
@@ -525,7 +696,7 @@ export default function WorkspaceSelector() {
                             />
 
                             <span>
-                              Election Day
+                              Next Election
                             </span>
 
                             <strong>
@@ -559,7 +730,7 @@ export default function WorkspaceSelector() {
                             />
 
                             <span>
-                              Access Level
+                              Workspace Access
                             </span>
 
                             <strong>
@@ -622,10 +793,7 @@ export default function WorkspaceSelector() {
                           }
                         >
                           <span>
-                            Enter{" "}
-                            {getDashboardLabel(
-                              membership.dashboardType,
-                            )}
+                            Open Campaign HQ
                           </span>
 
                           <ArrowRight
@@ -671,7 +839,8 @@ export default function WorkspaceSelector() {
           </div>
         </section>
 
-        <aside className={styles.sidePanel}>
+        <aside className={styles.sidePanel}
+          hidden={memberships.length > 1}>
           <div
             className={styles.accessCard}
           >
@@ -706,9 +875,7 @@ export default function WorkspaceSelector() {
             </div>
 
             <p>
-              Campaign HQ automatically applies
-              the correct tools and permissions
-              whenever you enter this workspace.
+              Your assigned role and permissions are applied automatically when you open this workspace.
             </p>
 
             <div
@@ -754,7 +921,7 @@ export default function WorkspaceSelector() {
                       ?.permissions?.length ||
                     0
                   }{" "}
-                  verified permissions
+                  permissions enabled
                 </span>
               </div>
             </div>
@@ -772,7 +939,7 @@ export default function WorkspaceSelector() {
               />
 
               <span>
-                Election Countdown
+                Next Election
               </span>
             </div>
 
@@ -813,13 +980,11 @@ export default function WorkspaceSelector() {
 
           <div className={styles.inviteCard}>
             <span>
-              Working on another campaign?
+              Need access to another campaign?
             </span>
 
             <p>
-              The campaign owner or authorized
-              leadership team can invite this
-              same Campaign HQ account.
+              Ask the campaign owner or an authorized administrator to invite your Campaign Seat account.
             </p>
           </div>
         </aside>
@@ -827,11 +992,11 @@ export default function WorkspaceSelector() {
 
       <footer className={styles.footer}>
         <span>
-          © 2026 Campaign HQ
+          © 2026 Campaign Seat Technologies LLC
         </span>
 
         <span>
-          Secure campaign operations platform
+          Build the campaign. Win the seat.
         </span>
       </footer>
     </div>
