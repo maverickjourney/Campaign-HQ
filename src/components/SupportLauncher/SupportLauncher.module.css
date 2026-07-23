@@ -72,6 +72,53 @@
   outline-offset: 3px !important;
 }
 
+
+
+/*
+ * Authenticated pages contain dense workspace controls near the
+ * viewport edges. Keep the launcher compact by default so it does
+ * not cover campaign cards, then expand it on pointer hover or
+ * keyboard focus.
+ */
+.compact {
+  width: 48px !important;
+  height: 48px !important;
+  min-height: 48px !important;
+  gap: 0 !important;
+  overflow: hidden !important;
+  padding: 0 !important;
+  border-radius: 16px !important;
+}
+
+.compact > span {
+  max-width: 0;
+  overflow: hidden;
+  opacity: 0;
+  white-space: nowrap;
+  transition:
+    max-width 160ms ease,
+    opacity 130ms ease;
+}
+
+.compact::after {
+  display: none;
+}
+
+.compact:hover,
+.compact:focus-visible {
+  width: 122px !important;
+  gap: 8px !important;
+  padding: 0 14px !important;
+  border-radius: 999px !important;
+}
+
+.compact:hover > span,
+.compact:focus-visible > span {
+  max-width: 72px;
+  opacity: 1;
+}
+
+
 @media (max-width: 640px) {
   .launcher {
     right: max(12px, env(safe-area-inset-right)) !important;
@@ -79,6 +126,21 @@
     min-height: 43px !important;
     padding: 0 14px !important;
     font-size: 0.81rem !important;
+  }
+
+  .compact {
+    width: 44px !important;
+    height: 44px !important;
+    min-height: 44px !important;
+    padding: 0 !important;
+    border-radius: 15px !important;
+  }
+
+  .compact:hover,
+  .compact:focus-visible {
+    width: 116px !important;
+    padding: 0 13px !important;
+    border-radius: 999px !important;
   }
 }
 
