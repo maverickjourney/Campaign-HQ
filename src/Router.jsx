@@ -27,6 +27,8 @@ import Team from "./pages/Team/Team";
 import RoleTasks from "./pages/RoleTasks/RoleTasks";
 import WorkspaceSettings from "./pages/WorkspaceSettings/WorkspaceSettings";
 import WorkspaceSelector from "./pages/WorkspaceSelector/WorkspaceSelector";
+import Support from "./pages/Support/Support";
+import SupportLauncher from "./components/SupportLauncher/SupportLauncher";
 
 const LEADERSHIP_EXPERIENCES = [
   "owner",
@@ -43,6 +45,11 @@ export default function Router() {
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<Login />} />
+
+        <Route
+          path="/support"
+          element={<Support />}
+        />
 
         <Route
           path="/forgot-password"
@@ -202,6 +209,8 @@ export default function Router() {
 
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
+
+      <SupportLauncher />
     </BrowserRouter>
   );
 }

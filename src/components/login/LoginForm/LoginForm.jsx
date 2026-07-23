@@ -380,14 +380,23 @@ export default function LoginForm() {
         <div className={styles.help}>
           <span>Need help?</span>
 
-          <button type="button">
-            Contact campaign leadership
+          <button
+            type="button"
+            onClick={() =>
+              navigate(
+                "/support?from=%2F",
+              )
+            }
+          >
+            Contact Campaign Seat Support
           </button>
         </div>
       </section>
 
       <footer className={styles.footer}>
-        <span>© 2026 Campaign HQ</span>
+        <span>
+          © 2026 Campaign Seat Technologies LLC
+        </span>
 
         <span>
           Authorized campaign use only

@@ -1,0 +1,89 @@
+.launcher {
+  position: fixed !important;
+  right: max(18px, env(safe-area-inset-right)) !important;
+  bottom: max(18px, env(safe-area-inset-bottom)) !important;
+  z-index: 2147483000 !important;
+
+  display: inline-flex !important;
+  width: auto !important;
+  min-width: 0 !important;
+  max-width: none !important;
+  min-height: 46px !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 9px !important;
+
+  margin: 0 !important;
+  padding: 0 17px !important;
+  border: 1px solid rgba(255, 255, 255, 0.22) !important;
+  border-radius: 999px !important;
+
+  color: #ffffff !important;
+  background:
+    linear-gradient(
+      135deg,
+      #174d82,
+      #071c38
+    ) !important;
+
+  box-shadow:
+    0 20px 52px rgba(1, 11, 26, 0.38),
+    inset 0 1px 0 rgba(255, 255, 255, 0.14) !important;
+
+  font-family: inherit !important;
+  font-size: 0.86rem !important;
+  font-weight: 850 !important;
+  line-height: 1 !important;
+  text-decoration: none !important;
+
+  opacity: 1 !important;
+  visibility: visible !important;
+  pointer-events: auto !important;
+
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+
+  transition:
+    translate 160ms ease,
+    border-color 160ms ease,
+    box-shadow 160ms ease !important;
+}
+
+.launcher::after {
+  content: "";
+  width: 7px;
+  height: 7px;
+  flex: 0 0 auto;
+  border-radius: 50%;
+  background: #f13249;
+  box-shadow: 0 0 0 4px rgba(241, 50, 73, 0.14);
+}
+
+.launcher:hover {
+  translate: 0 -2px;
+  border-color: rgba(255, 255, 255, 0.38) !important;
+  box-shadow:
+    0 24px 60px rgba(1, 11, 26, 0.46),
+    inset 0 1px 0 rgba(255, 255, 255, 0.17) !important;
+}
+
+.launcher:focus-visible {
+  outline: 3px solid rgba(79, 148, 225, 0.58) !important;
+  outline-offset: 3px !important;
+}
+
+@media (max-width: 640px) {
+  .launcher {
+    right: max(12px, env(safe-area-inset-right)) !important;
+    bottom: max(12px, env(safe-area-inset-bottom)) !important;
+    min-height: 43px !important;
+    padding: 0 14px !important;
+    font-size: 0.81rem !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .launcher {
+    transition: none !important;
+  }
+}
