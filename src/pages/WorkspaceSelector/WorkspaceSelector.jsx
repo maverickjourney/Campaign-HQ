@@ -36,28 +36,13 @@ import {
 
 import styles from "./WorkspaceSelector.module.css";
 
-const LAST_OPENED_KEY =
-  "campaignSeat.workspaceLastOpened";
+const lastOpenedWorkspaceMemory =
+  new Map();
 
 function readLastOpenedWorkspaces() {
-  try {
-    const value =
-      window.localStorage.getItem(
-        LAST_OPENED_KEY,
-      );
-
-    const parsed =
-      value
-        ? JSON.parse(value)
-        : {};
-
-    return parsed &&
-      typeof parsed === "object"
-      ? parsed
-      : {};
-  } catch {
-    return {};
-  }
+  return Object.fromEntries(
+    lastOpenedWorkspaceMemory,
+  );
 }
 
 function saveLastOpenedWorkspace(
@@ -68,22 +53,20 @@ function saveLastOpenedWorkspace(
     return current;
   }
 
-  const next = {
+  const openedAt =
+    new Date().toISOString();
+
+  // Keep workspace recency only in memory for the current app session.
+  // Workspace identifiers are never persisted to browser storage.
+  lastOpenedWorkspaceMemory.set(
+    workspaceId,
+    openedAt,
+  );
+
+  return {
     ...current,
-    [workspaceId]:
-      new Date().toISOString(),
+    [workspaceId]: openedAt,
   };
-
-  try {
-    window.localStorage.setItem(
-      LAST_OPENED_KEY,
-      JSON.stringify(next),
-    );
-  } catch {
-    // Opening the workspace still works when storage is unavailable.
-  }
-
-  return next;
 }
 
 function formatLastOpened(value) {
