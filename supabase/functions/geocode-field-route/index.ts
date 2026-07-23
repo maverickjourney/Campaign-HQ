@@ -2,13 +2,81 @@ import {
   createClient,
 } from "npm:@supabase/supabase-js@2.110.2";
 import {
-  corsHeaders,
+  corsHeaders as supabaseCorsHeaders,
 } from "npm:@supabase/supabase-js@2.110.2/cors";
 
-const JSON_HEADERS = {
-  ...corsHeaders,
-  "Content-Type": "application/json",
-};
+const ALLOWED_ORIGINS = new Set([
+  "https://campaignseat.com",
+  "https://www.campaignseat.com",
+  "http://localhost:5173",
+  "http://localhost:5174",
+]);
+
+function isAllowedOrigin(
+  origin: string,
+): boolean {
+  if (
+    ALLOWED_ORIGINS.has(
+      origin,
+    )
+  ) {
+    return true;
+  }
+
+  try {
+    const parsedOrigin =
+      new URL(origin);
+
+    return (
+      parsedOrigin.protocol ===
+        "http:" &&
+      [
+        "localhost",
+        "127.0.0.1",
+        "[::1]",
+      ].includes(
+        parsedOrigin.hostname,
+      )
+    );
+  } catch {
+    return false;
+  }
+}
+
+function getCorsHeaders(
+  request: Request,
+): Record<string, string> {
+  const requestOrigin =
+    request.headers.get(
+      "origin",
+    ) || "";
+
+  const allowedOrigin =
+    isAllowedOrigin(
+      requestOrigin,
+    )
+      ? requestOrigin
+      : "https://campaignseat.com";
+
+  return {
+    ...supabaseCorsHeaders,
+
+    "Access-Control-Allow-Origin":
+      allowedOrigin,
+
+    "Access-Control-Allow-Methods":
+      "POST, OPTIONS",
+
+    "Access-Control-Max-Age":
+      "86400",
+
+    "Cache-Control":
+      "no-store",
+
+    "Vary":
+      "Origin",
+  };
+}
 
 const MAX_STOPS_PER_RUN = 100;
 const CONCURRENCY = 4;
@@ -40,17 +108,25 @@ type GeocodeResult = {
   reason?: string;
 };
 
-function jsonResponse(
-  body: Record<string, unknown>,
-  status = 200,
+function createJsonResponse(
+  corsHeaders: Record<string, string>,
 ) {
-  return new Response(
-    JSON.stringify(body),
-    {
-      status,
-      headers: JSON_HEADERS,
-    },
-  );
+  return function jsonResponse(
+    body: Record<string, unknown>,
+    status = 200,
+  ) {
+    return new Response(
+      JSON.stringify(body),
+      {
+        status,
+        headers: {
+          ...corsHeaders,
+          "Content-Type":
+            "application/json",
+        },
+      },
+    );
+  };
 }
 
 function isUuid(value: unknown) {
@@ -337,6 +413,14 @@ function leadershipApproved(
 
 Deno.serve(
   async (request) => {
+    const corsHeaders =
+      getCorsHeaders(request);
+
+    const jsonResponse =
+      createJsonResponse(
+        corsHeaders,
+      );
+
     if (
       request.method ===
       "OPTIONS"
