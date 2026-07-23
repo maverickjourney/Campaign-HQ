@@ -1165,3 +1165,112 @@
     min-height: 64px;
   }
 }
+
+/* CAMPAIGN SEAT CLEAN MAIN WORKSPACE — START */
+
+.page {
+  width: 100%;
+  min-height: 100dvh !important;
+  height: 100dvh !important;
+  max-height: none !important;
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+  overscroll-behavior-y: auto;
+}
+
+.main,
+.workspaceGrid {
+  min-height: 0 !important;
+  height: auto !important;
+  max-height: none !important;
+  overflow: visible !important;
+}
+
+.main {
+  padding-bottom: 40px !important;
+}
+
+.campaignCard {
+  height: auto !important;
+  max-height: none !important;
+}
+
+.cardFooter {
+  position: relative !important;
+  inset: auto !important;
+}
+
+.footer {
+  position: relative !important;
+  inset: auto !important;
+  padding-bottom: 24px !important;
+}
+
+.lastOpened {
+  display: block;
+  margin-top: 4px;
+  color: rgba(255, 255, 255, 0.62);
+  font-size: 10px;
+  font-weight: 650;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.membershipBadge {
+  min-width: 178px;
+  justify-content: center;
+  white-space: nowrap;
+}
+
+.sidePanel[hidden] {
+  display: none !important;
+}
+
+.multipleMain {
+  grid-template-columns: minmax(0, 1fr) !important;
+}
+
+.multipleMain .workspaceGrid {
+  display: grid;
+  grid-template-columns:
+    repeat(2, minmax(0, 1fr));
+  gap: 22px;
+}
+
+.multipleMain .campaignCard {
+  min-height: 500px !important;
+}
+
+@media (min-width: 1081px) {
+  .sidePanel {
+    padding-top: 116px !important;
+  }
+}
+
+@media (max-width: 1280px) {
+  .multipleMain .workspaceGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 1080px) {
+  .sidePanel {
+    padding-top: 0 !important;
+  }
+
+  .multipleMain .campaignCard {
+    min-height: 520px !important;
+  }
+}
+
+@media (max-width: 720px) {
+  .membershipBadge {
+    min-width: 0;
+  }
+
+  .multipleMain .campaignCard {
+    min-height: 0 !important;
+  }
+}
+
+/* CAMPAIGN SEAT CLEAN MAIN WORKSPACE — END */
