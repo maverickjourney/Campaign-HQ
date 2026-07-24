@@ -2486,3 +2486,37 @@
     z-index: 70 !important;
   }
 }
+
+/* Dashboard foundation: truthful loading and empty states. */
+.emptyState {
+  display: flex;
+  min-height: 112px;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 6px;
+  padding: 22px;
+  border: 1px dashed rgba(15, 46, 82, 0.16);
+  border-radius: 16px;
+  color: #6b7f96;
+  background: rgba(244, 248, 252, 0.62);
+  text-align: center;
+}
+
+.emptyState strong {
+  color: #183552;
+  font-size: 0.86rem;
+}
+
+.emptyState p {
+  max-width: 320px;
+  margin: 0;
+  font-size: 0.75rem;
+  line-height: 1.5;
+}
+
+.primaryPanelButton:disabled {
+  cursor: default;
+  opacity: 0.58;
+  transform: none;
+}
