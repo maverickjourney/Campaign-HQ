@@ -54,3 +54,10 @@ campaign-font-audit.txt
 
 # Supabase CLI temporary state
 supabase/.temp/
+
+# BEGIN CAMPAIGN HQ LOCAL DOCS
+# Locally generated architecture / security documentation (not shipped).
+docs/Campaign-HQ-Architecture.html
+docs/Campaign-HQ-Security-Audit.html
+docs/Campaign-HQ-Security-Briefing.html
+# END CAMPAIGN HQ LOCAL DOCS
