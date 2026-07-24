@@ -1,0 +1,5173 @@
+.app {
+  display: flex;
+  width: 100%;
+  height: 100vh;
+  overflow: hidden;
+  color: #102845;
+  background:
+    radial-gradient(circle at 52% 0%, rgba(60, 105, 157, 0.07), transparent 34%),
+    linear-gradient(180deg, #f5f7fa 0%, #edf2f7 100%);
+}
+
+.sidebar {
+  position: relative;
+  z-index: 50;
+  display: flex;
+  width: 242px;
+  height: 100%;
+  flex: 0 0 242px;
+  flex-direction: column;
+  color: #ffffff;
+  background:
+    radial-gradient(circle at 100% 0%, rgba(255, 255, 255, 0.12), transparent 28%),
+    linear-gradient(180deg, #b81523 0%, #7f0914 52%, #57070e 100%);
+  box-shadow: 10px 0 30px rgba(63, 7, 14, 0.12);
+}
+
+.sidebarBrand {
+  display: flex;
+  min-height: 98px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 22px 20px 18px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.sidebarBrand > div {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.sidebarBrand strong {
+  font-size: 1.05rem;
+  letter-spacing: -0.025em;
+}
+
+.sidebarBrand span {
+  color: rgba(255, 255, 255, 0.64);
+  font-size: 0.56rem;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.closeSidebar {
+  display: none;
+  width: 36px;
+  height: 36px;
+  place-items: center;
+  border-radius: 10px;
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.sidebarNavigation {
+  display: flex;
+  min-height: 0;
+  flex: 1;
+  flex-direction: column;
+  gap: 3px;
+  overflow-y: auto;
+  padding: 10px 12px 18px;
+}
+
+.sidebarNavigation > button {
+  display: flex;
+  width: 100%;
+  min-height: 39px;
+  align-items: center;
+  gap: 11px;
+  padding: 0 12px;
+  border-radius: 11px;
+  color: rgba(255, 255, 255, 0.76);
+  background: transparent;
+  text-align: left;
+  font-size: 0.71rem;
+  font-weight: 730;
+  transition:
+    color 0.2s ease,
+    background 0.2s ease,
+    transform 0.2s ease;
+}
+
+.sidebarNavigation > button:hover {
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.08);
+  transform: translateX(1px);
+}
+
+.sidebarNavigation > button.activeNavigation {
+  color: #ffffff;
+  background: linear-gradient(
+    90deg,
+    rgba(15, 57, 103, 0.96),
+    rgba(28, 76, 126, 0.9)
+  );
+  box-shadow:
+    inset 3px 0 #65b7ff,
+    0 8px 20px rgba(5, 24, 46, 0.18);
+}
+
+.sidebarNavigation > button small {
+  display: grid;
+  min-width: 22px;
+  height: 22px;
+  margin-left: auto;
+  place-items: center;
+  border-radius: 999px;
+  color: #ffffff;
+  background: #0d4e89;
+  font-size: 0.58rem;
+  font-weight: 900;
+}
+
+.navigationLabel {
+  margin: 14px 10px 5px;
+  color: rgba(255, 255, 255, 0.42);
+  font-size: 0.55rem;
+  font-weight: 900;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.connectedApps {
+  display: flex;
+  gap: 7px;
+  padding: 4px 8px 8px;
+}
+
+.connectedApps button {
+  display: grid;
+  width: 32px;
+  height: 32px;
+  place-items: center;
+  border: 1px solid rgba(255, 255, 255, 0.13);
+  border-radius: 9px;
+  color: rgba(255, 255, 255, 0.8);
+  background: rgba(4, 23, 45, 0.18);
+}
+
+.connectedApps button:hover {
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.sidebarProfile {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+  padding: 15px 17px;
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.profileAvatar {
+  display: grid;
+  width: 38px;
+  height: 38px;
+  place-items: center;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 50%;
+  color: #ffffff;
+  background: #164e82;
+  font-size: 0.65rem;
+  font-weight: 900;
+}
+
+.sidebarProfile > div {
+  min-width: 0;
+}
+
+.sidebarProfile strong,
+.sidebarProfile span {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.sidebarProfile strong {
+  font-size: 0.67rem;
+}
+
+.sidebarProfile > div span {
+  margin-top: 4px;
+  color: rgba(255, 255, 255, 0.58);
+  font-size: 0.57rem;
+}
+
+.workspace {
+  display: flex;
+  min-width: 0;
+  flex: 1;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.topbar {
+  display: grid;
+  min-height: 88px;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 16px;
+  padding: 14px 22px;
+  border-bottom: 1px solid #dfe6ee;
+  background: rgba(255, 255, 255, 0.96);
+  backdrop-filter: blur(18px);
+}
+
+.menuButton {
+  display: none;
+  width: 40px;
+  height: 40px;
+  place-items: center;
+  border: 1px solid #d5dee8;
+  border-radius: 11px;
+  color: #17446f;
+  background: #ffffff;
+}
+
+.greeting {
+  min-width: 0;
+}
+
+.greeting h1 {
+  margin: 0;
+  color: #102844;
+  font-size: clamp(1.35rem, 2vw, 2rem);
+  line-height: 1;
+  letter-spacing: -0.04em;
+}
+
+.greeting h1 span {
+  color: #ef3340;
+}
+
+.greeting p {
+  margin: 7px 0 0;
+  color: #6c8096;
+  font-size: 0.7rem;
+}
+
+.topbarActions {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 9px;
+}
+
+.workspaceSwitcher {
+  display: grid;
+  min-width: 235px;
+  height: 48px;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+  padding: 0 12px;
+  border: 1px solid #d7e0e9;
+  border-radius: 13px;
+  color: #173a5e;
+  background: #ffffff;
+  text-align: left;
+  box-shadow: 0 8px 20px rgba(16, 48, 81, 0.05);
+}
+
+.workspaceMark {
+  display: grid;
+  width: 32px;
+  height: 32px;
+  place-items: center;
+  border-radius: 50%;
+  color: #ffffff;
+  background: linear-gradient(135deg, #0f477c, #ef3340);
+  font-size: 0.58rem;
+  font-weight: 900;
+}
+
+.workspaceSwitcher > span:nth-child(2) {
+  min-width: 0;
+}
+
+.workspaceSwitcher strong,
+.workspaceSwitcher small {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.workspaceSwitcher strong {
+  font-size: 0.64rem;
+}
+
+.workspaceSwitcher small {
+  margin-top: 3px;
+  color: #71859a;
+  font-size: 0.55rem;
+}
+
+.main {
+  min-height: 0;
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px;
+}
+
+.errorBanner {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin-bottom: 12px;
+  padding: 11px 13px;
+  border: 1px solid #f0b8be;
+  border-radius: 11px;
+  color: #9b2430;
+  background: #fff1f2;
+  font-size: 0.68rem;
+  font-weight: 760;
+}
+
+.heroGrid {
+  display: grid;
+  grid-template-columns: minmax(580px, 1.75fr) minmax(340px, 0.92fr);
+  gap: 12px;
+}
+
+.heroCard,
+.scheduleCard,
+.compactCard,
+.lowerCard {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid #dbe4ed;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.98);
+  box-shadow:
+    0 14px 34px rgba(15, 48, 83, 0.07),
+    inset 0 1px #ffffff;
+}
+
+.heroCard {
+  display: grid;
+  min-height: 342px;
+  grid-template-columns: minmax(0, 1.32fr) minmax(270px, 0.84fr);
+  color: #ffffff;
+  background:
+    radial-gradient(circle at 18% 10%, rgba(70, 133, 205, 0.23), transparent 34%),
+    linear-gradient(135deg, #0c2a4d 0%, #0f3d6d 61%, #102f53 100%);
+}
+
+.heroCard::before {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  content: "";
+  background:
+    linear-gradient(120deg, transparent 52%, rgba(239, 51, 64, 0.15)),
+    radial-gradient(circle at 35% 100%, rgba(255, 255, 255, 0.06), transparent 34%);
+}
+
+.heroCopy {
+  position: relative;
+  z-index: 2;
+  padding: 22px 0 20px 24px;
+}
+
+.sectionEyebrow {
+  color: #a9c8e8;
+  font-size: 0.63rem;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.heroCopy h2 {
+  max-width: 590px;
+  margin: 12px 0 0;
+  font-size: clamp(1.82rem, 2.6vw, 3rem);
+  line-height: 1.02;
+  letter-spacing: -0.05em;
+}
+
+.heroCopy h2 strong {
+  color: #ff5965;
+}
+
+.heroCopy > p {
+  max-width: 530px;
+  margin: 12px 0 0;
+  color: rgba(255, 255, 255, 0.76);
+  font-size: 0.72rem;
+  line-height: 1.5;
+}
+
+.heroTags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  margin-top: 13px;
+}
+
+.heroTags span {
+  display: inline-flex;
+  min-height: 24px;
+  align-items: center;
+  padding: 0 10px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 999px;
+  color: rgba(255, 255, 255, 0.82);
+  background: rgba(255, 255, 255, 0.07);
+  font-size: 0.58rem;
+  font-weight: 800;
+}
+
+.heroStats {
+  display: grid;
+  grid-template-columns: 145px minmax(0, 1fr);
+  align-items: end;
+  gap: 24px;
+  margin-top: 17px;
+}
+
+.heroStats > div:first-child small,
+.heroStats > div:first-child span {
+  display: block;
+}
+
+.heroStats > div:first-child small {
+  color: #a9c2dc;
+  font-size: 0.57rem;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.heroStats > div:first-child strong {
+  display: block;
+  margin-top: 3px;
+  font-size: 2.5rem;
+  line-height: 1;
+  letter-spacing: -0.06em;
+}
+
+.heroStats > div:first-child span {
+  margin-top: 5px;
+  color: rgba(255, 255, 255, 0.66);
+  font-size: 0.58rem;
+}
+
+.readiness > div:first-child {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  color: rgba(255, 255, 255, 0.72);
+  font-size: 0.6rem;
+}
+
+.readiness > div:first-child strong {
+  color: #ffffff;
+}
+
+.progressTrack {
+  height: 7px;
+  margin-top: 7px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.16);
+}
+
+.progressTrack span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #ef3340, #ff7380);
+}
+
+.readiness > small {
+  display: block;
+  margin-top: 6px;
+  color: rgba(255, 255, 255, 0.55);
+  font-size: 0.54rem;
+}
+
+.heroActions {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 7px;
+  margin-top: 15px;
+}
+
+.heroActions button {
+  display: flex;
+  min-height: 38px;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  padding: 0 9px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 10px;
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.08);
+  font-size: 0.58rem;
+  font-weight: 800;
+}
+
+.heroActions button:hover {
+  background: rgba(255, 255, 255, 0.14);
+}
+
+.heroPortraitWrap {
+  position: relative;
+  z-index: 1;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.heroPortraitWrap::before {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  content: "";
+  background:
+    linear-gradient(90deg, #0e3762 0%, transparent 28%),
+    linear-gradient(180deg, transparent 62%, rgba(6, 23, 43, 0.28));
+}
+
+.heroPortrait {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 54% center;
+}
+
+.scheduleCard,
+.compactCard,
+.lowerCard {
+  padding: 16px;
+}
+
+.cardHeading {
+  display: flex;
+  min-height: 22px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.cardHeading > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  color: #173c62;
+  font-size: 0.63rem;
+  font-weight: 900;
+  letter-spacing: 0.045em;
+  text-transform: uppercase;
+}
+
+.cardHeading > span svg {
+  color: #ef3340;
+}
+
+.cardHeading button,
+.cardHeading > small {
+  color: #2b649d;
+  background: transparent;
+  font-size: 0.56rem;
+  font-weight: 820;
+}
+
+.scheduleTimeline {
+  position: relative;
+  display: grid;
+  gap: 2px;
+  margin-top: 13px;
+}
+
+.scheduleTimeline::before {
+  position: absolute;
+  top: 15px;
+  bottom: 15px;
+  left: 61px;
+  width: 1px;
+  content: "";
+  background: #d4dfe9;
+}
+
+.emptyTimeline::before {
+  display: none;
+}
+
+.scheduleTimeline > button {
+  position: relative;
+  display: grid;
+  min-height: 46px;
+  grid-template-columns: 47px 14px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 7px;
+  padding: 5px 7px;
+  border-radius: 9px;
+  color: #244564;
+  background: transparent;
+  text-align: left;
+}
+
+.scheduleTimeline > button:hover,
+.scheduleTimeline > button.activeSchedule {
+  background: #f5f8fb;
+}
+
+.scheduleTimeline > button.activeSchedule {
+  box-shadow: inset 3px 0 #ef3340;
+}
+
+.scheduleTimeline time {
+  color: #72869a;
+  font-size: 0.56rem;
+  font-weight: 850;
+}
+
+.timelineDot {
+  position: relative;
+  z-index: 1;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #6085ad;
+  box-shadow: 0 0 0 4px #ffffff;
+}
+
+.activeSchedule .timelineDot {
+  background: #ef3340;
+}
+
+.scheduleTimeline strong {
+  display: block;
+  overflow: hidden;
+  font-size: 0.63rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.scheduleTimeline small {
+  display: block;
+  overflow: hidden;
+  margin-top: 3px;
+  color: #7b8fa3;
+  font-size: 0.54rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.scheduleTimeline > button > svg {
+  color: #8b9cac;
+}
+
+.scheduleFooter {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin-top: 11px;
+  padding-top: 11px;
+  border-top: 1px solid #e5ebf1;
+  color: #9b6a14;
+  font-size: 0.56rem;
+  font-weight: 820;
+}
+
+.middleGrid {
+  display: grid;
+  grid-template-columns:
+    1.18fr
+    0.8fr
+    0.96fr
+    0.96fr
+    1.05fr;
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.bottomGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1.08fr 1.24fr;
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.compactCard {
+  min-height: 210px;
+}
+
+.lowerCard {
+  min-height: 220px;
+}
+
+.priorityList {
+  display: grid;
+  gap: 4px;
+  margin-top: 10px;
+}
+
+.priorityList button {
+  display: grid;
+  min-height: 37px;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 3px;
+  border-bottom: 1px solid #edf1f5;
+  color: #244563;
+  background: transparent;
+  text-align: left;
+}
+
+.priorityIcon {
+  display: grid;
+  width: 25px;
+  height: 25px;
+  place-items: center;
+  border-radius: 7px;
+  color: #2473b7;
+  background: #edf5fd;
+}
+
+.priorityIcon.high {
+  color: #cf2432;
+  background: #fff0f1;
+}
+
+.priorityIcon.medium {
+  color: #aa6a00;
+  background: #fff5df;
+}
+
+.priorityIcon.low {
+  color: #218154;
+  background: #eaf8f1;
+}
+
+.priorityList strong,
+.priorityList small {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.priorityList strong {
+  font-size: 0.58rem;
+}
+
+.priorityList small {
+  margin-top: 3px;
+  color: #7e90a2;
+  font-size: 0.49rem;
+}
+
+.priorityBadge {
+  padding: 3px 7px;
+  border-radius: 999px;
+  color: #2473b7;
+  background: #edf5fd;
+  font-size: 0.48rem;
+  font-weight: 900;
+  text-transform: capitalize;
+}
+
+.priorityBadge.high {
+  color: #cf2432;
+  background: #fff0f1;
+}
+
+.priorityBadge.medium {
+  color: #aa6a00;
+  background: #fff5df;
+}
+
+.priorityBadge.low {
+  color: #218154;
+  background: #eaf8f1;
+}
+
+.metricNumber {
+  margin-top: 24px;
+  color: #102b4a;
+  font-size: 2rem;
+  font-weight: 900;
+  letter-spacing: -0.055em;
+}
+
+.metricDescription {
+  margin: 3px 0 16px;
+  color: #74889c;
+  font-size: 0.61rem;
+}
+
+.communicationStats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.communicationStats span {
+  display: flex;
+  min-height: 58px;
+  justify-content: center;
+  flex-direction: column;
+  gap: 4px;
+  padding: 9px;
+  border: 1px solid #e4eaf0;
+  border-radius: 10px;
+  color: #8092a4;
+  background: #f8fafc;
+  font-size: 0.52rem;
+}
+
+.communicationStats strong {
+  color: #173b60;
+  font-size: 0.78rem;
+}
+
+.waitingMetric,
+.volunteerMetric,
+.approvalMetric {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin-top: 18px;
+}
+
+.waitingMetric strong,
+.volunteerMetric strong,
+.approvalMetric strong {
+  color: #102b4a;
+  font-size: 1.9rem;
+  letter-spacing: -0.055em;
+}
+
+.waitingMetric span,
+.volunteerMetric span,
+.approvalMetric span {
+  color: #75899d;
+  font-size: 0.56rem;
+}
+
+.waitingList,
+.approvalList {
+  display: grid;
+  gap: 2px;
+  margin-top: 10px;
+}
+
+.waitingList button,
+.approvalList button {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 7px 0;
+  border-top: 1px solid #e8edf2;
+  color: #294a69;
+  background: transparent;
+  text-align: left;
+}
+
+.waitingList button span,
+.approvalList button > span {
+  min-width: 0;
+}
+
+.waitingList button > span,
+.approvalList strong {
+  overflow: hidden;
+  font-size: 0.54rem;
+  font-weight: 760;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.waitingList button small,
+.approvalStatus {
+  flex: 0 0 auto;
+  color: #7f91a3;
+  font-size: 0.48rem;
+}
+
+.waitingList .overdue {
+  color: #d52735;
+}
+
+.healthLayout {
+  display: grid;
+  grid-template-columns: 86px minmax(0, 1fr);
+  align-items: center;
+  gap: 12px;
+  margin-top: 17px;
+}
+
+.healthRing {
+  display: grid;
+  width: 82px;
+  height: 82px;
+  place-items: center;
+  border-radius: 50%;
+}
+
+.healthRing > div {
+  display: grid;
+  width: 60px;
+  height: 60px;
+  place-content: center;
+  border-radius: 50%;
+  background: #ffffff;
+  box-shadow: inset 0 0 0 1px #e1e8ef;
+  text-align: center;
+}
+
+.healthRing strong {
+  color: #102d4e;
+  font-size: 1.25rem;
+}
+
+.healthRing span {
+  color: #d72836;
+  font-size: 0.48rem;
+  font-weight: 850;
+}
+
+.healthLayout > div:last-child {
+  display: grid;
+  gap: 7px;
+}
+
+.healthLayout > div:last-child span {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  color: #72869a;
+  font-size: 0.51rem;
+}
+
+.healthLayout > div:last-child strong {
+  color: #244463;
+  font-size: 0.51rem;
+}
+
+.activityList {
+  display: grid;
+  gap: 1px;
+  margin-top: 11px;
+}
+
+.activityList > div {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: start;
+  gap: 7px;
+  padding: 7px 0;
+  border-top: 1px solid #e9edf2;
+}
+
+.activityDot {
+  width: 7px;
+  height: 7px;
+  margin-top: 3px;
+  border-radius: 50%;
+  background: #ef3340;
+  box-shadow: 0 0 0 3px rgba(239, 51, 64, 0.09);
+}
+
+.activityList strong,
+.activityList small {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.activityList strong {
+  color: #284866;
+  font-size: 0.54rem;
+}
+
+.activityList small {
+  margin-top: 3px;
+  color: #8192a3;
+  font-size: 0.47rem;
+}
+
+.activityList time {
+  color: #8799aa;
+  font-size: 0.45rem;
+}
+
+.upcomingList {
+  display: grid;
+  gap: 4px;
+  margin-top: 12px;
+}
+
+.upcomingList button {
+  display: grid;
+  min-height: 50px;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: 9px;
+  padding: 5px 0;
+  border-top: 1px solid #e8edf2;
+  color: #294865;
+  background: transparent;
+  text-align: left;
+}
+
+.dateBadge {
+  display: grid;
+  width: 38px;
+  overflow: hidden;
+  border: 1px solid #dbe4ec;
+  border-radius: 8px;
+  background: #ffffff;
+  text-align: center;
+}
+
+.dateBadge small {
+  padding: 3px 2px;
+  color: #ffffff;
+  background: #ef3340;
+  font-size: 0.43rem;
+  font-weight: 900;
+}
+
+.dateBadge strong {
+  padding: 4px 2px;
+  color: #173b60;
+  font-size: 0.73rem;
+}
+
+.upcomingList button > span:last-child strong,
+.upcomingList button > span:last-child small {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.upcomingList button > span:last-child strong {
+  font-size: 0.56rem;
+}
+
+.upcomingList button > span:last-child small {
+  margin-top: 4px;
+  color: #7e91a3;
+  font-size: 0.47rem;
+}
+
+.coverageRow {
+  margin-top: 16px;
+}
+
+.coverageRow > span {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: #708499;
+  font-size: 0.53rem;
+}
+
+.coverageRow > span strong {
+  color: #173c62;
+}
+
+.coverageRow > div {
+  height: 8px;
+  margin-top: 7px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: #e5ebf1;
+}
+
+.coverageRow > div span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #174d7f, #ef3340);
+}
+
+.coverageRow > small {
+  display: block;
+  margin-top: 7px;
+  color: #8496a7;
+  font-size: 0.48rem;
+}
+
+.integrationState {
+  display: flex;
+  min-height: 165px;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 7px;
+  color: #72879a;
+  text-align: center;
+}
+
+.integrationState svg {
+  color: #2f6ea9;
+}
+
+.integrationState strong {
+  color: #244764;
+  font-size: 0.6rem;
+}
+
+.integrationState p {
+  max-width: 250px;
+  margin: 0;
+  font-size: 0.49rem;
+  line-height: 1.5;
+}
+
+.integrationState button {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  margin-top: 4px;
+  color: #1d5f9d;
+  background: transparent;
+  font-size: 0.5rem;
+  font-weight: 850;
+}
+
+.approvalList strong,
+.approvalList small {
+  display: block;
+}
+
+.approvalList button > span small {
+  margin-top: 3px;
+  color: #8294a5;
+  font-size: 0.45rem;
+}
+
+.approvalStatus {
+  padding: 3px 6px;
+  border-radius: 999px;
+  color: #c22330;
+  background: #fff0f1;
+  font-weight: 850;
+}
+
+.emptyState {
+  display: flex;
+  min-height: 205px;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 7px;
+  color: #7d91a5;
+  text-align: center;
+}
+
+.emptyState strong {
+  color: #284966;
+  font-size: 0.62rem;
+}
+
+.emptyState p {
+  margin: 0;
+  font-size: 0.5rem;
+}
+
+.emptyMini {
+  display: grid;
+  min-height: 90px;
+  place-items: center;
+  color: #8294a5;
+  font-size: 0.52rem;
+  text-align: center;
+}
+
+.tipBar {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 10px;
+  margin-top: 12px;
+  padding: 11px 13px;
+  border: 1px solid #dbe4ed;
+  border-radius: 13px;
+  color: #6d8296;
+  background: linear-gradient(90deg, #ffffff, #f7f9fb);
+  box-shadow: 0 10px 24px rgba(15, 48, 83, 0.05);
+  font-size: 0.58rem;
+}
+
+.tipBar > svg {
+  color: #ef3340;
+}
+
+.tipBar p {
+  margin: 0;
+}
+
+.tipBar strong {
+  color: #183d62;
+}
+
+.tipBar button {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  color: #1e5e9b;
+  background: transparent;
+  font-size: 0.52rem;
+  font-weight: 850;
+}
+
+.footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 14px 2px 1px;
+  color: #8999aa;
+  font-size: 0.5rem;
+}
+
+.sidebarScrim {
+  display: none;
+}
+
+@media (max-width: 1440px) {
+  .heroGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .scheduleCard {
+    min-height: auto;
+  }
+
+  .middleGrid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .bottomGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 1180px) {
+  .topbar {
+    grid-template-columns: auto 1fr;
+  }
+
+  .topbarActions {
+    grid-column: 1 / -1;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+  }
+
+  .middleGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .heroCard {
+    grid-template-columns: 1fr;
+  }
+
+  .heroPortraitWrap {
+    min-height: 310px;
+  }
+}
+
+@media (max-width: 900px) {
+  .sidebar {
+    position: fixed;
+    inset: 0 auto 0 0;
+    transform: translateX(-102%);
+    transition: transform 0.24s ease;
+  }
+
+  .sidebarOpen {
+    transform: translateX(0);
+  }
+
+  .closeSidebar,
+  .menuButton {
+    display: grid;
+  }
+
+  .sidebarScrim {
+    position: fixed;
+    z-index: 40;
+    inset: 0;
+    display: block;
+    background: rgba(7, 22, 39, 0.42);
+  }
+
+  .middleGrid,
+  .bottomGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 680px) {
+  .topbar {
+    padding: 13px;
+  }
+
+  .main {
+    padding: 12px;
+  }
+
+  .workspaceSwitcher {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .heroCopy {
+    padding: 18px;
+  }
+
+  .heroStats {
+    grid-template-columns: 1fr;
+  }
+
+  .heroActions {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .heroPortraitWrap {
+    min-height: 270px;
+  }
+
+  .tipBar {
+    grid-template-columns: auto 1fr;
+  }
+
+  .tipBar button {
+    grid-column: 1 / -1;
+    justify-self: flex-start;
+  }
+
+  .footer {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}
+
+/* REFERENCE MATCH OVERRIDES — START */
+
+/*
+ * Keeps the approved Campaign Seat red, navy, white and light-gray
+ * palette while matching the reference dashboard's tighter density,
+ * proportions, card hierarchy and single-screen command-center feel.
+ */
+
+.app {
+  background:
+    radial-gradient(
+      circle at 52% 0%,
+      rgba(32, 86, 141, 0.055),
+      transparent 32%
+    ),
+    linear-gradient(180deg, #f7f9fb 0%, #edf2f7 100%);
+}
+
+.sidebar {
+  width: 232px;
+  flex-basis: 232px;
+  box-shadow: 8px 0 24px rgba(76, 8, 16, 0.12);
+}
+
+.sidebarBrand {
+  min-height: 82px;
+  padding: 17px 17px 14px;
+}
+
+.sidebarBrand strong {
+  font-size: 0.96rem;
+}
+
+.sidebarBrand span {
+  font-size: 0.5rem;
+}
+
+.sidebarNavigation {
+  gap: 1px;
+  padding: 8px 10px 12px;
+}
+
+.sidebarNavigation > button {
+  min-height: 34px;
+  gap: 9px;
+  padding: 0 10px;
+  border-radius: 9px;
+  font-size: 0.64rem;
+}
+
+.sidebarNavigation > button small {
+  min-width: 20px;
+  height: 20px;
+  font-size: 0.53rem;
+}
+
+.navigationLabel {
+  margin: 11px 9px 4px;
+  font-size: 0.49rem;
+}
+
+.connectedApps {
+  gap: 6px;
+  padding: 3px 7px 6px;
+}
+
+.connectedApps button {
+  width: 29px;
+  height: 29px;
+  border-radius: 8px;
+}
+
+.sidebarProfile {
+  gap: 8px;
+  padding: 12px 14px;
+}
+
+.profileAvatar {
+  width: 34px;
+  height: 34px;
+  font-size: 0.59rem;
+}
+
+.sidebarProfile strong {
+  font-size: 0.61rem;
+}
+
+.sidebarProfile > div span {
+  margin-top: 3px;
+  font-size: 0.51rem;
+}
+
+.topbar {
+  min-height: 72px;
+  gap: 12px;
+  padding: 10px 16px;
+}
+
+.greeting h1 {
+  font-size: clamp(1.2rem, 1.65vw, 1.62rem);
+}
+
+.greeting p {
+  margin-top: 5px;
+  font-size: 0.62rem;
+}
+
+.topbarActions {
+  gap: 7px;
+}
+
+.workspaceSwitcher {
+  min-width: 214px;
+  height: 42px;
+  gap: 8px;
+  padding: 0 10px;
+  border-radius: 11px;
+}
+
+.workspaceMark {
+  width: 29px;
+  height: 29px;
+}
+
+.workspaceSwitcher strong {
+  font-size: 0.58rem;
+}
+
+.workspaceSwitcher small {
+  font-size: 0.49rem;
+}
+
+.main {
+  padding: 11px 12px 12px;
+}
+
+.heroGrid {
+  grid-template-columns:
+    minmax(620px, 1.82fr)
+    minmax(330px, 0.92fr);
+  gap: 10px;
+}
+
+.heroCard,
+.scheduleCard,
+.compactCard,
+.lowerCard {
+  border-radius: 12px;
+  box-shadow:
+    0 9px 24px rgba(15, 48, 83, 0.055),
+    inset 0 1px #ffffff;
+}
+
+.heroCard {
+  height: 326px;
+  min-height: 326px;
+  grid-template-columns:
+    minmax(0, 1.36fr)
+    minmax(270px, 0.84fr);
+}
+
+.heroCopy {
+  padding: 17px 0 14px 19px;
+}
+
+.sectionEyebrow {
+  font-size: 0.56rem;
+}
+
+.heroCopy h2 {
+  margin-top: 9px;
+  font-size: clamp(1.7rem, 2.15vw, 2.45rem);
+  line-height: 0.98;
+}
+
+.heroCopy > p {
+  max-width: 500px;
+  margin-top: 8px;
+  font-size: 0.62rem;
+  line-height: 1.42;
+}
+
+.heroTags {
+  gap: 5px;
+  margin-top: 9px;
+}
+
+.heroTags span {
+  min-height: 21px;
+  padding: 0 8px;
+  font-size: 0.5rem;
+}
+
+.heroStats {
+  grid-template-columns: 126px minmax(0, 1fr);
+  gap: 18px;
+  margin-top: 11px;
+}
+
+.heroStats > div:first-child small {
+  font-size: 0.5rem;
+}
+
+.heroStats > div:first-child strong {
+  font-size: 2.12rem;
+}
+
+.heroStats > div:first-child span {
+  margin-top: 3px;
+  font-size: 0.51rem;
+}
+
+.readiness > div:first-child {
+  font-size: 0.52rem;
+}
+
+.progressTrack {
+  height: 6px;
+  margin-top: 5px;
+}
+
+.readiness > small {
+  margin-top: 5px;
+  font-size: 0.48rem;
+}
+
+.heroActions {
+  gap: 6px;
+  margin-top: 10px;
+}
+
+.heroActions button {
+  min-height: 34px;
+  gap: 6px;
+  padding: 0 7px;
+  border-radius: 8px;
+  font-size: 0.51rem;
+}
+
+.heroPortrait {
+  object-position: 55% center;
+}
+
+.scheduleCard,
+.compactCard,
+.lowerCard {
+  padding: 13px;
+}
+
+.scheduleCard {
+  height: 326px;
+  min-height: 326px;
+}
+
+.cardHeading {
+  min-height: 18px;
+}
+
+.cardHeading > span {
+  gap: 6px;
+  font-size: 0.56rem;
+}
+
+.cardHeading button,
+.cardHeading > small {
+  font-size: 0.49rem;
+}
+
+.scheduleTimeline {
+  gap: 1px;
+  margin-top: 9px;
+}
+
+.scheduleTimeline::before {
+  top: 13px;
+  bottom: 13px;
+  left: 55px;
+}
+
+.scheduleTimeline > button {
+  min-height: 39px;
+  grid-template-columns: 42px 13px minmax(0, 1fr) auto;
+  gap: 6px;
+  padding: 4px 6px;
+  border-radius: 8px;
+}
+
+.scheduleTimeline time {
+  font-size: 0.5rem;
+}
+
+.scheduleTimeline strong {
+  font-size: 0.56rem;
+}
+
+.scheduleTimeline small {
+  margin-top: 2px;
+  font-size: 0.48rem;
+}
+
+.scheduleFooter {
+  gap: 6px;
+  margin-top: 8px;
+  padding-top: 8px;
+  font-size: 0.5rem;
+}
+
+.middleGrid {
+  grid-template-columns:
+    1.25fr
+    0.78fr
+    0.94fr
+    0.95fr
+    1.08fr;
+  gap: 9px;
+  margin-top: 9px;
+}
+
+.bottomGrid {
+  grid-template-columns:
+    1fr
+    1.02fr
+    1.08fr
+    1.22fr;
+  gap: 9px;
+  margin-top: 9px;
+}
+
+.compactCard {
+  min-height: 180px;
+  height: 180px;
+}
+
+.lowerCard {
+  min-height: 192px;
+  height: 192px;
+}
+
+.priorityList {
+  gap: 2px;
+  margin-top: 7px;
+}
+
+.priorityList button {
+  min-height: 31px;
+  gap: 6px;
+  padding: 3px 2px;
+}
+
+.priorityIcon {
+  width: 22px;
+  height: 22px;
+  border-radius: 6px;
+}
+
+.priorityList strong {
+  font-size: 0.51rem;
+}
+
+.priorityList small {
+  margin-top: 2px;
+  font-size: 0.43rem;
+}
+
+.priorityBadge {
+  padding: 2px 6px;
+  font-size: 0.42rem;
+}
+
+.metricNumber {
+  margin-top: 19px;
+  font-size: 1.72rem;
+}
+
+.metricDescription {
+  margin: 2px 0 12px;
+  font-size: 0.53rem;
+}
+
+.communicationStats {
+  gap: 6px;
+}
+
+.communicationStats span {
+  min-height: 48px;
+  gap: 3px;
+  padding: 7px;
+  border-radius: 8px;
+  font-size: 0.46rem;
+}
+
+.communicationStats strong {
+  font-size: 0.68rem;
+}
+
+.waitingMetric,
+.volunteerMetric,
+.approvalMetric {
+  gap: 6px;
+  margin-top: 13px;
+}
+
+.waitingMetric strong,
+.volunteerMetric strong,
+.approvalMetric strong {
+  font-size: 1.55rem;
+}
+
+.waitingMetric span,
+.volunteerMetric span,
+.approvalMetric span {
+  font-size: 0.49rem;
+}
+
+.waitingList,
+.approvalList {
+  margin-top: 7px;
+}
+
+.waitingList button,
+.approvalList button {
+  gap: 6px;
+  padding: 5px 0;
+}
+
+.waitingList button > span,
+.approvalList strong {
+  font-size: 0.48rem;
+}
+
+.waitingList button small,
+.approvalStatus {
+  font-size: 0.42rem;
+}
+
+.healthLayout {
+  grid-template-columns: 76px minmax(0, 1fr);
+  gap: 9px;
+  margin-top: 12px;
+}
+
+.healthRing {
+  width: 72px;
+  height: 72px;
+}
+
+.healthRing > div {
+  width: 52px;
+  height: 52px;
+}
+
+.healthRing strong {
+  font-size: 1.08rem;
+}
+
+.healthRing span {
+  font-size: 0.42rem;
+}
+
+.healthLayout > div:last-child {
+  gap: 5px;
+}
+
+.healthLayout > div:last-child span,
+.healthLayout > div:last-child strong {
+  font-size: 0.45rem;
+}
+
+.activityList {
+  margin-top: 8px;
+}
+
+.activityList > div {
+  gap: 6px;
+  padding: 5px 0;
+}
+
+.activityList strong {
+  font-size: 0.48rem;
+}
+
+.activityList small {
+  margin-top: 2px;
+  font-size: 0.41rem;
+}
+
+.activityList time {
+  font-size: 0.39rem;
+}
+
+.upcomingList {
+  gap: 2px;
+  margin-top: 8px;
+}
+
+.upcomingList button {
+  min-height: 42px;
+  gap: 7px;
+  padding: 3px 0;
+}
+
+.dateBadge {
+  width: 34px;
+  border-radius: 7px;
+}
+
+.dateBadge small {
+  font-size: 0.38rem;
+}
+
+.dateBadge strong {
+  font-size: 0.64rem;
+}
+
+.upcomingList button > span:last-child strong {
+  font-size: 0.5rem;
+}
+
+.upcomingList button > span:last-child small {
+  margin-top: 3px;
+  font-size: 0.41rem;
+}
+
+.coverageRow {
+  margin-top: 12px;
+}
+
+.coverageRow > span {
+  font-size: 0.46rem;
+}
+
+.coverageRow > div {
+  height: 6px;
+  margin-top: 5px;
+}
+
+.coverageRow > small {
+  margin-top: 5px;
+  font-size: 0.41rem;
+}
+
+.integrationState {
+  min-height: 139px;
+  gap: 5px;
+}
+
+.integrationState strong {
+  font-size: 0.53rem;
+}
+
+.integrationState p {
+  font-size: 0.42rem;
+}
+
+.integrationState button {
+  font-size: 0.44rem;
+}
+
+.emptyState {
+  min-height: 170px;
+  gap: 5px;
+}
+
+.emptyState strong {
+  font-size: 0.55rem;
+}
+
+.emptyState p {
+  font-size: 0.44rem;
+}
+
+.emptyMini {
+  min-height: 72px;
+  font-size: 0.46rem;
+}
+
+.tipBar {
+  gap: 8px;
+  margin-top: 9px;
+  padding: 8px 11px;
+  border-radius: 10px;
+  font-size: 0.5rem;
+}
+
+.tipBar button {
+  font-size: 0.46rem;
+}
+
+.footer {
+  padding: 9px 1px 0;
+  font-size: 0.43rem;
+}
+
+@media (min-width: 1450px) and (min-height: 820px) {
+  .main {
+    overflow-y: auto;
+  }
+}
+
+@media (max-width: 1440px) {
+  .heroGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .heroCard,
+  .scheduleCard {
+    height: auto;
+    min-height: 300px;
+  }
+
+  .middleGrid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .compactCard {
+    height: auto;
+    min-height: 178px;
+  }
+
+  .bottomGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .lowerCard {
+    height: auto;
+    min-height: 188px;
+  }
+}
+
+@media (max-width: 1180px) {
+  .heroCard {
+    grid-template-columns: 1fr;
+  }
+
+  .heroPortraitWrap {
+    min-height: 280px;
+  }
+}
+
+@media (max-width: 900px) {
+  .sidebar {
+    width: 242px;
+    flex-basis: 242px;
+  }
+}
+
+/* REFERENCE MATCH OVERRIDES — END */
+
+/* PRESENTATION SCHEDULE — START */
+
+.scheduleTimeline > button {
+  grid-template-columns:
+    43px
+    13px
+    minmax(0, 1fr)
+    auto;
+}
+
+.activeSchedule {
+  position: relative;
+  color: #b3202e;
+  background:
+    linear-gradient(
+      90deg,
+      rgba(239, 51, 64, 0.075),
+      rgba(29, 76, 126, 0.045)
+    ) !important;
+  box-shadow:
+    inset 3px 0 #ef3340,
+    0 5px 14px rgba(15, 48, 83, 0.04);
+}
+
+.activeSchedule strong {
+  color: #d02735;
+}
+
+.attendeeStack {
+  display: flex;
+  min-width: 62px;
+  align-items: center;
+  justify-content: flex-end;
+  padding-left: 8px;
+}
+
+.attendeeStack i {
+  display: grid;
+  width: 20px;
+  height: 20px;
+  margin-left: -5px;
+  place-items: center;
+  border: 2px solid #ffffff;
+  border-radius: 50%;
+  color: #ffffff;
+  background:
+    linear-gradient(
+      135deg,
+      #164e82,
+      #ef3340
+    );
+  box-shadow: 0 3px 8px rgba(15, 48, 83, 0.12);
+  font-size: 0.38rem;
+  font-style: normal;
+  font-weight: 900;
+}
+
+.attendeeStack i:nth-child(2) {
+  background:
+    linear-gradient(
+      135deg,
+      #7b2533,
+      #123f6d
+    );
+}
+
+.attendeeStack i:nth-child(3) {
+  background:
+    linear-gradient(
+      135deg,
+      #365f8b,
+      #b8202d
+    );
+}
+
+.attendeeStack i:last-child {
+  background: #6f8092;
+}
+
+.phoneAction {
+  display: grid;
+  width: 27px;
+  height: 27px;
+  place-items: center;
+  border-radius: 50%;
+  color: #ef3340;
+  background: rgba(239, 51, 64, 0.1);
+}
+
+.scheduleConflict {
+  color: #a86c09;
+}
+
+.scheduleConflict button {
+  margin-left: auto;
+  color: #255f98;
+  background: transparent;
+  font-size: inherit;
+  font-weight: 850;
+}
+
+.scheduleConflict button:hover {
+  color: #d02735;
+}
+
+/* PRESENTATION SCHEDULE — END */
+
+/* ACCESSIBLE SMALL TEXT — START */
+
+/*
+ * Text-only accessibility adjustment.
+ * Card dimensions and dashboard proportions remain unchanged.
+ */
+
+.sidebarNavigation > button {
+  font-size: 0.84rem;
+  line-height: 1.35;
+}
+
+.navigationLabel {
+  font-size: 0.66rem;
+  letter-spacing: 0.09em;
+}
+
+.sidebarProfile strong {
+  font-size: 0.75rem;
+}
+
+.sidebarProfile > div span {
+  font-size: 0.67rem;
+}
+
+.greeting p {
+  color: #526b84;
+  font-size: 0.78rem;
+  line-height: 1.45;
+}
+
+.workspaceSwitcher strong {
+  font-size: 0.72rem;
+}
+
+.workspaceSwitcher small {
+  color: #5f768d;
+  font-size: 0.64rem;
+}
+
+.sectionEyebrow {
+  font-size: 0.7rem;
+}
+
+.heroCopy > p {
+  font-size: 0.8rem;
+  line-height: 1.5;
+}
+
+.heroTags span {
+  font-size: 0.65rem;
+}
+
+.heroStats > div:first-child small {
+  font-size: 0.65rem;
+}
+
+.heroStats > div:first-child span {
+  font-size: 0.66rem;
+}
+
+.readiness > div:first-child {
+  font-size: 0.68rem;
+}
+
+.readiness > small {
+  font-size: 0.61rem;
+  line-height: 1.4;
+}
+
+.heroActions button {
+  font-size: 0.69rem;
+}
+
+.cardHeading > span {
+  font-size: 0.75rem;
+}
+
+.cardHeading button,
+.cardHeading > small {
+  font-size: 0.66rem;
+}
+
+.scheduleTimeline time {
+  color: #536f8a;
+  font-size: 0.69rem;
+}
+
+.scheduleTimeline strong {
+  font-size: 0.75rem;
+}
+
+.scheduleTimeline small {
+  color: #607890;
+  font-size: 0.66rem;
+  line-height: 1.35;
+}
+
+.scheduleFooter {
+  font-size: 0.68rem;
+}
+
+.priorityList strong {
+  font-size: 0.72rem;
+}
+
+.priorityList small {
+  color: #61778d;
+  font-size: 0.63rem;
+  line-height: 1.35;
+}
+
+.priorityBadge {
+  font-size: 0.59rem;
+}
+
+.metricDescription {
+  color: #60778e;
+  font-size: 0.71rem;
+}
+
+.communicationStats span {
+  color: #62798f;
+  font-size: 0.64rem;
+}
+
+.communicationStats strong {
+  font-size: 0.88rem;
+}
+
+.waitingMetric span,
+.volunteerMetric span,
+.approvalMetric span {
+  color: #61778d;
+  font-size: 0.67rem;
+}
+
+.waitingList button > span,
+.approvalList strong {
+  font-size: 0.69rem;
+}
+
+.waitingList button small,
+.approvalStatus {
+  font-size: 0.61rem;
+}
+
+.healthLayout > div:last-child span,
+.healthLayout > div:last-child strong {
+  font-size: 0.67rem;
+}
+
+.activityList strong {
+  font-size: 0.69rem;
+}
+
+.activityList small {
+  color: #60778d;
+  font-size: 0.61rem;
+}
+
+.activityList time {
+  color: #647a90;
+  font-size: 0.58rem;
+}
+
+.upcomingList button > span:last-child strong {
+  font-size: 0.69rem;
+}
+
+.upcomingList button > span:last-child small {
+  color: #60778d;
+  font-size: 0.61rem;
+}
+
+.coverageRow > span {
+  font-size: 0.67rem;
+}
+
+.coverageRow > small {
+  color: #60778d;
+  font-size: 0.6rem;
+}
+
+.integrationState strong {
+  font-size: 0.71rem;
+}
+
+.integrationState p {
+  color: #60778d;
+  font-size: 0.62rem;
+  line-height: 1.5;
+}
+
+.integrationState button {
+  font-size: 0.65rem;
+}
+
+.emptyState strong {
+  font-size: 0.72rem;
+}
+
+.emptyState p,
+.emptyMini {
+  color: #60778d;
+  font-size: 0.63rem;
+  line-height: 1.45;
+}
+
+.tipBar {
+  font-size: 0.68rem;
+}
+
+.tipBar button {
+  font-size: 0.64rem;
+}
+
+.footer {
+  color: #687e94;
+  font-size: 0.61rem;
+}
+
+/* ACCESSIBLE SMALL TEXT — END */
+
+/* RESPONSIVE SCROLL ACCESSIBILITY — START */
+
+/*
+ * Desktop cards scroll internally when their content exceeds the
+ * available space. Smaller screens use natural card height and
+ * page scrolling so no content is hidden.
+ */
+
+.workspace,
+.main,
+.heroGrid,
+.middleGrid,
+.bottomGrid,
+.heroCard,
+.scheduleCard,
+.compactCard,
+.lowerCard {
+  min-width: 0;
+}
+
+.main {
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior-y: contain;
+  scrollbar-gutter: stable;
+  -webkit-overflow-scrolling: touch;
+}
+
+.scheduleCard,
+.compactCard,
+.lowerCard {
+  display: flex;
+  min-height: 0;
+  flex-direction: column;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+}
+
+.scheduleCard:focus-visible,
+.compactCard:focus-visible,
+.lowerCard:focus-visible {
+  outline: 3px solid rgba(34, 104, 170, 0.42);
+  outline-offset: 2px;
+}
+
+.scheduleCard > .cardHeading,
+.compactCard > .cardHeading,
+.lowerCard > .cardHeading {
+  position: sticky;
+  z-index: 5;
+  top: 0;
+  flex: 0 0 auto;
+  padding-bottom: 8px;
+  background:
+    linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 1) 0%,
+      rgba(255, 255, 255, 0.97) 78%,
+      rgba(255, 255, 255, 0) 100%
+    );
+}
+
+.scheduleTimeline,
+.priorityList,
+.waitingList,
+.activityList,
+.upcomingList,
+.approvalList,
+.communicationStats,
+.healthLayout,
+.coverageRow,
+.integrationState {
+  min-width: 0;
+  flex: 0 0 auto;
+}
+
+/* Prevent operational text from being cut off with ellipses. */
+.scheduleTimeline strong,
+.scheduleTimeline small,
+.priorityList strong,
+.priorityList small,
+.waitingList button > span,
+.approvalList strong,
+.approvalList button > span small,
+.activityList strong,
+.activityList small,
+.upcomingList button > span:last-child strong,
+.upcomingList button > span:last-child small {
+  overflow: visible;
+  max-width: 100%;
+  text-overflow: clip;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  word-break: normal;
+}
+
+.scheduleTimeline strong,
+.priorityList strong,
+.waitingList button > span,
+.approvalList strong,
+.activityList strong,
+.upcomingList button > span:last-child strong {
+  line-height: 1.35;
+}
+
+.scheduleTimeline small,
+.priorityList small,
+.approvalList button > span small,
+.activityList small,
+.upcomingList button > span:last-child small {
+  line-height: 1.45;
+}
+
+.priorityList button,
+.waitingList button,
+.approvalList button,
+.upcomingList button {
+  align-items: flex-start;
+}
+
+.priorityList button > span:nth-child(2),
+.waitingList button > span:first-child,
+.approvalList button > span:first-child,
+.upcomingList button > span:last-child,
+.activityList > div > span:nth-child(2),
+.scheduleTimeline > button > span:nth-child(3) {
+  min-width: 0;
+}
+
+/* Clear, visible scrollbars for mouse and trackpad users. */
+.scheduleCard,
+.compactCard,
+.lowerCard,
+.main {
+  scrollbar-width: thin;
+  scrollbar-color: #8da3b8 #edf2f7;
+}
+
+.scheduleCard::-webkit-scrollbar,
+.compactCard::-webkit-scrollbar,
+.lowerCard::-webkit-scrollbar,
+.main::-webkit-scrollbar {
+  width: 9px;
+  height: 9px;
+}
+
+.scheduleCard::-webkit-scrollbar-track,
+.compactCard::-webkit-scrollbar-track,
+.lowerCard::-webkit-scrollbar-track,
+.main::-webkit-scrollbar-track {
+  border-radius: 999px;
+  background: #edf2f7;
+}
+
+.scheduleCard::-webkit-scrollbar-thumb,
+.compactCard::-webkit-scrollbar-thumb,
+.lowerCard::-webkit-scrollbar-thumb,
+.main::-webkit-scrollbar-thumb {
+  border: 2px solid #edf2f7;
+  border-radius: 999px;
+  background: #8da3b8;
+}
+
+.scheduleCard::-webkit-scrollbar-thumb:hover,
+.compactCard::-webkit-scrollbar-thumb:hover,
+.lowerCard::-webkit-scrollbar-thumb:hover,
+.main::-webkit-scrollbar-thumb:hover {
+  background: #607c98;
+}
+
+/* Medium desktop and laptop screens. */
+@media (max-width: 1500px) {
+  .heroGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .heroCard,
+  .scheduleCard {
+    height: auto;
+    min-height: 360px;
+  }
+
+  .scheduleCard,
+  .compactCard,
+  .lowerCard {
+    overflow-y: visible;
+  }
+
+  .scheduleCard > .cardHeading,
+  .compactCard > .cardHeading,
+  .lowerCard > .cardHeading {
+    position: static;
+    padding-bottom: 0;
+    background: transparent;
+  }
+
+  .middleGrid {
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+  }
+
+  .bottomGrid {
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+  }
+
+  .compactCard,
+  .lowerCard {
+    height: auto;
+    min-height: 230px;
+  }
+}
+
+/* Smaller laptops and tablets use the off-canvas navigation. */
+@media (max-width: 1100px) {
+  .sidebar {
+    position: fixed;
+    z-index: 70;
+    inset: 0 auto 0 0;
+    width: min(290px, 86vw);
+    height: 100dvh;
+    flex-basis: auto;
+    transform: translateX(-102%);
+    transition: transform 0.24s ease;
+  }
+
+  .sidebarOpen {
+    transform: translateX(0);
+  }
+
+  .closeSidebar,
+  .menuButton {
+    display: grid;
+  }
+
+  .sidebarScrim {
+    position: fixed;
+    z-index: 60;
+    inset: 0;
+    display: block;
+    background: rgba(7, 22, 39, 0.48);
+    backdrop-filter: blur(2px);
+  }
+
+  .topbar {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+
+  .topbarActions {
+    grid-column: 1 / -1;
+    width: 100%;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+  }
+
+  .workspaceSwitcher {
+    min-width: 220px;
+  }
+
+  .heroCard {
+    grid-template-columns: 1fr;
+  }
+
+  .heroPortraitWrap {
+    min-height: 330px;
+  }
+
+  .heroCopy {
+    padding-right: 22px;
+  }
+}
+
+/* Tablets and narrow windows. */
+@media (max-width: 760px) {
+  .topbar {
+    gap: 12px;
+    padding: 14px;
+  }
+
+  .greeting {
+    min-width: 0;
+  }
+
+  .greeting h1 {
+    font-size: 1.55rem;
+    line-height: 1.1;
+  }
+
+  .topbarActions {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .workspaceSwitcher {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .main {
+    padding: 12px;
+  }
+
+  .middleGrid,
+  .bottomGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .heroCard,
+  .scheduleCard,
+  .compactCard,
+  .lowerCard {
+    width: 100%;
+    height: auto;
+    min-height: 0;
+    overflow: visible;
+  }
+
+  .heroCopy {
+    padding: 22px;
+  }
+
+  .heroCopy h2 {
+    font-size: clamp(2rem, 10vw, 2.75rem);
+  }
+
+  .heroStats {
+    grid-template-columns: 1fr;
+  }
+
+  .heroActions {
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+  }
+
+  .heroPortraitWrap {
+    min-height: 285px;
+  }
+
+  .scheduleTimeline::before {
+    left: 69px;
+  }
+
+  .scheduleTimeline > button {
+    grid-template-columns:
+      56px
+      16px
+      minmax(0, 1fr)
+      auto;
+  }
+
+  .attendeeStack {
+    min-width: 58px;
+  }
+
+  .attendeeStack i {
+    width: 22px;
+    height: 22px;
+  }
+
+  .footer {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}
+
+/* Phones. */
+@media (max-width: 520px) {
+  .topbar {
+    grid-template-columns: auto 1fr;
+  }
+
+  .greeting h1 {
+    font-size: 1.35rem;
+  }
+
+  .greeting p {
+    font-size: 0.72rem;
+  }
+
+  .heroCopy {
+    padding: 18px;
+  }
+
+  .heroCopy h2 {
+    font-size: 2rem;
+  }
+
+  .heroActions {
+    grid-template-columns: 1fr;
+  }
+
+  .heroActions button {
+    justify-content: flex-start;
+    padding: 0 14px;
+  }
+
+  .scheduleCard,
+  .compactCard,
+  .lowerCard {
+    padding: 15px;
+    border-radius: 14px;
+  }
+
+  .scheduleTimeline > button {
+    grid-template-columns:
+      52px
+      14px
+      minmax(0, 1fr);
+    padding: 8px 5px;
+  }
+
+  .scheduleTimeline > button > :last-child {
+    grid-column: 3;
+    justify-self: flex-start;
+    margin-top: 5px;
+  }
+
+  .scheduleTimeline::before {
+    left: 63px;
+  }
+
+  .priorityList button {
+    grid-template-columns:
+      auto
+      minmax(0, 1fr);
+  }
+
+  .priorityBadge {
+    grid-column: 2;
+    justify-self: flex-start;
+  }
+
+  .tipBar {
+    grid-template-columns: auto 1fr;
+  }
+
+  .tipBar button {
+    grid-column: 1 / -1;
+    justify-self: flex-start;
+  }
+}
+
+/* RESPONSIVE SCROLL ACCESSIBILITY — END */
+
+/* SPOTLIGHT REFERENCE MATCH — START */
+
+/*
+ * Matches the approved Campaign Spotlight reference:
+ * compact height, balanced portrait, tighter information
+ * hierarchy and one-line action controls.
+ */
+
+.heroCard {
+  height: 390px;
+  min-height: 390px;
+  grid-template-columns:
+    minmax(0, 1.42fr)
+    minmax(330px, 0.86fr);
+  border-radius: 17px;
+}
+
+.heroCopy {
+  display: flex;
+  min-width: 0;
+  justify-content: flex-start;
+  flex-direction: column;
+  padding: 20px 0 18px 22px;
+}
+
+.sectionEyebrow {
+  font-size: 0.63rem;
+  letter-spacing: 0.13em;
+}
+
+.heroCopy h2 {
+  max-width: 610px;
+  margin-top: 10px;
+  font-size: clamp(2rem, 2.45vw, 2.75rem);
+  line-height: 0.98;
+  letter-spacing: -0.052em;
+}
+
+.heroCopy > p {
+  max-width: 560px;
+  margin-top: 10px;
+  font-size: 0.69rem;
+  line-height: 1.45;
+}
+
+.heroTags {
+  gap: 6px;
+  margin-top: 11px;
+}
+
+.heroTags span {
+  min-height: 23px;
+  padding: 0 9px;
+  font-size: 0.55rem;
+}
+
+.heroStats {
+  grid-template-columns: 135px minmax(0, 1fr);
+  align-items: end;
+  gap: 22px;
+  margin-top: 14px;
+}
+
+.heroStats > div:first-child small {
+  font-size: 0.55rem;
+}
+
+.heroStats > div:first-child strong {
+  margin-top: 3px;
+  font-size: 2.5rem;
+  line-height: 0.95;
+}
+
+.heroStats > div:first-child span {
+  margin-top: 5px;
+  font-size: 0.56rem;
+}
+
+.readiness {
+  min-width: 0;
+}
+
+.readiness > div:first-child {
+  font-size: 0.58rem;
+}
+
+.progressTrack {
+  height: 7px;
+  margin-top: 6px;
+}
+
+.readiness > small {
+  margin-top: 5px;
+  font-size: 0.51rem;
+  line-height: 1.35;
+}
+
+.heroActions {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 7px;
+  margin-top: 14px;
+}
+
+.heroActions button {
+  min-width: 0;
+  min-height: 39px;
+  gap: 7px;
+  padding: 0 9px;
+  border-radius: 9px;
+  font-size: 0.57rem;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
+.heroActions button span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.heroActions button svg {
+  width: 16px;
+  height: 16px;
+  flex: 0 0 auto;
+}
+
+.heroPortraitWrap {
+  min-width: 0;
+  height: 390px;
+}
+
+.heroPortrait {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 53% center;
+}
+
+/* Standard laptops keep the reference composition. */
+@media (max-width: 1500px) and (min-width: 1101px) {
+  .heroCard {
+    height: 370px;
+    min-height: 370px;
+    grid-template-columns:
+      minmax(0, 1.35fr)
+      minmax(310px, 0.82fr);
+  }
+
+  .heroPortraitWrap {
+    height: 370px;
+  }
+
+  .heroCopy h2 {
+    font-size: clamp(1.85rem, 2.3vw, 2.5rem);
+  }
+
+  .heroCopy > p {
+    max-width: 500px;
+  }
+}
+
+/* Tablet layout stacks without hiding content. */
+@media (max-width: 1100px) {
+  .heroCard {
+    height: auto;
+    min-height: 0;
+    grid-template-columns: 1fr;
+  }
+
+  .heroCopy {
+    padding: 22px;
+  }
+
+  .heroPortraitWrap {
+    height: 330px;
+    min-height: 330px;
+  }
+
+  .heroPortrait {
+    object-position: center 24%;
+  }
+}
+
+/* Phone layout keeps every action readable. */
+@media (max-width: 620px) {
+  .heroCopy {
+    padding: 18px;
+  }
+
+  .heroCopy h2 {
+    font-size: 2rem;
+  }
+
+  .heroStats {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+
+  .heroActions {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .heroActions button {
+    justify-content: flex-start;
+    min-height: 43px;
+    padding: 0 12px;
+    font-size: 0.65rem;
+  }
+
+  .heroPortraitWrap {
+    height: 285px;
+    min-height: 285px;
+  }
+}
+
+/* SPOTLIGHT REFERENCE MATCH — END */
+
+/* THREE-COLUMN HEADER — START */
+
+/*
+ * Desktop command-center header:
+ * Top Priorities | Campaign Spotlight | Today’s Schedule
+ *
+ * All three cards share one aligned height. Top Priorities
+ * and Schedule scroll internally when their content exceeds
+ * the available space.
+ */
+
+.heroGrid {
+  display: grid;
+  grid-template-columns:
+    minmax(255px, 0.82fr)
+    minmax(530px, 1.68fr)
+    minmax(295px, 0.94fr);
+  align-items: stretch;
+  gap: 14px;
+}
+
+.heroPriorityCard,
+.heroCard,
+.scheduleCard {
+  width: 100%;
+  height: 390px;
+  min-height: 390px;
+  max-height: 390px;
+}
+
+.heroPriorityCard {
+  order: 1;
+  padding: 18px;
+  overflow-x: hidden;
+  overflow-y: auto;
+  border-radius: 17px;
+  scrollbar-gutter: stable;
+  overscroll-behavior: contain;
+}
+
+.heroCard {
+  order: 2;
+  grid-template-columns:
+    minmax(0, 1.3fr)
+    minmax(225px, 0.82fr);
+}
+
+.scheduleCard {
+  order: 3;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+.heroPriorityCard > .cardHeading {
+  position: sticky;
+  z-index: 6;
+  top: 0;
+  padding-bottom: 10px;
+  background:
+    linear-gradient(
+      180deg,
+      #ffffff 0%,
+      rgba(255, 255, 255, 0.98) 82%,
+      rgba(255, 255, 255, 0) 100%
+    );
+}
+
+.heroPriorityCard .priorityList {
+  gap: 4px;
+  margin-top: 10px;
+}
+
+.heroPriorityCard .priorityList button {
+  min-height: 0;
+  align-items: flex-start;
+  grid-template-columns:
+    auto
+    minmax(0, 1fr)
+    auto;
+  gap: 9px;
+  padding: 10px 2px;
+}
+
+.heroPriorityCard .priorityIcon {
+  width: 29px;
+  height: 29px;
+  margin-top: 1px;
+}
+
+.heroPriorityCard .priorityList strong {
+  font-size: 0.72rem;
+  line-height: 1.35;
+}
+
+.heroPriorityCard .priorityList small {
+  margin-top: 4px;
+  color: #60778d;
+  font-size: 0.62rem;
+  line-height: 1.45;
+}
+
+.heroPriorityCard .priorityBadge {
+  margin-top: 1px;
+  padding: 4px 8px;
+  font-size: 0.56rem;
+}
+
+.heroPriorityCard::-webkit-scrollbar,
+.scheduleCard::-webkit-scrollbar {
+  width: 8px;
+}
+
+.heroPriorityCard::-webkit-scrollbar-track,
+.scheduleCard::-webkit-scrollbar-track {
+  border-radius: 999px;
+  background: #edf2f7;
+}
+
+.heroPriorityCard::-webkit-scrollbar-thumb,
+.scheduleCard::-webkit-scrollbar-thumb {
+  border: 2px solid #edf2f7;
+  border-radius: 999px;
+  background: #8da3b8;
+}
+
+/* The remaining four operational cards fill the row below. */
+.middleGrid {
+  grid-template-columns:
+    repeat(4, minmax(0, 1fr));
+}
+
+/*
+ * Standard laptops retain all three top cards.
+ * The Spotlight actions move to two rows when horizontal
+ * space becomes limited, keeping the labels readable.
+ */
+@media (max-width: 1550px) and (min-width: 1181px) {
+  .heroGrid {
+    grid-template-columns:
+      minmax(225px, 0.8fr)
+      minmax(455px, 1.55fr)
+      minmax(255px, 0.9fr);
+    gap: 10px;
+  }
+
+  .heroPriorityCard,
+  .heroCard,
+  .scheduleCard {
+    height: 380px;
+    min-height: 380px;
+    max-height: 380px;
+  }
+
+  .heroCard {
+    grid-template-columns:
+      minmax(0, 1.2fr)
+      minmax(195px, 0.78fr);
+  }
+
+  .heroCopy {
+    padding:
+      18px
+      0
+      16px
+      18px;
+  }
+
+  .heroCopy h2 {
+    font-size:
+      clamp(
+        1.75rem,
+        2.15vw,
+        2.25rem
+      );
+  }
+
+  .heroCopy > p {
+    font-size: 0.65rem;
+  }
+
+  .heroActions {
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+  }
+
+  .heroActions button {
+    min-height: 36px;
+    white-space: normal;
+  }
+
+  .heroPortraitWrap {
+    height: 380px;
+  }
+
+  .middleGrid {
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+  }
+}
+
+/*
+ * Tablets and smaller laptops stack the three cards.
+ * No card or feature is hidden.
+ */
+@media (max-width: 1180px) {
+  .heroGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .heroPriorityCard,
+  .heroCard,
+  .scheduleCard {
+    width: 100%;
+    height: auto;
+    min-height: 0;
+    max-height: none;
+  }
+
+  .heroPriorityCard {
+    order: 1;
+    max-height: 420px;
+  }
+
+  .heroCard {
+    order: 2;
+  }
+
+  .scheduleCard {
+    order: 3;
+    max-height: 460px;
+  }
+
+  .heroPortraitWrap {
+    height: 330px;
+  }
+
+  .middleGrid {
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+  }
+}
+
+/* Phones use one full-width card per row. */
+@media (max-width: 720px) {
+  .heroPriorityCard,
+  .scheduleCard {
+    max-height: none;
+    overflow-y: visible;
+  }
+
+  .middleGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .heroPriorityCard .priorityList button {
+    grid-template-columns:
+      auto
+      minmax(0, 1fr);
+  }
+
+  .heroPriorityCard .priorityBadge {
+    grid-column: 2;
+    justify-self: flex-start;
+  }
+}
+
+/* THREE-COLUMN HEADER — END */
+
+/* SPOTLIGHT CONTENT FIT — START */
+
+/*
+ * Removes the readiness section and keeps the spotlight
+ * compact inside the three-column dashboard header.
+ */
+
+.heroCard {
+  grid-template-columns:
+    minmax(0, 1.42fr)
+    minmax(220px, 0.72fr);
+}
+
+.heroCopy {
+  min-width: 0;
+  padding:
+    20px
+    0
+    18px
+    20px;
+}
+
+.heroCopy h2 {
+  max-width: none;
+  margin-top: 10px;
+  font-size:
+    clamp(
+      1.58rem,
+      1.82vw,
+      1.95rem
+    );
+  line-height: 1;
+  letter-spacing: -0.045em;
+  white-space: nowrap;
+}
+
+.heroCopy h2 strong {
+  white-space: nowrap;
+}
+
+.heroCopy > p {
+  max-width: 520px;
+  margin-top: 12px;
+  font-size: 0.66rem;
+  line-height: 1.48;
+}
+
+.heroTags {
+  margin-top: 12px;
+}
+
+.heroStats {
+  display: block;
+  margin-top: 18px;
+}
+
+.heroStats > div:first-child {
+  display: grid;
+  grid-template-columns:
+    auto
+    minmax(0, 1fr);
+  align-items: end;
+  column-gap: 10px;
+  width: max-content;
+  max-width: 100%;
+}
+
+.heroStats > div:first-child small {
+  grid-column: 1 / -1;
+}
+
+.heroStats > div:first-child strong {
+  grid-column: 1;
+  margin-top: 3px;
+  font-size: 2.35rem;
+}
+
+.heroStats > div:first-child span {
+  grid-column: 2;
+  align-self: end;
+  margin-bottom: 5px;
+  font-size: 0.56rem;
+  white-space: nowrap;
+}
+
+.heroActions {
+  grid-template-columns:
+    repeat(4, minmax(0, 1fr));
+  gap: 7px;
+  margin-top: 18px;
+}
+
+.heroActions button {
+  min-width: 0;
+  min-height: 40px;
+  gap: 6px;
+  padding: 0 7px;
+  border-radius: 9px;
+  font-size: 0.54rem;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
+.heroActions button svg {
+  width: 16px;
+  height: 16px;
+  flex: 0 0 auto;
+}
+
+.heroActions button span {
+  display: block;
+  overflow: visible;
+  min-width: 0;
+  text-overflow: clip;
+  white-space: nowrap;
+}
+
+.heroPortraitWrap {
+  min-width: 0;
+}
+
+.heroPortrait {
+  object-position: 53% center;
+}
+
+/* Standard desktop and laptop widths. */
+@media (max-width: 1550px) and (min-width: 1181px) {
+  .heroCard {
+    grid-template-columns:
+      minmax(0, 1.38fr)
+      minmax(190px, 0.68fr);
+  }
+
+  .heroCopy {
+    padding:
+      18px
+      0
+      16px
+      17px;
+  }
+
+  .heroCopy h2 {
+    font-size:
+      clamp(
+        1.42rem,
+        1.65vw,
+        1.72rem
+      );
+  }
+
+  .heroCopy > p {
+    max-width: 455px;
+    font-size: 0.61rem;
+  }
+
+  .heroActions {
+    gap: 5px;
+  }
+
+  .heroActions button {
+    min-height: 38px;
+    padding: 0 5px;
+    font-size: 0.49rem;
+  }
+
+  .heroActions button svg {
+    width: 14px;
+    height: 14px;
+  }
+}
+
+/* Tablets stack the spotlight without hiding content. */
+@media (max-width: 1180px) {
+  .heroCard {
+    grid-template-columns: 1fr;
+  }
+
+  .heroCopy {
+    padding: 22px;
+  }
+
+  .heroCopy h2 {
+    font-size: 2.25rem;
+    white-space: normal;
+  }
+
+  .heroCopy h2 strong {
+    white-space: normal;
+  }
+
+  .heroStats > div:first-child {
+    width: auto;
+  }
+
+  .heroActions button {
+    font-size: 0.65rem;
+  }
+}
+
+/* Phones use stacked actions. */
+@media (max-width: 620px) {
+  .heroCopy {
+    padding: 18px;
+  }
+
+  .heroCopy h2 {
+    font-size: 2rem;
+  }
+
+  .heroStats > div:first-child {
+    display: block;
+  }
+
+  .heroStats > div:first-child span {
+    display: block;
+    margin-top: 5px;
+    white-space: normal;
+  }
+
+  .heroActions {
+    grid-template-columns: 1fr;
+  }
+
+  .heroActions button {
+    justify-content: flex-start;
+    min-height: 44px;
+    padding: 0 13px;
+    font-size: 0.7rem;
+  }
+}
+
+/* SPOTLIGHT CONTENT FIT — END */
+
+/* PRIORITIES REFERENCE MATCH — START */
+
+/*
+ * Compact reference-style priorities:
+ * five rows, one-line details, urgency badges and
+ * a monitoring message at the bottom.
+ */
+
+.heroPriorityCard {
+  display: flex;
+  padding: 16px;
+  flex-direction: column;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+.heroPriorityCard > .cardHeading {
+  position: sticky;
+  z-index: 7;
+  top: -1px;
+  min-height: 26px;
+  flex: 0 0 auto;
+  padding-bottom: 9px;
+  background:
+    linear-gradient(
+      180deg,
+      #ffffff 0%,
+      #ffffff 78%,
+      rgba(255, 255, 255, 0) 100%
+    );
+}
+
+.heroPriorityCard .cardHeading > span {
+  font-size: 0.72rem;
+}
+
+.heroPriorityCard .cardHeading button {
+  font-size: 0.62rem;
+}
+
+.heroPriorityCard .priorityList {
+  display: grid;
+  flex: 0 0 auto;
+  gap: 0;
+  margin-top: 5px;
+}
+
+.heroPriorityCard .priorityList button {
+  display: grid;
+  min-height: 53px;
+  grid-template-columns:
+    30px
+    minmax(0, 1fr)
+    auto;
+  align-items: center;
+  gap: 9px;
+  padding: 7px 5px;
+  border-bottom: 1px solid #e7edf3;
+  border-radius: 0;
+  color: #244563;
+  background: transparent;
+  text-align: left;
+}
+
+.heroPriorityCard .priorityList button:first-child {
+  padding-right: 8px;
+  padding-left: 8px;
+  border-radius: 10px;
+  background:
+    linear-gradient(
+      90deg,
+      rgba(28, 78, 127, 0.055),
+      rgba(239, 51, 64, 0.025)
+    );
+}
+
+.heroPriorityCard .priorityList button:hover {
+  background: #f5f8fb;
+}
+
+.heroPriorityCard .priorityIcon {
+  display: grid;
+  width: 28px;
+  height: 28px;
+  place-items: center;
+  border-radius: 8px;
+}
+
+.heroPriorityCard .priorityIcon.urgent {
+  color: #a96d00;
+  background: #fff4dc;
+}
+
+.heroPriorityCard .priorityIcon.high {
+  color: #385e83;
+  background: #edf3f8;
+}
+
+.heroPriorityCard .priorityIcon.medium {
+  color: #536d85;
+  background: #f0f4f7;
+}
+
+.heroPriorityCard .priorityIcon.low {
+  color: #1b7f54;
+  background: #eaf8f1;
+}
+
+.heroPriorityCard .priorityCopy {
+  display: block;
+  min-width: 0;
+}
+
+.heroPriorityCard .priorityList strong {
+  display: block;
+  overflow: hidden;
+  color: #244563;
+  font-size: 0.68rem;
+  font-weight: 820;
+  line-height: 1.3;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.heroPriorityCard .priorityList small {
+  display: block;
+  overflow: hidden;
+  margin-top: 3px;
+  color: #647b91;
+  font-size: 0.59rem;
+  line-height: 1.3;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.heroPriorityCard .priorityBadge {
+  min-width: 52px;
+  padding: 4px 8px;
+  border-radius: 999px;
+  font-size: 0.55rem;
+  font-weight: 900;
+  text-align: center;
+  text-transform: capitalize;
+}
+
+.heroPriorityCard .priorityBadge.urgent {
+  color: #ffffff;
+  background: #d92332;
+}
+
+.heroPriorityCard .priorityBadge.high {
+  color: #c52331;
+  background: #fff0f1;
+}
+
+.heroPriorityCard .priorityBadge.medium {
+  color: #9b6500;
+  background: #fff4dc;
+}
+
+.heroPriorityCard .priorityBadge.low {
+  color: #18774d;
+  background: #e7f8ef;
+}
+
+.priorityMonitoring {
+  position: sticky;
+  bottom: -1px;
+  display: flex;
+  min-height: 38px;
+  align-items: center;
+  gap: 8px;
+  margin-top: auto;
+  padding: 10px 5px 3px;
+  color: #557089;
+  background:
+    linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0),
+      #ffffff 25%
+    );
+  font-size: 0.61rem;
+}
+
+.priorityMonitoring svg {
+  flex: 0 0 auto;
+  color: #2c76bc;
+}
+
+.priorityMonitoring strong {
+  color: #27659f;
+}
+
+/* Laptops keep the compact five-row presentation. */
+@media (max-width: 1550px) and (min-width: 1181px) {
+  .heroPriorityCard {
+    padding: 14px;
+  }
+
+  .heroPriorityCard .priorityList button {
+    min-height: 50px;
+    gap: 7px;
+    padding: 6px 3px;
+  }
+
+  .heroPriorityCard .priorityIcon {
+    width: 26px;
+    height: 26px;
+  }
+
+  .heroPriorityCard .priorityList strong {
+    font-size: 0.62rem;
+  }
+
+  .heroPriorityCard .priorityList small {
+    font-size: 0.54rem;
+  }
+
+  .heroPriorityCard .priorityBadge {
+    min-width: 46px;
+    padding: 3px 6px;
+    font-size: 0.49rem;
+  }
+}
+
+/* Tablets and phones allow details to wrap naturally. */
+@media (max-width: 1180px) {
+  .heroPriorityCard .priorityList strong,
+  .heroPriorityCard .priorityList small {
+    overflow: visible;
+    text-overflow: clip;
+    white-space: normal;
+  }
+
+  .heroPriorityCard .priorityList button {
+    min-height: 58px;
+  }
+}
+
+@media (max-width: 560px) {
+  .heroPriorityCard .priorityList button {
+    grid-template-columns:
+      30px
+      minmax(0, 1fr);
+  }
+
+  .heroPriorityCard .priorityBadge {
+    grid-column: 2;
+    justify-self: flex-start;
+  }
+}
+
+/* PRIORITIES REFERENCE MATCH — END */
+
+/* EDITABLE SPOTLIGHT SHORTCUTS V2 — START */
+
+.heroShortcutArea {
+  position: relative;
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 13px;
+}
+
+.heroShortcutArea .heroActions {
+  display: grid;
+  grid-template-columns:
+    repeat(2, minmax(0, 1fr));
+  gap: 7px;
+  margin-top: 0;
+}
+
+.heroShortcutArea .heroActions button {
+  display: flex;
+  width: 100%;
+  min-width: 0;
+  min-height: 37px;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 8px;
+  padding: 0 11px;
+  border-radius: 9px;
+  font-size: 0.59rem;
+  line-height: 1.25;
+  white-space: normal;
+}
+
+.heroShortcutArea .heroActions button span {
+  overflow: visible;
+  min-width: 0;
+  text-align: left;
+  text-overflow: clip;
+  white-space: normal;
+}
+
+.editShortcutsButton {
+  display: inline-flex;
+  min-height: 25px;
+  align-items: center;
+  align-self: flex-end;
+  justify-content: center;
+  gap: 5px;
+  padding: 0 8px;
+  border: 1px solid rgba(255, 255, 255, 0.17);
+  border-radius: 7px;
+  color: rgba(255, 255, 255, 0.78);
+  background: rgba(255, 255, 255, 0.06);
+  font-size: 0.5rem;
+  font-weight: 820;
+}
+
+.editShortcutsButton:hover,
+.editShortcutsButton[aria-expanded="true"] {
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.13);
+}
+
+.shortcutEditor {
+  position: absolute;
+  z-index: 90;
+  right: 0;
+  bottom: 32px;
+  width: min(380px, 100%);
+  max-height: 330px;
+  overflow-y: auto;
+  padding: 14px;
+  border: 1px solid #d7e1eb;
+  border-radius: 14px;
+  color: #173b60;
+  background: #ffffff;
+  box-shadow:
+    0 22px 54px rgba(4, 23, 43, 0.32),
+    0 4px 14px rgba(4, 23, 43, 0.14);
+  scrollbar-width: thin;
+  scrollbar-color: #8da3b8 #edf2f7;
+}
+
+.shortcutEditorHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.shortcutEditorHeader strong,
+.shortcutEditorHeader small {
+  display: block;
+}
+
+.shortcutEditorHeader strong {
+  font-size: 0.76rem;
+}
+
+.shortcutEditorHeader small {
+  margin-top: 4px;
+  color: #647b91;
+  font-size: 0.61rem;
+  line-height: 1.45;
+}
+
+.shortcutEditorHeader > button {
+  display: grid;
+  width: 30px;
+  height: 30px;
+  flex: 0 0 auto;
+  place-items: center;
+  border-radius: 8px;
+  color: #536f89;
+  background: #f1f5f8;
+}
+
+.shortcutOptions {
+  display: grid;
+  grid-template-columns:
+    repeat(2, minmax(0, 1fr));
+  gap: 7px;
+  margin-top: 13px;
+}
+
+.shortcutOptions > button {
+  display: grid;
+  min-height: 46px;
+  grid-template-columns:
+    auto
+    minmax(0, 1fr)
+    auto;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 9px;
+  border: 1px solid #dfe7ee;
+  border-radius: 10px;
+  color: #294a69;
+  background: #f8fafc;
+  text-align: left;
+  font-size: 0.62rem;
+  font-weight: 760;
+}
+
+.shortcutOptions > button:hover {
+  border-color: #a9bed2;
+  background: #f2f7fb;
+}
+
+.shortcutOptions > button.selectedShortcut {
+  border-color: rgba(239, 51, 64, 0.44);
+  color: #9f2430;
+  background: #fff2f3;
+}
+
+.shortcutOptions > button > svg:last-child {
+  color: #ef3340;
+}
+
+.shortcutEditorFooter {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: 13px;
+  padding-top: 11px;
+  border-top: 1px solid #e3e9ef;
+}
+
+.shortcutEditorFooter span {
+  color: #71869a;
+  font-size: 0.57rem;
+}
+
+.shortcutEditorFooter button {
+  color: #24629d;
+  background: transparent;
+  font-size: 0.57rem;
+  font-weight: 850;
+}
+
+@media (max-width: 1550px) and (min-width: 1181px) {
+  .heroShortcutArea {
+    margin-top: 10px;
+  }
+
+  .heroShortcutArea .heroActions {
+    gap: 5px;
+  }
+
+  .heroShortcutArea .heroActions button {
+    min-height: 34px;
+    padding: 0 8px;
+    font-size: 0.53rem;
+  }
+}
+
+@media (max-width: 1180px) {
+  .heroShortcutArea .heroActions button {
+    min-height: 43px;
+    font-size: 0.68rem;
+  }
+
+  .shortcutEditor {
+    right: auto;
+    left: 0;
+    width: min(430px, 100%);
+  }
+}
+
+@media (max-width: 560px) {
+  .heroShortcutArea .heroActions,
+  .shortcutOptions {
+    grid-template-columns: 1fr;
+  }
+
+  .editShortcutsButton {
+    align-self: stretch;
+  }
+
+  .shortcutEditor {
+    position: static;
+    width: 100%;
+    max-height: none;
+  }
+}
+
+/* EDITABLE SPOTLIGHT SHORTCUTS V2 — END */
+
+/* SPOTLIGHT AI PANEL — START */
+
+/*
+ * Top row:
+ * Top Priorities | Short Spotlight + AI | Schedule
+ *
+ * The combined center stack matches the height of the
+ * left and right cards.
+ */
+
+.centerHeroStack {
+  order: 2;
+  display: grid;
+  min-width: 0;
+  width: 100%;
+  height: 390px;
+  grid-template-rows:
+    minmax(0, 320px)
+    minmax(0, 60px);
+  gap: 10px;
+}
+
+.centerHeroStack .heroCard {
+  order: initial;
+  width: 100%;
+  height: 320px;
+  min-height: 320px;
+  max-height: 320px;
+  grid-template-columns:
+    minmax(0, 1.42fr)
+    minmax(215px, 0.72fr);
+}
+
+.centerHeroStack .heroPortraitWrap {
+  height: 320px;
+  min-height: 320px;
+  max-height: 320px;
+}
+
+.centerHeroStack .heroCopy {
+  padding:
+    15px
+    0
+    13px
+    17px;
+}
+
+.centerHeroStack .sectionEyebrow {
+  font-size: 0.55rem;
+}
+
+.centerHeroStack .heroCopy h2 {
+  margin-top: 7px;
+  font-size:
+    clamp(
+      1.45rem,
+      1.7vw,
+      1.75rem
+    );
+  line-height: 0.98;
+}
+
+.centerHeroStack .heroCopy > p {
+  max-width: 475px;
+  margin-top: 8px;
+  font-size: 0.59rem;
+  line-height: 1.42;
+}
+
+.centerHeroStack .heroTags {
+  gap: 5px;
+  margin-top: 8px;
+}
+
+.centerHeroStack .heroTags span {
+  min-height: 20px;
+  padding: 0 8px;
+  font-size: 0.49rem;
+}
+
+.centerHeroStack .heroStats {
+  margin-top: 10px;
+}
+
+.centerHeroStack
+  .heroStats
+  > div:first-child
+  strong {
+  font-size: 2rem;
+}
+
+.centerHeroStack
+  .heroStats
+  > div:first-child
+  small {
+  font-size: 0.5rem;
+}
+
+.centerHeroStack
+  .heroStats
+  > div:first-child
+  span {
+  margin-bottom: 3px;
+  font-size: 0.5rem;
+}
+
+.centerHeroStack .heroShortcutArea {
+  gap: 4px;
+  margin-top: 9px;
+}
+
+.centerHeroStack
+  .heroShortcutArea
+  .heroActions {
+  gap: 5px;
+}
+
+.centerHeroStack
+  .heroShortcutArea
+  .heroActions
+  button {
+  min-height: 32px;
+  gap: 7px;
+  padding: 0 9px;
+  font-size: 0.52rem;
+}
+
+.centerHeroStack
+  .heroShortcutArea
+  .heroActions
+  button
+  svg {
+  width: 14px;
+  height: 14px;
+}
+
+/* Center the Edit shortcuts button beneath all four controls. */
+.centerHeroStack .editShortcutsButton {
+  min-height: 22px;
+  align-self: center;
+  padding: 0 8px;
+  font-size: 0.47rem;
+}
+
+.centerHeroStack .shortcutEditor {
+  right: auto;
+  left: 50%;
+  bottom: 29px;
+  width: min(390px, 96%);
+  transform: translateX(-50%);
+}
+
+/* White Campaign AI strip beneath the Spotlight. */
+.campaignAiPanel {
+  display: grid;
+  min-width: 0;
+  height: 60px;
+  grid-template-columns:
+    auto
+    minmax(0, 1fr)
+    auto;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 11px;
+  border: 1px solid #d8e3ed;
+  border-radius: 13px;
+  color: #173d63;
+  background:
+    linear-gradient(
+      90deg,
+      #ffffff 0%,
+      #f8fbfe 100%
+    );
+  box-shadow:
+    0 8px 22px rgba(15, 48, 83, 0.055),
+    inset 0 1px #ffffff;
+}
+
+.campaignAiIcon {
+  display: grid;
+  width: 35px;
+  height: 35px;
+  place-items: center;
+  border-radius: 10px;
+  color: #ef3340;
+  background: #fff0f1;
+}
+
+.campaignAiCopy {
+  min-width: 0;
+}
+
+.campaignAiCopy strong,
+.campaignAiCopy small {
+  display: block;
+}
+
+.campaignAiCopy strong {
+  color: #173d63;
+  font-size: 0.68rem;
+}
+
+.campaignAiCopy small {
+  overflow: hidden;
+  margin-top: 3px;
+  color: #627990;
+  font-size: 0.53rem;
+  line-height: 1.3;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.campaignAiAction {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.campaignAiAction > * {
+  flex: 0 0 auto;
+}
+
+/* Keep the outside cards aligned with the full center stack. */
+.heroPriorityCard,
+.scheduleCard {
+  height: 390px;
+  min-height: 390px;
+  max-height: 390px;
+}
+
+/* Standard laptop widths. */
+@media (max-width: 1550px) and (min-width: 1181px) {
+  .centerHeroStack {
+    height: 380px;
+    grid-template-rows:
+      minmax(0, 310px)
+      minmax(0, 60px);
+  }
+
+  .centerHeroStack .heroCard,
+  .centerHeroStack .heroPortraitWrap {
+    height: 310px;
+    min-height: 310px;
+    max-height: 310px;
+  }
+
+  .heroPriorityCard,
+  .scheduleCard {
+    height: 380px;
+    min-height: 380px;
+    max-height: 380px;
+  }
+
+  .centerHeroStack .heroCopy {
+    padding:
+      13px
+      0
+      11px
+      14px;
+  }
+
+  .centerHeroStack .heroCopy h2 {
+    font-size:
+      clamp(
+        1.3rem,
+        1.55vw,
+        1.55rem
+      );
+  }
+
+  .centerHeroStack .heroCopy > p {
+    max-width: 420px;
+    font-size: 0.55rem;
+  }
+
+  .centerHeroStack
+    .heroShortcutArea
+    .heroActions
+    button {
+    min-height: 30px;
+    padding: 0 7px;
+    font-size: 0.48rem;
+  }
+
+  .campaignAiCopy small {
+    max-width: 260px;
+  }
+}
+
+/* Tablets stack all three dashboard sections naturally. */
+@media (max-width: 1180px) {
+  .centerHeroStack {
+    order: 2;
+    height: auto;
+    grid-template-rows:
+      auto
+      auto;
+  }
+
+  .centerHeroStack .heroCard {
+    height: auto;
+    min-height: 0;
+    max-height: none;
+    grid-template-columns: 1fr;
+  }
+
+  .centerHeroStack .heroPortraitWrap {
+    height: 330px;
+    min-height: 330px;
+    max-height: none;
+  }
+
+  .centerHeroStack .heroCopy {
+    padding: 22px;
+  }
+
+  .centerHeroStack .heroCopy h2 {
+    font-size: 2.2rem;
+  }
+
+  .centerHeroStack .heroCopy > p {
+    max-width: 650px;
+    font-size: 0.72rem;
+  }
+
+  .centerHeroStack
+    .heroShortcutArea
+    .heroActions
+    button {
+    min-height: 42px;
+    font-size: 0.67rem;
+  }
+
+  .centerHeroStack .shortcutEditor {
+    right: auto;
+    left: 0;
+    transform: none;
+  }
+
+  .campaignAiPanel {
+    height: auto;
+    min-height: 70px;
+  }
+
+  .campaignAiCopy small {
+    overflow: visible;
+    text-overflow: clip;
+    white-space: normal;
+  }
+
+  .heroPriorityCard,
+  .scheduleCard {
+    height: auto;
+    min-height: 0;
+    max-height: none;
+  }
+}
+
+/* Phones stack the AI control beneath its description. */
+@media (max-width: 620px) {
+  .campaignAiPanel {
+    grid-template-columns:
+      auto
+      minmax(0, 1fr);
+  }
+
+  .campaignAiAction {
+    grid-column: 1 / -1;
+    justify-content: stretch;
+  }
+
+  .campaignAiAction > * {
+    width: 100%;
+  }
+
+  .centerHeroStack
+    .heroShortcutArea
+    .heroActions {
+    grid-template-columns: 1fr;
+  }
+
+  .centerHeroStack .editShortcutsButton {
+    align-self: stretch;
+  }
+}
+
+/* SPOTLIGHT AI PANEL — END */
+
+/* LIVE CAMPAIGN AI EFFECT V2 — START */
+
+.campaignAiPanel {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  border-color: rgba(54, 126, 190, 0.42);
+  background:
+    radial-gradient(
+      circle at 6% 50%,
+      rgba(239, 51, 64, 0.07),
+      transparent 28%
+    ),
+    radial-gradient(
+      circle at 82% 50%,
+      rgba(43, 117, 185, 0.1),
+      transparent 36%
+    ),
+    linear-gradient(
+      100deg,
+      #ffffff 0%,
+      #f7fbff 50%,
+      #ffffff 100%
+    );
+  box-shadow:
+    0 10px 28px rgba(16, 65, 109, 0.1),
+    0 0 24px rgba(43, 117, 185, 0.08),
+    inset 0 1px #ffffff;
+  transition:
+    border-color 0.25s ease,
+    box-shadow 0.25s ease,
+    transform 0.25s ease;
+}
+
+.campaignAiPanel > * {
+  position: relative;
+  z-index: 3;
+}
+
+.campaignAiPanel::before {
+  position: absolute;
+  z-index: 1;
+  inset: -1px;
+  padding: 1px;
+  pointer-events: none;
+  border-radius: inherit;
+  content: "";
+  opacity: 0.78;
+  background:
+    linear-gradient(
+      105deg,
+      rgba(239, 51, 64, 0.24),
+      rgba(48, 127, 197, 0.8),
+      rgba(138, 200, 247, 0.38),
+      rgba(239, 51, 64, 0.28),
+      rgba(48, 127, 197, 0.8)
+    );
+  background-size: 270% 100%;
+  animation: campaignAiBorderFlowV2 5s linear infinite;
+
+  -webkit-mask:
+    linear-gradient(#ffffff 0 0) content-box,
+    linear-gradient(#ffffff 0 0);
+  -webkit-mask-composite: xor;
+
+  mask:
+    linear-gradient(#ffffff 0 0) content-box,
+    linear-gradient(#ffffff 0 0);
+  mask-composite: exclude;
+}
+
+.campaignAiPanel::after {
+  position: absolute;
+  z-index: 2;
+  top: -55%;
+  bottom: -55%;
+  left: -30%;
+  width: 20%;
+  pointer-events: none;
+  content: "";
+  opacity: 0;
+  transform: skewX(-18deg);
+  background:
+    linear-gradient(
+      90deg,
+      transparent,
+      rgba(93, 170, 230, 0.18),
+      rgba(255, 255, 255, 0.82),
+      rgba(239, 51, 64, 0.1),
+      transparent
+    );
+  filter: blur(2px);
+  animation: campaignAiScannerV2 6.2s ease-in-out infinite;
+}
+
+.campaignAiPanel:hover {
+  border-color: rgba(44, 119, 187, 0.62);
+  box-shadow:
+    0 14px 34px rgba(16, 65, 109, 0.15),
+    0 0 34px rgba(43, 117, 185, 0.15),
+    inset 0 1px #ffffff;
+  transform: translateY(-1px);
+}
+
+.campaignAiIcon {
+  position: relative;
+  color: #ef3340;
+  background:
+    radial-gradient(
+      circle,
+      #fff8f9 0%,
+      #ffecef 100%
+    );
+  box-shadow:
+    0 0 0 1px rgba(239, 51, 64, 0.1),
+    0 0 17px rgba(239, 51, 64, 0.17);
+  animation: campaignAiIconPulseV2 2.8s ease-in-out infinite;
+}
+
+.campaignAiIcon::before,
+.campaignAiIcon::after {
+  position: absolute;
+  inset: -5px;
+  pointer-events: none;
+  border: 1px solid rgba(239, 51, 64, 0.22);
+  border-radius: 13px;
+  content: "";
+  opacity: 0;
+  animation: campaignAiSignalRingV2 2.8s ease-out infinite;
+}
+
+.campaignAiIcon::after {
+  animation-delay: 1.4s;
+}
+
+.campaignAiLive {
+  display: inline-flex;
+  width: max-content;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 4px;
+  color: #216da9;
+  font-size: 0.48rem;
+  font-weight: 900;
+  letter-spacing: 0.075em;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.campaignAiLive i {
+  position: relative;
+  width: 7px;
+  height: 7px;
+  flex: 0 0 auto;
+  border-radius: 50%;
+  background: #2ca86c;
+  box-shadow:
+    0 0 0 3px rgba(44, 168, 108, 0.12),
+    0 0 11px rgba(44, 168, 108, 0.48);
+  animation: campaignAiLivePulseV2 1.8s ease-in-out infinite;
+}
+
+.campaignAiLive i::after {
+  position: absolute;
+  inset: -4px;
+  border: 1px solid rgba(44, 168, 108, 0.38);
+  border-radius: 50%;
+  content: "";
+  animation: campaignAiLiveRingV2 1.8s ease-out infinite;
+}
+
+.campaignAiAction {
+  position: relative;
+}
+
+.campaignAiAction::before {
+  position: absolute;
+  z-index: -1;
+  inset: 3px;
+  pointer-events: none;
+  border-radius: 13px;
+  content: "";
+  background:
+    radial-gradient(
+      circle,
+      rgba(52, 130, 200, 0.17),
+      transparent 72%
+    );
+  filter: blur(10px);
+  animation: campaignAiActionGlowV2 3s ease-in-out infinite;
+}
+
+@keyframes campaignAiBorderFlowV2 {
+  from {
+    background-position: 0% 50%;
+  }
+
+  to {
+    background-position: 270% 50%;
+  }
+}
+
+@keyframes campaignAiScannerV2 {
+  0%,
+  46% {
+    left: -30%;
+    opacity: 0;
+  }
+
+  55% {
+    opacity: 0.68;
+  }
+
+  79% {
+    opacity: 0.38;
+  }
+
+  90%,
+  100% {
+    left: 120%;
+    opacity: 0;
+  }
+}
+
+@keyframes campaignAiIconPulseV2 {
+  0%,
+  100% {
+    box-shadow:
+      0 0 0 1px rgba(239, 51, 64, 0.1),
+      0 0 13px rgba(239, 51, 64, 0.13);
+    transform: scale(1);
+  }
+
+  50% {
+    box-shadow:
+      0 0 0 1px rgba(239, 51, 64, 0.18),
+      0 0 25px rgba(239, 51, 64, 0.27);
+    transform: scale(1.04);
+  }
+}
+
+@keyframes campaignAiSignalRingV2 {
+  0% {
+    opacity: 0.62;
+    transform: scale(0.82);
+  }
+
+  75%,
+  100% {
+    opacity: 0;
+    transform: scale(1.24);
+  }
+}
+
+@keyframes campaignAiLivePulseV2 {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  50% {
+    opacity: 0.58;
+    transform: scale(0.84);
+  }
+}
+
+@keyframes campaignAiLiveRingV2 {
+  0% {
+    opacity: 0.6;
+    transform: scale(0.7);
+  }
+
+  100% {
+    opacity: 0;
+    transform: scale(1.7);
+  }
+}
+
+@keyframes campaignAiActionGlowV2 {
+  0%,
+  100% {
+    opacity: 0.4;
+    transform: scale(0.97);
+  }
+
+  50% {
+    opacity: 0.95;
+    transform: scale(1.04);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .campaignAiPanel,
+  .campaignAiPanel::before,
+  .campaignAiPanel::after,
+  .campaignAiIcon,
+  .campaignAiIcon::before,
+  .campaignAiIcon::after,
+  .campaignAiLive i,
+  .campaignAiLive i::after,
+  .campaignAiAction::before {
+    animation: none !important;
+    transition: none !important;
+  }
+
+  .campaignAiPanel:hover {
+    transform: none;
+  }
+}
+
+/* LIVE CAMPAIGN AI EFFECT V2 — END */
+
+/* RESPONSIVE AI PANEL CLEANUP — START */
+
+/*
+ * Clean, balanced Campaign HQ AI panel.
+ * Prevents clipping and preserves responsive behavior.
+ */
+
+/* Balance the Spotlight and AI panel inside the center stack. */
+.centerHeroStack {
+  height: 404px;
+  grid-template-rows:
+    minmax(0, 314px)
+    minmax(80px, auto);
+  gap: 10px;
+}
+
+.centerHeroStack .heroCard {
+  height: 314px;
+  min-height: 314px;
+  max-height: 314px;
+}
+
+.centerHeroStack .heroPortraitWrap {
+  height: 314px;
+  min-height: 314px;
+  max-height: 314px;
+}
+
+/* Match the outside cards to the complete center stack. */
+.heroPriorityCard,
+.scheduleCard {
+  height: 404px;
+  min-height: 404px;
+  max-height: 404px;
+}
+
+/* Main AI panel structure. */
+.campaignAiPanel {
+  display: grid;
+  width: 100%;
+  height: 80px;
+  min-height: 80px;
+  grid-template-columns:
+    auto
+    minmax(0, 1fr)
+    minmax(215px, 250px);
+  align-items: center;
+  gap: 12px;
+  overflow: hidden;
+  padding: 10px 12px;
+  border-radius: 14px;
+}
+
+.campaignAiIcon {
+  width: 40px;
+  height: 40px;
+  flex: 0 0 auto;
+  border-radius: 11px;
+}
+
+.campaignAiCopy {
+  display: flex;
+  min-width: 0;
+  justify-content: center;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.campaignAiLive {
+  display: inline-flex;
+  width: max-content;
+  max-width: 100%;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
+  font-size: 0.52rem;
+  line-height: 1.1;
+  white-space: nowrap;
+}
+
+.campaignAiCopy strong {
+  overflow: hidden;
+  color: #173d63;
+  font-size: 0.76rem;
+  line-height: 1.25;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.campaignAiCopy small {
+  display: block;
+  overflow: hidden;
+  max-width: 100%;
+  margin: 0;
+  color: #58728a;
+  font-size: 0.62rem;
+  line-height: 1.35;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.campaignAiAction {
+  display: flex;
+  width: 100%;
+  min-width: 0;
+  max-width: 250px;
+  align-items: center;
+  justify-content: stretch;
+}
+
+.campaignAiAction > * {
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+}
+
+/* Keep the glow controlled instead of overpowering the content. */
+.campaignAiPanel::before {
+  opacity: 0.58;
+}
+
+.campaignAiPanel::after {
+  width: 14%;
+  opacity: 0;
+}
+
+.campaignAiPanel:hover {
+  transform: translateY(-1px);
+}
+
+/* Large and standard laptops. */
+@media (max-width: 1550px) and (min-width: 1181px) {
+  .centerHeroStack {
+    height: 394px;
+    grid-template-rows:
+      minmax(0, 304px)
+      minmax(80px, auto);
+  }
+
+  .centerHeroStack .heroCard,
+  .centerHeroStack .heroPortraitWrap {
+    height: 304px;
+    min-height: 304px;
+    max-height: 304px;
+  }
+
+  .heroPriorityCard,
+  .scheduleCard {
+    height: 394px;
+    min-height: 394px;
+    max-height: 394px;
+  }
+
+  .campaignAiPanel {
+    height: 80px;
+    min-height: 80px;
+    grid-template-columns:
+      auto
+      minmax(0, 1fr)
+      minmax(190px, 225px);
+    gap: 9px;
+    padding: 9px 10px;
+  }
+
+  .campaignAiIcon {
+    width: 36px;
+    height: 36px;
+  }
+
+  .campaignAiLive {
+    font-size: 0.48rem;
+  }
+
+  .campaignAiCopy strong {
+    font-size: 0.7rem;
+  }
+
+  .campaignAiCopy small {
+    font-size: 0.57rem;
+  }
+}
+
+/* Tablets and smaller laptops stack the AI action cleanly. */
+@media (max-width: 1180px) {
+  .centerHeroStack {
+    height: auto;
+    grid-template-rows:
+      auto
+      auto;
+  }
+
+  .centerHeroStack .heroCard {
+    height: auto;
+    min-height: 0;
+    max-height: none;
+  }
+
+  .centerHeroStack .heroPortraitWrap {
+    height: 330px;
+    min-height: 330px;
+    max-height: none;
+  }
+
+  .heroPriorityCard,
+  .scheduleCard {
+    height: auto;
+    min-height: 0;
+    max-height: none;
+  }
+
+  .campaignAiPanel {
+    height: auto;
+    min-height: 88px;
+    grid-template-columns:
+      auto
+      minmax(0, 1fr)
+      minmax(205px, 240px);
+  }
+
+  .campaignAiCopy small {
+    overflow: visible;
+    text-overflow: clip;
+    white-space: normal;
+  }
+}
+
+/* Narrow tablets. */
+@media (max-width: 820px) {
+  .campaignAiPanel {
+    grid-template-columns:
+      auto
+      minmax(0, 1fr);
+    gap: 10px;
+    padding: 12px;
+  }
+
+  .campaignAiAction {
+    grid-column: 1 / -1;
+    width: 100%;
+    max-width: none;
+  }
+
+  .campaignAiAction > * {
+    width: 100%;
+  }
+
+  .campaignAiCopy strong {
+    white-space: normal;
+  }
+
+  .campaignAiCopy small {
+    white-space: normal;
+  }
+}
+
+/* Phones. */
+@media (max-width: 560px) {
+  .campaignAiPanel {
+    display: grid;
+    min-height: 0;
+    grid-template-columns:
+      42px
+      minmax(0, 1fr);
+    gap: 10px;
+    overflow: visible;
+    padding: 13px;
+    border-radius: 14px;
+  }
+
+  .campaignAiIcon {
+    width: 40px;
+    height: 40px;
+  }
+
+  .campaignAiLive {
+    width: auto;
+    font-size: 0.48rem;
+    white-space: normal;
+  }
+
+  .campaignAiCopy strong {
+    font-size: 0.74rem;
+    white-space: normal;
+  }
+
+  .campaignAiCopy small {
+    font-size: 0.62rem;
+    white-space: normal;
+  }
+
+  .campaignAiAction {
+    grid-column: 1 / -1;
+    width: 100%;
+    max-width: none;
+    margin-top: 2px;
+  }
+
+  /* Remove the sweeping scanner on phones for cleaner performance. */
+  .campaignAiPanel::after {
+    display: none;
+  }
+
+  .campaignAiPanel:hover {
+    transform: none;
+  }
+}
+
+/* Very small phones. */
+@media (max-width: 390px) {
+  .campaignAiPanel {
+    grid-template-columns: 1fr;
+  }
+
+  .campaignAiIcon {
+    justify-self: center;
+  }
+
+  .campaignAiCopy {
+    align-items: center;
+    text-align: center;
+  }
+
+  .campaignAiLive {
+    justify-content: center;
+  }
+}
+
+/* RESPONSIVE AI PANEL CLEANUP — END */
+
+/* COMPLETE AI LAUNCHER REPAIR — START */
+
+.campaignAiPanel {
+  overflow: hidden;
+}
+
+.campaignAiAction {
+  position: relative;
+  display: flex;
+  width: 100%;
+  min-width: 0;
+  max-width: 260px;
+  align-items: center;
+  justify-content: stretch;
+  overflow: visible;
+}
+
+.campaignAiAction > * {
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+}
+
+.campaignAiLauncher {
+  position: relative;
+  z-index: 5;
+  display: grid;
+  width: 100%;
+  min-width: 0;
+  min-height: 50px;
+  grid-template-columns:
+    auto
+    minmax(0, 1fr)
+    auto;
+  align-items: center;
+  gap: 10px;
+  overflow: hidden;
+  padding: 0 12px;
+  border: 1px solid #cad9e7;
+  border-radius: 14px;
+  color: #1a4e7e;
+  background:
+    linear-gradient(
+      105deg,
+      #ffffff 0%,
+      #f4f9fd 100%
+    );
+  box-shadow:
+    0 7px 18px rgba(18, 63, 103, 0.08),
+    inset 0 1px #ffffff;
+  font-size: 0.77rem;
+  font-weight: 850;
+  text-align: left;
+  cursor: pointer;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.2s ease;
+}
+
+.campaignAiLauncher > svg {
+  width: 18px;
+  height: 18px;
+  flex: 0 0 auto;
+  color: #ef3340;
+}
+
+.campaignAiLauncher > span {
+  display: block;
+  overflow: hidden;
+  min-width: 0;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.campaignAiLauncher kbd {
+  display: grid;
+  min-width: 36px;
+  height: 29px;
+  place-items: center;
+  border: 1px solid #d4dee8;
+  border-radius: 8px;
+  color: #74899d;
+  background: #ffffff;
+  box-shadow: 0 2px 0 #dce4ec;
+  font-family: inherit;
+  font-size: 0.65rem;
+  font-weight: 850;
+}
+
+.campaignAiLauncher:hover {
+  border-color: #83acd0;
+  box-shadow:
+    0 9px 24px rgba(18, 63, 103, 0.13),
+    0 0 18px rgba(49, 126, 195, 0.09);
+  transform: translateY(-1px);
+}
+
+.campaignAiLauncher:focus-visible {
+  outline: 3px solid rgba(42, 111, 177, 0.36);
+  outline-offset: 2px;
+}
+
+.campaignAiAction::before {
+  z-index: -1;
+  pointer-events: none;
+}
+
+@media (max-width: 1550px) and (min-width: 1181px) {
+  .campaignAiAction {
+    max-width: 225px;
+  }
+
+  .campaignAiLauncher {
+    min-height: 46px;
+    gap: 8px;
+    padding: 0 9px;
+    font-size: 0.68rem;
+  }
+}
+
+@media (max-width: 820px) {
+  .campaignAiAction {
+    grid-column: 1 / -1;
+    width: 100%;
+    max-width: none;
+  }
+
+  .campaignAiLauncher {
+    width: 100%;
+  }
+}
+
+@media (max-width: 560px) {
+  .campaignAiPanel {
+    overflow: visible;
+  }
+
+  .campaignAiLauncher {
+    min-height: 52px;
+    font-size: 0.74rem;
+  }
+
+  .campaignAiLauncher kbd {
+    min-width: 34px;
+  }
+}
+
+/* COMPLETE AI LAUNCHER REPAIR — END */

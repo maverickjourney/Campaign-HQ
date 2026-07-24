@@ -688,3 +688,33 @@
     transform: none;
   }
 }
+
+/* CAMPAIGN SEARCH PORTAL LAYER — START */
+
+/*
+ * This modal is rendered directly under document.body.
+ * These rules affect only Campaign Search.
+ */
+
+.overlay {
+  position: fixed !important;
+  z-index: 2147483500 !important;
+  inset: 0 !important;
+}
+
+.searchModal {
+  position: fixed !important;
+  z-index: 2147483501 !important;
+  isolation: isolate;
+}
+
+@media (max-width: 760px) {
+  .searchModal {
+    width: calc(100vw - 20px) !important;
+    max-width: calc(100vw - 20px) !important;
+    max-height: calc(100dvh - 20px) !important;
+    overflow: auto !important;
+  }
+}
+
+/* CAMPAIGN SEARCH PORTAL LAYER — END */
