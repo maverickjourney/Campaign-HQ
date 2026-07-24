@@ -28,11 +28,24 @@ export default function SupportLauncher() {
       currentLocation,
     )}`;
 
+  const isAuthenticatedPage =
+    location.pathname !== "/";
+
+  const launcherClassName = [
+    styles.launcher,
+    isAuthenticatedPage
+      ? styles.compact
+      : "",
+  ]
+    .filter(Boolean)
+    .join(" ");
+
   return createPortal(
     <Link
-      className={styles.launcher}
+      className={launcherClassName}
       to={destination}
       aria-label="Open Campaign Seat Support"
+      title="Campaign Seat Support"
     >
       <LifeBuoy
         size={18}
