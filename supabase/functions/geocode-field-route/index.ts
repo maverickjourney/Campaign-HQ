@@ -564,6 +564,62 @@ Deno.serve(
       );
     }
 
+    const accessToken =
+      authorization
+        .slice(
+          "Bearer ".length,
+        )
+        .trim();
+
+    const {
+      data:
+        verifiedClaimsResult,
+      error:
+        verifiedClaimsError,
+    } =
+      await supabase.auth
+        .getClaims(
+          accessToken,
+        );
+
+    const verifiedClaims =
+      verifiedClaimsResult
+        ?.claims;
+
+    if (
+      verifiedClaimsError ||
+      !verifiedClaims ||
+      verifiedClaims.sub !==
+        userResult.user.id
+    ) {
+      return jsonResponse(
+        {
+          ok: false,
+          error:
+            "The Campaign HQ session claims could not be verified.",
+        },
+        401,
+      );
+    }
+
+    if (
+      verifiedClaims.aal !==
+        "aal2"
+    ) {
+      return jsonResponse(
+        {
+          ok: false,
+          error:
+            "Complete two-step verification before geocoding field routes.",
+          code:
+            "MFA_REQUIRED",
+          mfaRequired:
+            true,
+        },
+        403,
+      );
+    }
+
     let body:
       Record<string, unknown>;
 
