@@ -1,4 +1,8 @@
-import { useMemo, useState } from "react";
+import {
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 import { useNavigate } from "react-router-dom";
 import {
   AlertCircle,
@@ -180,6 +184,48 @@ const PRESENTATION_PRIORITIES = [
     priority: "low",
     icon: Users,
   },
+  {
+    id: "presentation-canvass-routes",
+    title: "Confirm weekend canvass routes",
+    detail: "North and west teams need final turf",
+    priority: "high",
+    icon: MapPin,
+  },
+  {
+    id: "presentation-social-calendar",
+    title: "Approve weekend social calendar",
+    detail: "Six posts are awaiting review",
+    priority: "high",
+    icon: MessageSquare,
+  },
+  {
+    id: "presentation-community-leaders",
+    title: "Follow up with community leaders",
+    detail: "Three introductions remain open",
+    priority: "medium",
+    icon: Users,
+  },
+  {
+    id: "presentation-volunteer-briefing",
+    title: "Finalize volunteer captain briefing",
+    detail: "Send the briefing before 5:30 PM",
+    priority: "medium",
+    icon: FileCheck2,
+  },
+  {
+    id: "presentation-mail-plan",
+    title: "Review vote-by-mail outreach plan",
+    detail: "Mail deadline checklist due today",
+    priority: "high",
+    icon: Mail,
+  },
+  {
+    id: "presentation-polling-handout",
+    title: "Confirm polling-location handout",
+    detail: "Final addresses require verification",
+    priority: "low",
+    icon: MapPin,
+  },
 ];
 // PRESENTATION PRIORITIES — END
 
@@ -215,7 +261,6 @@ const PRESENTATION_SCHEDULE = [
     starts_at: "2026-07-24T14:00:00-04:00",
     attendeeLabels: [],
     attendeeOverflow: 0,
-    highlight: true,
     phone: true,
     conflict: true,
   },
@@ -234,6 +279,38 @@ const PRESENTATION_SCHEDULE = [
     starts_at: "2026-07-24T18:00:00-04:00",
     attendeeLabels: [],
     attendeeOverflow: 0,
+  },
+  {
+    id: "presentation-captain-check-in",
+    title: "Volunteer Captain Check-In",
+    location: "Zoom Meeting",
+    starts_at: "2026-07-24T19:15:00-04:00",
+    attendeeLabels: ["TM", "JS", "PB"],
+    attendeeOverflow: 5,
+  },
+  {
+    id: "presentation-digital-review",
+    title: "Digital Advertising Review",
+    location: "Campaign HQ",
+    starts_at: "2026-07-24T20:00:00-04:00",
+    attendeeLabels: ["EA", "CH"],
+    attendeeOverflow: 2,
+  },
+  {
+    id: "presentation-canvass-briefing",
+    title: "Weekend Canvass Briefing",
+    location: "Field Office",
+    starts_at: "2026-07-24T20:45:00-04:00",
+    attendeeLabels: ["TM", "JS"],
+    attendeeOverflow: 7,
+  },
+  {
+    id: "presentation-war-room",
+    title: "End-of-Day War Room",
+    location: "HQ Office",
+    starts_at: "2026-07-24T21:30:00-04:00",
+    attendeeLabels: ["EA", "CH", "TM"],
+    attendeeOverflow: 4,
   },
 ];
 
@@ -440,7 +517,45 @@ export default function DashboardReferencePreview() {
   const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
-  const [
+
+
+  // COMMAND HEADER CLOCK — START
+  const [headerNow, setHeaderNow] = useState(
+    () => new Date(),
+  );
+
+  useEffect(() => {
+    const intervalId = window.setInterval(() => {
+      setHeaderNow(new Date());
+    }, 30000);
+
+    return () => {
+      window.clearInterval(intervalId);
+    };
+  }, []);
+
+  const headerDateLabel = new Intl.DateTimeFormat(
+    "en-US",
+    {
+      timeZone: "America/New_York",
+      weekday: "short",
+      month: "short",
+      day: "numeric",
+      year: "numeric",
+    },
+  ).format(headerNow);
+
+  const headerTimeLabel = new Intl.DateTimeFormat(
+    "en-US",
+    {
+      timeZone: "America/New_York",
+      hour: "numeric",
+      minute: "2-digit",
+      timeZoneName: "short",
+    },
+  ).format(headerNow);
+  // COMMAND HEADER CLOCK — END
+const [
     isEditingSpotlightShortcuts,
     setIsEditingSpotlightShortcuts,
   ] = useState(false);
@@ -727,6 +842,487 @@ export default function DashboardReferencePreview() {
       ? customSpotlightShortcutKeys
       : recommendedSpotlightShortcutKeys;
 
+
+  // SAFE LIVE SCHEDULE SYNC — START
+  useEffect(() => {
+    let intervalId = 0;
+    let animationFrameId = 0;
+    let observer = null;
+    let observedTimeline = null;
+    let lastSelectedKey = "";
+    let synchronizationPending = false;
+
+    const easternMinutesNow = () => {
+      const parts =
+        new Intl.DateTimeFormat(
+          "en-US",
+          {
+            timeZone:
+              "America/New_York",
+            hour:
+              "2-digit",
+            minute:
+              "2-digit",
+            hour12:
+              false,
+          },
+        ).formatToParts(
+          new Date(),
+        );
+
+      const values =
+        Object.fromEntries(
+          parts.map(
+            (part) => [
+              part.type,
+              part.value,
+            ],
+          ),
+        );
+
+      let hour =
+        Number(values.hour);
+
+      const minute =
+        Number(values.minute);
+
+      if (hour === 24) {
+        hour = 0;
+      }
+
+      return (
+        hour * 60 +
+        minute
+      );
+    };
+
+    const parseDisplayedTime = (
+      value,
+    ) => {
+      const match =
+        String(value || "")
+          .trim()
+          .match(
+            /^(\d{1,2}):(\d{2})\s*(AM|PM)$/i,
+          );
+
+      if (!match) {
+        return null;
+      }
+
+      let hour =
+        Number(match[1]);
+
+      const minute =
+        Number(match[2]);
+
+      const period =
+        match[3].toUpperCase();
+
+      if (hour === 12) {
+        hour = 0;
+      }
+
+      if (period === "PM") {
+        hour += 12;
+      }
+
+      return (
+        hour * 60 +
+        minute
+      );
+    };
+
+    const findScrollableContainer = (
+      timeline,
+    ) => {
+      const scheduleCard =
+        timeline.closest(
+          `.${styles.scheduleCard}`,
+        );
+
+      const candidates = [
+        timeline,
+        timeline.parentElement,
+        scheduleCard,
+      ];
+
+      for (
+        const candidate
+        of candidates
+      ) {
+        if (
+          !(
+            candidate instanceof
+            HTMLElement
+          )
+        ) {
+          continue;
+        }
+
+        const computed =
+          window.getComputedStyle(
+            candidate,
+          );
+
+        const permitsScrolling =
+          computed.overflowY ===
+            "auto" ||
+          computed.overflowY ===
+            "scroll";
+
+        if (
+          permitsScrolling &&
+          candidate.scrollHeight >
+            candidate.clientHeight + 3
+        ) {
+          return candidate;
+        }
+      }
+
+      return timeline;
+    };
+
+    const synchronizeSchedule = ({
+      forceScroll = false,
+    } = {}) => {
+      synchronizationPending = false;
+
+      const timeline =
+        document.querySelector(
+          `.${styles.scheduleTimeline}`,
+        );
+
+      if (
+        !(
+          timeline instanceof
+          HTMLElement
+        )
+      ) {
+        return;
+      }
+
+      if (
+        observedTimeline !==
+        timeline
+      ) {
+        observer?.disconnect();
+
+        observer =
+          new MutationObserver(
+            () => {
+              if (
+                synchronizationPending
+              ) {
+                return;
+              }
+
+              synchronizationPending =
+                true;
+
+              window.requestAnimationFrame(
+                () =>
+                  synchronizeSchedule(),
+              );
+            },
+          );
+
+        observer.observe(
+          timeline,
+          {
+            childList:
+              true,
+            subtree:
+              true,
+            attributes:
+              true,
+            attributeFilter: [
+              "class",
+            ],
+          },
+        );
+
+        observedTimeline =
+          timeline;
+      }
+
+      const rows =
+        Array.from(
+          timeline.children,
+        ).filter(
+          (element) =>
+            element instanceof
+              HTMLButtonElement,
+        );
+
+      if (!rows.length) {
+        return;
+      }
+
+      const currentMinutes =
+        easternMinutesNow();
+
+      const rowMinutes =
+        rows.map(
+          (row) =>
+            parseDisplayedTime(
+              row.querySelector(
+                "time",
+              )?.textContent,
+            ),
+        );
+
+      let selectedIndex = 0;
+
+      const firstTime =
+        rowMinutes[0];
+
+      if (
+        firstTime !== null &&
+        currentMinutes >= firstTime
+      ) {
+        rowMinutes.forEach(
+          (
+            eventMinutes,
+            index,
+          ) => {
+            if (
+              eventMinutes !== null &&
+              eventMinutes <=
+                currentMinutes
+            ) {
+              selectedIndex =
+                index;
+            }
+          },
+        );
+      }
+
+      const selectedRow =
+        rows[selectedIndex];
+
+      if (!selectedRow) {
+        return;
+      }
+
+      rows.forEach(
+        (
+          row,
+          index,
+        ) => {
+          const shouldBeActive =
+            index === selectedIndex;
+
+          if (
+            row.classList.contains(
+              styles.activeSchedule,
+            ) !== shouldBeActive
+          ) {
+            row.classList.toggle(
+              styles.activeSchedule,
+              shouldBeActive,
+            );
+          }
+
+          if (shouldBeActive) {
+            if (
+              row.getAttribute(
+                "data-live-schedule",
+              ) !== "current"
+            ) {
+              row.setAttribute(
+                "data-live-schedule",
+                "current",
+              );
+            }
+
+            if (
+              row.getAttribute(
+                "aria-current",
+              ) !== "time"
+            ) {
+              row.setAttribute(
+                "aria-current",
+                "time",
+              );
+            }
+          } else {
+            if (
+              row.hasAttribute(
+                "data-live-schedule",
+              )
+            ) {
+              row.removeAttribute(
+                "data-live-schedule",
+              );
+            }
+
+            if (
+              row.hasAttribute(
+                "aria-current",
+              )
+            ) {
+              row.removeAttribute(
+                "aria-current",
+              );
+            }
+          }
+        },
+      );
+
+      const selectedTime =
+        selectedRow.querySelector(
+          "time",
+        )?.textContent
+          ?.trim() || "";
+
+      const selectedTitle =
+        selectedRow.querySelector(
+          "strong",
+        )?.textContent
+          ?.trim() || "";
+
+      const selectedKey =
+        `${selectedTime}|${selectedTitle}`;
+
+      if (
+        forceScroll ||
+        selectedKey !==
+          lastSelectedKey
+      ) {
+        lastSelectedKey =
+          selectedKey;
+
+        const scrollContainer =
+          findScrollableContainer(
+            timeline,
+          );
+
+        const containerRect =
+          scrollContainer
+            .getBoundingClientRect();
+
+        const rowRect =
+          selectedRow
+            .getBoundingClientRect();
+
+        const maximumScroll =
+          Math.max(
+            0,
+            scrollContainer
+              .scrollHeight -
+            scrollContainer
+              .clientHeight,
+          );
+
+        const requestedScroll =
+          scrollContainer.scrollTop +
+          (
+            rowRect.top -
+            containerRect.top
+          ) -
+          (
+            scrollContainer
+              .clientHeight -
+            rowRect.height
+          ) /
+            2;
+
+        const nextScroll =
+          Math.max(
+            0,
+            Math.min(
+              maximumScroll,
+              requestedScroll,
+            ),
+          );
+
+        scrollContainer.scrollTo({
+          top:
+            nextScroll,
+          behavior:
+            "auto",
+        });
+      }
+    };
+
+    const queueSynchronization = ({
+      forceScroll = false,
+    } = {}) => {
+      window.cancelAnimationFrame(
+        animationFrameId,
+      );
+
+      animationFrameId =
+        window.requestAnimationFrame(
+          () =>
+            window.requestAnimationFrame(
+              () =>
+                synchronizeSchedule({
+                  forceScroll,
+                }),
+            ),
+        );
+    };
+
+    queueSynchronization({
+      forceScroll:
+        true,
+    });
+
+    intervalId =
+      window.setInterval(
+        () =>
+          queueSynchronization(),
+        15000,
+      );
+
+    const handleReturn = () => {
+      if (
+        document.visibilityState ===
+        "visible"
+      ) {
+        queueSynchronization({
+          forceScroll:
+            true,
+        });
+      }
+    };
+
+    window.addEventListener(
+      "focus",
+      handleReturn,
+    );
+
+    document.addEventListener(
+      "visibilitychange",
+      handleReturn,
+    );
+
+    return () => {
+      window.clearInterval(
+        intervalId,
+      );
+
+      window.cancelAnimationFrame(
+        animationFrameId,
+      );
+
+      observer?.disconnect();
+
+      window.removeEventListener(
+        "focus",
+        handleReturn,
+      );
+
+      document.removeEventListener(
+        "visibilitychange",
+        handleReturn,
+      );
+    };
+  }, []);
+  // SAFE LIVE SCHEDULE SYNC — END
+
   const spotlightActions =
     activeSpotlightShortcutKeys
       .map((key) =>
@@ -769,27 +1365,141 @@ export default function DashboardReferencePreview() {
   // PRESENTATION SPOTLIGHT ACTIONS — START
   // PRESENTATION SPOTLIGHT ACTIONS — END
 
+
+  // OPERATIONAL CARD INTERACTION — START
+  const activateOperationalCard = (event) => {
+    const interactiveElement = event.target.closest(
+      "button, a, input, select, textarea",
+    );
+
+    if (
+      interactiveElement &&
+      interactiveElement !== event.currentTarget
+    ) {
+      return;
+    }
+
+    event.currentTarget.focus();
+
+    if (
+      !window.matchMedia(
+        "(prefers-reduced-motion: reduce)",
+      ).matches
+    ) {
+      event.currentTarget.animate(
+        [
+          {
+            transform:
+              "translateY(-2px) scale(1)",
+          },
+          {
+            transform:
+              "translateY(0) scale(0.992)",
+          },
+          {
+            transform:
+              "translateY(-2px) scale(1)",
+          },
+        ],
+        {
+          duration: 220,
+          easing: "ease-out",
+        },
+      );
+    }
+  };
+
+  const handleOperationalCardKeyDown = (event) => {
+    if (event.target !== event.currentTarget) {
+      return;
+    }
+
+    if (
+      event.key === "Enter" ||
+      event.key === " "
+    ) {
+      event.preventDefault();
+      activateOperationalCard(event);
+    }
+  };
+  // OPERATIONAL CARD INTERACTION — END
+
   const sidebar = (
     <aside
       className={`${styles.sidebar} ${
         sidebarOpen ? styles.sidebarOpen : ""
       }`}
     >
-      <div className={styles.sidebarBrand}>
-        <div>
-          <strong>Campaign Seat</strong>
-          <span>Campaign Operations Platform</span>
-        </div>
+      {/* LOCKED WORKSPACE SWITCHER — START */}
+      <details
+        className={styles.workspaceSwitcher}
+        data-workspace-switcher="true"
+      >
+        <summary>
 
-        <button
-          type="button"
-          className={styles.closeSidebar}
-          onClick={() => setSidebarOpen(false)}
-          aria-label="Close navigation"
-        >
-          <X size={19} />
-        </button>
-      </div>
+            <span className={styles.workspaceBrandCopy}>
+              <small>Campaign Workspace</small>
+
+              <strong>Elizabeth Accomando</strong>
+
+              <span className={styles.workspaceDistrict}>
+                Palm Beach County Commission
+                <br />
+                District 6
+              </span>
+            </span>
+
+            <span
+              className={styles.workspaceSwitcherChevron}
+              aria-hidden="true"
+            >
+              ⌄
+            </span>
+          </summary>
+
+        <div className={styles.workspaceSwitcherMenu}>
+          <button
+            type="button"
+            onClick={() =>
+              window.location.assign("/dashboard")
+            }
+          >
+            <span className={styles.workspaceSwitcherAvatar}>
+              EA
+            </span>
+
+            <span>
+              <strong>Elizabeth Accomando</strong>
+
+              <small>
+                Palm Beach County · District 6
+              </small>
+            </span>
+
+            <em>Current</em>
+          </button>
+
+          <button
+            type="button"
+            onClick={() =>
+              window.location.assign("/workspaces")
+            }
+          >
+            <span className={styles.workspaceSwitcherIcon}>
+              +
+            </span>
+
+            <span>
+              <strong>View all workspaces</strong>
+
+              <small>
+                Open or switch campaigns
+              </small>
+            </span>
+          </button>
+        </div>
+      </details>
+      {/* LOCKED WORKSPACE SWITCHER — END */}
 
       <nav className={styles.sidebarNavigation}>
         {PRIMARY_NAVIGATION.map((item) => {
@@ -899,7 +1609,15 @@ export default function DashboardReferencePreview() {
         </div>
       </nav>
 
-      <div className={styles.sidebarProfile}>
+      <button
+        className={styles.sidebarProfile}
+        data-profile-settings="true"
+        type="button"
+        aria-label="Open profile settings"
+        onClick={() =>
+          navigate("/workspace/settings")
+        }
+      >
         <span className={styles.profileAvatar}>
           {initials}
         </span>
@@ -910,7 +1628,7 @@ export default function DashboardReferencePreview() {
         </div>
 
         <ChevronDown size={15} />
-      </div>
+      </button>
     </aside>
   );
 
@@ -950,30 +1668,76 @@ export default function DashboardReferencePreview() {
           </div>
 
           <div className={styles.topbarActions}>
-            <CampaignSearch />
-            <ActivityCenter />
+            <button
+              className={styles.headerDeadline}
+              type="button"
+              onClick={() => navigate("/tasks")}
+              aria-label="Open next campaign deadline"
+            >
+              <span className={styles.headerDeadlineIcon}>
+                <Clock3 size={20} />
+              </span>
+
+              <span className={styles.headerDeadlineCopy}>
+                <small>Next deadline</small>
+
+                <strong>
+                  {overdueTasks.length
+                    ? "Overdue"
+                    : "Upcoming"}
+                  {" · "}
+                  {overdueTasks[0]?.due_at
+                    ? formatTime(overdueTasks[0].due_at)
+                    : "6:00 PM"}
+                </strong>
+
+                <span>
+                  {overdueTasks[0]?.title ||
+                    displayedPriorities[0]?.title ||
+                    "Review campaign priorities"}
+                </span>
+              </span>
+            </button>
 
             <button
-              className={styles.workspaceSwitcher}
+              className={styles.headerDateTimeButton}
               type="button"
-              onClick={() => navigate("/workspaces")}
+              onClick={() =>
+                navigate("/workspace/settings")
+              }
+              aria-label="Open date and time zone settings"
             >
-              <span className={styles.workspaceMark}>
-                {workspace.name
-                  .split(" ")
-                  .map((part) => part[0])
-                  .join("")
-                  .slice(0, 2)
-                  .toUpperCase()}
+              <CalendarDays
+                className={styles.headerDateTimeCalendar}
+                size={18}
+              />
+
+              <span className={styles.headerDateValue}>
+                {headerDateLabel}
               </span>
 
-              <span>
-                <strong>{workspace.name}</strong>
-                <small>{workspace.location}</small>
-              </span>
+              <span
+                className={styles.headerDateTimeDivider}
+                aria-hidden="true"
+              />
 
-              <ChevronDown size={15} />
+              <Clock3
+                className={styles.headerDateTimeClock}
+                size={18}
+              />
+
+              <span className={styles.headerTimeValue}>
+                {headerTimeLabel}
+              </span>
             </button>
+
+            <div className={styles.headerCampaignSearch}>
+              <CampaignSearch />
+            </div>
+
+            <div className={styles.headerNotifications}>
+              <ActivityCenter />
+            </div>
           </div>
         </header>
 
@@ -1255,7 +2019,7 @@ export default function DashboardReferencePreview() {
               <section
                 className={styles.campaignAiPanel}
                 aria-label="Ask Campaign HQ"
-              
+
               data-campaign-ai-panel="true"
             >
                 <span className={styles.campaignAiIcon}>
@@ -1472,17 +2236,21 @@ export default function DashboardReferencePreview() {
           </section>
 
           <section className={styles.middleGrid}>
-            
+
 
             <article
-              className={styles.compactCard}
+              className={`${styles.compactCard} ${styles.communicationsAttentionCard}`}
               tabIndex={0}
-              aria-label="Campaign communications summary"
-            >
+              aria-label="Unread campaign messages"
+
+              data-operational-card="unread-messages"
+              role="button"
+              onClick={activateOperationalCard}
+              onKeyDown={handleOperationalCardKeyDown}>
               <div className={styles.cardHeading}>
                 <span>
                   <Mail size={15} />
-                  Communications
+                  Unread messages
                 </span>
 
                 <button
@@ -1491,32 +2259,52 @@ export default function DashboardReferencePreview() {
                     navigate("/communications")
                   }
                 >
-                  Open
+                  View all
                 </button>
               </div>
 
-              <div className={styles.metricNumber}>
-                {responseRate}%
+              <div className={styles.unreadMessageMetric}>
+                <strong>8</strong>
+                <span>Require your attention</span>
               </div>
 
-              <p className={styles.metricDescription}>
-                Message open response
-              </p>
-
-              <div className={styles.communicationStats}>
-                <span>
-                  <strong>
-                    {messagesSent.toLocaleString()}
-                  </strong>
-                  Sent
+              <div
+                className={styles.unreadAvatarStack}
+                aria-label="Campaign conversations requiring attention"
+              >
+                <span className={styles.unreadPhotoAvatar}>
+                  <img
+                    src={elizabethPhoto}
+                    alt=""
+                    aria-hidden="true"
+                  />
                 </span>
 
-                <span>
-                  <strong>
-                    {messagesOpened.toLocaleString()}
-                  </strong>
-                  Opened
+                <span className={styles.unreadInitialAvatar}>
+                  TM
                 </span>
+
+                <span className={styles.unreadInitialAvatar}>
+                  JS
+                </span>
+
+                <span className={styles.unreadInitialAvatar}>
+                  PB
+                </span>
+
+                <span
+                  className={`${styles.unreadInitialAvatar} ${styles.unreadMoreAvatar}`}
+                >
+                  +5
+                </span>
+              </div>
+
+              <div className={styles.unreadPrioritySummary}>
+                <strong>3 high priority</strong>
+
+                <i aria-hidden="true" />
+
+                <span>5 normal</span>
               </div>
             </article>
 
@@ -1524,7 +2312,11 @@ export default function DashboardReferencePreview() {
               className={styles.compactCard}
               tabIndex={0}
               aria-label="Campaign follow-ups"
-            >
+
+              data-operational-card="waiting-on"
+              role="button"
+              onClick={activateOperationalCard}
+              onKeyDown={handleOperationalCardKeyDown}>
               <div className={styles.cardHeading}>
                 <span>
                   <Clock3 size={15} />
@@ -1591,7 +2383,11 @@ export default function DashboardReferencePreview() {
               className={styles.compactCard}
               tabIndex={0}
               aria-label="Campaign health"
-            >
+
+              data-operational-card="campaign-health"
+              role="button"
+              onClick={activateOperationalCard}
+              onKeyDown={handleOperationalCardKeyDown}>
               <div className={styles.cardHeading}>
                 <span>
                   <TrendingUp size={15} />
@@ -1655,7 +2451,11 @@ export default function DashboardReferencePreview() {
               className={styles.compactCard}
               tabIndex={0}
               aria-label="Recent campaign activity"
-            >
+
+              data-operational-card="recent-activity"
+              role="button"
+              onClick={activateOperationalCard}
+              onKeyDown={handleOperationalCardKeyDown}>
               <div className={styles.cardHeading}>
                 <span>
                   <Zap size={15} />
@@ -1696,7 +2496,11 @@ export default function DashboardReferencePreview() {
               className={styles.lowerCard}
               tabIndex={0}
               aria-label="Upcoming campaign events"
-            >
+
+              data-operational-card="upcoming-events"
+              role="button"
+              onClick={activateOperationalCard}
+              onKeyDown={handleOperationalCardKeyDown}>
               <div className={styles.cardHeading}>
                 <span>
                   <CalendarDays size={15} />
@@ -1754,7 +2558,11 @@ export default function DashboardReferencePreview() {
               className={styles.lowerCard}
               tabIndex={0}
               aria-label="Volunteer activity"
-            >
+
+              data-operational-card="volunteer-activity"
+              role="button"
+              onClick={activateOperationalCard}
+              onKeyDown={handleOperationalCardKeyDown}>
               <div className={styles.cardHeading}>
                 <span>
                   <Users size={15} />
@@ -1807,7 +2615,11 @@ export default function DashboardReferencePreview() {
               className={styles.lowerCard}
               tabIndex={0}
               aria-label="Fundraising snapshot"
-            >
+
+              data-operational-card="fundraising-snapshot"
+              role="button"
+              onClick={activateOperationalCard}
+              onKeyDown={handleOperationalCardKeyDown}>
               <div className={styles.cardHeading}>
                 <span>
                   <CircleDollarSign size={15} />
@@ -1850,7 +2662,11 @@ export default function DashboardReferencePreview() {
               className={styles.lowerCard}
               tabIndex={0}
               aria-label="Approval queue"
-            >
+
+              data-operational-card="approval-queue"
+              role="button"
+              onClick={activateOperationalCard}
+              onKeyDown={handleOperationalCardKeyDown}>
               <div className={styles.cardHeading}>
                 <span>
                   <FileCheck2 size={15} />
@@ -1905,22 +2721,6 @@ export default function DashboardReferencePreview() {
                 )}
               </div>
             </article>
-          </section>
-
-          <section className={styles.tipBar}>
-            <Sparkles size={16} />
-            <p>
-              <strong>Campaign Seat tip:</strong> Ask
-              Campaign HQ what needs attention today.
-            </p>
-
-            <button
-              type="button"
-              onClick={() => navigate("/tasks")}
-            >
-              Open priorities
-              <ArrowRight size={14} />
-            </button>
           </section>
 
           <footer className={styles.footer}>

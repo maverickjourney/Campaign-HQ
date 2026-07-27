@@ -867,6 +867,7 @@ export function CampaignSearch() {
           openSearch
         }
         aria-label="Ask Campaign HQ"
+        data-campaign-hq-launcher="floating"
         title="Ask Campaign HQ — Command K"
       >
         <Sparkles

@@ -259,22 +259,6 @@
   gap: 9px;
 }
 
-.workspaceSwitcher {
-  display: grid;
-  min-width: 235px;
-  height: 48px;
-  grid-template-columns: auto minmax(0, 1fr) auto;
-  align-items: center;
-  gap: 10px;
-  padding: 0 12px;
-  border: 1px solid #d7e0e9;
-  border-radius: 13px;
-  color: #173a5e;
-  background: #ffffff;
-  text-align: left;
-  box-shadow: 0 8px 20px rgba(16, 48, 81, 0.05);
-}
-
 .workspaceMark {
   display: grid;
   width: 32px;
@@ -285,28 +269,6 @@
   background: linear-gradient(135deg, #0f477c, #ef3340);
   font-size: 0.58rem;
   font-weight: 900;
-}
-
-.workspaceSwitcher > span:nth-child(2) {
-  min-width: 0;
-}
-
-.workspaceSwitcher strong,
-.workspaceSwitcher small {
-  display: block;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.workspaceSwitcher strong {
-  font-size: 0.64rem;
-}
-
-.workspaceSwitcher small {
-  margin-top: 3px;
-  color: #71859a;
-  font-size: 0.55rem;
 }
 
 .main {
@@ -1326,11 +1288,6 @@
     padding: 12px;
   }
 
-  .workspaceSwitcher {
-    width: 100%;
-    min-width: 0;
-  }
-
   .heroCopy {
     padding: 18px;
   }
@@ -1473,25 +1430,9 @@
   gap: 7px;
 }
 
-.workspaceSwitcher {
-  min-width: 214px;
-  height: 42px;
-  gap: 8px;
-  padding: 0 10px;
-  border-radius: 11px;
-}
-
 .workspaceMark {
   width: 29px;
   height: 29px;
-}
-
-.workspaceSwitcher strong {
-  font-size: 0.58rem;
-}
-
-.workspaceSwitcher small {
-  font-size: 0.49rem;
 }
 
 .main {
@@ -2148,15 +2089,6 @@
   line-height: 1.45;
 }
 
-.workspaceSwitcher strong {
-  font-size: 0.72rem;
-}
-
-.workspaceSwitcher small {
-  color: #5f768d;
-  font-size: 0.64rem;
-}
-
 .sectionEyebrow {
   font-size: 0.7rem;
 }
@@ -2600,10 +2532,6 @@
     flex-wrap: wrap;
   }
 
-  .workspaceSwitcher {
-    min-width: 220px;
-  }
-
   .heroCard {
     grid-template-columns: 1fr;
   }
@@ -2636,11 +2564,6 @@
   .topbarActions {
     display: grid;
     grid-template-columns: 1fr;
-  }
-
-  .workspaceSwitcher {
-    width: 100%;
-    min-width: 0;
   }
 
   .main {
@@ -5171,3 +5094,4774 @@
 }
 
 /* COMPLETE AI LAUNCHER REPAIR — END */
+
+/* EIGHT OPERATIONAL CARDS — START */
+
+/*
+ * These rules apply only to the eight cards below the hero.
+ * The Today’s Priorities hero card is intentionally excluded.
+ */
+
+.middleGrid,
+.bottomGrid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  align-items: stretch;
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.middleGrid > .compactCard,
+.bottomGrid > .lowerCard {
+  display: flex;
+  width: 100%;
+  height: 252px;
+  min-height: 252px;
+  max-height: 252px;
+  flex-direction: column;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+.middleGrid > .compactCard > .cardHeading,
+.bottomGrid > .lowerCard > .cardHeading {
+  position: sticky;
+  z-index: 5;
+  top: 0;
+  flex: 0 0 auto;
+  padding-bottom: 10px;
+  background: #ffffff;
+}
+
+@media (min-width: 761px) and (max-width: 1180px) {
+  .middleGrid,
+  .bottomGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .middleGrid > .compactCard,
+  .bottomGrid > .lowerCard {
+    height: 248px;
+    min-height: 248px;
+    max-height: 248px;
+  }
+}
+
+@media (max-width: 760px) {
+  .middleGrid,
+  .bottomGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .middleGrid > .compactCard,
+  .bottomGrid > .lowerCard {
+    height: auto;
+    min-height: 220px;
+    max-height: none;
+    overflow: visible;
+  }
+
+  .middleGrid > .compactCard > .cardHeading,
+  .bottomGrid > .lowerCard > .cardHeading {
+    position: static;
+    padding-bottom: 0;
+    background: transparent;
+  }
+}
+
+/* EIGHT OPERATIONAL CARDS — END */
+
+
+/* PRIORITY AND SHORTCUT REPAIR — START */
+
+/*
+ * Restore the priorities card to the full hero-row height.
+ * Only its task list scrolls; the heading and monitoring message remain visible.
+ */
+
+.heroPriorityCard {
+  display: flex;
+  height: auto !important;
+  min-height: 0 !important;
+  max-height: none !important;
+  align-self: stretch;
+  flex-direction: column;
+  overflow: hidden !important;
+}
+
+.heroPriorityCard > .cardHeading {
+  position: static !important;
+  flex: 0 0 auto;
+  padding-bottom: 0 !important;
+  background: transparent !important;
+}
+
+.heroPriorityCard .priorityList {
+  min-height: 0;
+  flex: 1 1 auto;
+  overflow-x: hidden;
+  overflow-y: auto;
+  margin-bottom: 8px;
+  padding-right: 5px;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: #9aafc2 #edf2f7;
+}
+
+.heroPriorityCard .priorityList::-webkit-scrollbar {
+  width: 7px;
+}
+
+.heroPriorityCard .priorityList::-webkit-scrollbar-track {
+  border-radius: 999px;
+  background: #edf2f7;
+}
+
+.heroPriorityCard .priorityList::-webkit-scrollbar-thumb {
+  border: 2px solid #edf2f7;
+  border-radius: 999px;
+  background: #9aafc2;
+}
+
+.heroPriorityCard .priorityMonitoring {
+  position: static !important;
+  z-index: auto !important;
+  flex: 0 0 auto;
+  margin-top: auto;
+  padding: 10px 2px 2px;
+  border-top: 1px solid #e7edf3;
+  background: #ffffff;
+}
+
+/*
+ * Keep the shortcut editor inside the navy spotlight card.
+ * It opens upward from Edit shortcuts without covering the portrait
+ * or becoming a large page-level overlay.
+ */
+
+.heroShortcutArea {
+  position: relative;
+  z-index: 25;
+}
+
+.shortcutEditor {
+  position: absolute !important;
+  z-index: 60 !important;
+  inset: auto 0 44px 0 !important;
+  display: grid !important;
+  width: auto !important;
+  min-width: 0 !important;
+  max-width: none !important;
+  height: auto !important;
+  max-height: 280px !important;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  overflow: hidden !important;
+  padding: 0 !important;
+  border: 1px solid #d4dee8 !important;
+  border-radius: 14px !important;
+  color: #173b60 !important;
+  background: #ffffff !important;
+  box-shadow:
+    0 22px 48px rgba(5, 27, 50, 0.3),
+    0 4px 12px rgba(5, 27, 50, 0.14) !important;
+}
+
+.shortcutEditorHeader {
+  display: flex !important;
+  align-items: flex-start !important;
+  justify-content: space-between !important;
+  gap: 12px !important;
+  padding: 11px 12px !important;
+  border-bottom: 1px solid #e5ebf1 !important;
+  background: #ffffff !important;
+}
+
+.shortcutEditorHeader strong {
+  display: block;
+  color: #153a60;
+  font-size: 0.72rem;
+}
+
+.shortcutEditorHeader small {
+  display: block;
+  margin-top: 3px;
+  color: #667d93;
+  font-size: 0.61rem;
+  line-height: 1.35;
+}
+
+.shortcutEditorHeader > button {
+  display: grid !important;
+  width: 30px !important;
+  height: 30px !important;
+  flex: 0 0 30px !important;
+  place-items: center !important;
+  padding: 0 !important;
+  border: 1px solid #dce5ed !important;
+  border-radius: 8px !important;
+  color: #395c7d !important;
+  background: #f7f9fb !important;
+}
+
+.shortcutOptions {
+  display: grid !important;
+  min-height: 0 !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  align-content: start !important;
+  gap: 6px !important;
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+  padding: 9px 10px !important;
+  background: #ffffff !important;
+  scrollbar-width: thin;
+  scrollbar-color: #9aafc2 #edf2f7;
+}
+
+.shortcutOptions::-webkit-scrollbar {
+  width: 7px;
+}
+
+.shortcutOptions::-webkit-scrollbar-track {
+  background: #edf2f7;
+}
+
+.shortcutOptions::-webkit-scrollbar-thumb {
+  border: 2px solid #edf2f7;
+  border-radius: 999px;
+  background: #9aafc2;
+}
+
+.shortcutOptions button {
+  display: grid !important;
+  min-width: 0 !important;
+  min-height: 38px !important;
+  grid-template-columns: auto minmax(0, 1fr) auto !important;
+  align-items: center !important;
+  justify-content: initial !important;
+  gap: 8px !important;
+  padding: 7px 9px !important;
+  border: 1px solid #dbe5ee !important;
+  border-radius: 9px !important;
+  color: #244b70 !important;
+  background: #f8fafc !important;
+  text-align: left !important;
+  font-size: 0.66rem !important;
+  font-weight: 760 !important;
+}
+
+.shortcutOptions button:hover {
+  border-color: #aebfd0 !important;
+  background: #f1f6fa !important;
+}
+
+.shortcutOptions button[aria-pressed="true"],
+.shortcutOptions .selectedShortcut {
+  border-color: #ef7881 !important;
+  color: #a82431 !important;
+  background: #fff1f2 !important;
+}
+
+.shortcutOptions button span {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.shortcutEditorFooter {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 12px !important;
+  padding: 9px 12px !important;
+  border-top: 1px solid #e5ebf1 !important;
+  color: #617990 !important;
+  background: #f8fafc !important;
+  font-size: 0.61rem !important;
+}
+
+.shortcutEditorFooter button {
+  padding: 0 !important;
+  color: #235f98 !important;
+  background: transparent !important;
+  font-size: 0.61rem !important;
+  font-weight: 820 !important;
+}
+
+@media (max-width: 760px) {
+  .shortcutEditor {
+    position: fixed !important;
+    z-index: 200 !important;
+    inset: auto 12px 12px 12px !important;
+    max-height: min(70vh, 520px) !important;
+  }
+
+  .shortcutOptions {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* PRIORITY AND SHORTCUT REPAIR — END */
+
+/* SHORTCUT WIDGET STABILITY — START */
+
+/*
+ * The shortcut editor is a centered application modal rather than
+ * an absolutely positioned panel tied to the narrow hero-copy column.
+ */
+
+.shortcutEditor {
+  position: fixed !important;
+  z-index: 5000 !important;
+  inset: 50% auto auto 50% !important;
+  width: min(680px, calc(100vw - 40px)) !important;
+  min-width: 0 !important;
+  max-width: 680px !important;
+  height: auto !important;
+  max-height: min(620px, calc(100vh - 70px)) !important;
+  margin: 0 !important;
+  transform: translate(-50%, -50%) !important;
+  grid-template-rows: auto minmax(0, 1fr) auto !important;
+  overflow: hidden !important;
+  border: 1px solid #cbd8e4 !important;
+  border-radius: 18px !important;
+  color: #173b60 !important;
+  background: #ffffff !important;
+  box-shadow:
+    0 0 0 9999px rgba(5, 20, 37, 0.48),
+    0 28px 70px rgba(5, 23, 43, 0.34),
+    0 8px 24px rgba(5, 23, 43, 0.18) !important;
+  isolation: isolate;
+}
+
+.shortcutEditorHeader {
+  position: relative !important;
+  z-index: 2 !important;
+  min-width: 0 !important;
+  padding: 16px 18px !important;
+  border-bottom: 1px solid #e2e9f0 !important;
+  background: #ffffff !important;
+}
+
+.shortcutEditorHeader > div {
+  min-width: 0;
+  padding-right: 42px;
+}
+
+.shortcutEditorHeader strong {
+  color: #15395e !important;
+  font-size: 0.9rem !important;
+  line-height: 1.25 !important;
+}
+
+.shortcutEditorHeader small {
+  color: #627a91 !important;
+  font-size: 0.7rem !important;
+  line-height: 1.45 !important;
+}
+
+.shortcutEditorHeader > button {
+  position: absolute !important;
+  top: 12px !important;
+  right: 14px !important;
+  width: 34px !important;
+  height: 34px !important;
+  padding: 0 !important;
+  border: 1px solid #d7e1ea !important;
+  border-radius: 10px !important;
+  color: #315779 !important;
+  background: #f5f8fb !important;
+}
+
+.shortcutEditorHeader > button:hover {
+  color: #b62633 !important;
+  background: #fff0f1 !important;
+}
+
+.shortcutOptions {
+  min-height: 0 !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  align-content: start !important;
+  gap: 9px !important;
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+  padding: 14px 16px !important;
+  background: #ffffff !important;
+  scrollbar-width: thin;
+  scrollbar-color: #91a8bd #edf2f7;
+}
+
+.shortcutOptions::-webkit-scrollbar {
+  width: 8px;
+}
+
+.shortcutOptions::-webkit-scrollbar-track {
+  background: #edf2f7;
+}
+
+.shortcutOptions::-webkit-scrollbar-thumb {
+  border: 2px solid #edf2f7;
+  border-radius: 999px;
+  background: #91a8bd;
+}
+
+.shortcutOptions button {
+  min-width: 0 !important;
+  min-height: 52px !important;
+  grid-template-columns: auto minmax(0, 1fr) auto !important;
+  gap: 10px !important;
+  padding: 10px 12px !important;
+  border: 1px solid #d9e3ec !important;
+  border-radius: 12px !important;
+  color: #244a6e !important;
+  background: #f8fafc !important;
+  font-size: 0.75rem !important;
+  line-height: 1.25 !important;
+}
+
+.shortcutOptions button:hover {
+  border-color: #aabed0 !important;
+  background: #f1f6fa !important;
+}
+
+.shortcutOptions button[aria-pressed="true"],
+.shortcutOptions .selectedShortcut {
+  border-color: #ef707a !important;
+  color: #a82431 !important;
+  background: #fff1f2 !important;
+  box-shadow: inset 0 0 0 1px rgba(239, 51, 64, 0.08);
+}
+
+.shortcutOptions button span {
+  min-width: 0 !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+}
+
+.shortcutEditorFooter {
+  position: relative !important;
+  z-index: 2 !important;
+  min-height: 54px !important;
+  padding: 12px 18px !important;
+  border-top: 1px solid #e2e9f0 !important;
+  color: #637b92 !important;
+  background: #f7f9fb !important;
+  font-size: 0.7rem !important;
+}
+
+.shortcutEditorFooter button {
+  color: #205f9a !important;
+  font-size: 0.7rem !important;
+  font-weight: 850 !important;
+}
+
+.shortcutEditorFooter button:hover {
+  color: #c52836 !important;
+}
+
+@media (max-width: 680px) {
+  .shortcutEditor {
+    width: calc(100vw - 24px) !important;
+    max-height: calc(100dvh - 24px) !important;
+    border-radius: 15px !important;
+  }
+
+  .shortcutOptions {
+    grid-template-columns: 1fr !important;
+    padding: 12px !important;
+  }
+
+  .shortcutEditorHeader {
+    padding: 14px !important;
+  }
+
+  .shortcutEditorFooter {
+    align-items: flex-start !important;
+    flex-direction: column !important;
+    gap: 7px !important;
+    padding: 11px 14px !important;
+  }
+}
+
+/* SHORTCUT WIDGET STABILITY — END */
+
+/* SHORTCUT MODAL STACKING — START */
+
+/*
+ * The shortcut editor remains inside the Spotlight component,
+ * but its complete ancestor stacking chain is raised while open.
+ * This prevents sticky headings in the eight operational cards
+ * from painting over the modal or its backdrop.
+ */
+
+.main:has(.shortcutEditor) {
+  isolation: isolate;
+}
+
+.heroGrid:has(.shortcutEditor) {
+  position: relative;
+  z-index: 2147482000;
+  overflow: visible;
+}
+
+.centerHeroStack:has(.shortcutEditor) {
+  position: relative;
+  z-index: 2147482100;
+  overflow: visible !important;
+  isolation: auto;
+}
+
+.heroCard:has(.shortcutEditor) {
+  position: relative;
+  z-index: 2147482200;
+  overflow: visible !important;
+  isolation: auto;
+}
+
+.heroCopy:has(.shortcutEditor),
+.heroShortcutArea:has(.shortcutEditor) {
+  position: relative;
+  z-index: 2147482300;
+  overflow: visible !important;
+  isolation: auto;
+}
+
+.shortcutEditor {
+  z-index: 2147483000 !important;
+}
+
+/*
+ * Temporarily flatten the lower card stacking contexts while
+ * the shortcut editor is open.
+ */
+
+.main:has(.shortcutEditor) .middleGrid,
+.main:has(.shortcutEditor) .bottomGrid,
+.main:has(.shortcutEditor) .middleGrid > .compactCard,
+.main:has(.shortcutEditor) .bottomGrid > .lowerCard {
+  position: relative;
+  z-index: 0 !important;
+}
+
+.main:has(.shortcutEditor)
+  .middleGrid
+  > .compactCard
+  > .cardHeading,
+.main:has(.shortcutEditor)
+  .bottomGrid
+  > .lowerCard
+  > .cardHeading {
+  z-index: 0 !important;
+}
+
+/*
+ * Prevent the priority and schedule headings from creating
+ * competing layers beside the editor.
+ */
+
+.main:has(.shortcutEditor)
+  .heroPriorityCard
+  > .cardHeading,
+.main:has(.shortcutEditor)
+  .scheduleCard
+  > .cardHeading {
+  z-index: 0 !important;
+}
+
+/* SHORTCUT MODAL STACKING — END */
+
+/* DASHBOARD COMMAND HEADER — START */
+
+/*
+ * Header order:
+ * 1. Next deadline
+ * 2. Eastern date and time
+ * 3. Ask Campaign HQ
+ * 4. Notifications
+ */
+
+.topbar {
+  min-height: 96px;
+  grid-template-columns:
+    minmax(290px, 1fr)
+    auto;
+  align-items: center;
+  gap: 20px;
+  padding: 13px 22px;
+}
+
+.topbarActions {
+  display: grid;
+  min-width: 0;
+  grid-template-columns:
+    minmax(245px, 292px)
+    minmax(205px, 238px)
+    auto
+    auto;
+  align-items: stretch;
+  justify-content: end;
+  gap: 10px;
+}
+
+.headerDeadline,
+.headerClock {
+  display: grid;
+  min-width: 0;
+  min-height: 62px;
+  align-items: center;
+  border: 1px solid #d6e0ea;
+  border-radius: 15px;
+  color: #173b60;
+  background:
+    linear-gradient(
+      180deg,
+      #ffffff 0%,
+      #f8fafc 100%
+    );
+  box-shadow:
+    0 8px 22px rgba(15, 48, 83, 0.055),
+    inset 0 1px #ffffff;
+  text-align: left;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.2s ease;
+}
+
+.headerDeadline:hover,
+.headerClock:hover {
+  border-color: #aec0d1;
+  box-shadow:
+    0 11px 28px rgba(15, 48, 83, 0.09),
+    inset 0 1px #ffffff;
+  transform: translateY(-1px);
+}
+
+.headerDeadline {
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 11px;
+  padding: 9px 13px;
+}
+
+.headerDeadlineIcon {
+  display: grid;
+  width: 38px;
+  height: 38px;
+  place-items: center;
+  border-radius: 11px;
+  color: #ffffff;
+  background:
+    linear-gradient(
+      135deg,
+      #173f6c,
+      #245f98
+    );
+  box-shadow:
+    0 7px 16px rgba(18, 63, 108, 0.2);
+}
+
+.headerDeadlineCopy {
+  display: block;
+  min-width: 0;
+}
+
+.headerDeadlineCopy small,
+.headerDeadlineCopy strong,
+.headerDeadlineCopy > span {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.headerDeadlineCopy small {
+  color: #7a8da1;
+  font-size: 0.62rem;
+  font-weight: 900;
+  letter-spacing: 0.075em;
+  line-height: 1.1;
+  text-transform: uppercase;
+}
+
+.headerDeadlineCopy strong {
+  margin-top: 4px;
+  color: #132f4f;
+  font-size: 0.82rem;
+  line-height: 1.15;
+}
+
+.headerDeadlineCopy > span {
+  margin-top: 3px;
+  color: #657c92;
+  font-size: 0.65rem;
+  line-height: 1.2;
+}
+
+.headerClock {
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 11px;
+  padding: 9px 14px;
+}
+
+.headerClock > svg {
+  color: #ef3340;
+}
+
+.headerClock > span {
+  min-width: 0;
+}
+
+.headerClock strong,
+.headerClock small {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.headerClock strong {
+  color: #304f70;
+  font-size: 0.72rem;
+  line-height: 1.25;
+}
+
+.headerClock small {
+  margin-top: 5px;
+  color: #163b61;
+  font-size: 0.82rem;
+  font-weight: 850;
+  line-height: 1.1;
+}
+
+.headerCampaignSearch,
+.headerNotifications {
+  display: flex;
+  min-width: 0;
+  align-items: stretch;
+}
+
+.headerCampaignSearch > button {
+  min-height: 62px !important;
+  border-radius: 15px !important;
+}
+
+.headerNotifications > button {
+  width: 58px !important;
+  min-width: 58px !important;
+  height: 62px !important;
+  min-height: 62px !important;
+  border-radius: 15px !important;
+}
+
+/*
+ * Medium desktop windows place the controls on their own row.
+ */
+
+@media (max-width: 1500px) {
+  .topbar {
+    grid-template-columns:
+      minmax(260px, 1fr);
+  }
+
+  .topbarActions {
+    grid-column: 1 / -1;
+    width: 100%;
+    grid-template-columns:
+      minmax(235px, 1.2fr)
+      minmax(205px, 0.9fr)
+      auto
+      58px;
+    justify-content: stretch;
+  }
+}
+
+/*
+ * Smaller laptops use two organized rows.
+ */
+
+@media (max-width: 1040px) {
+  .topbarActions {
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+  }
+
+  .headerCampaignSearch > button,
+  .headerNotifications > button {
+    width: 100% !important;
+    min-width: 0 !important;
+  }
+}
+
+/*
+ * Mobile stacks every command without hiding anything.
+ */
+
+@media (max-width: 680px) {
+  .topbar {
+    padding: 13px;
+  }
+
+  .topbarActions {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .headerDeadline,
+  .headerClock,
+  .headerCampaignSearch > button,
+  .headerNotifications > button {
+    width: 100% !important;
+    min-width: 0 !important;
+  }
+}
+
+/* DASHBOARD COMMAND HEADER — END */
+
+/* MATCHED HEADER CLOCK — START */
+
+/*
+ * Date/time now matches the Ask Campaign HQ control:
+ * same height, border weight, corner radius and vertical alignment.
+ */
+
+.headerClock {
+  display: flex !important;
+  width: auto !important;
+  min-width: 230px !important;
+  height: 62px !important;
+  min-height: 62px !important;
+  max-height: 62px !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  gap: 12px !important;
+  padding: 0 16px !important;
+  border: 1px solid #d6e0ea !important;
+  border-radius: 15px !important;
+  color: #173b60 !important;
+  background:
+    linear-gradient(
+      180deg,
+      #ffffff 0%,
+      #f8fafc 100%
+    ) !important;
+  box-shadow:
+    0 8px 22px rgba(15, 48, 83, 0.055),
+    inset 0 1px #ffffff !important;
+}
+
+.headerClock:hover {
+  border-color: #aec0d1 !important;
+  box-shadow:
+    0 11px 28px rgba(15, 48, 83, 0.09),
+    inset 0 1px #ffffff !important;
+  transform: translateY(-1px);
+}
+
+.headerClock > svg {
+  width: 22px !important;
+  height: 22px !important;
+  flex: 0 0 22px !important;
+  color: #ef3340 !important;
+}
+
+.headerClock > span {
+  display: flex !important;
+  min-width: 0 !important;
+  align-items: center !important;
+  gap: 10px !important;
+}
+
+.headerClock strong,
+.headerClock small {
+  display: block !important;
+  margin: 0 !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+}
+
+.headerClock strong {
+  color: #315476 !important;
+  font-size: 0.76rem !important;
+  font-weight: 780 !important;
+  line-height: 1 !important;
+}
+
+.headerClock small {
+  padding-left: 10px !important;
+  border-left: 1px solid #d9e2eb !important;
+  color: #173b60 !important;
+  font-size: 0.76rem !important;
+  font-weight: 850 !important;
+  line-height: 1 !important;
+}
+
+.headerCampaignSearch,
+.headerCampaignSearch > button {
+  height: 62px !important;
+  min-height: 62px !important;
+  max-height: 62px !important;
+}
+
+@media (max-width: 680px) {
+  .headerClock {
+    width: 100% !important;
+    min-width: 0 !important;
+  }
+
+  .headerClock > span {
+    flex-wrap: wrap !important;
+    gap: 5px 10px !important;
+  }
+}
+
+/* MATCHED HEADER CLOCK — END */
+
+/* TRUE MATCHED HEADER CLOCK — START */
+
+/*
+ * The deadline card creates a taller grid row.
+ * Prevent the date/time control from stretching with that row.
+ */
+
+.topbarActions {
+  align-items: center !important;
+}
+
+.headerClock {
+  box-sizing: border-box !important;
+  align-self: center !important;
+  justify-self: stretch !important;
+
+  width: 300px !important;
+  min-width: 300px !important;
+  max-width: 300px !important;
+
+  height: 62px !important;
+  min-height: 62px !important;
+  max-height: 62px !important;
+
+  padding: 0 16px !important;
+
+  border: 1px solid #d6e0ea !important;
+  border-radius: 15px !important;
+
+  color: #173b60 !important;
+  background:
+    linear-gradient(
+      180deg,
+      #ffffff 0%,
+      #f8fafc 100%
+    ) !important;
+
+  box-shadow:
+    0 8px 22px rgba(15, 48, 83, 0.055),
+    inset 0 1px #ffffff !important;
+
+  transform: none !important;
+}
+
+.headerClock:hover {
+  border-color: #aec0d1 !important;
+  box-shadow:
+    0 11px 28px rgba(15, 48, 83, 0.09),
+    inset 0 1px #ffffff !important;
+  transform: translateY(-1px) !important;
+}
+
+.headerClock > svg {
+  width: 22px !important;
+  height: 22px !important;
+  flex: 0 0 22px !important;
+  color: #ef3340 !important;
+}
+
+.headerClock > span {
+  display: grid !important;
+  min-width: 0 !important;
+  grid-template-columns:
+    minmax(0, 1fr)
+    auto !important;
+  align-items: center !important;
+  gap: 13px !important;
+}
+
+.headerClock strong,
+.headerClock small {
+  display: block !important;
+  width: auto !important;
+  min-width: 0 !important;
+  margin: 0 !important;
+
+  overflow: visible !important;
+  text-overflow: clip !important;
+  white-space: nowrap !important;
+
+  color: #315476 !important;
+  font-size: 0.76rem !important;
+  font-weight: 820 !important;
+  line-height: 1 !important;
+}
+
+.headerClock small {
+  padding-left: 13px !important;
+  border-left: 1px solid #d9e2eb !important;
+  color: #173b60 !important;
+}
+
+/*
+ * Force the Ask Campaign HQ wrapper and its actual nested button
+ * to use the exact same control height.
+ */
+
+.headerCampaignSearch {
+  align-self: center !important;
+  height: 62px !important;
+  min-height: 62px !important;
+  max-height: 62px !important;
+}
+
+.headerCampaignSearch > * {
+  height: 62px !important;
+  min-height: 62px !important;
+  max-height: 62px !important;
+}
+
+.headerCampaignSearch button {
+  box-sizing: border-box !important;
+  height: 62px !important;
+  min-height: 62px !important;
+  max-height: 62px !important;
+  border-radius: 15px !important;
+}
+
+/*
+ * Reserve enough horizontal room for the complete date and time.
+ */
+
+@media (min-width: 1501px) {
+  .topbarActions {
+    grid-template-columns:
+      minmax(245px, 292px)
+      300px
+      auto
+      auto !important;
+  }
+}
+
+@media (max-width: 1500px) and (min-width: 1041px) {
+  .topbarActions {
+    grid-template-columns:
+      minmax(235px, 1fr)
+      300px
+      auto
+      58px !important;
+  }
+}
+
+@media (max-width: 1040px) {
+  .headerClock {
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: none !important;
+  }
+}
+
+@media (max-width: 680px) {
+  .headerClock > span {
+    grid-template-columns: 1fr !important;
+    gap: 4px !important;
+  }
+
+  .headerClock small {
+    padding-left: 0 !important;
+    border-left: 0 !important;
+  }
+}
+
+/* TRUE MATCHED HEADER CLOCK — END */
+
+/* COMPACT COMMAND HEADER — START */
+
+/*
+ * Compact control order:
+ * Deadline, Date, Time Zone, Campaign HQ, Notifications.
+ */
+
+.topbar {
+  min-height: 76px !important;
+  padding-top: 10px !important;
+  padding-bottom: 10px !important;
+}
+
+.topbarActions {
+  display: grid !important;
+  grid-template-columns:
+    224px
+    190px
+    154px
+    218px
+    50px !important;
+  align-items: center !important;
+  justify-content: end !important;
+  gap: 9px !important;
+}
+
+/*
+ * Shared compact control appearance.
+ */
+
+.headerDeadline,
+.headerDateButton,
+.headerTimeButton {
+  box-sizing: border-box !important;
+  align-self: center !important;
+  height: 48px !important;
+  min-height: 48px !important;
+  max-height: 48px !important;
+  border: 1px solid #d5e0ea !important;
+  border-radius: 13px !important;
+  color: #244d73 !important;
+  background:
+    linear-gradient(
+      180deg,
+      #ffffff 0%,
+      #f8fafc 100%
+    ) !important;
+  box-shadow:
+    0 6px 18px rgba(15, 48, 83, 0.055),
+    inset 0 1px #ffffff !important;
+  transform: none !important;
+}
+
+.headerDeadline:hover,
+.headerDateButton:hover,
+.headerTimeButton:hover {
+  border-color: #adc0d2 !important;
+  box-shadow:
+    0 9px 22px rgba(15, 48, 83, 0.09),
+    inset 0 1px #ffffff !important;
+  transform: translateY(-1px) !important;
+}
+
+/*
+ * Compact deadline control.
+ */
+
+.headerDeadline {
+  display: grid !important;
+  width: 224px !important;
+  min-width: 224px !important;
+  max-width: 224px !important;
+  grid-template-columns: auto minmax(0, 1fr) !important;
+  align-items: center !important;
+  gap: 9px !important;
+  padding: 0 11px !important;
+}
+
+.headerDeadlineIcon {
+  width: 32px !important;
+  height: 32px !important;
+  border-radius: 9px !important;
+}
+
+.headerDeadlineIcon svg {
+  width: 17px !important;
+  height: 17px !important;
+}
+
+.headerDeadlineCopy small {
+  font-size: 0.56rem !important;
+}
+
+.headerDeadlineCopy strong {
+  margin-top: 3px !important;
+  font-size: 0.72rem !important;
+}
+
+.headerDeadlineCopy > span {
+  display: none !important;
+}
+
+/*
+ * Separate compact date and time-zone controls.
+ */
+
+.headerDateButton,
+.headerTimeButton {
+  display: flex !important;
+  min-width: 0 !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  gap: 9px !important;
+  padding: 0 12px !important;
+  text-align: left !important;
+}
+
+.headerDateButton {
+  width: 190px !important;
+  max-width: 190px !important;
+}
+
+.headerTimeButton {
+  width: 154px !important;
+  max-width: 154px !important;
+}
+
+.headerDateButton svg,
+.headerTimeButton svg {
+  width: 18px !important;
+  height: 18px !important;
+  flex: 0 0 18px !important;
+  color: #ef3340 !important;
+}
+
+.headerDateButton span,
+.headerTimeButton span {
+  min-width: 0 !important;
+  overflow: hidden !important;
+  color: #294f74 !important;
+  font-size: 0.7rem !important;
+  font-weight: 820 !important;
+  line-height: 1 !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+}
+
+/*
+ * Restore Ask Campaign HQ to its original compact size.
+ */
+
+.headerCampaignSearch {
+  width: 218px !important;
+  min-width: 218px !important;
+  max-width: 218px !important;
+  height: 48px !important;
+  min-height: 48px !important;
+  max-height: 48px !important;
+  align-self: center !important;
+}
+
+.headerCampaignSearch > *,
+.headerCampaignSearch button {
+  box-sizing: border-box !important;
+  width: 100% !important;
+  height: 48px !important;
+  min-height: 48px !important;
+  max-height: 48px !important;
+  border-radius: 13px !important;
+}
+
+/*
+ * Compact notification button.
+ */
+
+.headerNotifications {
+  width: 50px !important;
+  min-width: 50px !important;
+  max-width: 50px !important;
+  height: 48px !important;
+  min-height: 48px !important;
+  max-height: 48px !important;
+  align-self: center !important;
+}
+
+.headerNotifications > *,
+.headerNotifications button {
+  box-sizing: border-box !important;
+  width: 50px !important;
+  min-width: 50px !important;
+  max-width: 50px !important;
+  height: 48px !important;
+  min-height: 48px !important;
+  max-height: 48px !important;
+  border-radius: 13px !important;
+}
+
+/*
+ * Medium screens wrap cleanly without stretching controls.
+ */
+
+@media (max-width: 1420px) {
+  .topbarActions {
+    grid-template-columns:
+      224px
+      190px
+      154px
+      218px
+      50px !important;
+    justify-content: start !important;
+    overflow-x: auto;
+    padding-bottom: 2px;
+  }
+}
+
+/*
+ * Tablets use two columns.
+ */
+
+@media (max-width: 900px) {
+  .topbarActions {
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr)) !important;
+    overflow: visible;
+  }
+
+  .headerDeadline,
+  .headerDateButton,
+  .headerTimeButton,
+  .headerCampaignSearch,
+  .headerNotifications {
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: none !important;
+  }
+
+  .headerNotifications > *,
+  .headerNotifications button {
+    width: 100% !important;
+    max-width: none !important;
+  }
+}
+
+/*
+ * Mobile stacks controls naturally.
+ */
+
+@media (max-width: 600px) {
+  .topbarActions {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* COMPACT COMMAND HEADER — END */
+
+/* COMBINED COMPACT DATE TIME — START */
+
+/*
+ * Final compact header:
+ * Deadline | Date + Time Zone | Campaign HQ | Notifications
+ */
+
+.topbarActions {
+  grid-template-columns:
+    224px
+    324px
+    218px
+    50px !important;
+  align-items: center !important;
+  gap: 9px !important;
+}
+
+.headerDateTimeButton {
+  box-sizing: border-box !important;
+  display: grid !important;
+  width: 324px !important;
+  min-width: 324px !important;
+  max-width: 324px !important;
+  height: 48px !important;
+  min-height: 48px !important;
+  max-height: 48px !important;
+  grid-template-columns:
+    auto
+    minmax(0, 1fr)
+    1px
+    auto !important;
+  align-items: center !important;
+  gap: 12px !important;
+  padding: 0 14px !important;
+  border: 1px solid #d5e0ea !important;
+  border-radius: 13px !important;
+  color: #294f74 !important;
+  background:
+    linear-gradient(
+      180deg,
+      #ffffff 0%,
+      #f8fafc 100%
+    ) !important;
+  box-shadow:
+    0 6px 18px rgba(15, 48, 83, 0.055),
+    inset 0 1px #ffffff !important;
+  text-align: left !important;
+  transform: none !important;
+}
+
+.headerDateTimeButton:hover {
+  border-color: #adc0d2 !important;
+  box-shadow:
+    0 9px 22px rgba(15, 48, 83, 0.09),
+    inset 0 1px #ffffff !important;
+  transform: translateY(-1px) !important;
+}
+
+.headerDateTimeButton > svg {
+  width: 18px !important;
+  height: 18px !important;
+  flex: 0 0 18px !important;
+  color: #ef3340 !important;
+}
+
+.headerDateValue,
+.headerTimeValue {
+  min-width: 0 !important;
+  overflow: hidden !important;
+  color: #294f74 !important;
+  font-size: 0.7rem !important;
+  font-weight: 820 !important;
+  line-height: 1 !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+}
+
+.headerTimeValue {
+  color: #173b60 !important;
+  text-align: right !important;
+}
+
+.headerDateTimeDivider {
+  display: block !important;
+  width: 1px !important;
+  height: 22px !important;
+  background: #d8e1ea !important;
+}
+
+/*
+ * Ask Campaign HQ and notifications remain compact.
+ */
+
+.headerCampaignSearch,
+.headerCampaignSearch > *,
+.headerCampaignSearch button {
+  height: 48px !important;
+  min-height: 48px !important;
+  max-height: 48px !important;
+}
+
+.headerNotifications,
+.headerNotifications > *,
+.headerNotifications button {
+  height: 48px !important;
+  min-height: 48px !important;
+  max-height: 48px !important;
+}
+
+/*
+ * Smaller screens retain all controls without stretching them.
+ */
+
+@media (max-width: 1420px) {
+  .topbarActions {
+    grid-template-columns:
+      224px
+      324px
+      218px
+      50px !important;
+    justify-content: start !important;
+    overflow-x: auto;
+    padding-bottom: 2px;
+  }
+}
+
+@media (max-width: 900px) {
+  .topbarActions {
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr)) !important;
+    overflow: visible;
+  }
+
+  .headerDateTimeButton {
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: none !important;
+  }
+}
+
+@media (max-width: 600px) {
+  .topbarActions {
+    grid-template-columns: 1fr !important;
+  }
+
+  .headerDateTimeButton {
+    grid-template-columns:
+      auto
+      minmax(0, 1fr)
+      auto !important;
+  }
+
+  .headerDateTimeDivider {
+    display: none !important;
+  }
+
+  .headerTimeValue {
+    text-align: right !important;
+  }
+}
+
+/* COMBINED COMPACT DATE TIME — END */
+
+/* REFERENCE DATE TIME HEADER — START */
+
+/*
+ * Final header:
+ * Next Deadline | Date + Time/Zone | Ask Campaign HQ | Notifications
+ */
+
+.topbarActions {
+  grid-template-columns:
+    224px
+    240px
+    190px
+    50px !important;
+  align-items: center !important;
+  justify-content: end !important;
+  gap: 9px !important;
+}
+
+.headerDateTimeButton {
+  box-sizing: border-box !important;
+  display: grid !important;
+
+  width: 240px !important;
+  min-width: 240px !important;
+  max-width: 240px !important;
+
+  height: 48px !important;
+  min-height: 48px !important;
+  max-height: 48px !important;
+
+  grid-template-columns:
+    auto
+    minmax(0, 1fr)
+    1px
+    auto
+    auto !important;
+
+  align-items: center !important;
+  gap: 8px !important;
+  padding: 0 11px !important;
+
+  border: 1px solid #d5e0ea !important;
+  border-radius: 13px !important;
+
+  color: #294f74 !important;
+  background:
+    linear-gradient(
+      180deg,
+      #ffffff 0%,
+      #f8fafc 100%
+    ) !important;
+
+  box-shadow:
+    0 6px 18px rgba(15, 48, 83, 0.055),
+    inset 0 1px #ffffff !important;
+
+  text-align: left !important;
+  transform: none !important;
+}
+
+.headerDateTimeButton:hover {
+  border-color: #adc0d2 !important;
+  box-shadow:
+    0 9px 22px rgba(15, 48, 83, 0.09),
+    inset 0 1px #ffffff !important;
+  transform: translateY(-1px) !important;
+}
+
+.headerDateTimeCalendar,
+.headerDateTimeClock {
+  width: 18px !important;
+  height: 18px !important;
+  flex: 0 0 18px !important;
+}
+
+.headerDateTimeCalendar {
+  color: #2467a5 !important;
+}
+
+.headerDateTimeClock {
+  color: #ef3340 !important;
+}
+
+.headerDateValue,
+.headerTimeValue {
+  display: block !important;
+  min-width: 0 !important;
+  overflow: hidden !important;
+  font-size: 0.68rem !important;
+  font-weight: 820 !important;
+  line-height: 1 !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+}
+
+.headerDateValue {
+  color: #5e7188 !important;
+}
+
+.headerTimeValue {
+  color: #173b60 !important;
+  text-align: right !important;
+}
+
+.headerDateTimeDivider {
+  display: block !important;
+  width: 1px !important;
+  height: 22px !important;
+  background: #d8e1ea !important;
+}
+
+/*
+ * Restore the compact original Campaign HQ dimensions.
+ */
+
+.headerCampaignSearch {
+  width: 190px !important;
+  min-width: 190px !important;
+  max-width: 190px !important;
+
+  height: 48px !important;
+  min-height: 48px !important;
+  max-height: 48px !important;
+}
+
+.headerCampaignSearch > *,
+.headerCampaignSearch button {
+  box-sizing: border-box !important;
+  width: 100% !important;
+
+  height: 48px !important;
+  min-height: 48px !important;
+  max-height: 48px !important;
+
+  border-radius: 13px !important;
+}
+
+/*
+ * Compact notification control and existing red count badge.
+ */
+
+.headerNotifications {
+  width: 50px !important;
+  min-width: 50px !important;
+  max-width: 50px !important;
+
+  height: 48px !important;
+  min-height: 48px !important;
+  max-height: 48px !important;
+}
+
+.headerNotifications > *,
+.headerNotifications button {
+  box-sizing: border-box !important;
+  width: 50px !important;
+  min-width: 50px !important;
+  max-width: 50px !important;
+
+  height: 48px !important;
+  min-height: 48px !important;
+  max-height: 48px !important;
+
+  border-radius: 13px !important;
+}
+
+@media (max-width: 1420px) {
+  .topbarActions {
+    justify-content: start !important;
+    overflow-x: auto;
+    padding-bottom: 2px;
+  }
+}
+
+@media (max-width: 900px) {
+  .topbarActions {
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr)) !important;
+    overflow: visible;
+  }
+
+  .headerDateTimeButton,
+  .headerCampaignSearch,
+  .headerNotifications {
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: none !important;
+  }
+
+  .headerNotifications > *,
+  .headerNotifications button {
+    width: 100% !important;
+    max-width: none !important;
+  }
+}
+
+@media (max-width: 600px) {
+  .topbarActions {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* REFERENCE DATE TIME HEADER — END */
+
+/* UNREAD COMMUNICATIONS CARD — START */
+
+/*
+ * This block affects only the Communications card.
+ * Every other dashboard card remains unchanged.
+ */
+
+.communicationsAttentionCard {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden !important;
+  border-color: rgba(89, 143, 188, 0.38) !important;
+  color: #ffffff !important;
+  background:
+    radial-gradient(
+      circle at 14% 5%,
+      rgba(42, 112, 166, 0.28),
+      transparent 35%
+    ),
+    linear-gradient(
+      145deg,
+      #061f39 0%,
+      #082844 54%,
+      #061a30 100%
+    ) !important;
+  box-shadow:
+    0 15px 34px rgba(5, 28, 52, 0.22),
+    inset 0 0 0 1px rgba(121, 174, 216, 0.08) !important;
+}
+
+.communicationsAttentionCard::before {
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  pointer-events: none;
+  content: "";
+  background:
+    linear-gradient(
+      115deg,
+      rgba(255, 255, 255, 0.025),
+      transparent 38%
+    );
+}
+
+.communicationsAttentionCard > .cardHeading {
+  position: static !important;
+  z-index: 1 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  background: transparent !important;
+}
+
+.communicationsAttentionCard
+  > .cardHeading
+  > span {
+  color: #ffffff !important;
+  font-size: 0.75rem !important;
+}
+
+.communicationsAttentionCard
+  > .cardHeading
+  > span
+  svg {
+  color: #42dfb1 !important;
+  filter:
+    drop-shadow(
+      0 0 7px rgba(66, 223, 177, 0.28)
+    );
+}
+
+.communicationsAttentionCard
+  > .cardHeading
+  button {
+  color: #a9c3dc !important;
+  font-size: 0.66rem !important;
+}
+
+.communicationsAttentionCard
+  > .cardHeading
+  button:hover {
+  color: #ffffff !important;
+}
+
+.unreadMessageMetric {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-top: 24px;
+}
+
+.unreadMessageMetric strong {
+  color: #ffffff;
+  font-size: 2.3rem;
+  font-weight: 900;
+  line-height: 0.95;
+  letter-spacing: -0.055em;
+}
+
+.unreadMessageMetric span {
+  color: #d5e3ef;
+  font-size: 0.74rem;
+  font-weight: 760;
+}
+
+.unreadAvatarStack {
+  display: flex;
+  align-items: center;
+  margin-top: 21px;
+  padding-left: 4px;
+}
+
+.unreadPhotoAvatar,
+.unreadInitialAvatar {
+  display: grid;
+  width: 39px;
+  height: 39px;
+  margin-left: -7px;
+  place-items: center;
+  overflow: hidden;
+  border: 2px solid #08243f;
+  border-radius: 50%;
+  color: #ffffff;
+  background:
+    linear-gradient(
+      135deg,
+      #163f69,
+      #0c2a48
+    );
+  box-shadow:
+    0 5px 13px rgba(2, 17, 32, 0.28);
+  font-size: 0.68rem;
+  font-weight: 900;
+}
+
+.unreadPhotoAvatar:first-child {
+  margin-left: 0;
+}
+
+.unreadPhotoAvatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center top;
+}
+
+.unreadInitialAvatar:nth-child(3) {
+  background:
+    linear-gradient(
+      135deg,
+      #7e40ba,
+      #54288e
+    );
+}
+
+.unreadInitialAvatar:nth-child(4) {
+  background:
+    linear-gradient(
+      135deg,
+      #f14a5a,
+      #c52035
+    );
+}
+
+.unreadMoreAvatar {
+  background:
+    linear-gradient(
+      135deg,
+      #294d70,
+      #142e49
+    ) !important;
+}
+
+.unreadPrioritySummary {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 21px;
+  color: #b8cada;
+  font-size: 0.73rem;
+}
+
+.unreadPrioritySummary strong {
+  color: #eef6fc;
+  font-weight: 800;
+}
+
+.unreadPrioritySummary i {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #ef3340;
+  box-shadow:
+    0 0 0 3px rgba(239, 51, 64, 0.1);
+}
+
+@media (max-width: 760px) {
+  .communicationsAttentionCard {
+    min-height: 245px !important;
+  }
+}
+
+/* UNREAD COMMUNICATIONS CARD — END */
+
+/* WHITE OPERATIONAL CARDS — START */
+
+/*
+ * White high-readability treatment for the eight operational cards.
+ * Existing content, buttons and card interactions remain unchanged.
+ */
+
+.middleGrid > [data-operational-card],
+.bottomGrid > [data-operational-card] {
+  position: relative;
+  isolation: isolate;
+  color: #173b60 !important;
+  background: #ffffff !important;
+  border: 1px solid #d9e3ec !important;
+  box-shadow:
+    0 12px 28px rgba(15, 48, 83, 0.07),
+    inset 0 1px #ffffff !important;
+  filter: none !important;
+}
+
+/* Thin brand accents without reducing readability. */
+
+.middleGrid > [data-operational-card] {
+  border-top: 3px solid #1b527f !important;
+}
+
+.bottomGrid > [data-operational-card] {
+  border-top: 3px solid #d92e3b !important;
+}
+
+/* Remove the previous dark Communications-card overlay. */
+
+.communicationsAttentionCard {
+  color: #173b60 !important;
+  background: #ffffff !important;
+}
+
+.communicationsAttentionCard::before {
+  display: none !important;
+}
+
+/* Keep every sticky heading white. */
+
+.middleGrid
+  > [data-operational-card]
+  > .cardHeading,
+.bottomGrid
+  > [data-operational-card]
+  > .cardHeading,
+.communicationsAttentionCard
+  > .cardHeading {
+  color: #173b60 !important;
+  background:
+    linear-gradient(
+      180deg,
+      #ffffff 0%,
+      rgba(255, 255, 255, 0.98) 82%,
+      rgba(255, 255, 255, 0) 100%
+    ) !important;
+}
+
+/* Card headings and primary values. */
+
+[data-operational-card]
+  .cardHeading
+  > span,
+[data-operational-card]
+  .metricNumber,
+[data-operational-card]
+  .waitingMetric
+  strong,
+[data-operational-card]
+  .volunteerMetric
+  strong,
+[data-operational-card]
+  .approvalMetric
+  strong,
+[data-operational-card]
+  .healthLayout
+  strong,
+[data-operational-card]
+  .activityList
+  strong,
+[data-operational-card]
+  .upcomingList
+  strong,
+[data-operational-card]
+  .integrationState
+  strong,
+[data-operational-card]
+  .approvalList
+  strong,
+[data-operational-card]
+  .unreadMessageMetric
+  strong {
+  color: #102f50 !important;
+}
+
+[data-operational-card]
+  .cardHeading
+  > span
+  svg {
+  color: #ef3340 !important;
+}
+
+/* Header actions. */
+
+[data-operational-card]
+  .cardHeading
+  button,
+[data-operational-card]
+  .cardHeading
+  > small {
+  color: #22619c !important;
+}
+
+[data-operational-card]
+  .cardHeading
+  button:hover {
+  color: #d52a38 !important;
+}
+
+/* Secondary copy. */
+
+[data-operational-card]
+  .metricDescription,
+[data-operational-card]
+  .waitingMetric
+  span,
+[data-operational-card]
+  .volunteerMetric
+  span,
+[data-operational-card]
+  .approvalMetric
+  span,
+[data-operational-card]
+  .healthLayout
+  > div:last-child
+  span,
+[data-operational-card]
+  .activityList
+  small,
+[data-operational-card]
+  .activityList
+  time,
+[data-operational-card]
+  .upcomingList
+  small,
+[data-operational-card]
+  .coverageRow
+  > span,
+[data-operational-card]
+  .coverageRow
+  > small,
+[data-operational-card]
+  .integrationState,
+[data-operational-card]
+  .integrationState
+  p,
+[data-operational-card]
+  .approvalList
+  small,
+[data-operational-card]
+  .emptyMini,
+[data-operational-card]
+  .unreadMessageMetric
+  span,
+[data-operational-card]
+  .unreadPrioritySummary {
+  color: #62798f !important;
+}
+
+/* Lists and dividers. */
+
+[data-operational-card]
+  .waitingList
+  button,
+[data-operational-card]
+  .approvalList
+  button,
+[data-operational-card]
+  .upcomingList
+  button,
+[data-operational-card]
+  .activityList
+  > div {
+  color: #294a69 !important;
+  border-color: #e5ebf1 !important;
+}
+
+[data-operational-card]
+  .waitingList
+  button
+  > span,
+[data-operational-card]
+  .approvalList
+  strong,
+[data-operational-card]
+  .activityList
+  strong,
+[data-operational-card]
+  .upcomingList
+  strong {
+  color: #294a69 !important;
+}
+
+[data-operational-card]
+  .waitingList
+  button
+  small {
+  color: #7f91a3 !important;
+}
+
+[data-operational-card]
+  .waitingList
+  .overdue {
+  color: #d52735 !important;
+}
+
+/* Communications avatar and priority section. */
+
+.communicationsAttentionCard
+  .unreadMessageMetric
+  strong {
+  color: #102f50 !important;
+}
+
+.communicationsAttentionCard
+  .unreadMessageMetric
+  span {
+  color: #526d86 !important;
+}
+
+.communicationsAttentionCard
+  .unreadPrioritySummary
+  strong {
+  color: #173b60 !important;
+}
+
+.communicationsAttentionCard
+  .unreadPrioritySummary
+  i {
+  background: #ef3340 !important;
+}
+
+.communicationsAttentionCard
+  .unreadPhotoAvatar,
+.communicationsAttentionCard
+  .unreadInitialAvatar {
+  border-color: #ffffff !important;
+  box-shadow:
+    0 4px 12px rgba(15, 48, 83, 0.17) !important;
+}
+
+/* Health ring. */
+
+[data-operational-card]
+  .healthRing
+  > div {
+  background: #ffffff !important;
+  box-shadow:
+    inset 0 0 0 1px #dfe7ee !important;
+}
+
+[data-operational-card]
+  .healthRing
+  span {
+  color: #d72836 !important;
+}
+
+/* Communication statistics. */
+
+[data-operational-card]
+  .communicationStats
+  span {
+  color: #62798f !important;
+  background: #f7f9fb !important;
+  border-color: #dfe7ee !important;
+}
+
+[data-operational-card]
+  .communicationStats
+  strong {
+  color: #173b60 !important;
+}
+
+/* Calendar badge. */
+
+[data-operational-card]
+  .dateBadge {
+  background: #ffffff !important;
+  border-color: #dbe4ec !important;
+}
+
+[data-operational-card]
+  .dateBadge
+  small {
+  color: #ffffff !important;
+  background: #ef3340 !important;
+}
+
+[data-operational-card]
+  .dateBadge
+  strong {
+  color: #173b60 !important;
+}
+
+/* Volunteer progress. */
+
+[data-operational-card]
+  .coverageRow
+  > span
+  strong {
+  color: #173b60 !important;
+}
+
+[data-operational-card]
+  .coverageRow
+  > div {
+  background: #e4ebf1 !important;
+}
+
+[data-operational-card]
+  .coverageRow
+  > div
+  span {
+  background:
+    linear-gradient(
+      90deg,
+      #174d7f,
+      #ef3340
+    ) !important;
+}
+
+/* Fundraising state. */
+
+[data-operational-card]
+  .integrationState
+  svg {
+  color: #2e6da8 !important;
+}
+
+[data-operational-card]
+  .integrationState
+  button {
+  color: #205f9b !important;
+}
+
+/* Approval status. */
+
+[data-operational-card]
+  .approvalStatus {
+  color: #c22330 !important;
+  background: #fff0f1 !important;
+}
+
+/* Interaction feedback remains enabled. */
+
+[data-operational-card]:hover {
+  border-color: #b9c9d8 !important;
+  box-shadow:
+    0 16px 34px rgba(15, 48, 83, 0.11),
+    inset 0 1px #ffffff !important;
+  filter: none !important;
+  transform: translateY(-2px);
+}
+
+[data-operational-card]:focus-visible {
+  outline: 3px solid rgba(38, 105, 166, 0.42);
+  outline-offset: 3px;
+}
+
+[data-operational-card]:active {
+  transform: translateY(0) scale(0.992);
+}
+
+.middleGrid > [data-operational-card],
+.bottomGrid > [data-operational-card] {
+  scrollbar-color: #94a9bc #edf2f7;
+}
+
+/* WHITE OPERATIONAL CARDS — END */
+
+/* NATURAL CARD SCROLL CHAINING — START */
+
+/*
+ * Scrollbars appear only when content exceeds the available card height.
+ * Reaching the top or bottom of a card passes scrolling back to the
+ * main dashboard instead of trapping the mouse wheel or trackpad.
+ *
+ * No global html/body/root scrolling rules are used here.
+ */
+
+.main {
+  overscroll-behavior-y: auto !important;
+}
+
+/* Today’s priorities: only its task list may scroll when necessary. */
+
+.heroPriorityCard .priorityList {
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+  overscroll-behavior-y: auto !important;
+  scrollbar-gutter: auto !important;
+  scroll-behavior: auto !important;
+}
+
+/* Schedule and the eight operational cards. */
+
+.scheduleCard,
+.middleGrid > .compactCard,
+.bottomGrid > .lowerCard,
+.middleGrid > [data-operational-card],
+.bottomGrid > [data-operational-card] {
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+  overscroll-behavior-x: auto !important;
+  overscroll-behavior-y: auto !important;
+  scrollbar-gutter: auto !important;
+  scroll-behavior: auto !important;
+  -webkit-overflow-scrolling: touch;
+}
+
+/*
+ * Cards that do not overflow will have no active internal scrolling
+ * and no reserved scrollbar space.
+ */
+
+.scheduleCard:not(:hover),
+.middleGrid > .compactCard:not(:hover),
+.bottomGrid > .lowerCard:not(:hover) {
+  scrollbar-gutter: auto !important;
+}
+
+/*
+ * Mobile and narrow layouts keep natural page scrolling.
+ */
+
+@media (max-width: 760px) {
+  .heroPriorityCard,
+  .scheduleCard,
+  .middleGrid > .compactCard,
+  .bottomGrid > .lowerCard,
+  .middleGrid > [data-operational-card],
+  .bottomGrid > [data-operational-card] {
+    height: auto !important;
+    max-height: none !important;
+    overflow: visible !important;
+    overscroll-behavior: auto !important;
+  }
+
+  .heroPriorityCard .priorityList {
+    overflow: visible !important;
+  }
+}
+
+/* NATURAL CARD SCROLL CHAINING — END */
+
+/* NATURAL HERO INNER SCROLL — START */
+
+/*
+ * Do not assign a height to either side card.
+ * The existing hero grid determines their original natural height.
+ *
+ * Only the priorities list and schedule timeline scroll.
+ */
+
+.heroGrid {
+  align-items: stretch !important;
+}
+
+.heroPriorityCard,
+.scheduleCard {
+  min-height: 0 !important;
+  align-self: stretch !important;
+  overflow: hidden !important;
+}
+
+/*
+ * Preserve the card's existing natural dimensions.
+ * No height, max-height or fixed pixel value is assigned.
+ */
+
+.heroPriorityCard {
+  display: flex !important;
+  flex-direction: column !important;
+}
+
+.scheduleCard {
+  display: flex !important;
+  flex-direction: column !important;
+}
+
+/* Fixed headings */
+
+.heroPriorityCard > .cardHeading,
+.scheduleCard > .cardHeading {
+  position: static !important;
+  flex: 0 0 auto !important;
+  margin: 0 !important;
+  background: #ffffff !important;
+}
+
+/* Scrollable content only */
+
+.heroPriorityCard .priorityList,
+.scheduleCard .scheduleTimeline {
+  min-height: 0 !important;
+  flex: 1 1 0 !important;
+  align-content: start !important;
+
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+
+  padding-right: 6px !important;
+
+  overscroll-behavior-y: auto !important;
+  scrollbar-gutter: auto !important;
+
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-y;
+}
+
+/*
+ * Keep every schedule event at its normal readable size.
+ * Extra events remain below and are reached by scrolling.
+ */
+
+.scheduleCard .scheduleTimeline {
+  grid-auto-rows: max-content !important;
+}
+
+.scheduleCard .scheduleTimeline > button {
+  height: auto !important;
+  flex: none !important;
+}
+
+/*
+ * Keep every priority at its original size.
+ */
+
+.heroPriorityCard .priorityList {
+  grid-auto-rows: max-content !important;
+}
+
+.heroPriorityCard .priorityList > button {
+  height: auto !important;
+  flex: none !important;
+}
+
+/* Fixed bottom sections */
+
+.heroPriorityCard .priorityMonitoring,
+.scheduleCard .scheduleFooter {
+  position: static !important;
+  flex: 0 0 auto !important;
+  background: #ffffff !important;
+}
+
+/* Thin scrollbars only when overflow exists */
+
+.heroPriorityCard .priorityList,
+.scheduleCard .scheduleTimeline {
+  scrollbar-width: thin;
+  scrollbar-color: #8da5ba transparent;
+}
+
+.heroPriorityCard
+  .priorityList::-webkit-scrollbar,
+.scheduleCard
+  .scheduleTimeline::-webkit-scrollbar {
+  width: 7px;
+}
+
+.heroPriorityCard
+  .priorityList::-webkit-scrollbar-track,
+.scheduleCard
+  .scheduleTimeline::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.heroPriorityCard
+  .priorityList::-webkit-scrollbar-thumb,
+.scheduleCard
+  .scheduleTimeline::-webkit-scrollbar-thumb {
+  border: 2px solid #ffffff;
+  border-radius: 999px;
+  background: #8da5ba;
+}
+
+/* Mobile returns to normal page scrolling */
+
+@media (max-width: 900px) {
+  .heroPriorityCard,
+  .scheduleCard {
+    overflow: visible !important;
+  }
+
+  .heroPriorityCard .priorityList,
+  .scheduleCard .scheduleTimeline {
+    overflow: visible !important;
+    padding-right: 0 !important;
+  }
+}
+
+/* NATURAL HERO INNER SCROLL — END */
+
+/* DASHBOARD HEADER AND READABILITY LOCK — START */
+
+/*
+ * Keep the greeting and dashboard controls on one clean row.
+ * This override intentionally comes last so older responsive
+ * experiments cannot push the controls underneath the title.
+ */
+
+@media (min-width: 1180px) {
+  .topbar,
+  .dashboardHeader {
+    box-sizing: border-box !important;
+    display: flex !important;
+    min-height: 112px !important;
+    height: auto !important;
+    align-items: center !important;
+    justify-content:
+      space-between !important;
+    flex-direction: row !important;
+    flex-wrap: nowrap !important;
+    gap: 22px !important;
+    padding: 18px 24px !important;
+  }
+
+  .greeting {
+    min-width: 0 !important;
+    flex: 1 1 auto !important;
+  }
+
+  .topbarActions,
+  .headerActions {
+    display: flex !important;
+    width: auto !important;
+    max-width: none !important;
+    min-width: 0 !important;
+    flex: 0 0 auto !important;
+    align-items: center !important;
+    justify-content:
+      flex-end !important;
+    flex-direction: row !important;
+    flex-wrap: nowrap !important;
+    gap: 10px !important;
+    margin: 0 !important;
+  }
+
+  .topbarActions > *,
+  .headerActions > * {
+    flex: 0 0 auto !important;
+  }
+}
+
+.greeting h1 {
+  font-size:
+    clamp(
+      1.65rem,
+      2vw,
+      2.15rem
+    ) !important;
+}
+
+.greeting p {
+  margin-top: 8px !important;
+  font-size: 0.76rem !important;
+}
+
+/*
+ * Increase only the smaller type in the three hero sections.
+ * Card dimensions and layout remain unchanged.
+ */
+
+.cardHeading > span {
+  font-size: 0.78rem !important;
+}
+
+.cardHeading > button {
+  font-size: 0.65rem !important;
+}
+
+.priorityCopy strong {
+  font-size: 0.72rem !important;
+  line-height: 1.25 !important;
+}
+
+.priorityCopy small {
+  margin-top: 4px !important;
+  font-size: 0.61rem !important;
+  line-height: 1.35 !important;
+}
+
+.priorityBadge {
+  font-size: 0.56rem !important;
+}
+
+.priorityMonitoring {
+  font-size: 0.61rem !important;
+}
+
+.sectionEyebrow {
+  font-size: 0.6rem !important;
+}
+
+.heroCopy h2 {
+  font-size:
+    clamp(
+      1.55rem,
+      2vw,
+      2rem
+    ) !important;
+  line-height: 0.98 !important;
+}
+
+.heroCopy > p {
+  font-size: 0.7rem !important;
+  line-height: 1.45 !important;
+}
+
+.heroTags span {
+  font-size: 0.53rem !important;
+}
+
+.heroStats small {
+  font-size: 0.56rem !important;
+}
+
+.heroStats strong {
+  font-size: 1.8rem !important;
+}
+
+.heroStats span {
+  font-size: 0.54rem !important;
+}
+
+.heroActions button {
+  font-size: 0.58rem !important;
+}
+
+.editShortcutsButton {
+  font-size: 0.55rem !important;
+}
+
+.scheduleTimeline button time {
+  font-size: 0.65rem !important;
+  line-height: 1.3 !important;
+}
+
+.scheduleTimeline
+  button
+  > span:nth-child(3)
+  strong {
+  font-size: 0.71rem !important;
+  line-height: 1.2 !important;
+}
+
+.scheduleTimeline
+  button
+  > span:nth-child(3)
+  small {
+  margin-top: 4px !important;
+  font-size: 0.59rem !important;
+  line-height: 1.3 !important;
+}
+
+@media (max-width: 1179px) {
+  .topbar,
+  .dashboardHeader {
+    height: auto !important;
+  }
+}
+
+/* DASHBOARD HEADER AND READABILITY LOCK — END */
+
+/* COMFORTABLE DASHBOARD TYPE V2 — START */
+
+.greeting h1 {
+  font-size:
+    clamp(1.9rem, 2.35vw, 2.3rem) !important;
+}
+
+.greeting p {
+  font-size: 0.94rem !important;
+  line-height: 1.45 !important;
+}
+
+.cardHeading > span {
+  font-size: 0.92rem !important;
+}
+
+.cardHeading > button {
+  font-size: 0.77rem !important;
+}
+
+.priorityCopy strong {
+  font-size: 0.86rem !important;
+  line-height: 1.3 !important;
+}
+
+.priorityCopy small {
+  font-size: 0.76rem !important;
+  line-height: 1.4 !important;
+}
+
+.priorityBadge {
+  font-size: 0.67rem !important;
+}
+
+.priorityMonitoring {
+  font-size: 0.76rem !important;
+}
+
+.sectionEyebrow {
+  font-size: 0.7rem !important;
+}
+
+.heroCopy h2 {
+  font-size:
+    clamp(1.75rem, 2.25vw, 2.18rem) !important;
+}
+
+.heroCopy > p {
+  font-size: 0.85rem !important;
+  line-height: 1.48 !important;
+}
+
+.heroTags span,
+.heroStats small,
+.heroStats span {
+  font-size: 0.68rem !important;
+}
+
+.heroActions button,
+.editShortcutsButton {
+  font-size: 0.72rem !important;
+}
+
+.scheduleTimeline button time {
+  font-size: 0.79rem !important;
+}
+
+.scheduleTimeline
+  button
+  > span:nth-child(3)
+  strong {
+  font-size: 0.87rem !important;
+  line-height: 1.28 !important;
+}
+
+.scheduleTimeline
+  button
+  > span:nth-child(3)
+  small {
+  font-size: 0.76rem !important;
+  line-height: 1.35 !important;
+}
+
+/* COMFORTABLE DASHBOARD TYPE V2 — END */
+
+/* CLEAN WORKSPACE SWITCHER — START */
+
+/*
+ * Canonical workspace control for HQ and Inbox.
+ * No other sidebar section is controlled by this block.
+ */
+
+.workspaceSwitcher {
+  position: relative !important;
+  z-index: 120 !important;
+
+  box-sizing: border-box !important;
+  display: block !important;
+
+  width: 100% !important;
+  height: 88px !important;
+  min-height: 88px !important;
+  max-height: 88px !important;
+  flex: 0 0 88px !important;
+
+  margin: 0 !important;
+  padding: 0 !important;
+
+  overflow: visible !important;
+
+  color: #ffffff !important;
+}
+
+/* =========================================================
+   CLOSED WORKSPACE HEADER
+   ========================================================= */
+
+.workspaceSwitcher > summary {
+  box-sizing: border-box !important;
+  display: grid !important;
+
+  width: 100% !important;
+  height: 88px !important;
+  min-height: 88px !important;
+  max-height: 88px !important;
+
+  grid-template-columns:
+    minmax(0, 1fr) 28px !important;
+
+  align-items: center !important;
+  gap: 8px !important;
+
+  margin: 0 !important;
+
+  padding:
+    9px 14px !important;
+
+  overflow: hidden !important;
+
+  border: 0 !important;
+  border-bottom:
+    1px solid
+    rgba(255, 255, 255, 0.15) !important;
+
+  border-radius: 0 !important;
+
+  outline: none !important;
+
+  color: #ffffff !important;
+
+  background:
+    radial-gradient(
+      circle at 100% 0%,
+      rgba(255, 255, 255, 0.1),
+      transparent 45%
+    ),
+    linear-gradient(
+      135deg,
+      #cc3747 0%,
+      #b8172b 100%
+    ) !important;
+
+  box-shadow: none !important;
+
+  cursor: pointer !important;
+
+  list-style: none !important;
+  appearance: none !important;
+  -webkit-appearance: none !important;
+  user-select: none !important;
+}
+
+.workspaceSwitcher > summary::-webkit-details-marker {
+  display: none !important;
+}
+
+.workspaceSwitcher > summary::marker {
+  content: "" !important;
+  display: none !important;
+}
+
+.workspaceSwitcher > summary::before {
+  content: none !important;
+  display: none !important;
+}
+
+.workspaceSwitcher > summary:focus {
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+.workspaceSwitcher > summary:focus-visible {
+  outline: none !important;
+
+  box-shadow:
+    inset
+    0
+    0
+    0
+    2px
+    rgba(255, 255, 255, 0.34) !important;
+}
+
+.workspaceSwitcher > summary:hover {
+  background:
+    radial-gradient(
+      circle at 100% 0%,
+      rgba(255, 255, 255, 0.14),
+      transparent 45%
+    ),
+    linear-gradient(
+      135deg,
+      #d54150 0%,
+      #c21c30 100%
+    ) !important;
+}
+
+/* The top EA tile is intentionally removed. */
+
+.workspaceIdentityAvatar,
+.workspaceIdentityBadge {
+  display: none !important;
+}
+
+/* Workspace label, name and district */
+
+.workspaceBrandCopy {
+  box-sizing: border-box !important;
+  display: flex !important;
+
+  width: 100% !important;
+  min-width: 0 !important;
+
+  flex-direction: column !important;
+  align-items: flex-start !important;
+  justify-content: center !important;
+
+  gap: 2px !important;
+
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+.workspaceBrandCopy > small {
+  display: block !important;
+
+  width: 100% !important;
+  margin: 0 !important;
+
+  overflow: hidden !important;
+
+  color:
+    rgba(255, 255, 255, 0.72) !important;
+
+  font-size: 9px !important;
+  font-weight: 850 !important;
+  letter-spacing: 0.1em !important;
+  line-height: 1.05 !important;
+
+  text-overflow: ellipsis !important;
+  text-transform: uppercase !important;
+  white-space: nowrap !important;
+}
+
+.workspaceBrandCopy > strong {
+  display: block !important;
+
+  width: 100% !important;
+  min-width: 0 !important;
+
+  margin: 0 !important;
+
+  overflow: hidden !important;
+
+  color: #ffffff !important;
+
+  font-size: 15px !important;
+  font-weight: 820 !important;
+  letter-spacing: -0.018em !important;
+  line-height: 1.1 !important;
+
+  text-overflow: clip !important;
+  white-space: nowrap !important;
+}
+
+.workspaceDistrict {
+  display: block !important;
+
+  width: 100% !important;
+  min-width: 0 !important;
+
+  margin: 0 !important;
+
+  color:
+    rgba(255, 255, 255, 0.84) !important;
+
+  font-size: 11px !important;
+  font-weight: 500 !important;
+  line-height: 1.16 !important;
+}
+
+/* Dropdown chevron */
+
+.workspaceSwitcherChevron {
+  box-sizing: border-box !important;
+  display: grid !important;
+
+  width: 28px !important;
+  height: 28px !important;
+  min-width: 28px !important;
+
+  place-items: center !important;
+
+  margin: 0 !important;
+  padding: 0 !important;
+
+  border:
+    1px solid
+    rgba(255, 255, 255, 0.24) !important;
+
+  border-radius: 9px !important;
+
+  color: #ffffff !important;
+
+  background:
+    rgba(84, 4, 17, 0.17) !important;
+
+  font-size: 14px !important;
+  font-weight: 800 !important;
+  line-height: 1 !important;
+
+  opacity: 1 !important;
+
+  transform: none !important;
+
+  transition:
+    transform 0.18s ease,
+    background 0.18s ease !important;
+}
+
+.workspaceSwitcher[open]
+  .workspaceSwitcherChevron {
+  background:
+    rgba(84, 4, 17, 0.32) !important;
+
+  transform: rotate(180deg) !important;
+}
+
+/* =========================================================
+   OPEN WORKSPACE MENU
+   ========================================================= */
+
+.workspaceSwitcherMenu {
+  position: absolute !important;
+  z-index: 500 !important;
+
+  top: 82px !important;
+  right: 7px !important;
+  left: 7px !important;
+
+  box-sizing: border-box !important;
+  display: grid !important;
+
+  width: auto !important;
+  min-width: 0 !important;
+
+  gap: 4px !important;
+
+  margin: 0 !important;
+  padding: 6px !important;
+
+  overflow: hidden !important;
+
+  border:
+    1px solid #d7e2ea !important;
+
+  border-radius: 11px !important;
+
+  color: #173b60 !important;
+
+  background:
+    rgba(255, 255, 255, 0.99) !important;
+
+  box-shadow:
+    0 18px 40px rgba(8, 28, 48, 0.25) !important;
+
+  backdrop-filter:
+    blur(18px)
+    saturate(1.08) !important;
+}
+
+/* Dropdown rows */
+
+.workspaceSwitcherMenu > button {
+  position: relative !important;
+
+  box-sizing: border-box !important;
+  display: grid !important;
+
+  width: 100% !important;
+  min-width: 0 !important;
+  min-height: 50px !important;
+
+  grid-template-columns:
+    34px minmax(0, 1fr) !important;
+
+  align-items: center !important;
+  gap: 8px !important;
+
+  margin: 0 !important;
+  padding: 6px 7px !important;
+
+  overflow: hidden !important;
+
+  border: 0 !important;
+  border-radius: 9px !important;
+
+  color: #173b60 !important;
+  background: transparent !important;
+
+  cursor: pointer !important;
+  text-align: left !important;
+
+  font-family: inherit !important;
+}
+
+.workspaceSwitcherMenu > button:first-child {
+  padding-right: 70px !important;
+}
+
+.workspaceSwitcherMenu > button:hover {
+  background: #eef4f8 !important;
+}
+
+.workspaceSwitcherMenu
+  > button
+  > span:nth-child(2) {
+  box-sizing: border-box !important;
+  display: flex !important;
+
+  width: 100% !important;
+  min-width: 0 !important;
+
+  flex-direction: column !important;
+  align-items: flex-start !important;
+
+  gap: 2px !important;
+
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+.workspaceSwitcherMenu strong {
+  display: block !important;
+
+  width: 100% !important;
+  min-width: 0 !important;
+
+  margin: 0 !important;
+
+  overflow: hidden !important;
+
+  color: #173b60 !important;
+
+  font-size: 13px !important;
+  font-weight: 800 !important;
+  line-height: 1.15 !important;
+
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+}
+
+.workspaceSwitcherMenu small {
+  display: block !important;
+
+  width: 100% !important;
+  min-width: 0 !important;
+
+  margin: 0 !important;
+
+  overflow: hidden !important;
+
+  color: #71869a !important;
+
+  font-size: 10px !important;
+  font-weight: 500 !important;
+  line-height: 1.18 !important;
+
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+}
+
+/* Current badge no longer steals name width */
+
+.workspaceSwitcherMenu em {
+  position: absolute !important;
+
+  top: 50% !important;
+  right: 8px !important;
+
+  display: inline-flex !important;
+
+  align-items: center !important;
+  justify-content: center !important;
+
+  margin: 0 !important;
+  padding: 5px 8px !important;
+
+  border-radius: 999px !important;
+
+  color: #18724e !important;
+  background: #e5f7ed !important;
+
+  font-size: 9px !important;
+  font-style: normal !important;
+  font-weight: 800 !important;
+  line-height: 1 !important;
+
+  white-space: nowrap !important;
+
+  transform: translateY(-50%) !important;
+}
+
+/* Menu icons */
+
+.workspaceSwitcherAvatar,
+.workspaceSwitcherIcon {
+  box-sizing: border-box !important;
+  display: grid !important;
+
+  width: 34px !important;
+  height: 34px !important;
+  min-width: 34px !important;
+
+  place-items: center !important;
+
+  margin: 0 !important;
+  padding: 0 !important;
+
+  border-radius: 9px !important;
+
+  color: #ffffff !important;
+
+  background:
+    linear-gradient(
+      145deg,
+      #286a9f,
+      #174d7d
+    ) !important;
+
+  font-size: 11px !important;
+  font-weight: 900 !important;
+  line-height: 1 !important;
+}
+
+.workspaceSwitcherIcon {
+  color: #d52735 !important;
+  background: #fff0f1 !important;
+
+  font-size: 19px !important;
+}
+
+/* CLEAN WORKSPACE SWITCHER — END */
+
+/* CENTER WORKSPACE CHEVRON — START */
+
+.workspaceSwitcherChevron {
+  box-sizing: border-box !important;
+  display: grid !important;
+  place-items: center !important;
+
+  width: 28px !important;
+  height: 28px !important;
+  min-width: 28px !important;
+
+  padding: 0 !important;
+  margin: 0 !important;
+
+  overflow: hidden !important;
+
+  font-size: 0 !important;
+  line-height: 1 !important;
+  text-align: center !important;
+}
+
+.workspaceSwitcherChevron::before {
+  content: "⌄" !important;
+
+  display: grid !important;
+  width: 100% !important;
+  height: 100% !important;
+
+  place-items: center !important;
+
+  color: #ffffff !important;
+
+  font-size: 15px !important;
+  font-weight: 800 !important;
+  line-height: 1 !important;
+
+  transform: translateY(-1px) !important;
+}
+
+.workspaceSwitcher[open]
+  .workspaceSwitcherChevron {
+  transform: rotate(180deg) !important;
+}
+
+/* CENTER WORKSPACE CHEVRON — END */
+
+/* COMPACT SIGNED-IN PROFILE V2 — START */
+
+/*
+ * One canonical bottom profile card for HQ and Inbox.
+ * Profile image support remains available through the
+ * existing avatar container. Initials remain the fallback.
+ */
+
+[data-profile-settings="true"] {
+  position: relative !important;
+  box-sizing: border-box !important;
+
+  display: grid !important;
+  width: 100% !important;
+
+  min-height: 80px !important;
+  height: 80px !important;
+  flex: 0 0 80px !important;
+
+  grid-template-columns:
+    40px
+    minmax(0, 1fr)
+    38px !important;
+
+  align-items: center !important;
+  gap: 9px !important;
+
+  margin: auto 0 0 !important;
+
+  padding:
+    23px
+    12px
+    8px !important;
+
+  overflow: hidden !important;
+
+  border: 0 !important;
+  border-top:
+    1px solid
+    rgba(255, 255, 255, 0.15) !important;
+
+  border-radius:
+    0
+    0
+    14px
+    14px !important;
+
+  color: #ffffff !important;
+
+  background:
+    linear-gradient(
+      180deg,
+      #740813 0%,
+      #58040c 100%
+    ) !important;
+
+  box-shadow: none !important;
+
+  cursor: pointer !important;
+  text-align: left !important;
+}
+
+[data-profile-settings="true"]:hover {
+  background:
+    linear-gradient(
+      180deg,
+      #810a17 0%,
+      #620510 100%
+    ) !important;
+}
+
+/* Small signed-in label */
+
+[data-profile-settings="true"]::before {
+  content: "SIGNED IN AS" !important;
+
+  position: absolute !important;
+  z-index: 4 !important;
+
+  top: 8px !important;
+  left: 14px !important;
+
+  color:
+    rgba(255, 255, 255, 0.61) !important;
+
+  font-size: 0.44rem !important;
+  font-weight: 900 !important;
+  letter-spacing: 0.12em !important;
+  line-height: 1 !important;
+}
+
+/* Compact settings/profile button */
+
+[data-profile-settings="true"]::after {
+  content: "" !important;
+
+  box-sizing: border-box !important;
+
+  display: block !important;
+
+  width: 38px !important;
+  height: 38px !important;
+
+  border:
+    1px solid
+    rgba(255, 255, 255, 0.22) !important;
+
+  border-radius: 10px !important;
+
+  background-color:
+    rgba(255, 255, 255, 0.055) !important;
+
+  background-image:
+    url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='22'%20height='22'%20viewBox='0%200%2024%2024'%20fill='none'%20stroke='%23ffffff'%20stroke-width='2'%20stroke-linecap='round'%20stroke-linejoin='round'%3E%3Cpath%20d='M10%2017l5-5-5-5'/%3E%3Cpath%20d='M15%2012H3'/%3E%3Cpath%20d='M15%203h4a2%202%200%200%201%202%202v14a2%202%200%200%201-2%202h-4'/%3E%3C/svg%3E") !important;
+
+  background-repeat: no-repeat !important;
+  background-position: center !important;
+  background-size: 20px 20px !important;
+
+  opacity: 0.9 !important;
+}
+
+[data-profile-settings="true"]:hover::after {
+  border-color:
+    rgba(255, 255, 255, 0.36) !important;
+
+  background-color:
+    rgba(255, 255, 255, 0.1) !important;
+
+  opacity: 1 !important;
+}
+
+/*
+ * HQ may have a nested profile panel. It must not add its
+ * own dimensions, padding, background or grid.
+ */
+
+[data-profile-panel="true"] {
+  display: contents !important;
+}
+
+/* Hide the old arrow or chevron. */
+
+[data-profile-settings="true"] > svg,
+[data-profile-panel="true"] > svg {
+  display: none !important;
+}
+
+/* Compact initials/photo container */
+
+[data-profile-settings="true"]
+  [class*="profileAvatar"] {
+  box-sizing: border-box !important;
+
+  display: grid !important;
+
+  width: 40px !important;
+  height: 40px !important;
+  min-width: 40px !important;
+
+  place-items: center !important;
+
+  overflow: hidden !important;
+
+  padding: 0 !important;
+  margin: 0 !important;
+
+  border:
+    2px solid
+    rgba(255, 255, 255, 0.2) !important;
+
+  border-radius: 11px !important;
+
+  color: #ffffff !important;
+
+  background:
+    linear-gradient(
+      145deg,
+      #286a9f,
+      #174d7d
+    ) !important;
+
+  box-shadow:
+    0
+    4px
+    11px
+    rgba(27, 2, 8, 0.18) !important;
+
+  font-size: 0.68rem !important;
+  font-weight: 900 !important;
+  line-height: 1 !important;
+}
+
+/* Future Profile Settings photo */
+
+[data-profile-settings="true"]
+  [class*="profileAvatar"]
+  img {
+  display: block !important;
+
+  width: 100% !important;
+  height: 100% !important;
+
+  object-fit: cover !important;
+  object-position: center top !important;
+}
+
+/* Name and role */
+
+[data-profile-settings="true"] > div,
+[data-profile-panel="true"] > div {
+  min-width: 0 !important;
+  width: 100% !important;
+
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+[data-profile-settings="true"] strong,
+[data-profile-panel="true"] strong {
+  display: block !important;
+
+  width: 100% !important;
+
+  overflow: hidden !important;
+
+  color: #ffffff !important;
+
+  font-size: 0.72rem !important;
+  font-weight: 830 !important;
+  letter-spacing: -0.018em !important;
+  line-height: 1.15 !important;
+
+  text-overflow: clip !important;
+  white-space: nowrap !important;
+}
+
+[data-profile-settings="true"]
+  > div
+  > span,
+[data-profile-panel="true"]
+  > div
+  > span {
+  display: block !important;
+
+  margin: 4px 0 0 !important;
+
+  color:
+    rgba(255, 255, 255, 0.68) !important;
+
+  font-size: 0.6rem !important;
+  line-height: 1.1 !important;
+}
+
+/* COMPACT SIGNED-IN PROFILE V2 — END */
+
+/* SPOTLIGHT WRAPPER FLOW FIX — START */
+
+/*
+ * Canonical Campaign Spotlight internal layout.
+ *
+ * The shortcut controls stay in normal document flow inside
+ * .heroShortcutArea. No absolute positioning is used.
+ *
+ * This block is scoped to the center Spotlight card only.
+ */
+
+.centerHeroStack .heroCard {
+  position: relative !important;
+
+  overflow: hidden !important;
+}
+
+/*
+ * Make the copy column fill the existing 314px card and divide
+ * its vertical space between the campaign information and the
+ * shortcut area.
+ */
+
+.centerHeroStack .heroCopy {
+  box-sizing: border-box !important;
+
+  display: flex !important;
+  flex-direction: column !important;
+
+  width: 100% !important;
+  height: 100% !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+
+  padding:
+    13px
+    13px
+    7px
+    16px !important;
+
+  overflow: visible !important;
+}
+
+/* Campaign Spotlight eyebrow */
+
+.centerHeroStack .sectionEyebrow {
+  flex: 0 0 auto !important;
+
+  margin:
+    0
+    0
+    4px !important;
+
+  font-size: 9px !important;
+  line-height: 1 !important;
+}
+
+/* Main Spotlight heading */
+
+.centerHeroStack .heroCopy > h2 {
+  flex: 0 0 auto !important;
+
+  margin:
+    0
+    0
+    5px !important;
+
+  font-size:
+    clamp(
+      26px,
+      1.75vw,
+      30px
+    ) !important;
+
+  letter-spacing: -0.035em !important;
+  line-height: 0.96 !important;
+}
+
+.centerHeroStack .heroCopy > h2 strong {
+  font-size: inherit !important;
+  line-height: inherit !important;
+}
+
+/* Spotlight description */
+
+.centerHeroStack .heroCopy > p {
+  flex: 0 0 auto !important;
+
+  margin: 0 !important;
+
+  font-size: 11px !important;
+  line-height: 1.24 !important;
+}
+
+/* Campaign tags */
+
+.centerHeroStack .heroTags {
+  flex: 0 0 auto !important;
+
+  gap: 4px !important;
+
+  margin:
+    6px
+    0
+    0 !important;
+}
+
+.centerHeroStack .heroTags span {
+  box-sizing: border-box !important;
+
+  min-height: 18px !important;
+
+  padding:
+    0
+    7px !important;
+
+  font-size: 8px !important;
+  line-height: 1 !important;
+}
+
+/* Election countdown */
+
+.centerHeroStack .heroStats {
+  flex: 0 0 auto !important;
+
+  margin:
+    6px
+    0
+    0 !important;
+}
+
+.centerHeroStack .heroStats > div {
+  min-height: 0 !important;
+}
+
+.centerHeroStack .heroStats small {
+  margin-bottom: 1px !important;
+
+  font-size: 8px !important;
+  line-height: 1 !important;
+}
+
+.centerHeroStack .heroStats strong {
+  font-size: 29px !important;
+  line-height: 0.9 !important;
+}
+
+.centerHeroStack .heroStats span {
+  font-size: 9px !important;
+  line-height: 1.1 !important;
+}
+
+/*
+ * This is the important correction:
+ * use the real shared wrapper and push it to the bottom of the
+ * existing copy column without overlapping the campaign text.
+ */
+
+.centerHeroStack .heroShortcutArea {
+  position: relative !important;
+
+  box-sizing: border-box !important;
+
+  display: grid !important;
+
+  width: 100% !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+
+  grid-template-rows:
+    auto
+    auto !important;
+
+  align-content: end !important;
+  justify-items: stretch !important;
+
+  gap: 4px !important;
+
+  margin:
+    auto
+    0
+    0 !important;
+
+  padding:
+    5px
+    0
+    0 !important;
+
+  overflow: visible !important;
+}
+
+/* Four shortcuts: two rows of two */
+
+.centerHeroStack
+  .heroShortcutArea
+  .heroActions {
+  position: static !important;
+
+  box-sizing: border-box !important;
+
+  display: grid !important;
+
+  width: 100% !important;
+  min-width: 0 !important;
+
+  grid-template-columns:
+    repeat(
+      2,
+      minmax(0, 1fr)
+    ) !important;
+
+  gap: 4px !important;
+
+  margin: 0 !important;
+  padding: 0 !important;
+
+  transform: none !important;
+}
+
+.centerHeroStack
+  .heroShortcutArea
+  .heroActions
+  button {
+  position: static !important;
+
+  box-sizing: border-box !important;
+
+  display: inline-flex !important;
+
+  width: 100% !important;
+  min-width: 0 !important;
+
+  height: 27px !important;
+  min-height: 27px !important;
+  max-height: 27px !important;
+
+  align-items: center !important;
+  justify-content: flex-start !important;
+
+  gap: 5px !important;
+
+  margin: 0 !important;
+
+  padding:
+    0
+    7px !important;
+
+  overflow: hidden !important;
+
+  border-radius: 7px !important;
+
+  font-size: 9px !important;
+  line-height: 1 !important;
+
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+
+  transform: none !important;
+}
+
+.centerHeroStack
+  .heroShortcutArea
+  .heroActions
+  button
+  svg {
+  width: 12px !important;
+  height: 12px !important;
+  min-width: 12px !important;
+
+  flex: 0 0 12px !important;
+}
+
+.centerHeroStack
+  .heroShortcutArea
+  .heroActions
+  button
+  span {
+  display: block !important;
+
+  min-width: 0 !important;
+
+  overflow: hidden !important;
+
+  font-size: inherit !important;
+  line-height: inherit !important;
+
+  text-align: left !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+}
+
+/* Edit shortcuts remains below all four buttons */
+
+.centerHeroStack .editShortcutsButton {
+  position: static !important;
+
+  box-sizing: border-box !important;
+
+  display: inline-flex !important;
+
+  width: auto !important;
+
+  height: 19px !important;
+  min-height: 19px !important;
+  max-height: 19px !important;
+
+  align-items: center !important;
+  align-self: auto !important;
+  justify-content: center !important;
+  justify-self: center !important;
+
+  gap: 3px !important;
+
+  margin: 0 !important;
+
+  padding:
+    0
+    7px !important;
+
+  border-radius: 6px !important;
+
+  font-size: 8px !important;
+  line-height: 1 !important;
+
+  transform: none !important;
+}
+
+.centerHeroStack .editShortcutsButton svg {
+  width: 11px !important;
+  height: 11px !important;
+  min-width: 11px !important;
+}
+
+/*
+ * Keep the existing editor behavior. The card can overflow only
+ * while the shortcut editor is actually open.
+ */
+
+.centerHeroStack
+  .heroCard:has(.shortcutEditor) {
+  overflow: visible !important;
+}
+
+.centerHeroStack
+  .heroCard:has(.shortcutEditor)
+  .heroCopy,
+.centerHeroStack
+  .heroCard:has(.shortcutEditor)
+  .heroShortcutArea {
+  overflow: visible !important;
+}
+
+/* SPOTLIGHT WRAPPER FLOW FIX — END */
+
+/* EXACT CLEAN PRIORITIES AND SCHEDULE — START */
+
+/*
+ * Final exact-selector treatment for the two outside hero cards.
+ *
+ * No inferred class names.
+ * No substring selectors.
+ * No card-height changes.
+ * No Spotlight, sidebar, header or lower-card selectors.
+ */
+
+/* =========================================================
+   SHARED HEADINGS
+   ========================================================= */
+
+.heroPriorityCard > .cardHeading,
+.scheduleCard > .cardHeading {
+  min-height: 24px !important;
+}
+
+.heroPriorityCard
+  > .cardHeading
+  > span,
+.scheduleCard
+  > .cardHeading
+  > span {
+  gap: 7px !important;
+
+  font-size: 0.78rem !important;
+  font-weight: 900 !important;
+  line-height: 1.1 !important;
+}
+
+.heroPriorityCard
+  > .cardHeading
+  button,
+.scheduleCard
+  > .cardHeading
+  button {
+  font-size: 0.65rem !important;
+  line-height: 1 !important;
+}
+
+/* =========================================================
+   TODAY'S PRIORITIES
+   ========================================================= */
+
+.heroPriorityCard {
+  overflow: hidden !important;
+}
+
+.heroPriorityCard .priorityList {
+  min-height: 0 !important;
+
+  gap: 0 !important;
+  margin-top: 6px !important;
+  padding-right: 4px !important;
+
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+
+  overscroll-behavior-y: auto !important;
+  scrollbar-gutter: auto !important;
+  scroll-behavior: auto !important;
+}
+
+.heroPriorityCard
+  .priorityList
+  > button {
+  box-sizing: border-box !important;
+
+  min-height: 47px !important;
+
+  grid-template-columns:
+    27px
+    minmax(0, 1fr)
+    auto !important;
+
+  align-items: center !important;
+
+  gap: 8px !important;
+
+  padding:
+    6px
+    4px !important;
+}
+
+.heroPriorityCard
+  .priorityList
+  > button:first-child {
+  padding-right: 7px !important;
+  padding-left: 7px !important;
+}
+
+.heroPriorityCard .priorityIcon {
+  width: 27px !important;
+  height: 27px !important;
+
+  margin-top: 0 !important;
+
+  border-radius: 8px !important;
+}
+
+.heroPriorityCard
+  .priorityIcon
+  svg {
+  width: 15px !important;
+  height: 15px !important;
+}
+
+.heroPriorityCard .priorityCopy {
+  min-width: 0 !important;
+}
+
+.heroPriorityCard
+  .priorityCopy
+  strong {
+  display: block !important;
+
+  overflow: hidden !important;
+
+  font-size: 0.70rem !important;
+  font-weight: 820 !important;
+  line-height: 1.2 !important;
+
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+}
+
+.heroPriorityCard
+  .priorityCopy
+  small {
+  display: block !important;
+
+  overflow: hidden !important;
+
+  margin-top: 3px !important;
+
+  font-size: 0.60rem !important;
+  line-height: 1.2 !important;
+
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+}
+
+.heroPriorityCard .priorityBadge {
+  min-width: 48px !important;
+
+  margin-top: 0 !important;
+
+  padding:
+    4px
+    7px !important;
+
+  font-size: 0.55rem !important;
+  line-height: 1 !important;
+}
+
+.heroPriorityCard .priorityMonitoring {
+  min-height: 36px !important;
+
+  gap: 7px !important;
+
+  padding:
+    8px
+    3px
+    2px !important;
+
+  font-size: 0.60rem !important;
+  line-height: 1.25 !important;
+}
+
+/* =========================================================
+   TODAY'S SCHEDULE
+   ========================================================= */
+
+/*
+ * Keep scrolling on the timeline only.
+ * The heading and conflict footer remain fixed.
+ */
+
+.scheduleCard {
+  overflow: hidden !important;
+}
+
+.scheduleCard .scheduleTimeline {
+  min-height: 0 !important;
+
+  grid-auto-rows: max-content !important;
+
+  gap: 1px !important;
+
+  margin-top: 8px !important;
+  padding-right: 4px !important;
+
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+
+  overscroll-behavior-y: auto !important;
+  scrollbar-gutter: auto !important;
+  scroll-behavior: auto !important;
+}
+
+/*
+ * Exact row structure:
+ * time | timeline dot | title
+ *
+ * All direct children after the title column are hidden.
+ * This removes initials, overflow counts, arrows and phone icons.
+ */
+
+.scheduleCard
+  .scheduleTimeline
+  > button {
+  box-sizing: border-box !important;
+
+  display: grid !important;
+
+  min-height: 41px !important;
+  height: auto !important;
+
+  grid-template-columns:
+    50px
+    13px
+    minmax(0, 1fr) !important;
+
+  align-items: center !important;
+
+  gap: 7px !important;
+
+  padding:
+    5px
+    6px !important;
+
+  border-radius: 9px !important;
+}
+
+.scheduleCard
+  .scheduleTimeline
+  > button
+  > :nth-child(n + 4) {
+  display: none !important;
+}
+
+/* Time */
+
+.scheduleCard
+  .scheduleTimeline
+  > button
+  > time {
+  box-sizing: border-box !important;
+
+  display: block !important;
+
+  width: 50px !important;
+  min-width: 50px !important;
+
+  margin: 0 !important;
+  padding: 0 !important;
+
+  color: #536f8a !important;
+
+  font-size: 0.64rem !important;
+  font-weight: 850 !important;
+  line-height: 1.08 !important;
+
+  text-align: left !important;
+  white-space: nowrap !important;
+  word-break: keep-all !important;
+}
+
+/* Preserve the timeline dot exactly as a circle. */
+
+.scheduleCard .timelineDot {
+  position: relative !important;
+  z-index: 1 !important;
+
+  display: block !important;
+
+  width: 7px !important;
+  min-width: 7px !important;
+  max-width: 7px !important;
+
+  height: 7px !important;
+  min-height: 7px !important;
+  max-height: 7px !important;
+
+  margin: 0 !important;
+  padding: 0 !important;
+
+  border-radius: 50% !important;
+
+  flex: 0 0 7px !important;
+
+  transform: none !important;
+}
+
+/* Title column */
+
+.scheduleCard
+  .scheduleTimeline
+  > button
+  > span:nth-child(3) {
+  display: block !important;
+
+  min-width: 0 !important;
+}
+
+/* Hide the location and all secondary event text. */
+
+.scheduleCard
+  .scheduleTimeline
+  > button
+  > span:nth-child(3)
+  > small {
+  display: none !important;
+}
+
+/* Event title */
+
+.scheduleCard
+  .scheduleTimeline
+  > button
+  > span:nth-child(3)
+  > strong {
+  display: -webkit-box !important;
+
+  min-width: 0 !important;
+  max-width: 100% !important;
+
+  overflow: hidden !important;
+
+  color: #244563 !important;
+
+  font-size: 0.72rem !important;
+  font-weight: 820 !important;
+  line-height: 1.15 !important;
+
+  text-overflow: ellipsis !important;
+  white-space: normal !important;
+
+  -webkit-box-orient: vertical !important;
+  -webkit-line-clamp: 2 !important;
+}
+
+/* Preserve the active conflict styling. */
+
+.scheduleCard
+  .scheduleTimeline
+  > button.activeSchedule
+  > span:nth-child(3)
+  > strong {
+  color: #d02735 !important;
+}
+
+/* Fixed conflict footer */
+
+.scheduleCard .scheduleFooter {
+  position: static !important;
+
+  min-height: 37px !important;
+
+  flex: 0 0 auto !important;
+
+  gap: 7px !important;
+
+  margin-top: 8px !important;
+
+  padding-top: 8px !important;
+
+  background: #ffffff !important;
+
+  font-size: 0.64rem !important;
+  line-height: 1.1 !important;
+}
+
+.scheduleCard
+  .scheduleFooter
+  button {
+  font-size: inherit !important;
+  line-height: inherit !important;
+}
+
+/* EXACT CLEAN PRIORITIES AND SCHEDULE — END */
+
+/* CLEAN SCHEDULE SPACING AND LINE V2 — START */
+
+/*
+ * Exact-selector correction for Today's Schedule.
+ *
+ * Displays:
+ * - event time
+ * - timeline dot
+ * - event title
+ *
+ * Hides:
+ * - locations
+ * - attendee initials
+ * - attendee overflow counts
+ * - arrows and phone icons
+ *
+ * Card height, Spotlight, Priorities, sidebar, header,
+ * AI panel and lower dashboard cards are untouched.
+ */
+
+.scheduleCard {
+  overflow: hidden !important;
+}
+
+/* Keep the heading and conflict footer outside the scroll area. */
+
+.scheduleCard > .cardHeading {
+  position: static !important;
+
+  min-height: 24px !important;
+
+  flex: 0 0 auto !important;
+
+  margin: 0 !important;
+  padding: 0 !important;
+
+  background: #ffffff !important;
+}
+
+.scheduleCard
+  > .cardHeading
+  > span {
+  gap: 7px !important;
+
+  font-size: 0.78rem !important;
+  line-height: 1.1 !important;
+}
+
+.scheduleCard
+  > .cardHeading
+  button {
+  font-size: 0.65rem !important;
+  line-height: 1 !important;
+}
+
+/*
+ * Only the events scroll.
+ * Rows remain packed at the top rather than spreading vertically.
+ */
+
+.scheduleCard .scheduleTimeline {
+  position: relative !important;
+
+  display: grid !important;
+
+  min-height: 0 !important;
+
+  flex: 1 1 0 !important;
+
+  grid-auto-rows: max-content !important;
+
+  align-content: start !important;
+
+  row-gap: 2px !important;
+
+  margin-top: 8px !important;
+  padding: 0 4px 0 0 !important;
+
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+
+  overscroll-behavior-y: auto !important;
+  scrollbar-gutter: auto !important;
+  scroll-behavior: auto !important;
+}
+
+/*
+ * Disable the old single pseudo-element line.
+ * It was limited to the visible scroll viewport and stopped early.
+ */
+
+.scheduleCard
+  .scheduleTimeline::before {
+  display: none !important;
+}
+
+/*
+ * Exact event row:
+ *
+ * 50px time | 13px dot | remaining title width
+ */
+
+.scheduleCard
+  .scheduleTimeline
+  > button {
+  position: relative !important;
+
+  box-sizing: border-box !important;
+
+  display: grid !important;
+
+  width: 100% !important;
+
+  min-height: 46px !important;
+  height: 46px !important;
+
+  grid-template-columns:
+    50px
+    13px
+    minmax(0, 1fr) !important;
+
+  align-items: center !important;
+
+  column-gap: 7px !important;
+
+  margin: 0 !important;
+
+  padding:
+    4px
+    6px !important;
+
+  border-radius: 9px !important;
+
+  overflow: visible !important;
+}
+
+/*
+ * Draw one connected timeline segment inside every event row.
+ * This scrolls with the content and reaches the final event.
+ */
+
+.scheduleCard
+  .scheduleTimeline
+  > button::before {
+  position: absolute !important;
+  z-index: 0 !important;
+
+  top: -3px !important;
+  bottom: -3px !important;
+  left: 66px !important;
+
+  width: 1px !important;
+
+  content: "" !important;
+
+  background: #d4dfe9 !important;
+}
+
+.scheduleCard
+  .scheduleTimeline
+  > button:first-child::before {
+  top: 50% !important;
+}
+
+.scheduleCard
+  .scheduleTimeline
+  > button:last-child::before {
+  bottom: 50% !important;
+}
+
+/* Hide everything after the title column. */
+
+.scheduleCard
+  .scheduleTimeline
+  > button
+  > :nth-child(n + 4) {
+  display: none !important;
+}
+
+/* Time */
+
+.scheduleCard
+  .scheduleTimeline
+  > button
+  > time {
+  position: relative !important;
+  z-index: 2 !important;
+
+  box-sizing: border-box !important;
+
+  display: block !important;
+
+  width: 50px !important;
+  min-width: 50px !important;
+
+  margin: 0 !important;
+  padding: 0 !important;
+
+  color: #536f8a !important;
+
+  font-size: 0.64rem !important;
+  font-weight: 850 !important;
+  line-height: 1 !important;
+
+  text-align: left !important;
+
+  white-space: nowrap !important;
+  word-break: keep-all !important;
+}
+
+/* Restore every timeline dot as a true circle. */
+
+.scheduleCard .timelineDot {
+  position: relative !important;
+  z-index: 3 !important;
+
+  display: block !important;
+
+  width: 7px !important;
+  min-width: 7px !important;
+  max-width: 7px !important;
+
+  height: 7px !important;
+  min-height: 7px !important;
+  max-height: 7px !important;
+
+  justify-self: start !important;
+
+  margin: 0 !important;
+  padding: 0 !important;
+
+  border-radius: 50% !important;
+
+  background: #6085ad !important;
+
+  box-shadow:
+    0 0 0 4px #ffffff !important;
+
+  transform: none !important;
+}
+
+.scheduleCard
+  .activeSchedule
+  .timelineDot {
+  background: #ef3340 !important;
+}
+
+/* Title wrapper */
+
+.scheduleCard
+  .scheduleTimeline
+  > button
+  > span:nth-child(3) {
+  position: relative !important;
+  z-index: 2 !important;
+
+  display: block !important;
+
+  min-width: 0 !important;
+}
+
+/* Remove the location and secondary event line. */
+
+.scheduleCard
+  .scheduleTimeline
+  > button
+  > span:nth-child(3)
+  > small {
+  display: none !important;
+}
+
+/*
+ * Keep event titles compact and clean.
+ * One line is used whenever possible; long titles may use two.
+ */
+
+.scheduleCard
+  .scheduleTimeline
+  > button
+  > span:nth-child(3)
+  > strong {
+  display: -webkit-box !important;
+
+  min-width: 0 !important;
+  max-width: 100% !important;
+
+  overflow: hidden !important;
+
+  color: #244563 !important;
+
+  font-size: 0.70rem !important;
+  font-weight: 820 !important;
+  line-height: 1.12 !important;
+
+  text-overflow: ellipsis !important;
+  white-space: normal !important;
+
+  -webkit-box-orient: vertical !important;
+  -webkit-line-clamp: 2 !important;
+}
+
+.scheduleCard
+  .scheduleTimeline
+  > button.activeSchedule
+  > span:nth-child(3)
+  > strong {
+  color: #d02735 !important;
+}
+
+/* Preserve the clean highlighted conflict row. */
+
+.scheduleCard
+  .scheduleTimeline
+  > button.activeSchedule {
+  background:
+    linear-gradient(
+      90deg,
+      rgba(239, 51, 64, 0.075),
+      rgba(29, 76, 126, 0.045)
+    ) !important;
+
+  box-shadow:
+    inset 3px 0 #ef3340,
+    0 5px 14px rgba(15, 48, 83, 0.04) !important;
+}
+
+/* Fixed conflict footer */
+
+.scheduleCard .scheduleFooter {
+  position: static !important;
+  z-index: 5 !important;
+
+  min-height: 37px !important;
+
+  flex: 0 0 auto !important;
+
+  gap: 7px !important;
+
+  margin-top: 8px !important;
+
+  padding-top: 8px !important;
+
+  background: #ffffff !important;
+
+  font-size: 0.64rem !important;
+  line-height: 1.1 !important;
+}
+
+.scheduleCard
+  .scheduleFooter
+  button {
+  font-size: inherit !important;
+  line-height: inherit !important;
+}
+
+/* CLEAN SCHEDULE SPACING AND LINE V2 — END */
+
+/* LIVE SCHEDULE LOCATION AND TIME — START */
+
+/*
+ * Adds the event location beneath each title and visually
+ * follows the event nearest to the browser's current local time.
+ *
+ * The approved schedule timeline layout remains unchanged.
+ */
+
+.scheduleCard
+  .scheduleTimeline
+  > button {
+  min-height: 53px !important;
+  height: 53px !important;
+
+  padding-top: 5px !important;
+  padding-bottom: 5px !important;
+}
+
+/* Event-title wrapper */
+
+.scheduleCard
+  .scheduleTimeline
+  > button
+  > span:nth-child(3) {
+  display: grid !important;
+
+  min-width: 0 !important;
+
+  align-content: center !important;
+
+  gap: 2px !important;
+}
+
+/* Event title */
+
+.scheduleCard
+  .scheduleTimeline
+  > button
+  > span:nth-child(3)
+  > strong {
+  display: block !important;
+
+  min-width: 0 !important;
+
+  overflow: hidden !important;
+
+  font-size: 0.68rem !important;
+  font-weight: 820 !important;
+  line-height: 1.14 !important;
+
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+
+  -webkit-line-clamp: unset !important;
+}
+
+/*
+ * Restore HQ Office, Zoom Meeting, Phone Call,
+ * campaign locations and full street addresses.
+ */
+
+.scheduleCard
+  .scheduleTimeline
+  > button
+  > span:nth-child(3)
+  > small {
+  display: block !important;
+
+  min-width: 0 !important;
+
+  overflow: hidden !important;
+
+  margin: 0 !important;
+
+  color: #6c8298 !important;
+
+  font-size: 0.57rem !important;
+  font-weight: 520 !important;
+  line-height: 1.16 !important;
+
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+}
+
+/* Current event based on the browser's real local time. */
+
+.scheduleCard
+  .scheduleTimeline
+  > button[data-live-schedule="current"] {
+  background:
+    linear-gradient(
+      90deg,
+      rgba(239, 51, 64, 0.075),
+      rgba(29, 76, 126, 0.045)
+    ) !important;
+
+  box-shadow:
+    inset 3px 0 #ef3340,
+    0 5px 14px
+      rgba(15, 48, 83, 0.04) !important;
+}
+
+.scheduleCard
+  .scheduleTimeline
+  > button[data-live-schedule="current"]
+  .timelineDot {
+  background: #ef3340 !important;
+}
+
+.scheduleCard
+  .scheduleTimeline
+  > button[data-live-schedule="current"]
+  > span:nth-child(3)
+  > strong {
+  color: #d02735 !important;
+}
+
+/* LIVE SCHEDULE LOCATION AND TIME — END */
