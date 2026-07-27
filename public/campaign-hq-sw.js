@@ -1,5 +1,40 @@
 const CAMPAIGN_HQ_VERSION = "campaign-hq-mobile-foundation-v1";
 
+function safeNotificationTarget(value) {
+  const fallback =
+    new URL(
+      "/dashboard",
+      self.location.origin,
+    ).toString();
+
+  if (
+    typeof value !==
+      "string" ||
+    !value.trim()
+  ) {
+    return fallback;
+  }
+
+  try {
+    const candidate =
+      new URL(
+        value,
+        self.location.origin,
+      );
+
+    if (
+      candidate.origin !==
+      self.location.origin
+    ) {
+      return fallback;
+    }
+
+    return candidate.toString();
+  } catch {
+    return fallback;
+  }
+}
+
 self.addEventListener("install", () => {
   self.skipWaiting();
 });
@@ -47,8 +82,9 @@ self.addEventListener("notificationclick", (event) => {
   event.notification.close();
 
   const targetUrl =
-    event.notification.data?.url ||
-    "/dashboard";
+    safeNotificationTarget(
+      event.notification.data?.url,
+    );
 
   event.waitUntil(
     self.clients
