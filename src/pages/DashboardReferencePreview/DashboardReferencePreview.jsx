@@ -618,10 +618,14 @@ const [
 
   const priorities = visibleTasks.slice(0, 5);
 
+  const overdueReferenceTime =
+    lastUpdated?.getTime() ?? 0;
+
   const overdueTasks = openTasks.filter(
     (task) =>
       task.due_at &&
-      new Date(task.due_at).getTime() < Date.now(),
+      new Date(task.due_at).getTime() <
+        overdueReferenceTime,
   );
 
   const pendingApprovals = data.approvals.filter((approval) =>
