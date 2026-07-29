@@ -1,7 +1,10 @@
 import {
+  useEffect,
   useMemo,
   useState,
 } from "react";
+
+import { createPortal } from "react-dom";
 
 import {
   Activity,
@@ -297,6 +300,24 @@ export function ActivityCenter() {
       }
     };
 
+  // ACTIVITY CENTER BODY LOCK — START
+  useEffect(() => {
+    if (!isOpen) {
+      return undefined;
+    }
+
+    const previousOverflow =
+      document.body.style.overflow;
+
+    document.body.style.overflow = "hidden";
+
+    return () => {
+      document.body.style.overflow =
+        previousOverflow;
+    };
+  }, [isOpen]);
+  // ACTIVITY CENTER BODY LOCK — END
+
   return (
     <div
       className={
@@ -336,8 +357,9 @@ export function ActivityCenter() {
         )}
       </button>
 
-      {isOpen && (
-        <>
+      {isOpen &&
+        createPortal(
+          <>
           <button
             className={
               styles.overlay
@@ -670,8 +692,9 @@ export function ActivityCenter() {
               </span>
             </footer>
           </aside>
-        </>
-      )}
+          </>,
+          document.body,
+        )}
     </div>
   );
 }

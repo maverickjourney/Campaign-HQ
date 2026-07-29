@@ -513,6 +513,8 @@ const {
 
   if (openApprovals.length > 0) {
     urgentItems.push({
+      id: "approvals",
+      route: "/approvals",
       title: `${openApprovals.length} ${
         openApprovals.length === 1
           ? "approval"
@@ -534,6 +536,8 @@ const {
 
   if (overdueTasks.length > 0) {
     urgentItems.push({
+      id: "overdue-tasks",
+      route: "/tasks",
       title: `${overdueTasks.length} ${
         overdueTasks.length === 1
           ? "task is"
@@ -557,6 +561,8 @@ const {
     );
 
     urgentItems.push({
+      id: "volunteer-coverage",
+      route: "/field-operations",
       title: `Volunteer coverage is ${volunteerCoverage}%`,
       detail: `${remainingShifts} more ${
         remainingShifts === 1 ? "shift" : "shifts"
@@ -568,6 +574,8 @@ const {
 
   if (events[0]) {
     urgentItems.push({
+      id: `event-${events[0].id}`,
+      route: "/calendar",
       title: `Next event: ${events[0].title}`,
       detail: `${formatEventTime(
         events[0].starts_at,
@@ -579,12 +587,17 @@ const {
 
   if (!urgentItems.length) {
     urgentItems.push({
+      id: "clear",
+      route: "",
       title: "No urgent campaign items",
       detail:
         "The campaign workspace is currently on track.",
       level: "info",
     });
   }
+
+  const primaryUrgentItem =
+    urgentItems.find((item) => item.route) || null;
 
   const dashboardStatus = isLoading
     ? "Synchronizing campaign data…"
@@ -970,8 +983,19 @@ const toggleTask = async (task) => {
                   ))}
                 </div>
 
-                <button className={styles.primaryPanelButton} type="button">
-                  Open urgent items
+                <button
+                  className={styles.primaryPanelButton}
+                  type="button"
+                  disabled={!primaryUrgentItem}
+                  onClick={() => {
+                    if (primaryUrgentItem?.route) {
+                      navigate(primaryUrgentItem.route);
+                    }
+                  }}
+                >
+                  {primaryUrgentItem
+                    ? "Open urgent items"
+                    : "No urgent items"}
                   <ArrowRight size={16} strokeWidth={2} />
                 </button>
               </article>
@@ -1078,38 +1102,62 @@ const toggleTask = async (task) => {
               </div>
 
               <div className={styles.priorityList}>
-                {priorities.map((priority) => {
-                  const isComplete =
+                {priorities.length ? (
+                  priorities.map((priority) => {
+                    const isComplete =
                       priority.status === "completed";
 
-                  return (
-                    <button
-                      key={priority.id}
-                      className={isComplete ? styles.completedPriority : ""}
-                      type="button"
-                      disabled={
-                        taskUpdatingId === priority.id
-                      }
-                      onClick={() => toggleTask(priority)}
-                    >
-                      <span className={styles.taskCheck}>
-                        {isComplete && <CheckCircle2 size={18} strokeWidth={2.3} />}
-                      </span>
-
-                      <div className={styles.priorityCopy}>
-                        <strong>{priority.title}</strong>
-
-                        <span>
-                          {priority.category}
-                          <i />
-                          {priority.time}
+                    return (
+                      <button
+                        key={priority.id}
+                        className={
+                          isComplete
+                            ? styles.completedPriority
+                            : ""
+                        }
+                        type="button"
+                        disabled={
+                          taskUpdatingId === priority.id
+                        }
+                        onClick={() => toggleTask(priority)}
+                      >
+                        <span className={styles.taskCheck}>
+                          {isComplete && (
+                            <CheckCircle2
+                              size={18}
+                              strokeWidth={2.3}
+                            />
+                          )}
                         </span>
-                      </div>
 
-                      <ChevronRight size={17} />
-                    </button>
-                  );
-                })}
+                        <div className={styles.priorityCopy}>
+                          <strong>{priority.title}</strong>
+
+                          <span>
+                            {priority.category}
+                            <i />
+                            {priority.time}
+                          </span>
+                        </div>
+
+                        <ChevronRight size={17} />
+                      </button>
+                    );
+                  })
+                ) : (
+                  <div className={styles.emptyState}>
+                    <strong>
+                      {isLoading
+                        ? "Loading campaign priorities…"
+                        : "No active priorities"}
+                    </strong>
+                    <p>
+                      {isLoading
+                        ? "Campaign work is being synchronized."
+                        : "New assigned work will appear here."}
+                    </p>
+                  </div>
+                )}
               </div>
             </article>
 
@@ -1131,25 +1179,46 @@ const toggleTask = async (task) => {
               </div>
 
               <div className={styles.eventList}>
-                {upcomingEvents.map((event) => (
-                  <div key={event.id} className={styles.eventItem}>
-                    <div className={styles.eventDate}>
-                      <span>{event.month}</span>
-                      <strong>{event.day}</strong>
+                {upcomingEvents.length ? (
+                  upcomingEvents.map((event) => (
+                    <div
+                      key={event.id}
+                      className={styles.eventItem}
+                    >
+                      <div className={styles.eventDate}>
+                        <span>{event.month}</span>
+                        <strong>{event.day}</strong>
+                      </div>
+
+                      <div className={styles.eventCopy}>
+                        <strong>{event.title}</strong>
+
+                        <span>
+                          <Clock3
+                            size={14}
+                            strokeWidth={1.8}
+                          />
+                          {event.time}
+                        </span>
+                      </div>
+
+                      <small>{event.type}</small>
                     </div>
-
-                    <div className={styles.eventCopy}>
-                      <strong>{event.title}</strong>
-
-                      <span>
-                        <Clock3 size={14} strokeWidth={1.8} />
-                        {event.time}
-                      </span>
-                    </div>
-
-                    <small>{event.type}</small>
+                  ))
+                ) : (
+                  <div className={styles.emptyState}>
+                    <strong>
+                      {isLoading
+                        ? "Loading campaign schedule…"
+                        : "No upcoming events"}
+                    </strong>
+                    <p>
+                      {isLoading
+                        ? "Scheduled events are being synchronized."
+                        : "New campaign events will appear here."}
+                    </p>
                   </div>
-                ))}
+                )}
               </div>
             </article>
 
@@ -1164,19 +1233,40 @@ const toggleTask = async (task) => {
               </div>
 
               <div className={styles.activityList}>
-                {recentActivity.map((activity) => (
-                  <div key={activity.id} className={styles.activityItem}>
-                    <div className={styles.activityIcon}>
-                      <CheckCircle2 size={16} strokeWidth={2} />
-                    </div>
+                {recentActivity.length ? (
+                  recentActivity.map((activity) => (
+                    <div
+                      key={activity.id}
+                      className={styles.activityItem}
+                    >
+                      <div className={styles.activityIcon}>
+                        <CheckCircle2
+                          size={16}
+                          strokeWidth={2}
+                        />
+                      </div>
 
-                    <div>
-                      <strong>{activity.title}</strong>
-                      <p>{activity.detail}</p>
-                      <span>{activity.time}</span>
+                      <div>
+                        <strong>{activity.title}</strong>
+                        <p>{activity.detail}</p>
+                        <span>{activity.time}</span>
+                      </div>
                     </div>
+                  ))
+                ) : (
+                  <div className={styles.emptyState}>
+                    <strong>
+                      {isLoading
+                        ? "Loading recent activity…"
+                        : "No recent activity"}
+                    </strong>
+                    <p>
+                      {isLoading
+                        ? "Campaign updates are being synchronized."
+                        : "Completed work and campaign changes will appear here."}
+                    </p>
                   </div>
-                ))}
+                )}
               </div>
 
               <div className={styles.feedDivider} />
@@ -1194,16 +1284,37 @@ const toggleTask = async (task) => {
               </div>
 
               <div className={styles.feedList}>
-                {liveFeed.map((item) => (
-                  <div key={item.id} className={styles.feedItem}>
-                    <span className={styles.feedPulse} aria-hidden="true" />
-                    <div>
-                      <strong>{item.title}</strong>
-                      <p>{item.detail}</p>
+                {liveFeed.length ? (
+                  liveFeed.map((item) => (
+                    <div
+                      key={item.id}
+                      className={styles.feedItem}
+                    >
+                      <span
+                        className={styles.feedPulse}
+                        aria-hidden="true"
+                      />
+                      <div>
+                        <strong>{item.title}</strong>
+                        <p>{item.detail}</p>
+                      </div>
+                      <small>{item.time}</small>
                     </div>
-                    <small>{item.time}</small>
+                  ))
+                ) : (
+                  <div className={styles.emptyState}>
+                    <strong>
+                      {isLoading
+                        ? "Connecting to live activity…"
+                        : "No live updates yet"}
+                    </strong>
+                    <p>
+                      {isLoading
+                        ? "The campaign activity stream is connecting."
+                        : "New workspace activity will appear automatically."}
+                    </p>
                   </div>
-                ))}
+                )}
               </div>
             </article>
           </section>
@@ -1223,12 +1334,18 @@ const toggleTask = async (task) => {
               </div>
 
               <div className={styles.adminButtons}>
-                <button type="button">
+                <button
+                  type="button"
+                  onClick={() => navigate("/team/access")}
+                >
                   <UserCog size={16} />
                   Manage users
                 </button>
 
-                <button type="button">
+                <button
+                  type="button"
+                  onClick={() => navigate("/workspace/settings")}
+                >
                   <Settings size={16} />
                   Workspace settings
                 </button>
@@ -1237,7 +1354,7 @@ const toggleTask = async (task) => {
           )}
 
           <footer className={styles.footer}>
-            <span>© 2026 Campaign HQ</span>
+            <span>© 2026 Campaign Seat Technologies LLC</span>
 
             <div>
               <ShieldCheck size={14} />

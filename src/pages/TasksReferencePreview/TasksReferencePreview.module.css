@@ -1,0 +1,2813 @@
+.page {
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  min-height: calc(100vh - 74px);
+  padding: 22px 24px 32px;
+  color: #14385f;
+  background:
+    radial-gradient(
+      circle at 88% 4%,
+      rgba(70, 158, 220, 0.08),
+      transparent 31%
+    ),
+    #f3f7fa;
+}
+
+.page button,
+.page input,
+.page select,
+.page textarea {
+  font: inherit;
+}
+
+.pageHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 24px;
+  margin: 0 0 20px;
+}
+
+.pageHeading {
+  min-width: 0;
+}
+
+.pageHeading > span {
+  display: block;
+  margin: 0 0 6px;
+  color: #eb2f3c;
+  font-size: 0.72rem;
+  font-weight: 850;
+  letter-spacing: 0.17em;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.pageHeading h1 {
+  margin: 0;
+  color: #102f52;
+  font-size: clamp(2rem, 3vw, 3rem);
+  font-weight: 850;
+  letter-spacing: -0.055em;
+  line-height: 1;
+}
+
+.pageHeading p {
+  max-width: 650px;
+  margin: 10px 0 0;
+  color: #64809c;
+  font-size: 1rem;
+  line-height: 1.45;
+}
+
+.liveLine {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 12px 0 0;
+  color: #64809c;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.liveLine > span {
+  width: 7px;
+  height: 7px;
+  border-radius: 999px;
+  background: #22af76;
+  box-shadow: 0 0 0 5px rgba(34, 175, 118, 0.1);
+}
+
+.headingActions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 10px;
+  min-width: min(100%, 580px);
+}
+
+.headerSearch {
+  display: flex;
+  align-items: center;
+  flex: 1 1 270px;
+  min-width: 230px;
+  height: 46px;
+  padding: 0 12px;
+  border: 1px solid #cadae8;
+  border-radius: 12px;
+  background: #fff;
+  box-shadow: 0 6px 18px rgba(21, 57, 91, 0.04);
+}
+
+.headerSearch svg {
+  flex: 0 0 auto;
+  color: #587896;
+}
+
+.headerSearch input {
+  min-width: 0;
+  flex: 1;
+  height: 100%;
+  padding: 0 10px;
+  border: 0;
+  outline: 0;
+  color: #15395f;
+  background: transparent;
+}
+
+.headerSearch kbd {
+  padding: 4px 7px;
+  border: 1px solid #d6e2ec;
+  border-radius: 7px;
+  color: #7890a6;
+  background: #f5f8fa;
+  font-family: inherit;
+  font-size: 0.68rem;
+  font-weight: 750;
+}
+
+.refreshButton,
+.newTaskButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 46px;
+  padding: 0 16px;
+  border-radius: 12px;
+  font-size: 0.82rem;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.refreshButton {
+  border: 1px solid #cadae8;
+  color: #214e78;
+  background: #fff;
+}
+
+.newTaskButton {
+  border: 1px solid #e62534;
+  color: #fff;
+  background:
+    linear-gradient(
+      135deg,
+      #f02e3d,
+      #d9182a
+    );
+  box-shadow: 0 12px 25px rgba(222, 30, 46, 0.18);
+}
+
+.refreshButton:disabled,
+.newTaskButton:disabled {
+  cursor: wait;
+  opacity: 0.65;
+}
+
+.summaryGrid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 12px;
+  margin: 0 0 16px;
+}
+
+.summaryCard {
+  display: grid;
+  grid-template-columns: 42px minmax(0, 1fr);
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+  min-height: 108px;
+  padding: 16px;
+  border: 1px solid #cddde9;
+  border-radius: 15px;
+  text-align: left;
+  background: #fff;
+  box-shadow: 0 8px 24px rgba(21, 57, 91, 0.045);
+  cursor: pointer;
+  transition:
+    transform 160ms ease,
+    border-color 160ms ease,
+    box-shadow 160ms ease;
+}
+
+.summaryCard:hover {
+  transform: translateY(-2px);
+  border-color: #9dbbd2;
+  box-shadow: 0 12px 28px rgba(21, 57, 91, 0.08);
+}
+
+.summaryIcon {
+  display: grid;
+  width: 42px;
+  height: 42px;
+  place-items: center;
+  border-radius: 12px;
+  color: #2671ab;
+  background: #eaf4fc;
+}
+
+.summaryCopy {
+  display: block;
+  min-width: 0;
+}
+
+.summaryCopy small,
+.summaryCopy strong,
+.summaryCopy em {
+  display: block;
+  min-width: 0;
+}
+
+.summaryCopy small {
+  overflow: hidden;
+  color: #627f9b;
+  font-size: 0.72rem;
+  font-weight: 800;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.summaryCopy strong {
+  margin: 4px 0 3px;
+  color: #102f52;
+  font-size: 1.55rem;
+  font-weight: 880;
+  line-height: 1;
+}
+
+.summaryCopy em {
+  overflow: hidden;
+  color: #7990a6;
+  font-size: 0.68rem;
+  font-style: normal;
+  line-height: 1.3;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.summaryCard.danger .summaryIcon {
+  color: #dc2435;
+  background: #fff0f2;
+}
+
+.summaryCard.success .summaryIcon {
+  color: #168b5e;
+  background: #e9f8f0;
+}
+
+.tasksWorkspace {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  align-items: start;
+  gap: 14px;
+  min-width: 0;
+}
+
+.tasksWorkspace.hasDetails {
+  grid-template-columns:
+    minmax(0, 1fr)
+    minmax(310px, 350px);
+}
+
+.taskPanel,
+.detailsPanel {
+  min-width: 0;
+  border: 1px solid #ccdde9;
+  border-radius: 16px;
+  background: #fff;
+  box-shadow: 0 10px 28px rgba(21, 57, 91, 0.05);
+}
+
+.taskPanel {
+  overflow: hidden;
+}
+
+.tabsBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  min-height: 64px;
+  padding: 0 16px;
+  border-bottom: 1px solid #d8e4ed;
+}
+
+.tabs {
+  display: flex;
+  align-items: stretch;
+  align-self: stretch;
+  min-width: 0;
+  overflow-x: auto;
+}
+
+.tabs button {
+  position: relative;
+  min-width: max-content;
+  padding: 0 17px;
+  border: 0;
+  color: #607b95;
+  background: transparent;
+  font-size: 0.77rem;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.tabs button::after {
+  position: absolute;
+  right: 14px;
+  bottom: 0;
+  left: 14px;
+  height: 2px;
+  border-radius: 999px 999px 0 0;
+  background: transparent;
+  content: "";
+}
+
+.tabs .activeTab {
+  color: #102f52;
+}
+
+.tabs .activeTab::after {
+  background: #ec2d3a;
+}
+
+.tableActions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.selectControl,
+.sortControl {
+  display: flex;
+  align-items: center;
+  height: 38px;
+  padding: 0 10px;
+  border: 1px solid #d4e1eb;
+  border-radius: 10px;
+  color: #476a89;
+  background: #fff;
+}
+
+.selectControl svg {
+  flex: 0 0 auto;
+}
+
+.selectControl select,
+.sortControl select {
+  min-width: 0;
+  height: 100%;
+  padding: 0 4px 0 7px;
+  border: 0;
+  outline: 0;
+  color: #214869;
+  background: transparent;
+  font-size: 0.72rem;
+  font-weight: 750;
+  cursor: pointer;
+}
+
+.sortControl > span {
+  color: #7a90a5;
+  font-size: 0.69rem;
+  font-weight: 700;
+}
+
+.resultsLine {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  min-height: 44px;
+  padding: 0 18px;
+  border-bottom: 1px solid #e0e9f0;
+  background: #fbfdfe;
+}
+
+.resultsLine > div {
+  display: flex;
+  align-items: baseline;
+  gap: 5px;
+}
+
+.resultsLine strong {
+  color: #153b61;
+  font-size: 0.82rem;
+}
+
+.resultsLine span {
+  color: #7b91a7;
+  font-size: 0.72rem;
+}
+
+.resultsLine button {
+  border: 0;
+  color: #d92736;
+  background: transparent;
+  font-size: 0.7rem;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.tableScroller {
+  width: 100%;
+  min-width: 0;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+}
+
+.taskTable {
+  width: 100%;
+  min-width: 930px;
+  border-collapse: collapse;
+  table-layout: fixed;
+}
+
+.taskTable th {
+  height: 42px;
+  padding: 0 10px;
+  border-bottom: 1px solid #dae5ed;
+  color: #688197;
+  background: #f8fafc;
+  font-size: 0.66rem;
+  font-weight: 800;
+  letter-spacing: 0.015em;
+  text-align: left;
+  text-transform: uppercase;
+}
+
+.taskTable th:nth-child(1) {
+  width: 42px;
+}
+
+.taskTable th:nth-child(2) {
+  width: 30%;
+}
+
+.taskTable th:nth-child(3) {
+  width: 90px;
+}
+
+.taskTable th:nth-child(4) {
+  width: 145px;
+}
+
+.taskTable th:nth-child(5) {
+  width: 110px;
+}
+
+.taskTable th:nth-child(6) {
+  width: 112px;
+}
+
+.taskTable th:nth-child(7) {
+  width: 120px;
+}
+
+.taskTable th:nth-child(8) {
+  width: 44px;
+}
+
+.taskRow {
+  transition:
+    background 140ms ease,
+    box-shadow 140ms ease;
+  cursor: pointer;
+}
+
+.taskRow:hover {
+  background: #f8fbfd;
+}
+
+.taskRow.selectedRow {
+  background: #fff6f7;
+  box-shadow: inset 3px 0 0 #ed2b39;
+}
+
+.taskRow.overdueRow:not(.selectedRow) {
+  background: #fffafb;
+}
+
+.taskRow td {
+  height: 67px;
+  padding: 8px 10px;
+  border-bottom: 1px solid #e1e9f0;
+  vertical-align: middle;
+}
+
+.taskCheckbox {
+  display: grid;
+  width: 20px;
+  height: 20px;
+  place-items: center;
+  cursor: pointer;
+}
+
+.taskCheckbox input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.taskCheckbox > span {
+  display: grid;
+  width: 16px;
+  height: 16px;
+  place-items: center;
+  border: 1px solid #aebfce;
+  border-radius: 4px;
+  color: #fff;
+  background: #fff;
+}
+
+.taskCheckbox input:checked + span {
+  border-color: #e72b3a;
+  background: #e72b3a;
+}
+
+.taskName {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  text-align: left;
+  background: transparent;
+  cursor: pointer;
+}
+
+.taskName strong,
+.taskName span {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.taskName strong {
+  color: #173b60;
+  font-size: 0.78rem;
+  font-weight: 830;
+}
+
+.taskName span {
+  margin: 4px 0 0;
+  color: #71899f;
+  font-size: 0.68rem;
+}
+
+.priorityBadge,
+.statusBadge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  max-width: 100%;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+
+.priorityBadge {
+  min-width: 58px;
+  padding: 5px 9px;
+  font-size: 0.65rem;
+  font-weight: 850;
+}
+
+.priorityBadge.urgent {
+  color: #fff;
+  background: #e92133;
+}
+
+.priorityBadge.high {
+  color: #cc2636;
+  background: #ffe9ec;
+}
+
+.priorityBadge.normal {
+  color: #a26706;
+  background: #fff1d6;
+}
+
+.priorityBadge.low {
+  color: #167750;
+  background: #e2f7ec;
+}
+
+.assignee {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.assignee > span {
+  display: grid;
+  width: 28px;
+  height: 28px;
+  flex: 0 0 auto;
+  place-items: center;
+  border-radius: 999px;
+  color: #fff;
+  background:
+    linear-gradient(
+      145deg,
+      #2b699a,
+      #153f6b
+    );
+  font-size: 0.58rem;
+  font-weight: 850;
+}
+
+.assignee strong {
+  overflow: hidden;
+  min-width: 0;
+  color: #315574;
+  font-size: 0.68rem;
+  font-weight: 750;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.dueDate {
+  display: block;
+}
+
+.dueDate strong,
+.dueDate small {
+  display: block;
+}
+
+.dueDate strong {
+  color: #365b7b;
+  font-size: 0.68rem;
+  font-weight: 800;
+}
+
+.dueDate small {
+  margin: 3px 0 0;
+  color: #8195a8;
+  font-size: 0.62rem;
+}
+
+.dueDate.overdueDate strong {
+  color: #de2737;
+}
+
+.statusBadge {
+  gap: 5px;
+  padding: 5px 8px;
+  border: 1px solid #d7e2ea;
+  color: #526f89;
+  background: #f6f8fa;
+  font-size: 0.63rem;
+  font-weight: 760;
+}
+
+.statusBadge.in_progress {
+  border-color: #c8dcf7;
+  color: #2564a3;
+  background: #eef5ff;
+}
+
+.statusBadge.completed {
+  border-color: #cce8da;
+  color: #187450;
+  background: #edf9f3;
+}
+
+.statusBadge.archived {
+  color: #6e7e8d;
+  background: #edf1f4;
+}
+
+.projectName {
+  display: block;
+  overflow: hidden;
+  color: #59748d;
+  font-size: 0.67rem;
+  font-weight: 720;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.moreButton {
+  display: grid;
+  width: 30px;
+  height: 30px;
+  place-items: center;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  color: #688199;
+  background: transparent;
+  cursor: pointer;
+}
+
+.moreButton:hover {
+  border-color: #d4e1eb;
+  background: #fff;
+}
+
+.loadingCell,
+.emptyCell {
+  height: 320px !important;
+  text-align: center;
+}
+
+.loadingCell {
+  color: #668198;
+  font-size: 0.8rem;
+}
+
+.loadingCell svg {
+  margin: 0 8px -6px 0;
+}
+
+.emptyCell svg,
+.emptyCell strong,
+.emptyCell span {
+  display: block;
+  margin-right: auto;
+  margin-left: auto;
+}
+
+.emptyCell svg {
+  color: #2b719f;
+}
+
+.emptyCell strong {
+  margin-top: 12px;
+  color: #183b5e;
+  font-size: 0.9rem;
+}
+
+.emptyCell span {
+  margin-top: 5px;
+  color: #7a90a5;
+  font-size: 0.72rem;
+}
+
+.tableFooter {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  min-height: 44px;
+  padding: 0 18px;
+  color: #7a90a5;
+  background: #fbfdfe;
+  font-size: 0.66rem;
+}
+
+.detailsPanel {
+  position: sticky;
+  top: 14px;
+  display: flex;
+  flex-direction: column;
+  max-height: calc(100vh - 104px);
+  overflow: hidden;
+}
+
+.detailsHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 64px;
+  padding: 0 16px;
+  border-bottom: 1px solid #dbe5ed;
+}
+
+.detailsHeader > div span,
+.detailsHeader > div strong {
+  display: block;
+}
+
+.detailsHeader > div span {
+  color: #eb2d3c;
+  font-size: 0.64rem;
+  font-weight: 850;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+}
+
+.detailsHeader > div strong {
+  margin: 5px 0 0;
+  color: #173b5e;
+  font-size: 0.78rem;
+}
+
+.detailsHeader > button {
+  display: grid;
+  width: 34px;
+  height: 34px;
+  place-items: center;
+  border: 1px solid #d4e1ea;
+  border-radius: 9px;
+  color: #59748d;
+  background: #fff;
+  cursor: pointer;
+}
+
+.detailsBody {
+  min-height: 0;
+  flex: 1;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.detailsTitle {
+  padding: 18px 18px 16px;
+  border-bottom: 1px solid #e0e8ef;
+}
+
+.detailTitleLine {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.detailTitleLine > button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 9px;
+  border: 1px solid #d3e0ea;
+  border-radius: 8px;
+  color: #315c7e;
+  background: #fff;
+  font-size: 0.67rem;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.detailsTitle h2 {
+  margin: 15px 0 8px;
+  color: #102f52;
+  font-size: 1.23rem;
+  font-weight: 850;
+  letter-spacing: -0.025em;
+  line-height: 1.2;
+}
+
+.detailsTitle p {
+  margin: 0;
+  color: #607c95;
+  font-size: 0.74rem;
+  line-height: 1.55;
+}
+
+.detailFields {
+  display: grid;
+  gap: 0;
+  padding: 5px 18px;
+}
+
+.detailFields > div {
+  display: grid;
+  grid-template-columns: 105px minmax(0, 1fr);
+  align-items: center;
+  gap: 12px;
+  min-height: 48px;
+  border-bottom: 1px solid #e5ecf2;
+}
+
+.detailFields > div > span {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  color: #7890a4;
+  font-size: 0.67rem;
+  font-weight: 720;
+}
+
+.detailFields strong,
+.detailFields select {
+  min-width: 0;
+  color: #294f70;
+  font-size: 0.7rem;
+  font-weight: 800;
+}
+
+.detailFields select {
+  height: 32px;
+  padding: 0 8px;
+  border: 1px solid #d2dfe9;
+  border-radius: 8px;
+  outline: 0;
+  background: #fff;
+}
+
+.redText {
+  color: #d92535 !important;
+}
+
+.tagsBlock,
+.progressBlock,
+.commentsBlock {
+  margin: 0 18px;
+  padding: 16px 0;
+  border-bottom: 1px solid #e2eaf0;
+}
+
+.tagsBlock > span {
+  display: block;
+  margin: 0 0 9px;
+  color: #7890a5;
+  font-size: 0.67rem;
+  font-weight: 760;
+}
+
+.tagsBlock > div {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+}
+
+.tagsBlock strong {
+  padding: 5px 9px;
+  border: 1px solid #d8e2ea;
+  border-radius: 999px;
+  color: #476985;
+  background: #f7f9fb;
+  font-size: 0.62rem;
+}
+
+.progressBlock > div {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.progressBlock > div strong {
+  color: #173b60;
+  font-size: 0.72rem;
+}
+
+.progressBlock > div span {
+  color: #668198;
+  font-size: 0.68rem;
+  font-weight: 800;
+}
+
+.progressTrack {
+  display: block;
+  height: 6px;
+  margin: 11px 0 0;
+  overflow: hidden;
+  border-radius: 999px;
+  background: #e4ebf1;
+}
+
+.progressTrack > span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background:
+    linear-gradient(
+      90deg,
+      #ec2d3b,
+      #dd1f31
+    );
+  transition: width 220ms ease;
+}
+
+.commentsBlock {
+  border-bottom: 0;
+}
+
+.commentsBlock > header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.commentsBlock > header > div strong,
+.commentsBlock > header > div span {
+  display: block;
+}
+
+.commentsBlock > header strong {
+  color: #173b5f;
+  font-size: 0.74rem;
+}
+
+.commentsBlock > header span {
+  margin: 3px 0 0;
+  color: #8497a9;
+  font-size: 0.62rem;
+}
+
+.commentsBlock > header svg {
+  color: #4a718f;
+}
+
+.commentList {
+  display: grid;
+  gap: 13px;
+  margin: 16px 0;
+}
+
+.commentList article {
+  display: grid;
+  grid-template-columns: 30px minmax(0, 1fr);
+  gap: 9px;
+}
+
+.commentList article > span {
+  display: grid;
+  width: 30px;
+  height: 30px;
+  place-items: center;
+  border-radius: 999px;
+  color: #fff;
+  background: #1d527c;
+  font-size: 0.56rem;
+  font-weight: 850;
+}
+
+.commentList article header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.commentList article header strong {
+  color: #294f70;
+  font-size: 0.67rem;
+}
+
+.commentList article header small {
+  color: #8497a8;
+  font-size: 0.57rem;
+}
+
+.commentList article p {
+  margin: 4px 0 0;
+  color: #5f7b93;
+  font-size: 0.67rem;
+  line-height: 1.45;
+}
+
+.noComments {
+  display: grid;
+  min-height: 105px;
+  place-items: center;
+  align-content: center;
+  color: #8094a6;
+  text-align: center;
+}
+
+.noComments svg {
+  color: #5c809e;
+}
+
+.noComments strong,
+.noComments span {
+  display: block;
+}
+
+.noComments strong {
+  margin: 6px 0 3px;
+  color: #3c607e;
+  font-size: 0.7rem;
+}
+
+.noComments span {
+  font-size: 0.63rem;
+}
+
+.commentForm {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 36px;
+  gap: 7px;
+}
+
+.commentForm textarea {
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 62px;
+  resize: vertical;
+  padding: 10px;
+  border: 1px solid #d2dfe9;
+  border-radius: 10px;
+  outline: 0;
+  color: #294f70;
+  background: #fff;
+  font-size: 0.68rem;
+  line-height: 1.4;
+}
+
+.commentForm textarea:focus {
+  border-color: #8cb1ce;
+  box-shadow: 0 0 0 3px rgba(48, 112, 160, 0.09);
+}
+
+.commentForm button {
+  display: grid;
+  width: 36px;
+  height: 36px;
+  align-self: end;
+  place-items: center;
+  border: 0;
+  border-radius: 10px;
+  color: #fff;
+  background: #e72535;
+  cursor: pointer;
+}
+
+.commentForm button:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
+.detailsFooter {
+  display: grid;
+  grid-template-columns: 0.8fr 1.2fr;
+  gap: 9px;
+  padding: 13px 16px;
+  border-top: 1px solid #dae5ed;
+  background: #fbfdfe;
+}
+
+.detailsFooter button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  min-height: 40px;
+  padding: 0 10px;
+  border: 1px solid #d2dfe8;
+  border-radius: 10px;
+  color: #516e87;
+  background: #fff;
+  font-size: 0.68rem;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.detailsFooter .primaryDetailButton {
+  border-color: #e32737;
+  color: #fff;
+  background: #e32737;
+}
+
+.modalLayer {
+  position: fixed;
+  z-index: 1000000;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+}
+
+.modalBackdrop {
+  position: absolute;
+  z-index: 0;
+  inset: 0;
+  border: 0;
+  background: rgba(12, 34, 55, 0.58);
+  backdrop-filter: blur(7px);
+}
+
+.taskModal {
+  position: relative;
+  z-index: 1;
+  width: min(700px, 100%);
+  max-height: min(860px, calc(100vh - 40px));
+  overflow: hidden auto;
+  border: 1px solid rgba(201, 218, 231, 0.95);
+  border-radius: 18px;
+  background: #fff;
+  box-shadow: 0 30px 75px rgba(11, 31, 49, 0.3);
+}
+
+.taskModal > header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  min-height: 82px;
+  padding: 0 22px;
+  border-bottom: 1px solid #dce6ee;
+}
+
+.taskModal > header span {
+  display: block;
+  color: #e62a39;
+  font-size: 0.65rem;
+  font-weight: 850;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+}
+
+.taskModal > header h2 {
+  margin: 6px 0 0;
+  color: #123456;
+  font-size: 1.45rem;
+  letter-spacing: -0.03em;
+}
+
+.taskModal > header button {
+  display: grid;
+  width: 38px;
+  height: 38px;
+  place-items: center;
+  border: 1px solid #d3e0e9;
+  border-radius: 10px;
+  color: #54718a;
+  background: #fff;
+  cursor: pointer;
+}
+
+.taskForm {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
+  padding: 20px 22px 22px;
+}
+
+.taskForm label {
+  display: block;
+  min-width: 0;
+}
+
+.taskForm label > span {
+  display: block;
+  margin: 0 0 7px;
+  color: #315574;
+  font-size: 0.7rem;
+  font-weight: 800;
+}
+
+.taskForm input,
+.taskForm select,
+.taskForm textarea {
+  box-sizing: border-box;
+  width: 100%;
+  border: 1px solid #cfdee9;
+  border-radius: 10px;
+  outline: 0;
+  color: #254b6d;
+  background: #fff;
+  font-size: 0.76rem;
+}
+
+.taskForm input,
+.taskForm select {
+  height: 43px;
+  padding: 0 11px;
+}
+
+.taskForm textarea {
+  min-height: 100px;
+  resize: vertical;
+  padding: 11px;
+  line-height: 1.5;
+}
+
+.taskForm input:focus,
+.taskForm select:focus,
+.taskForm textarea:focus {
+  border-color: #88acc8;
+  box-shadow: 0 0 0 3px rgba(38, 107, 157, 0.08);
+}
+
+.fullField,
+.formError,
+.taskForm > footer {
+  grid-column: 1 / -1;
+}
+
+.formError {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  padding: 10px 12px;
+  border: 1px solid #ffcdd3;
+  border-radius: 10px;
+  color: #c62434;
+  background: #fff3f4;
+  font-size: 0.7rem;
+  font-weight: 750;
+}
+
+.taskForm > footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 9px;
+  margin: 2px -22px -22px;
+  padding: 14px 22px;
+  border-top: 1px solid #dce6ed;
+  background: #fbfdfe;
+}
+
+.taskForm > footer button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  min-width: 110px;
+  height: 42px;
+  border: 1px solid #cfdee8;
+  border-radius: 10px;
+  color: #446581;
+  background: #fff;
+  font-size: 0.72rem;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.taskForm > footer .saveButton {
+  min-width: 145px;
+  border-color: #e22636;
+  color: #fff;
+  background: #e22636;
+}
+
+.spinning {
+  animation: tasks-spin 850ms linear infinite;
+}
+
+@keyframes tasks-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (max-width: 1450px) {
+  .page {
+    padding-right: 18px;
+    padding-left: 18px;
+  }
+
+  .summaryGrid {
+    grid-template-columns:
+      repeat(3, minmax(0, 1fr));
+  }
+
+  .tasksWorkspace.hasDetails {
+    grid-template-columns:
+      minmax(0, 1fr)
+      minmax(290px, 320px);
+  }
+}
+
+@media (max-width: 1180px) {
+  .pageHeader {
+    flex-direction: column;
+  }
+
+  .headingActions {
+    width: 100%;
+    min-width: 0;
+    justify-content: flex-start;
+  }
+
+  .tasksWorkspace.hasDetails {
+    grid-template-columns: 1fr;
+  }
+
+  .detailsPanel {
+    position: relative;
+    top: auto;
+    max-height: none;
+  }
+
+  .detailsBody {
+    max-height: 600px;
+  }
+}
+
+@media (max-width: 900px) {
+  .summaryGrid {
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+  }
+
+  .tabsBar {
+    align-items: flex-start;
+    flex-direction: column;
+    padding-top: 10px;
+    padding-bottom: 10px;
+  }
+
+  .tabs {
+    width: 100%;
+    min-height: 44px;
+  }
+
+  .tableActions {
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+  .selectControl,
+  .sortControl {
+    flex: 1 1 150px;
+  }
+}
+
+@media (max-width: 650px) {
+  .page {
+    padding: 15px 11px 24px;
+  }
+
+  .pageHeading p {
+    font-size: 0.88rem;
+  }
+
+  .headingActions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .headerSearch {
+    grid-column: 1 / -1;
+    min-width: 0;
+  }
+
+  .refreshButton,
+  .newTaskButton {
+    width: 100%;
+  }
+
+  .summaryGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .summaryCard {
+    min-height: 88px;
+  }
+
+  .tableFooter {
+    align-items: flex-start;
+    flex-direction: column;
+    justify-content: center;
+    padding-top: 8px;
+    padding-bottom: 8px;
+  }
+
+  .detailFields > div {
+    grid-template-columns: 1fr;
+    gap: 5px;
+    padding-top: 8px;
+    padding-bottom: 8px;
+  }
+
+  .detailsFooter {
+    grid-template-columns: 1fr;
+  }
+
+  .taskForm {
+    grid-template-columns: 1fr;
+  }
+
+  .fullField,
+  .formError,
+  .taskForm > footer {
+    grid-column: auto;
+  }
+
+  .taskForm > footer {
+    align-items: stretch;
+    flex-direction: column-reverse;
+  }
+
+  .taskForm > footer button {
+    width: 100%;
+  }
+}
+
+/* TASKS TABLE AND DETAILS FINAL POLISH — START */
+
+/*
+ * Tasks-only corrections:
+ *
+ * - Completed tab remains fully visible.
+ * - Filters use a dedicated clean row.
+ * - Table fits beside the details panel.
+ * - Task, assignee and project columns remain readable.
+ * - Details content scrolls without losing its footer.
+ * - Floating support launcher does not cover task actions.
+ */
+
+/* =========================================================
+   TASKS WORKSPACE WIDTH BALANCE
+   ========================================================= */
+
+.tasksWorkspace.hasDetails {
+  grid-template-columns:
+    minmax(0, 1fr)
+    minmax(310px, 332px) !important;
+
+  gap: 13px !important;
+}
+
+.taskPanel,
+.detailsPanel {
+  min-width: 0 !important;
+}
+
+/* =========================================================
+   TABS AND FILTER TOOLBAR
+   ========================================================= */
+
+/*
+ * The original single-row layout squeezed the Completed tab.
+ * Tabs now receive their own uninterrupted row.
+ */
+
+.tabsBar {
+  display: grid !important;
+
+  grid-template-columns: minmax(0, 1fr) !important;
+
+  align-items: stretch !important;
+
+  gap: 0 !important;
+
+  min-height: 0 !important;
+
+  padding: 0 !important;
+}
+
+.tabs {
+  box-sizing: border-box !important;
+
+  display: flex !important;
+
+  width: 100% !important;
+  min-width: 0 !important;
+  min-height: 56px !important;
+
+  align-items: stretch !important;
+
+  padding:
+    0
+    17px !important;
+
+  overflow-x: auto !important;
+
+  border-bottom:
+    1px
+    solid
+    #dbe5ed !important;
+
+  scrollbar-width: none !important;
+}
+
+.tabs::-webkit-scrollbar {
+  display: none !important;
+}
+
+.tabs button {
+  box-sizing: border-box !important;
+
+  display: inline-flex !important;
+
+  min-width: max-content !important;
+  min-height: 55px !important;
+
+  flex: 0 0 auto !important;
+
+  align-items: center !important;
+  justify-content: center !important;
+
+  padding:
+    0
+    19px !important;
+
+  overflow: visible !important;
+
+  text-overflow: clip !important;
+  white-space: nowrap !important;
+}
+
+.tabs button::after {
+  right: 17px !important;
+  left: 17px !important;
+}
+
+.tableActions {
+  box-sizing: border-box !important;
+
+  display: flex !important;
+
+  width: 100% !important;
+  min-width: 0 !important;
+  min-height: 53px !important;
+
+  flex-wrap: wrap !important;
+
+  align-items: center !important;
+  justify-content: flex-end !important;
+
+  gap: 8px !important;
+
+  padding:
+    8px
+    13px !important;
+
+  border-bottom:
+    1px
+    solid
+    #dbe5ed !important;
+
+  background:
+    linear-gradient(
+      180deg,
+      #fbfdfe,
+      #f7fafc
+    ) !important;
+}
+
+.selectControl,
+.sortControl {
+  box-sizing: border-box !important;
+
+  min-width: 142px !important;
+  height: 36px !important;
+
+  flex: 0 1 auto !important;
+
+  border-radius: 9px !important;
+}
+
+.sortControl {
+  min-width: 180px !important;
+}
+
+.selectControl select,
+.sortControl select {
+  font-size: 0.69rem !important;
+}
+
+/* =========================================================
+   RESULTS LINE
+   ========================================================= */
+
+.resultsLine {
+  min-height: 40px !important;
+
+  padding:
+    0
+    17px !important;
+}
+
+/* =========================================================
+   TABLE FIT AND COLUMN ORGANIZATION
+   ========================================================= */
+
+.tableScroller {
+  overflow-x: auto !important;
+
+  scrollbar-gutter: stable !important;
+}
+
+.taskTable {
+  width: 100% !important;
+  min-width: 868px !important;
+
+  table-layout: fixed !important;
+}
+
+.taskTable th:nth-child(1) {
+  width: 40px !important;
+}
+
+.taskTable th:nth-child(2) {
+  width: 260px !important;
+}
+
+.taskTable th:nth-child(3) {
+  width: 82px !important;
+}
+
+.taskTable th:nth-child(4) {
+  width: 130px !important;
+}
+
+.taskTable th:nth-child(5) {
+  width: 100px !important;
+}
+
+.taskTable th:nth-child(6) {
+  width: 106px !important;
+}
+
+.taskTable th:nth-child(7) {
+  width: 110px !important;
+}
+
+.taskTable th:nth-child(8) {
+  width: 40px !important;
+}
+
+.taskTable th {
+  padding:
+    0
+    9px !important;
+
+  font-size: 0.63rem !important;
+}
+
+.taskRow td {
+  height: 64px !important;
+
+  padding:
+    7px
+    9px !important;
+}
+
+.taskName strong {
+  font-size: 0.75rem !important;
+  line-height: 1.2 !important;
+}
+
+.taskName span {
+  margin-top: 3px !important;
+
+  font-size: 0.65rem !important;
+}
+
+.assignee {
+  gap: 7px !important;
+}
+
+.assignee > span {
+  width: 27px !important;
+  height: 27px !important;
+
+  flex-basis: 27px !important;
+}
+
+.assignee strong {
+  font-size: 0.65rem !important;
+}
+
+.priorityBadge {
+  min-width: 55px !important;
+
+  padding:
+    5px
+    7px !important;
+
+  font-size: 0.62rem !important;
+}
+
+.statusBadge {
+  padding:
+    5px
+    7px !important;
+
+  font-size: 0.61rem !important;
+}
+
+.dueDate strong {
+  font-size: 0.65rem !important;
+}
+
+.dueDate small {
+  font-size: 0.59rem !important;
+}
+
+.projectName {
+  box-sizing: border-box !important;
+
+  width: 100% !important;
+  min-width: 0 !important;
+
+  color: #456681 !important;
+
+  font-size: 0.64rem !important;
+  font-weight: 760 !important;
+}
+
+/* =========================================================
+   DETAILS PANEL
+   ========================================================= */
+
+.detailsPanel {
+  position: sticky !important;
+  z-index: 12 !important;
+  top: 12px !important;
+
+  display: flex !important;
+
+  min-width: 0 !important;
+  min-height: 480px !important;
+  max-height:
+    calc(
+      100vh -
+      106px
+    ) !important;
+
+  flex-direction: column !important;
+
+  overflow: hidden !important;
+}
+
+.detailsHeader,
+.detailsFooter {
+  flex: 0 0 auto !important;
+}
+
+.detailsBody {
+  min-height: 0 !important;
+
+  flex: 1 1 auto !important;
+
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+
+  overscroll-behavior: contain !important;
+
+  scrollbar-gutter: stable !important;
+}
+
+.detailsBody::-webkit-scrollbar {
+  width: 8px !important;
+}
+
+.detailsBody::-webkit-scrollbar-track {
+  background: transparent !important;
+}
+
+.detailsBody::-webkit-scrollbar-thumb {
+  border:
+    2px
+    solid
+    #ffffff !important;
+
+  border-radius: 999px !important;
+
+  background: #c9d7e2 !important;
+}
+
+.detailsTitle {
+  padding:
+    17px
+    17px
+    15px !important;
+}
+
+.detailsTitle h2 {
+  font-size: 1.14rem !important;
+  line-height: 1.22 !important;
+}
+
+.detailsTitle p {
+  font-size: 0.7rem !important;
+}
+
+.detailFields {
+  padding:
+    4px
+    17px !important;
+}
+
+.detailFields > div {
+  grid-template-columns:
+    96px
+    minmax(0, 1fr) !important;
+
+  gap: 9px !important;
+
+  min-height: 46px !important;
+}
+
+.detailFields > div > span {
+  font-size: 0.63rem !important;
+}
+
+.detailFields strong,
+.detailFields select {
+  font-size: 0.66rem !important;
+}
+
+.tagsBlock,
+.progressBlock,
+.commentsBlock {
+  margin:
+    0
+    17px !important;
+
+  padding:
+    14px
+    0 !important;
+}
+
+/*
+ * Extra right clearance is retained as a fallback in case a
+ * browser extension or alternate launcher ignores the hidden
+ * focus-state selectors below.
+ */
+
+.detailsFooter {
+  position: relative !important;
+  z-index: 3 !important;
+
+  grid-template-columns:
+    minmax(88px, 0.72fr)
+    minmax(135px, 1.28fr) !important;
+
+  gap: 8px !important;
+
+  padding:
+    12px
+    60px
+    12px
+    15px !important;
+}
+
+.detailsFooter button {
+  min-width: 0 !important;
+
+  padding:
+    0
+    8px !important;
+
+  font-size: 0.65rem !important;
+  white-space: nowrap !important;
+}
+
+/* =========================================================
+   LAPTOP WIDTHS
+   ========================================================= */
+
+@media (max-width: 1450px) {
+  .tasksWorkspace.hasDetails {
+    grid-template-columns:
+      minmax(0, 1fr)
+      minmax(300px, 320px) !important;
+  }
+
+  .taskTable {
+    min-width: 838px !important;
+  }
+
+  .taskTable th:nth-child(2) {
+    width: 238px !important;
+  }
+
+  .taskTable th:nth-child(4) {
+    width: 122px !important;
+  }
+
+  .taskTable th:nth-child(7) {
+    width: 104px !important;
+  }
+}
+
+/* =========================================================
+   STACKED TABLET LAYOUT
+   ========================================================= */
+
+@media (max-width: 1180px) {
+  .tasksWorkspace.hasDetails {
+    grid-template-columns: 1fr !important;
+  }
+
+  .detailsPanel {
+    position: relative !important;
+    top: auto !important;
+
+    min-height: 0 !important;
+    max-height: none !important;
+  }
+
+  .detailsBody {
+    max-height: 620px !important;
+  }
+
+  .detailsFooter {
+    padding:
+      12px
+      15px !important;
+  }
+}
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
+@media (max-width: 700px) {
+  .tabs {
+    padding:
+      0
+      8px !important;
+  }
+
+  .tabs button {
+    padding:
+      0
+      13px !important;
+  }
+
+  .tabs button::after {
+    right: 11px !important;
+    left: 11px !important;
+  }
+
+  .tableActions {
+    align-items: stretch !important;
+    flex-direction: column !important;
+  }
+
+  .selectControl,
+  .sortControl {
+    width: 100% !important;
+    min-width: 0 !important;
+
+    flex: 1 1 auto !important;
+  }
+}
+
+/* TASKS TABLE AND DETAILS FINAL POLISH — END */
+
+/* =========================================================
+   TASKS LOCAL CLICK-DETAILS PREVIEW — START
+   ========================================================= */
+
+.tasksWorkspace {
+  transition:
+    grid-template-columns
+    180ms
+    ease,
+    gap
+    180ms
+    ease;
+}
+
+.detailsPanel {
+  animation:
+    taskDetailsEnter
+    180ms
+    ease-out;
+}
+
+@keyframes taskDetailsEnter {
+  from {
+    opacity: 0;
+    transform:
+      translateX(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform:
+      translateX(0);
+  }
+}
+
+.demoTaskRow button,
+.demoTaskRow input,
+.demoTaskRow select,
+.demoTaskRow label,
+.demoTaskRow a {
+  pointer-events: none !important;
+}
+
+.demoDetailsBody button,
+.demoDetailsBody select,
+.demoDetailsBody input,
+.demoDetailsBody textarea,
+.demoDetailsBody a,
+.demoDetailsFooter button {
+  pointer-events: none !important;
+  opacity: 0.58;
+}
+
+/* TASKS LOCAL CLICK-DETAILS PREVIEW — END */
+
+/* TASKS COMPACT FIVE-CARD SUMMARY — START */
+
+/*
+ * Desktop:
+ * Keep all five task summary cards on one compact row.
+ */
+@media (min-width: 1181px) {
+  .summaryGrid {
+    grid-template-columns:
+      repeat(
+        5,
+        minmax(0, 1fr)
+      ) !important;
+
+    gap: 10px !important;
+    margin-bottom: 16px !important;
+  }
+
+  .summaryCard {
+    min-height: 104px !important;
+    padding:
+      14px
+      15px !important;
+
+    border-radius: 14px !important;
+  }
+
+  .summaryCard > div:first-child,
+  .summaryCardIcon {
+    width: 42px !important;
+    height: 42px !important;
+    min-width: 42px !important;
+    flex-basis: 42px !important;
+  }
+
+  .summaryCard strong {
+    font-size: 1.52rem !important;
+    line-height: 1 !important;
+  }
+
+  .summaryCard span {
+    font-size: 0.72rem !important;
+  }
+
+  .summaryCard p {
+    margin-top: 4px !important;
+    font-size: 0.67rem !important;
+    line-height: 1.3 !important;
+  }
+}
+
+/*
+ * Medium desktop and tablet:
+ * Preserve comfortable wrapping rather than squeezing.
+ */
+@media (
+  min-width: 761px
+) and (
+  max-width: 1180px
+) {
+  .summaryGrid {
+    grid-template-columns:
+      repeat(
+        3,
+        minmax(0, 1fr)
+      ) !important;
+  }
+}
+
+@media (max-width: 760px) {
+  .summaryGrid {
+    grid-template-columns:
+      repeat(
+        2,
+        minmax(0, 1fr)
+      ) !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .summaryGrid {
+    grid-template-columns:
+      1fr !important;
+  }
+}
+
+/* TASKS COMPACT FIVE-CARD SUMMARY — END */
+
+/* TASKS OPEN DETAILS TABLE READABILITY — START */
+
+/*
+ * These adjustments apply only while Task Details is open.
+ * The normal full-width table remains unchanged.
+ */
+@media (min-width: 1181px) {
+  .tasksWorkspace.hasDetails .taskTable {
+    min-width: 820px !important;
+  }
+
+  .tasksWorkspace.hasDetails
+    .taskTable
+    th:nth-child(1) {
+    width: 40px !important;
+  }
+
+  .tasksWorkspace.hasDetails
+    .taskTable
+    th:nth-child(2) {
+    width: 270px !important;
+  }
+
+  .tasksWorkspace.hasDetails
+    .taskTable
+    th:nth-child(3) {
+    width: 74px !important;
+  }
+
+  .tasksWorkspace.hasDetails
+    .taskTable
+    th:nth-child(4) {
+    width: 110px !important;
+  }
+
+  .tasksWorkspace.hasDetails
+    .taskTable
+    th:nth-child(5) {
+    width: 90px !important;
+  }
+
+  .tasksWorkspace.hasDetails
+    .taskTable
+    th:nth-child(6) {
+    width: 92px !important;
+  }
+
+  .tasksWorkspace.hasDetails
+    .taskTable
+    th:nth-child(7) {
+    width: 104px !important;
+  }
+
+  .tasksWorkspace.hasDetails
+    .taskTable
+    th:nth-child(8) {
+    width: 40px !important;
+  }
+
+  .tasksWorkspace.hasDetails .taskRow td {
+    height: 74px !important;
+    vertical-align: middle !important;
+  }
+
+  /*
+   * Show up to two complete lines of the task title instead
+   * of shortening it immediately with a single-line ellipsis.
+   */
+  .tasksWorkspace.hasDetails .taskName strong {
+    display: -webkit-box !important;
+
+    overflow: hidden !important;
+
+    white-space: normal !important;
+    overflow-wrap: anywhere !important;
+
+    line-height: 1.22 !important;
+
+    text-overflow: ellipsis !important;
+
+    -webkit-box-orient: vertical !important;
+    -webkit-line-clamp: 2 !important;
+  }
+
+  /*
+   * Keep the supporting description compact so the title
+   * receives most of the available vertical space.
+   */
+  .tasksWorkspace.hasDetails .taskName span,
+  .tasksWorkspace.hasDetails .taskName small,
+  .tasksWorkspace.hasDetails .taskName p {
+    display: block !important;
+
+    margin-top: 3px !important;
+
+    overflow: hidden !important;
+
+    white-space: nowrap !important;
+    text-overflow: ellipsis !important;
+  }
+
+  /*
+   * Project labels may wrap to two lines rather than being
+   * cut off after only a few characters.
+   */
+  .tasksWorkspace.hasDetails .projectName {
+    display: -webkit-box !important;
+
+    overflow: hidden !important;
+
+    white-space: normal !important;
+    overflow-wrap: anywhere !important;
+
+    line-height: 1.24 !important;
+
+    text-overflow: ellipsis !important;
+
+    -webkit-box-orient: vertical !important;
+    -webkit-line-clamp: 2 !important;
+  }
+}
+
+/* TASKS OPEN DETAILS TABLE READABILITY — END */
+
+/* TASKS INVISIBLE SCROLLBARS — START */
+
+/*
+ * Task Details and the task table remain independently scrollable
+ * when needed, but their scrollbar tracks are not displayed.
+ */
+.tableScroller,
+.detailsBody {
+  scrollbar-width: none !important;
+
+  -ms-overflow-style: none !important;
+}
+
+.tableScroller::-webkit-scrollbar,
+.detailsBody::-webkit-scrollbar {
+  display: none !important;
+
+  width: 0 !important;
+  height: 0 !important;
+}
+
+/* TASKS INVISIBLE SCROLLBARS — END */
+
+/* TASK MODAL HIDDEN SCROLL + STICKY ACTIONS — START */
+
+/*
+ * The outer dialog remains fixed inside the viewport.
+ * Only the field area scrolls.
+ */
+.taskModal {
+  display: flex !important;
+
+  width:
+    min(
+      700px,
+      calc(100vw - 32px)
+    ) !important;
+
+  height: auto !important;
+  max-height:
+    min(
+      820px,
+      calc(100vh - 32px)
+    ) !important;
+
+  flex-direction: column !important;
+
+  overflow: hidden !important;
+}
+
+/*
+ * The modal title and close button never move.
+ */
+.taskModal > header {
+  min-height: 72px !important;
+  padding:
+    0
+    20px !important;
+
+  flex: 0 0 auto !important;
+
+  background: #ffffff !important;
+}
+
+/*
+ * The form becomes the single modal scrolling region.
+ */
+.taskForm {
+  min-height: 0 !important;
+
+  flex: 1 1 auto !important;
+
+  grid-template-columns:
+    repeat(
+      2,
+      minmax(0, 1fr)
+    ) !important;
+
+  gap:
+    12px
+    14px !important;
+
+  padding:
+    17px
+    20px
+    0 !important;
+
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+
+  overscroll-behavior: contain !important;
+
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
+}
+
+.taskForm::-webkit-scrollbar {
+  display: none !important;
+
+  width: 0 !important;
+  height: 0 !important;
+}
+
+/*
+ * Slightly reduce field spacing so more of the form fits.
+ */
+.taskForm label > span {
+  margin-bottom: 5px !important;
+}
+
+.taskForm input,
+.taskForm select {
+  height: 41px !important;
+}
+
+.taskForm textarea {
+  min-height: 88px !important;
+  max-height: 150px !important;
+
+  padding: 10px !important;
+}
+
+/*
+ * Action buttons stay visible while the fields scroll.
+ */
+.taskForm > footer {
+  position: sticky !important;
+  z-index: 8 !important;
+  bottom: 0 !important;
+
+  min-height: 68px !important;
+
+  margin:
+    2px
+    -20px
+    0 !important;
+
+  padding:
+    12px
+    20px !important;
+
+  border-top:
+    1px
+    solid
+    #dce6ed !important;
+
+  background:
+    rgba(
+      251,
+      253,
+      254,
+      0.98
+    ) !important;
+
+  box-shadow:
+    0
+    -10px
+    20px
+    rgba(
+      26,
+      57,
+      83,
+      0.06
+    ) !important;
+
+  backdrop-filter:
+    blur(8px);
+}
+
+/*
+ * Keep the bottom fields from sitting underneath the sticky footer.
+ */
+.taskForm > footer::before {
+  content: "";
+
+  position: absolute;
+  right: 0;
+  bottom: 100%;
+  left: 0;
+
+  height: 8px;
+
+  pointer-events: none;
+
+  background:
+    linear-gradient(
+      to top,
+      rgba(
+        251,
+        253,
+        254,
+        0.9
+      ),
+      transparent
+    );
+}
+
+@media (max-width: 700px) {
+  .modalLayer {
+    padding: 10px !important;
+  }
+
+  .taskModal {
+    width:
+      calc(
+        100vw -
+        20px
+      ) !important;
+
+    max-height:
+      calc(
+        100vh -
+        20px
+      ) !important;
+
+    border-radius: 14px !important;
+  }
+
+  .taskModal > header {
+    min-height: 66px !important;
+    padding:
+      0
+      16px !important;
+  }
+
+  .taskForm {
+    grid-template-columns:
+      1fr !important;
+
+    gap: 11px !important;
+
+    padding:
+      15px
+      16px
+      0 !important;
+  }
+
+  .fullField,
+  .formError,
+  .taskForm > footer {
+    grid-column:
+      1
+      /
+      -1 !important;
+  }
+
+  .taskForm > footer {
+    align-items: stretch !important;
+    flex-direction: column-reverse !important;
+
+    margin:
+      2px
+      -16px
+      0 !important;
+
+    padding:
+      12px
+      16px !important;
+  }
+
+  .taskForm > footer button {
+    width: 100% !important;
+  }
+}
+
+/* TASK MODAL HIDDEN SCROLL + STICKY ACTIONS — END */
+
+/* TASKS STICKY CONTROL BAR — START */
+
+/*
+ * Keep the tabs and task filters accessible while the main
+ * Tasks page scrolls.
+ */
+@media (min-width: 901px) {
+  .taskPanel {
+    position: relative !important;
+  }
+
+  .tabsBar {
+    position: sticky !important;
+    z-index: 30 !important;
+    top: 0 !important;
+
+    border-bottom:
+      1px
+      solid
+      #d7e3ec !important;
+
+    background:
+      rgba(
+        255,
+        255,
+        255,
+        0.97
+      ) !important;
+
+    box-shadow:
+      0
+      10px
+      22px
+      rgba(
+        25,
+        58,
+        85,
+        0.07
+      ) !important;
+
+    backdrop-filter:
+      blur(12px);
+  }
+
+  .tabsBar::after {
+    content: "";
+
+    position: absolute;
+    right: 0;
+    bottom: -8px;
+    left: 0;
+
+    height: 8px;
+
+    pointer-events: none;
+
+    background:
+      linear-gradient(
+        to bottom,
+        rgba(
+          35,
+          68,
+          94,
+          0.05
+        ),
+        transparent
+      );
+  }
+}
+
+/*
+ * On smaller screens the controls remain in normal document flow,
+ * avoiding a large sticky block.
+ */
+@media (max-width: 900px) {
+  .tabsBar {
+    position: relative !important;
+    top: auto !important;
+
+    box-shadow: none !important;
+    backdrop-filter: none !important;
+  }
+
+  .tabsBar::after {
+    display: none !important;
+  }
+}
+
+/* TASKS STICKY CONTROL BAR — END */
+
+/* TASKS ACTIVE SUMMARY FILTER — START */
+
+.summaryCard {
+  position: relative !important;
+
+  transition:
+    transform 150ms ease,
+    border-color 150ms ease,
+    box-shadow 150ms ease,
+    background 150ms ease !important;
+}
+
+.summaryCard:hover {
+  transform:
+    translateY(-2px);
+}
+
+.summaryCard:focus-visible {
+  outline:
+    3px
+    solid
+    rgba(
+      35,
+      108,
+      166,
+      0.2
+    ) !important;
+
+  outline-offset:
+    2px !important;
+}
+
+.summaryCardActive {
+  border-color:
+    #4d8fc3 !important;
+
+  background:
+    linear-gradient(
+      145deg,
+      #ffffff,
+      #eef7ff
+    ) !important;
+
+  box-shadow:
+    0
+    13px
+    26px
+    rgba(
+      31,
+      91,
+      139,
+      0.14
+    ) !important;
+
+  transform:
+    translateY(-2px);
+}
+
+.summaryCardActive::after {
+  content: "";
+
+  position: absolute;
+  right: 14px;
+  bottom: 9px;
+  left: 14px;
+
+  height: 3px;
+
+  border-radius: 999px;
+
+  background:
+    linear-gradient(
+      90deg,
+      #2d70a8,
+      #65a7d6
+    );
+}
+
+/* TASKS ACTIVE SUMMARY FILTER — END */
+
+/* =========================================================
+   TASKS FINAL VIEWPORT POLISH — START
+   ========================================================= */
+
+/*
+ * Mouse clicks do not retain a heavy rectangle around the task
+ * title. Keyboard navigation still receives a visible outline.
+ */
+.taskName:focus {
+  outline: none !important;
+}
+
+.taskName:focus-visible {
+  border-radius: 6px !important;
+
+  outline:
+    3px
+    solid
+    rgba(
+      45,
+      112,
+      168,
+      0.2
+    ) !important;
+
+  outline-offset: 2px !important;
+}
+
+/*
+ * Keep the complete Task Details card, including the action
+ * footer, within the desktop workspace viewport.
+ */
+.detailsPanel {
+  align-self: start !important;
+}
+
+@media (min-width: 1181px) {
+  .detailsPanel {
+    max-height:
+      calc(
+        100vh -
+        136px
+      ) !important;
+
+    max-height:
+      calc(
+        100dvh -
+        136px
+      ) !important;
+  }
+
+  /*
+   * Support is hidden during details focus, so the footer no
+   * longer needs artificial right-side clearance.
+   */
+  .detailsFooter {
+    padding:
+      12px
+      15px !important;
+  }
+}
+
+/*
+ * Support remains visible on the normal Tasks page. Hide it only
+ * while Task Details or the Create/Edit task modal is active.
+ */
+:global(body[data-tasks-focus-mode="true"] a[aria-label="Open Campaign Seat Support"]) {
+  display: none !important;
+}
+
+/* TASKS FINAL VIEWPORT POLISH — END */

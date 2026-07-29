@@ -4,6 +4,8 @@ import {
   useState,
 } from "react";
 
+import { createPortal } from "react-dom";
+
 import {
   Activity,
   CalendarDays,
@@ -832,6 +834,24 @@ export function CampaignSearch() {
       );
     };
 
+  // CAMPAIGN SEARCH BODY LOCK — START
+  useEffect(() => {
+    if (!isOpen) {
+      return undefined;
+    }
+
+    const previousOverflow =
+      document.body.style.overflow;
+
+    document.body.style.overflow = "hidden";
+
+    return () => {
+      document.body.style.overflow =
+        previousOverflow;
+    };
+  }, [isOpen]);
+  // CAMPAIGN SEARCH BODY LOCK — END
+
   return (
     <div
       className={
@@ -847,6 +867,7 @@ export function CampaignSearch() {
           openSearch
         }
         aria-label="Ask Campaign HQ"
+        data-campaign-hq-launcher="floating"
         title="Ask Campaign HQ — Command K"
       >
         <Sparkles
@@ -866,8 +887,9 @@ export function CampaignSearch() {
         </kbd>
       </button>
 
-      {isOpen && (
-        <>
+      {isOpen &&
+        createPortal(
+          <>
           <button
             className={
               styles.overlay
@@ -1295,8 +1317,9 @@ export function CampaignSearch() {
               </span>
             </footer>
           </section>
-        </>
-      )}
+          </>,
+          document.body,
+        )}
     </div>
   );
 }

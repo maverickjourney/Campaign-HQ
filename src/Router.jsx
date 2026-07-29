@@ -8,10 +8,10 @@ import {
 import ProtectedRoute from "./components/auth/ProtectedRoute/ProtectedRoute";
 import Calendar from "./pages/Calendar/Calendar";
 import RoleDashboard from "./pages/RoleDashboard/RoleDashboard";
-import Approvals from "./pages/Approvals/Approvals";
+import ApprovalsReferencePreview from "./pages/ApprovalsReferencePreview/ApprovalsReferencePreview";
 import Communications from "./pages/Communications/Communications";
-import Contacts from "./pages/Contacts/Contacts";
-import Files from "./pages/Files/Files";
+import ContactsReferencePreview from "./pages/ContactsReferencePreview/ContactsReferencePreview";
+import DocumentsReferencePreview from "./pages/DocumentsReferencePreview/DocumentsReferencePreview";
 import VolunteerFieldAssignment from "./pages/VolunteerFieldAssignment/VolunteerFieldAssignment";
 import FieldOperations from "./pages/FieldOperations/FieldOperations";
 import Login from "./pages/Login/Login";
@@ -23,8 +23,10 @@ import InvitationAccept from "./pages/InvitationAccept/InvitationAccept";
 import ProfileSettings from "./pages/ProfileSettings/ProfileSettings";
 import Invitations from "./pages/Team/Invitations";
 import TeamAccess from "./pages/TeamAccess/TeamAccess";
-import Team from "./pages/Team/Team";
+import TeamReferencePreview from "./pages/TeamReferencePreview/TeamReferencePreview";
 import RoleTasks from "./pages/RoleTasks/RoleTasks";
+import CommitmentsReferencePreview from "./pages/CommitmentsReferencePreview/CommitmentsReferencePreview";
+import WaitingOnReferencePreview from "./pages/WaitingOnReferencePreview/WaitingOnReferencePreview";
 import WorkspaceSettings from "./pages/WorkspaceSettings/WorkspaceSettings";
 import WorkspaceSelector from "./pages/WorkspaceSelector/WorkspaceSelector";
 import Support from "./pages/Support/Support";
@@ -109,6 +111,32 @@ export default function Router() {
         />
 
         <Route
+          path="/commitments"
+          element={
+            <ProtectedRoute
+              allowedExperiences={
+                LEADERSHIP_EXPERIENCES
+              }
+            >
+              <CommitmentsReferencePreview />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/waiting-on"
+          element={
+            <ProtectedRoute
+              allowedExperiences={
+                LEADERSHIP_EXPERIENCES
+              }
+            >
+              <WaitingOnReferencePreview />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
           path="/field-operations"
           element={
             <ProtectedRoute allowedExperiences={LEADERSHIP_EXPERIENCES}>
@@ -139,7 +167,16 @@ export default function Router() {
           path="/approvals"
           element={
             <ProtectedRoute allowedExperiences={LEADERSHIP_EXPERIENCES}>
-              <Approvals />
+              <ApprovalsReferencePreview />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/approvals-preview"
+          element={
+            <ProtectedRoute allowedExperiences={LEADERSHIP_EXPERIENCES}>
+              <ApprovalsReferencePreview />
             </ProtectedRoute>
           }
         />
@@ -157,7 +194,25 @@ export default function Router() {
           path="/contacts"
           element={
             <ProtectedRoute allowedExperiences={LEADERSHIP_EXPERIENCES}>
-              <Contacts />
+              <ContactsReferencePreview />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/contacts-preview"
+          element={
+            <ProtectedRoute allowedExperiences={LEADERSHIP_EXPERIENCES}>
+              <ContactsReferencePreview />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/documents-preview"
+          element={
+            <ProtectedRoute allowedExperiences={LEADERSHIP_EXPERIENCES}>
+              <DocumentsReferencePreview />
             </ProtectedRoute>
           }
         />
@@ -166,7 +221,7 @@ export default function Router() {
           path="/files"
           element={
             <ProtectedRoute allowedExperiences={LEADERSHIP_EXPERIENCES}>
-              <Files />
+              <DocumentsReferencePreview />
             </ProtectedRoute>
           }
         />
@@ -193,7 +248,16 @@ export default function Router() {
           path="/team"
           element={
             <ProtectedRoute allowedExperiences={LEADERSHIP_EXPERIENCES}>
-              <Team />
+              <TeamReferencePreview />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/team-preview"
+          element={
+            <ProtectedRoute allowedExperiences={LEADERSHIP_EXPERIENCES}>
+              <TeamReferencePreview />
             </ProtectedRoute>
           }
         />
