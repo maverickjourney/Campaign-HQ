@@ -69,12 +69,12 @@ const PRIMARY_NAVIGATION = [
   {
     label: "Commitments",
     icon: Target,
-    route: "/tasks",
+    route: "/commitments",
   },
   {
     label: "Waiting On",
     icon: Clock3,
-    route: "/approvals",
+    route: "/waiting-on",
     count: 3,
   },
   {
@@ -151,15 +151,20 @@ export function CampaignWorkspaceShell({
   const initials = getUserInitials(user.name);
 
 
-  const isInboxWorkspace = ["Inbox", "Calendar", "Tasks"].includes(activeItem);
+  const isInboxWorkspace = [
+    "Inbox",
+    "Calendar",
+    "Tasks",
+    "Commitments",
+    "Waiting On",
+  ].includes(activeItem);
 
   const workspaceEyebrow = isInboxWorkspace
     ? "Current workspace"
     : "Campaign workspace";
 
-  const workspaceTitle = isInboxWorkspace
-    ? `${workspace.name} · District 6`
-    : workspace.name;
+  const workspaceTitle =
+    `${workspace.name} · District 6`;
   const dateLabel = useMemo(
     () =>
       new Intl.DateTimeFormat(

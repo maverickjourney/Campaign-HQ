@@ -2035,3 +2035,779 @@
 }
 
 /* TASKS TABLE AND DETAILS FINAL POLISH — END */
+
+/* =========================================================
+   TASKS LOCAL CLICK-DETAILS PREVIEW — START
+   ========================================================= */
+
+.tasksWorkspace {
+  transition:
+    grid-template-columns
+    180ms
+    ease,
+    gap
+    180ms
+    ease;
+}
+
+.detailsPanel {
+  animation:
+    taskDetailsEnter
+    180ms
+    ease-out;
+}
+
+@keyframes taskDetailsEnter {
+  from {
+    opacity: 0;
+    transform:
+      translateX(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform:
+      translateX(0);
+  }
+}
+
+.demoTaskRow button,
+.demoTaskRow input,
+.demoTaskRow select,
+.demoTaskRow label,
+.demoTaskRow a {
+  pointer-events: none !important;
+}
+
+.demoDetailsBody button,
+.demoDetailsBody select,
+.demoDetailsBody input,
+.demoDetailsBody textarea,
+.demoDetailsBody a,
+.demoDetailsFooter button {
+  pointer-events: none !important;
+  opacity: 0.58;
+}
+
+/* TASKS LOCAL CLICK-DETAILS PREVIEW — END */
+
+/* TASKS COMPACT FIVE-CARD SUMMARY — START */
+
+/*
+ * Desktop:
+ * Keep all five task summary cards on one compact row.
+ */
+@media (min-width: 1181px) {
+  .summaryGrid {
+    grid-template-columns:
+      repeat(
+        5,
+        minmax(0, 1fr)
+      ) !important;
+
+    gap: 10px !important;
+    margin-bottom: 16px !important;
+  }
+
+  .summaryCard {
+    min-height: 104px !important;
+    padding:
+      14px
+      15px !important;
+
+    border-radius: 14px !important;
+  }
+
+  .summaryCard > div:first-child,
+  .summaryCardIcon {
+    width: 42px !important;
+    height: 42px !important;
+    min-width: 42px !important;
+    flex-basis: 42px !important;
+  }
+
+  .summaryCard strong {
+    font-size: 1.52rem !important;
+    line-height: 1 !important;
+  }
+
+  .summaryCard span {
+    font-size: 0.72rem !important;
+  }
+
+  .summaryCard p {
+    margin-top: 4px !important;
+    font-size: 0.67rem !important;
+    line-height: 1.3 !important;
+  }
+}
+
+/*
+ * Medium desktop and tablet:
+ * Preserve comfortable wrapping rather than squeezing.
+ */
+@media (
+  min-width: 761px
+) and (
+  max-width: 1180px
+) {
+  .summaryGrid {
+    grid-template-columns:
+      repeat(
+        3,
+        minmax(0, 1fr)
+      ) !important;
+  }
+}
+
+@media (max-width: 760px) {
+  .summaryGrid {
+    grid-template-columns:
+      repeat(
+        2,
+        minmax(0, 1fr)
+      ) !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .summaryGrid {
+    grid-template-columns:
+      1fr !important;
+  }
+}
+
+/* TASKS COMPACT FIVE-CARD SUMMARY — END */
+
+/* TASKS OPEN DETAILS TABLE READABILITY — START */
+
+/*
+ * These adjustments apply only while Task Details is open.
+ * The normal full-width table remains unchanged.
+ */
+@media (min-width: 1181px) {
+  .tasksWorkspace.hasDetails .taskTable {
+    min-width: 820px !important;
+  }
+
+  .tasksWorkspace.hasDetails
+    .taskTable
+    th:nth-child(1) {
+    width: 40px !important;
+  }
+
+  .tasksWorkspace.hasDetails
+    .taskTable
+    th:nth-child(2) {
+    width: 270px !important;
+  }
+
+  .tasksWorkspace.hasDetails
+    .taskTable
+    th:nth-child(3) {
+    width: 74px !important;
+  }
+
+  .tasksWorkspace.hasDetails
+    .taskTable
+    th:nth-child(4) {
+    width: 110px !important;
+  }
+
+  .tasksWorkspace.hasDetails
+    .taskTable
+    th:nth-child(5) {
+    width: 90px !important;
+  }
+
+  .tasksWorkspace.hasDetails
+    .taskTable
+    th:nth-child(6) {
+    width: 92px !important;
+  }
+
+  .tasksWorkspace.hasDetails
+    .taskTable
+    th:nth-child(7) {
+    width: 104px !important;
+  }
+
+  .tasksWorkspace.hasDetails
+    .taskTable
+    th:nth-child(8) {
+    width: 40px !important;
+  }
+
+  .tasksWorkspace.hasDetails .taskRow td {
+    height: 74px !important;
+    vertical-align: middle !important;
+  }
+
+  /*
+   * Show up to two complete lines of the task title instead
+   * of shortening it immediately with a single-line ellipsis.
+   */
+  .tasksWorkspace.hasDetails .taskName strong {
+    display: -webkit-box !important;
+
+    overflow: hidden !important;
+
+    white-space: normal !important;
+    overflow-wrap: anywhere !important;
+
+    line-height: 1.22 !important;
+
+    text-overflow: ellipsis !important;
+
+    -webkit-box-orient: vertical !important;
+    -webkit-line-clamp: 2 !important;
+  }
+
+  /*
+   * Keep the supporting description compact so the title
+   * receives most of the available vertical space.
+   */
+  .tasksWorkspace.hasDetails .taskName span,
+  .tasksWorkspace.hasDetails .taskName small,
+  .tasksWorkspace.hasDetails .taskName p {
+    display: block !important;
+
+    margin-top: 3px !important;
+
+    overflow: hidden !important;
+
+    white-space: nowrap !important;
+    text-overflow: ellipsis !important;
+  }
+
+  /*
+   * Project labels may wrap to two lines rather than being
+   * cut off after only a few characters.
+   */
+  .tasksWorkspace.hasDetails .projectName {
+    display: -webkit-box !important;
+
+    overflow: hidden !important;
+
+    white-space: normal !important;
+    overflow-wrap: anywhere !important;
+
+    line-height: 1.24 !important;
+
+    text-overflow: ellipsis !important;
+
+    -webkit-box-orient: vertical !important;
+    -webkit-line-clamp: 2 !important;
+  }
+}
+
+/* TASKS OPEN DETAILS TABLE READABILITY — END */
+
+/* TASKS INVISIBLE SCROLLBARS — START */
+
+/*
+ * Task Details and the task table remain independently scrollable
+ * when needed, but their scrollbar tracks are not displayed.
+ */
+.tableScroller,
+.detailsBody {
+  scrollbar-width: none !important;
+
+  -ms-overflow-style: none !important;
+}
+
+.tableScroller::-webkit-scrollbar,
+.detailsBody::-webkit-scrollbar {
+  display: none !important;
+
+  width: 0 !important;
+  height: 0 !important;
+}
+
+/* TASKS INVISIBLE SCROLLBARS — END */
+
+/* TASK MODAL HIDDEN SCROLL + STICKY ACTIONS — START */
+
+/*
+ * The outer dialog remains fixed inside the viewport.
+ * Only the field area scrolls.
+ */
+.taskModal {
+  display: flex !important;
+
+  width:
+    min(
+      700px,
+      calc(100vw - 32px)
+    ) !important;
+
+  height: auto !important;
+  max-height:
+    min(
+      820px,
+      calc(100vh - 32px)
+    ) !important;
+
+  flex-direction: column !important;
+
+  overflow: hidden !important;
+}
+
+/*
+ * The modal title and close button never move.
+ */
+.taskModal > header {
+  min-height: 72px !important;
+  padding:
+    0
+    20px !important;
+
+  flex: 0 0 auto !important;
+
+  background: #ffffff !important;
+}
+
+/*
+ * The form becomes the single modal scrolling region.
+ */
+.taskForm {
+  min-height: 0 !important;
+
+  flex: 1 1 auto !important;
+
+  grid-template-columns:
+    repeat(
+      2,
+      minmax(0, 1fr)
+    ) !important;
+
+  gap:
+    12px
+    14px !important;
+
+  padding:
+    17px
+    20px
+    0 !important;
+
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+
+  overscroll-behavior: contain !important;
+
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
+}
+
+.taskForm::-webkit-scrollbar {
+  display: none !important;
+
+  width: 0 !important;
+  height: 0 !important;
+}
+
+/*
+ * Slightly reduce field spacing so more of the form fits.
+ */
+.taskForm label > span {
+  margin-bottom: 5px !important;
+}
+
+.taskForm input,
+.taskForm select {
+  height: 41px !important;
+}
+
+.taskForm textarea {
+  min-height: 88px !important;
+  max-height: 150px !important;
+
+  padding: 10px !important;
+}
+
+/*
+ * Action buttons stay visible while the fields scroll.
+ */
+.taskForm > footer {
+  position: sticky !important;
+  z-index: 8 !important;
+  bottom: 0 !important;
+
+  min-height: 68px !important;
+
+  margin:
+    2px
+    -20px
+    0 !important;
+
+  padding:
+    12px
+    20px !important;
+
+  border-top:
+    1px
+    solid
+    #dce6ed !important;
+
+  background:
+    rgba(
+      251,
+      253,
+      254,
+      0.98
+    ) !important;
+
+  box-shadow:
+    0
+    -10px
+    20px
+    rgba(
+      26,
+      57,
+      83,
+      0.06
+    ) !important;
+
+  backdrop-filter:
+    blur(8px);
+}
+
+/*
+ * Keep the bottom fields from sitting underneath the sticky footer.
+ */
+.taskForm > footer::before {
+  content: "";
+
+  position: absolute;
+  right: 0;
+  bottom: 100%;
+  left: 0;
+
+  height: 8px;
+
+  pointer-events: none;
+
+  background:
+    linear-gradient(
+      to top,
+      rgba(
+        251,
+        253,
+        254,
+        0.9
+      ),
+      transparent
+    );
+}
+
+@media (max-width: 700px) {
+  .modalLayer {
+    padding: 10px !important;
+  }
+
+  .taskModal {
+    width:
+      calc(
+        100vw -
+        20px
+      ) !important;
+
+    max-height:
+      calc(
+        100vh -
+        20px
+      ) !important;
+
+    border-radius: 14px !important;
+  }
+
+  .taskModal > header {
+    min-height: 66px !important;
+    padding:
+      0
+      16px !important;
+  }
+
+  .taskForm {
+    grid-template-columns:
+      1fr !important;
+
+    gap: 11px !important;
+
+    padding:
+      15px
+      16px
+      0 !important;
+  }
+
+  .fullField,
+  .formError,
+  .taskForm > footer {
+    grid-column:
+      1
+      /
+      -1 !important;
+  }
+
+  .taskForm > footer {
+    align-items: stretch !important;
+    flex-direction: column-reverse !important;
+
+    margin:
+      2px
+      -16px
+      0 !important;
+
+    padding:
+      12px
+      16px !important;
+  }
+
+  .taskForm > footer button {
+    width: 100% !important;
+  }
+}
+
+/* TASK MODAL HIDDEN SCROLL + STICKY ACTIONS — END */
+
+/* TASKS STICKY CONTROL BAR — START */
+
+/*
+ * Keep the tabs and task filters accessible while the main
+ * Tasks page scrolls.
+ */
+@media (min-width: 901px) {
+  .taskPanel {
+    position: relative !important;
+  }
+
+  .tabsBar {
+    position: sticky !important;
+    z-index: 30 !important;
+    top: 0 !important;
+
+    border-bottom:
+      1px
+      solid
+      #d7e3ec !important;
+
+    background:
+      rgba(
+        255,
+        255,
+        255,
+        0.97
+      ) !important;
+
+    box-shadow:
+      0
+      10px
+      22px
+      rgba(
+        25,
+        58,
+        85,
+        0.07
+      ) !important;
+
+    backdrop-filter:
+      blur(12px);
+  }
+
+  .tabsBar::after {
+    content: "";
+
+    position: absolute;
+    right: 0;
+    bottom: -8px;
+    left: 0;
+
+    height: 8px;
+
+    pointer-events: none;
+
+    background:
+      linear-gradient(
+        to bottom,
+        rgba(
+          35,
+          68,
+          94,
+          0.05
+        ),
+        transparent
+      );
+  }
+}
+
+/*
+ * On smaller screens the controls remain in normal document flow,
+ * avoiding a large sticky block.
+ */
+@media (max-width: 900px) {
+  .tabsBar {
+    position: relative !important;
+    top: auto !important;
+
+    box-shadow: none !important;
+    backdrop-filter: none !important;
+  }
+
+  .tabsBar::after {
+    display: none !important;
+  }
+}
+
+/* TASKS STICKY CONTROL BAR — END */
+
+/* TASKS ACTIVE SUMMARY FILTER — START */
+
+.summaryCard {
+  position: relative !important;
+
+  transition:
+    transform 150ms ease,
+    border-color 150ms ease,
+    box-shadow 150ms ease,
+    background 150ms ease !important;
+}
+
+.summaryCard:hover {
+  transform:
+    translateY(-2px);
+}
+
+.summaryCard:focus-visible {
+  outline:
+    3px
+    solid
+    rgba(
+      35,
+      108,
+      166,
+      0.2
+    ) !important;
+
+  outline-offset:
+    2px !important;
+}
+
+.summaryCardActive {
+  border-color:
+    #4d8fc3 !important;
+
+  background:
+    linear-gradient(
+      145deg,
+      #ffffff,
+      #eef7ff
+    ) !important;
+
+  box-shadow:
+    0
+    13px
+    26px
+    rgba(
+      31,
+      91,
+      139,
+      0.14
+    ) !important;
+
+  transform:
+    translateY(-2px);
+}
+
+.summaryCardActive::after {
+  content: "";
+
+  position: absolute;
+  right: 14px;
+  bottom: 9px;
+  left: 14px;
+
+  height: 3px;
+
+  border-radius: 999px;
+
+  background:
+    linear-gradient(
+      90deg,
+      #2d70a8,
+      #65a7d6
+    );
+}
+
+/* TASKS ACTIVE SUMMARY FILTER — END */
+
+/* =========================================================
+   TASKS FINAL VIEWPORT POLISH — START
+   ========================================================= */
+
+/*
+ * Mouse clicks do not retain a heavy rectangle around the task
+ * title. Keyboard navigation still receives a visible outline.
+ */
+.taskName:focus {
+  outline: none !important;
+}
+
+.taskName:focus-visible {
+  border-radius: 6px !important;
+
+  outline:
+    3px
+    solid
+    rgba(
+      45,
+      112,
+      168,
+      0.2
+    ) !important;
+
+  outline-offset: 2px !important;
+}
+
+/*
+ * Keep the complete Task Details card, including the action
+ * footer, within the desktop workspace viewport.
+ */
+.detailsPanel {
+  align-self: start !important;
+}
+
+@media (min-width: 1181px) {
+  .detailsPanel {
+    max-height:
+      calc(
+        100vh -
+        136px
+      ) !important;
+
+    max-height:
+      calc(
+        100dvh -
+        136px
+      ) !important;
+  }
+
+  /*
+   * Support is hidden during details focus, so the footer no
+   * longer needs artificial right-side clearance.
+   */
+  .detailsFooter {
+    padding:
+      12px
+      15px !important;
+  }
+}
+
+/*
+ * Support remains visible on the normal Tasks page. Hide it only
+ * while Task Details or the Create/Edit task modal is active.
+ */
+:global(body[data-tasks-focus-mode="true"] a[aria-label="Open Campaign Seat Support"]) {
+  display: none !important;
+}
+
+/* TASKS FINAL VIEWPORT POLISH — END */

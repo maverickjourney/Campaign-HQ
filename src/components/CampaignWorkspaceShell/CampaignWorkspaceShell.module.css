@@ -1249,3 +1249,108 @@
 }
 
 /* SHARED ACTIVE NAVIGATION LOCK — END */
+
+/* CAMPAIGN SEAT SINGLE INVISIBLE SCROLL — START */
+
+/*
+ * Lock the application shell to the viewport so the browser body
+ * cannot create a second vertical scrollbar.
+ */
+.app {
+  position: fixed !important;
+  inset: 0 !important;
+
+  width: 100% !important;
+  height: auto !important;
+  min-height: 0 !important;
+  max-height: none !important;
+
+  overflow: hidden !important;
+}
+
+/*
+ * The workspace itself never scrolls. Only its content area moves.
+ */
+.workspace {
+  width: auto !important;
+  height: 100% !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+  max-height: 100% !important;
+
+  overflow: hidden !important;
+}
+
+/*
+ * Preserve normal page scrolling but hide the visual scrollbar.
+ */
+.content {
+  min-width: 0 !important;
+  min-height: 0 !important;
+
+  flex: 1 1 auto !important;
+
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+
+  overscroll-behavior: contain !important;
+  scrollbar-gutter: auto !important;
+  scrollbar-width: none !important;
+
+  -ms-overflow-style: none !important;
+}
+
+.content::-webkit-scrollbar {
+  display: none !important;
+
+  width: 0 !important;
+  height: 0 !important;
+}
+
+/*
+ * The complete sidebar remains fixed inside the application shell.
+ */
+.app > :global(aside[class*="sidebar"]) {
+  height: 100% !important;
+  min-height: 0 !important;
+  max-height: 100% !important;
+
+  overflow: hidden !important;
+
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
+}
+
+.app
+  > :global(aside[class*="sidebar"])
+ ::-webkit-scrollbar {
+  display: none !important;
+
+  width: 0 !important;
+  height: 0 !important;
+}
+
+/*
+ * Navigation may still scroll when necessary, but no scrollbar
+ * track or thumb is shown beside the left tabs.
+ */
+:global([class*="sidebarNavigation"]) {
+  min-height: 0 !important;
+
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+
+  overscroll-behavior: contain !important;
+  scrollbar-width: none !important;
+
+  -ms-overflow-style: none !important;
+}
+
+:global([class*="sidebarNavigation"])::-webkit-scrollbar {
+  display: none !important;
+
+  width: 0 !important;
+  height: 0 !important;
+}
+
+/* CAMPAIGN SEAT SINGLE INVISIBLE SCROLL — END */

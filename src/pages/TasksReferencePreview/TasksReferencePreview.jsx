@@ -11,7 +11,6 @@ import {
   Check,
   CheckCircle2,
   ChevronDown,
-  Circle,
   CircleDot,
   ClipboardCheck,
   Clock3,
@@ -320,6 +319,128 @@ function commentDate(comment) {
   );
 }
 
+
+// TASKS LOCAL PREVIEW DATASET — START
+//
+// Displayed only when the URL contains ?task-demo=1.
+// These objects are never inserted into Supabase.
+//
+const DEMO_REFERENCE_TIME = Date.now();
+
+const DEMO_TASK_BLUEPRINTS = [
+  {
+    title: "Finalize Monday candidate briefing",
+    description:
+      "Prepare final talking points, schedule notes and issue research for Monday morning.",
+    category: "Candidate",
+    priority: "high",
+    status: "in_progress",
+    dueOffsetHours: -28,
+    estimatedMinutes: 60,
+    tags: ["candidate", "briefing"],
+  },
+  {
+    title: "Confirm event volunteer assignments",
+    description:
+      "Confirm check-in, parking, greeting and sign-distribution responsibilities.",
+    category: "Volunteer",
+    priority: "urgent",
+    status: "open",
+    dueOffsetHours: 4,
+    estimatedMinutes: 35,
+    tags: ["volunteers", "event"],
+  },
+  {
+    title: "Review July fundraising report",
+    description:
+      "Review contribution totals, outstanding follow-ups and donor priorities.",
+    category: "Fundraising",
+    priority: "high",
+    status: "open",
+    dueOffsetHours: 20,
+    estimatedMinutes: 45,
+    tags: ["fundraising", "report"],
+  },
+  {
+    title: "Approve social media content calendar",
+    description:
+      "Review upcoming Facebook and Instagram content before scheduling.",
+    category: "Digital",
+    priority: "normal",
+    status: "in_progress",
+    dueOffsetHours: 32,
+    estimatedMinutes: 30,
+    tags: ["social", "approval"],
+  },
+  {
+    title: "Send community forum follow-up",
+    description:
+      "Send thank-you messages and requested campaign information to attendees.",
+    category: "Communications",
+    priority: "high",
+    status: "open",
+    dueOffsetHours: 50,
+    estimatedMinutes: 40,
+    tags: ["community", "follow-up"],
+  },
+  {
+    title: "Confirm event venue logistics",
+    description:
+      "Verify venue access, seating, sound equipment and signage placement.",
+    category: "Events",
+    priority: "normal",
+    status: "open",
+    dueOffsetHours: 74,
+    estimatedMinutes: 50,
+    tags: ["venue", "logistics"],
+  },
+  {
+    title: "Prepare commission meeting research",
+    description:
+      "Compile agenda items, public records and background notes for leadership.",
+    category: "Research",
+    priority: "high",
+    status: "open",
+    dueOffsetHours: 102,
+    estimatedMinutes: 90,
+    tags: ["research", "commission"],
+  },
+  {
+    title: "Review yard sign inventory",
+    description:
+      "Reconcile signs in storage with deliveries and distribution requests.",
+    category: "Operations",
+    priority: "low",
+    status: "open",
+    dueOffsetHours: 148,
+    estimatedMinutes: 25,
+    tags: ["signs", "inventory"],
+  },
+  {
+    title: "Submit weekly compliance report",
+    description:
+      "Review required campaign records and submit the internal compliance summary.",
+    category: "Compliance",
+    priority: "normal",
+    status: "open",
+    dueOffsetHours: 194,
+    estimatedMinutes: 45,
+    tags: ["compliance", "weekly"],
+  },
+  {
+    title: "Call high-priority donors",
+    description:
+      "Complete the priority donor call list and record finance follow-up notes.",
+    category: "Fundraising",
+    priority: "high",
+    status: "completed",
+    dueOffsetHours: -210,
+    estimatedMinutes: 75,
+    tags: ["donors", "calls"],
+  },
+];
+// TASKS LOCAL PREVIEW DATASET — END
+
 export default function TasksReferencePreview() {
   const user = getCurrentUser();
   const workspace = getCurrentWorkspace();
@@ -359,6 +480,9 @@ export default function TasksReferencePreview() {
   const [sortMode, setSortMode] =
     useState("due");
 
+  const [summaryFilter, setSummaryFilter] =
+    useState("all");
+
   const [selectedTaskId, setSelectedTaskId] =
     useState("");
 
@@ -375,7 +499,7 @@ export default function TasksReferencePreview() {
     useState("");
 
   const {
-    tasks,
+    tasks: liveTasks,
     team,
     comments,
     isLoading,
@@ -390,8 +514,108 @@ export default function TasksReferencePreview() {
   } = useTasksCommandCenter({
     workspaceId: workspace.id,
     userId: user.id,
-    selectedTaskId,
+    selectedTaskId:
+      selectedTaskId.startsWith(
+        "demo-task-",
+      )
+        ? ""
+        : selectedTaskId,
   });
+
+  const demoMode =
+    typeof window !== "undefined" &&
+    new URLSearchParams(
+      window.location.search,
+    ).get("task-demo") === "1";
+
+  const tasks = useMemo(() => {
+    const currentTasks =
+      Array.isArray(liveTasks)
+        ? liveTasks
+        : [];
+
+    if (!demoMode) {
+      return currentTasks;
+    }
+
+    const existingTitles =
+      new Set(
+        currentTasks.map(
+          (task) =>
+            String(task.title || "")
+              .trim()
+              .toLowerCase(),
+        ),
+      );
+
+    const now = DEMO_REFERENCE_TIME;
+    const hour = 60 * 60 * 1000;
+
+    const demoTasks =
+      DEMO_TASK_BLUEPRINTS
+        .filter(
+          (item) =>
+            !existingTitles.has(
+              item.title
+                .trim()
+                .toLowerCase(),
+            ),
+        )
+        .map((item, index) => ({
+          id: `demo-task-${index + 1}`,
+          workspace_id: workspace.id,
+          title: item.title,
+          description: item.description,
+          category: item.category,
+          project: item.category,
+          priority: item.priority,
+          status: item.status,
+          assigned_to: user.id,
+          created_by: user.id,
+          due_at:
+            new Date(
+              now +
+                item.dueOffsetHours *
+                  hour,
+            ).toISOString(),
+          visibility: "workspace",
+          tags: item.tags,
+          estimated_minutes:
+            item.estimatedMinutes,
+          created_at:
+            new Date(
+              now -
+                (index + 3) *
+                  8 *
+                  hour,
+            ).toISOString(),
+          updated_at:
+            new Date(
+              now -
+                (index + 1) *
+                  hour,
+            ).toISOString(),
+          completed_at:
+            item.status === "completed"
+              ? new Date(
+                  now -
+                    10 *
+                      hour,
+                ).toISOString()
+              : null,
+          is_demo: true,
+        }));
+
+    return [
+      ...currentTasks,
+      ...demoTasks,
+    ];
+  }, [
+    demoMode,
+    liveTasks,
+    user.id,
+    workspace.id,
+  ]);
 
 
   const activeTasks = useMemo(
@@ -477,6 +701,34 @@ export default function TasksReferencePreview() {
         if (
           priorityFilter !== "all" &&
           task.priority !== priorityFilter
+        ) {
+          return false;
+        }
+
+        if (
+          summaryFilter === "today" &&
+          !isDueToday(task)
+        ) {
+          return false;
+        }
+
+        if (
+          summaryFilter === "week" &&
+          !isDueThisWeek(task)
+        ) {
+          return false;
+        }
+
+        if (
+          summaryFilter === "overdue" &&
+          !isOverdue(task)
+        ) {
+          return false;
+        }
+
+        if (
+          summaryFilter === "completed" &&
+          !isCompletedThisMonth(task)
         ) {
           return false;
         }
@@ -567,6 +819,7 @@ export default function TasksReferencePreview() {
     search,
     priorityFilter,
     statusFilter,
+    summaryFilter,
     sortMode,
   ]);
 
@@ -575,23 +828,44 @@ export default function TasksReferencePreview() {
   );
 
   useEffect(() => {
-    if (!visibleTasks.length) {
-      setSelectedTaskId("");
-      return;
+    if (typeof document === "undefined") {
+      return undefined;
     }
 
+    const body = document.body;
+
+    const shouldHideSupportLauncher =
+      Boolean(
+        selectedTaskId ||
+        modalMode,
+      );
+
+    if (shouldHideSupportLauncher) {
+      body.dataset.tasksFocusMode = "true";
+    } else {
+      delete body.dataset.tasksFocusMode;
+    }
+
+    return () => {
+      delete body.dataset.tasksFocusMode;
+    };
+  }, [
+    modalMode,
+    selectedTaskId,
+  ]);
+
+  useEffect(() => {
     if (
       selectedTaskId &&
-      visibleTasks.some(
-        (task) => task.id === selectedTaskId,
+      !visibleTasks.some(
+        (task) =>
+          task.id === selectedTaskId,
       )
     ) {
-      return;
+      // Filtering intentionally closes a task that is no longer visible.
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setSelectedTaskId("");
     }
-
-    setSelectedTaskId(
-      visibleTasks[0].id,
-    );
   }, [
     visibleTasks,
     selectedTaskId,
@@ -605,6 +879,11 @@ export default function TasksReferencePreview() {
         ? "completed"
         : "active",
     );
+    setSummaryFilter(
+      activeTab === "completed"
+        ? "completed"
+        : "all",
+    );
     setSortMode("due");
   };
 
@@ -617,6 +896,7 @@ export default function TasksReferencePreview() {
         ? "completed"
         : "active",
     );
+    setSummaryFilter("");
   };
 
   const openCreateModal = () => {
@@ -798,7 +1078,7 @@ export default function TasksReferencePreview() {
   const summaryCards = [
     {
       key: "all",
-      label: "Total tasks",
+      label: "Active tasks",
       value: activeTasks.length,
       caption: "All active campaign work",
       icon: ClipboardCheck,
@@ -839,16 +1119,20 @@ export default function TasksReferencePreview() {
   ];
 
   const summaryClick = (key) => {
+    setSelectedTaskId("");
+    setSearch("");
+    setPriorityFilter("all");
+    setSortMode("due");
+
     if (key === "completed") {
       chooseTab("completed");
+      setSummaryFilter("completed");
       return;
     }
 
     chooseTab("all");
-
-    if (key === "overdue") {
-      setSortMode("due");
-    }
+    setStatusFilter("active");
+    setSummaryFilter(key);
   };
 
   return (
@@ -887,9 +1171,10 @@ export default function TasksReferencePreview() {
               <input
                 type="search"
                 value={search}
-                onChange={(event) =>
-                  setSearch(event.target.value)
-                }
+                onChange={(event) => {
+                  setSearch(event.target.value);
+                  setSummaryFilter("");
+                }}
                 placeholder="Search tasks…"
               />
 
@@ -943,8 +1228,15 @@ export default function TasksReferencePreview() {
                   card.tone
                     ? styles[card.tone]
                     : ""
+                } ${
+                  summaryFilter === card.key
+                    ? styles.summaryCardActive
+                    : ""
                 }`}
                 type="button"
+                aria-pressed={
+                  summaryFilter === card.key
+                }
                 onClick={() =>
                   summaryClick(card.key)
                 }
@@ -1012,11 +1304,12 @@ export default function TasksReferencePreview() {
 
                   <select
                     value={priorityFilter}
-                    onChange={(event) =>
+                    onChange={(event) => {
                       setPriorityFilter(
                         event.target.value,
-                      )
-                    }
+                      );
+                      setSummaryFilter("");
+                    }}
                   >
                     <option value="all">
                       All priorities
@@ -1041,11 +1334,12 @@ export default function TasksReferencePreview() {
 
                   <select
                     value={statusFilter}
-                    onChange={(event) =>
+                    onChange={(event) => {
                       setStatusFilter(
                         event.target.value,
-                      )
-                    }
+                      );
+                      setSummaryFilter("");
+                    }}
                   >
                     <option value="active">
                       Active
@@ -1114,7 +1408,14 @@ export default function TasksReferencePreview() {
                       ? "completed"
                       : "active"
                   ) ||
-                sortMode !== "due") && (
+                sortMode !== "due" ||
+                (
+                  summaryFilter &&
+                  ![
+                    "all",
+                    "completed",
+                  ].includes(summaryFilter)
+                )) && (
                 <button
                   type="button"
                   onClick={clearFilters}
@@ -1195,6 +1496,10 @@ export default function TasksReferencePreview() {
                         <tr
                           key={task.id}
                           className={`${styles.taskRow} ${
+                            task.is_demo
+                              ? styles.demoTaskRow
+                              : ""
+                          } ${
                             selectedTaskId === task.id
                               ? styles.selectedRow
                               : ""
@@ -1217,7 +1522,10 @@ export default function TasksReferencePreview() {
                               <input
                                 type="checkbox"
                                 checked={completed}
-                                disabled={isSaving}
+                                disabled={
+                                  isSaving ||
+                                  task.is_demo
+                                }
                                 onChange={() =>
                                   setTaskStatus(
                                     task,
@@ -1386,7 +1694,13 @@ export default function TasksReferencePreview() {
                 </button>
               </header>
 
-              <div className={styles.detailsBody}>
+              <div
+                className={`${styles.detailsBody} ${
+                  selectedTask.is_demo
+                    ? styles.demoDetailsBody
+                    : ""
+                }`}
+              >
                 <section className={styles.detailsTitle}>
                   <div className={styles.detailTitleLine}>
                     <span
@@ -1684,7 +1998,13 @@ export default function TasksReferencePreview() {
                 </section>
               </div>
 
-              <footer className={styles.detailsFooter}>
+              <footer
+                className={`${styles.detailsFooter} ${
+                  selectedTask.is_demo
+                    ? styles.demoDetailsFooter
+                    : ""
+                }`}
+              >
                 <button
                   type="button"
                   disabled={isSaving}
