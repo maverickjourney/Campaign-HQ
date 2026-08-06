@@ -3709,3 +3709,565 @@ button[data-campaign-hq-launcher="floating"] {
 }
 
 /* FINAL CALENDAR VIEWPORT AND OVERLAY POLISH — END */
+
+/* CAMPAIGN SEAT CALENDAR 721-759 BRIDGE — START */
+
+/*
+ * Preserve the approved phone layout at 720px and below.
+ * Preserve the working tablet layout at 760px and above.
+ *
+ * This bridge reasserts the existing tablet architecture only
+ * inside the narrow interval where the desktop Calendar layout
+ * was incorrectly returning.
+ */
+@media
+  (min-width: 721px)
+  and
+  (max-width: 759px) {
+
+  .page {
+    box-sizing:
+      border-box !important;
+
+    width:
+      100% !important;
+    min-width:
+      0 !important;
+
+    padding:
+      16px !important;
+  }
+
+  .pageHeader {
+    box-sizing:
+      border-box !important;
+
+    display:
+      grid !important;
+
+    width:
+      100% !important;
+    min-width:
+      0 !important;
+
+    grid-template-columns:
+      minmax(0, 1fr) !important;
+
+    align-items:
+      stretch !important;
+    justify-items:
+      stretch !important;
+
+    gap:
+      14px !important;
+  }
+
+  .headerActions {
+    box-sizing:
+      border-box !important;
+
+    display:
+      grid !important;
+
+    width:
+      100% !important;
+    min-width:
+      0 !important;
+
+    grid-template-columns:
+      repeat(
+        2,
+        minmax(0, 1fr)
+      ) !important;
+
+    gap:
+      10px !important;
+  }
+
+  .searchBox {
+    box-sizing:
+      border-box !important;
+
+    width:
+      100% !important;
+    min-width:
+      0 !important;
+
+    grid-column:
+      1 / -1 !important;
+  }
+
+  .summaryGrid {
+    box-sizing:
+      border-box !important;
+
+    display:
+      grid !important;
+
+    width:
+      100% !important;
+    min-width:
+      0 !important;
+
+    grid-template-columns:
+      repeat(
+        2,
+        minmax(0, 1fr)
+      ) !important;
+  }
+
+  /*
+   * Calendar becomes the complete first row.
+   * Calendar utilities move below at full width.
+   */
+  .calendarLayout {
+    box-sizing:
+      border-box !important;
+
+    display:
+      grid !important;
+
+    width:
+      100% !important;
+    min-width:
+      0 !important;
+    max-width:
+      none !important;
+
+    grid-template-columns:
+      minmax(0, 1fr) !important;
+
+    align-items:
+      start !important;
+
+    gap:
+      12px !important;
+  }
+
+  .calendarCard {
+    box-sizing:
+      border-box !important;
+
+    width:
+      100% !important;
+    min-width:
+      0 !important;
+    max-width:
+      none !important;
+
+    grid-column:
+      1 / -1 !important;
+  }
+
+  .rightRail {
+    box-sizing:
+      border-box !important;
+
+    display:
+      grid !important;
+
+    width:
+      100% !important;
+    min-width:
+      0 !important;
+    max-width:
+      none !important;
+
+    grid-template-columns:
+      minmax(0, 1fr) !important;
+
+    grid-column:
+      1 / -1 !important;
+
+    gap:
+      12px !important;
+  }
+
+  .railCard {
+    box-sizing:
+      border-box !important;
+
+    width:
+      100% !important;
+    min-width:
+      0 !important;
+    max-width:
+      none !important;
+  }
+
+  .calendarToolbar {
+    box-sizing:
+      border-box !important;
+
+    width:
+      100% !important;
+    min-width:
+      0 !important;
+
+    align-items:
+      stretch !important;
+
+    flex-direction:
+      column !important;
+  }
+}
+
+/* CAMPAIGN SEAT CALENDAR 721-759 BRIDGE — END */
+
+/* CAMPAIGN SEAT CALENDAR MEDIUM DESKTOP RAIL — START */
+
+/*
+ * Medium desktop:
+ *
+ * Keep the main Calendar and right rail side by side.
+ * Stack August, Upcoming Events and My Calendar Tasks
+ * vertically inside the available rail width.
+ *
+ * 1180px and below keeps the existing tablet layout.
+ * Above 1380px keeps the established wide-desktop layout.
+ */
+@media
+  (min-width: 1181px)
+  and
+  (max-width: 1380px) {
+
+  .calendarLayout {
+    box-sizing:
+      border-box !important;
+
+    width:
+      100% !important;
+    min-width:
+      0 !important;
+
+    grid-template-columns:
+      minmax(0, 1fr)
+      minmax(250px, 275px) !important;
+
+    align-items:
+      start !important;
+
+    gap:
+      12px !important;
+  }
+
+  .calendarCard {
+    box-sizing:
+      border-box !important;
+
+    width:
+      100% !important;
+    min-width:
+      0 !important;
+  }
+
+  .rightRail {
+    box-sizing:
+      border-box !important;
+
+    display:
+      grid !important;
+
+    width:
+      100% !important;
+    min-width:
+      0 !important;
+    max-width:
+      275px !important;
+
+    grid-template-columns:
+      minmax(0, 1fr) !important;
+
+    grid-auto-flow:
+      row !important;
+
+    align-content:
+      start !important;
+    align-items:
+      stretch !important;
+
+    gap:
+      11px !important;
+
+    overflow:
+      visible !important;
+  }
+
+  .rightRail > .railCard,
+  .railCard {
+    box-sizing:
+      border-box !important;
+
+    width:
+      100% !important;
+    min-width:
+      0 !important;
+    max-width:
+      none !important;
+
+    grid-column:
+      1 / -1 !important;
+  }
+
+  .railCard > header {
+    min-width:
+      0 !important;
+  }
+
+  .upcomingList,
+  .taskList,
+  .miniMonth {
+    box-sizing:
+      border-box !important;
+
+    width:
+      100% !important;
+    min-width:
+      0 !important;
+  }
+
+  .upcomingList strong,
+  .upcomingList small,
+  .taskList label,
+  .taskList small {
+    overflow-wrap:
+      anywhere !important;
+  }
+}
+
+/* CAMPAIGN SEAT CALENDAR MEDIUM DESKTOP RAIL — END */
+
+/* CAMPAIGN SEAT CALENDAR PHONE COMPACT LAYOUT — START */
+
+/*
+ * Calendar-only phone optimization.
+ *
+ * The shared workspace header is intentionally untouched.
+ * Tablet and desktop layouts remain governed by their existing rules.
+ */
+@media (max-width: 520px) {
+
+  .page {
+    box-sizing:
+      border-box !important;
+
+    width:
+      100% !important;
+    min-width:
+      0 !important;
+
+    padding:
+      12px !important;
+  }
+
+  /*
+   * Row 1: Search
+   * Row 2: Sync Calendar | New Event
+   */
+  .headerActions {
+    box-sizing:
+      border-box !important;
+
+    display:
+      grid !important;
+
+    width:
+      100% !important;
+    min-width:
+      0 !important;
+
+    grid-template-columns:
+      repeat(
+        2,
+        minmax(0, 1fr)
+      ) !important;
+
+    gap:
+      8px !important;
+  }
+
+  .searchBox {
+    box-sizing:
+      border-box !important;
+
+    width:
+      100% !important;
+    min-width:
+      0 !important;
+
+    grid-column:
+      1 / -1 !important;
+  }
+
+  .syncButton,
+  .primaryButton {
+    box-sizing:
+      border-box !important;
+
+    width:
+      100% !important;
+    min-width:
+      0 !important;
+
+    padding-right:
+      8px !important;
+    padding-left:
+      8px !important;
+
+    white-space:
+      nowrap !important;
+  }
+
+  /*
+   * Five summary cards use two columns.
+   * The final Meetings card spans the complete last row.
+   */
+  .summaryGrid {
+    box-sizing:
+      border-box !important;
+
+    display:
+      grid !important;
+
+    width:
+      100% !important;
+    min-width:
+      0 !important;
+
+    grid-template-columns:
+      repeat(
+        2,
+        minmax(0, 1fr)
+      ) !important;
+
+    gap:
+      8px !important;
+  }
+
+  .summaryGrid article {
+    box-sizing:
+      border-box !important;
+
+    min-width:
+      0 !important;
+    min-height:
+      92px !important;
+
+    padding:
+      10px !important;
+  }
+
+  .summaryGrid article:last-child {
+    grid-column:
+      1 / -1 !important;
+  }
+
+  .summaryGrid article > div {
+    min-width:
+      0 !important;
+  }
+
+  .summaryGrid p {
+    margin-top:
+      4px !important;
+
+    overflow:
+      visible !important;
+
+    font-size:
+      0.59rem !important;
+    line-height:
+      1.2 !important;
+
+    text-overflow:
+      clip !important;
+    white-space:
+      normal !important;
+  }
+
+  .calendarToolbar {
+    box-sizing:
+      border-box !important;
+
+    width:
+      100% !important;
+    min-width:
+      0 !important;
+
+    gap:
+      8px !important;
+
+    padding:
+      9px !important;
+  }
+
+  .viewControls {
+    min-width:
+      0 !important;
+  }
+
+  .viewControls > button {
+    min-width:
+      0 !important;
+
+    padding-right:
+      8px !important;
+    padding-left:
+      8px !important;
+  }
+
+  /*
+   * Week mode still scrolls horizontally, but the narrower day
+   * width reveals more of the schedule without crushing event text.
+   */
+  .weekModeTimeline {
+    min-width:
+      calc(
+        56px +
+        (
+          var(--calendar-columns) *
+          128px
+        )
+      ) !important;
+  }
+
+  .weekModeTimeline .dayColumns {
+    grid-template-columns:
+      repeat(
+        var(--calendar-columns),
+        minmax(128px, 1fr)
+      ) !important;
+  }
+
+  .rightRail {
+    gap:
+      10px !important;
+  }
+}
+
+/* CAMPAIGN SEAT CALENDAR PHONE COMPACT LAYOUT — END */
+
+/* CAMPAIGN SEAT CALENDAR MOBILE LAUNCHER — START */
+
+/*
+ * The mobile workspace header already provides Campaign HQ access.
+ * Hide only the redundant floating launcher on the Calendar route
+ * so it cannot cover the legend, events or Connect Calendar button.
+ */
+@media (max-width: 520px) {
+
+  :global(
+    button[data-campaign-hq-launcher="floating"]
+  ) {
+    display:
+      none !important;
+
+    visibility:
+      hidden !important;
+
+    pointer-events:
+      none !important;
+  }
+}
+
+/* CAMPAIGN SEAT CALENDAR MOBILE LAUNCHER — END */
