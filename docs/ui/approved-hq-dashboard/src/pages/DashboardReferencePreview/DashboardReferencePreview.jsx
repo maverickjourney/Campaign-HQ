@@ -20,6 +20,7 @@ import {
   FolderKanban,
   Inbox,
   LayoutDashboard,
+  LifeBuoy,
   Mail,
   MapPin,
   Menu,
@@ -61,7 +62,7 @@ const PRIMARY_NAVIGATION = [
   {
     label: "Inbox",
     icon: Inbox,
-    route: "/communications",
+    route: "/inbox",
   },
   {
     label: "Calendar",
@@ -110,39 +111,34 @@ const PRIMARY_NAVIGATION = [
 
 const CAMPAIGN_TOOLS = [
   {
-    label: "Communications",
-    icon: Mail,
-    route: "/communications",
-  },
-  {
     label: "Volunteers",
     icon: Users,
-    route: "/team",
+    route: "/volunteers",
   },
   {
     label: "Fundraising",
     icon: CircleDollarSign,
-    route: "/workspace/settings",
+    route: "/fundraising",
   },
   {
     label: "Events",
     icon: CalendarDays,
-    route: "/calendar",
+    route: "/events",
   },
   {
     label: "Social Media",
     icon: MessageSquare,
-    route: "/communications",
+    route: "/social-media",
   },
   {
     label: "Media Center",
     icon: FolderKanban,
-    route: "/files",
+    route: "/media-center",
   },
   {
     label: "Reports & Analytics",
     icon: BarChart3,
-    route: "/dashboard",
+    route: "/reports-analytics",
   },
 ];
 
@@ -517,7 +513,7 @@ export default function DashboardReferencePreview() {
   const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
-  
+
 
   // COMMAND HEADER CLOCK — START
   const [headerNow, setHeaderNow] = useState(
@@ -618,10 +614,14 @@ const [
 
   const priorities = visibleTasks.slice(0, 5);
 
+  const overdueReferenceTime =
+    lastUpdated?.getTime() ?? 0;
+
   const overdueTasks = openTasks.filter(
     (task) =>
       task.due_at &&
-      new Date(task.due_at).getTime() < Date.now(),
+      new Date(task.due_at).getTime() <
+        overdueReferenceTime,
   );
 
   const pendingApprovals = data.approvals.filter((approval) =>
@@ -1456,7 +1456,7 @@ const [
               ⌄
             </span>
           </summary>
-      
+
         <div className={styles.workspaceSwitcherMenu}>
           <button
             type="button"
@@ -1467,18 +1467,18 @@ const [
             <span className={styles.workspaceSwitcherAvatar}>
               EA
             </span>
-      
+
             <span>
               <strong>Elizabeth Accomando</strong>
-      
+
               <small>
                 Palm Beach County · District 6
               </small>
             </span>
-      
+
             <em>Current</em>
           </button>
-      
+
           <button
             type="button"
             onClick={() =>
@@ -1488,10 +1488,10 @@ const [
             <span className={styles.workspaceSwitcherIcon}>
               +
             </span>
-      
+
             <span>
               <strong>View all workspaces</strong>
-      
+
               <small>
                 Open or switch campaigns
               </small>
@@ -1536,18 +1536,40 @@ const [
 
         {CAMPAIGN_TOOLS.map((item) => {
           const Icon = item.icon;
+          const isComingSoon = Boolean(item.comingSoon);
 
           return (
             <button
               key={item.label}
+              className={
+                isComingSoon
+                  ? styles.comingSoonNavigation
+                  : ""
+              }
               type="button"
+              aria-disabled={
+                isComingSoon ? "true" : undefined
+              }
+              title={
+                isComingSoon
+                  ? `${item.label} — Coming soon`
+                  : undefined
+              }
               onClick={() => {
-                navigate(item.route);
-                setSidebarOpen(false);
+                if (!isComingSoon) {
+                  navigate(item.route);
+                  setSidebarOpen(false);
+                }
               }}
             >
               <Icon size={17} strokeWidth={1.9} />
               <span>{item.label}</span>
+
+              {isComingSoon ? (
+                <em className={styles.comingSoonHint}>
+                  Coming soon
+                </em>
+              ) : null}
             </button>
           );
         })}
@@ -1733,6 +1755,24 @@ const [
 
             <div className={styles.headerCampaignSearch}>
               <CampaignSearch />
+            </div>
+
+            <div className={styles.headerSupport}>
+              <span data-native-support-slot="true"><button
+                className={styles.headerSupportButton}
+                type="button"
+                onClick={() =>
+                  navigate("/support?from=%2Fdashboard")
+                }
+                aria-label="Open Campaign Seat Support"
+               data-native-support-button="true">
+                <LifeBuoy
+                  size={19}
+                  strokeWidth={2}
+                  aria-hidden="true"
+                />
+
+                <span data-native-support-label="true">Support</span></button></span>
             </div>
 
             <div className={styles.headerNotifications}>
@@ -2019,7 +2059,7 @@ const [
               <section
                 className={styles.campaignAiPanel}
                 aria-label="Ask Campaign HQ"
-              
+
               data-campaign-ai-panel="true"
             >
                 <span className={styles.campaignAiIcon}>
@@ -2235,22 +2275,16 @@ const [
             </article>
           </section>
 
-          <section className={styles.middleGrid}>
-            
-
+                                        {/* CAMPAIGN SEAT DECISION GRID — START */}
+          <section className={styles.decisionGrid}>
             <article
-              className={`${styles.compactCard} ${styles.communicationsAttentionCard}`}
-              tabIndex={0}
-              aria-label="Unread campaign messages"
-            
-              data-operational-card="unread-messages"
-              role="button"
-              onClick={activateOperationalCard}
-              onKeyDown={handleOperationalCardKeyDown}>
+              className={`${styles.compactCard} ${styles.candidateMessagesCard}`}
+              aria-label="Messages requiring the candidate's attention"
+            >
               <div className={styles.cardHeading}>
                 <span>
                   <Mail size={15} />
-                  Unread messages
+                  Messages for you
                 </span>
 
                 <button
@@ -2259,18 +2293,21 @@ const [
                     navigate("/communications")
                   }
                 >
-                  View all
+                  View inbox
                 </button>
               </div>
 
-              <div className={styles.unreadMessageMetric}>
+              <div className={styles.candidateMessageMetric}>
                 <strong>8</strong>
-                <span>Require your attention</span>
+
+                <span>
+                  Conversations requiring your attention
+                </span>
               </div>
 
               <div
-                className={styles.unreadAvatarStack}
-                aria-label="Campaign conversations requiring attention"
+                className={styles.candidateMessagePeople}
+                aria-label="People waiting for a response"
               >
                 <span className={styles.unreadPhotoAvatar}>
                   <img
@@ -2299,429 +2336,741 @@ const [
                 </span>
               </div>
 
-              <div className={styles.unreadPrioritySummary}>
+              <div className={styles.candidateMessageSummary}>
                 <strong>3 high priority</strong>
 
                 <i aria-hidden="true" />
 
                 <span>5 normal</span>
               </div>
+
+              <button
+                className={styles.candidateCardFooter}
+                type="button"
+                onClick={() =>
+                  navigate("/communications")
+                }
+              >
+                <span>Open messages</span>
+                <ArrowRight size={14} />
+              </button>
             </article>
 
             <article
-              className={styles.compactCard}
-              tabIndex={0}
-              aria-label="Campaign follow-ups"
-            
-              data-operational-card="waiting-on"
-              role="button"
-              onClick={activateOperationalCard}
-              onKeyDown={handleOperationalCardKeyDown}>
-              <div className={styles.cardHeading}>
-                <span>
-                  <Clock3 size={15} />
-                  Waiting on
-                </span>
-
-                <button
-                  type="button"
-                  onClick={() => navigate("/approvals")}
-                >
-                  View all
-                </button>
-              </div>
-
-              <div className={styles.waitingMetric}>
-                <strong>
-                  {pendingApprovals.length +
-                    overdueTasks.length}
-                </strong>
-                <span>Open follow-ups</span>
-              </div>
-
-              <div className={styles.waitingList}>
-                {pendingApprovals.slice(0, 2).map(
-                  (approval) => (
-                    <button
-                      key={approval.id}
-                      type="button"
-                      onClick={() =>
-                        navigate("/approvals")
-                      }
-                    >
-                      <span>{approval.title}</span>
-                      <small>
-                        {formatStatus(approval.status)}
-                      </small>
-                    </button>
-                  ),
-                )}
-
-                {overdueTasks.slice(0, 1).map((task) => (
-                  <button
-                    key={task.id}
-                    type="button"
-                    onClick={() => navigate("/tasks")}
-                  >
-                    <span>{task.title}</span>
-                    <small className={styles.overdue}>
-                      Overdue
-                    </small>
-                  </button>
-                ))}
-
-                {!pendingApprovals.length &&
-                  !overdueTasks.length && (
-                    <div className={styles.emptyMini}>
-                      Nothing is waiting.
-                    </div>
-                  )}
-              </div>
-            </article>
-
-            <article
-              className={styles.compactCard}
-              tabIndex={0}
-              aria-label="Campaign health"
-            
-              data-operational-card="campaign-health"
-              role="button"
-              onClick={activateOperationalCard}
-              onKeyDown={handleOperationalCardKeyDown}>
-              <div className={styles.cardHeading}>
-                <span>
-                  <TrendingUp size={15} />
-                  Campaign health
-                </span>
-
-                <small>
-                  {lastUpdated
-                    ? formatRelative(lastUpdated)
-                    : "Live"}
-                </small>
-              </div>
-
-              <div className={styles.healthLayout}>
-                <div
-                  className={styles.healthRing}
-                  style={{
-                    background: `conic-gradient(#ef3340 ${
-                      campaignHealth * 3.6
-                    }deg, #e5ebf2 0deg)`,
-                  }}
-                >
-                  <div>
-                    <strong>{campaignHealth}</strong>
-                    <span>Healthy</span>
-                  </div>
-                </div>
-
-                <div>
-                  <span>
-                    Field
-                    <strong>
-                      {latestMetric.field_health || 0}%
-                    </strong>
-                  </span>
-                  <span>
-                    Events
-                    <strong>
-                      {latestMetric.events_health || 0}%
-                    </strong>
-                  </span>
-                  <span>
-                    Volunteers
-                    <strong>
-                      {latestMetric.volunteers_health || 0}%
-                    </strong>
-                  </span>
-                  <span>
-                    Tasks
-                    <strong>
-                      {overdueTasks.length > 0
-                        ? "Needs attention"
-                        : "On track"}
-                    </strong>
-                  </span>
-                </div>
-              </div>
-            </article>
-
-            <article
-              className={styles.compactCard}
-              tabIndex={0}
-              aria-label="Recent campaign activity"
-            
-              data-operational-card="recent-activity"
-              role="button"
-              onClick={activateOperationalCard}
-              onKeyDown={handleOperationalCardKeyDown}>
-              <div className={styles.cardHeading}>
-                <span>
-                  <Zap size={15} />
-                  Recent activity
-                </span>
-              </div>
-
-              <div className={styles.activityList}>
-                {recentActivity.length ? (
-                  recentActivity.map((item) => (
-                    <div key={item.id}>
-                      <span className={styles.activityDot} />
-
-                      <span>
-                        <strong>{item.title}</strong>
-                        <small>
-                          {item.detail ||
-                            "Campaign workspace update"}
-                        </small>
-                      </span>
-
-                      <time>
-                        {formatRelative(item.occurred_at)}
-                      </time>
-                    </div>
-                  ))
-                ) : (
-                  <div className={styles.emptyMini}>
-                    No recent activity.
-                  </div>
-                )}
-              </div>
-            </article>
-          </section>
-
-          <section className={styles.bottomGrid}>
-            <article
-              className={styles.lowerCard}
-              tabIndex={0}
-              aria-label="Upcoming campaign events"
-            
-              data-operational-card="upcoming-events"
-              role="button"
-              onClick={activateOperationalCard}
-              onKeyDown={handleOperationalCardKeyDown}>
-              <div className={styles.cardHeading}>
-                <span>
-                  <CalendarDays size={15} />
-                  Upcoming events
-                </span>
-
-                <button
-                  type="button"
-                  onClick={() => navigate("/calendar")}
-                >
-                  View calendar
-                </button>
-              </div>
-
-              <div className={styles.upcomingList}>
-                {lowerEvents.length ? (
-                  lowerEvents.map((event) => {
-                    const badge = formatDateBadge(
-                      event.starts_at,
-                    );
-
-                    return (
-                      <button
-                        key={event.id}
-                        type="button"
-                        onClick={() =>
-                          navigate("/calendar")
-                        }
-                      >
-                        <span className={styles.dateBadge}>
-                          <small>{badge.month}</small>
-                          <strong>{badge.day}</strong>
-                        </span>
-
-                        <span>
-                          <strong>{event.title}</strong>
-                          <small>
-                            {formatTime(event.starts_at)} ·{" "}
-                            {event.location ||
-                              "Location pending"}
-                          </small>
-                        </span>
-                      </button>
-                    );
-                  })
-                ) : (
-                  <div className={styles.emptyMini}>
-                    No upcoming events.
-                  </div>
-                )}
-              </div>
-            </article>
-
-            <article
-              className={styles.lowerCard}
-              tabIndex={0}
-              aria-label="Volunteer activity"
-            
-              data-operational-card="volunteer-activity"
-              role="button"
-              onClick={activateOperationalCard}
-              onKeyDown={handleOperationalCardKeyDown}>
-              <div className={styles.cardHeading}>
-                <span>
-                  <Users size={15} />
-                  Volunteer activity
-                </span>
-
-                <button
-                  type="button"
-                  onClick={() => navigate("/team")}
-                >
-                  View all
-                </button>
-              </div>
-
-              <div className={styles.volunteerMetric}>
-                <strong>
-                  {data.volunteerCount > 0
-                    ? data.volunteerCount.toLocaleString()
-                    : "—"}
-                </strong>
-                <span>
-                  {data.volunteerCount > 0
-                    ? "Active volunteer records"
-                    : "No active volunteer records found"}
-                </span>
-              </div>
-
-              <div className={styles.coverageRow}>
-                <span>
-                  Shift coverage
-                  <strong>{volunteerCoverage}%</strong>
-                </span>
-
-                <div>
-                  <span
-                    style={{
-                      width: `${volunteerCoverage}%`,
-                    }}
-                  />
-                </div>
-
-                <small>
-                  Shift coverage metric · {shiftsFilled} of{" "}
-                  {shiftsGoal} shifts filled
-                </small>
-              </div>
-            </article>
-
-            <article
-              className={styles.lowerCard}
-              tabIndex={0}
-              aria-label="Fundraising snapshot"
-            
-              data-operational-card="fundraising-snapshot"
-              role="button"
-              onClick={activateOperationalCard}
-              onKeyDown={handleOperationalCardKeyDown}>
-              <div className={styles.cardHeading}>
-                <span>
-                  <CircleDollarSign size={15} />
-                  Fundraising snapshot
-                </span>
-
-                <button
-                  type="button"
-                  onClick={() =>
-                    navigate("/workspace/settings")
-                  }
-                >
-                  Configure
-                </button>
-              </div>
-
-              <div className={styles.integrationState}>
-                <ShieldCheck size={22} />
-                <strong>
-                  Fundraising data is not connected
-                </strong>
-                <p>
-                  Connect an approved fundraising provider
-                  to display verified totals here.
-                </p>
-
-                <button
-                  type="button"
-                  onClick={() =>
-                    navigate("/workspace/settings")
-                  }
-                >
-                  Open integration settings
-                  <ArrowRight size={14} />
-                </button>
-              </div>
-            </article>
-
-            <article
-              className={styles.lowerCard}
-              tabIndex={0}
-              aria-label="Approval queue"
-            
-              data-operational-card="approval-queue"
-              role="button"
-              onClick={activateOperationalCard}
-              onKeyDown={handleOperationalCardKeyDown}>
+              className={`${styles.compactCard} ${styles.candidateDecisionsCard}`}
+              aria-label="Decisions requiring the candidate's approval"
+            >
               <div className={styles.cardHeading}>
                 <span>
                   <FileCheck2 size={15} />
-                  Approval queue
+                  Decisions for you
                 </span>
 
                 <button
                   type="button"
-                  onClick={() => navigate("/approvals")}
+                  onClick={() =>
+                    navigate("/approvals")
+                  }
                 >
                   View all
                 </button>
               </div>
 
-              <div className={styles.approvalMetric}>
+              <div className={styles.candidateDecisionMetric}>
                 <strong>{pendingApprovals.length}</strong>
-                <span>Items awaiting review</span>
+
+                <span>
+                  {pendingApprovals.length === 1
+                    ? "Decision awaiting review"
+                    : "Decisions awaiting review"}
+                </span>
               </div>
 
-              <div className={styles.approvalList}>
-                {pendingApprovals.slice(0, 3).map(
-                  (approval) => (
-                    <button
-                      key={approval.id}
-                      type="button"
-                      onClick={() =>
-                        navigate("/approvals")
-                      }
-                    >
-                      <span>
-                        <strong>{approval.title}</strong>
-                        <small>
-                          {formatStatus(
-                            approval.approval_type,
-                          )}
-                        </small>
-                      </span>
-
-                      <small
-                        className={styles.approvalStatus}
+              <div className={styles.candidateCardList}>
+                {pendingApprovals.length ? (
+                  pendingApprovals
+                    .slice(0, 3)
+                    .map((approval) => (
+                      <button
+                        key={`candidate-decision-${approval.id}`}
+                        type="button"
+                        onClick={() =>
+                          navigate("/approvals")
+                        }
                       >
-                        {formatStatus(approval.status)}
-                      </small>
-                    </button>
-                  ),
-                )}
+                        <span className={styles.candidateListIcon}>
+                          <FileCheck2 size={14} />
+                        </span>
 
-                {!pendingApprovals.length && (
-                  <div className={styles.emptyMini}>
-                    Approval queue is clear.
+                        <span className={styles.candidateListCopy}>
+                          <strong>{approval.title}</strong>
+
+                          <small>
+                            {approval.category ||
+                              approval.type ||
+                              "Candidate approval"}
+                          </small>
+                        </span>
+
+                        <em className={styles.candidatePendingBadge}>
+                          {formatStatus(approval.status)}
+                        </em>
+                      </button>
+                    ))
+                ) : (
+                  <div className={styles.candidateClearState}>
+                    <CheckCircle2 size={19} />
+
+                    <span>
+                      <strong>No decisions are waiting</strong>
+                      <small>
+                        Your approval queue is currently clear.
+                      </small>
+                    </span>
                   </div>
                 )}
               </div>
+
+              {pendingApprovals.length > 3 && (
+                <button
+                  className={styles.candidateCardFooter}
+                  type="button"
+                  onClick={() =>
+                    navigate("/approvals")
+                  }
+                >
+                  <span>
+                    {pendingApprovals.length - 3} more{" "}
+                    {pendingApprovals.length - 3 === 1
+                      ? "decision"
+                      : "decisions"}
+                  </span>
+
+                  <ArrowRight size={14} />
+                </button>
+              )}
+            </article>
+
+            <article
+              className={`${styles.compactCard} ${styles.candidateContactsCard}`}
+              aria-label="People the candidate should contact"
+            >
+              <div className={styles.cardHeading}>
+                <span>
+                  <PhoneCall size={15} />
+                  People to contact
+                </span>
+
+                <button
+                  type="button"
+                  onClick={() =>
+                    navigate("/tasks")
+                  }
+                >
+                  View tasks
+                </button>
+              </div>
+
+              {(() => {
+                const contactPattern =
+                  /reporter|donor|community|supporter|leader|call|thank|introduction|follow[\s-]?up/i;
+
+                const contactItems =
+                  displayedPriorities.filter(
+                    (task) =>
+                      contactPattern.test(
+                        [
+                          task.title,
+                          task.detail,
+                          task.description,
+                        ]
+                          .filter(Boolean)
+                          .join(" "),
+                      ),
+                  );
+
+                return (
+                  <>
+                    <div className={styles.candidateContactSummary}>
+                      <strong>{contactItems.length}</strong>
+
+                      <span>
+                        {contactItems.length === 1
+                          ? "Personal follow-up"
+                          : "Personal follow-ups"}
+                      </span>
+                    </div>
+
+                    <div className={styles.candidateCardList}>
+                      {contactItems.length ? (
+                        contactItems
+                          .slice(0, 3)
+                          .map((item) => (
+                            <button
+                              key={`candidate-contact-${item.id}`}
+                              type="button"
+                              onClick={() =>
+                                navigate("/tasks")
+                              }
+                            >
+                              <span
+                                className={
+                                  styles.candidateContactIcon
+                                }
+                              >
+                                <PhoneCall size={14} />
+                              </span>
+
+                              <span
+                                className={
+                                  styles.candidateListCopy
+                                }
+                              >
+                                <strong>{item.title}</strong>
+
+                                <small>
+                                  {item.detail ||
+                                    item.description ||
+                                    "Personal outreach"}
+                                </small>
+                              </span>
+
+                              <ArrowRight size={14} />
+                            </button>
+                          ))
+                      ) : (
+                        <div className={styles.candidateClearState}>
+                          <CheckCircle2 size={19} />
+
+                          <span>
+                            <strong>
+                              No personal outreach is waiting
+                            </strong>
+
+                            <small>
+                              New calls and follow-ups will
+                              appear here.
+                            </small>
+                          </span>
+                        </div>
+                      )}
+                    </div>
+
+                    {contactItems.length > 3 && (
+                      <button
+                        className={styles.candidateCardFooter}
+                        type="button"
+                        onClick={() =>
+                          navigate("/tasks")
+                        }
+                      >
+                        <span>
+                          {contactItems.length - 3} more{" "}
+                          {contactItems.length - 3 === 1
+                            ? "contact"
+                            : "contacts"}
+                        </span>
+
+                        <ArrowRight size={14} />
+                      </button>
+                    )}
+                  </>
+                );
+              })()}
+            </article>
+
+            <article
+              className={`${styles.compactCard} ${styles.candidateCommitmentsCard}`}
+              aria-label="Candidate commitments and follow-ups"
+            >
+              <div className={styles.cardHeading}>
+                <span>
+                  <Target size={15} />
+                  Commitments &amp; follow-ups
+                </span>
+
+                <button
+                  type="button"
+                  onClick={() =>
+                    navigate("/tasks")
+                  }
+                >
+                  View all
+                </button>
+              </div>
+
+              {(() => {
+                const contactPattern =
+                  /reporter|donor|community|supporter|leader|call|thank|introduction/i;
+
+                const commitmentPattern =
+                  /confirm|finalize|prepare|review|approve|send|complete|commitment|promise|follow[\s-]?up/i;
+
+                const combinedItems = [
+                  ...overdueTasks,
+                  ...displayedPriorities.filter(
+                    (task) =>
+                      commitmentPattern.test(
+                        [
+                          task.title,
+                          task.detail,
+                          task.description,
+                        ]
+                          .filter(Boolean)
+                          .join(" "),
+                      ),
+                  ),
+                ];
+
+                const commitmentItems = Array.from(
+                  new Map(
+                    combinedItems.map(
+                      (item) => [item.id, item],
+                    ),
+                  ).values(),
+                ).filter(
+                  (item) =>
+                    !contactPattern.test(
+                      [
+                        item.title,
+                        item.detail,
+                        item.description,
+                      ]
+                        .filter(Boolean)
+                        .join(" "),
+                    ),
+                );
+
+                return (
+                  <>
+                    <div className={styles.candidateCommitmentSummary}>
+                      <strong>{commitmentItems.length}</strong>
+
+                      <span>
+                        {commitmentItems.length === 1
+                          ? "Open commitment"
+                          : "Open commitments"}
+                      </span>
+                    </div>
+
+                    <div className={styles.candidateCardList}>
+                      {commitmentItems.length ? (
+                        commitmentItems
+                          .slice(0, 3)
+                          .map((item) => {
+                            const isOverdue =
+                              overdueTasks.some(
+                                (task) =>
+                                  task.id === item.id,
+                              );
+
+                            return (
+                              <button
+                                key={`candidate-commitment-${item.id}`}
+                                type="button"
+                                onClick={() =>
+                                  navigate("/tasks")
+                                }
+                              >
+                                <span
+                                  className={
+                                    isOverdue
+                                      ? styles.candidateOverdueIcon
+                                      : styles.candidateCommitmentIcon
+                                  }
+                                >
+                                  {isOverdue ? (
+                                    <AlertCircle size={14} />
+                                  ) : (
+                                    <Target size={14} />
+                                  )}
+                                </span>
+
+                                <span
+                                  className={
+                                    styles.candidateListCopy
+                                  }
+                                >
+                                  <strong>{item.title}</strong>
+
+                                  <small>
+                                    {item.detail ||
+                                      item.description ||
+                                      "Campaign commitment"}
+                                  </small>
+                                </span>
+
+                                <em
+                                  className={
+                                    isOverdue
+                                      ? styles.candidateOverdueBadge
+                                      : styles.candidateOpenBadge
+                                  }
+                                >
+                                  {isOverdue
+                                    ? "Overdue"
+                                    : "Open"}
+                                </em>
+                              </button>
+                            );
+                          })
+                      ) : (
+                        <div className={styles.candidateClearState}>
+                          <CheckCircle2 size={19} />
+
+                          <span>
+                            <strong>
+                              No commitments need attention
+                            </strong>
+
+                            <small>
+                              Current campaign commitments
+                              are on track.
+                            </small>
+                          </span>
+                        </div>
+                      )}
+                    </div>
+
+                    {commitmentItems.length > 3 && (
+                      <button
+                        className={styles.candidateCardFooter}
+                        type="button"
+                        onClick={() =>
+                          navigate("/tasks")
+                        }
+                      >
+                        <span>
+                          {commitmentItems.length - 3} more{" "}
+                          {commitmentItems.length - 3 === 1
+                            ? "commitment"
+                            : "commitments"}
+                        </span>
+
+                        <ArrowRight size={14} />
+                      </button>
+                    )}
+                  </>
+                );
+              })()}
+            </article>
+
+            <article
+              className={`${styles.compactCard} ${styles.candidateTeamBriefCard}`}
+              aria-label="Candidate team brief"
+            >
+              <div className={styles.cardHeading}>
+                <span>
+                  <Zap size={15} />
+                  Team brief
+                </span>
+
+                <small>Latest changes</small>
+              </div>
+
+              <div className={styles.candidateTeamList}>
+                {recentActivity.length ? (
+                  recentActivity
+                    .slice(0, 3)
+                    .map((item) => {
+                      const readableTitle =
+                        String(item.title || "")
+                          .replace(
+                            /^Task reopened:\s*/i,
+                            "Needs another review: ",
+                          )
+                          .replace(
+                            /^Task completed:\s*/i,
+                            "Completed: ",
+                          )
+                          .replace(
+                            /^Comment added to task$/i,
+                            "New team comment",
+                          );
+
+                      return (
+                        <button
+                          key={`candidate-team-${item.id}`}
+                          type="button"
+                          onClick={() =>
+                            navigate("/tasks")
+                          }
+                        >
+                          <span className={styles.candidateTeamDot} />
+
+                          <span className={styles.candidateListCopy}>
+                            <strong>{readableTitle}</strong>
+
+                            <small>
+                              {item.detail ||
+                                "Campaign team update"}
+                            </small>
+                          </span>
+
+                          <time>
+                            {formatRelative(item.occurred_at)}
+                          </time>
+                        </button>
+                      );
+                    })
+                ) : (
+                  <div className={styles.candidateClearState}>
+                    <CheckCircle2 size={19} />
+
+                    <span>
+                      <strong>No new team updates</strong>
+
+                      <small>
+                        Important team changes will appear here.
+                      </small>
+                    </span>
+                  </div>
+                )}
+              </div>
+
+              {recentActivity.length > 3 && (
+                <button
+                  className={styles.candidateCardFooter}
+                  type="button"
+                  onClick={() =>
+                    navigate("/tasks")
+                  }
+                >
+                  <span>
+                    {recentActivity.length - 3} more{" "}
+                    {recentActivity.length - 3 === 1
+                      ? "update"
+                      : "updates"}
+                  </span>
+
+                  <ArrowRight size={14} />
+                </button>
+              )}
+            </article>
+
+            <article
+              className={`${styles.compactCard} ${styles.candidateRiskCard}`}
+              aria-label="Candidate risk and compliance overview"
+            >
+              <div className={styles.cardHeading}>
+                <span>
+                  <ShieldCheck size={15} />
+                  Risk &amp; compliance
+                </span>
+
+                <button
+                  type="button"
+                  onClick={() =>
+                    navigate("/tasks")
+                  }
+                >
+                  Review
+                </button>
+              </div>
+
+              {(() => {
+                const seriousRiskPattern =
+                  /treasurer|filing|campaign finance|compliance|disclaimer|legal|security|permission|access|public statement|endorsement|major spending/i;
+
+                const riskTasks = Array.from(
+                  new Map(
+                    [
+                      ...overdueTasks,
+                      ...displayedPriorities,
+                    ]
+                      .filter(
+                        (item) =>
+                          seriousRiskPattern.test(
+                            [
+                              item.title,
+                              item.detail,
+                              item.description,
+                            ]
+                              .filter(Boolean)
+                              .join(" "),
+                          ),
+                      )
+                      .map(
+                        (item) => [item.id, item],
+                      ),
+                  ).values(),
+                );
+
+                const riskApprovals =
+                  pendingApprovals.filter(
+                    (approval) =>
+                      seriousRiskPattern.test(
+                        [
+                          approval.title,
+                          approval.category,
+                          approval.type,
+                        ]
+                          .filter(Boolean)
+                          .join(" "),
+                      ),
+                  );
+
+                const rawRisks = [
+                  hasScheduleConflict
+                    ? {
+                        key: "candidate-schedule-conflict",
+                        title:
+                          "Schedule conflict requires attention",
+                        detail:
+                          "Two campaign commitments overlap today.",
+                        route: "/calendar",
+                        tone: "critical",
+                        icon: CalendarDays,
+                      }
+                    : null,
+
+                  ...riskTasks.map((item) => ({
+                    key: `candidate-risk-task-${item.id}`,
+                    title: item.title,
+                    detail:
+                      item.detail ||
+                      item.description ||
+                      "Campaign compliance work is pending.",
+                    route: "/tasks",
+                    tone: overdueTasks.some(
+                      (task) =>
+                        task.id === item.id,
+                    )
+                      ? "critical"
+                      : "warning",
+                    icon: ShieldCheck,
+                  })),
+
+                  ...riskApprovals.map((approval) => ({
+                    key: `candidate-risk-approval-${approval.id}`,
+                    title: approval.title,
+                    detail:
+                      "A sensitive campaign decision is awaiting review.",
+                    route: "/approvals",
+                    tone: "warning",
+                    icon: FileCheck2,
+                  })),
+                ].filter(Boolean);
+
+                const riskItems = Array.from(
+                  new Map(
+                    rawRisks.map(
+                      (item) => [item.title, item],
+                    ),
+                  ).values(),
+                );
+
+                return (
+                  <>
+                    <div className={styles.candidateRiskSummary}>
+                      <strong>{riskItems.length}</strong>
+
+                      <span>
+                        {riskItems.length === 1
+                          ? "Important issue"
+                          : "Important issues"}
+                      </span>
+
+                      <small
+                        className={
+                          riskItems.some(
+                            (item) =>
+                              item.tone === "critical",
+                          )
+                            ? styles.candidateRiskAttention
+                            : styles.candidateRiskClear
+                        }
+                      >
+                        {riskItems.length
+                          ? "Review recommended"
+                          : "No critical issues"}
+                      </small>
+                    </div>
+
+                    <div className={styles.candidateRiskList}>
+                      {riskItems.length ? (
+                        riskItems
+                          .slice(0, 3)
+                          .map((item) => {
+                            const Icon = item.icon;
+
+                            return (
+                              <button
+                                key={item.key}
+                                type="button"
+                                className={
+                                  item.tone === "critical"
+                                    ? styles.candidateCriticalRisk
+                                    : styles.candidateWarningRisk
+                                }
+                                onClick={() =>
+                                  navigate(item.route)
+                                }
+                              >
+                                <span
+                                  className={
+                                    styles.candidateRiskIcon
+                                  }
+                                >
+                                  <Icon size={14} />
+                                </span>
+
+                                <span
+                                  className={
+                                    styles.candidateListCopy
+                                  }
+                                >
+                                  <strong>{item.title}</strong>
+
+                                  <small>{item.detail}</small>
+                                </span>
+
+                                <ArrowRight size={14} />
+                              </button>
+                            );
+                          })
+                      ) : (
+                        <div className={styles.candidateClearState}>
+                          <CheckCircle2 size={19} />
+
+                          <span>
+                            <strong>
+                              No critical risks are active
+                            </strong>
+
+                            <small>
+                              Filing, schedule and approval risks
+                              are currently clear.
+                            </small>
+                          </span>
+                        </div>
+                      )}
+                    </div>
+
+                    {riskItems.length > 3 && (
+                      <button
+                        className={styles.candidateCardFooter}
+                        type="button"
+                        onClick={() =>
+                          navigate("/tasks")
+                        }
+                      >
+                        <span>
+                          {riskItems.length - 3} more{" "}
+                          {riskItems.length - 3 === 1
+                            ? "issue"
+                            : "issues"}
+                        </span>
+
+                        <ArrowRight size={14} />
+                      </button>
+                    )}
+                  </>
+                );
+              })()}
             </article>
           </section>
+          {/* CAMPAIGN SEAT DECISION GRID — END */}
 
           <footer className={styles.footer}>
             <span>

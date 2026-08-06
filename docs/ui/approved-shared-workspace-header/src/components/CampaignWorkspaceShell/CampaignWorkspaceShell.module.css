@@ -1249,3 +1249,2044 @@
 }
 
 /* SHARED ACTIVE NAVIGATION LOCK — END */
+
+/* CAMPAIGN SEAT SINGLE INVISIBLE SCROLL — START */
+
+/*
+ * Lock the application shell to the viewport so the browser body
+ * cannot create a second vertical scrollbar.
+ */
+.app {
+  position: fixed !important;
+  inset: 0 !important;
+
+  width: 100% !important;
+  height: auto !important;
+  min-height: 0 !important;
+  max-height: none !important;
+
+  overflow: hidden !important;
+}
+
+/*
+ * The workspace itself never scrolls. Only its content area moves.
+ */
+.workspace {
+  width: auto !important;
+  height: 100% !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+  max-height: 100% !important;
+
+  overflow: hidden !important;
+}
+
+/*
+ * Preserve normal page scrolling but hide the visual scrollbar.
+ */
+.content {
+  min-width: 0 !important;
+  min-height: 0 !important;
+
+  flex: 1 1 auto !important;
+
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+
+  overscroll-behavior: contain !important;
+  scrollbar-gutter: auto !important;
+  scrollbar-width: none !important;
+
+  -ms-overflow-style: none !important;
+}
+
+.content::-webkit-scrollbar {
+  display: none !important;
+
+  width: 0 !important;
+  height: 0 !important;
+}
+
+/*
+ * The complete sidebar remains fixed inside the application shell.
+ */
+.app > :global(aside[class*="sidebar"]) {
+  height: 100% !important;
+  min-height: 0 !important;
+  max-height: 100% !important;
+
+  overflow: hidden !important;
+
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
+}
+
+.app
+  > :global(aside[class*="sidebar"])
+ ::-webkit-scrollbar {
+  display: none !important;
+
+  width: 0 !important;
+  height: 0 !important;
+}
+
+/*
+ * Navigation may still scroll when necessary, but no scrollbar
+ * track or thumb is shown beside the left tabs.
+ */
+:global([class*="sidebarNavigation"]) {
+  min-height: 0 !important;
+
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+
+  overscroll-behavior: contain !important;
+  scrollbar-width: none !important;
+
+  -ms-overflow-style: none !important;
+}
+
+:global([class*="sidebarNavigation"])::-webkit-scrollbar {
+  display: none !important;
+
+  width: 0 !important;
+  height: 0 !important;
+}
+
+/* CAMPAIGN SEAT SINGLE INVISIBLE SCROLL — END */
+
+
+/* CAMPAIGN TOOL PREVIEW ROUTES — START */
+
+/*
+ * Every Campaign Tool now opens a real preview page.
+ * Standard navigation, hover and active states apply.
+ */
+
+/* CAMPAIGN TOOL PREVIEW ROUTES — END */
+
+/* CAMPAIGN SEAT TRUE RESPONSIVE WORKSPACE — START */
+
+.app,
+.workspace,
+.topbar,
+.topbarActions,
+.content {
+  box-sizing: border-box;
+  min-width: 0;
+  max-width: 100%;
+}
+
+.workspace {
+  width: 100%;
+}
+
+.content {
+  width: 100%;
+  overflow-x: hidden;
+}
+
+/*
+ * Shared workspace pages on tablets.
+ * Controls scroll horizontally instead of becoming compressed.
+ */
+@media (max-width: 1060px) {
+  .topbar {
+    min-height: auto;
+    align-items: stretch;
+    gap: 10px;
+    padding: 12px 14px;
+  }
+
+  .topbarActions {
+    width: 100%;
+    max-width: 100%;
+
+    justify-content: flex-start;
+    flex-wrap: nowrap;
+
+    overflow-x: auto;
+    overflow-y: hidden;
+
+    padding-bottom: 5px;
+
+    overscroll-behavior-x: contain;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .topbarActions::-webkit-scrollbar {
+    display: none;
+  }
+
+  .topbarActions > * {
+    flex: 0 0 auto;
+  }
+}
+
+/*
+ * Shared workspace mobile navigation.
+ *
+ * Because these shared pages do not currently contain a JavaScript
+ * drawer trigger, the large desktop sidebar becomes a compact,
+ * horizontally scrollable navigation rail rather than stacking the
+ * full sidebar above every page.
+ */
+@media (max-width: 760px) {
+  .app {
+    display: block;
+    width: 100%;
+    min-height: 100dvh;
+    overflow-x: hidden;
+  }
+
+  .sidebar {
+    position: relative !important;
+    z-index: 70 !important;
+
+    display: block !important;
+
+    width: 100% !important;
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    flex-basis: auto !important;
+
+    overflow: visible !important;
+
+    box-shadow:
+      0 8px 24px rgba(63, 7, 14, 0.14) !important;
+  }
+
+  .workspaceSwitcher {
+    height: 66px !important;
+    min-height: 66px !important;
+    max-height: 66px !important;
+    flex-basis: 66px !important;
+  }
+
+  .workspaceSwitcher > summary {
+    height: 66px !important;
+    min-height: 66px !important;
+    max-height: 66px !important;
+
+    padding: 8px 12px !important;
+  }
+
+  .workspaceBrandCopy > small {
+    font-size: 8px !important;
+  }
+
+  .workspaceBrandCopy > strong {
+    font-size: 14px !important;
+  }
+
+  .workspaceDistrict {
+    font-size: 9px !important;
+  }
+
+  .sidebarNavigation {
+    box-sizing: border-box !important;
+    display: flex !important;
+
+    width: 100% !important;
+    min-height: 58px !important;
+
+    flex-direction: row !important;
+    gap: 6px !important;
+
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+
+    padding: 7px 9px 8px !important;
+
+    background:
+      linear-gradient(
+        180deg,
+        #8f0e19,
+        #740b14
+      ) !important;
+
+    overscroll-behavior-x: contain !important;
+    scrollbar-width: none !important;
+    -webkit-overflow-scrolling: touch !important;
+  }
+
+  .sidebarNavigation::-webkit-scrollbar {
+    display: none !important;
+  }
+
+  .sidebarNavigation > button {
+    box-sizing: border-box !important;
+
+    width: auto !important;
+    min-width: max-content !important;
+    min-height: 44px !important;
+    flex: 0 0 auto !important;
+
+    padding: 0 14px !important;
+    border-radius: 11px !important;
+
+    font-size: 0.76rem !important;
+  }
+
+  .sidebarNavigation > button small {
+    position: static !important;
+    margin-left: 4px !important;
+  }
+
+  .navigationLabel,
+  .connectedApps,
+  .sidebarProfile {
+    display: none !important;
+  }
+
+  .workspace {
+    width: 100%;
+    height: auto;
+    min-height: 0;
+    overflow: visible;
+  }
+
+  .topbar {
+    position: relative;
+
+    width: 100%;
+    min-height: auto;
+
+    align-items: stretch;
+    gap: 9px;
+
+    padding: 11px;
+  }
+
+  .workspaceIdentity strong {
+    overflow-wrap: anywhere;
+    white-space: normal;
+  }
+
+  .topbarActions {
+    gap: 7px;
+  }
+
+  .dateTime {
+    min-height: 44px;
+  }
+}
+
+@media (max-width: 480px) {
+  .workspaceSwitcher {
+    height: 62px !important;
+    min-height: 62px !important;
+    max-height: 62px !important;
+    flex-basis: 62px !important;
+  }
+
+  .workspaceSwitcher > summary {
+    height: 62px !important;
+    min-height: 62px !important;
+    max-height: 62px !important;
+  }
+
+  .workspaceDistrict {
+    display: none !important;
+  }
+
+  .sidebarNavigation {
+    min-height: 55px !important;
+    padding: 6px 8px 7px !important;
+  }
+
+  .sidebarNavigation > button {
+    min-height: 42px !important;
+    padding: 0 12px !important;
+  }
+
+  .topbar {
+    padding:
+      10px
+      max(9px, env(safe-area-inset-right))
+      10px
+      max(9px, env(safe-area-inset-left));
+  }
+
+  .workspaceIdentity span {
+    font-size: 0.52rem;
+  }
+
+  .workspaceIdentity strong {
+    font-size: 0.74rem;
+  }
+}
+
+/* CAMPAIGN SEAT TRUE RESPONSIVE WORKSPACE — END */
+
+/* CAMPAIGN SEAT BALANCED SHELL TYPE — START */
+
+.app {
+  font-size: 15px !important;
+  line-height: 1.45 !important;
+}
+
+.workspaceBrandCopy > small {
+  font-size: 10.5px !important;
+}
+
+.workspaceBrandCopy > strong {
+  font-size: 15px !important;
+}
+
+.workspaceDistrict {
+  font-size: 11.5px !important;
+}
+
+.sidebarNavigation > button {
+  font-size: 13.5px !important;
+}
+
+.navigationLabel {
+  font-size: 10.5px !important;
+}
+
+.sidebarProfile strong {
+  font-size: 12.5px !important;
+}
+
+.sidebarProfile > div span {
+  font-size: 11.5px !important;
+}
+
+.workspaceIdentity span {
+  font-size: 10.5px !important;
+}
+
+.workspaceIdentity strong {
+  font-size: 13px !important;
+}
+
+.dateTime,
+.topbarActions button {
+  font-size: 12.5px !important;
+}
+
+@media (max-width: 760px) {
+  .sidebarNavigation > button {
+    font-size: 13.5px !important;
+  }
+
+  .workspaceIdentity strong {
+    font-size: 13px !important;
+  }
+}
+
+/* CAMPAIGN SEAT BALANCED SHELL TYPE — END */
+
+/* CAMPAIGN SEAT SYSTEM RESPONSIVE SHELL — START */
+
+/*
+ * Shared responsive foundation for operational Campaign Seat pages.
+ *
+ * Covered by CampaignWorkspaceShell:
+ * Inbox, Calendar, Tasks, Commitments, Waiting On, Contacts,
+ * Documents, Approvals, Team, Volunteers, Profile Settings,
+ * and campaign-tool placeholder pages.
+ */
+
+/* =========================================================
+   BASE SCROLL ARCHITECTURE
+   ========================================================= */
+
+.app {
+  width: 100% !important;
+  height: 100dvh !important;
+  min-height: 100dvh !important;
+
+  overflow: hidden !important;
+}
+
+.workspace,
+[data-shared-workspace-region="true"] {
+  min-width: 0 !important;
+  min-height: 0 !important;
+
+  height: 100dvh !important;
+
+  flex:
+    1
+    1
+    auto !important;
+
+  overflow: hidden !important;
+}
+
+.content,
+[data-shared-workspace-content="true"] {
+  min-width: 0 !important;
+  min-height: 0 !important;
+
+  flex:
+    1
+    1
+    auto !important;
+
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+
+  overscroll-behavior-y:
+    contain !important;
+
+  -webkit-overflow-scrolling:
+    touch;
+}
+
+.sharedMenuButton,
+.sharedSidebarScrim {
+  display: none;
+}
+
+/* Prevent child pages from forcing the shell wider. */
+
+[data-shared-workspace-content="true"]
+  > * {
+  min-width: 0;
+  max-width: 100%;
+}
+
+/* =========================================================
+   LANDSCAPE TABLET AND SMALL LAPTOP
+   ========================================================= */
+
+@media (max-width: 1240px) {
+  [data-shared-workspace-sidebar="true"] {
+    position: fixed !important;
+    z-index: 95 !important;
+
+    inset:
+      0
+      auto
+      0
+      0 !important;
+
+    display: flex !important;
+
+    width:
+      min(
+        300px,
+        86vw
+      ) !important;
+
+    height: 100dvh !important;
+    min-height: 100dvh !important;
+
+    flex:
+      0
+      0
+      auto !important;
+
+    transform:
+      translateX(-103%) !important;
+
+    transition:
+      transform
+      220ms
+      ease !important;
+
+    box-shadow:
+      18px
+      0
+      44px
+      rgba(
+        17,
+        31,
+        49,
+        0.24
+      ) !important;
+  }
+
+  [data-shared-workspace-sidebar="true"]
+  [data-workspace-switcher="true"] {
+    flex:
+      0
+      0
+      auto !important;
+  }
+
+  [data-shared-workspace-sidebar="true"]
+  nav {
+    min-height: 0 !important;
+
+    flex:
+      1
+      1
+      auto !important;
+
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+  }
+
+  [data-shared-workspace-sidebar="true"]
+  [data-profile-settings="true"] {
+    flex:
+      0
+      0
+      auto !important;
+  }
+
+  [data-shared-workspace-sidebar="true"]
+  [data-open="true"],
+  [data-shared-workspace-sidebar="true"][data-open="true"] {
+    transform:
+      translateX(0) !important;
+  }
+
+  .sharedSidebarScrim {
+    position: fixed !important;
+    z-index: 85 !important;
+
+    inset: 0 !important;
+
+    display: block !important;
+
+    width: 100% !important;
+    height: 100% !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
+
+    border: 0 !important;
+
+    background:
+      rgba(
+        7,
+        22,
+        39,
+        0.46
+      ) !important;
+
+    backdrop-filter:
+      blur(2px);
+
+    cursor: pointer !important;
+  }
+
+  .sharedMenuButton {
+    position: relative !important;
+    z-index: 5 !important;
+
+    display: grid !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+
+    width: 42px !important;
+    height: 42px !important;
+    min-width: 42px !important;
+    min-height: 42px !important;
+
+    place-items: center !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
+
+    border:
+      1px solid
+      #d4dee9 !important;
+
+    border-radius:
+      11px !important;
+
+    color: #164a79 !important;
+    background: #ffffff !important;
+
+    box-shadow:
+      0
+      5px
+      14px
+      rgba(
+        19,
+        59,
+        97,
+        0.08
+      ) !important;
+
+    cursor: pointer !important;
+  }
+
+  .sharedMenuButton:hover {
+    color: #ffffff !important;
+
+    border-color:
+      #164f84 !important;
+
+    background:
+      linear-gradient(
+        180deg,
+        #1c5b94,
+        #0e416f
+      ) !important;
+  }
+
+  [data-shared-workspace-region="true"] {
+    width: 100% !important;
+    min-width: 0 !important;
+  }
+
+  [data-shared-workspace-topbar="true"] {
+    display: grid !important;
+
+    grid-template-columns:
+      42px
+      minmax(190px, 0.72fr)
+      minmax(0, 2.3fr) !important;
+
+    align-items: center !important;
+
+    gap:
+      0
+      11px !important;
+
+    min-height: 74px !important;
+
+    padding:
+      10px
+      14px !important;
+
+    overflow: visible !important;
+  }
+
+  [data-shared-workspace-topbar="true"]
+  > .sharedMenuButton {
+    grid-column: 1 !important;
+    grid-row: 1 !important;
+
+    align-self: center !important;
+    justify-self: start !important;
+  }
+
+  [data-shared-workspace-topbar="true"]
+  > .workspaceIdentity {
+    grid-column: 2 !important;
+    grid-row: 1 !important;
+
+    min-width: 0 !important;
+
+    align-self: center !important;
+  }
+
+  [data-shared-workspace-topbar="true"]
+  > .workspaceIdentity span,
+  [data-shared-workspace-topbar="true"]
+  > .workspaceIdentity strong {
+    overflow: hidden !important;
+
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+  }
+
+  [data-shared-workspace-topbar="true"]
+  > .topbarActions {
+    display: flex !important;
+
+    width: 100% !important;
+    min-width: 0 !important;
+
+    grid-column: 3 !important;
+    grid-row: 1 !important;
+
+    align-items: center !important;
+    justify-content: flex-end !important;
+
+    gap: 7px !important;
+
+    margin: 0 !important;
+
+    overflow: visible !important;
+  }
+
+  [data-shared-workspace-topbar="true"]
+  > .topbarActions
+  > * {
+    min-width: 0 !important;
+  }
+
+  [data-shared-workspace-topbar="true"]
+  > .topbarActions
+  > :nth-child(2) {
+    min-width: 170px !important;
+
+    flex:
+      1
+      1
+      250px !important;
+  }
+
+  .dateTime {
+    min-height: 48px !important;
+
+    flex:
+      0
+      1
+      auto !important;
+  }
+}
+
+/* =========================================================
+   NARROW TABLET
+   ========================================================= */
+
+@media
+  (min-width: 701px)
+  and
+  (max-width: 1020px) {
+
+  [data-shared-workspace-topbar="true"] {
+    grid-template-columns:
+      42px
+      minmax(0, 1fr) !important;
+
+    grid-template-rows:
+      auto
+      auto !important;
+
+    gap:
+      8px
+      10px !important;
+
+    padding:
+      10px
+      12px !important;
+  }
+
+  [data-shared-workspace-topbar="true"]
+  > .sharedMenuButton {
+    grid-column: 1 !important;
+    grid-row: 1 !important;
+  }
+
+  [data-shared-workspace-topbar="true"]
+  > .workspaceIdentity {
+    grid-column: 2 !important;
+    grid-row: 1 !important;
+  }
+
+  [data-shared-workspace-topbar="true"]
+  > .topbarActions {
+    display: grid !important;
+
+    grid-column:
+      1 / -1 !important;
+
+    grid-row: 2 !important;
+
+    grid-template-columns:
+      minmax(250px, 1.15fr)
+      minmax(220px, 1fr)
+      auto !important;
+
+    align-items: center !important;
+
+    gap: 7px !important;
+
+    width: 100% !important;
+  }
+
+  [data-shared-workspace-topbar="true"]
+  > .topbarActions
+  > :nth-child(2) {
+    width: 100% !important;
+    min-width: 0 !important;
+  }
+}
+
+/* =========================================================
+   PHONE
+   ========================================================= */
+
+@media (max-width: 700px) {
+  .app {
+    height: 100dvh !important;
+    min-height: 100dvh !important;
+
+    overflow: hidden !important;
+  }
+
+  [data-shared-workspace-sidebar="true"] {
+    width:
+      min(
+        310px,
+        88vw
+      ) !important;
+  }
+
+  [data-shared-workspace-region="true"] {
+    height: 100dvh !important;
+    min-height: 100dvh !important;
+  }
+
+  [data-shared-workspace-topbar="true"] {
+    position: sticky !important;
+    z-index: 60 !important;
+
+    top: 0 !important;
+
+    grid-template-columns:
+      40px
+      minmax(0, 1fr) !important;
+
+    grid-template-rows:
+      auto
+      auto !important;
+
+    gap:
+      8px
+      9px !important;
+
+    min-height: 0 !important;
+
+    padding:
+      9px
+      10px !important;
+  }
+
+  .sharedMenuButton {
+    width: 40px !important;
+    height: 40px !important;
+    min-width: 40px !important;
+    min-height: 40px !important;
+  }
+
+  [data-shared-workspace-topbar="true"]
+  > .workspaceIdentity span {
+    font-size: 10px !important;
+  }
+
+  [data-shared-workspace-topbar="true"]
+  > .workspaceIdentity strong {
+    margin-top: 4px !important;
+
+    font-size: 13px !important;
+  }
+
+  [data-shared-workspace-topbar="true"]
+  > .topbarActions {
+    display: grid !important;
+
+    grid-column:
+      1 / -1 !important;
+
+    grid-row: 2 !important;
+
+    grid-template-columns:
+      minmax(0, 1fr)
+      auto !important;
+
+    align-items: center !important;
+
+    gap: 7px !important;
+
+    width: 100% !important;
+  }
+
+  .dateTime {
+    width: 100% !important;
+    min-width: 0 !important;
+    min-height: 46px !important;
+
+    grid-column:
+      1 / -1 !important;
+
+    grid-template-columns:
+      auto
+      minmax(0, 1fr)
+      1px
+      auto
+      auto !important;
+
+    padding:
+      0
+      10px !important;
+  }
+
+  .dateTime span,
+  .dateTime strong {
+    overflow: hidden !important;
+
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+  }
+
+  [data-shared-workspace-topbar="true"]
+  > .topbarActions
+  > :nth-child(2) {
+    width: 100% !important;
+    min-width: 0 !important;
+
+    grid-column: 1 !important;
+    grid-row: 2 !important;
+  }
+
+  [data-shared-workspace-topbar="true"]
+  > .topbarActions
+  > :nth-child(3) {
+    min-width: max-content !important;
+
+    grid-column: 2 !important;
+    grid-row: 2 !important;
+
+    justify-self: end !important;
+  }
+
+  [data-shared-workspace-content="true"] {
+    width: 100% !important;
+
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+  }
+}
+
+/* =========================================================
+   SMALL PHONE
+   ========================================================= */
+
+@media (max-width: 430px) {
+  [data-shared-workspace-topbar="true"] {
+    padding:
+      8px !important;
+  }
+
+  .dateTime {
+    font-size: 11px !important;
+  }
+
+  .dateTime strong {
+    max-width: 92px !important;
+  }
+}
+
+/* CAMPAIGN SEAT SYSTEM RESPONSIVE SHELL — END */
+
+/* CAMPAIGN SEAT CENTERED MOBILE HEADER CONTROLS — START */
+
+/*
+ * Mobile shared-header refinement.
+ *
+ * Row 1:
+ * menu + workspace identity
+ *
+ * Row 2:
+ * complete date and time
+ *
+ * Row 3:
+ * centered Ask Campaign HQ + notifications
+ */
+
+@media (max-width: 700px) {
+
+  [data-shared-workspace-topbar="true"] {
+    grid-template-rows:
+      auto
+      auto !important;
+
+    row-gap: 8px !important;
+  }
+
+  [data-shared-workspace-topbar="true"]
+  > .topbarActions {
+    display: grid !important;
+
+    width: 100% !important;
+    min-width: 0 !important;
+
+    grid-template-columns:
+      auto
+      auto !important;
+
+    grid-template-rows:
+      auto
+      auto !important;
+
+    justify-content: center !important;
+    align-items: center !important;
+
+    column-gap: 9px !important;
+    row-gap: 8px !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
+
+    overflow: visible !important;
+  }
+
+  /*
+   * Date and time occupy the full first action row.
+   */
+  [data-shared-workspace-topbar="true"]
+  > .topbarActions
+  > .dateTime {
+    width: 100% !important;
+    min-width: 0 !important;
+
+    grid-column:
+      1 / -1 !important;
+
+    grid-row: 1 !important;
+
+    justify-self: stretch !important;
+  }
+
+  /*
+   * Ask Campaign HQ and notifications become one centered pair.
+   */
+  [data-shared-workspace-topbar="true"]
+  > .topbarActions
+  > :nth-child(2) {
+    width: 42px !important;
+    min-width: 42px !important;
+    max-width: 42px !important;
+
+    grid-column: 1 !important;
+    grid-row: 2 !important;
+
+    justify-self: end !important;
+  }
+
+  [data-shared-workspace-topbar="true"]
+  > .topbarActions
+  > :nth-child(3) {
+    width: 42px !important;
+    min-width: 42px !important;
+    max-width: 42px !important;
+
+    grid-column: 2 !important;
+    grid-row: 2 !important;
+
+    justify-self: start !important;
+  }
+
+  [data-shared-workspace-topbar="true"]
+  > .topbarActions
+  > :nth-child(2)
+  > button,
+  [data-shared-workspace-topbar="true"]
+  > .topbarActions
+  > :nth-child(3)
+  > button {
+    box-sizing: border-box !important;
+
+    width: 42px !important;
+    height: 42px !important;
+    min-width: 42px !important;
+    min-height: 42px !important;
+    max-width: 42px !important;
+    max-height: 42px !important;
+
+    display: grid !important;
+    place-items: center !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+}
+
+
+@media (max-width: 430px) {
+
+  [data-shared-workspace-topbar="true"]
+  > .topbarActions {
+    column-gap: 8px !important;
+  }
+
+  [data-shared-workspace-topbar="true"]
+  > .topbarActions
+  > :nth-child(2),
+  [data-shared-workspace-topbar="true"]
+  > .topbarActions
+  > :nth-child(3),
+  [data-shared-workspace-topbar="true"]
+  > .topbarActions
+  > :nth-child(2)
+  > button,
+  [data-shared-workspace-topbar="true"]
+  > .topbarActions
+  > :nth-child(3)
+  > button {
+    width: 40px !important;
+    height: 40px !important;
+    min-width: 40px !important;
+    min-height: 40px !important;
+    max-width: 40px !important;
+    max-height: 40px !important;
+  }
+}
+
+/* CAMPAIGN SEAT CENTERED MOBILE HEADER CONTROLS — END */
+
+/* CAMPAIGN SEAT CANONICAL TABLET DESKTOP HEADER — START */
+
+/*
+ * Canonical shared authenticated-header system.
+ *
+ * 701–899:
+ *   row 1 = menu + workspace identity
+ *   row 2 = date/time + AI icon + notifications
+ *
+ * 900–1099:
+ *   row 1 = menu + workspace identity
+ *   row 2 = date/time + labeled AI + notifications
+ *
+ * 1100–1240:
+ *   one row with two separate zones:
+ *   left = menu + workspace identity
+ *   right = date/time + labeled AI + notifications
+ *
+ * Phones below 701px and desktop above 1240px are excluded.
+ */
+
+
+/* =========================================================
+   PORTRAIT TABLET
+   701px through 899px
+   ========================================================= */
+
+@media
+  (min-width: 701px)
+  and
+  (max-width: 899px) {
+
+  [data-shared-workspace-topbar="true"] {
+    box-sizing: border-box !important;
+
+    display: grid !important;
+
+    width: 100% !important;
+    min-width: 0 !important;
+
+    grid-template-columns:
+      auto
+      minmax(0, 1fr) !important;
+
+    grid-template-areas:
+      "menu identity"
+      "actions actions" !important;
+
+    align-items: center !important;
+
+    column-gap: 10px !important;
+    row-gap: 8px !important;
+
+    min-height: auto !important;
+
+    padding:
+      11px
+      13px !important;
+  }
+
+  [data-shared-workspace-topbar="true"]
+  > .sharedMenuButton {
+    grid-area: menu !important;
+
+    align-self: center !important;
+    justify-self: start !important;
+  }
+
+  [data-shared-workspace-topbar="true"]
+  > .workspaceIdentity {
+    grid-area: identity !important;
+
+    width: auto !important;
+    min-width: 0 !important;
+
+    align-self: center !important;
+    justify-self: start !important;
+
+    margin: 0 !important;
+
+    text-align: left !important;
+  }
+
+  [data-shared-workspace-topbar="true"]
+  > .topbarActions {
+    box-sizing: border-box !important;
+
+    display: grid !important;
+
+    width:
+      min(
+        100%,
+        620px
+      ) !important;
+
+    min-width: 0 !important;
+    max-width: 620px !important;
+
+    grid-area: actions !important;
+
+    grid-template-columns:
+      minmax(0, 1fr)
+      44px
+      44px !important;
+
+    align-items: center !important;
+    justify-content: center !important;
+
+    gap: 8px !important;
+
+    align-self: center !important;
+    justify-self: center !important;
+
+    margin:
+      0
+      auto !important;
+
+    padding: 0 !important;
+
+    overflow: visible !important;
+  }
+
+  [data-shared-workspace-topbar="true"]
+  > .topbarActions
+  > .dateTime {
+    box-sizing: border-box !important;
+
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: none !important;
+
+    grid-column: 1 !important;
+    grid-row: 1 !important;
+
+    justify-self: stretch !important;
+
+    margin: 0 !important;
+  }
+
+  /*
+   * Campaign Search becomes the compact AI icon at this width.
+   */
+  [data-shared-workspace-topbar="true"]
+  > .topbarActions
+  > :nth-child(2) {
+    box-sizing: border-box !important;
+
+    width: 44px !important;
+    min-width: 44px !important;
+    max-width: 44px !important;
+
+    height: 44px !important;
+    min-height: 44px !important;
+    max-height: 44px !important;
+
+    grid-column: 2 !important;
+    grid-row: 1 !important;
+
+    justify-self: center !important;
+
+    margin: 0 !important;
+
+    overflow: visible !important;
+  }
+
+  [data-shared-workspace-topbar="true"]
+  > .topbarActions
+  > :nth-child(2)
+  > button {
+    box-sizing: border-box !important;
+
+    display: grid !important;
+
+    width: 44px !important;
+    min-width: 44px !important;
+    max-width: 44px !important;
+
+    height: 44px !important;
+    min-height: 44px !important;
+    max-height: 44px !important;
+
+    place-items: center !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
+
+    overflow: hidden !important;
+  }
+
+  /*
+   * Activity Center remains directly beside Campaign Search.
+   */
+  [data-shared-workspace-topbar="true"]
+  > .topbarActions
+  > :nth-child(3) {
+    box-sizing: border-box !important;
+
+    width: 44px !important;
+    min-width: 44px !important;
+    max-width: 44px !important;
+
+    height: 44px !important;
+    min-height: 44px !important;
+    max-height: 44px !important;
+
+    grid-column: 3 !important;
+    grid-row: 1 !important;
+
+    justify-self: center !important;
+
+    margin: 0 !important;
+
+    overflow: visible !important;
+  }
+
+  [data-shared-workspace-topbar="true"]
+  > .topbarActions
+  > :nth-child(3)
+  > button {
+    box-sizing: border-box !important;
+
+    display: grid !important;
+
+    width: 44px !important;
+    min-width: 44px !important;
+    max-width: 44px !important;
+
+    height: 44px !important;
+    min-height: 44px !important;
+    max-height: 44px !important;
+
+    place-items: center !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
+
+    overflow: visible !important;
+  }
+}
+
+
+/* =========================================================
+   LANDSCAPE TABLET / INTERMEDIATE WIDTH
+   900px through 1099px
+   ========================================================= */
+
+@media
+  (min-width: 900px)
+  and
+  (max-width: 1099px) {
+
+  [data-shared-workspace-topbar="true"] {
+    box-sizing: border-box !important;
+
+    display: grid !important;
+
+    width: 100% !important;
+    min-width: 0 !important;
+
+    grid-template-columns:
+      auto
+      minmax(0, 1fr) !important;
+
+    grid-template-areas:
+      "menu identity"
+      "actions actions" !important;
+
+    align-items: center !important;
+
+    column-gap: 11px !important;
+    row-gap: 9px !important;
+
+    min-height: auto !important;
+
+    padding:
+      11px
+      15px !important;
+  }
+
+  [data-shared-workspace-topbar="true"]
+  > .sharedMenuButton {
+    grid-area: menu !important;
+
+    align-self: center !important;
+    justify-self: start !important;
+  }
+
+  [data-shared-workspace-topbar="true"]
+  > .workspaceIdentity {
+    grid-area: identity !important;
+
+    min-width: 0 !important;
+
+    align-self: center !important;
+    justify-self: start !important;
+
+    margin: 0 !important;
+
+    text-align: left !important;
+  }
+
+  [data-shared-workspace-topbar="true"]
+  > .topbarActions {
+    box-sizing: border-box !important;
+
+    display: grid !important;
+
+    width:
+      min(
+        100%,
+        760px
+      ) !important;
+
+    min-width: 0 !important;
+    max-width: 760px !important;
+
+    grid-area: actions !important;
+
+    grid-template-columns:
+      minmax(250px, 1fr)
+      minmax(150px, 180px)
+      44px !important;
+
+    align-items: center !important;
+    justify-content: center !important;
+
+    gap: 8px !important;
+
+    align-self: center !important;
+    justify-self: center !important;
+
+    margin:
+      0
+      auto !important;
+
+    padding: 0 !important;
+
+    overflow: visible !important;
+  }
+
+  [data-shared-workspace-topbar="true"]
+  > .topbarActions
+  > .dateTime {
+    box-sizing: border-box !important;
+
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: none !important;
+
+    grid-column: 1 !important;
+    grid-row: 1 !important;
+
+    justify-self: stretch !important;
+
+    margin: 0 !important;
+  }
+
+  [data-shared-workspace-topbar="true"]
+  > .topbarActions
+  > :nth-child(2) {
+    box-sizing: border-box !important;
+
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 180px !important;
+
+    height: 44px !important;
+    min-height: 44px !important;
+    max-height: 44px !important;
+
+    grid-column: 2 !important;
+    grid-row: 1 !important;
+
+    justify-self: stretch !important;
+
+    margin: 0 !important;
+
+    overflow: visible !important;
+  }
+
+  [data-shared-workspace-topbar="true"]
+  > .topbarActions
+  > :nth-child(2)
+  > button {
+    box-sizing: border-box !important;
+
+    width: 100% !important;
+    min-width: 0 !important;
+
+    height: 44px !important;
+    min-height: 44px !important;
+    max-height: 44px !important;
+
+    justify-content: center !important;
+
+    margin: 0 !important;
+
+    padding:
+      0
+      11px !important;
+
+    white-space: nowrap !important;
+  }
+
+  [data-shared-workspace-topbar="true"]
+  > .topbarActions
+  > :nth-child(3) {
+    box-sizing: border-box !important;
+
+    width: 44px !important;
+    min-width: 44px !important;
+    max-width: 44px !important;
+
+    height: 44px !important;
+    min-height: 44px !important;
+    max-height: 44px !important;
+
+    grid-column: 3 !important;
+    grid-row: 1 !important;
+
+    justify-self: center !important;
+
+    margin: 0 !important;
+
+    overflow: visible !important;
+  }
+
+  [data-shared-workspace-topbar="true"]
+  > .topbarActions
+  > :nth-child(3)
+  > button {
+    box-sizing: border-box !important;
+
+    display: grid !important;
+
+    width: 44px !important;
+    min-width: 44px !important;
+    max-width: 44px !important;
+
+    height: 44px !important;
+    min-height: 44px !important;
+    max-height: 44px !important;
+
+    place-items: center !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
+
+    overflow: visible !important;
+  }
+}
+
+
+/* =========================================================
+   COMPACT DESKTOP
+   1100px through 1240px
+   ========================================================= */
+
+@media
+  (min-width: 1100px)
+  and
+  (max-width: 1240px) {
+
+  [data-shared-workspace-topbar="true"] {
+    box-sizing: border-box !important;
+
+    display: grid !important;
+
+    width: 100% !important;
+    min-width: 0 !important;
+
+    grid-template-columns:
+      auto
+      minmax(210px, 1fr)
+      auto !important;
+
+    grid-template-areas:
+      "menu identity actions" !important;
+
+    align-items: center !important;
+
+    gap: 12px !important;
+
+    min-height: 82px !important;
+
+    padding:
+      11px
+      16px !important;
+  }
+
+  [data-shared-workspace-topbar="true"]
+  > .sharedMenuButton {
+    grid-area: menu !important;
+
+    align-self: center !important;
+    justify-self: start !important;
+  }
+
+  /*
+   * The campaign identity remains its own left-side zone.
+   */
+  [data-shared-workspace-topbar="true"]
+  > .workspaceIdentity {
+    grid-area: identity !important;
+
+    width: auto !important;
+    min-width: 0 !important;
+
+    align-self: center !important;
+    justify-self: start !important;
+
+    margin: 0 !important;
+
+    text-align: left !important;
+  }
+
+  /*
+   * Date/time, Ask Campaign HQ and notifications form one
+   * compact right-side control group.
+   */
+  [data-shared-workspace-topbar="true"]
+  > .topbarActions {
+    box-sizing: border-box !important;
+
+    display: grid !important;
+
+    width: auto !important;
+    min-width: 0 !important;
+    max-width: none !important;
+
+    grid-area: actions !important;
+
+    grid-template-columns:
+      minmax(275px, 310px)
+      minmax(165px, 190px)
+      44px !important;
+
+    align-items: center !important;
+    justify-content: end !important;
+
+    gap: 8px !important;
+
+    align-self: center !important;
+    justify-self: end !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
+
+    overflow: visible !important;
+  }
+
+  [data-shared-workspace-topbar="true"]
+  > .topbarActions
+  > .dateTime {
+    box-sizing: border-box !important;
+
+    width: 100% !important;
+    min-width: 275px !important;
+    max-width: 310px !important;
+
+    grid-column: 1 !important;
+    grid-row: 1 !important;
+
+    justify-self: stretch !important;
+
+    margin: 0 !important;
+  }
+
+  [data-shared-workspace-topbar="true"]
+  > .topbarActions
+  > :nth-child(2) {
+    box-sizing: border-box !important;
+
+    width: 100% !important;
+    min-width: 165px !important;
+    max-width: 190px !important;
+
+    height: 44px !important;
+    min-height: 44px !important;
+    max-height: 44px !important;
+
+    grid-column: 2 !important;
+    grid-row: 1 !important;
+
+    justify-self: stretch !important;
+
+    margin: 0 !important;
+
+    overflow: visible !important;
+  }
+
+  [data-shared-workspace-topbar="true"]
+  > .topbarActions
+  > :nth-child(2)
+  > button {
+    box-sizing: border-box !important;
+
+    width: 100% !important;
+    min-width: 0 !important;
+
+    height: 44px !important;
+    min-height: 44px !important;
+    max-height: 44px !important;
+
+    justify-content: center !important;
+
+    margin: 0 !important;
+
+    padding:
+      0
+      12px !important;
+
+    white-space: nowrap !important;
+  }
+
+  [data-shared-workspace-topbar="true"]
+  > .topbarActions
+  > :nth-child(3) {
+    box-sizing: border-box !important;
+
+    width: 44px !important;
+    min-width: 44px !important;
+    max-width: 44px !important;
+
+    height: 44px !important;
+    min-height: 44px !important;
+    max-height: 44px !important;
+
+    grid-column: 3 !important;
+    grid-row: 1 !important;
+
+    justify-self: center !important;
+
+    margin: 0 !important;
+
+    overflow: visible !important;
+  }
+
+  [data-shared-workspace-topbar="true"]
+  > .topbarActions
+  > :nth-child(3)
+  > button {
+    box-sizing: border-box !important;
+
+    display: grid !important;
+
+    width: 44px !important;
+    min-width: 44px !important;
+    max-width: 44px !important;
+
+    height: 44px !important;
+    min-height: 44px !important;
+    max-height: 44px !important;
+
+    place-items: center !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
+
+    overflow: visible !important;
+  }
+}
+
+/* CAMPAIGN SEAT CANONICAL TABLET DESKTOP HEADER — END */
+
+/* CAMPAIGN SEAT INTERMEDIATE HEADER COMPACT AI — START */
+
+/*
+ * The canonical intermediate header remains two rows:
+ *
+ * row 1 = menu + workspace identity
+ * row 2 = date/time + AI icon + notifications
+ *
+ * This prevents the AI control from becoming a wide empty button
+ * between 900px and 1099px.
+ */
+
+@media
+  (min-width: 900px)
+  and
+  (max-width: 1099px) {
+
+  [data-shared-workspace-topbar="true"]
+  > .topbarActions {
+    box-sizing: border-box !important;
+
+    display: grid !important;
+
+    width:
+      min(
+        100%,
+        650px
+      ) !important;
+
+    min-width: 0 !important;
+    max-width: 650px !important;
+
+    grid-template-columns:
+      minmax(0, 1fr)
+      44px
+      44px !important;
+
+    align-items: center !important;
+    justify-content: center !important;
+
+    gap: 8px !important;
+
+    justify-self: center !important;
+
+    margin:
+      0
+      auto !important;
+
+    padding: 0 !important;
+
+    overflow: visible !important;
+  }
+
+  [data-shared-workspace-topbar="true"]
+  > .topbarActions
+  > .dateTime {
+    box-sizing: border-box !important;
+
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: none !important;
+
+    grid-column: 1 !important;
+    grid-row: 1 !important;
+
+    justify-self: stretch !important;
+
+    margin: 0 !important;
+  }
+
+  /*
+   * Ask Campaign HQ becomes a proper compact icon button.
+   */
+  [data-shared-workspace-topbar="true"]
+  > .topbarActions
+  > :nth-child(2) {
+    box-sizing: border-box !important;
+
+    width: 44px !important;
+    min-width: 44px !important;
+    max-width: 44px !important;
+
+    height: 44px !important;
+    min-height: 44px !important;
+    max-height: 44px !important;
+
+    grid-column: 2 !important;
+    grid-row: 1 !important;
+
+    justify-self: center !important;
+
+    margin: 0 !important;
+
+    overflow: hidden !important;
+  }
+
+  [data-shared-workspace-topbar="true"]
+  > .topbarActions
+  > :nth-child(2)
+  > button {
+    box-sizing: border-box !important;
+
+    display: grid !important;
+
+    width: 44px !important;
+    min-width: 44px !important;
+    max-width: 44px !important;
+
+    height: 44px !important;
+    min-height: 44px !important;
+    max-height: 44px !important;
+
+    place-items: center !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
+
+    overflow: hidden !important;
+
+    font-size: 0 !important;
+  }
+
+  [data-shared-workspace-topbar="true"]
+  > .topbarActions
+  > :nth-child(2)
+  > button
+  svg {
+    display: block !important;
+
+    width: 19px !important;
+    height: 19px !important;
+
+    margin: 0 !important;
+
+    font-size: initial !important;
+  }
+
+  /*
+   * Hide the keyboard shortcut and text inside the compact button.
+   */
+  [data-shared-workspace-topbar="true"]
+  > .topbarActions
+  > :nth-child(2)
+  > button
+  kbd,
+  [data-shared-workspace-topbar="true"]
+  > .topbarActions
+  > :nth-child(2)
+  > button
+  span {
+    display: none !important;
+  }
+
+  /*
+   * Notification remains attached to the AI icon.
+   */
+  [data-shared-workspace-topbar="true"]
+  > .topbarActions
+  > :nth-child(3) {
+    box-sizing: border-box !important;
+
+    width: 44px !important;
+    min-width: 44px !important;
+    max-width: 44px !important;
+
+    height: 44px !important;
+    min-height: 44px !important;
+    max-height: 44px !important;
+
+    grid-column: 3 !important;
+    grid-row: 1 !important;
+
+    justify-self: center !important;
+
+    margin: 0 !important;
+
+    overflow: visible !important;
+  }
+
+  [data-shared-workspace-topbar="true"]
+  > .topbarActions
+  > :nth-child(3)
+  > button {
+    box-sizing: border-box !important;
+
+    display: grid !important;
+
+    width: 44px !important;
+    min-width: 44px !important;
+    max-width: 44px !important;
+
+    height: 44px !important;
+    min-height: 44px !important;
+    max-height: 44px !important;
+
+    place-items: center !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
+
+    overflow: visible !important;
+  }
+}
+
+/* CAMPAIGN SEAT INTERMEDIATE HEADER COMPACT AI — END */

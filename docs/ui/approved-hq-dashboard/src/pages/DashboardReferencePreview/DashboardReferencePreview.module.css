@@ -9865,3 +9865,7886 @@
 }
 
 /* LIVE SCHEDULE LOCATION AND TIME — END */
+
+
+/* DASHBOARD CAMPAIGN TOOLS COMING SOON — START */
+
+.sidebarNavigation
+  > button.comingSoonNavigation {
+  cursor: not-allowed;
+  opacity: 0.72;
+}
+
+.sidebarNavigation
+  > button.comingSoonNavigation:hover,
+.sidebarNavigation
+  > button.comingSoonNavigation:focus-visible {
+  color: rgba(255, 255, 255, 0.82);
+  background: rgba(255, 255, 255, 0.07);
+  transform: none;
+}
+
+.comingSoonHint {
+  margin-left: auto;
+  padding: 3px 6px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 999px;
+  color: rgba(255, 255, 255, 0.86);
+  background: rgba(37, 0, 6, 0.28);
+  opacity: 0;
+  font-size: 0.46rem;
+  font-style: normal;
+  font-weight: 820;
+  line-height: 1;
+  white-space: nowrap;
+  transform: translateX(4px);
+  transition:
+    opacity 0.16s ease,
+    transform 0.16s ease;
+}
+
+.comingSoonNavigation:hover
+  .comingSoonHint,
+.comingSoonNavigation:focus-visible
+  .comingSoonHint {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+/* DASHBOARD CAMPAIGN TOOLS COMING SOON — END */
+
+
+/* HQ ALIGNED COMPACT HEADER V8 — START */
+
+/*
+ * Desktop:
+ *
+ * [ compact greeting ]   [ deadline ][ date/time ][ Campaign HQ ][ bell ]
+ *
+ * The controls use intentional fixed sizes instead of stretching
+ * across the complete dashboard width.
+ */
+
+@media (min-width: 1081px) {
+  .app .topbar {
+    box-sizing: border-box !important;
+
+    display: grid !important;
+    grid-template-columns:
+      minmax(250px, 1fr)
+      auto !important;
+
+    grid-template-rows:
+      minmax(0, 1fr) !important;
+
+    width: 100% !important;
+    min-width: 0 !important;
+
+    height: auto !important;
+    min-height: 72px !important;
+    max-height: none !important;
+
+    align-items: center !important;
+    gap: 20px !important;
+
+    padding:
+      8px
+      24px
+      8px
+      22px !important;
+
+    overflow: visible !important;
+  }
+
+  .app .menuButton {
+    display: none !important;
+  }
+
+  .app .greeting {
+    display: grid !important;
+
+    grid-column: 1 !important;
+    grid-row: 1 !important;
+
+    min-width: 0 !important;
+    max-width: 390px !important;
+
+    align-content: center !important;
+    align-self: center !important;
+    gap: 5px !important;
+
+    overflow: hidden !important;
+
+    transform: translateY(2px) !important;
+  }
+
+  .app .greeting h1 {
+    margin: 0 !important;
+
+    overflow: hidden !important;
+
+    color: #102844 !important;
+
+    font-size:
+      clamp(
+        1.4rem,
+        1.6vw,
+        1.78rem
+      ) !important;
+
+    font-weight: 850 !important;
+    line-height: 1.02 !important;
+    letter-spacing: -0.042em !important;
+
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+  }
+
+  .app .greeting h1 span {
+    display: inline !important;
+
+    margin-left: 0.1em !important;
+
+    color: #ed2638 !important;
+
+    white-space: nowrap !important;
+  }
+
+  .app .greeting p {
+    margin: 0 !important;
+
+    overflow: hidden !important;
+
+    color: #617b91 !important;
+
+    font-size: 0.7rem !important;
+    font-weight: 500 !important;
+    line-height: 1.2 !important;
+
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+  }
+
+  .app .topbarActions {
+    box-sizing: border-box !important;
+
+    display: grid !important;
+
+    grid-column: 2 !important;
+    grid-row: 1 !important;
+
+    grid-template-columns:
+      184px
+      244px
+      184px
+      46px
+      46px !important;
+
+    width: auto !important;
+    min-width: 0 !important;
+    max-width: none !important;
+
+    align-items: center !important;
+    align-self: center !important;
+    justify-content: end !important;
+    justify-self: end !important;
+
+    gap: 8px !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
+
+    overflow: visible !important;
+  }
+
+  .app .headerDeadline {
+    box-sizing: border-box !important;
+
+    display: grid !important;
+    grid-template-columns:
+      34px
+      minmax(0, 1fr) !important;
+
+    width: 184px !important;
+    min-width: 184px !important;
+    max-width: 184px !important;
+
+    height: 46px !important;
+    min-height: 46px !important;
+    max-height: 46px !important;
+
+    align-items: center !important;
+    gap: 8px !important;
+
+    padding:
+      0
+      10px !important;
+
+    overflow: hidden !important;
+
+    border-radius: 11px !important;
+  }
+
+  .app .headerDeadlineIcon {
+    display: grid !important;
+
+    width: 34px !important;
+    height: 34px !important;
+
+    place-items: center !important;
+
+    border-radius: 9px !important;
+  }
+
+  .app .headerDeadlineIcon svg {
+    width: 17px !important;
+    height: 17px !important;
+  }
+
+  .app .headerDeadlineCopy {
+    display: grid !important;
+
+    min-width: 0 !important;
+
+    gap: 2px !important;
+  }
+
+  .app .headerDeadlineCopy small {
+    overflow: hidden !important;
+
+    font-size: 0.55rem !important;
+    line-height: 1 !important;
+
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+  }
+
+  .app .headerDeadlineCopy strong {
+    margin: 0 !important;
+
+    overflow: hidden !important;
+
+    font-size: 0.7rem !important;
+    line-height: 1.08 !important;
+
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+  }
+
+  .app .headerDeadlineCopy > span {
+    display: none !important;
+  }
+
+  .app .headerDateTimeButton {
+    box-sizing: border-box !important;
+
+    display: grid !important;
+    grid-template-columns:
+      17px
+      minmax(0, 1fr)
+      1px
+      17px
+      max-content !important;
+
+    width: 244px !important;
+    min-width: 244px !important;
+    max-width: 244px !important;
+
+    height: 46px !important;
+    min-height: 46px !important;
+    max-height: 46px !important;
+
+    align-items: center !important;
+    gap: 7px !important;
+
+    padding:
+      0
+      10px !important;
+
+    overflow: hidden !important;
+
+    border-radius: 11px !important;
+
+    transform: none !important;
+  }
+
+  .app .headerDateTimeButton:hover {
+    transform: translateY(-1px) !important;
+  }
+
+  .app .headerDateTimeButton > svg {
+    width: 17px !important;
+    height: 17px !important;
+  }
+
+  .app .headerDateValue {
+    display: block !important;
+
+    min-width: 0 !important;
+
+    overflow: hidden !important;
+
+    color: #5e7188 !important;
+
+    font-size: 0.65rem !important;
+    font-weight: 800 !important;
+    line-height: 1 !important;
+
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+  }
+
+  .app .headerDateTimeDivider {
+    display: block !important;
+
+    width: 1px !important;
+    height: 20px !important;
+
+    background: #d8e1ea !important;
+  }
+
+  .app .headerTimeValue {
+    display: block !important;
+
+    color: #173b60 !important;
+
+    font-size: 0.65rem !important;
+    font-weight: 820 !important;
+    line-height: 1 !important;
+
+    text-align: right !important;
+    white-space: nowrap !important;
+  }
+
+  .app .headerCampaignSearch,
+  .app .headerCampaignSearch > *,
+  .app .headerCampaignSearch button {
+    box-sizing: border-box !important;
+
+    width: 184px !important;
+    min-width: 184px !important;
+    max-width: 184px !important;
+
+    height: 46px !important;
+    min-height: 46px !important;
+    max-height: 46px !important;
+  }
+
+  .app .headerCampaignSearch button {
+    padding:
+      0
+      10px !important;
+
+    overflow: hidden !important;
+
+    border-radius: 11px !important;
+
+    font-size: 0.69rem !important;
+
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+  }
+
+  .app .headerNotifications,
+  .app .headerNotifications > *,
+  .app .headerNotifications button {
+    box-sizing: border-box !important;
+
+    width: 46px !important;
+    min-width: 46px !important;
+    max-width: 46px !important;
+
+    height: 46px !important;
+    min-height: 46px !important;
+    max-height: 46px !important;
+  }
+
+  .app .headerNotifications {
+    display: grid !important;
+
+    place-items: center !important;
+    justify-self: end !important;
+
+    overflow: visible !important;
+  }
+
+  .app .headerNotifications button {
+    border-radius: 11px !important;
+
+    overflow: visible !important;
+  }
+
+  .app .headerNotifications button svg {
+    width: 19px !important;
+    height: 19px !important;
+  }
+}
+
+/*
+ * Smaller screens may place the command group below the greeting.
+ */
+
+@media (min-width: 681px) and (max-width: 1080px) {
+  .app .topbar {
+    box-sizing: border-box !important;
+
+    display: grid !important;
+    grid-template-columns:
+      auto
+      minmax(0, 1fr) !important;
+
+    min-height: auto !important;
+
+    gap: 10px !important;
+
+    padding:
+      12px
+      16px !important;
+  }
+
+  .app .topbarActions {
+    display: grid !important;
+
+    grid-column: 1 / -1 !important;
+    grid-template-columns:
+      minmax(155px, 0.9fr)
+      minmax(210px, 1.2fr)
+      minmax(155px, 0.9fr)
+      46px
+      46px !important;
+
+    width: 100% !important;
+    min-width: 0 !important;
+
+    gap: 8px !important;
+
+    overflow: visible !important;
+  }
+
+  .app .headerDeadline,
+  .app .headerDateTimeButton,
+  .app .headerCampaignSearch {
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: none !important;
+  }
+
+  .app .headerNotifications,
+  .app .headerNotifications > *,
+  .app .headerNotifications button {
+    width: 46px !important;
+    min-width: 46px !important;
+    max-width: 46px !important;
+  }
+}
+
+
+/*
+ * The support launcher is a real top-bar child immediately
+ * before the ActivityCenter notification control.
+ */
+
+@media (min-width: 681px) {
+  .app .headerSupport {
+    box-sizing: border-box !important;
+
+    display: grid !important;
+
+    width: 46px !important;
+    min-width: 46px !important;
+    max-width: 46px !important;
+
+    height: 46px !important;
+    min-height: 46px !important;
+    max-height: 46px !important;
+
+    place-items: center !important;
+    justify-self: end !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
+
+    overflow: visible !important;
+  }
+
+  .app .headerSupport > * {
+    width: 46px !important;
+    min-width: 46px !important;
+    max-width: 46px !important;
+
+    height: 46px !important;
+    min-height: 46px !important;
+    max-height: 46px !important;
+  }
+}
+
+@media (max-width: 680px) {
+  .app .headerSupport {
+    display: grid !important;
+
+    width: 46px !important;
+    height: 46px !important;
+
+    justify-self: end !important;
+    place-items: center !important;
+  }
+}
+/* HQ ALIGNED COMPACT HEADER V8 — END */
+
+/* NATIVE TOPBAR SUPPORT BUTTON V1 — START */
+
+.app .headerSupportButton {
+  box-sizing: border-box !important;
+
+  display: grid !important;
+
+  width: 46px !important;
+  min-width: 46px !important;
+  max-width: 46px !important;
+
+  height: 46px !important;
+  min-height: 46px !important;
+  max-height: 46px !important;
+
+  place-items: center !important;
+
+  margin: 0 !important;
+  padding: 0 !important;
+
+  border:
+    1px
+    solid
+    rgba(255, 255, 255, 0.2) !important;
+
+  border-radius: 11px !important;
+
+  color: #ffffff !important;
+
+  background:
+    linear-gradient(
+      145deg,
+      #215d96 0%,
+      #0c2f55 100%
+    ) !important;
+
+  box-shadow:
+    0 6px 16px rgba(9, 44, 79, 0.2),
+    inset 0 1px rgba(255, 255, 255, 0.15) !important;
+
+  cursor: pointer !important;
+
+  transition:
+    transform 150ms ease,
+    box-shadow 150ms ease !important;
+}
+
+.app .headerSupportButton:hover {
+  transform: translateY(-1px) !important;
+
+  box-shadow:
+    0 8px 20px rgba(9, 44, 79, 0.26),
+    inset 0 1px rgba(255, 255, 255, 0.18) !important;
+}
+
+.app .headerSupportButton:focus-visible {
+  outline:
+    3px
+    solid
+    rgba(56, 132, 205, 0.35) !important;
+
+  outline-offset: 2px !important;
+}
+
+.app .headerSupportButton svg {
+  width: 19px !important;
+  height: 19px !important;
+
+  color: #ffffff !important;
+}
+
+/* NATIVE TOPBAR SUPPORT BUTTON V1 — END */
+
+
+
+/* CAMPAIGN SEAT TRUE RESPONSIVE DASHBOARD — START */
+
+/*
+ * Responsive foundation:
+ * no dashboard grid, card or section may force horizontal overflow.
+ */
+.app,
+.workspace,
+.main,
+.heroGrid,
+.middleGrid,
+.bottomGrid,
+.heroCard,
+.scheduleCard,
+.compactCard,
+.lowerCard {
+  box-sizing: border-box;
+  min-width: 0;
+  max-width: 100%;
+}
+
+.main {
+  width: 100%;
+  overflow-x: hidden;
+}
+
+.heroGrid,
+.middleGrid,
+.bottomGrid {
+  width: 100%;
+}
+
+.heroCard,
+.scheduleCard,
+.compactCard,
+.lowerCard {
+  width: 100%;
+}
+
+/*
+ * Smaller desktop and landscape tablet.
+ */
+@media (max-width: 1280px) {
+  .heroGrid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .heroCard,
+  .scheduleCard {
+    height: auto;
+    min-height: 300px;
+  }
+
+  .middleGrid {
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+  }
+
+  .bottomGrid {
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+  }
+
+  .compactCard,
+  .lowerCard {
+    height: auto;
+  }
+}
+
+/*
+ * Tablets, including 1024px landscape widths.
+ * The sidebar becomes the existing slide-out drawer at this point,
+ * leaving the content area a usable size.
+ */
+@media (max-width: 1024px) {
+  .sidebar {
+    position: fixed;
+    z-index: 60;
+    inset: 0 auto 0 0;
+
+    width: min(290px, 86vw);
+    height: 100dvh;
+    flex-basis: auto;
+
+    transform: translateX(-102%);
+    transition: transform 220ms ease;
+  }
+
+  .sidebarOpen {
+    transform: translateX(0);
+  }
+
+  .closeSidebar,
+  .menuButton {
+    display: grid;
+  }
+
+  .sidebarScrim {
+    position: fixed;
+    z-index: 55;
+    inset: 0;
+
+    display: block;
+    background: rgba(7, 22, 39, 0.46);
+    backdrop-filter: blur(2px);
+  }
+
+  .workspace {
+    width: 100%;
+  }
+
+  .topbar {
+    min-height: auto;
+    grid-template-columns:
+      auto minmax(0, 1fr);
+    align-items: center;
+    gap: 10px;
+    padding: 12px 14px;
+  }
+
+  .greeting {
+    min-width: 0;
+  }
+
+  .topbarActions {
+    grid-column: 1 / -1;
+
+    width: 100%;
+    max-width: 100%;
+
+    justify-content: flex-start;
+    flex-wrap: nowrap;
+
+    overflow-x: auto;
+    overflow-y: hidden;
+
+    padding: 2px 1px 5px;
+
+    overscroll-behavior-x: contain;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .topbarActions::-webkit-scrollbar {
+    display: none;
+  }
+
+  .topbarActions > * {
+    flex: 0 0 auto;
+  }
+
+  .main {
+    padding: 12px;
+  }
+
+  .heroCard {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .heroPortraitWrap {
+    min-height: 260px;
+  }
+
+  .middleGrid,
+  .bottomGrid {
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+  }
+}
+
+/*
+ * Portrait tablets and larger phones.
+ */
+@media (max-width: 760px) {
+  .topbar {
+    gap: 8px;
+    padding: 11px;
+  }
+
+  .greeting h1 {
+    font-size: clamp(1.18rem, 5vw, 1.48rem);
+  }
+
+  .greeting p {
+    margin-top: 4px;
+    font-size: 0.72rem;
+  }
+
+  .main {
+    padding: 10px;
+  }
+
+  .heroGrid,
+  .middleGrid,
+  .bottomGrid {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 10px;
+  }
+
+  .heroCopy {
+    padding: 18px;
+  }
+
+  .heroCopy h2 {
+    font-size: clamp(1.65rem, 8vw, 2.25rem);
+  }
+
+  .heroStats {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 13px;
+  }
+
+  .heroActions {
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+  }
+
+  .heroActions button {
+    min-height: 44px;
+  }
+
+  .heroPortraitWrap {
+    min-height: 235px;
+  }
+
+  .scheduleCard,
+  .compactCard,
+  .lowerCard {
+    padding: 14px;
+  }
+
+  .cardHeading {
+    align-items: flex-start;
+  }
+
+  .cardHeading > span {
+    min-width: 0;
+  }
+
+  .scheduleTimeline > button {
+    min-width: 0;
+    min-height: 58px;
+  }
+
+  .tipBar {
+    grid-template-columns:
+      auto minmax(0, 1fr);
+  }
+
+  .tipBar button {
+    grid-column: 1 / -1;
+    justify-self: flex-start;
+  }
+
+  .footer {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}
+
+/*
+ * Phones.
+ */
+@media (max-width: 520px) {
+  .topbar {
+    position: sticky;
+    z-index: 35;
+    top: 0;
+
+    grid-template-columns:
+      auto minmax(0, 1fr);
+
+    padding:
+      max(9px, env(safe-area-inset-top))
+      9px
+      9px;
+  }
+
+  .menuButton {
+    width: 44px;
+    height: 44px;
+  }
+
+  .greeting h1 {
+    font-size: 1.16rem;
+    line-height: 1.08;
+  }
+
+  .greeting p {
+    display: none;
+  }
+
+  .topbarActions {
+    gap: 6px;
+    scroll-snap-type: x proximity;
+  }
+
+  .topbarActions > * {
+    scroll-snap-align: start;
+  }
+
+  .main {
+    padding:
+      8px
+      max(8px, env(safe-area-inset-right))
+      max(14px, env(safe-area-inset-bottom))
+      max(8px, env(safe-area-inset-left));
+  }
+
+  .heroCard,
+  .scheduleCard,
+  .compactCard,
+  .lowerCard {
+    border-radius: 14px;
+  }
+
+  .heroCopy {
+    padding: 16px;
+  }
+
+  .heroCopy > p {
+    font-size: 0.76rem;
+  }
+
+  .heroActions {
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+    gap: 7px;
+  }
+
+  .heroActions button {
+    min-height: 46px;
+    padding: 7px;
+  }
+
+  .heroPortraitWrap {
+    min-height: 205px;
+  }
+
+  .scheduleTimeline {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .scheduleTimeline::before {
+    left: 58px;
+  }
+
+  .scheduleTimeline > button {
+    grid-template-columns:
+      47px
+      13px
+      minmax(0, 1fr);
+
+    gap: 6px;
+    min-height: 66px;
+    padding: 8px 4px;
+  }
+
+  .attendeeStack,
+  .phoneAction {
+    display: none;
+  }
+
+  .scheduleTimeline strong,
+  .scheduleTimeline small {
+    overflow-wrap: anywhere;
+    white-space: normal;
+  }
+
+  .activityList > div {
+    grid-template-columns:
+      auto minmax(0, 1fr);
+  }
+
+  .activityList time {
+    grid-column: 2;
+  }
+
+  .footer {
+    gap: 7px;
+    font-size: 0.62rem;
+  }
+}
+
+/* CAMPAIGN SEAT TRUE RESPONSIVE DASHBOARD — END */
+
+/* CAMPAIGN SEAT SIMPLE SUPPORT LABEL — START */
+
+/*
+ * The Support icon always occupies exactly one 48px slot.
+ * Nothing in the header moves or changes width.
+ */
+[data-native-support-slot="true"] {
+  position: relative !important;
+  z-index: 30 !important;
+  isolation: isolate !important;
+
+  box-sizing: border-box !important;
+  display: block !important;
+
+  width: 48px !important;
+  min-width: 48px !important;
+  max-width: 48px !important;
+  height: 48px !important;
+  min-height: 48px !important;
+  max-height: 48px !important;
+  flex: 0 0 48px !important;
+
+  margin: 0 !important;
+  padding: 0 !important;
+
+  overflow: visible !important;
+}
+
+/*
+ * The word Support is a separate attached surface.
+ * It appears behind and to the left of the stationary icon.
+ */
+[data-native-support-slot="true"]::before {
+  position: absolute !important;
+  z-index: 1 !important;
+
+  top: 0 !important;
+  right: 39px !important;
+
+  box-sizing: border-box !important;
+  display: flex !important;
+
+  width: 86px !important;
+  height: 48px !important;
+
+  align-items: center !important;
+  justify-content: flex-start !important;
+
+  padding: 0 16px !important;
+
+  border:
+    1px solid
+    rgba(255, 255, 255, 0.18) !important;
+
+  border-right: 0 !important;
+
+  border-radius:
+    999px
+    0
+    0
+    999px !important;
+
+  color: #ffffff !important;
+
+  background:
+    linear-gradient(
+      135deg,
+      #174f83,
+      #0b3158
+    ) !important;
+
+  box-shadow:
+    0 12px 26px
+    rgba(7, 42, 78, 0.2) !important;
+
+  content: "Support" !important;
+
+  font-family: inherit !important;
+  font-size: 0.79rem !important;
+  font-weight: 820 !important;
+  line-height: 1 !important;
+  letter-spacing: 0.01em !important;
+  white-space: nowrap !important;
+
+  opacity: 0 !important;
+  pointer-events: none !important;
+
+  transform:
+    translateX(10px)
+    scaleX(0.88) !important;
+
+  transform-origin:
+    right center !important;
+
+  transition:
+    opacity 120ms ease,
+    transform 170ms ease !important;
+}
+
+/*
+ * The real Support control remains a normal icon button.
+ */
+[data-native-support-button="true"] {
+  position: absolute !important;
+  z-index: 2 !important;
+
+  inset:
+    0
+    0
+    auto
+    auto !important;
+
+  box-sizing: border-box !important;
+  display: grid !important;
+
+  width: 48px !important;
+  min-width: 48px !important;
+  max-width: 48px !important;
+  height: 48px !important;
+  min-height: 48px !important;
+  max-height: 48px !important;
+
+  place-items: center !important;
+
+  gap: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+
+  overflow: hidden !important;
+
+  border-radius: 16px !important;
+
+  transform: none !important;
+
+  transition:
+    border-radius 160ms ease,
+    box-shadow 160ms ease !important;
+}
+
+[data-native-support-button="true"] > svg {
+  position: static !important;
+
+  width: 21px !important;
+  height: 21px !important;
+
+  flex: none !important;
+  margin: 0 !important;
+  transform: none !important;
+}
+
+/*
+ * Remove the old inserted text from inside the icon button.
+ */
+[data-native-support-label="true"] {
+  display: none !important;
+}
+
+/*
+ * Desktop mouse and trackpad behavior only.
+ */
+@media
+  (min-width: 1025px)
+  and (hover: hover)
+  and (pointer: fine) {
+
+  [data-native-support-slot="true"]:hover::before,
+  [data-native-support-slot="true"]:focus-within::before {
+    opacity: 1 !important;
+    transform:
+      translateX(0)
+      scaleX(1) !important;
+  }
+
+  [data-native-support-slot="true"]:hover
+    [data-native-support-button="true"],
+  [data-native-support-slot="true"]:focus-within
+    [data-native-support-button="true"] {
+    border-radius:
+      0
+      16px
+      16px
+      0 !important;
+
+    box-shadow:
+      0 12px 26px
+      rgba(7, 42, 78, 0.2),
+      inset
+      0
+      1px
+      0
+      rgba(255, 255, 255, 0.15) !important;
+  }
+}
+
+[data-native-support-button="true"]:focus-visible {
+  outline:
+    3px solid
+    rgba(72, 145, 214, 0.5) !important;
+
+  outline-offset: 3px !important;
+}
+
+/*
+ * Phones and tablets stay icon-only and touch-friendly.
+ */
+@media (max-width: 1024px),
+  (hover: none),
+  (pointer: coarse) {
+
+  [data-native-support-slot="true"]::before {
+    display: none !important;
+  }
+
+  [data-native-support-button="true"] {
+    border-radius: 15px !important;
+  }
+}
+
+@media (max-width: 520px) {
+  [data-native-support-slot="true"] {
+    width: 44px !important;
+    min-width: 44px !important;
+    max-width: 44px !important;
+    height: 44px !important;
+    min-height: 44px !important;
+    max-height: 44px !important;
+    flex-basis: 44px !important;
+  }
+
+  [data-native-support-button="true"] {
+    width: 44px !important;
+    min-width: 44px !important;
+    max-width: 44px !important;
+    height: 44px !important;
+    min-height: 44px !important;
+    max-height: 44px !important;
+    border-radius: 14px !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-native-support-slot="true"]::before,
+  [data-native-support-button="true"] {
+    transition: none !important;
+  }
+}
+
+/* CAMPAIGN SEAT SIMPLE SUPPORT LABEL — END */
+
+/* CAMPAIGN SEAT SUPPORT ALIGNMENT PATCH — START */
+
+/*
+ * Final visual alignment:
+ * - both pieces are exactly 48px tall
+ * - the label ends at the icon edge
+ * - there is no rectangular overlap underneath
+ * - both pieces share one identical navy surface
+ */
+[data-native-support-slot="true"] {
+  --campaign-support-surface:
+    linear-gradient(
+      135deg,
+      #174f83 0%,
+      #0b3158 100%
+    );
+
+  position: relative !important;
+  width: 48px !important;
+  min-width: 48px !important;
+  max-width: 48px !important;
+  height: 48px !important;
+  min-height: 48px !important;
+  max-height: 48px !important;
+
+  overflow: visible !important;
+
+  filter: none;
+  transition: filter 160ms ease !important;
+}
+
+[data-native-support-slot="true"]::before {
+  top: 50% !important;
+
+  /*
+   * The icon is 48px wide.
+   * A one-pixel overlap prevents a visible hairline seam without
+   * allowing the label to protrude beneath the icon.
+   */
+  right: 47px !important;
+
+  width: 90px !important;
+  height: 48px !important;
+  min-height: 48px !important;
+  max-height: 48px !important;
+
+  align-items: center !important;
+  justify-content: center !important;
+
+  padding: 0 14px !important;
+
+  border:
+    1px solid
+    rgba(255, 255, 255, 0.18) !important;
+
+  border-right: 0 !important;
+
+  border-radius:
+    16px
+    0
+    0
+    16px !important;
+
+  background:
+    var(--campaign-support-surface) !important;
+
+  box-shadow: none !important;
+
+  line-height: 1 !important;
+
+  transform:
+    translate(10px, -50%)
+    scaleX(0.9) !important;
+
+  transform-origin:
+    right center !important;
+}
+
+[data-native-support-button="true"] {
+  top: 50% !important;
+  right: 0 !important;
+  bottom: auto !important;
+  left: auto !important;
+
+  width: 48px !important;
+  min-width: 48px !important;
+  max-width: 48px !important;
+  height: 48px !important;
+  min-height: 48px !important;
+  max-height: 48px !important;
+
+  margin: 0 !important;
+  padding: 0 !important;
+
+  border:
+    1px solid
+    rgba(255, 255, 255, 0.18) !important;
+
+  border-radius: 16px !important;
+
+  background:
+    var(--campaign-support-surface) !important;
+
+  box-shadow: none !important;
+
+  transform:
+    translateY(-50%) !important;
+}
+
+[data-native-support-button="true"] > svg {
+  width: 21px !important;
+  height: 21px !important;
+
+  margin: 0 !important;
+
+  transform: none !important;
+}
+
+/*
+ * Desktop hover:
+ * form one clean horizontal control.
+ */
+@media
+  (min-width: 1025px)
+  and (hover: hover)
+  and (pointer: fine) {
+
+  [data-native-support-slot="true"]:hover,
+  [data-native-support-slot="true"]:focus-within {
+    filter:
+      drop-shadow(
+        0
+        10px
+        15px
+        rgba(7, 42, 78, 0.2)
+      );
+  }
+
+  [data-native-support-slot="true"]:hover::before,
+  [data-native-support-slot="true"]:focus-within::before {
+    opacity: 1 !important;
+
+    transform:
+      translate(0, -50%)
+      scaleX(1) !important;
+  }
+
+  [data-native-support-slot="true"]:hover
+    [data-native-support-button="true"],
+  [data-native-support-slot="true"]:focus-within
+    [data-native-support-button="true"] {
+
+    border-left: 0 !important;
+
+    border-radius:
+      0
+      16px
+      16px
+      0 !important;
+
+    box-shadow: none !important;
+
+    transform:
+      translateY(-50%) !important;
+  }
+}
+
+/*
+ * Touch layouts remain icon-only.
+ */
+@media (max-width: 1024px),
+  (hover: none),
+  (pointer: coarse) {
+
+  [data-native-support-slot="true"] {
+    filter: none !important;
+  }
+
+  [data-native-support-button="true"] {
+    border-left:
+      1px solid
+      rgba(255, 255, 255, 0.18) !important;
+
+    border-radius: 15px !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-native-support-slot="true"],
+  [data-native-support-slot="true"]::before,
+  [data-native-support-button="true"] {
+    transition: none !important;
+  }
+}
+
+/* CAMPAIGN SEAT SUPPORT ALIGNMENT PATCH — END */
+
+/* CAMPAIGN SEAT CANDIDATE-FOCUSED BOXES — START */
+
+.app {
+  height: 100vh !important;
+  height: 100dvh !important;
+  min-height: 0 !important;
+  overflow: hidden !important;
+}
+
+.workspace {
+  display: flex !important;
+  height: 100vh !important;
+  height: 100dvh !important;
+  min-height: 0 !important;
+  flex: 1 1 auto !important;
+  flex-direction: column !important;
+  overflow: hidden !important;
+}
+
+.topbar {
+  flex: 0 0 auto !important;
+}
+
+.main {
+  width: 100% !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+  flex: 1 1 auto !important;
+
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+
+  overscroll-behavior-y: auto !important;
+  scrollbar-gutter: stable;
+
+  -webkit-overflow-scrolling: touch;
+}
+
+.decisionGrid {
+  display: grid !important;
+
+  width: 100% !important;
+  min-width: 0 !important;
+
+  grid-template-columns:
+    repeat(3, minmax(0, 1fr)) !important;
+
+  grid-template-rows:
+    repeat(2, 208px) !important;
+
+  align-items: stretch !important;
+  gap: 10px !important;
+
+  margin-top: 10px !important;
+}
+
+.decisionGrid > article {
+  box-sizing: border-box !important;
+  display: flex !important;
+
+  width: 100% !important;
+  min-width: 0 !important;
+
+  height: 100% !important;
+  min-height: 0 !important;
+  max-height: none !important;
+
+  flex-direction: column !important;
+
+  overflow: hidden !important;
+
+  padding: 14px !important;
+}
+
+.decisionGrid .cardHeading {
+  min-height: 23px !important;
+  flex: 0 0 auto !important;
+}
+
+.decisionGrid .cardHeading > span {
+  min-width: 0;
+  font-size: 0.74rem !important;
+}
+
+.decisionGrid .cardHeading button,
+.decisionGrid .cardHeading > small {
+  flex: 0 0 auto;
+  font-size: 0.61rem !important;
+}
+
+.candidateMessageMetric,
+.candidateDecisionMetric,
+.candidateContactSummary,
+.candidateCommitmentSummary {
+  display: flex;
+  min-height: 43px;
+  flex: 0 0 auto;
+  align-items: flex-end;
+  gap: 7px;
+  margin-top: 8px;
+  margin-bottom: 5px;
+}
+
+.candidateMessageMetric strong,
+.candidateDecisionMetric strong,
+.candidateContactSummary strong,
+.candidateCommitmentSummary strong {
+  color: #173b60;
+  font-size: 1.48rem;
+  line-height: 1;
+}
+
+.candidateMessageMetric span,
+.candidateDecisionMetric span,
+.candidateContactSummary span,
+.candidateCommitmentSummary span {
+  padding-bottom: 2px;
+  color: #71869a;
+  font-size: 0.6rem;
+}
+
+.candidateMessagePeople {
+  display: flex;
+  align-items: center;
+  margin-top: 7px;
+}
+
+.candidateMessagePeople
+  .unreadPhotoAvatar,
+.candidateMessagePeople
+  .unreadInitialAvatar {
+  width: 34px !important;
+  height: 34px !important;
+}
+
+.candidateMessageSummary {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin-top: 10px;
+  color: #71869a;
+  font-size: 0.6rem;
+}
+
+.candidateMessageSummary strong {
+  color: #244665;
+}
+
+.candidateMessageSummary i {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #ef3340;
+  box-shadow:
+    0 0 0 4px
+    rgba(239, 51, 64, 0.09);
+}
+
+.candidateCardList,
+.candidateTeamList,
+.candidateRiskList {
+  display: grid;
+  min-width: 0;
+  min-height: 0;
+  align-content: start;
+  flex: 1 1 auto;
+  overflow: hidden;
+}
+
+.candidateCardList > button,
+.candidateTeamList > button,
+.candidateRiskList > button {
+  box-sizing: border-box;
+  display: grid;
+
+  width: 100%;
+  min-width: 0;
+  min-height: 42px;
+
+  grid-template-columns:
+    auto minmax(0, 1fr) auto;
+
+  align-items: center;
+  gap: 8px;
+
+  padding: 5px 1px;
+
+  border: 0;
+  border-top: 1px solid #e6ecf2;
+
+  color: #244665;
+  background: transparent;
+
+  cursor: pointer;
+  text-align: left;
+}
+
+.candidateCardList > button:first-child,
+.candidateTeamList > button:first-child,
+.candidateRiskList > button:first-child {
+  border-top: 0;
+}
+
+.candidateCardList > button:hover,
+.candidateTeamList > button:hover,
+.candidateRiskList > button:hover {
+  background:
+    linear-gradient(
+      90deg,
+      rgba(36, 102, 159, 0.045),
+      transparent
+    );
+}
+
+.candidateListIcon,
+.candidateContactIcon,
+.candidateCommitmentIcon,
+.candidateOverdueIcon,
+.candidateRiskIcon {
+  display: grid;
+  width: 27px;
+  height: 27px;
+  place-items: center;
+  border-radius: 8px;
+}
+
+.candidateListIcon {
+  color: #286aa2;
+  background: #edf5fb;
+}
+
+.candidateContactIcon {
+  color: #16734c;
+  background: #eaf8f1;
+}
+
+.candidateCommitmentIcon {
+  color: #286aa2;
+  background: #edf5fb;
+}
+
+.candidateOverdueIcon {
+  color: #d52c39;
+  background: #fff0f1;
+}
+
+.candidateListCopy {
+  min-width: 0;
+}
+
+.candidateListCopy strong {
+  display: -webkit-box;
+
+  overflow: hidden;
+
+  color: #244665;
+
+  font-size: 0.61rem;
+  line-height: 1.25;
+
+  white-space: normal;
+
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.candidateListCopy small {
+  display: block;
+
+  margin-top: 2px;
+
+  overflow: hidden;
+
+  color: #71869a;
+
+  font-size: 0.51rem;
+
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.candidatePendingBadge,
+.candidateOpenBadge,
+.candidateOverdueBadge {
+  padding: 4px 7px;
+
+  border-radius: 999px;
+
+  font-size: 0.48rem;
+  font-style: normal;
+  font-weight: 850;
+  white-space: nowrap;
+}
+
+.candidatePendingBadge {
+  color: #7d6470;
+  background: #fff0f1;
+}
+
+.candidateOpenBadge {
+  color: #28679d;
+  background: #edf5fb;
+}
+
+.candidateOverdueBadge {
+  color: #c92734;
+  background: #fff0f1;
+}
+
+.candidateTeamDot {
+  width: 8px;
+  height: 8px;
+
+  border-radius: 50%;
+
+  background: #ef3340;
+
+  box-shadow:
+    0 0 0 4px
+    rgba(239, 51, 64, 0.09);
+}
+
+.candidateTeamList time {
+  color: #7f91a3;
+  font-size: 0.48rem;
+  white-space: nowrap;
+}
+
+.candidateCardFooter {
+  display: inline-flex;
+
+  min-height: 27px;
+
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+
+  margin-top: auto;
+  padding: 6px 1px 0;
+
+  border: 0;
+  border-top: 1px solid #e5ebf1;
+
+  color: #27669f;
+  background: transparent;
+
+  cursor: pointer;
+
+  font-size: 0.56rem;
+  font-weight: 850;
+  text-align: left;
+}
+
+.candidateCardFooter:hover {
+  color: #d52b38;
+}
+
+.candidateClearState {
+  display: flex;
+
+  min-height: 105px;
+
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+
+  color: #23815a;
+}
+
+.candidateClearState > span {
+  min-width: 0;
+}
+
+.candidateClearState strong,
+.candidateClearState small {
+  display: block;
+}
+
+.candidateClearState strong {
+  color: #244665;
+  font-size: 0.62rem;
+}
+
+.candidateClearState small {
+  max-width: 250px;
+  margin-top: 4px;
+  color: #71869a;
+  font-size: 0.52rem;
+  line-height: 1.4;
+}
+
+.candidateRiskCard {
+  border-top-color: #ef3340 !important;
+}
+
+.candidateRiskSummary {
+  display: grid;
+
+  min-height: 42px;
+
+  grid-template-columns:
+    auto minmax(0, 1fr) auto;
+
+  align-items: center;
+  gap: 7px;
+
+  flex: 0 0 auto;
+
+  margin-top: 7px;
+  margin-bottom: 4px;
+  padding-bottom: 7px;
+
+  border-bottom: 1px solid #e2e9f0;
+}
+
+.candidateRiskSummary > strong {
+  color: #173b60;
+  font-size: 1.35rem;
+  line-height: 1;
+}
+
+.candidateRiskSummary > span {
+  color: #71869a;
+  font-size: 0.59rem;
+}
+
+.candidateRiskSummary > small {
+  padding: 4px 7px;
+
+  border-radius: 999px;
+
+  font-size: 0.48rem;
+  font-weight: 850;
+  white-space: nowrap;
+}
+
+.candidateRiskAttention {
+  color: #c92734;
+  background: #fff0f1;
+}
+
+.candidateRiskClear {
+  color: #16734c;
+  background: #eaf8f1;
+}
+
+.candidateCriticalRisk
+  .candidateRiskIcon {
+  color: #d52c39;
+  background: #fff0f1;
+}
+
+.candidateWarningRisk
+  .candidateRiskIcon {
+  color: #a86d08;
+  background: #fff6df;
+}
+
+.candidateRiskList > button > svg {
+  color: #7990a5;
+}
+
+@media (max-width: 1180px) {
+  .decisionGrid {
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr)) !important;
+
+    grid-template-rows:
+      repeat(3, 210px) !important;
+  }
+}
+
+@media (max-width: 720px) {
+  .app {
+    height: auto !important;
+    min-height: 100dvh !important;
+    overflow: visible !important;
+  }
+
+  .workspace {
+    height: auto !important;
+    min-height: 0 !important;
+    overflow: visible !important;
+  }
+
+  .main {
+    overflow: visible !important;
+  }
+
+  .decisionGrid {
+    grid-template-columns:
+      minmax(0, 1fr) !important;
+
+    grid-template-rows: none !important;
+    grid-auto-rows: auto !important;
+  }
+
+  .decisionGrid > article {
+    height: auto !important;
+    min-height: 205px !important;
+  }
+
+  .candidateListCopy strong {
+    -webkit-line-clamp: 3;
+  }
+
+  .candidateListCopy small {
+    overflow: visible;
+    text-overflow: clip;
+    white-space: normal;
+  }
+}
+
+/* CAMPAIGN SEAT CANDIDATE-FOCUSED BOXES — END */
+
+/* CAMPAIGN SEAT FINAL SCROLL ARCHITECTURE — START */
+
+/* =========================================================
+   DESKTOP + TABLET
+   One scrollbar: the dashboard main area.
+   ========================================================= */
+
+:global(html),
+:global(body),
+:global(#root) {
+  width: 100% !important;
+  height: 100% !important;
+  min-height: 100% !important;
+}
+
+:global(html),
+:global(body) {
+  overflow: hidden !important;
+  overscroll-behavior: none !important;
+}
+
+.app {
+  box-sizing: border-box !important;
+
+  display: flex !important;
+
+  width: 100% !important;
+  height: 100vh !important;
+  height: 100dvh !important;
+  min-height: 0 !important;
+  max-height: 100dvh !important;
+
+  overflow: hidden !important;
+}
+
+.workspace {
+  box-sizing: border-box !important;
+
+  display: flex !important;
+
+  width: auto !important;
+  min-width: 0 !important;
+  height: 100% !important;
+  min-height: 0 !important;
+  max-height: 100% !important;
+
+  flex: 1 1 auto !important;
+  flex-direction: column !important;
+
+  overflow: hidden !important;
+}
+
+/*
+ * The header is a normal fixed-height flex item.
+ * It does not participate in the scrolling surface.
+ */
+.topbar {
+  position: relative !important;
+  z-index: 35 !important;
+  top: auto !important;
+
+  width: 100% !important;
+  min-width: 0 !important;
+
+  flex: 0 0 auto !important;
+
+  transform: none !important;
+}
+
+/*
+ * This is the only vertical dashboard scroll container.
+ */
+.main {
+  position: relative !important;
+
+  box-sizing: border-box !important;
+
+  display: block !important;
+
+  width: 100% !important;
+  min-width: 0 !important;
+
+  height: auto !important;
+  min-height: 0 !important;
+  max-height: none !important;
+
+  flex: 1 1 auto !important;
+
+  overflow-x: hidden !important;
+  overflow-y: scroll !important;
+
+  overscroll-behavior-x: none !important;
+  overscroll-behavior-y: auto !important;
+
+  scroll-behavior: auto !important;
+  scroll-snap-type: none !important;
+  scrollbar-gutter: stable !important;
+
+  touch-action: pan-y !important;
+
+  -webkit-overflow-scrolling: touch !important;
+}
+
+.main::-webkit-scrollbar {
+  width: 10px;
+}
+
+.main::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.main::-webkit-scrollbar-thumb {
+  border: 3px solid transparent;
+  border-radius: 999px;
+
+  background:
+    rgba(36, 70, 101, 0.34);
+
+  background-clip: padding-box;
+}
+
+.main::-webkit-scrollbar-thumb:hover {
+  background:
+    rgba(36, 70, 101, 0.52);
+
+  background-clip: padding-box;
+}
+
+/* =========================================================
+   CARDS NEVER CAPTURE OR TRAP PAGE SCROLLING
+   ========================================================= */
+
+.decisionGrid,
+.decisionGrid > article,
+.candidateCardList,
+.candidateTeamList,
+.candidateRiskList,
+.waitingList,
+.approvalList,
+.upcomingList,
+.activityList,
+.complianceRiskList {
+  overscroll-behavior: auto !important;
+  scroll-snap-type: none !important;
+}
+
+/*
+ * These lists show their selected rows and View-more footer.
+ * They must never become separate wheel or trackpad containers.
+ */
+.candidateCardList,
+.candidateTeamList,
+.candidateRiskList,
+.waitingList,
+.approvalList,
+.upcomingList,
+.activityList,
+.complianceRiskList {
+  max-height: none !important;
+
+  overflow-x: hidden !important;
+  overflow-y: visible !important;
+
+  touch-action: auto !important;
+  scrollbar-width: none !important;
+}
+
+.candidateCardList::-webkit-scrollbar,
+.candidateTeamList::-webkit-scrollbar,
+.candidateRiskList::-webkit-scrollbar,
+.waitingList::-webkit-scrollbar,
+.approvalList::-webkit-scrollbar,
+.upcomingList::-webkit-scrollbar,
+.activityList::-webkit-scrollbar,
+.complianceRiskList::-webkit-scrollbar {
+  display: none !important;
+}
+
+/*
+ * Cards may clip their decorative surface, but not create another
+ * scrolling viewport.
+ */
+.decisionGrid > article {
+  overflow: hidden !important;
+
+  overscroll-behavior: auto !important;
+  touch-action: pan-y !important;
+}
+
+/*
+ * Buttons and card content must allow vertical trackpad gestures
+ * to bubble into the main dashboard.
+ */
+.decisionGrid button,
+.heroGrid button,
+.campaignAiPanel button {
+  touch-action: manipulation !important;
+}
+
+/* =========================================================
+   MOBILE
+   Normal document scrolling—no fixed-height application shell.
+   ========================================================= */
+
+@media (max-width: 760px) {
+  :global(html),
+  :global(body),
+  :global(#root) {
+    height: auto !important;
+    min-height: 100% !important;
+  }
+
+  :global(html),
+  :global(body) {
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+
+    overscroll-behavior-y: auto !important;
+  }
+
+  .app {
+    display: block !important;
+
+    height: auto !important;
+    min-height: 100dvh !important;
+    max-height: none !important;
+
+    overflow: visible !important;
+  }
+
+  .workspace {
+    display: block !important;
+
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+
+    overflow: visible !important;
+  }
+
+  .topbar {
+    position: sticky !important;
+    top: 0 !important;
+  }
+
+  .main {
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+
+    overflow: visible !important;
+
+    scrollbar-gutter: auto !important;
+    touch-action: auto !important;
+  }
+
+  .decisionGrid > article {
+    overflow: hidden !important;
+  }
+}
+
+/* CAMPAIGN SEAT FINAL SCROLL ARCHITECTURE — END */
+
+/* CAMPAIGN SEAT BALANCED DASHBOARD TYPE — START */
+
+/*
+ * Balanced Campaign Seat scale:
+ * readable at 100% zoom without making the interface oversized.
+ */
+.app {
+  font-size: 15px !important;
+  line-height: 1.45 !important;
+}
+
+/* Sidebar */
+.workspaceBrandCopy > small {
+  font-size: 10.5px !important;
+  line-height: 1.2 !important;
+}
+
+.workspaceBrandCopy > strong {
+  font-size: 15px !important;
+  line-height: 1.18 !important;
+}
+
+.workspaceDistrict {
+  font-size: 11.5px !important;
+  line-height: 1.3 !important;
+}
+
+.sidebarNavigation > button {
+  font-size: 13.5px !important;
+  line-height: 1.3 !important;
+}
+
+.navigationLabel {
+  font-size: 10.5px !important;
+  line-height: 1.2 !important;
+}
+
+.sidebarProfile strong {
+  font-size: 12.5px !important;
+  line-height: 1.3 !important;
+}
+
+.sidebarProfile > div span {
+  font-size: 11.5px !important;
+  line-height: 1.3 !important;
+}
+
+/* Header */
+.greeting p {
+  font-size: 13px !important;
+  line-height: 1.4 !important;
+}
+
+.headerDeadlineCopy small {
+  font-size: 10.5px !important;
+}
+
+.headerDeadlineCopy strong {
+  font-size: 12.5px !important;
+}
+
+.headerDeadlineCopy > span {
+  font-size: 11.5px !important;
+}
+
+.headerDateValue,
+.headerTimeValue {
+  font-size: 12.5px !important;
+}
+
+.topbarActions button {
+  font-size: 12.5px !important;
+}
+
+/* Main dashboard headings */
+.cardHeading > span {
+  font-size: 13.5px !important;
+  line-height: 1.3 !important;
+}
+
+.cardHeading button,
+.cardHeading > small {
+  font-size: 11.5px !important;
+  line-height: 1.3 !important;
+}
+
+/* Priorities */
+.priorityList strong {
+  font-size: 12.5px !important;
+  line-height: 1.3 !important;
+}
+
+.priorityList small {
+  font-size: 11.5px !important;
+  line-height: 1.35 !important;
+}
+
+.priorityBadge {
+  font-size: 10.5px !important;
+}
+
+.priorityMonitoring {
+  font-size: 11.5px !important;
+}
+
+/* Campaign spotlight */
+.sectionEyebrow {
+  font-size: 10.5px !important;
+}
+
+.heroCopy > p {
+  font-size: 13px !important;
+  line-height: 1.45 !important;
+}
+
+.heroTags span,
+.heroStats small,
+.heroStats span {
+  font-size: 11.5px !important;
+}
+
+.heroActions button {
+  font-size: 12px !important;
+}
+
+.editShortcutsButton {
+  font-size: 11px !important;
+}
+
+/* Schedule */
+.scheduleTimeline time,
+.scheduleTimeline strong {
+  font-size: 12.5px !important;
+  line-height: 1.3 !important;
+}
+
+.scheduleTimeline small {
+  font-size: 11.5px !important;
+  line-height: 1.35 !important;
+}
+
+.scheduleFooter {
+  font-size: 11.5px !important;
+}
+
+/* Ask Campaign HQ */
+.campaignAiLive {
+  font-size: 10.5px !important;
+}
+
+.campaignAiCopy strong {
+  font-size: 13px !important;
+}
+
+.campaignAiCopy small {
+  font-size: 11.5px !important;
+}
+
+.campaignAiLauncher {
+  font-size: 12.5px !important;
+}
+
+.campaignAiLauncher kbd {
+  font-size: 11px !important;
+}
+
+/* Candidate-focused cards */
+.decisionGrid {
+  grid-template-rows:
+    repeat(
+      2,
+      minmax(220px, auto)
+    ) !important;
+}
+
+.decisionGrid > article {
+  min-height: 220px !important;
+}
+
+.decisionGrid .cardHeading > span {
+  font-size: 13.5px !important;
+}
+
+.decisionGrid .cardHeading button,
+.decisionGrid .cardHeading > small {
+  font-size: 11.5px !important;
+}
+
+.candidateMessageMetric span,
+.candidateDecisionMetric span,
+.candidateContactSummary span,
+.candidateCommitmentSummary span,
+.candidateRiskSummary > span {
+  font-size: 12px !important;
+  line-height: 1.35 !important;
+}
+
+.candidateMessageSummary {
+  font-size: 11.5px !important;
+}
+
+.candidateListCopy strong {
+  font-size: 12.5px !important;
+  line-height: 1.3 !important;
+}
+
+.candidateListCopy small {
+  font-size: 11.5px !important;
+  line-height: 1.3 !important;
+}
+
+.candidateTeamList time {
+  font-size: 10.5px !important;
+}
+
+.candidatePendingBadge,
+.candidateOpenBadge,
+.candidateOverdueBadge,
+.candidateRiskSummary > small {
+  font-size: 10.5px !important;
+}
+
+.candidateCardFooter {
+  font-size: 11.5px !important;
+}
+
+.candidateClearState strong {
+  font-size: 12.5px !important;
+}
+
+.candidateClearState small {
+  font-size: 11.5px !important;
+}
+
+/* Footer */
+.footer {
+  font-size: 11px !important;
+}
+
+/* Tablet */
+@media (max-width: 1180px) {
+  .decisionGrid {
+    grid-template-rows:
+      repeat(
+        3,
+        minmax(222px, auto)
+      ) !important;
+  }
+
+  .decisionGrid > article {
+    min-height: 222px !important;
+  }
+}
+
+/* Mobile */
+@media (max-width: 720px) {
+  .sidebarNavigation > button {
+    font-size: 13.5px !important;
+  }
+
+  .decisionGrid {
+    grid-template-rows: none !important;
+    grid-auto-rows: auto !important;
+  }
+
+  .decisionGrid > article {
+    min-height: 212px !important;
+  }
+
+  .candidateListCopy strong {
+    font-size: 13px !important;
+  }
+
+  .candidateListCopy small {
+    font-size: 12px !important;
+  }
+
+  .candidateCardFooter {
+    font-size: 12px !important;
+  }
+}
+
+/* CAMPAIGN SEAT BALANCED DASHBOARD TYPE — END */
+
+/* CAMPAIGN SEAT CANDIDATE CARD SPACING — START */
+
+/*
+ * Spacing-only refinement.
+ * Typography, colors, content and functionality remain unchanged.
+ */
+
+/* Slightly shorter cards without forcing content to clip. */
+.decisionGrid {
+  grid-template-rows:
+    repeat(
+      2,
+      minmax(208px, auto)
+    ) !important;
+
+  gap: 9px !important;
+}
+
+.decisionGrid > article {
+  min-height: 208px !important;
+
+  padding:
+    12px
+    13px !important;
+}
+
+/* Tighten heading spacing while preserving readable text. */
+.decisionGrid .cardHeading {
+  min-height: 21px !important;
+
+  margin-bottom: 1px !important;
+}
+
+/* Metrics sit closer to their content. */
+.candidateMessageMetric,
+.candidateDecisionMetric,
+.candidateContactSummary,
+.candidateCommitmentSummary {
+  min-height: 37px !important;
+
+  margin-top: 6px !important;
+  margin-bottom: 3px !important;
+}
+
+.candidateRiskSummary {
+  min-height: 38px !important;
+
+  margin-top: 5px !important;
+  margin-bottom: 3px !important;
+  padding-bottom: 5px !important;
+}
+
+/* Messages card. */
+.candidateMessagePeople {
+  margin-top: 5px !important;
+}
+
+.candidateMessageSummary {
+  margin-top: 7px !important;
+}
+
+/* Operational rows. */
+.candidateCardList > button,
+.candidateTeamList > button,
+.candidateRiskList > button {
+  min-height: 38px !important;
+
+  gap: 7px !important;
+
+  padding:
+    4px
+    1px !important;
+}
+
+.candidateListIcon,
+.candidateContactIcon,
+.candidateCommitmentIcon,
+.candidateOverdueIcon,
+.candidateRiskIcon {
+  width: 25px !important;
+  height: 25px !important;
+}
+
+/* Team Brief uses the same compact row rhythm. */
+.candidateTeamList time {
+  align-self: center !important;
+}
+
+/* Reduce oversized empty-state whitespace. */
+.candidateClearState {
+  min-height: 86px !important;
+
+  padding:
+    8px
+    0 !important;
+}
+
+/* Keep View-more actions visible without wasting height. */
+.candidateCardFooter {
+  min-height: 24px !important;
+
+  padding-top: 5px !important;
+}
+
+/* Keep bottom page spacing clean. */
+.decisionGrid + .footer,
+.footer {
+  margin-top: 7px !important;
+}
+
+/* Tablet spacing. */
+@media (max-width: 1180px) {
+  .decisionGrid {
+    grid-template-rows:
+      repeat(
+        3,
+        minmax(210px, auto)
+      ) !important;
+  }
+
+  .decisionGrid > article {
+    min-height: 210px !important;
+  }
+}
+
+/* Mobile cards grow naturally instead of reserving blank space. */
+@media (max-width: 720px) {
+  .decisionGrid {
+    gap: 9px !important;
+
+    grid-template-rows: none !important;
+    grid-auto-rows: auto !important;
+  }
+
+  .decisionGrid > article {
+    height: auto !important;
+    min-height: 0 !important;
+
+    padding:
+      13px
+      14px !important;
+  }
+
+  .candidateCardList > button,
+  .candidateTeamList > button,
+  .candidateRiskList > button {
+    min-height: 44px !important;
+  }
+
+  .candidateClearState {
+    min-height: 92px !important;
+  }
+
+  .candidateCardFooter {
+    min-height: 36px !important;
+  }
+}
+
+/* CAMPAIGN SEAT CANDIDATE CARD SPACING — END */
+
+/* CAMPAIGN SEAT FINAL RESPONSIVE DASHBOARD — START */
+
+/* =========================================================
+   REMOVE NESTED SCROLLING FROM THE TOP CARDS
+   ========================================================= */
+
+.priorityList,
+.scheduleTimeline {
+  max-height: none !important;
+
+  overflow-x: hidden !important;
+  overflow-y: visible !important;
+
+  overscroll-behavior: auto !important;
+  scrollbar-width: none !important;
+}
+
+.priorityList::-webkit-scrollbar,
+.scheduleTimeline::-webkit-scrollbar {
+  display: none !important;
+}
+
+/* =========================================================
+   TABLET LANDSCAPE AND SMALL LAPTOPS
+   ========================================================= */
+
+@media (max-width: 1240px) {
+  /*
+   * Convert the sidebar to an off-canvas drawer earlier.
+   * This gives the tablet dashboard its full screen width and
+   * prevents the greeting from colliding with header controls.
+   */
+  .sidebar {
+    position: fixed !important;
+    z-index: 90 !important;
+
+    inset:
+      0
+      auto
+      0
+      0 !important;
+
+    width:
+      min(
+        300px,
+        86vw
+      ) !important;
+
+    height: 100dvh !important;
+
+    flex-basis: auto !important;
+
+    transform:
+      translateX(-102%) !important;
+
+    transition:
+      transform
+      220ms
+      ease !important;
+  }
+
+  .sidebarOpen {
+    transform:
+      translateX(0) !important;
+  }
+
+  .menuButton {
+    display: grid !important;
+  }
+
+  .sidebarScrim {
+    position: fixed !important;
+    z-index: 80 !important;
+
+    inset: 0 !important;
+
+    display: block !important;
+
+    border: 0 !important;
+
+    background:
+      rgba(
+        7,
+        22,
+        39,
+        0.46
+      ) !important;
+
+    backdrop-filter:
+      blur(2px);
+  }
+
+  .workspace {
+    width: 100% !important;
+    min-width: 0 !important;
+  }
+
+  /*
+   * Two clean header rows:
+   * greeting first, operational controls second.
+   */
+  .topbar {
+    grid-template-columns:
+      auto
+      minmax(0, 1fr) !important;
+
+    min-height: 0 !important;
+
+    gap:
+      9px
+      12px !important;
+
+    padding:
+      11px
+      14px !important;
+  }
+
+  .topbarActions {
+    display: grid !important;
+
+    width: 100% !important;
+    min-width: 0 !important;
+
+    grid-column:
+      1 / -1 !important;
+
+    grid-template-columns:
+      minmax(180px, 0.9fr)
+      minmax(310px, 1.35fr)
+      minmax(190px, 0.9fr)
+      auto !important;
+
+    align-items: stretch !important;
+    justify-content: stretch !important;
+
+    gap: 8px !important;
+  }
+
+  .headerDeadline,
+  .headerDateTimeButton,
+  .headerCampaignSearch,
+  .headerNotifications {
+    min-width: 0 !important;
+  }
+
+  .headerDeadline,
+  .headerDateTimeButton {
+    width: 100% !important;
+  }
+
+  /*
+   * Tablet top section:
+   * Hero and AI panel first, then Priorities and Schedule side by side.
+   */
+  .heroGrid {
+    display: grid !important;
+
+    grid-template-columns:
+      repeat(
+        2,
+        minmax(0, 1fr)
+      ) !important;
+
+    grid-template-areas:
+      "hero hero"
+      "priorities schedule" !important;
+
+    align-items: stretch !important;
+
+    gap: 10px !important;
+  }
+
+  .centerHeroStack {
+    grid-area: hero !important;
+
+    min-width: 0 !important;
+  }
+
+  .heroPriorityCard {
+    grid-area: priorities !important;
+  }
+
+  .scheduleCard {
+    grid-area: schedule !important;
+  }
+
+  /*
+   * Keep the hero horizontal on tablets instead of producing a
+   * very tall portrait block.
+   */
+  .heroCard {
+    height: 330px !important;
+    min-height: 330px !important;
+
+    grid-template-columns:
+      minmax(0, 1.18fr)
+      minmax(320px, 0.82fr) !important;
+  }
+
+  .heroPortraitWrap {
+    height: 330px !important;
+    min-height: 330px !important;
+  }
+
+  .heroPortrait {
+    width: 100% !important;
+    height: 100% !important;
+
+    object-fit: cover !important;
+    object-position:
+      50%
+      10% !important;
+  }
+
+  .heroPriorityCard,
+  .scheduleCard {
+    height: 300px !important;
+    min-height: 300px !important;
+  }
+
+  .decisionGrid {
+    grid-template-columns:
+      repeat(
+        2,
+        minmax(0, 1fr)
+      ) !important;
+
+    grid-template-rows: none !important;
+    grid-auto-rows: auto !important;
+  }
+}
+
+/* =========================================================
+   TABLET PORTRAIT
+   ========================================================= */
+
+@media (max-width: 900px) {
+  /*
+   * Header actions fit in one practical tablet row.
+   * The duplicate header AI search is hidden because the full
+   * Ask Campaign HQ panel remains immediately below the hero.
+   */
+  .topbarActions {
+    grid-template-columns:
+      minmax(180px, 0.85fr)
+      minmax(300px, 1.35fr)
+      auto !important;
+  }
+
+  .headerCampaignSearch {
+    display: none !important;
+  }
+
+  .headerNotifications {
+    justify-self: end !important;
+  }
+
+  .heroCard {
+    height: 340px !important;
+    min-height: 340px !important;
+
+    grid-template-columns:
+      minmax(0, 1.16fr)
+      minmax(285px, 0.84fr) !important;
+  }
+
+  .heroPortraitWrap {
+    height: 340px !important;
+    min-height: 340px !important;
+  }
+
+  .heroPriorityCard,
+  .scheduleCard {
+    height: 305px !important;
+    min-height: 305px !important;
+  }
+}
+
+/* =========================================================
+   PHONES
+   ========================================================= */
+
+@media (max-width: 700px) {
+  /*
+   * Compact mobile header without the large empty control area.
+   */
+  .topbar {
+    position: sticky !important;
+    z-index: 60 !important;
+
+    top: 0 !important;
+
+    grid-template-columns:
+      auto
+      minmax(0, 1fr) !important;
+
+    gap: 8px !important;
+
+    padding:
+      9px
+      10px !important;
+  }
+
+  .menuButton {
+    width: 38px !important;
+    height: 38px !important;
+  }
+
+  .greeting h1 {
+    font-size: 1.34rem !important;
+    line-height: 1.05 !important;
+  }
+
+  .greeting p {
+    display: none !important;
+  }
+
+  .topbarActions {
+    display: grid !important;
+
+    grid-template-columns:
+      minmax(0, 1fr)
+      auto !important;
+
+    grid-column:
+      1 / -1 !important;
+
+    gap: 7px !important;
+  }
+
+  .headerDeadline {
+    grid-column:
+      1 / -1 !important;
+
+    min-height: 52px !important;
+  }
+
+  .headerDeadlineCopy > span {
+    display: none !important;
+  }
+
+  .headerDateTimeButton {
+    grid-column:
+      1 / -1 !important;
+
+    min-height: 47px !important;
+  }
+
+  .headerCampaignSearch {
+    display: none !important;
+  }
+
+  .headerNotifications {
+    grid-column: 2 !important;
+
+    justify-self: end !important;
+
+    min-width: 0 !important;
+  }
+
+  .main {
+    padding:
+      9px
+      9px
+      12px !important;
+  }
+
+  /*
+   * Practical mobile order:
+   * immediate priorities, campaign spotlight, then schedule.
+   */
+  .heroGrid {
+    grid-template-columns:
+      minmax(0, 1fr) !important;
+
+    grid-template-areas:
+      "priorities"
+      "hero"
+      "schedule" !important;
+
+    gap: 9px !important;
+  }
+
+  .heroPriorityCard,
+  .scheduleCard {
+    height: auto !important;
+    min-height: 0 !important;
+
+    padding:
+      12px
+      13px !important;
+  }
+
+  /*
+   * Restore meaningful content that earlier responsive rules hid.
+   * Show the first three priority and schedule rows.
+   */
+  .priorityList {
+    display: grid !important;
+
+    margin-top: 8px !important;
+  }
+
+  .priorityList > button {
+    display: grid !important;
+  }
+
+  .priorityList
+    > button:nth-child(n + 4) {
+    display: none !important;
+  }
+
+  .scheduleTimeline {
+    display: grid !important;
+
+    margin-top: 8px !important;
+  }
+
+  .scheduleTimeline > button {
+    display: grid !important;
+  }
+
+  .scheduleTimeline
+    > button:nth-child(n + 4) {
+    display: none !important;
+  }
+
+  /*
+   * Mobile hero remains stacked, but its portrait is intentionally
+   * shorter so it does not dominate several screens.
+   */
+  .heroCard {
+    height: auto !important;
+    min-height: 0 !important;
+
+    grid-template-columns:
+      minmax(0, 1fr) !important;
+  }
+
+  .heroCopy {
+    padding:
+      17px
+      17px
+      14px !important;
+  }
+
+  .heroPortraitWrap {
+    height: 255px !important;
+    min-height: 255px !important;
+  }
+
+  .heroPortrait {
+    object-position:
+      50%
+      8% !important;
+  }
+
+  .campaignAiPanel {
+    grid-template-columns:
+      auto
+      minmax(0, 1fr) !important;
+
+    gap:
+      8px
+      10px !important;
+
+    padding:
+      11px !important;
+  }
+
+  .campaignAiAction {
+    width: 100% !important;
+
+    grid-column:
+      1 / -1 !important;
+  }
+
+  .campaignAiLauncher {
+    width: 100% !important;
+  }
+
+  /*
+   * The six candidate cards continue as one clean column.
+   */
+  .decisionGrid {
+    grid-template-columns:
+      minmax(0, 1fr) !important;
+
+    grid-template-rows: none !important;
+    grid-auto-rows: auto !important;
+
+    gap: 9px !important;
+  }
+
+  .decisionGrid > article {
+    height: auto !important;
+    min-height: 0 !important;
+  }
+
+  .footer {
+    align-items: flex-start !important;
+
+    flex-direction: column !important;
+
+    gap: 4px !important;
+  }
+}
+
+/* =========================================================
+   SMALL PHONES
+   ========================================================= */
+
+@media (max-width: 430px) {
+  .sidebar {
+    width:
+      min(
+        310px,
+        88vw
+      ) !important;
+  }
+
+  .topbar {
+    padding:
+      8px !important;
+  }
+
+  .main {
+    padding:
+      8px
+      8px
+      11px !important;
+  }
+
+  .heroCopy {
+    padding:
+      15px !important;
+  }
+
+  .heroCopy h2 {
+    font-size:
+      clamp(
+        1.65rem,
+        8vw,
+        2rem
+      ) !important;
+  }
+
+  .heroPortraitWrap {
+    height: 235px !important;
+    min-height: 235px !important;
+  }
+
+  .heroPriorityCard,
+  .scheduleCard,
+  .decisionGrid > article {
+    border-radius: 11px !important;
+  }
+}
+
+/* CAMPAIGN SEAT FINAL RESPONSIVE DASHBOARD — END */
+
+/* CAMPAIGN SEAT PERFECT TABLET HEADER — START */
+
+/* =========================================================
+   SHARED TABLET HEADER SAFETY
+   ========================================================= */
+
+@media
+  (min-width: 901px)
+  and
+  (max-width: 1240px) {
+
+  /*
+   * The sidebar is a drawer at these widths, so the hamburger
+   * must always remain visible and usable.
+   */
+  .menuButton {
+    position: relative !important;
+    z-index: 5 !important;
+
+    display: grid !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+
+    width: 42px !important;
+    height: 42px !important;
+    min-width: 42px !important;
+    min-height: 42px !important;
+
+    flex: 0 0 42px !important;
+
+    place-items: center !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
+
+    border:
+      1px solid
+      #d4dee9 !important;
+
+    border-radius: 11px !important;
+
+    color: #164a79 !important;
+    background: #ffffff !important;
+
+    box-shadow:
+      0 5px 14px
+      rgba(
+        19,
+        59,
+        97,
+        0.08
+      ) !important;
+  }
+
+  .menuButton:hover {
+    color: #ffffff !important;
+
+    border-color: #164f84 !important;
+
+    background:
+      linear-gradient(
+        180deg,
+        #1c5b94,
+        #0e416f
+      ) !important;
+  }
+
+  .topbar {
+    width: 100% !important;
+    min-width: 0 !important;
+
+    overflow: visible !important;
+  }
+
+  .topbar > *,
+  .topbarActions > * {
+    min-width: 0 !important;
+  }
+
+  .greeting {
+    min-width: 0 !important;
+  }
+
+  .greeting h1 {
+    overflow: hidden !important;
+
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+  }
+
+  .topbarActions {
+    min-width: 0 !important;
+  }
+
+  .headerDeadline,
+  .headerDateTimeButton {
+    width: 100% !important;
+    min-width: 0 !important;
+
+    align-self: stretch !important;
+  }
+
+  .headerDeadline {
+    min-height: 48px !important;
+  }
+
+  .headerDateTimeButton {
+    min-height: 48px !important;
+  }
+
+  /*
+   * The long task title is unnecessary in the compact tablet
+   * topbar and causes avoidable width pressure.
+   */
+  .headerDeadlineCopy > span {
+    display: none !important;
+  }
+
+  .headerCampaignSearch {
+    width: 100% !important;
+    min-width: 0 !important;
+
+    align-self: stretch !important;
+  }
+
+  .headerCampaignSearch > * {
+    width: 100% !important;
+    min-width: 0 !important;
+  }
+
+  .headerNotifications {
+    display: flex !important;
+
+    min-width: max-content !important;
+
+    align-items: center !important;
+    justify-content: flex-end !important;
+
+    align-self: center !important;
+  }
+
+  /*
+   * Keep all major tablet dashboard sections aligned to the
+   * same left and right edges.
+   */
+  .heroGrid,
+  .decisionGrid,
+  .footer {
+    width: 100% !important;
+    min-width: 0 !important;
+  }
+
+  .centerHeroStack,
+  .heroPriorityCard,
+  .scheduleCard,
+  .decisionGrid > article {
+    min-width: 0 !important;
+  }
+}
+
+/* =========================================================
+   TABLET LANDSCAPE: 1021PX–1240PX
+   ONE CLEAN HEADER ROW
+   ========================================================= */
+
+@media
+  (min-width: 1021px)
+  and
+  (max-width: 1240px) {
+
+  .topbar {
+    display: grid !important;
+
+    grid-template-columns:
+      42px
+      minmax(220px, 0.82fr)
+      minmax(0, 2.35fr) !important;
+
+    grid-template-rows:
+      minmax(52px, auto) !important;
+
+    align-items: center !important;
+
+    column-gap: 11px !important;
+    row-gap: 0 !important;
+
+    min-height: 74px !important;
+
+    padding:
+      10px
+      14px !important;
+  }
+
+  .menuButton {
+    grid-column: 1 !important;
+    grid-row: 1 !important;
+
+    align-self: center !important;
+    justify-self: start !important;
+  }
+
+  .greeting {
+    grid-column: 2 !important;
+    grid-row: 1 !important;
+
+    align-self: center !important;
+  }
+
+  .greeting h1 {
+    font-size:
+      clamp(
+        1.34rem,
+        2.15vw,
+        1.72rem
+      ) !important;
+
+    line-height: 1.05 !important;
+  }
+
+  .greeting p {
+    margin-top: 5px !important;
+
+    font-size: 12px !important;
+  }
+
+  .topbarActions {
+    display: grid !important;
+
+    grid-column: 3 !important;
+    grid-row: 1 !important;
+
+    grid-template-columns:
+      minmax(160px, 0.86fr)
+      minmax(250px, 1.35fr)
+      minmax(175px, 0.9fr)
+      auto !important;
+
+    align-items: center !important;
+
+    gap: 7px !important;
+
+    width: 100% !important;
+
+    margin: 0 !important;
+  }
+
+  .headerDeadline,
+  .headerDateTimeButton,
+  .headerCampaignSearch {
+    height: 48px !important;
+  }
+
+  .headerNotifications {
+    height: 48px !important;
+  }
+}
+
+/* =========================================================
+   NARROW TABLET: 901PX–1020PX
+   GREETING ROW + CONTROLS ROW
+   ========================================================= */
+
+@media
+  (min-width: 901px)
+  and
+  (max-width: 1020px) {
+
+  .topbar {
+    display: grid !important;
+
+    grid-template-columns:
+      42px
+      minmax(0, 1fr) !important;
+
+    grid-template-rows:
+      auto
+      auto !important;
+
+    align-items: center !important;
+
+    gap:
+      8px
+      10px !important;
+
+    min-height: 0 !important;
+
+    padding:
+      10px
+      13px !important;
+  }
+
+  .menuButton {
+    grid-column: 1 !important;
+    grid-row: 1 !important;
+
+    align-self: center !important;
+  }
+
+  .greeting {
+    grid-column: 2 !important;
+    grid-row: 1 !important;
+
+    align-self: center !important;
+  }
+
+  .greeting h1 {
+    font-size: 1.48rem !important;
+  }
+
+  .topbarActions {
+    display: grid !important;
+
+    grid-column:
+      1 / -1 !important;
+
+    grid-row: 2 !important;
+
+    grid-template-columns:
+      minmax(175px, 0.82fr)
+      minmax(280px, 1.35fr)
+      minmax(170px, 0.82fr)
+      auto !important;
+
+    align-items: center !important;
+
+    gap: 7px !important;
+
+    width: 100% !important;
+
+    margin: 0 !important;
+  }
+
+  .headerDeadline,
+  .headerDateTimeButton,
+  .headerCampaignSearch,
+  .headerNotifications {
+    min-height: 47px !important;
+  }
+}
+
+/* =========================================================
+   TABLET PORTRAIT: KEEP THE EXISTING GOOD LAYOUT ALIGNED
+   ========================================================= */
+
+@media
+  (min-width: 701px)
+  and
+  (max-width: 900px) {
+
+  .topbar {
+    display: grid !important;
+
+    grid-template-columns:
+      42px
+      minmax(0, 1fr) !important;
+
+    grid-template-rows:
+      auto
+      auto !important;
+
+    align-items: center !important;
+
+    gap:
+      8px
+      10px !important;
+
+    padding:
+      10px
+      12px !important;
+  }
+
+  .menuButton {
+    display: grid !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+
+    grid-column: 1 !important;
+    grid-row: 1 !important;
+
+    width: 40px !important;
+    height: 40px !important;
+
+    align-self: center !important;
+  }
+
+  .greeting {
+    grid-column: 2 !important;
+    grid-row: 1 !important;
+  }
+
+  .topbarActions {
+    display: grid !important;
+
+    grid-column:
+      1 / -1 !important;
+
+    grid-row: 2 !important;
+
+    grid-template-columns:
+      minmax(175px, 0.9fr)
+      minmax(285px, 1.35fr)
+      auto !important;
+
+    align-items: center !important;
+
+    gap: 7px !important;
+
+    width: 100% !important;
+  }
+
+  .headerCampaignSearch {
+    display: none !important;
+  }
+
+  .headerNotifications {
+    justify-self: end !important;
+  }
+}
+
+/* CAMPAIGN SEAT PERFECT TABLET HEADER — END */
+
+
+
+/* CAMPAIGN SEAT CLEAN DASHBOARD SCROLL EDGE — START */
+
+/*
+ * Keep the dashboard vertically scrollable while removing the
+ * visible scrollbar track and reserved strip that appeared on
+ * the far-right side at tablet and small-laptop widths.
+ */
+@media
+  (min-width: 701px)
+  and
+  (max-width: 1240px) {
+
+  .app,
+  .workspace {
+    overflow: hidden !important;
+
+    scrollbar-gutter:
+      auto !important;
+  }
+
+  .main {
+    width: 100% !important;
+    min-width: 0 !important;
+
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+
+    border-right: 0 !important;
+
+    scrollbar-gutter:
+      auto !important;
+
+    scrollbar-width:
+      none !important;
+
+    -ms-overflow-style:
+      none !important;
+  }
+
+  .main::-webkit-scrollbar {
+    display: none !important;
+
+    width: 0 !important;
+    height: 0 !important;
+  }
+
+  .main::-webkit-scrollbar-track,
+  .main::-webkit-scrollbar-thumb,
+  .main::-webkit-scrollbar-corner {
+    display: none !important;
+
+    width: 0 !important;
+
+    border: 0 !important;
+    background: transparent !important;
+  }
+}
+
+/* CAMPAIGN SEAT CLEAN DASHBOARD SCROLL EDGE — END */
+
+/* CAMPAIGN SEAT CANONICAL 1180 HEADER — START */
+
+/*
+ * Exact local JSX order:
+ *
+ * 1. Deadline
+ * 2. Date/time
+ * 3. Ask Campaign HQ
+ * 4. Support
+ * 5. Notifications
+ *
+ * All five controls receive an explicit column.
+ * No implicit grid row can be created.
+ */
+@media
+  (min-width: 1081px)
+  and
+  (max-width: 1240px) {
+
+  .app
+  .workspace
+  .topbar {
+    box-sizing: border-box !important;
+
+    display: grid !important;
+
+    grid-template-columns:
+      42px
+      minmax(300px, 320px)
+      minmax(0, 1fr) !important;
+
+    grid-template-rows:
+      52px !important;
+
+    align-items: center !important;
+
+    column-gap: 9px !important;
+    row-gap: 0 !important;
+
+    width: 100% !important;
+    min-width: 0 !important;
+
+    min-height: 72px !important;
+    height: 72px !important;
+
+    padding:
+      10px
+      14px !important;
+
+    overflow: visible !important;
+  }
+
+  /*
+   * Hamburger
+   */
+  .app
+  .workspace
+  .topbar
+  > .menuButton,
+  .app
+  .workspace
+  .topbar
+  > button[aria-label="Open navigation"] {
+    position: relative !important;
+    z-index: 20 !important;
+
+    display: grid !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+
+    grid-column: 1 !important;
+    grid-row: 1 !important;
+
+    width: 42px !important;
+    min-width: 42px !important;
+    max-width: 42px !important;
+
+    height: 42px !important;
+    min-height: 42px !important;
+    max-height: 42px !important;
+
+    align-self: center !important;
+    justify-self: start !important;
+
+    margin: 0 !important;
+  }
+
+  /*
+   * Greeting
+   */
+  .app
+  .workspace
+  .topbar
+  > .greeting {
+    display: grid !important;
+
+    grid-column: 2 !important;
+    grid-row: 1 !important;
+
+    width: 100% !important;
+    min-width: 300px !important;
+    max-width: 320px !important;
+
+    align-content: center !important;
+    align-self: center !important;
+
+    gap: 4px !important;
+
+    margin: 0 !important;
+
+    overflow: visible !important;
+  }
+
+  .app
+  .workspace
+  .topbar
+  > .greeting
+  h1 {
+    width: max-content !important;
+    max-width: none !important;
+
+    margin: 0 !important;
+
+    overflow: visible !important;
+
+    font-size: 1.34rem !important;
+    line-height: 1.05 !important;
+
+    text-overflow: clip !important;
+    white-space: nowrap !important;
+  }
+
+  .app
+  .workspace
+  .topbar
+  > .greeting
+  p {
+    width: 100% !important;
+    max-width: 300px !important;
+
+    margin: 0 !important;
+
+    overflow: hidden !important;
+
+    font-size: 10.5px !important;
+    line-height: 1.2 !important;
+
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+  }
+
+  /*
+   * Five explicit action columns.
+   */
+  .app
+  .workspace
+  .topbar
+  > .topbarActions {
+    box-sizing: border-box !important;
+
+    display: grid !important;
+
+    grid-column: 3 !important;
+    grid-row: 1 !important;
+
+    grid-template-columns:
+      minmax(145px, 0.9fr)
+      minmax(220px, 1.25fr)
+      minmax(160px, 0.95fr)
+      48px
+      46px !important;
+
+    grid-template-areas:
+      "deadline datetime search support notifications" !important;
+
+    grid-template-rows:
+      48px !important;
+
+    grid-auto-flow: column !important;
+    grid-auto-rows: 48px !important;
+
+    align-items: center !important;
+    justify-content: stretch !important;
+
+    gap: 6px !important;
+
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: none !important;
+
+    height: 48px !important;
+    min-height: 48px !important;
+    max-height: 48px !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
+
+    overflow: visible !important;
+  }
+
+  .app
+  .workspace
+  .topbar
+  > .topbarActions
+  > * {
+    box-sizing: border-box !important;
+
+    grid-row: 1 !important;
+
+    min-width: 0 !important;
+
+    align-self: center !important;
+
+    margin: 0 !important;
+  }
+
+  /*
+   * Explicit placement prevents all wrapping.
+   */
+  .app
+  .workspace
+  .topbar
+  .headerDeadline {
+    grid-area: deadline !important;
+  }
+
+  .app
+  .workspace
+  .topbar
+  .headerDateTimeButton {
+    grid-area: datetime !important;
+  }
+
+  .app
+  .workspace
+  .topbar
+  .headerCampaignSearch {
+    grid-area: search !important;
+  }
+
+  .app
+  .workspace
+  .topbar
+  .headerSupport {
+    grid-area: support !important;
+  }
+
+  .app
+  .workspace
+  .topbar
+  .headerNotifications {
+    grid-area: notifications !important;
+  }
+
+  /*
+   * Main rectangular controls.
+   */
+  .app
+  .workspace
+  .topbar
+  .headerDeadline,
+  .app
+  .workspace
+  .topbar
+  .headerDateTimeButton,
+  .app
+  .workspace
+  .topbar
+  .headerCampaignSearch {
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: none !important;
+
+    height: 48px !important;
+    min-height: 48px !important;
+    max-height: 48px !important;
+
+    align-self: center !important;
+  }
+
+  .app
+  .workspace
+  .topbar
+  .headerCampaignSearch
+  > * {
+    width: 100% !important;
+    min-width: 0 !important;
+
+    height: 48px !important;
+    min-height: 48px !important;
+    max-height: 48px !important;
+  }
+
+  /*
+   * Support receives its real 48px slot.
+   */
+  .app
+  .workspace
+  .topbar
+  .headerSupport,
+  .app
+  .workspace
+  .topbar
+  .headerSupport
+  > * {
+    width: 48px !important;
+    min-width: 48px !important;
+    max-width: 48px !important;
+
+    height: 48px !important;
+    min-height: 48px !important;
+    max-height: 48px !important;
+
+    align-self: center !important;
+    justify-self: center !important;
+  }
+
+  /*
+   * Activity Center receives its own separate 46px column.
+   */
+  .app
+  .workspace
+  .topbar
+  .headerNotifications,
+  .app
+  .workspace
+  .topbar
+  .headerNotifications
+  > *,
+  .app
+  .workspace
+  .topbar
+  .headerNotifications
+  button {
+    position: relative !important;
+    inset: auto !important;
+
+    width: 46px !important;
+    min-width: 46px !important;
+    max-width: 46px !important;
+
+    height: 46px !important;
+    min-height: 46px !important;
+    max-height: 46px !important;
+
+    align-self: center !important;
+    justify-self: center !important;
+
+    margin: 0 !important;
+
+    transform: none !important;
+
+    overflow: visible !important;
+  }
+}
+
+/* CAMPAIGN SEAT CANONICAL 1180 HEADER — END */
+
+/* CAMPAIGN SEAT DYNAMIC PROFILE SPOTLIGHT — START */
+
+/*
+ * The Spotlight portrait is profile-driven.
+ *
+ * Images may be uploaded by the candidate, campaign owner,
+ * or another authorized campaign user.
+ *
+ * The layout must therefore support different image dimensions
+ * without allowing the portrait to control the card height.
+ */
+@media
+  (min-width: 1081px)
+  and
+  (max-width: 1240px) {
+
+  /*
+   * Controlled landscape card.
+   * Neither the text nor uploaded image may increase this height.
+   */
+  .app
+  .workspace
+  .main
+  .heroCard {
+    box-sizing: border-box !important;
+
+    display: grid !important;
+
+    grid-template-columns:
+      minmax(0, 1.12fr)
+      minmax(375px, 0.88fr) !important;
+
+    width: 100% !important;
+    min-width: 0 !important;
+
+    height: 330px !important;
+    min-height: 330px !important;
+    max-height: 330px !important;
+
+    overflow: hidden !important;
+  }
+
+  /*
+   * Compact and readable campaign information.
+   */
+  .app
+  .workspace
+  .main
+  .heroCopy {
+    box-sizing: border-box !important;
+
+    display: flex !important;
+
+    width: 100% !important;
+    min-width: 0 !important;
+
+    height: 330px !important;
+    min-height: 330px !important;
+    max-height: 330px !important;
+
+    flex-direction: column !important;
+
+    align-items: stretch !important;
+    justify-content: center !important;
+
+    gap: 7px !important;
+
+    padding:
+      22px
+      24px !important;
+
+    overflow: hidden !important;
+  }
+
+  .app
+  .workspace
+  .main
+  .heroCopy
+  .sectionEyebrow {
+    margin: 0 !important;
+
+    font-size: 10.5px !important;
+    font-weight: 850 !important;
+    line-height: 1.1 !important;
+    letter-spacing: 0.14em !important;
+  }
+
+  .app
+  .workspace
+  .main
+  .heroCopy
+  h2 {
+    width: 100% !important;
+    max-width: 560px !important;
+
+    margin: 0 !important;
+
+    font-size:
+      clamp(
+        2rem,
+        2.6vw,
+        2.32rem
+      ) !important;
+
+    font-weight: 850 !important;
+    line-height: 0.98 !important;
+    letter-spacing: -0.04em !important;
+  }
+
+  .app
+  .workspace
+  .main
+  .heroCopy
+  > p {
+    width: 100% !important;
+    max-width: 580px !important;
+
+    margin:
+      1px
+      0
+      0 !important;
+
+    font-size: 12.5px !important;
+    line-height: 1.4 !important;
+  }
+
+  .app
+  .workspace
+  .main
+  .heroTags {
+    display: flex !important;
+
+    flex-wrap: wrap !important;
+
+    gap: 5px !important;
+
+    margin:
+      1px
+      0
+      0 !important;
+  }
+
+  .app
+  .workspace
+  .main
+  .heroTags
+  > * {
+    min-height: 22px !important;
+
+    padding:
+      4px
+      8px !important;
+
+    font-size: 9.5px !important;
+    line-height: 1 !important;
+  }
+
+  .app
+  .workspace
+  .main
+  .heroStats {
+    display: flex !important;
+
+    align-items: flex-end !important;
+
+    gap: 8px !important;
+
+    margin:
+      2px
+      0
+      0 !important;
+  }
+
+  .app
+  .workspace
+  .main
+  .heroStats
+  strong {
+    font-size: 2.15rem !important;
+    line-height: 0.9 !important;
+    letter-spacing: -0.045em !important;
+  }
+
+  .app
+  .workspace
+  .main
+  .heroStats
+  small,
+  .app
+  .workspace
+  .main
+  .heroStats
+  span {
+    font-size: 9.5px !important;
+    line-height: 1.25 !important;
+  }
+
+  /*
+   * Campaign shortcuts remain close to the campaign information.
+   */
+  .app
+  .workspace
+  .main
+  .heroActions {
+    display: grid !important;
+
+    grid-template-columns:
+      repeat(
+        2,
+        minmax(0, 1fr)
+      ) !important;
+
+    gap:
+      6px
+      7px !important;
+
+    width: 100% !important;
+    max-width: 590px !important;
+
+    margin:
+      8px
+      0
+      0 !important;
+  }
+
+  .app
+  .workspace
+  .main
+  .heroActions
+  button {
+    width: 100% !important;
+    min-width: 0 !important;
+
+    min-height: 34px !important;
+
+    padding:
+      6px
+      10px !important;
+
+    font-size: 10.5px !important;
+    line-height: 1.15 !important;
+  }
+
+  /*
+   * Dynamic profile-photo container.
+   *
+   * The background remains visible while a new upload loads,
+   * or when no usable image has been supplied.
+   */
+  .app
+  .workspace
+  .main
+  .heroPortraitWrap {
+    position: relative !important;
+
+    box-sizing: border-box !important;
+
+    width: 100% !important;
+    min-width: 0 !important;
+
+    height: 330px !important;
+    min-height: 330px !important;
+    max-height: 330px !important;
+
+    align-self: stretch !important;
+
+    overflow: hidden !important;
+
+    background:
+      linear-gradient(
+        145deg,
+        #174f83,
+        #071f3c
+      ) !important;
+  }
+
+  /*
+   * Uploaded photos never stretch or change the card dimensions.
+   *
+   * A future Profile Settings focal-point control may override:
+   * --campaign-profile-photo-position
+   */
+  .app
+  .workspace
+  .main
+  .heroPortrait {
+    display: block !important;
+
+    width: 100% !important;
+    min-width: 100% !important;
+    max-width: 100% !important;
+
+    height: 100% !important;
+    min-height: 100% !important;
+    max-height: 100% !important;
+
+    object-fit: cover !important;
+
+    object-position:
+      var(
+        --campaign-profile-photo-position,
+        50% 24%
+      ) !important;
+
+    transform: none !important;
+  }
+}
+
+/* CAMPAIGN SEAT DYNAMIC PROFILE SPOTLIGHT — END */
+
+/* CAMPAIGN SEAT SPOTLIGHT COUNTDOWN CLEARANCE — START */
+
+/*
+ * Fix only the vertical clearance between the election countdown
+ * and the four Spotlight shortcut buttons.
+ */
+@media
+  (min-width: 1081px)
+  and
+  (max-width: 1240px) {
+
+  /*
+   * Add only fourteen pixels of height so the content can breathe
+   * without returning to the oversized Spotlight version.
+   */
+  .app
+  .workspace
+  .main
+  .heroCard {
+    height: 344px !important;
+    min-height: 344px !important;
+    max-height: 344px !important;
+  }
+
+  .app
+  .workspace
+  .main
+  .heroCopy {
+    height: 344px !important;
+    min-height: 344px !important;
+    max-height: 344px !important;
+
+    justify-content: flex-start !important;
+
+    gap: 6px !important;
+
+    padding:
+      20px
+      24px
+      17px !important;
+  }
+
+  /*
+   * Give the complete Election Day statistic its own protected row.
+   */
+  .app
+  .workspace
+  .main
+  .heroStats {
+    box-sizing: border-box !important;
+
+    min-height: 48px !important;
+
+    flex: 0 0 48px !important;
+
+    align-items: flex-end !important;
+
+    margin:
+      1px
+      0
+      0 !important;
+
+    padding:
+      0
+      0
+      10px !important;
+
+    overflow: visible !important;
+  }
+
+  .app
+  .workspace
+  .main
+  .heroStats
+  strong,
+  .app
+  .workspace
+  .main
+  .heroStats
+  small,
+  .app
+  .workspace
+  .main
+  .heroStats
+  span {
+    position: relative !important;
+    z-index: 2 !important;
+  }
+
+  /*
+   * Shortcut grid begins only after the protected countdown row.
+   */
+  .app
+  .workspace
+  .main
+  .heroActions {
+    position: relative !important;
+    z-index: 1 !important;
+
+    flex: 0 0 auto !important;
+
+    margin:
+      0 !important;
+
+    padding:
+      0 !important;
+  }
+
+  .app
+  .workspace
+  .main
+  .heroActions
+  button {
+    min-height: 32px !important;
+
+    padding:
+      6px
+      10px !important;
+  }
+
+  .app
+  .workspace
+  .main
+  .editShortcutsButton {
+    flex: 0 0 auto !important;
+
+    margin-top: 1px !important;
+  }
+
+  /*
+   * Keep the uploaded profile-photo area synchronized with the card.
+   */
+  .app
+  .workspace
+  .main
+  .heroPortraitWrap {
+    height: 344px !important;
+    min-height: 344px !important;
+    max-height: 344px !important;
+  }
+}
+
+/* CAMPAIGN SEAT SPOTLIGHT COUNTDOWN CLEARANCE — END */
+
+/* CAMPAIGN SEAT SPOTLIGHT META SEPARATION — START */
+
+/*
+ * Separate the campaign classification chips from the
+ * Election Day countdown without changing the header,
+ * portrait crop, or overall dashboard layout.
+ */
+@media
+  (min-width: 1081px)
+  and
+  (max-width: 1240px) {
+
+  /*
+   * Metadata chips remain grouped beneath the description.
+   */
+  .app
+  .workspace
+  .main
+  .heroTags {
+    box-sizing: border-box !important;
+
+    flex: 0 0 auto !important;
+
+    margin:
+      2px
+      0
+      0 !important;
+
+    padding:
+      0
+      0
+      9px !important;
+  }
+
+  /*
+   * Election Day receives a clearly separated information block.
+   */
+  .app
+  .workspace
+  .main
+  .heroStats {
+    box-sizing: border-box !important;
+
+    display: block !important;
+
+    min-height: 55px !important;
+
+    flex:
+      0
+      0
+      55px !important;
+
+    margin: 0 !important;
+
+    padding:
+      8px
+      0
+      7px !important;
+
+    border-top:
+      1px solid
+      rgba(
+        255,
+        255,
+        255,
+        0.14
+      ) !important;
+
+    overflow: visible !important;
+  }
+
+  /*
+   * Keep the label on its own line, followed by the number
+   * and election date on one clean row.
+   */
+  .app
+  .workspace
+  .main
+  .heroStats
+  > div {
+    display: grid !important;
+
+    grid-template-columns:
+      auto
+      minmax(0, 1fr) !important;
+
+    grid-template-rows:
+      auto
+      auto !important;
+
+    align-items: end !important;
+
+    column-gap: 8px !important;
+    row-gap: 2px !important;
+
+    width: 100% !important;
+    min-width: 0 !important;
+  }
+
+  .app
+  .workspace
+  .main
+  .heroStats
+  small {
+    grid-column:
+      1 / -1 !important;
+
+    grid-row: 1 !important;
+
+    display: block !important;
+
+    margin: 0 !important;
+
+    line-height: 1.1 !important;
+  }
+
+  .app
+  .workspace
+  .main
+  .heroStats
+  strong {
+    grid-column: 1 !important;
+    grid-row: 2 !important;
+
+    display: block !important;
+
+    margin: 0 !important;
+
+    line-height: 0.9 !important;
+  }
+
+  .app
+  .workspace
+  .main
+  .heroStats
+  span {
+    grid-column: 2 !important;
+    grid-row: 2 !important;
+
+    display: block !important;
+
+    min-width: 0 !important;
+
+    align-self: end !important;
+
+    padding-bottom: 3px !important;
+
+    line-height: 1.2 !important;
+  }
+
+  /*
+   * Shortcut controls begin after the completed countdown block.
+   */
+  .app
+  .workspace
+  .main
+  .heroShortcutArea {
+    flex: 0 0 auto !important;
+
+    margin:
+      2px
+      0
+      0 !important;
+  }
+
+  .app
+  .workspace
+  .main
+  .heroActions {
+    margin: 0 !important;
+  }
+}
+
+/* CAMPAIGN SEAT SPOTLIGHT META SEPARATION — END */
+
+/* CAMPAIGN SEAT CANONICAL 820 TABLET HEADER — START */
+
+/*
+ * Portrait-tablet header only.
+ *
+ * Row one:
+ * Hamburger + full greeting
+ *
+ * Row two:
+ * Deadline + full date/time + Support + Notifications
+ *
+ * The confirmed 1180 landscape-tablet header is outside
+ * this breakpoint and remains untouched.
+ */
+@media
+  (min-width: 701px)
+  and
+  (max-width: 900px) {
+
+  .app
+  .workspace
+  .topbar {
+    box-sizing: border-box !important;
+
+    display: grid !important;
+
+    grid-template-columns:
+      42px
+      minmax(0, 1fr) !important;
+
+    grid-template-rows:
+      auto
+      48px !important;
+
+    align-items: center !important;
+
+    column-gap: 10px !important;
+    row-gap: 10px !important;
+
+    width: 100% !important;
+    min-width: 0 !important;
+
+    height: auto !important;
+    min-height: 116px !important;
+    max-height: none !important;
+
+    padding:
+      12px
+      14px !important;
+
+    overflow: visible !important;
+  }
+
+  /*
+   * Hamburger remains on the first row.
+   */
+  .app
+  .workspace
+  .topbar
+  > .menuButton,
+  .app
+  .workspace
+  .topbar
+  > button[aria-label="Open navigation"] {
+    position: relative !important;
+    inset: auto !important;
+
+    display: grid !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+
+    grid-column: 1 !important;
+    grid-row: 1 !important;
+
+    width: 42px !important;
+    min-width: 42px !important;
+    max-width: 42px !important;
+
+    height: 42px !important;
+    min-height: 42px !important;
+    max-height: 42px !important;
+
+    place-items: center !important;
+
+    align-self: center !important;
+    justify-self: start !important;
+
+    margin: 0 !important;
+
+    transform: none !important;
+  }
+
+  /*
+   * Full greeting receives the entire remaining first row.
+   */
+  .app
+  .workspace
+  .topbar
+  > .greeting {
+    display: grid !important;
+
+    grid-column: 2 !important;
+    grid-row: 1 !important;
+
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: none !important;
+
+    align-content: center !important;
+
+    gap: 4px !important;
+
+    margin: 0 !important;
+
+    overflow: visible !important;
+  }
+
+  .app
+  .workspace
+  .topbar
+  > .greeting
+  h1 {
+    width: 100% !important;
+    max-width: none !important;
+
+    margin: 0 !important;
+
+    overflow: visible !important;
+
+    font-size:
+      clamp(
+        1.45rem,
+        3.6vw,
+        1.72rem
+      ) !important;
+
+    line-height: 1.05 !important;
+    letter-spacing: -0.03em !important;
+
+    text-overflow: clip !important;
+    white-space: nowrap !important;
+  }
+
+  .app
+  .workspace
+  .topbar
+  > .greeting
+  p {
+    width: 100% !important;
+    max-width: none !important;
+
+    margin: 0 !important;
+
+    overflow: hidden !important;
+
+    font-size: 10.5px !important;
+    line-height: 1.2 !important;
+
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+  }
+
+  /*
+   * All header controls use the full second row.
+   */
+  .app
+  .workspace
+  .topbar
+  > .topbarActions {
+    box-sizing: border-box !important;
+
+    display: grid !important;
+
+    grid-column:
+      1 / -1 !important;
+
+    grid-row: 2 !important;
+
+    grid-template-columns:
+      minmax(155px, 0.8fr)
+      minmax(250px, 1.35fr)
+      46px
+      46px !important;
+
+    grid-template-areas:
+      "deadline datetime support notifications" !important;
+
+    grid-template-rows:
+      48px !important;
+
+    align-items: center !important;
+
+    gap: 7px !important;
+
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: none !important;
+
+    height: 48px !important;
+    min-height: 48px !important;
+    max-height: 48px !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
+
+    overflow: visible !important;
+  }
+
+  .app
+  .workspace
+  .topbar
+  > .topbarActions
+  > * {
+    box-sizing: border-box !important;
+
+    grid-row: 1 !important;
+
+    min-width: 0 !important;
+
+    align-self: center !important;
+
+    margin: 0 !important;
+  }
+
+  /*
+   * Hide the duplicate header AI search on portrait tablet.
+   * The complete Campaign HQ panel remains directly below
+   * the Spotlight.
+   */
+  .app
+  .workspace
+  .topbar
+  .headerCampaignSearch {
+    display: none !important;
+  }
+
+  .app
+  .workspace
+  .topbar
+  .headerDeadline {
+    grid-area: deadline !important;
+
+    width: 100% !important;
+    min-width: 0 !important;
+
+    height: 48px !important;
+    min-height: 48px !important;
+    max-height: 48px !important;
+  }
+
+  .app
+  .workspace
+  .topbar
+  .headerDateTimeButton {
+    grid-area: datetime !important;
+
+    width: 100% !important;
+    min-width: 0 !important;
+
+    height: 48px !important;
+    min-height: 48px !important;
+    max-height: 48px !important;
+
+    overflow: visible !important;
+  }
+
+  /*
+   * Prevent the date from being shortened with an ellipsis.
+   */
+  .app
+  .workspace
+  .topbar
+  .headerDateTimeButton
+  * {
+    max-width: none !important;
+
+    overflow: visible !important;
+
+    text-overflow: clip !important;
+    white-space: nowrap !important;
+  }
+
+  /*
+   * Support receives its own fixed column.
+   */
+  .app
+  .workspace
+  .topbar
+  .headerSupport,
+  .app
+  .workspace
+  .topbar
+  .headerSupport
+  > * {
+    grid-area: support !important;
+
+    position: relative !important;
+    inset: auto !important;
+
+    width: 46px !important;
+    min-width: 46px !important;
+    max-width: 46px !important;
+
+    height: 46px !important;
+    min-height: 46px !important;
+    max-height: 46px !important;
+
+    align-self: center !important;
+    justify-self: center !important;
+
+    margin: 0 !important;
+
+    transform: none !important;
+  }
+
+  /*
+   * Activity Center receives a separate fixed column.
+   */
+  .app
+  .workspace
+  .topbar
+  .headerNotifications,
+  .app
+  .workspace
+  .topbar
+  .headerNotifications
+  > *,
+  .app
+  .workspace
+  .topbar
+  .headerNotifications
+  button {
+    grid-area: notifications !important;
+
+    position: relative !important;
+    inset: auto !important;
+
+    width: 46px !important;
+    min-width: 46px !important;
+    max-width: 46px !important;
+
+    height: 46px !important;
+    min-height: 46px !important;
+    max-height: 46px !important;
+
+    align-self: center !important;
+    justify-self: center !important;
+
+    margin: 0 !important;
+
+    transform: none !important;
+
+    overflow: visible !important;
+  }
+}
+
+/* CAMPAIGN SEAT CANONICAL 820 TABLET HEADER — END */
+
+/* CAMPAIGN SEAT CONSOLIDATED 820 SPOTLIGHT — START */
+
+/*
+ * Canonical portrait-tablet Spotlight.
+ *
+ * This rule controls the exact JSX structure:
+ *
+ * .heroCopy
+ *   .sectionEyebrow
+ *   h2
+ *   p
+ *   .heroTags
+ *   .heroStats
+ *   .heroShortcutArea
+ *     .heroActions
+ *     .editShortcutsButton
+ *
+ * Every section remains in normal grid flow.
+ * No section is pushed, floated or independently positioned.
+ */
+@media
+  (min-width: 701px)
+  and
+  (max-width: 900px) {
+
+  /* =======================================================
+     COMPLETE SPOTLIGHT CARD
+     ======================================================= */
+
+  .app
+  .workspace
+  .main
+  .centerHeroStack
+  .heroCard {
+    box-sizing: border-box !important;
+
+    display: grid !important;
+
+    grid-template-columns:
+      minmax(0, 1.46fr)
+      minmax(235px, 0.74fr) !important;
+
+    width: 100% !important;
+    min-width: 0 !important;
+
+    height: 420px !important;
+    min-height: 420px !important;
+    max-height: 420px !important;
+
+    overflow: hidden !important;
+  }
+
+  /* =======================================================
+     INFORMATION COLUMN
+     ======================================================= */
+
+  .app
+  .workspace
+  .main
+  .centerHeroStack
+  .heroCopy {
+    box-sizing: border-box !important;
+
+    display: grid !important;
+
+    grid-template-columns:
+      minmax(0, 1fr) !important;
+
+    grid-template-rows:
+      auto
+      auto
+      auto
+      auto
+      auto
+      auto !important;
+
+    align-content: start !important;
+    align-items: start !important;
+
+    gap: 7px !important;
+
+    width: 100% !important;
+    min-width: 0 !important;
+
+    height: 420px !important;
+    min-height: 420px !important;
+    max-height: 420px !important;
+
+    padding:
+      20px
+      20px
+      16px !important;
+
+    overflow: hidden !important;
+  }
+
+  .app
+  .workspace
+  .main
+  .centerHeroStack
+  .heroCopy
+  > * {
+    box-sizing: border-box !important;
+
+    min-width: 0 !important;
+    max-width: 100% !important;
+  }
+
+  /* =======================================================
+     LABEL AND HEADLINE
+     ======================================================= */
+
+  .app
+  .workspace
+  .main
+  .centerHeroStack
+  .heroCopy
+  > .sectionEyebrow {
+    margin: 0 !important;
+
+    font-size: 10.5px !important;
+    font-weight: 850 !important;
+    line-height: 1.1 !important;
+    letter-spacing: 0.15em !important;
+  }
+
+  .app
+  .workspace
+  .main
+  .centerHeroStack
+  .heroCopy
+  > h2 {
+    width: 100% !important;
+
+    margin: 0 !important;
+
+    font-size:
+      clamp(
+        2rem,
+        4.25vw,
+        2.3rem
+      ) !important;
+
+    font-weight: 850 !important;
+    line-height: 0.98 !important;
+    letter-spacing: -0.04em !important;
+  }
+
+  .app
+  .workspace
+  .main
+  .centerHeroStack
+  .heroCopy
+  > h2
+  strong {
+    font-size: inherit !important;
+    line-height: inherit !important;
+  }
+
+  .app
+  .workspace
+  .main
+  .centerHeroStack
+  .heroCopy
+  > p {
+    width: 100% !important;
+
+    margin: 0 !important;
+
+    font-size: 12.5px !important;
+    line-height: 1.4 !important;
+  }
+
+  /* =======================================================
+     CAMPAIGN TAGS
+     ======================================================= */
+
+  .app
+  .workspace
+  .main
+  .centerHeroStack
+  .heroTags {
+    display: flex !important;
+
+    flex-wrap: wrap !important;
+
+    align-items: center !important;
+
+    gap: 6px !important;
+
+    margin:
+      1px
+      0
+      0 !important;
+
+    padding: 0 !important;
+
+    border: 0 !important;
+  }
+
+  .app
+  .workspace
+  .main
+  .centerHeroStack
+  .heroTags
+  > span {
+    display: inline-flex !important;
+
+    min-height: 24px !important;
+
+    align-items: center !important;
+    justify-content: center !important;
+
+    padding:
+      4px
+      9px !important;
+
+    font-size: 9.75px !important;
+    font-weight: 750 !important;
+    line-height: 1 !important;
+  }
+
+  /* =======================================================
+     ELECTION DAY PANEL
+     ======================================================= */
+
+  .app
+  .workspace
+  .main
+  .centerHeroStack
+  .heroStats {
+    position: static !important;
+
+    display: block !important;
+
+    width: 100% !important;
+    min-width: 0 !important;
+
+    height: 60px !important;
+    min-height: 60px !important;
+    max-height: 60px !important;
+
+    margin:
+      2px
+      0
+      0 !important;
+
+    padding:
+      8px
+      11px !important;
+
+    border:
+      1px solid
+      rgba(
+        255,
+        255,
+        255,
+        0.15
+      ) !important;
+
+    border-radius: 10px !important;
+
+    background:
+      rgba(
+        255,
+        255,
+        255,
+        0.055
+      ) !important;
+
+    overflow: hidden !important;
+
+    transform: none !important;
+  }
+
+  .app
+  .workspace
+  .main
+  .centerHeroStack
+  .heroStats
+  > div {
+    display: grid !important;
+
+    grid-template-columns:
+      auto
+      minmax(0, 1fr) !important;
+
+    grid-template-rows:
+      auto
+      auto !important;
+
+    align-items: end !important;
+
+    column-gap: 9px !important;
+    row-gap: 2px !important;
+
+    width: 100% !important;
+    min-width: 0 !important;
+
+    min-height: 0 !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  .app
+  .workspace
+  .main
+  .centerHeroStack
+  .heroStats
+  small {
+    grid-column:
+      1 / -1 !important;
+
+    grid-row: 1 !important;
+
+    display: block !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
+
+    font-size: 9px !important;
+    font-weight: 850 !important;
+    line-height: 1 !important;
+    letter-spacing: 0.09em !important;
+  }
+
+  .app
+  .workspace
+  .main
+  .centerHeroStack
+  .heroStats
+  strong {
+    grid-column: 1 !important;
+    grid-row: 2 !important;
+
+    display: block !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
+
+    font-size: 2.15rem !important;
+    line-height: 0.88 !important;
+    letter-spacing: -0.045em !important;
+  }
+
+  .app
+  .workspace
+  .main
+  .centerHeroStack
+  .heroStats
+  span {
+    grid-column: 2 !important;
+    grid-row: 2 !important;
+
+    display: block !important;
+
+    min-width: 0 !important;
+
+    align-self: end !important;
+
+    margin: 0 !important;
+    padding:
+      0
+      0
+      3px !important;
+
+    font-size: 9.25px !important;
+    line-height: 1.15 !important;
+
+    white-space: normal !important;
+  }
+
+  /* =======================================================
+     REAL SHORTCUT WRAPPER
+     ======================================================= */
+
+  .app
+  .workspace
+  .main
+  .centerHeroStack
+  .heroShortcutArea {
+    position: relative !important;
+    inset: auto !important;
+
+    display: grid !important;
+
+    grid-template-columns:
+      minmax(0, 1fr) !important;
+
+    grid-template-rows:
+      auto
+      auto !important;
+
+    align-content: start !important;
+    align-items: start !important;
+    justify-items: stretch !important;
+
+    gap: 6px !important;
+
+    width: 100% !important;
+    min-width: 0 !important;
+
+    min-height: max-content !important;
+
+    margin:
+      1px
+      0
+      0 !important;
+
+    padding: 0 !important;
+
+    overflow: visible !important;
+
+    transform: none !important;
+  }
+
+  /* =======================================================
+     FOUR PRIMARY ACTIONS
+     ======================================================= */
+
+  .app
+  .workspace
+  .main
+  .centerHeroStack
+  .heroShortcutArea
+  .heroActions {
+    position: static !important;
+    inset: auto !important;
+
+    display: grid !important;
+
+    grid-template-columns:
+      repeat(
+        2,
+        minmax(0, 1fr)
+      ) !important;
+
+    gap:
+      7px
+      8px !important;
+
+    width: 100% !important;
+    min-width: 0 !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
+
+    overflow: visible !important;
+
+    transform: none !important;
+  }
+
+  .app
+  .workspace
+  .main
+  .centerHeroStack
+  .heroShortcutArea
+  .heroActions
+  button {
+    position: static !important;
+    inset: auto !important;
+
+    box-sizing: border-box !important;
+
+    display: inline-flex !important;
+
+    width: 100% !important;
+    min-width: 0 !important;
+
+    height: 36px !important;
+    min-height: 36px !important;
+    max-height: 36px !important;
+
+    align-items: center !important;
+    justify-content: flex-start !important;
+
+    gap: 7px !important;
+
+    margin: 0 !important;
+
+    padding:
+      7px
+      10px !important;
+
+    font-size: 10.25px !important;
+    font-weight: 750 !important;
+    line-height: 1.1 !important;
+
+    overflow: hidden !important;
+
+    white-space: nowrap !important;
+
+    transform: none !important;
+  }
+
+  .app
+  .workspace
+  .main
+  .centerHeroStack
+  .heroShortcutArea
+  .heroActions
+  button
+  svg {
+    width: 14px !important;
+    height: 14px !important;
+    min-width: 14px !important;
+
+    flex:
+      0
+      0
+      14px !important;
+  }
+
+  .app
+  .workspace
+  .main
+  .centerHeroStack
+  .heroShortcutArea
+  .heroActions
+  button
+  span {
+    display: block !important;
+
+    min-width: 0 !important;
+
+    overflow: hidden !important;
+
+    font-size: inherit !important;
+    line-height: inherit !important;
+
+    text-align: left !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+  }
+
+  /* =======================================================
+     EDIT SHORTCUTS
+     ======================================================= */
+
+  .app
+  .workspace
+  .main
+  .centerHeroStack
+  .heroShortcutArea
+  .editShortcutsButton {
+    position: static !important;
+    inset: auto !important;
+
+    box-sizing: border-box !important;
+
+    display: inline-flex !important;
+
+    width: auto !important;
+
+    height: 24px !important;
+    min-height: 24px !important;
+    max-height: 24px !important;
+
+    align-items: center !important;
+    align-self: auto !important;
+    justify-content: center !important;
+    justify-self: center !important;
+
+    gap: 4px !important;
+
+    margin: 0 !important;
+
+    padding:
+      4px
+      9px !important;
+
+    font-size: 8.75px !important;
+    line-height: 1 !important;
+
+    transform: none !important;
+  }
+
+  .app
+  .workspace
+  .main
+  .centerHeroStack
+  .heroShortcutArea
+  .editShortcutsButton
+  svg {
+    width: 11px !important;
+    height: 11px !important;
+    min-width: 11px !important;
+  }
+
+  /* =======================================================
+     USER-UPLOADED PORTRAIT
+     ======================================================= */
+
+  .app
+  .workspace
+  .main
+  .centerHeroStack
+  .heroPortraitWrap {
+    position: relative !important;
+
+    box-sizing: border-box !important;
+
+    width: 100% !important;
+    min-width: 0 !important;
+
+    height: 420px !important;
+    min-height: 420px !important;
+    max-height: 420px !important;
+
+    align-self: stretch !important;
+
+    overflow: hidden !important;
+
+    border-left:
+      1px solid
+      rgba(
+        255,
+        255,
+        255,
+        0.12
+      ) !important;
+
+    background:
+      linear-gradient(
+        145deg,
+        #174f83,
+        #071f3c
+      ) !important;
+  }
+
+  .app
+  .workspace
+  .main
+  .centerHeroStack
+  .heroPortrait {
+    display: block !important;
+
+    width: 100% !important;
+    min-width: 100% !important;
+    max-width: 100% !important;
+
+    height: 100% !important;
+    min-height: 100% !important;
+    max-height: 100% !important;
+
+    object-fit: cover !important;
+
+    object-position:
+      var(
+        --campaign-profile-photo-position,
+        50% 20%
+      ) !important;
+
+    transform: none !important;
+  }
+}
+
+/* CAMPAIGN SEAT CONSOLIDATED 820 SPOTLIGHT — END */
+
+/* CAMPAIGN SEAT CANONICAL MOBILE HEADER — START */
+
+/*
+ * Mobile header structure:
+ *
+ * Row 1: hamburger + greeting
+ * Row 2: deadline + Support + notifications
+ * Row 3: full date and time
+ *
+ * This removes the empty fourth row visible at 390px.
+ */
+@media (max-width: 700px) {
+
+  .app
+  .workspace
+  .topbar {
+    box-sizing: border-box !important;
+
+    display: grid !important;
+
+    grid-template-columns:
+      42px
+      minmax(0, 1fr) !important;
+
+    grid-template-rows:
+      auto
+      auto !important;
+
+    align-items: center !important;
+
+    column-gap: 9px !important;
+    row-gap: 9px !important;
+
+    width: 100% !important;
+    min-width: 0 !important;
+
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+
+    padding:
+      10px
+      10px
+      11px !important;
+
+    overflow: visible !important;
+  }
+
+  /*
+   * Row 1 — hamburger.
+   */
+  .app
+  .workspace
+  .topbar
+  > .menuButton,
+  .app
+  .workspace
+  .topbar
+  > button[aria-label="Open navigation"] {
+    position: static !important;
+    inset: auto !important;
+
+    display: grid !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+
+    grid-column: 1 !important;
+    grid-row: 1 !important;
+
+    width: 42px !important;
+    min-width: 42px !important;
+    max-width: 42px !important;
+
+    height: 42px !important;
+    min-height: 42px !important;
+    max-height: 42px !important;
+
+    place-items: center !important;
+
+    align-self: center !important;
+    justify-self: start !important;
+
+    margin: 0 !important;
+
+    transform: none !important;
+  }
+
+  /*
+   * Row 1 — full greeting.
+   */
+  .app
+  .workspace
+  .topbar
+  > .greeting {
+    display: grid !important;
+
+    grid-column: 2 !important;
+    grid-row: 1 !important;
+
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: none !important;
+
+    align-content: center !important;
+
+    gap: 3px !important;
+
+    margin: 0 !important;
+
+    overflow: visible !important;
+  }
+
+  .app
+  .workspace
+  .topbar
+  > .greeting
+  h1 {
+    width: 100% !important;
+    max-width: none !important;
+
+    margin: 0 !important;
+
+    overflow: visible !important;
+
+    font-size:
+      clamp(
+        1.22rem,
+        5.4vw,
+        1.45rem
+      ) !important;
+
+    line-height: 1.05 !important;
+    letter-spacing: -0.035em !important;
+
+    text-overflow: clip !important;
+    white-space: nowrap !important;
+  }
+
+  .app
+  .workspace
+  .topbar
+  > .greeting
+  p {
+    width: 100% !important;
+    max-width: none !important;
+
+    margin: 0 !important;
+
+    overflow: hidden !important;
+
+    font-size: 9.5px !important;
+    line-height: 1.2 !important;
+
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+  }
+
+  /*
+   * Rows 2 and 3 are contained inside topbarActions.
+   */
+  .app
+  .workspace
+  .topbar
+  > .topbarActions {
+    box-sizing: border-box !important;
+
+    position: static !important;
+    inset: auto !important;
+
+    display: grid !important;
+
+    grid-column:
+      1 / -1 !important;
+
+    grid-row: 2 !important;
+
+    grid-template-columns:
+      minmax(0, 1fr)
+      44px
+      44px !important;
+
+    grid-template-rows:
+      46px
+      46px !important;
+
+    grid-template-areas:
+      "deadline support notifications"
+      "datetime datetime datetime" !important;
+
+    align-items: center !important;
+
+    column-gap: 7px !important;
+    row-gap: 7px !important;
+
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: none !important;
+
+    height: auto !important;
+    min-height: 99px !important;
+    max-height: none !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
+
+    overflow: visible !important;
+
+    transform: none !important;
+  }
+
+  .app
+  .workspace
+  .topbar
+  > .topbarActions
+  > * {
+    box-sizing: border-box !important;
+
+    position: static !important;
+    inset: auto !important;
+
+    min-width: 0 !important;
+
+    margin: 0 !important;
+
+    transform: none !important;
+  }
+
+  /*
+   * The duplicate header AI control remains hidden on mobile.
+   * The complete Campaign HQ panel remains in the dashboard.
+   */
+  .app
+  .workspace
+  .topbar
+  .headerCampaignSearch {
+    display: none !important;
+  }
+
+  /*
+   * Row 2 — deadline.
+   */
+  .app
+  .workspace
+  .topbar
+  .headerDeadline {
+    grid-area: deadline !important;
+
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: none !important;
+
+    height: 46px !important;
+    min-height: 46px !important;
+    max-height: 46px !important;
+
+    align-self: center !important;
+    justify-self: stretch !important;
+
+    overflow: hidden !important;
+  }
+
+  /*
+   * Row 2 — Support.
+   */
+  .app
+  .workspace
+  .topbar
+  .headerSupport,
+  .app
+  .workspace
+  .topbar
+  .headerSupport
+  > * {
+    grid-area: support !important;
+
+    position: static !important;
+    inset: auto !important;
+
+    width: 44px !important;
+    min-width: 44px !important;
+    max-width: 44px !important;
+
+    height: 44px !important;
+    min-height: 44px !important;
+    max-height: 44px !important;
+
+    align-self: center !important;
+    justify-self: center !important;
+
+    margin: 0 !important;
+
+    transform: none !important;
+  }
+
+  /*
+   * Keep the mobile Support control icon-only.
+   */
+  .app
+  .workspace
+  .topbar
+  [data-native-support-label="true"] {
+    display: none !important;
+  }
+
+  /*
+   * Row 2 — notifications.
+   */
+  .app
+  .workspace
+  .topbar
+  .headerNotifications,
+  .app
+  .workspace
+  .topbar
+  .headerNotifications
+  > *,
+  .app
+  .workspace
+  .topbar
+  .headerNotifications
+  button {
+    grid-area: notifications !important;
+
+    position: relative !important;
+    inset: auto !important;
+
+    width: 44px !important;
+    min-width: 44px !important;
+    max-width: 44px !important;
+
+    height: 44px !important;
+    min-height: 44px !important;
+    max-height: 44px !important;
+
+    align-self: center !important;
+    justify-self: center !important;
+
+    margin: 0 !important;
+
+    transform: none !important;
+
+    overflow: visible !important;
+  }
+
+  /*
+   * Row 3 — full date and time.
+   */
+  .app
+  .workspace
+  .topbar
+  .headerDateTimeButton {
+    grid-area: datetime !important;
+
+    position: static !important;
+    inset: auto !important;
+
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: none !important;
+
+    height: 46px !important;
+    min-height: 46px !important;
+    max-height: 46px !important;
+
+    align-self: center !important;
+    justify-self: stretch !important;
+
+    margin: 0 !important;
+
+    overflow: hidden !important;
+
+    transform: none !important;
+  }
+
+  .app
+  .workspace
+  .topbar
+  .headerDateTimeButton
+  > * {
+    min-width: 0 !important;
+  }
+
+  .app
+  .workspace
+  .topbar
+  .headerDateTimeButton
+  span,
+  .app
+  .workspace
+  .topbar
+  .headerDateTimeButton
+  time {
+    max-width: none !important;
+
+    overflow: visible !important;
+
+    text-overflow: clip !important;
+    white-space: nowrap !important;
+  }
+}
+
+/* CAMPAIGN SEAT CANONICAL MOBILE HEADER — END */
+
+/* CAMPAIGN SEAT MOBILE DIRECT-CHILD HEADER PLACEMENT — START */
+
+/*
+ * Canonical mobile header:
+ *
+ * Row 1: greeting
+ * Row 2: deadline | Support | notifications
+ * Row 3: complete date and time
+ *
+ * The deadline and date/time elements remain grids so their
+ * internal labels, values and icons cannot collapse.
+ */
+@media (max-width: 700px) {
+
+  .app
+  .workspace
+  .topbar
+  > .topbarActions {
+    box-sizing: border-box !important;
+
+    display: grid !important;
+
+    grid-template-columns:
+      minmax(0, 1fr)
+      44px
+      44px !important;
+
+    grid-template-rows:
+      46px
+      46px !important;
+
+    grid-template-areas:
+      "deadline support notifications"
+      "datetime datetime datetime" !important;
+
+    width: 100% !important;
+    min-width: 0 !important;
+
+    column-gap: 7px !important;
+    row-gap: 7px !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
+
+    overflow: visible !important;
+  }
+
+  .app
+  .workspace
+  .topbar
+  > .topbarActions
+  > * {
+    box-sizing: border-box !important;
+
+    position: static !important;
+    inset: auto !important;
+
+    min-width: 0 !important;
+
+    margin: 0 !important;
+
+    transform: none !important;
+  }
+
+  /*
+   * Deadline control.
+   *
+   * Keep its original two-column internal structure.
+   */
+  .app
+  .workspace
+  .topbar
+  > .topbarActions
+  > :nth-child(1) {
+    grid-area: deadline !important;
+
+    display: grid !important;
+
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: none !important;
+
+    height: 46px !important;
+    min-height: 46px !important;
+    max-height: 46px !important;
+
+    grid-template-columns:
+      34px
+      minmax(0, 1fr) !important;
+
+    align-items: center !important;
+    align-self: center !important;
+    justify-self: stretch !important;
+
+    gap: 8px !important;
+
+    padding:
+      0
+      10px !important;
+
+    overflow: hidden !important;
+  }
+
+  .app
+  .workspace
+  .topbar
+  > .topbarActions
+  > :nth-child(1)
+  .headerDeadlineIcon {
+    display: grid !important;
+
+    width: 34px !important;
+    min-width: 34px !important;
+    max-width: 34px !important;
+
+    height: 34px !important;
+    min-height: 34px !important;
+    max-height: 34px !important;
+
+    place-items: center !important;
+
+    margin: 0 !important;
+  }
+
+  .app
+  .workspace
+  .topbar
+  > .topbarActions
+  > :nth-child(1)
+  .headerDeadlineCopy {
+    display: grid !important;
+
+    min-width: 0 !important;
+
+    align-content: center !important;
+
+    gap: 2px !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
+
+    overflow: hidden !important;
+  }
+
+  .app
+  .workspace
+  .topbar
+  > .topbarActions
+  > :nth-child(1)
+  .headerDeadlineCopy
+  small,
+  .app
+  .workspace
+  .topbar
+  > .topbarActions
+  > :nth-child(1)
+  .headerDeadlineCopy
+  strong {
+    position: static !important;
+
+    display: block !important;
+
+    width: 100% !important;
+    min-width: 0 !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
+
+    overflow: hidden !important;
+
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+  }
+
+  .app
+  .workspace
+  .topbar
+  > .topbarActions
+  > :nth-child(1)
+  .headerDeadlineCopy
+  small {
+    font-size: 9.5px !important;
+    line-height: 1 !important;
+  }
+
+  .app
+  .workspace
+  .topbar
+  > .topbarActions
+  > :nth-child(1)
+  .headerDeadlineCopy
+  strong {
+    font-size: 11.5px !important;
+    line-height: 1.08 !important;
+  }
+
+  .app
+  .workspace
+  .topbar
+  > :is(
+    .topbarActions
+  )
+  > :nth-child(1)
+  .headerDeadlineCopy
+  > span {
+    display: none !important;
+  }
+
+  /*
+   * Complete date and time control.
+   *
+   * Calendar | date | divider | clock | current time
+   */
+  .app
+  .workspace
+  .topbar
+  > .topbarActions
+  > :nth-child(2) {
+    grid-area: datetime !important;
+
+    display: grid !important;
+
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: none !important;
+
+    height: 46px !important;
+    min-height: 46px !important;
+    max-height: 46px !important;
+
+    grid-template-columns:
+      18px
+      minmax(0, 1fr)
+      1px
+      18px
+      max-content !important;
+
+    align-items: center !important;
+    align-self: center !important;
+    justify-self: stretch !important;
+
+    gap: 7px !important;
+
+    padding:
+      0
+      10px !important;
+
+    overflow: hidden !important;
+  }
+
+  .app
+  .workspace
+  .topbar
+  > .topbarActions
+  > :nth-child(2)
+  .headerDateTimeCalendar,
+  .app
+  .workspace
+  .topbar
+  > .topbarActions
+  > :nth-child(2)
+  .headerDateTimeClock {
+    position: static !important;
+
+    display: block !important;
+
+    width: 18px !important;
+    min-width: 18px !important;
+    max-width: 18px !important;
+
+    height: 18px !important;
+    min-height: 18px !important;
+    max-height: 18px !important;
+
+    margin: 0 !important;
+
+    transform: none !important;
+  }
+
+  .app
+  .workspace
+  .topbar
+  > .topbarActions
+  > :nth-child(2)
+  .headerDateTimeDivider {
+    position: static !important;
+
+    display: block !important;
+
+    width: 1px !important;
+    min-width: 1px !important;
+    max-width: 1px !important;
+
+    height: 20px !important;
+    min-height: 20px !important;
+    max-height: 20px !important;
+
+    margin: 0 !important;
+  }
+
+  .app
+  .workspace
+  .topbar
+  > .topbarActions
+  > :nth-child(2)
+  .headerDateValue,
+  .app
+  .workspace
+  .topbar
+  > .topbarActions
+  > :nth-child(2)
+  .headerTimeValue {
+    position: static !important;
+
+    display: block !important;
+
+    min-width: 0 !important;
+    max-width: none !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
+
+    overflow: hidden !important;
+
+    font-size: 11.5px !important;
+    line-height: 1 !important;
+
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+  }
+
+  .app
+  .workspace
+  .topbar
+  > .topbarActions
+  > :nth-child(2)
+  .headerTimeValue {
+    text-align: right !important;
+  }
+
+  /*
+   * The duplicate header AI control stays hidden.
+   * The complete Campaign HQ panel remains beneath the Spotlight.
+   */
+  .app
+  .workspace
+  .topbar
+  > .topbarActions
+  > :nth-child(3) {
+    display: none !important;
+  }
+
+  /*
+   * Support receives its own icon column.
+   */
+  .app
+  .workspace
+  .topbar
+  > .topbarActions
+  > :nth-child(4) {
+    grid-area: support !important;
+
+    position: relative !important;
+
+    display: grid !important;
+
+    width: 44px !important;
+    min-width: 44px !important;
+    max-width: 44px !important;
+
+    height: 44px !important;
+    min-height: 44px !important;
+    max-height: 44px !important;
+
+    place-items: center !important;
+
+    align-self: center !important;
+    justify-self: center !important;
+
+    overflow: visible !important;
+  }
+
+  .app
+  .workspace
+  .topbar
+  > .topbarActions
+  > :nth-child(4)
+  > *,
+  .app
+  .workspace
+  .topbar
+  > .topbarActions
+  > :nth-child(4)
+  button,
+  .app
+  .workspace
+  .topbar
+  > .topbarActions
+  > :nth-child(4)
+  [data-native-support-button="true"] {
+    position: relative !important;
+    inset: auto !important;
+
+    display: grid !important;
+
+    width: 44px !important;
+    min-width: 44px !important;
+    max-width: 44px !important;
+
+    height: 44px !important;
+    min-height: 44px !important;
+    max-height: 44px !important;
+
+    place-items: center !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
+
+    transform: none !important;
+
+    overflow: visible !important;
+  }
+
+  /*
+   * Notifications receives a separate final column.
+   */
+  .app
+  .workspace
+  .topbar
+  > .topbarActions
+  > :nth-child(5) {
+    grid-area: notifications !important;
+
+    position: relative !important;
+
+    display: grid !important;
+
+    width: 44px !important;
+    min-width: 44px !important;
+    max-width: 44px !important;
+
+    height: 44px !important;
+    min-height: 44px !important;
+    max-height: 44px !important;
+
+    place-items: center !important;
+
+    align-self: center !important;
+    justify-self: center !important;
+
+    overflow: visible !important;
+  }
+
+  .app
+  .workspace
+  .topbar
+  > .topbarActions
+  > :nth-child(5)
+  > *,
+  .app
+  .workspace
+  .topbar
+  > .topbarActions
+  > :nth-child(5)
+  button {
+    position: relative !important;
+    inset: auto !important;
+
+    display: grid !important;
+
+    width: 44px !important;
+    min-width: 44px !important;
+    max-width: 44px !important;
+
+    height: 44px !important;
+    min-height: 44px !important;
+    max-height: 44px !important;
+
+    place-items: center !important;
+
+    margin: 0 !important;
+
+    transform: none !important;
+
+    overflow: visible !important;
+  }
+
+  .app
+  .workspace
+  .topbar
+  [data-native-support-label="true"] {
+    display: none !important;
+  }
+
+  /*
+   * Restore actual mobile priority rows.
+   *
+   * Earlier rules assigned flex-basis: 0 to the list. Because the
+   * card uses natural height on mobile, that allowed the task list
+   * to collapse while the monitoring footer stayed visible.
+   */
+  .app
+  .workspace
+  .main
+  .heroPriorityCard {
+    display: flex !important;
+
+    width: 100% !important;
+    min-width: 0 !important;
+
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+
+    flex-direction: column !important;
+
+    padding:
+      12px
+      13px !important;
+
+    overflow: visible !important;
+  }
+
+  .app
+  .workspace
+  .main
+  .heroPriorityCard
+  > .cardHeading {
+    position: static !important;
+    inset: auto !important;
+
+    flex:
+      0
+      0
+      auto !important;
+
+    margin: 0 !important;
+    padding:
+      0
+      0
+      8px !important;
+
+    background: #ffffff !important;
+  }
+
+  .app
+  .workspace
+  .main
+  .heroPriorityCard
+  .priorityList {
+    position: static !important;
+
+    display: grid !important;
+
+    width: 100% !important;
+    min-width: 0 !important;
+
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+
+    flex:
+      0
+      0
+      auto !important;
+
+    grid-auto-rows: max-content !important;
+
+    gap: 0 !important;
+
+    margin:
+      0
+      0
+      8px !important;
+
+    padding: 0 !important;
+
+    overflow: visible !important;
+
+    transform: none !important;
+  }
+
+  .app
+  .workspace
+  .main
+  .heroPriorityCard
+  .priorityList
+  > button {
+    position: static !important;
+
+    display: grid !important;
+
+    width: 100% !important;
+    min-width: 0 !important;
+
+    height: auto !important;
+    min-height: 48px !important;
+    max-height: none !important;
+
+    flex:
+      0
+      0
+      auto !important;
+
+    grid-template-columns:
+      28px
+      minmax(0, 1fr)
+      auto !important;
+
+    align-items: center !important;
+
+    gap: 8px !important;
+
+    margin: 0 !important;
+    padding:
+      6px
+      4px !important;
+
+    overflow: visible !important;
+
+    visibility: visible !important;
+    opacity: 1 !important;
+
+    transform: none !important;
+  }
+
+  /*
+   * Three meaningful mobile priorities keep the card useful
+   * without making it dominate the first several screens.
+   */
+  .app
+  .workspace
+  .main
+  .heroPriorityCard
+  .priorityList
+  > button:nth-child(n + 4) {
+    display: none !important;
+  }
+
+  .app
+  .workspace
+  .main
+  .heroPriorityCard
+  .priorityCopy {
+    display: block !important;
+
+    min-width: 0 !important;
+  }
+
+  .app
+  .workspace
+  .main
+  .heroPriorityCard
+  .priorityList
+  strong,
+  .app
+  .workspace
+  .main
+  .heroPriorityCard
+  .priorityList
+  small {
+    display: block !important;
+
+    min-width: 0 !important;
+
+    overflow: hidden !important;
+
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+  }
+
+  .app
+  .workspace
+  .main
+  .heroPriorityCard
+  .priorityList
+  strong {
+    font-size: 11.5px !important;
+    line-height: 1.25 !important;
+  }
+
+  .app
+  .workspace
+  .main
+  .heroPriorityCard
+  .priorityList
+  small {
+    margin-top: 2px !important;
+
+    font-size: 10px !important;
+    line-height: 1.25 !important;
+  }
+
+  .app
+  .workspace
+  .main
+  .heroPriorityCard
+  .priorityBadge {
+    grid-column: auto !important;
+
+    min-width: 44px !important;
+
+    justify-self: end !important;
+
+    margin: 0 !important;
+    padding:
+      3px
+      6px !important;
+
+    font-size: 9px !important;
+    line-height: 1 !important;
+  }
+
+  .app
+  .workspace
+  .main
+  .heroPriorityCard
+  .priorityMonitoring {
+    position: static !important;
+    inset: auto !important;
+
+    display: flex !important;
+
+    width: 100% !important;
+    min-width: 0 !important;
+
+    min-height: 34px !important;
+
+    flex:
+      0
+      0
+      auto !important;
+
+    align-items: center !important;
+
+    gap: 7px !important;
+
+    margin: 0 !important;
+    padding:
+      8px
+      3px
+      1px !important;
+
+    overflow: visible !important;
+
+    border-top:
+      1px
+      solid
+      #e7edf3 !important;
+
+    background: #ffffff !important;
+  }
+}
+
+/* CAMPAIGN SEAT MOBILE DIRECT-CHILD HEADER PLACEMENT — END */
+
+/* CAMPAIGN SEAT MOBILE INNER LIST SCROLL — START */
+
+/*
+ * Mobile cards retain their natural outer height.
+ *
+ * Only the changing content areas scroll:
+ * - Today's Priorities task list
+ * - Today's Schedule event timeline
+ *
+ * Headings and bottom status sections remain outside
+ * the scroll containers and therefore stay visible.
+ */
+@media (max-width: 700px) {
+
+  .app
+  .workspace
+  .main
+  .heroPriorityCard,
+  .app
+  .workspace
+  .main
+  .scheduleCard {
+    box-sizing: border-box !important;
+
+    display: flex !important;
+
+    width: 100% !important;
+    min-width: 0 !important;
+
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+
+    flex-direction: column !important;
+
+    overflow: hidden !important;
+  }
+
+  /*
+   * Keep card headings outside the scrolling region.
+   */
+  .app
+  .workspace
+  .main
+  .heroPriorityCard
+  > .cardHeading,
+  .app
+  .workspace
+  .main
+  .scheduleCard
+  > .cardHeading {
+    position: static !important;
+    inset: auto !important;
+
+    flex:
+      0
+      0
+      auto !important;
+
+    width: 100% !important;
+
+    margin: 0 !important;
+
+    background: #ffffff !important;
+  }
+
+  /*
+   * Priorities show approximately three rows before scrolling.
+   * Every additional priority remains available by swiping.
+   */
+  .app
+  .workspace
+  .main
+  .heroPriorityCard
+  .priorityList {
+    position: static !important;
+
+    display: grid !important;
+
+    width: 100% !important;
+    min-width: 0 !important;
+
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: 150px !important;
+
+    flex:
+      0
+      0
+      auto !important;
+
+    grid-auto-rows: max-content !important;
+
+    margin:
+      0
+      0
+      8px !important;
+
+    padding:
+      0
+      4px
+      0
+      0 !important;
+
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+
+    overscroll-behavior-y: auto !important;
+    scroll-behavior: smooth !important;
+    scrollbar-gutter: auto !important;
+
+    -webkit-overflow-scrolling: touch !important;
+    touch-action: pan-y !important;
+  }
+
+  /*
+   * Undo any older mobile rule that hid priority four and beyond.
+   */
+  .app
+  .workspace
+  .main
+  .heroPriorityCard
+  .priorityList
+  > button,
+  .app
+  .workspace
+  .main
+  .heroPriorityCard
+  .priorityList
+  > button:nth-child(n) {
+    position: static !important;
+
+    display: grid !important;
+
+    visibility: visible !important;
+    opacity: 1 !important;
+
+    height: auto !important;
+    min-height: 48px !important;
+    max-height: none !important;
+
+    flex:
+      0
+      0
+      auto !important;
+
+    transform: none !important;
+  }
+
+  /*
+   * Schedule shows several useful events before scrolling.
+   * Later events remain available by swiping inside the timeline.
+   */
+  .app
+  .workspace
+  .main
+  .scheduleCard
+  .scheduleTimeline {
+    position: static !important;
+
+    display: grid !important;
+
+    width: 100% !important;
+    min-width: 0 !important;
+
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: 224px !important;
+
+    flex:
+      0
+      0
+      auto !important;
+
+    grid-auto-rows: max-content !important;
+
+    margin:
+      0
+      0
+      8px !important;
+
+    padding:
+      0
+      4px
+      0
+      0 !important;
+
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+
+    overscroll-behavior-y: auto !important;
+    scroll-behavior: smooth !important;
+    scrollbar-gutter: auto !important;
+
+    -webkit-overflow-scrolling: touch !important;
+    touch-action: pan-y !important;
+  }
+
+  /*
+   * Undo any older mobile rule that hid later schedule events.
+   */
+  .app
+  .workspace
+  .main
+  .scheduleCard
+  .scheduleTimeline
+  > button,
+  .app
+  .workspace
+  .main
+  .scheduleCard
+  .scheduleTimeline
+  > button:nth-child(n) {
+    position: static !important;
+
+    display: grid !important;
+
+    visibility: visible !important;
+    opacity: 1 !important;
+
+    height: auto !important;
+    min-height: 53px !important;
+    max-height: none !important;
+
+    flex:
+      0
+      0
+      auto !important;
+
+    transform: none !important;
+  }
+
+  /*
+   * Bottom information stays visible beneath each scrolling list.
+   */
+  .app
+  .workspace
+  .main
+  .heroPriorityCard
+  .priorityMonitoring,
+  .app
+  .workspace
+  .main
+  .scheduleCard
+  .scheduleFooter {
+    position: static !important;
+    inset: auto !important;
+
+    width: 100% !important;
+    min-width: 0 !important;
+
+    flex:
+      0
+      0
+      auto !important;
+
+    margin: 0 !important;
+
+    background: #ffffff !important;
+
+    transform: none !important;
+  }
+
+  /*
+   * Thin scrollbars appear only when content actually overflows.
+   */
+  .app
+  .workspace
+  .main
+  .heroPriorityCard
+  .priorityList,
+  .app
+  .workspace
+  .main
+  .scheduleCard
+  .scheduleTimeline {
+    scrollbar-width: thin !important;
+    scrollbar-color:
+      #8da5ba
+      transparent !important;
+  }
+
+  .app
+  .workspace
+  .main
+  .heroPriorityCard
+  .priorityList::-webkit-scrollbar,
+  .app
+  .workspace
+  .main
+  .scheduleCard
+  .scheduleTimeline::-webkit-scrollbar {
+    width: 6px !important;
+  }
+
+  .app
+  .workspace
+  .main
+  .heroPriorityCard
+  .priorityList::-webkit-scrollbar-track,
+  .app
+  .workspace
+  .main
+  .scheduleCard
+  .scheduleTimeline::-webkit-scrollbar-track {
+    background: transparent !important;
+  }
+
+  .app
+  .workspace
+  .main
+  .heroPriorityCard
+  .priorityList::-webkit-scrollbar-thumb,
+  .app
+  .workspace
+  .main
+  .scheduleCard
+  .scheduleTimeline::-webkit-scrollbar-thumb {
+    border:
+      1px
+      solid
+      #ffffff !important;
+
+    border-radius: 999px !important;
+
+    background: #8da5ba !important;
+  }
+}
+
+/* CAMPAIGN SEAT MOBILE INNER LIST SCROLL — END */
+
+/* CAMPAIGN SEAT CANONICAL MOBILE SPOTLIGHT — START */
+
+/*
+ * Mobile Campaign Spotlight:
+ *
+ * 1. Campaign information
+ * 2. Election Day panel
+ * 3. Four primary shortcuts
+ * 4. Edit shortcuts
+ * 5. Controlled uploaded portrait
+ *
+ * This breakpoint does not affect tablet or desktop.
+ */
+@media (max-width: 700px) {
+
+  /* =======================================================
+     COMPLETE MOBILE SPOTLIGHT
+     ======================================================= */
+
+  .app
+  .workspace
+  .main
+  .centerHeroStack
+  .heroCard {
+    box-sizing: border-box !important;
+
+    display: grid !important;
+
+    grid-template-columns:
+      minmax(0, 1fr) !important;
+
+    grid-template-rows:
+      auto
+      218px !important;
+
+    width: 100% !important;
+    min-width: 0 !important;
+
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+
+    overflow: hidden !important;
+
+    border-radius: 14px !important;
+  }
+
+  /* =======================================================
+     CAMPAIGN INFORMATION
+     ======================================================= */
+
+  .app
+  .workspace
+  .main
+  .centerHeroStack
+  .heroCopy {
+    box-sizing: border-box !important;
+
+    position: static !important;
+    inset: auto !important;
+
+    display: grid !important;
+
+    grid-template-columns:
+      minmax(0, 1fr) !important;
+
+    grid-template-rows:
+      auto
+      auto
+      auto
+      auto
+      auto
+      auto !important;
+
+    align-content: start !important;
+    align-items: start !important;
+
+    gap: 7px !important;
+
+    width: 100% !important;
+    min-width: 0 !important;
+
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+
+    margin: 0 !important;
+
+    padding:
+      15px
+      16px
+      13px !important;
+
+    overflow: visible !important;
+
+    transform: none !important;
+  }
+
+  .app
+  .workspace
+  .main
+  .centerHeroStack
+  .heroCopy
+  > * {
+    box-sizing: border-box !important;
+
+    min-width: 0 !important;
+    max-width: 100% !important;
+  }
+
+  /* =======================================================
+     LABEL, HEADLINE AND DESCRIPTION
+     ======================================================= */
+
+  .app
+  .workspace
+  .main
+  .centerHeroStack
+  .heroCopy
+  > .sectionEyebrow {
+    margin: 0 !important;
+
+    font-size: 9px !important;
+    font-weight: 850 !important;
+    line-height: 1.1 !important;
+    letter-spacing: 0.15em !important;
+  }
+
+  .app
+  .workspace
+  .main
+  .centerHeroStack
+  .heroCopy
+  > h2 {
+    width: 100% !important;
+
+    margin: 0 !important;
+
+    font-size:
+      clamp(
+        1.7rem,
+        7.2vw,
+        1.95rem
+      ) !important;
+
+    font-weight: 850 !important;
+    line-height: 0.98 !important;
+    letter-spacing: -0.04em !important;
+  }
+
+  .app
+  .workspace
+  .main
+  .centerHeroStack
+  .heroCopy
+  > h2
+  strong {
+    font-size: inherit !important;
+    line-height: inherit !important;
+  }
+
+  .app
+  .workspace
+  .main
+  .centerHeroStack
+  .heroCopy
+  > p {
+    width: 100% !important;
+
+    margin: 0 !important;
+
+    font-size: 10.5px !important;
+    line-height: 1.38 !important;
+  }
+
+  /* =======================================================
+     CAMPAIGN CLASSIFICATION CHIPS
+     ======================================================= */
+
+  .app
+  .workspace
+  .main
+  .centerHeroStack
+  .heroTags {
+    display: flex !important;
+
+    flex-wrap: wrap !important;
+
+    align-items: center !important;
+
+    gap: 5px !important;
+
+    margin:
+      1px
+      0
+      0 !important;
+
+    padding: 0 !important;
+
+    border: 0 !important;
+  }
+
+  .app
+  .workspace
+  .main
+  .centerHeroStack
+  .heroTags
+  > * {
+    display: inline-flex !important;
+
+    min-height: 21px !important;
+
+    align-items: center !important;
+    justify-content: center !important;
+
+    padding:
+      4px
+      7px !important;
+
+    font-size: 8px !important;
+    font-weight: 750 !important;
+    line-height: 1 !important;
+  }
+
+  /* =======================================================
+     ELECTION DAY PANEL
+     ======================================================= */
+
+  .app
+  .workspace
+  .main
+  .centerHeroStack
+  .heroStats {
+    position: static !important;
+    inset: auto !important;
+
+    display: block !important;
+
+    width: 100% !important;
+    min-width: 0 !important;
+
+    height: 54px !important;
+    min-height: 54px !important;
+    max-height: 54px !important;
+
+    margin:
+      2px
+      0
+      0 !important;
+
+    padding:
+      7px
+      10px !important;
+
+    overflow: hidden !important;
+
+    border:
+      1px
+      solid
+      rgba(
+        255,
+        255,
+        255,
+        0.16
+      ) !important;
+
+    border-radius: 9px !important;
+
+    background:
+      rgba(
+        255,
+        255,
+        255,
+        0.055
+      ) !important;
+
+    transform: none !important;
+  }
+
+  .app
+  .workspace
+  .main
+  .centerHeroStack
+  .heroStats
+  > div {
+    display: grid !important;
+
+    grid-template-columns:
+      auto
+      minmax(0, 1fr) !important;
+
+    grid-template-rows:
+      auto
+      auto !important;
+
+    align-items: end !important;
+
+    column-gap: 8px !important;
+    row-gap: 2px !important;
+
+    width: 100% !important;
+    min-width: 0 !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  .app
+  .workspace
+  .main
+  .centerHeroStack
+  .heroStats
+  small {
+    grid-column:
+      1 / -1 !important;
+
+    grid-row: 1 !important;
+
+    display: block !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
+
+    font-size: 8px !important;
+    font-weight: 850 !important;
+    line-height: 1 !important;
+    letter-spacing: 0.08em !important;
+  }
+
+  .app
+  .workspace
+  .main
+  .centerHeroStack
+  .heroStats
+  strong {
+    grid-column: 1 !important;
+    grid-row: 2 !important;
+
+    display: block !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
+
+    font-size: 1.85rem !important;
+    line-height: 0.88 !important;
+    letter-spacing: -0.045em !important;
+  }
+
+  .app
+  .workspace
+  .main
+  .centerHeroStack
+  .heroStats
+  span {
+    grid-column: 2 !important;
+    grid-row: 2 !important;
+
+    display: block !important;
+
+    min-width: 0 !important;
+
+    align-self: end !important;
+
+    margin: 0 !important;
+
+    padding:
+      0
+      0
+      3px !important;
+
+    overflow: hidden !important;
+
+    font-size: 8px !important;
+    line-height: 1.15 !important;
+
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+  }
+
+  /* =======================================================
+     SHORTCUT AREA
+     ======================================================= */
+
+  .app
+  .workspace
+  .main
+  .centerHeroStack
+  .heroShortcutArea {
+    position: static !important;
+    inset: auto !important;
+
+    display: grid !important;
+
+    grid-template-columns:
+      minmax(0, 1fr) !important;
+
+    grid-template-rows:
+      auto
+      auto !important;
+
+    align-items: start !important;
+    justify-items: stretch !important;
+
+    gap: 6px !important;
+
+    width: 100% !important;
+    min-width: 0 !important;
+
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+
+    margin:
+      1px
+      0
+      0 !important;
+
+    padding: 0 !important;
+
+    overflow: visible !important;
+
+    transform: none !important;
+  }
+
+  .app
+  .workspace
+  .main
+  .centerHeroStack
+  .heroShortcutArea
+  .heroActions {
+    position: static !important;
+    inset: auto !important;
+
+    display: grid !important;
+
+    grid-template-columns:
+      repeat(
+        2,
+        minmax(0, 1fr)
+      ) !important;
+
+    gap:
+      6px
+      7px !important;
+
+    width: 100% !important;
+    min-width: 0 !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
+
+    overflow: visible !important;
+
+    transform: none !important;
+  }
+
+  .app
+  .workspace
+  .main
+  .centerHeroStack
+  .heroShortcutArea
+  .heroActions
+  button {
+    position: static !important;
+    inset: auto !important;
+
+    box-sizing: border-box !important;
+
+    display: inline-flex !important;
+
+    width: 100% !important;
+    min-width: 0 !important;
+
+    height: 34px !important;
+    min-height: 34px !important;
+    max-height: 34px !important;
+
+    align-items: center !important;
+    justify-content: flex-start !important;
+
+    gap: 6px !important;
+
+    margin: 0 !important;
+
+    padding:
+      6px
+      8px !important;
+
+    overflow: hidden !important;
+
+    font-size: 9px !important;
+    font-weight: 750 !important;
+    line-height: 1.1 !important;
+
+    text-align: left !important;
+    white-space: nowrap !important;
+
+    transform: none !important;
+  }
+
+  .app
+  .workspace
+  .main
+  .centerHeroStack
+  .heroShortcutArea
+  .heroActions
+  button
+  svg {
+    width: 13px !important;
+    min-width: 13px !important;
+    max-width: 13px !important;
+
+    height: 13px !important;
+    min-height: 13px !important;
+    max-height: 13px !important;
+
+    flex:
+      0
+      0
+      13px !important;
+  }
+
+  .app
+  .workspace
+  .main
+  .centerHeroStack
+  .heroShortcutArea
+  .heroActions
+  button
+  span {
+    display: block !important;
+
+    min-width: 0 !important;
+
+    overflow: hidden !important;
+
+    font-size: inherit !important;
+    line-height: inherit !important;
+
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+  }
+
+  /* =======================================================
+     EDIT SHORTCUTS
+     ======================================================= */
+
+  .app
+  .workspace
+  .main
+  .centerHeroStack
+  .heroShortcutArea
+  .editShortcutsButton {
+    position: static !important;
+    inset: auto !important;
+
+    display: inline-flex !important;
+
+    width: auto !important;
+
+    height: 23px !important;
+    min-height: 23px !important;
+    max-height: 23px !important;
+
+    align-items: center !important;
+    justify-content: center !important;
+    justify-self: center !important;
+
+    gap: 4px !important;
+
+    margin: 0 !important;
+
+    padding:
+      4px
+      8px !important;
+
+    font-size: 8px !important;
+    line-height: 1 !important;
+
+    transform: none !important;
+  }
+
+  /* =======================================================
+     USER-UPLOADED CAMPAIGN PORTRAIT
+     ======================================================= */
+
+  .app
+  .workspace
+  .main
+  .centerHeroStack
+  .heroPortraitWrap {
+    position: relative !important;
+
+    box-sizing: border-box !important;
+
+    display: block !important;
+
+    width: 100% !important;
+    min-width: 0 !important;
+
+    height: 218px !important;
+    min-height: 218px !important;
+    max-height: 218px !important;
+
+    margin: 0 !important;
+
+    overflow: hidden !important;
+
+    border-top:
+      1px
+      solid
+      rgba(
+        255,
+        255,
+        255,
+        0.12
+      ) !important;
+
+    border-left: 0 !important;
+
+    background:
+      linear-gradient(
+        145deg,
+        #174f83,
+        #071f3c
+      ) !important;
+  }
+
+  .app
+  .workspace
+  .main
+  .centerHeroStack
+  .heroPortrait {
+    position: static !important;
+    inset: auto !important;
+
+    display: block !important;
+
+    width: 100% !important;
+    min-width: 100% !important;
+    max-width: 100% !important;
+
+    height: 100% !important;
+    min-height: 100% !important;
+    max-height: 100% !important;
+
+    margin: 0 !important;
+
+    object-fit: cover !important;
+
+    object-position:
+      var(
+        --campaign-profile-photo-position,
+        50% 18%
+      ) !important;
+
+    transform: none !important;
+  }
+}
+
+/*
+ * Slightly tighter photo crop for narrower phones.
+ */
+@media (max-width: 430px) {
+
+  .app
+  .workspace
+  .main
+  .centerHeroStack
+  .heroCard {
+    grid-template-rows:
+      auto
+      205px !important;
+  }
+
+  .app
+  .workspace
+  .main
+  .centerHeroStack
+  .heroPortraitWrap {
+    height: 205px !important;
+    min-height: 205px !important;
+    max-height: 205px !important;
+  }
+}
+
+/* CAMPAIGN SEAT CANONICAL MOBILE SPOTLIGHT — END */
