@@ -1337,9 +1337,7 @@ export default function CalendarReferencePreview() {
   };
 
   return (
-    <CampaignWorkspaceShell
-      activePage="Calendar"
-    >
+    <CampaignWorkspaceShell activeItem="Calendar">
       <main className={styles.page}>
         <section className={styles.pageHeader}>
           <div>
