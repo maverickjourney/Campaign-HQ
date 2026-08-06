@@ -20,6 +20,9 @@ export default function SupportLauncher() {
     location.pathname === "/social-media" ||
     location.pathname === "/media-center" ||
     location.pathname === "/reports-analytics" ||
+    location.pathname === "/profile/settings" ||
+    location.pathname === "/workspace/settings" ||
+    location.pathname === "/workspace/campaign-settings" ||
     typeof document === "undefined"
   ) {
     return null;

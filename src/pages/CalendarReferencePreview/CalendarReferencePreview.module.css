@@ -4250,14 +4250,16 @@ button[data-campaign-hq-launcher="floating"] {
 /* CAMPAIGN SEAT CALENDAR MOBILE LAUNCHER — START */
 
 /*
- * The mobile workspace header already provides Campaign HQ access.
- * Hide only the redundant floating launcher on the Calendar route
- * so it cannot cover the legend, events or Connect Calendar button.
+ * Hide only the floating Support link on Calendar phones.
+ *
+ * Campaign Search in the shared header must remain available.
+ * The Calendar page selector keeps this rule route-specific.
  */
 @media (max-width: 520px) {
 
+  :global(body):has(.page)
   :global(
-    button[data-campaign-hq-launcher="floating"]
+    a[aria-label="Open Campaign Seat Support"]
   ) {
     display:
       none !important;

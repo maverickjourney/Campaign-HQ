@@ -2483,3 +2483,2002 @@
 }
 
 /* CAMPAIGN SEAT CONTACTS LANDSCAPE GRID — END */
+
+/* CAMPAIGN SEAT CONTACTS TABLET REVIEW — START */
+
+/*
+ * Contacts tablet review:
+ *
+ * - preserve desktop above 1240px
+ * - remove the redundant floating Support overlap
+ * - replace the inherited 1080px table canvas at 701–900px
+ * - keep every populated contact field visible in compact cards
+ * - compact the tablet empty/loading state
+ */
+
+
+/* =========================================================
+   SUPPORT OVERLAP
+   ========================================================= */
+
+@media (max-width: 1240px) {
+
+  /*
+   * Ask Campaign HQ remains in the shared header.
+   * Hide only the separate floating Support link on Contacts.
+   */
+  :global(body):has(.page)
+  :global(
+    a[aria-label="Open Campaign Seat Support"]
+  ) {
+    display:
+      none !important;
+
+    visibility:
+      hidden !important;
+
+    pointer-events:
+      none !important;
+  }
+
+  .tableFooter {
+    padding-right:
+      18px !important;
+  }
+}
+
+
+/* =========================================================
+   TABLET CONTACT CARDS
+   701px through 900px
+   ========================================================= */
+
+@media
+  (min-width: 701px)
+  and
+  (max-width: 900px) {
+
+  .tableScroller {
+    width:
+      100% !important;
+
+    min-width:
+      0 !important;
+
+    overflow:
+      visible !important;
+
+    scrollbar-gutter:
+      auto !important;
+  }
+
+  .contactTable {
+    display:
+      block !important;
+
+    width:
+      100% !important;
+
+    min-width:
+      0 !important;
+
+    border-collapse:
+      separate !important;
+
+    table-layout:
+      auto !important;
+  }
+
+  .contactTable thead {
+    display:
+      none !important;
+  }
+
+  .contactTable tbody {
+    display:
+      block !important;
+
+    width:
+      100% !important;
+
+    min-width:
+      0 !important;
+  }
+
+  .contactRow {
+    box-sizing:
+      border-box !important;
+
+    display:
+      grid !important;
+
+    width:
+      100% !important;
+
+    min-width:
+      0 !important;
+
+    grid-template-columns:
+      28px
+      minmax(0, 1.35fr)
+      minmax(130px, 0.78fr)
+      minmax(105px, 0.62fr) !important;
+
+    grid-template-areas:
+      "check identity channel status"
+      "check location lists tags" !important;
+
+    column-gap:
+      12px !important;
+
+    row-gap:
+      9px !important;
+
+    padding:
+      12px
+      14px !important;
+
+    border-bottom:
+      1px
+      solid
+      #e0e8ef !important;
+  }
+
+  .contactRow td {
+    display:
+      block !important;
+
+    width:
+      auto !important;
+
+    min-width:
+      0 !important;
+
+    height:
+      auto !important;
+
+    padding:
+      0 !important;
+
+    border:
+      0 !important;
+
+    vertical-align:
+      top !important;
+  }
+
+  .contactRow td:nth-child(1) {
+    grid-area:
+      check !important;
+
+    align-self:
+      start !important;
+
+    padding-top:
+      3px !important;
+  }
+
+  .contactRow td:nth-child(2) {
+    grid-area:
+      identity !important;
+  }
+
+  .contactRow td:nth-child(3) {
+    grid-area:
+      channel !important;
+  }
+
+  .contactRow td:nth-child(4) {
+    grid-area:
+      location !important;
+  }
+
+  .contactRow td:nth-child(5) {
+    grid-area:
+      lists !important;
+  }
+
+  .contactRow td:nth-child(6) {
+    grid-area:
+      tags !important;
+  }
+
+  .contactRow td:nth-child(7) {
+    grid-area:
+      status !important;
+
+    justify-self:
+      end !important;
+  }
+
+  /*
+   * Selecting the row opens Contact Details,
+   * so the separate overflow control is redundant on tablets.
+   */
+  .contactRow td:nth-child(8) {
+    display:
+      none !important;
+  }
+
+  .contactRow td:nth-child(n+3):nth-child(-n+7)::before {
+    display:
+      block !important;
+
+    margin-bottom:
+      4px !important;
+
+    color:
+      #7890a5 !important;
+
+    font-size:
+      0.53rem !important;
+
+    font-weight:
+      850 !important;
+
+    letter-spacing:
+      0.05em !important;
+
+    text-transform:
+      uppercase !important;
+  }
+
+  .contactRow td:nth-child(3)::before {
+    content:
+      "Email / phone" !important;
+  }
+
+  .contactRow td:nth-child(4)::before {
+    content:
+      "Location" !important;
+  }
+
+  .contactRow td:nth-child(5)::before {
+    content:
+      "Lists" !important;
+  }
+
+  .contactRow td:nth-child(6)::before {
+    content:
+      "Tags" !important;
+  }
+
+  .contactRow td:nth-child(7)::before {
+    content:
+      "Status" !important;
+  }
+
+  .contactIdentity strong {
+    font-size:
+      0.7rem !important;
+  }
+
+  .contactIdentity small,
+  .contactChannel strong,
+  .contactChannel small,
+  .locationCell {
+    font-size:
+      0.59rem !important;
+  }
+
+  .contactIdentity strong,
+  .contactIdentity small,
+  .contactChannel strong,
+  .contactChannel small {
+    overflow:
+      hidden !important;
+
+    text-overflow:
+      ellipsis !important;
+
+    white-space:
+      nowrap !important;
+  }
+
+  .avatar {
+    width:
+      30px !important;
+
+    height:
+      30px !important;
+
+    min-width:
+      30px !important;
+  }
+
+  .listChip,
+  .tagChip {
+    min-height:
+      23px !important;
+
+    padding:
+      0
+      7px !important;
+
+    font-size:
+      0.53rem !important;
+  }
+
+  .statusBadge {
+    min-height:
+      26px !important;
+
+    padding:
+      0
+      8px !important;
+
+    font-size:
+      0.56rem !important;
+  }
+}
+
+
+/* =========================================================
+   NARROW TABLET
+   701px through 780px
+   ========================================================= */
+
+@media
+  (min-width: 701px)
+  and
+  (max-width: 780px) {
+
+  .contactRow {
+    grid-template-columns:
+      27px
+      minmax(0, 1fr)
+      auto !important;
+
+    grid-template-areas:
+      "check identity status"
+      "check channel channel"
+      "check location location"
+      "check lists tags" !important;
+
+    column-gap:
+      10px !important;
+
+    row-gap:
+      7px !important;
+
+    padding:
+      11px
+      12px !important;
+  }
+
+  .contactRow td:nth-child(7) {
+    align-self:
+      start !important;
+
+    justify-self:
+      end !important;
+
+    text-align:
+      right !important;
+  }
+
+  .contactRow td:nth-child(3)::before,
+  .contactRow td:nth-child(4)::before {
+    margin-bottom:
+      2px !important;
+  }
+
+  .contactIdentity strong {
+    font-size:
+      0.69rem !important;
+  }
+
+  .contactIdentity small,
+  .contactChannel strong,
+  .contactChannel small,
+  .locationCell {
+    font-size:
+      0.58rem !important;
+  }
+
+  .chipGroup {
+    gap:
+      4px !important;
+  }
+}
+
+
+/* =========================================================
+   TABLET EMPTY AND LOADING STATES
+   ========================================================= */
+
+@media
+  (min-width: 701px)
+  and
+  (max-width: 900px) {
+
+  .contactTable tbody
+  > tr:not(.contactRow) {
+    display:
+      block !important;
+
+    width:
+      100% !important;
+  }
+
+  .contactTable tbody
+  > tr:not(.contactRow)
+  > td,
+  .emptyCell {
+    box-sizing:
+      border-box !important;
+
+    display:
+      grid !important;
+
+    width:
+      100% !important;
+
+    height:
+      auto !important;
+
+    min-height:
+      220px !important;
+
+    place-items:
+      center !important;
+
+    align-content:
+      center !important;
+
+    justify-items:
+      center !important;
+
+    gap:
+      9px !important;
+
+    padding:
+      28px
+      18px !important;
+
+    text-align:
+      center !important;
+  }
+
+  .emptyCell svg,
+  .emptyCell strong,
+  .emptyCell span {
+    margin:
+      0
+      auto !important;
+  }
+
+  .emptyCell strong {
+    font-size:
+      0.82rem !important;
+
+    line-height:
+      1.25 !important;
+  }
+
+  .emptyCell span {
+    max-width:
+      340px !important;
+
+    font-size:
+      0.66rem !important;
+
+    line-height:
+      1.45 !important;
+  }
+
+  .tableFooter {
+    min-height:
+      42px !important;
+
+    padding:
+      8px
+      16px !important;
+  }
+}
+
+/* CAMPAIGN SEAT CONTACTS TABLET REVIEW — END */
+
+/* CAMPAIGN SEAT CONTACTS PHONE REVIEW — START */
+
+/*
+ * Contacts phone layout:
+ *
+ * - replace the 1080px table canvas
+ * - show every contact view in a two-row tab grid
+ * - center the empty state
+ * - prepare future populated contacts as readable cards
+ */
+
+
+/* =========================================================
+   PHONE CONTACT TABS
+   ========================================================= */
+
+@media (max-width: 620px) {
+
+  .tabs {
+    box-sizing:
+      border-box !important;
+
+    display:
+      grid !important;
+
+    width:
+      100% !important;
+    min-width:
+      0 !important;
+    min-height:
+      0 !important;
+
+    grid-template-columns:
+      repeat(
+        4,
+        minmax(0, 1fr)
+      ) !important;
+
+    align-items:
+      stretch !important;
+
+    padding:
+      0
+      3px !important;
+
+    overflow:
+      visible !important;
+  }
+
+  .tabs button {
+    box-sizing:
+      border-box !important;
+
+    width:
+      100% !important;
+    min-width:
+      0 !important;
+    min-height:
+      44px !important;
+
+    padding:
+      0
+      3px !important;
+
+    overflow:
+      hidden !important;
+
+    font-size:
+      0 !important;
+
+    text-overflow:
+      clip !important;
+  }
+
+  /*
+   * Preserve the original accessible button text while using
+   * shorter visual labels at narrow widths.
+   */
+  .tabs button::before {
+    display:
+      block !important;
+
+    overflow:
+      hidden !important;
+
+    color:
+      inherit !important;
+
+    font-size:
+      0.55rem !important;
+    font-weight:
+      820 !important;
+
+    line-height:
+      1 !important;
+
+    text-overflow:
+      ellipsis !important;
+    white-space:
+      nowrap !important;
+  }
+
+  .tabs button:nth-child(1)::before {
+    content:
+      "All" !important;
+  }
+
+  .tabs button:nth-child(2)::before {
+    content:
+      "Support" !important;
+  }
+
+  .tabs button:nth-child(3)::before {
+    content:
+      "Volunteers" !important;
+  }
+
+  .tabs button:nth-child(4)::before {
+    content:
+      "Donors" !important;
+  }
+
+  .tabs button:nth-child(5)::before {
+    content:
+      "Voters" !important;
+  }
+
+  .tabs button:nth-child(6)::before {
+    content:
+      "Media" !important;
+  }
+
+  .tabs button:nth-child(7)::before {
+    content:
+      "Lists" !important;
+  }
+
+  .tabs button::after {
+    right:
+      5px !important;
+    left:
+      5px !important;
+  }
+}
+
+@media (max-width: 380px) {
+
+  .tabs button:nth-child(2)::before {
+    content:
+      "Support" !important;
+  }
+
+  .tabs button:nth-child(3)::before {
+    content:
+      "Vols" !important;
+  }
+}
+
+
+/* =========================================================
+   PHONE CONTACT TABLE / CARDS
+   ========================================================= */
+
+@media (max-width: 620px) {
+
+  .tableScroller {
+    width:
+      100% !important;
+    min-width:
+      0 !important;
+
+    overflow:
+      visible !important;
+
+    scrollbar-gutter:
+      auto !important;
+  }
+
+  .contactTable {
+    display:
+      block !important;
+
+    width:
+      100% !important;
+    min-width:
+      0 !important;
+
+    border-collapse:
+      separate !important;
+
+    table-layout:
+      auto !important;
+  }
+
+  .contactTable thead {
+    display:
+      none !important;
+  }
+
+  .contactTable tbody {
+    display:
+      block !important;
+
+    width:
+      100% !important;
+    min-width:
+      0 !important;
+  }
+
+  .contactRow {
+    box-sizing:
+      border-box !important;
+
+    display:
+      grid !important;
+
+    width:
+      100% !important;
+    min-width:
+      0 !important;
+
+    grid-template-columns:
+      27px
+      minmax(0, 1fr)
+      auto !important;
+
+    grid-template-areas:
+      "check identity status"
+      "check channel channel"
+      "check location location"
+      "check lists tags" !important;
+
+    column-gap:
+      9px !important;
+    row-gap:
+      7px !important;
+
+    padding:
+      11px
+      10px !important;
+
+    border-bottom:
+      1px
+      solid
+      #e0e8ef !important;
+  }
+
+  .contactRow td {
+    display:
+      block !important;
+
+    width:
+      auto !important;
+    min-width:
+      0 !important;
+    height:
+      auto !important;
+
+    padding:
+      0 !important;
+
+    border:
+      0 !important;
+  }
+
+  .contactRow td:nth-child(1) {
+    grid-area:
+      check !important;
+
+    align-self:
+      start !important;
+
+    padding-top:
+      3px !important;
+  }
+
+  .contactRow td:nth-child(2) {
+    grid-area:
+      identity !important;
+  }
+
+  .contactRow td:nth-child(3) {
+    grid-area:
+      channel !important;
+  }
+
+  .contactRow td:nth-child(4) {
+    grid-area:
+      location !important;
+  }
+
+  .contactRow td:nth-child(5) {
+    grid-area:
+      lists !important;
+  }
+
+  .contactRow td:nth-child(6) {
+    grid-area:
+      tags !important;
+  }
+
+  .contactRow td:nth-child(7) {
+    grid-area:
+      status !important;
+
+    align-self:
+      start !important;
+
+    justify-self:
+      end !important;
+
+    text-align:
+      right !important;
+  }
+
+  .contactRow td:nth-child(8) {
+    display:
+      none !important;
+  }
+
+  .contactRow td:nth-child(n+3):nth-child(-n+7)::before {
+    display:
+      block !important;
+
+    margin-bottom:
+      2px !important;
+
+    color:
+      #7890a5 !important;
+
+    font-size:
+      0.48rem !important;
+    font-weight:
+      850 !important;
+
+    letter-spacing:
+      0.05em !important;
+
+    text-transform:
+      uppercase !important;
+  }
+
+  .contactRow td:nth-child(3)::before {
+    content:
+      "Email / phone" !important;
+  }
+
+  .contactRow td:nth-child(4)::before {
+    content:
+      "Location" !important;
+  }
+
+  .contactRow td:nth-child(5)::before {
+    content:
+      "Lists" !important;
+  }
+
+  .contactRow td:nth-child(6)::before {
+    content:
+      "Tags" !important;
+  }
+
+  .contactRow td:nth-child(7)::before {
+    content:
+      "Status" !important;
+  }
+
+  .contactIdentity {
+    gap:
+      7px !important;
+  }
+
+  .avatar {
+    width:
+      29px !important;
+    height:
+      29px !important;
+    min-width:
+      29px !important;
+  }
+
+  .contactIdentity strong {
+    font-size:
+      0.68rem !important;
+  }
+
+  .contactIdentity small,
+  .contactChannel strong,
+  .contactChannel small,
+  .locationCell {
+    font-size:
+      0.57rem !important;
+  }
+
+  .chipGroup {
+    gap:
+      4px !important;
+  }
+
+  .listChip,
+  .tagChip {
+    min-height:
+      22px !important;
+
+    padding:
+      0
+      6px !important;
+
+    font-size:
+      0.51rem !important;
+  }
+
+  .statusBadge {
+    min-height:
+      24px !important;
+
+    padding:
+      0
+      7px !important;
+
+    font-size:
+      0.53rem !important;
+  }
+}
+
+
+/* =========================================================
+   PHONE EMPTY / LOADING STATE
+   ========================================================= */
+
+@media (max-width: 620px) {
+
+  .contactTable tbody
+  > tr:not(.contactRow) {
+    display:
+      block !important;
+
+    width:
+      100% !important;
+    min-width:
+      0 !important;
+  }
+
+  .contactTable tbody
+  > tr:not(.contactRow)
+  > td,
+  .emptyCell {
+    box-sizing:
+      border-box !important;
+
+    display:
+      grid !important;
+
+    width:
+      100% !important;
+    min-width:
+      0 !important;
+
+    height:
+      auto !important;
+    min-height:
+      210px !important;
+
+    place-items:
+      center !important;
+
+    align-content:
+      center !important;
+    justify-items:
+      center !important;
+
+    gap:
+      9px !important;
+
+    padding:
+      28px
+      14px !important;
+
+    overflow:
+      hidden !important;
+
+    text-align:
+      center !important;
+  }
+
+  .emptyCell svg,
+  .emptyCell strong,
+  .emptyCell span {
+    max-width:
+      100% !important;
+
+    margin:
+      0
+      auto !important;
+  }
+
+  .emptyCell svg {
+    width:
+      30px !important;
+    height:
+      30px !important;
+  }
+
+  .emptyCell strong {
+    font-size:
+      0.84rem !important;
+
+    line-height:
+      1.25 !important;
+
+    white-space:
+      normal !important;
+  }
+
+  .emptyCell span {
+    max-width:
+      280px !important;
+
+    font-size:
+      0.65rem !important;
+
+    line-height:
+      1.45 !important;
+
+    white-space:
+      normal !important;
+  }
+
+  .resultsLine {
+    min-height:
+      42px !important;
+
+    padding:
+      0
+      12px !important;
+  }
+
+  .tableFooter {
+    min-height:
+      42px !important;
+
+    align-items:
+      center !important;
+
+    flex-direction:
+      row !important;
+
+    justify-content:
+      center !important;
+
+    padding:
+      8px
+      12px !important;
+
+    text-align:
+      center !important;
+  }
+
+  .tableFooter span:last-child {
+    display:
+      none !important;
+  }
+}
+
+/* CAMPAIGN SEAT CONTACTS PHONE REVIEW — END */
+
+/* CAMPAIGN SEAT CONTACTS MOBILE DETAILS — START */
+
+/*
+ * Mobile Contact Details:
+ *
+ * The contact drawer becomes a true device-viewport panel.
+ * The underlying directory is hidden while details are open.
+ * Header, actions, tabs, summary and footer remain fixed.
+ * Only the active detail content scrolls.
+ */
+
+@media (max-width: 620px) {
+
+  :global(
+    body[data-contacts-focus-mode="true"]
+  ) {
+    overflow:
+      hidden !important;
+
+    overscroll-behavior:
+      none !important;
+  }
+
+  .contactsWorkspace.hasDetails {
+    display:
+      block !important;
+
+    width:
+      100% !important;
+
+    min-width:
+      0 !important;
+  }
+
+  /*
+   * The directory remains preserved in React state but does
+   * not stay visibly underneath the mobile details panel.
+   */
+  .contactsWorkspace.hasDetails
+  .directoryPanel {
+    display:
+      none !important;
+  }
+
+  .detailsPanel,
+  .detailsPanelExpanded {
+    position:
+      fixed !important;
+
+    z-index:
+      1000001 !important;
+
+    inset:
+      0 !important;
+
+    box-sizing:
+      border-box !important;
+
+    display:
+      flex !important;
+
+    width:
+      100vw !important;
+
+    max-width:
+      none !important;
+
+    height:
+      100dvh !important;
+
+    min-height:
+      100dvh !important;
+
+    max-height:
+      100dvh !important;
+
+    margin:
+      0 !important;
+
+    flex-direction:
+      column !important;
+
+    overflow:
+      hidden !important;
+
+    border:
+      0 !important;
+
+    border-radius:
+      0 !important;
+
+    background:
+      #ffffff !important;
+
+    box-shadow:
+      none !important;
+
+    animation:
+      none !important;
+  }
+
+
+  /* =======================================================
+     FIXED DRAWER HEADER
+     ======================================================= */
+
+  .detailsHeader {
+    box-sizing:
+      border-box !important;
+
+    min-height:
+      64px !important;
+
+    flex:
+      0
+      0
+      auto !important;
+
+    gap:
+      10px !important;
+
+    padding:
+      0
+      12px !important;
+
+    background:
+      #ffffff !important;
+  }
+
+  .detailsProfile {
+    gap:
+      9px !important;
+  }
+
+  .detailsProfile > span {
+    width:
+      38px !important;
+
+    height:
+      38px !important;
+
+    min-width:
+      38px !important;
+
+    font-size:
+      0.62rem !important;
+  }
+
+  .detailsProfile h2 {
+    font-size:
+      0.94rem !important;
+
+    line-height:
+      1.15 !important;
+  }
+
+  .detailsProfile p {
+    margin-top:
+      3px !important;
+
+    font-size:
+      0.61rem !important;
+  }
+
+  .detailsHeaderActions {
+    display:
+      flex !important;
+
+    flex:
+      0
+      0
+      auto !important;
+
+    align-items:
+      center !important;
+
+    gap:
+      6px !important;
+  }
+
+  /*
+   * Expand/collapse has no purpose when the drawer already
+   * occupies the complete phone viewport.
+   */
+  .detailsHeaderActions
+  > button:first-child {
+    display:
+      none !important;
+  }
+
+  .detailsHeaderActions
+  > button:last-child {
+    width:
+      38px !important;
+
+    height:
+      38px !important;
+
+    flex:
+      0
+      0
+      38px !important;
+  }
+
+
+  /* =======================================================
+     FIXED PRIMARY ACTIONS
+     ======================================================= */
+
+  .quickActions {
+    box-sizing:
+      border-box !important;
+
+    display:
+      grid !important;
+
+    grid-template-columns:
+      minmax(0, 1.12fr)
+      minmax(0, 0.88fr) !important;
+
+    flex:
+      0
+      0
+      auto !important;
+
+    gap:
+      6px !important;
+
+    padding:
+      8px
+      10px !important;
+
+    background:
+      #fbfdfe !important;
+  }
+
+  .quickActions button,
+  .quickActions a {
+    min-width:
+      0 !important;
+
+    min-height:
+      39px !important;
+
+    padding:
+      0
+      7px !important;
+
+    font-size:
+      0.59rem !important;
+
+    white-space:
+      nowrap !important;
+  }
+
+
+  /* =======================================================
+     FIXED DETAIL TABS
+     ======================================================= */
+
+  .detailTabs {
+    box-sizing:
+      border-box !important;
+
+    display:
+      grid !important;
+
+    width:
+      100% !important;
+
+    min-width:
+      0 !important;
+
+    min-height:
+      48px !important;
+
+    grid-template-columns:
+      repeat(
+        4,
+        minmax(0, 1fr)
+      ) !important;
+
+    flex:
+      0
+      0
+      auto !important;
+
+    padding:
+      0
+      3px !important;
+
+    overflow:
+      hidden !important;
+
+    border-bottom:
+      1px
+      solid
+      #dbe5ed !important;
+
+    background:
+      #ffffff !important;
+  }
+
+  .detailTabs button {
+    box-sizing:
+      border-box !important;
+
+    width:
+      100% !important;
+
+    min-width:
+      0 !important;
+
+    min-height:
+      47px !important;
+
+    padding:
+      0
+      2px !important;
+
+    overflow:
+      hidden !important;
+
+    font-size:
+      0.56rem !important;
+
+    text-overflow:
+      ellipsis !important;
+
+    white-space:
+      nowrap !important;
+  }
+
+
+  /* =======================================================
+     FIXED CHANNEL SUMMARY
+     ======================================================= */
+
+  .contactMethodSummary {
+    box-sizing:
+      border-box !important;
+
+    display:
+      grid !important;
+
+    grid-template-columns:
+      repeat(
+        2,
+        minmax(0, 1fr)
+      ) !important;
+
+    flex:
+      0
+      0
+      auto !important;
+
+    gap:
+      6px !important;
+
+    padding:
+      8px
+      10px !important;
+  }
+
+  .contactMethodSummary > div {
+    min-width:
+      0 !important;
+
+    padding:
+      7px
+      8px !important;
+  }
+
+  .contactMethodSummary span {
+    font-size:
+      0.52rem !important;
+  }
+
+  .contactMethodSummary strong {
+    margin-top:
+      3px !important;
+
+    font-size:
+      0.61rem !important;
+  }
+
+
+  /* =======================================================
+     ONLY THIS AREA SCROLLS
+     ======================================================= */
+
+  .detailsBody {
+    box-sizing:
+      border-box !important;
+
+    min-width:
+      0 !important;
+
+    min-height:
+      0 !important;
+
+    max-height:
+      none !important;
+
+    flex:
+      1
+      1
+      auto !important;
+
+    overflow-x:
+      hidden !important;
+
+    overflow-y:
+      auto !important;
+
+    overscroll-behavior:
+      contain !important;
+
+    scrollbar-width:
+      none !important;
+
+    background:
+      #ffffff !important;
+  }
+
+  .detailsBody::-webkit-scrollbar {
+    display:
+      none !important;
+  }
+
+  .nextActionCard {
+    gap:
+      8px !important;
+
+    margin:
+      10px !important;
+
+    padding:
+      10px !important;
+  }
+
+  .nextActionCard span {
+    font-size:
+      0.52rem !important;
+  }
+
+  .nextActionCard strong {
+    margin-top:
+      4px !important;
+
+    font-size:
+      0.66rem !important;
+  }
+
+  .nextActionCard small {
+    margin-top:
+      3px !important;
+
+    font-size:
+      0.55rem !important;
+  }
+
+  .nextActionCard > button {
+    min-height:
+      35px !important;
+
+    font-size:
+      0.59rem !important;
+  }
+
+  .detailSection {
+    padding:
+      11px
+      12px !important;
+  }
+
+  .detailSection > header {
+    margin-bottom:
+      8px !important;
+  }
+
+  .detailSection h3 {
+    font-size:
+      0.68rem !important;
+  }
+
+  .infoRows {
+    gap:
+      7px !important;
+  }
+
+  .infoRows > div {
+    gap:
+      7px !important;
+
+    font-size:
+      0.61rem !important;
+  }
+
+  .compactDetails > div {
+    grid-template-columns:
+      minmax(95px, 0.82fr)
+      minmax(0, 1.18fr) !important;
+
+    gap:
+      8px !important;
+
+    padding:
+      6px
+      0 !important;
+  }
+
+  .compactDetails dt,
+  .compactDetails dd {
+    font-size:
+      0.59rem !important;
+  }
+
+
+  /* =======================================================
+     FIXED BOTTOM ACTION BAR
+     ======================================================= */
+
+  .detailsFooter {
+    position:
+      relative !important;
+
+    z-index:
+      20 !important;
+
+    bottom:
+      auto !important;
+
+    box-sizing:
+      border-box !important;
+
+    display:
+      grid !important;
+
+    width:
+      100% !important;
+
+    min-width:
+      0 !important;
+
+    grid-template-columns:
+      minmax(0, 1.2fr)
+      minmax(0, 0.8fr) !important;
+
+    flex:
+      0
+      0
+      auto !important;
+
+    gap:
+      6px !important;
+
+    padding:
+      8px
+      10px !important;
+
+    border-top:
+      1px
+      solid
+      #dae5ed !important;
+
+    background:
+      rgba(
+        251,
+        253,
+        254,
+        0.99
+      ) !important;
+
+    box-shadow:
+      0
+      -8px
+      18px
+      rgba(
+        26,
+        57,
+        83,
+        0.06
+      ) !important;
+
+    backdrop-filter:
+      blur(8px) !important;
+  }
+
+  .detailsFooter button {
+    width:
+      100% !important;
+
+    min-width:
+      0 !important;
+
+    min-height:
+      40px !important;
+
+    padding:
+      0
+      6px !important;
+
+    font-size:
+      0.58rem !important;
+
+    line-height:
+      1.15 !important;
+
+    white-space:
+      normal !important;
+  }
+}
+
+
+/* =========================================================
+   VERY SMALL PHONE REFINEMENT
+   ========================================================= */
+
+@media (max-width: 380px) {
+
+  .detailsHeader {
+    min-height:
+      60px !important;
+
+    padding:
+      0
+      10px !important;
+  }
+
+  .detailsProfile > span {
+    width:
+      35px !important;
+
+    height:
+      35px !important;
+
+    min-width:
+      35px !important;
+  }
+
+  .detailsProfile h2 {
+    font-size:
+      0.87rem !important;
+  }
+
+  .quickActions {
+    padding:
+      7px
+      8px !important;
+  }
+
+  .quickActions button,
+  .quickActions a {
+    font-size:
+      0.54rem !important;
+  }
+
+  .detailTabs button {
+    font-size:
+      0.51rem !important;
+  }
+
+  .contactMethodSummary {
+    padding:
+      7px
+      8px !important;
+  }
+
+  .detailsFooter {
+    padding:
+      7px
+      8px !important;
+  }
+
+  .detailsFooter button {
+    font-size:
+      0.54rem !important;
+  }
+}
+
+/* CAMPAIGN SEAT CONTACTS MOBILE DETAILS — END */
+
+/* CAMPAIGN SEAT CONTACTS COMPACT PHONE CARDS — START */
+
+/*
+ * Compact populated contact cards:
+ *
+ * Row 1 — checkbox, identity and status
+ * Row 2 — email/phone and location
+ * Row 3 — lists and tags
+ */
+
+@media (max-width: 620px) {
+
+  .contactRow {
+    grid-template-columns:
+      25px
+      minmax(0, 1.35fr)
+      minmax(88px, 0.65fr) !important;
+
+    grid-template-areas:
+      "check identity status"
+      "check channel location"
+      "check lists tags" !important;
+
+    column-gap:
+      8px !important;
+
+    row-gap:
+      6px !important;
+
+    padding:
+      10px
+      9px !important;
+  }
+
+  .contactRow td {
+    align-self:
+      center !important;
+  }
+
+  .contactRow td:nth-child(1) {
+    align-self:
+      start !important;
+
+    padding-top:
+      4px !important;
+  }
+
+  .contactRow td:nth-child(2) {
+    align-self:
+      start !important;
+  }
+
+  .contactRow td:nth-child(4),
+  .contactRow td:nth-child(6),
+  .contactRow td:nth-child(7) {
+    justify-self:
+      end !important;
+
+    text-align:
+      right !important;
+  }
+
+  .contactRow td:nth-child(n+3):nth-child(-n+7)::before {
+    margin-bottom:
+      2px !important;
+
+    font-size:
+      0.44rem !important;
+
+    line-height:
+      1 !important;
+  }
+
+  .contactIdentity {
+    gap:
+      7px !important;
+  }
+
+  .avatar {
+    width:
+      28px !important;
+
+    height:
+      28px !important;
+
+    min-width:
+      28px !important;
+
+    font-size:
+      0.5rem !important;
+  }
+
+  .contactIdentity strong {
+    font-size:
+      0.66rem !important;
+
+    line-height:
+      1.15 !important;
+  }
+
+  .contactIdentity small {
+    margin-top:
+      2px !important;
+
+    font-size:
+      0.54rem !important;
+  }
+
+  .contactChannel strong,
+  .contactChannel small {
+    max-width:
+      100% !important;
+
+    overflow:
+      hidden !important;
+
+    font-size:
+      0.54rem !important;
+
+    text-overflow:
+      ellipsis !important;
+
+    white-space:
+      nowrap !important;
+  }
+
+  .contactChannel small {
+    margin-top:
+      2px !important;
+  }
+
+  .locationCell {
+    display:
+      block !important;
+
+    max-width:
+      100% !important;
+
+    overflow:
+      hidden !important;
+
+    font-size:
+      0.54rem !important;
+
+    line-height:
+      1.15 !important;
+
+    text-overflow:
+      ellipsis !important;
+
+    white-space:
+      nowrap !important;
+
+    -webkit-line-clamp:
+      1 !important;
+  }
+
+  .chipGroup {
+    display:
+      flex !important;
+
+    min-width:
+      0 !important;
+
+    gap:
+      3px !important;
+
+    flex-wrap:
+      nowrap !important;
+  }
+
+  .contactRow td:nth-child(6)
+  .chipGroup {
+    justify-content:
+      flex-end !important;
+  }
+
+  .listChip,
+  .tagChip {
+    min-height:
+      21px !important;
+
+    max-width:
+      82px !important;
+
+    padding:
+      0
+      6px !important;
+
+    overflow:
+      hidden !important;
+
+    font-size:
+      0.49rem !important;
+
+    text-overflow:
+      ellipsis !important;
+  }
+
+  .statusBadge {
+    min-height:
+      23px !important;
+
+    padding:
+      0
+      7px !important;
+
+    font-size:
+      0.51rem !important;
+  }
+}
+
+
+/* Very narrow phones retain the same structure. */
+
+@media (max-width: 380px) {
+
+  .contactRow {
+    grid-template-columns:
+      23px
+      minmax(0, 1fr)
+      minmax(78px, auto) !important;
+
+    column-gap:
+      7px !important;
+
+    padding:
+      9px
+      8px !important;
+  }
+
+  .contactIdentity strong {
+    font-size:
+      0.63rem !important;
+  }
+
+  .contactChannel strong,
+  .contactChannel small,
+  .locationCell {
+    font-size:
+      0.51rem !important;
+  }
+
+  .statusBadge {
+    padding:
+      0
+      6px !important;
+
+    font-size:
+      0.48rem !important;
+  }
+}
+
+/* CAMPAIGN SEAT CONTACTS COMPACT PHONE CARDS — END */
