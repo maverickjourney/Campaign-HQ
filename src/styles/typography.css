@@ -76,3 +76,79 @@ textarea:focus-visible {
     transition-duration: 0.01ms !important;
   }
 }
+
+/* CAMPAIGN SEAT READABLE GLOBAL TYPE — START */
+
+/*
+ * Campaign Seat readable typography scale.
+ *
+ * Body:       16px
+ * Supporting: 14px
+ * Captions:   12–13px
+ * Controls:   14–16px
+ */
+:root {
+  --hq-text-body: 16px;
+  --hq-text-supporting: 14px;
+  --hq-text-navigation: 14px;
+  --hq-text-label: 12px;
+  --hq-text-caption: 13px;
+  --hq-text-button: 14px;
+  --hq-text-control: 16px;
+  --hq-text-card-title: 14px;
+  --hq-text-card-row: 13px;
+
+  --hq-line-body: 1.55;
+  --hq-line-supporting: 1.45;
+  --hq-line-heading: 1.2;
+}
+
+html {
+  font-size: 16px;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+body,
+button,
+input,
+select,
+textarea {
+  font-family:
+    Inter,
+    ui-sans-serif,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    Arial,
+    sans-serif;
+}
+
+body {
+  font-size: var(--hq-text-body);
+  line-height: var(--hq-line-body);
+}
+
+button,
+a {
+  font-size: var(--hq-text-button);
+  line-height: 1.35;
+}
+
+input,
+select,
+textarea {
+  font-size: var(--hq-text-control);
+  line-height: 1.4;
+}
+
+small {
+  font-size: var(--hq-text-caption);
+  line-height: var(--hq-line-supporting);
+}
+
+p {
+  line-height: var(--hq-line-body);
+}
+
+/* CAMPAIGN SEAT READABLE GLOBAL TYPE — END */

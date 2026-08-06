@@ -1500,3 +1500,140 @@
     border-radius: 10px !important;
   }
 }
+
+/* CAMPAIGN SEAT LANDSCAPE PAGE ALIGNMENT — START */
+
+/* =========================================================
+   TABLET PAGE HEADER ALIGNMENT
+   ========================================================= */
+
+@media
+  (min-width: 901px)
+  and
+  (max-width: 1240px) {
+
+  .page {
+    padding:
+      20px
+      22px
+      30px !important;
+  }
+
+  /*
+   * Prevent earlier page-specific rules from centering only
+   * the heading while the controls and cards remain left-aligned.
+   */
+  .pageHeader {
+    display: flex !important;
+
+    width: 100% !important;
+    max-width: none !important;
+
+    flex-direction: column !important;
+
+    align-items: stretch !important;
+    justify-content: flex-start !important;
+
+    gap: 14px !important;
+
+    margin:
+      0
+      0
+      14px !important;
+
+    padding: 0 !important;
+  }
+
+  .pageHeader > :first-child {
+    width: 100% !important;
+    max-width: none !important;
+
+    align-self: stretch !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
+
+    text-align: left !important;
+  }
+
+  .pageHeader .eyebrow,
+  .pageHeader h1,
+  .pageHeader p,
+  .pageHeader .updated {
+    margin-right: 0 !important;
+    margin-left: 0 !important;
+
+    text-align: left !important;
+  }
+
+  .pageHeader p {
+    max-width: 780px !important;
+  }
+
+  .headerActions {
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: none !important;
+
+    align-self: stretch !important;
+    justify-content: flex-start !important;
+
+    margin: 0 !important;
+  }
+}
+
+/* CAMPAIGN SEAT LANDSCAPE PAGE ALIGNMENT — END */
+
+/* CAMPAIGN SEAT ACCOUNTABILITY LANDSCAPE GRID — START */
+
+@media
+  (min-width: 1080px)
+  and
+  (max-width: 1240px) {
+
+  /*
+   * Search receives the flexible column. Both action buttons
+   * retain their natural width.
+   */
+  .headerActions {
+    display: grid !important;
+
+    grid-template-columns:
+      minmax(0, 1fr)
+      auto
+      auto !important;
+
+    align-items: center !important;
+
+    gap: 9px !important;
+  }
+
+  .searchBox {
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: none !important;
+
+    flex: none !important;
+  }
+
+  /*
+   * Keep all five accountability metrics in one balanced row.
+   */
+  .summaryGrid {
+    grid-template-columns:
+      repeat(
+        5,
+        minmax(0, 1fr)
+      ) !important;
+
+    gap: 9px !important;
+
+    margin-bottom: 14px !important;
+  }
+
+  .summaryCard {
+    min-width: 0 !important;
+  }
+}
+
+/* CAMPAIGN SEAT ACCOUNTABILITY LANDSCAPE GRID — END */

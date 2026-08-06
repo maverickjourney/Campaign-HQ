@@ -931,3 +931,390 @@
     font-size: 12px;
   }
 }
+
+/* CAMPAIGN SEAT PORTRAIT-TABLET FULL HERO — START */
+
+/*
+ * Restore the complete campaign story that the older narrow
+ * breakpoint intentionally hid.
+ */
+@media
+  (min-width: 701px)
+  and
+  (max-width: 900px)
+  and
+  (orientation: portrait) {
+
+  .hero {
+    box-sizing: border-box !important;
+
+    display: flex !important;
+    flex-direction: column !important;
+
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+
+    height: auto !important;
+    min-height: 100svh !important;
+    max-height: none !important;
+
+    padding:
+      34px
+      clamp(32px, 6vw, 52px)
+      40px !important;
+
+    overflow: hidden !important;
+
+    background-size: cover !important;
+  }
+
+  .header {
+    box-sizing: border-box !important;
+
+    display: grid !important;
+
+    grid-template-columns:
+      minmax(0, 1fr)
+      minmax(280px, 340px) !important;
+
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+
+    align-items: start !important;
+
+    gap: 24px !important;
+  }
+
+  .header > :first-child {
+    min-width: 0 !important;
+  }
+
+  .headerDetails {
+    box-sizing: border-box !important;
+
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 340px !important;
+
+    justify-self: end !important;
+  }
+
+  .headerTime,
+  .headerElections {
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+  }
+
+  .content {
+    width: min(100%, 660px) !important;
+    min-width: 0 !important;
+    max-width: 660px !important;
+
+    margin-top:
+      clamp(42px, 6svh, 68px) !important;
+  }
+
+  .content h1 {
+    font-size:
+      clamp(54px, 8vw, 72px) !important;
+
+    line-height: 0.98 !important;
+  }
+
+  .description {
+    display: block !important;
+
+    width: min(100%, 630px) !important;
+    max-width: 630px !important;
+
+    margin-top: 16px !important;
+  }
+
+  /*
+   * Support both the current and earlier overview class names.
+   */
+  .platformPulse,
+  .platformOverview {
+    display: block !important;
+
+    width: min(100%, 760px) !important;
+    max-width: 760px !important;
+
+    margin-top: 22px !important;
+  }
+
+  /*
+   * Support both the current and earlier feature-grid names.
+   */
+  .features,
+  .cards {
+    box-sizing: border-box !important;
+
+    display: grid !important;
+
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+
+    grid-template-columns:
+      repeat(
+        2,
+        minmax(0, 1fr)
+      ) !important;
+
+    gap: 12px !important;
+
+    margin-top: 22px !important;
+  }
+
+  .featureCard,
+  .card {
+    box-sizing: border-box !important;
+
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+
+    min-height: 98px !important;
+
+    padding:
+      14px
+      15px !important;
+  }
+
+  .featureCard h3,
+  .card h3,
+  .featureCard p,
+  .card p {
+    min-width: 0 !important;
+    max-width: 100% !important;
+  }
+}
+
+/* CAMPAIGN SEAT PORTRAIT-TABLET FULL HERO — END */
+
+/* CAMPAIGN SEAT MOBILE FULL HERO — START */
+
+@media (max-width: 700px) {
+
+  .hero {
+    box-sizing: border-box !important;
+
+    display: flex !important;
+    flex-direction: column !important;
+
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+
+    height: auto !important;
+    min-height: 100svh !important;
+    max-height: none !important;
+
+    padding:
+      24px
+      18px
+      30px !important;
+
+    overflow: hidden !important;
+
+    background-position: center center !important;
+    background-size: cover !important;
+  }
+
+  /*
+   * Brand first, campaign status beneath it.
+   */
+  .header {
+    box-sizing: border-box !important;
+
+    display: grid !important;
+
+    grid-template-columns:
+      minmax(0, 1fr) !important;
+
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+
+    gap: 18px !important;
+  }
+
+  .header > :first-child {
+    min-width: 0 !important;
+    max-width: 100% !important;
+  }
+
+  .headerDetails {
+    box-sizing: border-box !important;
+
+    display: grid !important;
+
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+
+    justify-self: stretch !important;
+
+    gap: 8px !important;
+  }
+
+  .headerTime {
+    display: grid !important;
+
+    grid-template-columns:
+      repeat(
+        2,
+        minmax(0, 1fr)
+      ) !important;
+
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+
+    gap: 7px !important;
+  }
+
+  .headerElections {
+    display: grid !important;
+
+    grid-template-columns:
+      minmax(0, 1fr) !important;
+
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+
+    gap: 7px !important;
+  }
+
+  .content {
+    box-sizing: border-box !important;
+
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+
+    margin-top: 38px !important;
+  }
+
+  .content h1 {
+    font-size:
+      clamp(
+        42px,
+        12vw,
+        58px
+      ) !important;
+
+    line-height: 0.98 !important;
+  }
+
+  .description {
+    display: block !important;
+
+    width: 100% !important;
+    max-width: 100% !important;
+
+    margin-top: 14px !important;
+
+    font-size: 14px !important;
+    line-height: 1.52 !important;
+  }
+
+  /*
+   * Restore the campaign overview panel.
+   */
+  .platformPulse,
+  .platformOverview {
+    display: block !important;
+
+    box-sizing: border-box !important;
+
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+
+    margin-top: 20px !important;
+  }
+
+  /*
+   * Use one readable feature card per row on phones.
+   */
+  .features,
+  .cards {
+    box-sizing: border-box !important;
+
+    display: grid !important;
+
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+
+    grid-template-columns:
+      minmax(0, 1fr) !important;
+
+    gap: 10px !important;
+
+    margin-top: 18px !important;
+  }
+
+  .featureCard,
+  .card {
+    box-sizing: border-box !important;
+
+    display: block !important;
+
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+
+    min-height: 92px !important;
+
+    padding:
+      14px
+      15px !important;
+
+    border-radius: 16px !important;
+  }
+
+  .featureCard h3,
+  .card h3,
+  .featureCard p,
+  .card p {
+    min-width: 0 !important;
+    max-width: 100% !important;
+  }
+}
+
+@media (max-width: 430px) {
+
+  .hero {
+    padding:
+      22px
+      14px
+      28px !important;
+  }
+
+  .headerTime {
+    grid-template-columns:
+      minmax(0, 1fr) !important;
+  }
+
+  .content {
+    margin-top: 32px !important;
+  }
+
+  .content h1 {
+    font-size:
+      clamp(
+        39px,
+        11vw,
+        50px
+      ) !important;
+  }
+}
+
+/* CAMPAIGN SEAT MOBILE FULL HERO — END */

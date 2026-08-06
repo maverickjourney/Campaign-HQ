@@ -787,3 +787,66 @@
     flex-wrap: wrap;
   }
 }
+
+/* CAMPAIGN SEAT PORTRAIT-TABLET LOGIN FORM — START */
+
+@media
+  (min-width: 701px)
+  and
+  (max-width: 900px)
+  and
+  (orientation: portrait) {
+
+  .wrapper {
+    width: min(100%, 640px) !important;
+    max-width: 640px !important;
+
+    max-height: none !important;
+
+    margin:
+      0
+      auto !important;
+
+    padding-block: 0 !important;
+
+    transform: none !important;
+  }
+
+  .loginCard {
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+}
+
+/* CAMPAIGN SEAT PORTRAIT-TABLET LOGIN FORM — END */
+
+/* CAMPAIGN SEAT MOBILE LOGIN FORM — START */
+
+@media (max-width: 700px) {
+
+  .wrapper {
+    box-sizing: border-box !important;
+
+    width: min(100%, 430px) !important;
+    max-width: 430px !important;
+
+    max-height: none !important;
+
+    margin:
+      0
+      auto !important;
+
+    padding-block: 0 !important;
+
+    transform: none !important;
+  }
+
+  .loginCard {
+    box-sizing: border-box !important;
+
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+}
+
+/* CAMPAIGN SEAT MOBILE LOGIN FORM — END */

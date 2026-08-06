@@ -149,3 +149,59 @@
     transition: none !important;
   }
 }
+
+
+/* INBOX SUPPORT POSITION — START */
+
+.inbox {
+  bottom:
+    max(
+      92px,
+      calc(
+        env(safe-area-inset-bottom)
+        + 92px
+      )
+    ) !important;
+}
+
+@media (max-width: 640px) {
+  .inbox {
+    bottom:
+      max(
+        78px,
+        calc(
+          env(safe-area-inset-bottom)
+          + 78px
+        )
+      ) !important;
+  }
+}
+
+/* INBOX SUPPORT POSITION — END */
+
+/* HIDE SUPPORT DURING INBOX MODALS — START */
+
+:global(
+  body:has(
+    [aria-label="Close New Message"]
+  )
+)
+.launcher,
+:global(
+  body:has(
+    [aria-label="Close new contact form"]
+  )
+)
+.launcher,
+:global(
+  body:has(
+    [aria-labelledby="quick-task-title"]
+  )
+)
+.launcher {
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+
+/* HIDE SUPPORT DURING INBOX MODALS — END */

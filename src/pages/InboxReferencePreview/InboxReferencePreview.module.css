@@ -1709,3 +1709,3072 @@
 }
 
 /* COMFORTABLE INBOX TYPE V2 — END */
+
+
+/* POWERFUL INBOX WORKFLOWS — START */
+
+.pageActions {
+  flex-wrap: wrap;
+}
+
+.quickTaskButton {
+  display: inline-flex;
+  min-height: 40px;
+  height: 40px;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 0 14px;
+  border: 1px solid #9eb8ce;
+  border-radius: 9px;
+  color: #1f5e91;
+  background: #ffffff;
+  box-shadow:
+    0 8px 20px
+    rgba(25, 76, 118, 0.07);
+  font-size: 0.84rem;
+  font-weight: 800;
+}
+
+.quickTaskButton:hover {
+  border-color: #6395bd;
+  background: #f4f9fd;
+}
+
+.metricsGrid {
+  grid-template-columns:
+    repeat(3, minmax(0, 1fr))
+    !important;
+}
+
+.metricCard {
+  min-height: 72px !important;
+  padding: 9px 13px !important;
+}
+
+.activeMetricCard {
+  border-color: #ef7781 !important;
+  background:
+    linear-gradient(
+      135deg,
+      #fff5f6,
+      #ffffff
+    ) !important;
+  box-shadow:
+    inset 3px 0 #ef3340,
+    0 9px 22px
+      rgba(198, 31, 45, 0.08) !important;
+}
+
+.newMessageFields {
+  grid-template-columns:
+    minmax(0, 1.45fr)
+    minmax(240px, 0.75fr)
+    !important;
+  align-items: start;
+}
+
+.contactPickerField {
+  position: relative;
+  min-width: 0;
+}
+
+.fieldLabel {
+  display: block;
+  color: #6b8194;
+  font-size: 0.72rem;
+  font-weight: 780;
+}
+
+.contactSearchControl {
+  display: grid;
+  min-height: 42px;
+  grid-template-columns:
+    auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 8px;
+  margin-top: 6px;
+  padding: 0 8px 0 11px;
+  border: 1px solid #d2dee7;
+  border-radius: 9px;
+  color: #71889b;
+  background: #ffffff;
+}
+
+.contactSearchControl input {
+  height: 40px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  outline: 0;
+  background: transparent !important;
+}
+
+.contactSearchControl > button {
+  display: inline-flex;
+  min-height: 31px;
+  align-items: center;
+  gap: 6px;
+  padding: 0 9px;
+  border: 1px solid #d5e0e8;
+  border-radius: 7px;
+  color: #245f8f;
+  background: #f7fafc;
+  font-size: 0.68rem;
+  font-weight: 760;
+}
+
+.contactResults {
+  max-height: 230px;
+  margin-top: 7px;
+  overflow-x: hidden;
+  overflow-y: auto;
+  border: 1px solid #d9e3eb;
+  border-radius: 9px;
+  background: #ffffff;
+  box-shadow:
+    0 14px 30px
+    rgba(20, 58, 91, 0.11);
+}
+
+.contactResults > button {
+  display: grid;
+  width: 100%;
+  min-height: 55px;
+  grid-template-columns:
+    auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 9px;
+  padding: 8px 10px;
+  border: 0;
+  border-bottom: 1px solid #edf1f4;
+  color: #315574;
+  background: #ffffff;
+  text-align: left;
+}
+
+.contactResults > button:last-child {
+  border-bottom: 0;
+}
+
+.contactResults > button:hover,
+.contactResults > button:focus-visible {
+  background: #f4f8fb;
+}
+
+.contactResults strong,
+.contactResults small,
+.selectedContactCard strong,
+.selectedContactCard small {
+  display: block;
+}
+
+.contactResults strong,
+.selectedContactCard strong {
+  font-size: 0.78rem;
+}
+
+.contactResults small,
+.selectedContactCard small {
+  margin-top: 3px;
+  overflow: hidden;
+  color: #7a8fa2;
+  font-size: 0.67rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.contactResults em {
+  padding: 4px 7px;
+  border-radius: 999px;
+  color: #557086;
+  background: #edf3f7;
+  font-size: 0.58rem;
+  font-style: normal;
+  text-transform: capitalize;
+}
+
+.contactLoading,
+.noContactResults {
+  display: flex;
+  min-height: 62px;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px;
+  color: #71879a;
+  font-size: 0.7rem;
+  text-align: center;
+}
+
+.contactLoading svg {
+  animation:
+    inboxWorkflowSpin 0.9s linear infinite;
+}
+
+.selectedContactCard {
+  display: grid;
+  min-height: 58px;
+  grid-template-columns:
+    auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 9px;
+  margin-top: 7px;
+  padding: 8px 10px;
+  border: 1px solid #b9d3e5;
+  border-radius: 9px;
+  background:
+    linear-gradient(
+      135deg,
+      #f2f8fc,
+      #ffffff
+    );
+}
+
+.selectedContactCard > button {
+  display: grid;
+  width: 29px;
+  height: 29px;
+  place-items: center;
+  border: 0;
+  border-radius: 7px;
+  color: #71879a;
+  background: transparent;
+}
+
+.newContactForm {
+  margin-top: 9px;
+  padding: 12px;
+  border: 1px solid #c9dae7;
+  border-radius: 10px;
+  background: #f8fbfd;
+}
+
+.newContactForm > header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.newContactForm > header strong,
+.newContactForm > header small {
+  display: block;
+}
+
+.newContactForm > header strong {
+  color: #173b60;
+  font-size: 0.8rem;
+}
+
+.newContactForm > header small {
+  margin-top: 3px;
+  color: #758a9c;
+  font-size: 0.66rem;
+}
+
+.newContactForm > header button {
+  display: grid;
+  width: 29px;
+  height: 29px;
+  place-items: center;
+  border: 0;
+  border-radius: 7px;
+  color: #6f8597;
+  background: transparent;
+}
+
+.newContactForm > div:not(.consentOptions):not(.workflowError) {
+  display: grid;
+  grid-template-columns:
+    repeat(2, minmax(0, 1fr));
+  gap: 9px;
+}
+
+.newContactForm label {
+  color: #5d7589;
+  font-size: 0.68rem;
+  font-weight: 730;
+}
+
+.newContactForm input:not([type="checkbox"]) {
+  box-sizing: border-box;
+  width: 100%;
+  height: 37px;
+  margin-top: 5px;
+  padding: 0 9px;
+  border: 1px solid #d3dfe8;
+  border-radius: 7px;
+  outline: 0;
+  color: #315574;
+  background: #ffffff;
+  font-size: 0.74rem;
+}
+
+.consentOptions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 10px;
+}
+
+.consentOptions label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.64rem;
+}
+
+.newContactForm > footer,
+.quickTaskModal > footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 11px;
+}
+
+.newContactForm > footer button,
+.quickTaskModal > footer button {
+  display: inline-flex;
+  min-height: 35px;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  padding: 0 12px;
+  border: 1px solid #d0dce5;
+  border-radius: 8px;
+  color: #49677f;
+  background: #ffffff;
+  font-size: 0.7rem;
+  font-weight: 760;
+}
+
+.newContactForm > footer button:last-child,
+.quickTaskModal > footer button:last-child {
+  border-color: transparent;
+  color: #ffffff;
+  background:
+    linear-gradient(
+      135deg,
+      #ef3340,
+      #c91d2b
+    );
+}
+
+.workflowError {
+  margin-top: 8px;
+  padding: 8px 10px;
+  border: 1px solid #f0b7bc;
+  border-radius: 7px;
+  color: #a6202c;
+  background: #fff3f4;
+  font-size: 0.68rem;
+  line-height: 1.4;
+}
+
+.subjectField {
+  min-width: 0;
+}
+
+.previewNotice {
+  display: flex;
+  align-items: flex-start;
+  gap: 7px;
+  margin-bottom: 8px;
+  padding: 8px 10px;
+  border: 1px solid #bed5e5;
+  border-radius: 8px;
+  color: #315f82;
+  background: #f3f8fc;
+  font-size: 0.68rem;
+  line-height: 1.4;
+}
+
+.previewNotice svg {
+  flex: 0 0 auto;
+  margin-top: 1px;
+  color: #25845d;
+}
+
+.modalOverlay {
+  position: fixed;
+  z-index: 400;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+  background:
+    rgba(8, 26, 45, 0.52);
+  backdrop-filter: blur(5px);
+}
+
+.quickTaskModal {
+  box-sizing: border-box;
+  width: min(560px, 100%);
+  max-height: calc(100vh - 40px);
+  overflow-x: hidden;
+  overflow-y: auto;
+  padding: 18px;
+  border: 1px solid #d6e1e9;
+  border-radius: 14px;
+  background: #ffffff;
+  box-shadow:
+    0 30px 80px
+    rgba(5, 24, 43, 0.3);
+}
+
+.quickTaskModal > header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 15px;
+}
+
+.quickTaskModal > header > div {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.quickTaskModal > header > div > span {
+  display: grid;
+  width: 42px;
+  height: 42px;
+  place-items: center;
+  border-radius: 10px;
+  color: #ffffff;
+  background:
+    linear-gradient(
+      135deg,
+      #235f92,
+      #174978
+    );
+}
+
+.quickTaskModal h2 {
+  margin: 3px 0 0;
+  color: #173b60;
+  font-size: 1.2rem;
+}
+
+.quickTaskModal > header small {
+  color: #ef3340;
+  font-size: 0.65rem;
+  font-weight: 850;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.quickTaskModal > header > button {
+  display: grid;
+  width: 34px;
+  height: 34px;
+  place-items: center;
+  border: 1px solid #d7e1e9;
+  border-radius: 8px;
+  color: #708698;
+  background: #ffffff;
+}
+
+.quickTaskContact {
+  display: grid;
+  grid-template-columns:
+    auto minmax(0, 1fr);
+  align-items: center;
+  gap: 9px;
+  margin: 15px 0;
+  padding: 10px;
+  border: 1px solid #d9e4ec;
+  border-radius: 9px;
+  background: #f7fafc;
+}
+
+.quickTaskContact strong,
+.quickTaskContact small {
+  display: block;
+}
+
+.quickTaskContact strong {
+  color: #173b60;
+  font-size: 0.8rem;
+}
+
+.quickTaskContact small {
+  margin-top: 3px;
+  color: #768b9d;
+  font-size: 0.68rem;
+}
+
+.quickTaskModal > label,
+.quickTaskGrid label {
+  display: block;
+  color: #587086;
+  font-size: 0.7rem;
+  font-weight: 760;
+}
+
+.quickTaskModal input,
+.quickTaskModal textarea,
+.quickTaskModal select {
+  box-sizing: border-box;
+  width: 100%;
+  margin-top: 5px;
+  padding: 0 10px;
+  border: 1px solid #d3dfe7;
+  border-radius: 8px;
+  outline: 0;
+  color: #315574;
+  background: #fbfcfd;
+  font: inherit;
+  font-size: 0.76rem;
+}
+
+.quickTaskModal input,
+.quickTaskModal select {
+  height: 39px;
+}
+
+.quickTaskModal textarea {
+  padding-top: 9px;
+  padding-bottom: 9px;
+  resize: vertical;
+}
+
+.quickTaskModal > label + label {
+  margin-top: 10px;
+}
+
+.quickTaskGrid {
+  display: grid;
+  grid-template-columns:
+    repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.spinning {
+  animation:
+    inboxWorkflowSpin 0.9s linear infinite;
+}
+
+@keyframes inboxWorkflowSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (max-width: 900px) {
+  .metricsGrid {
+    grid-template-columns:
+      1fr !important;
+  }
+
+  .newMessageFields {
+    grid-template-columns:
+      1fr !important;
+  }
+}
+
+@media (max-width: 620px) {
+  .pageActions {
+    width: 100%;
+  }
+
+  .quickTaskButton,
+  .newMessageButton {
+    width: 100%;
+  }
+
+  .newContactForm
+    > div:not(.consentOptions):not(.workflowError),
+  .quickTaskGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .contactSearchControl {
+    grid-template-columns:
+      auto minmax(0, 1fr);
+  }
+
+  .contactSearchControl > button {
+    grid-column: 1 / -1;
+    justify-content: center;
+    margin-bottom: 7px;
+  }
+}
+
+/* POWERFUL INBOX WORKFLOWS — END */
+
+
+/* INBOX CONTACT AND DATE POLISH — START */
+
+.consentOptions
+  input[type="checkbox"] {
+  width: 15px !important;
+  height: 15px !important;
+  min-width: 15px;
+  margin: 0;
+  padding: 0;
+  border-radius: 4px;
+  accent-color: #ef3340;
+  cursor: pointer;
+}
+
+.consentOptions label {
+  min-height: 24px;
+  align-items: center;
+}
+
+.contactResults > button em {
+  max-width: 92px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* INBOX CONTACT AND DATE POLISH — END */
+
+
+/* FINAL INBOX INTERACTIONS — START */
+
+.newMessageModal {
+  position: fixed !important;
+  z-index: 2147483100 !important;
+  inset: 24px !important;
+  box-sizing: border-box;
+  width: min(
+    980px,
+    calc(100vw - 48px)
+  ) !important;
+  height: min(
+    760px,
+    calc(100vh - 48px)
+  ) !important;
+  min-height: 0 !important;
+  max-height: calc(100vh - 48px) !important;
+  margin: auto !important;
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+  border-radius: 16px !important;
+  box-shadow:
+    0 0 0 100vmax
+      rgba(7, 26, 46, 0.56),
+    0 32px 90px
+      rgba(4, 19, 34, 0.38) !important;
+}
+
+.newMessageModal
+  .threadHeader {
+  position: sticky;
+  z-index: 4;
+  top: 0;
+  background: #ffffff;
+}
+
+.newMessageModal
+  .replyComposer {
+  position: sticky;
+  z-index: 3;
+  bottom: 0;
+}
+
+.contactResultsHidden {
+  display: none !important;
+}
+
+.newContactForm {
+  position: fixed !important;
+  z-index: 2147483300 !important;
+  top: 50% !important;
+  left: 50% !important;
+  box-sizing: border-box;
+  width: min(
+    570px,
+    calc(100vw - 40px)
+  ) !important;
+  max-height: calc(100vh - 40px);
+  margin: 0 !important;
+  overflow-x: hidden;
+  overflow-y: auto;
+  padding: 18px !important;
+  transform:
+    translate(-50%, -50%);
+  border-radius: 14px !important;
+  background: #ffffff !important;
+  box-shadow:
+    0 0 0 100vmax
+      rgba(7, 26, 46, 0.62),
+    0 30px 80px
+      rgba(4, 19, 34, 0.42) !important;
+}
+
+.modalOverlay {
+  z-index: 2147483200 !important;
+}
+
+.fileCount {
+  color: #72889a;
+  font-size: 0.68rem;
+  font-weight: 700;
+}
+
+.fileCard {
+  display: grid;
+  min-height: 58px;
+  grid-template-columns:
+    auto minmax(0, 1fr);
+  align-items: center;
+  gap: 10px;
+  padding: 10px;
+  border: 1px solid #dbe4eb;
+  border-radius: 9px;
+  color: #315574;
+  background: #f8fafc;
+}
+
+.fileCard strong,
+.fileCard small {
+  display: block;
+}
+
+.fileCard small {
+  margin-top: 3px;
+  color: #8093a3;
+}
+
+.conversationList > button {
+  cursor: pointer;
+}
+
+.threadHeader button[aria-label],
+.quickTaskModal button[aria-label],
+.newContactForm button[aria-label] {
+  cursor: pointer;
+}
+
+@media (max-width: 760px) {
+  .newMessageModal {
+    inset: 10px !important;
+    width: calc(100vw - 20px) !important;
+    height: calc(100vh - 20px) !important;
+    max-height: calc(100vh - 20px) !important;
+    border-radius: 13px !important;
+  }
+
+  .newContactForm {
+    width: calc(100vw - 24px) !important;
+    max-height: calc(100vh - 24px);
+  }
+}
+
+/* FINAL INBOX INTERACTIONS — END */
+
+
+/* REAL INBOX MODAL SCRIMS — START */
+
+.newMessageScrim,
+.newContactScrim {
+  position: fixed;
+  inset: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  cursor: default;
+}
+
+.newMessageScrim {
+  z-index: 2147483050;
+  background:
+    rgba(7, 26, 46, 0.68);
+}
+
+.newContactScrim {
+  z-index: 2147483250;
+  background:
+    rgba(7, 26, 46, 0.42);
+}
+
+.newMessageModal {
+  box-shadow:
+    0 32px 90px
+    rgba(4, 19, 34, 0.38)
+    !important;
+}
+
+.newContactForm {
+  box-shadow:
+    0 30px 80px
+    rgba(4, 19, 34, 0.42)
+    !important;
+}
+
+/* REAL INBOX MODAL SCRIMS — END */
+
+/* INBOX MODAL VISUAL POLISH V2 — START */
+
+.newMessageModal {
+  inset: auto !important;
+  top: 50% !important;
+  right: auto !important;
+  bottom: auto !important;
+  left: 50% !important;
+
+  width:
+    min(
+      930px,
+      calc(100vw - 56px)
+    ) !important;
+
+  height: auto !important;
+  min-height: 0 !important;
+  max-height:
+    calc(100vh - 56px) !important;
+
+  margin: 0 !important;
+
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+
+  transform:
+    translate(-50%, -50%) !important;
+
+  border-radius: 15px !important;
+}
+
+.newMessageModal
+  .threadHeader {
+  position: static !important;
+  min-height: 64px !important;
+}
+
+.newMessageModal
+  .newMessageFields {
+  padding:
+    15px
+    16px !important;
+}
+
+.newMessageModal
+  .replyComposer {
+  position: static !important;
+  padding:
+    14px
+    16px
+    16px !important;
+}
+
+.newMessageModal
+  .replyComposer textarea {
+  min-height: 145px !important;
+  max-height: 260px !important;
+}
+
+.newMessageModal
+  .previewNotice {
+  margin-bottom: 10px;
+}
+
+.newMessageScrim {
+  background:
+    rgba(7, 26, 46, 0.61)
+    !important;
+
+  backdrop-filter:
+    blur(2px);
+
+  -webkit-backdrop-filter:
+    blur(2px);
+}
+
+/*
+ * This layer sits above the New Message scrim,
+ * so it only needs a subtle additional tint.
+ */
+.newContactScrim {
+  background:
+    rgba(7, 26, 46, 0.18)
+    !important;
+
+  backdrop-filter:
+    blur(1px);
+
+  -webkit-backdrop-filter:
+    blur(1px);
+}
+
+.newContactForm {
+  width:
+    min(
+      590px,
+      calc(100vw - 40px)
+    ) !important;
+}
+
+@media (max-width: 760px) {
+  .newMessageModal {
+    width:
+      calc(100vw - 20px)
+      !important;
+
+    max-height:
+      calc(100vh - 20px)
+      !important;
+
+    border-radius:
+      13px !important;
+  }
+
+  .newMessageModal
+    .replyComposer textarea {
+    min-height:
+      125px !important;
+  }
+}
+
+/* INBOX MODAL VISUAL POLISH V2 — END */
+
+
+/* CHANNEL-AWARE NEW MESSAGE COMPOSER — START */
+
+.newMessageModal {
+  width:
+    min(
+      900px,
+      calc(100vw - 56px)
+    ) !important;
+}
+
+.newMessageModal
+  .newMessageFields {
+  grid-template-columns:
+    repeat(
+      2,
+      minmax(0, 1fr)
+    ) !important;
+
+  align-items: start !important;
+  gap: 14px !important;
+}
+
+.newMessageModal
+  .newMessageFieldsSingle {
+  grid-template-columns:
+    minmax(0, 1fr)
+    !important;
+}
+
+.newMessageModal
+  .newMessageFieldsSingle
+  .contactPickerField {
+  grid-column: 1 / -1;
+}
+
+.newMessageModal
+  .fieldLabel {
+  display: block;
+
+  color: #5f7589;
+
+  font-size: 0.72rem;
+  font-weight: 780;
+  line-height: 1.2;
+}
+
+.newMessageModal
+  .subjectField {
+  display: block;
+  min-width: 0;
+
+  color: inherit;
+  font-size: inherit;
+  font-weight: inherit;
+}
+
+.newMessageModal
+  .contactSearchControl,
+.newMessageModal
+  .subjectField
+  > input {
+  box-sizing: border-box;
+
+  width: 100%;
+  height: 46px !important;
+  min-height: 46px !important;
+
+  margin-top: 7px !important;
+
+  border:
+    1px solid
+    #cbd9e4 !important;
+
+  border-radius:
+    10px !important;
+
+  background:
+    #ffffff !important;
+
+  box-shadow:
+    none !important;
+}
+
+.newMessageModal
+  .contactSearchControl {
+  padding:
+    0 8px
+    0 13px !important;
+}
+
+.newMessageModal
+  .contactSearchControl
+  input {
+  height: 44px !important;
+
+  font-size: 0.84rem !important;
+  font-weight: 520 !important;
+}
+
+.newMessageModal
+  .subjectField
+  > input {
+  padding:
+    0 13px !important;
+
+  color: #2f526f;
+
+  font-family: inherit;
+  font-size: 0.84rem !important;
+  font-weight: 520 !important;
+  line-height: 1 !important;
+}
+
+.newMessageModal
+  .contactSearchControl
+  input::placeholder,
+.newMessageModal
+  .subjectField
+  > input::placeholder {
+  color: #8798a8;
+  opacity: 1;
+
+  font-size: 0.84rem;
+  font-weight: 500;
+}
+
+.newMessageModal
+  .contactSearchControl
+  > button {
+  min-height: 34px;
+
+  padding:
+    0 10px;
+
+  font-size: 0.7rem;
+}
+
+.newMessageModal
+  .contactSearchControl:focus-within,
+.newMessageModal
+  .subjectField
+  > input:focus {
+  border-color:
+    #5f91ba !important;
+
+  outline:
+    3px solid
+    rgba(
+      63,
+      126,
+      178,
+      0.12
+    );
+
+  outline-offset: 0;
+}
+
+@media (max-width: 760px) {
+  .newMessageModal
+    .newMessageFields {
+    grid-template-columns:
+      1fr !important;
+  }
+
+  .newMessageModal {
+    width:
+      calc(100vw - 20px)
+      !important;
+  }
+}
+
+/* CHANNEL-AWARE NEW MESSAGE COMPOSER — END */
+
+/* CAMPAIGN SEAT FINAL INBOX RESPONSIVE — START */
+
+/*
+ * Inbox-only responsive architecture.
+ *
+ * Desktop above 1240px remains unchanged.
+ * The shared workspace shell, dashboard, sidebar and JSX are untouched.
+ */
+
+/* =========================================================
+   SMALL LAPTOP / TABLET LANDSCAPE
+   901px through 1240px
+   ========================================================= */
+
+@media
+  (min-width: 901px)
+  and
+  (max-width: 1240px) {
+
+  /*
+   * Keep the complete Inbox inside the available workspace height.
+   * The three Inbox panels manage their own scrolling.
+   */
+  .page {
+    box-sizing: border-box !important;
+
+    display: flex !important;
+    height: calc(100dvh - 72px) !important;
+    min-height: 0 !important;
+    max-height: calc(100dvh - 72px) !important;
+    flex-direction: column !important;
+
+    padding:
+      12px
+      16px
+      14px !important;
+
+    overflow: hidden !important;
+  }
+
+  .pageHeader {
+    min-height: 52px !important;
+    flex: 0 0 auto !important;
+
+    margin-bottom: 9px !important;
+  }
+
+  .pageHeader h1 {
+    font-size: 1.75rem !important;
+  }
+
+  .pageHeader p {
+    font-size: 0.78rem !important;
+  }
+
+  .pageActions {
+    flex-wrap: nowrap !important;
+  }
+
+  .globalSearch {
+    min-width: 240px !important;
+  }
+
+  /*
+   * Keep all three status cards in one clean row.
+   */
+  .metricsGrid {
+    grid-template-columns:
+      repeat(
+        3,
+        minmax(0, 1fr)
+      ) !important;
+
+    flex: 0 0 auto !important;
+
+    gap: 9px !important;
+    margin-bottom: 9px !important;
+  }
+
+  .metricCard {
+    min-height: 72px !important;
+
+    padding:
+      9px
+      12px !important;
+  }
+
+  /*
+   * Preserve the complete desktop-style three-panel Inbox.
+   */
+  .inboxWorkspace {
+    display: grid !important;
+
+    min-height: 0 !important;
+    height: auto !important;
+    max-height: none !important;
+
+    flex: 1 1 auto !important;
+
+    grid-template-columns:
+      minmax(170px, 0.58fr)
+      minmax(270px, 0.92fr)
+      minmax(430px, 1.7fr) !important;
+
+    align-items: stretch !important;
+
+    gap: 9px !important;
+
+    overflow: hidden !important;
+  }
+
+  .utilityPanel,
+  .conversationPanel,
+  .threadPanel {
+    min-height: 0 !important;
+    height: 100% !important;
+    max-height: none !important;
+
+    overflow: hidden !important;
+  }
+
+  .utilityPanel {
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+
+    overscroll-behavior: contain !important;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .conversationPanel,
+  .threadPanel {
+    display: flex !important;
+    flex-direction: column !important;
+  }
+
+  .listHeader,
+  .threadHeader,
+  .threadTabs,
+  .replyComposer {
+    flex: 0 0 auto !important;
+  }
+
+  .conversationList {
+    min-height: 0 !important;
+    height: auto !important;
+    max-height: none !important;
+
+    flex: 1 1 auto !important;
+
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+
+    overscroll-behavior: contain !important;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .threadBody {
+    min-height: 0 !important;
+    height: auto !important;
+    max-height: none !important;
+
+    flex: 1 1 auto !important;
+
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+
+    overscroll-behavior: contain !important;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .replyComposer textarea {
+    min-height: 84px !important;
+    max-height: 130px !important;
+  }
+}
+
+
+/* =========================================================
+   TABLET PORTRAIT
+   601px through 900px
+   ========================================================= */
+
+@media
+  (min-width: 601px)
+  and
+  (max-width: 900px) {
+
+  .page {
+    box-sizing: border-box !important;
+
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+
+    padding:
+      12px
+      13px
+      18px !important;
+
+    overflow: visible !important;
+  }
+
+  .pageHeader {
+    gap: 10px !important;
+    margin-bottom: 10px !important;
+  }
+
+  .pageActions {
+    display: grid !important;
+    width: 100% !important;
+
+    grid-template-columns:
+      minmax(0, 1fr)
+      auto
+      auto !important;
+
+    align-items: stretch !important;
+
+    gap: 8px !important;
+  }
+
+  .globalSearch {
+    box-sizing: border-box !important;
+
+    width: 100% !important;
+    min-width: 0 !important;
+  }
+
+  .quickTaskButton,
+  .newMessageButton {
+    width: auto !important;
+    white-space: nowrap !important;
+  }
+
+  /*
+   * Override the old single-column tablet metric rule.
+   */
+  .metricsGrid {
+    grid-template-columns:
+      repeat(
+        3,
+        minmax(0, 1fr)
+      ) !important;
+
+    gap: 8px !important;
+    margin-bottom: 9px !important;
+  }
+
+  .metricCard {
+    min-height: 82px !important;
+
+    padding:
+      9px
+      10px !important;
+  }
+
+  /*
+   * Utility and conversations share the first row.
+   * The selected conversation uses the complete second row.
+   */
+  .inboxWorkspace {
+    display: grid !important;
+
+    min-height: 0 !important;
+    height: auto !important;
+    max-height: none !important;
+
+    grid-template-columns:
+      minmax(190px, 0.62fr)
+      minmax(0, 1fr) !important;
+
+    grid-template-areas:
+      "utility conversations"
+      "thread thread" !important;
+
+    align-items: stretch !important;
+
+    gap: 9px !important;
+
+    overflow: visible !important;
+  }
+
+  .utilityPanel {
+    grid-area: utility !important;
+
+    min-height: 0 !important;
+    height: 560px !important;
+    max-height: 560px !important;
+
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+
+    overscroll-behavior: contain !important;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .conversationPanel {
+    grid-area: conversations !important;
+
+    display: flex !important;
+
+    min-height: 0 !important;
+    height: 560px !important;
+    max-height: 560px !important;
+
+    flex-direction: column !important;
+
+    overflow: hidden !important;
+  }
+
+  .conversationList {
+    min-height: 0 !important;
+    height: auto !important;
+    max-height: none !important;
+
+    flex: 1 1 auto !important;
+
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+
+    overscroll-behavior: contain !important;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .threadPanel {
+    grid-area: thread !important;
+
+    display: flex !important;
+
+    min-height: 650px !important;
+    height: 650px !important;
+    max-height: 650px !important;
+
+    flex-direction: column !important;
+
+    overflow: hidden !important;
+  }
+
+  .threadHeader,
+  .threadTabs,
+  .replyComposer {
+    flex: 0 0 auto !important;
+  }
+
+  .threadBody {
+    min-height: 0 !important;
+    height: auto !important;
+    max-height: none !important;
+
+    flex: 1 1 auto !important;
+
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+
+    overscroll-behavior: contain !important;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .replyComposer textarea {
+    min-height: 104px !important;
+    max-height: 150px !important;
+  }
+}
+
+
+/* =========================================================
+   PHONES
+   600px and below
+   ========================================================= */
+
+@media (max-width: 600px) {
+
+  .page {
+    box-sizing: border-box !important;
+
+    width: 100% !important;
+    min-width: 0 !important;
+
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+
+    padding:
+      10px
+      9px
+      16px !important;
+
+    overflow: visible !important;
+  }
+
+  .pageHeader {
+    width: 100% !important;
+
+    gap: 9px !important;
+    margin-bottom: 9px !important;
+  }
+
+  .pageHeader h1 {
+    font-size: 1.72rem !important;
+  }
+
+  .pageHeader p {
+    margin-top: 4px !important;
+
+    font-size: 0.82rem !important;
+  }
+
+  /*
+   * Search uses the complete first row.
+   * Quick Task and New Message share the second row.
+   */
+  .pageActions {
+    display: grid !important;
+    width: 100% !important;
+
+    grid-template-columns:
+      repeat(
+        2,
+        minmax(0, 1fr)
+      ) !important;
+
+    gap: 7px !important;
+  }
+
+  .globalSearch {
+    box-sizing: border-box !important;
+
+    width: 100% !important;
+    min-width: 0 !important;
+
+    grid-column:
+      1 / -1 !important;
+  }
+
+  .quickTaskButton,
+  .newMessageButton {
+    box-sizing: border-box !important;
+
+    width: 100% !important;
+    min-width: 0 !important;
+
+    padding:
+      0
+      8px !important;
+
+    white-space: nowrap !important;
+  }
+
+  /*
+   * Three compact status cards replace the tall mobile stack.
+   */
+  .metricsGrid {
+    grid-template-columns:
+      repeat(
+        3,
+        minmax(0, 1fr)
+      ) !important;
+
+    gap: 6px !important;
+    margin-bottom: 8px !important;
+  }
+
+  .metricCard {
+    display: grid !important;
+
+    min-height: 84px !important;
+
+    grid-template-columns:
+      1fr !important;
+
+    justify-items: center !important;
+    align-content: center !important;
+
+    gap: 4px !important;
+
+    padding:
+      8px
+      5px !important;
+
+    text-align: center !important;
+  }
+
+  .metricIcon {
+    width: 31px !important;
+    height: 31px !important;
+  }
+
+  .metricCopy {
+    width: 100% !important;
+
+    text-align: center !important;
+  }
+
+  .metricCopy > small:first-child {
+    overflow: hidden !important;
+
+    font-size: 0.64rem !important;
+
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+  }
+
+  .metricCopy strong {
+    font-size: 1.24rem !important;
+  }
+
+  .metricCopy > small:last-child,
+  .metricCopy em {
+    display: none !important;
+  }
+
+  .inboxWorkspace {
+    display: grid !important;
+
+    min-height: 0 !important;
+    height: auto !important;
+    max-height: none !important;
+
+    grid-template-columns:
+      minmax(0, 1fr) !important;
+
+    grid-template-areas:
+      "utility"
+      "conversations"
+      "thread" !important;
+
+    gap: 9px !important;
+
+    overflow: visible !important;
+  }
+
+  /*
+   * Filters remain available but do not create an extremely long
+   * mobile page. The panel scrolls when more options are needed.
+   */
+  .utilityPanel {
+    grid-area: utility !important;
+
+    min-height: 0 !important;
+    height: auto !important;
+    max-height: 360px !important;
+
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+
+    overscroll-behavior: contain !important;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /*
+   * Conversation list remains independently scrollable.
+   */
+  .conversationPanel {
+    grid-area: conversations !important;
+
+    display: flex !important;
+
+    min-height: 500px !important;
+    height: 500px !important;
+    max-height: 500px !important;
+
+    flex-direction: column !important;
+
+    overflow: hidden !important;
+  }
+
+  .listHeader {
+    flex: 0 0 auto !important;
+  }
+
+  .conversationList {
+    min-height: 0 !important;
+    height: auto !important;
+    max-height: none !important;
+
+    flex: 1 1 auto !important;
+
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+
+    overscroll-behavior: contain !important;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /*
+   * The selected conversation and reply controls stay together.
+   */
+  .threadPanel {
+    grid-area: thread !important;
+
+    display: flex !important;
+
+    min-height: 0 !important;
+    height: auto !important;
+    max-height: none !important;
+
+    flex-direction: column !important;
+
+    overflow: hidden !important;
+  }
+
+  .threadHeader,
+  .threadTabs,
+  .replyComposer {
+    flex: 0 0 auto !important;
+  }
+
+  .threadTabs {
+    gap: 18px !important;
+
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+
+    scrollbar-width: none !important;
+  }
+
+  .threadTabs::-webkit-scrollbar {
+    display: none !important;
+  }
+
+  .threadTabs button {
+    flex: 0 0 auto !important;
+  }
+
+  .threadBody {
+    min-height: 320px !important;
+    height: auto !important;
+    max-height: 440px !important;
+
+    flex: 0 1 auto !important;
+
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+
+    overscroll-behavior: contain !important;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .inboundMessage,
+  .outboundMessage {
+    max-width: 94% !important;
+  }
+
+  .quickReplies {
+    flex-wrap: nowrap !important;
+
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+
+    padding-bottom: 2px !important;
+
+    scrollbar-width: none !important;
+  }
+
+  .quickReplies::-webkit-scrollbar {
+    display: none !important;
+  }
+
+  .quickReplies button {
+    flex: 0 0 auto !important;
+    white-space: nowrap !important;
+  }
+
+  .replyComposer {
+    padding:
+      11px
+      11px
+      12px !important;
+  }
+
+  .replyComposer textarea {
+    min-height: 105px !important;
+    max-height: 150px !important;
+  }
+
+  .composerFooter {
+    gap: 7px !important;
+  }
+
+  .replyChannels {
+    width: 100% !important;
+
+    padding-bottom: 2px !important;
+
+    scrollbar-width: none !important;
+  }
+
+  .replyChannels::-webkit-scrollbar {
+    display: none !important;
+  }
+
+  .sendButton {
+    width: 100% !important;
+    justify-content: center !important;
+  }
+}
+
+
+/* =========================================================
+   NARROW PHONES
+   ========================================================= */
+
+@media (max-width: 430px) {
+
+  .pageHeader h1 {
+    font-size: 1.64rem !important;
+  }
+
+  .globalSearch,
+  .quickTaskButton,
+  .newMessageButton {
+    min-height: 42px !important;
+    height: 42px !important;
+  }
+
+  .quickTaskButton,
+  .newMessageButton {
+    font-size: 0.74rem !important;
+  }
+
+  .metricCard {
+    min-height: 80px !important;
+  }
+
+  .metricCopy > small:first-child {
+    font-size: 0.6rem !important;
+  }
+
+  .conversationPanel {
+    min-height: 480px !important;
+    height: 480px !important;
+    max-height: 480px !important;
+  }
+}
+
+/* CAMPAIGN SEAT FINAL INBOX RESPONSIVE — END */
+
+/* CAMPAIGN SEAT MOBILE INBOX FILTER DRAWER — START */
+
+/*
+ * Hidden on tablet and desktop.
+ */
+.mobileFilterToggle {
+  display: none;
+}
+
+
+/* =========================================================
+   MOBILE FILTER CONTROL
+   ========================================================= */
+
+@media (max-width: 600px) {
+
+  /*
+   * Compact expandable control placed between the summary
+   * cards and the conversation workspace.
+   */
+  .mobileFilterToggle {
+    box-sizing: border-box !important;
+
+    display: flex !important;
+
+    width: 100% !important;
+    min-width: 0 !important;
+    min-height: 46px !important;
+
+    align-items: center !important;
+    justify-content: space-between !important;
+
+    gap: 12px !important;
+
+    margin:
+      0
+      0
+      8px !important;
+
+    padding:
+      0
+      13px !important;
+
+    border:
+      1px
+      solid
+      #bfd2e2 !important;
+
+    border-radius: 12px !important;
+
+    color: #17436d !important;
+
+    background:
+      #ffffff !important;
+
+    box-shadow:
+      0 5px 14px
+      rgba(
+        19,
+        58,
+        91,
+        0.06
+      ) !important;
+
+    text-align: left !important;
+  }
+
+  .mobileFilterToggleLabel,
+  .mobileFilterToggleMeta {
+    display: inline-flex !important;
+
+    min-width: 0 !important;
+
+    align-items: center !important;
+
+    gap: 8px !important;
+  }
+
+  .mobileFilterToggleLabel {
+    overflow: hidden !important;
+  }
+
+  .mobileFilterToggleLabel strong {
+    overflow: hidden !important;
+
+    font-size: 0.78rem !important;
+    font-weight: 800 !important;
+    line-height: 1 !important;
+
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+  }
+
+  .mobileFilterToggleMeta {
+    flex: 0 0 auto !important;
+  }
+
+  .mobileFilterToggleMeta small {
+    display: inline-flex !important;
+
+    min-height: 22px !important;
+
+    align-items: center !important;
+    justify-content: center !important;
+
+    padding:
+      0
+      8px !important;
+
+    border-radius: 999px !important;
+
+    color: #486984 !important;
+    background: #edf4f8 !important;
+
+    font-size: 0.62rem !important;
+    font-weight: 800 !important;
+    line-height: 1 !important;
+  }
+
+  .mobileFilterToggleMeta svg {
+    transition:
+      transform
+      160ms
+      ease !important;
+  }
+
+  .mobileFilterChevronOpen {
+    transform:
+      rotate(180deg) !important;
+  }
+
+
+  /*
+   * Mobile uses a simple vertical flow:
+   *
+   * optional filter drawer
+   * conversation list
+   * selected conversation
+   *
+   * A closed filter drawer therefore creates no empty grid row.
+   */
+  .inboxWorkspace {
+    display: flex !important;
+
+    width: 100% !important;
+    min-width: 0 !important;
+
+    flex-direction: column !important;
+
+    gap: 9px !important;
+
+    overflow: visible !important;
+  }
+
+
+  /*
+   * The permanent desktop utility column becomes a closed
+   * mobile drawer by default.
+   */
+  .utilityPanel {
+    display: none !important;
+
+    width: 100% !important;
+    min-width: 0 !important;
+
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+
+    overflow: hidden !important;
+  }
+
+
+  /*
+   * Open state. Channels and Filters share two columns;
+   * Tags use the complete row beneath them.
+   */
+  .utilityPanel.mobileFiltersOpen {
+    box-sizing: border-box !important;
+
+    display: grid !important;
+
+    grid-template-columns:
+      repeat(
+        2,
+        minmax(0, 1fr)
+      ) !important;
+
+    align-items: start !important;
+
+    gap:
+      10px
+      9px !important;
+
+    max-height: 430px !important;
+
+    padding:
+      11px !important;
+
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+
+    overscroll-behavior: contain !important;
+
+    scrollbar-width: thin !important;
+
+    -webkit-overflow-scrolling: touch !important;
+  }
+
+  .utilityPanel.mobileFiltersOpen > section {
+    min-width: 0 !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  .utilityPanel.mobileFiltersOpen > section:nth-child(3) {
+    grid-column:
+      1 / -1 !important;
+
+    padding-top: 9px !important;
+
+    border-top:
+      1px
+      solid
+      #dce8f0 !important;
+  }
+
+  .utilityPanel.mobileFiltersOpen section > header {
+    min-height: 26px !important;
+
+    margin:
+      0
+      0
+      5px !important;
+
+    padding: 0 !important;
+  }
+
+  .utilityPanel.mobileFiltersOpen section > header strong {
+    font-size: 0.68rem !important;
+    font-weight: 850 !important;
+    line-height: 1 !important;
+  }
+
+  .utilityPanel.mobileFiltersOpen .utilityList {
+    display: grid !important;
+
+    gap: 3px !important;
+  }
+
+  .utilityPanel.mobileFiltersOpen .utilityList button {
+    box-sizing: border-box !important;
+
+    display: grid !important;
+
+    width: 100% !important;
+    min-width: 0 !important;
+    min-height: 34px !important;
+
+    grid-template-columns:
+      16px
+      minmax(0, 1fr)
+      auto !important;
+
+    align-items: center !important;
+
+    gap: 6px !important;
+
+    padding:
+      0
+      7px !important;
+  }
+
+  .utilityPanel.mobileFiltersOpen
+  .utilityList
+  button
+  > span {
+    overflow: hidden !important;
+
+    font-size: 0.65rem !important;
+
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+  }
+
+  .utilityPanel.mobileFiltersOpen
+  .utilityList
+  button
+  > strong {
+    font-size: 0.58rem !important;
+  }
+
+  .utilityPanel.mobileFiltersOpen .tags {
+    display: flex !important;
+
+    flex-wrap: wrap !important;
+
+    gap: 5px !important;
+  }
+
+  .utilityPanel.mobileFiltersOpen .tags button {
+    min-height: 29px !important;
+
+    padding:
+      0
+      9px !important;
+
+    font-size: 0.62rem !important;
+  }
+
+
+  /*
+   * The message list now begins immediately after the compact
+   * filter control whenever the drawer is closed.
+   */
+  .conversationPanel {
+    width: 100% !important;
+    min-width: 0 !important;
+
+    min-height: 510px !important;
+    height: 510px !important;
+    max-height: 510px !important;
+
+    overflow: hidden !important;
+  }
+
+  .conversationList {
+    min-height: 0 !important;
+    height: auto !important;
+    max-height: none !important;
+
+    flex: 1 1 auto !important;
+
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+
+    overscroll-behavior: contain !important;
+
+    -webkit-overflow-scrolling: touch !important;
+  }
+}
+
+
+/* =========================================================
+   NARROW MOBILE
+   ========================================================= */
+
+@media (max-width: 430px) {
+
+  .mobileFilterToggle {
+    min-height: 44px !important;
+
+    padding:
+      0
+      11px !important;
+  }
+
+  .utilityPanel.mobileFiltersOpen {
+    max-height: 410px !important;
+
+    padding:
+      9px !important;
+  }
+
+  .utilityPanel.mobileFiltersOpen
+  .utilityList
+  button {
+    padding:
+      0
+      6px !important;
+  }
+
+  .conversationPanel {
+    min-height: 500px !important;
+    height: 500px !important;
+    max-height: 500px !important;
+  }
+}
+
+
+/* =========================================================
+   REDUCED MOTION
+   ========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+
+  .mobileFilterToggleMeta svg {
+    transition: none !important;
+  }
+}
+
+/* CAMPAIGN SEAT MOBILE INBOX FILTER DRAWER — END */
+
+/* CAMPAIGN SEAT CENTERED MOBILE INBOX METRICS — START */
+
+/*
+ * Center every component of the three mobile Inbox status cards:
+ * icon, label and count.
+ */
+
+@media (max-width: 600px) {
+
+  .metricCard {
+    display: grid !important;
+
+    grid-template-columns:
+      minmax(0, 1fr) !important;
+
+    grid-template-rows:
+      auto
+      auto !important;
+
+    place-items: center !important;
+    align-content: center !important;
+    justify-content: center !important;
+
+    gap: 5px !important;
+
+    text-align: center !important;
+  }
+
+  .metricIcon {
+    justify-self: center !important;
+    align-self: center !important;
+  }
+
+  .metricCopy {
+    display: flex !important;
+
+    width: 100% !important;
+    min-width: 0 !important;
+
+    align-items: center !important;
+    justify-content: center !important;
+    flex-direction: column !important;
+
+    text-align: center !important;
+  }
+
+  .metricCopy > small:first-child {
+    display: block !important;
+
+    width: 100% !important;
+
+    text-align: center !important;
+  }
+
+  /*
+   * This span previously remained left-aligned even though
+   * the surrounding card was centered.
+   */
+  .metricCopy > span {
+    display: flex !important;
+
+    width: 100% !important;
+
+    align-items: center !important;
+    justify-content: center !important;
+
+    gap: 0 !important;
+
+    margin-top: 3px !important;
+
+    text-align: center !important;
+  }
+
+  .metricCopy strong {
+    display: block !important;
+
+    width: auto !important;
+
+    margin: 0 auto !important;
+
+    line-height: 1 !important;
+    text-align: center !important;
+  }
+}
+
+/* CAMPAIGN SEAT CENTERED MOBILE INBOX METRICS — END */
+
+/* CAMPAIGN SEAT NARROW MOBILE QUICK REPLIES — START */
+
+/*
+ * Narrow-phone reply suggestions:
+ *
+ * Row 1: Sounds good | Let me confirm
+ * Row 2: Can you send details?
+ */
+
+@media (max-width: 430px) {
+
+  .quickReplies {
+    box-sizing: border-box !important;
+
+    display: grid !important;
+
+    width: 100% !important;
+    min-width: 0 !important;
+
+    grid-template-columns:
+      repeat(
+        2,
+        minmax(0, 1fr)
+      ) !important;
+
+    gap: 7px !important;
+
+    padding:
+      0 !important;
+
+    overflow: visible !important;
+
+    scrollbar-width: auto !important;
+  }
+
+  .quickReplies::-webkit-scrollbar {
+    display: none !important;
+  }
+
+  .quickReplies button {
+    box-sizing: border-box !important;
+
+    width: 100% !important;
+    min-width: 0 !important;
+    min-height: 38px !important;
+
+    display: flex !important;
+
+    align-items: center !important;
+    justify-content: center !important;
+
+    padding:
+      7px
+      8px !important;
+
+    overflow: visible !important;
+
+    font-size: 0.7rem !important;
+    line-height: 1.15 !important;
+    text-align: center !important;
+
+    white-space: normal !important;
+  }
+
+  .quickReplies button:nth-child(3) {
+    grid-column:
+      1 / -1 !important;
+  }
+}
+
+/* CAMPAIGN SEAT NARROW MOBILE QUICK REPLIES — END */
+
+/* CAMPAIGN SEAT CANONICAL INBOX BREAKPOINT BRIDGE — START */
+
+/*
+ * Inbox-only breakpoint bridge.
+ *
+ * 701–1099:
+ *   filters + conversation list across the upper row
+ *   selected conversation across the complete lower row
+ *
+ * 1100–1240:
+ *   complete three-column Inbox
+ *
+ * Mobile below 701px remains governed by the approved mobile
+ * drawer/list rules.
+ */
+
+
+/* =========================================================
+   TABLET AND INTERMEDIATE WIDTHS
+   701px through 1099px
+   ========================================================= */
+
+@media
+  (min-width: 701px)
+  and
+  (max-width: 1099px) {
+
+  .page {
+    box-sizing: border-box !important;
+
+    display: block !important;
+
+    width: 100% !important;
+    min-width: 0 !important;
+
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+
+    padding:
+      12px
+      13px
+      20px !important;
+
+    overflow: visible !important;
+  }
+
+  .metricsGrid {
+    display: grid !important;
+
+    grid-template-columns:
+      repeat(
+        3,
+        minmax(0, 1fr)
+      ) !important;
+
+    gap: 8px !important;
+
+    margin-bottom: 9px !important;
+  }
+
+  /*
+   * Eliminate the partial desktop grid and its empty right side.
+   */
+  .inboxWorkspace {
+    box-sizing: border-box !important;
+
+    display: grid !important;
+
+    width: 100% !important;
+    min-width: 0 !important;
+
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+
+    grid-template-columns:
+      minmax(205px, 0.7fr)
+      minmax(0, 1.3fr) !important;
+
+    grid-template-areas:
+      "utility conversations"
+      "thread thread" !important;
+
+    grid-template-rows:
+      auto
+      auto !important;
+
+    align-items: stretch !important;
+
+    gap: 10px !important;
+
+    overflow: visible !important;
+  }
+
+  .utilityPanel {
+    box-sizing: border-box !important;
+
+    grid-area: utility !important;
+
+    min-width: 0 !important;
+
+    min-height: 0 !important;
+    height: 430px !important;
+    max-height: 430px !important;
+
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+
+    overscroll-behavior: contain !important;
+
+    -webkit-overflow-scrolling: touch !important;
+  }
+
+  .conversationPanel {
+    box-sizing: border-box !important;
+
+    display: flex !important;
+
+    grid-area: conversations !important;
+
+    min-width: 0 !important;
+
+    min-height: 0 !important;
+    height: 430px !important;
+    max-height: 430px !important;
+
+    flex-direction: column !important;
+
+    overflow: hidden !important;
+  }
+
+  .listHeader {
+    flex: 0 0 auto !important;
+  }
+
+  .conversationList {
+    min-width: 0 !important;
+    min-height: 0 !important;
+
+    height: auto !important;
+    max-height: none !important;
+
+    flex: 1 1 auto !important;
+
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+
+    overscroll-behavior: contain !important;
+
+    -webkit-overflow-scrolling: touch !important;
+  }
+
+  /*
+   * The selected conversation always uses the complete second row.
+   */
+  .threadPanel {
+    box-sizing: border-box !important;
+
+    display: flex !important;
+
+    grid-area: thread !important;
+
+    grid-column:
+      1 / -1 !important;
+
+    min-width: 0 !important;
+
+    min-height: 620px !important;
+    height: 620px !important;
+    max-height: 620px !important;
+
+    flex-direction: column !important;
+
+    overflow: hidden !important;
+  }
+
+  .threadHeader,
+  .threadTabs,
+  .replyComposer {
+    flex: 0 0 auto !important;
+  }
+
+  .threadBody {
+    min-width: 0 !important;
+    min-height: 0 !important;
+
+    height: auto !important;
+    max-height: none !important;
+
+    flex: 1 1 auto !important;
+
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+
+    overscroll-behavior: contain !important;
+
+    -webkit-overflow-scrolling: touch !important;
+  }
+}
+
+
+/*
+ * Slightly shorter upper panels at intermediate landscape widths,
+ * allowing the selected conversation to appear sooner.
+ */
+@media
+  (min-width: 900px)
+  and
+  (max-width: 1099px) {
+
+  .utilityPanel,
+  .conversationPanel {
+    height: 390px !important;
+    max-height: 390px !important;
+  }
+
+  .threadPanel {
+    min-height: 580px !important;
+    height: 580px !important;
+    max-height: 580px !important;
+  }
+}
+
+
+/* =========================================================
+   COMPACT DESKTOP
+   1100px through 1240px
+   ========================================================= */
+
+@media
+  (min-width: 1100px)
+  and
+  (max-width: 1240px) {
+
+  /*
+   * Retain the complete desktop-style Inbox at 1180px.
+   */
+  .inboxWorkspace {
+    display: grid !important;
+
+    min-width: 0 !important;
+
+    grid-template-columns:
+      minmax(175px, 0.58fr)
+      minmax(285px, 0.94fr)
+      minmax(0, 1.7fr) !important;
+
+    grid-template-areas:
+      "utility conversations thread" !important;
+
+    align-items: stretch !important;
+
+    gap: 9px !important;
+
+    overflow: hidden !important;
+  }
+
+  .utilityPanel {
+    grid-area: utility !important;
+  }
+
+  .conversationPanel {
+    grid-area: conversations !important;
+  }
+
+  .threadPanel {
+    grid-area: thread !important;
+
+    grid-column: auto !important;
+  }
+
+  .utilityPanel,
+  .conversationPanel,
+  .threadPanel {
+    min-width: 0 !important;
+    min-height: 0 !important;
+
+    max-width: none !important;
+
+    overflow: hidden !important;
+  }
+
+  .utilityPanel {
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+  }
+
+  .conversationPanel,
+  .threadPanel {
+    display: flex !important;
+    flex-direction: column !important;
+  }
+
+  .conversationList,
+  .threadBody {
+    min-width: 0 !important;
+    min-height: 0 !important;
+
+    flex: 1 1 auto !important;
+
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+  }
+}
+
+/* CAMPAIGN SEAT CANONICAL INBOX BREAKPOINT BRIDGE — END */
+
+/* CAMPAIGN SEAT INTERMEDIATE INBOX VISIBILITY — START */
+
+/*
+ * The selected conversation was being pushed almost entirely
+ * below the viewport because the upper Channels/message row was
+ * too tall.
+ *
+ * These panels remain independently scrollable, but their visible
+ * height is reduced so the selected conversation begins sooner.
+ */
+
+
+/* =========================================================
+   PORTRAIT TABLET / SMALL INTERMEDIATE WIDTHS
+   701px through 899px
+   ========================================================= */
+
+@media
+  (min-width: 701px)
+  and
+  (max-width: 899px) {
+
+  .inboxWorkspace {
+    grid-template-rows:
+      320px
+      auto !important;
+  }
+
+  .utilityPanel,
+  .conversationPanel {
+    min-height: 0 !important;
+
+    height: 320px !important;
+    max-height: 320px !important;
+  }
+
+  .utilityPanel {
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+
+    overscroll-behavior: contain !important;
+
+    -webkit-overflow-scrolling: touch !important;
+  }
+
+  .conversationPanel {
+    display: flex !important;
+
+    flex-direction: column !important;
+
+    overflow: hidden !important;
+  }
+
+  .conversationList {
+    min-height: 0 !important;
+
+    height: auto !important;
+    max-height: none !important;
+
+    flex: 1 1 auto !important;
+
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+
+    overscroll-behavior: contain !important;
+
+    -webkit-overflow-scrolling: touch !important;
+  }
+
+  .threadPanel {
+    min-height: 540px !important;
+
+    height: 540px !important;
+    max-height: 540px !important;
+
+    overflow: hidden !important;
+  }
+
+  .threadBody {
+    min-height: 0 !important;
+
+    flex: 1 1 auto !important;
+
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+
+    overscroll-behavior: contain !important;
+
+    -webkit-overflow-scrolling: touch !important;
+  }
+}
+
+
+/* =========================================================
+   LANDSCAPE TABLET / INTERMEDIATE WIDTHS
+   900px through 1099px
+   ========================================================= */
+
+@media
+  (min-width: 900px)
+  and
+  (max-width: 1099px) {
+
+  .inboxWorkspace {
+    grid-template-rows:
+      285px
+      auto !important;
+  }
+
+  .utilityPanel,
+  .conversationPanel {
+    min-height: 0 !important;
+
+    height: 285px !important;
+    max-height: 285px !important;
+  }
+
+  .utilityPanel {
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+
+    overscroll-behavior: contain !important;
+
+    -webkit-overflow-scrolling: touch !important;
+  }
+
+  .conversationPanel {
+    display: flex !important;
+
+    flex-direction: column !important;
+
+    overflow: hidden !important;
+  }
+
+  .conversationList {
+    min-height: 0 !important;
+
+    height: auto !important;
+    max-height: none !important;
+
+    flex: 1 1 auto !important;
+
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+
+    overscroll-behavior: contain !important;
+
+    -webkit-overflow-scrolling: touch !important;
+  }
+
+  /*
+   * The selected conversation is now meaningfully visible within
+   * an 820px–844px-high viewport instead of showing only its header.
+   */
+  .threadPanel {
+    min-height: 520px !important;
+
+    height: 520px !important;
+    max-height: 520px !important;
+
+    overflow: hidden !important;
+  }
+
+  .threadBody {
+    min-height: 0 !important;
+
+    height: auto !important;
+    max-height: none !important;
+
+    flex: 1 1 auto !important;
+
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+
+    overscroll-behavior: contain !important;
+
+    -webkit-overflow-scrolling: touch !important;
+  }
+}
+
+/*
+ * 1100px and above deliberately excluded.
+ * The approved 1180px three-column Inbox remains unchanged.
+ */
+
+/* CAMPAIGN SEAT INTERMEDIATE INBOX VISIBILITY — END */
+
+/* CAMPAIGN SEAT INTERMEDIATE INBOX LEFT ALIGNMENT — START */
+
+/*
+ * Intermediate Inbox alignment:
+ *
+ * Title and subtitle stay against the left content edge.
+ * Search/actions, metrics and workspace panels share the same
+ * complete width without horizontal translation or auto-centering.
+ */
+
+@media
+  (min-width: 701px)
+  and
+  (max-width: 1099px) {
+
+  .page {
+    position: relative !important;
+
+    box-sizing: border-box !important;
+
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: none !important;
+
+    left: auto !important;
+    right: auto !important;
+
+    margin: 0 !important;
+    margin-inline: 0 !important;
+
+    transform: none !important;
+
+    overflow-x: hidden !important;
+  }
+
+  /*
+   * Remove the intermediate centered heading.
+   */
+  .pageHeader {
+    box-sizing: border-box !important;
+
+    display: grid !important;
+
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: none !important;
+
+    grid-template-columns:
+      minmax(0, 1fr) !important;
+
+    align-items: start !important;
+    justify-content: stretch !important;
+    justify-items: stretch !important;
+
+    gap: 10px !important;
+
+    margin:
+      0
+      0
+      10px !important;
+
+    padding: 0 !important;
+
+    text-align: left !important;
+
+    transform: none !important;
+  }
+
+  .pageHeader > div:first-child {
+    box-sizing: border-box !important;
+
+    width: 100% !important;
+    min-width: 0 !important;
+
+    justify-self: start !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
+
+    text-align: left !important;
+  }
+
+  .pageHeader h1 {
+    width: 100% !important;
+
+    margin: 0 !important;
+
+    text-align: left !important;
+  }
+
+  .pageHeader p {
+    width: 100% !important;
+
+    margin:
+      4px
+      0
+      0 !important;
+
+    text-align: left !important;
+  }
+
+  /*
+   * Search and action buttons begin from the same left edge.
+   */
+  .pageActions {
+    box-sizing: border-box !important;
+
+    display: flex !important;
+
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: none !important;
+
+    align-items: center !important;
+    justify-content: flex-start !important;
+
+    flex-wrap: nowrap !important;
+
+    gap: 8px !important;
+
+    justify-self: stretch !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
+
+    transform: none !important;
+  }
+
+  .globalSearch {
+    box-sizing: border-box !important;
+
+    width: auto !important;
+    min-width: 0 !important;
+    max-width: none !important;
+
+    flex:
+      1
+      1
+      320px !important;
+
+    margin: 0 !important;
+  }
+
+  /*
+   * Keep the remaining Inbox sections aligned to exactly the
+   * same left and right boundaries.
+   */
+  .metricsGrid,
+  .inboxWorkspace {
+    box-sizing: border-box !important;
+
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: none !important;
+
+    justify-self: stretch !important;
+
+    margin-right: 0 !important;
+    margin-left: 0 !important;
+
+    transform: none !important;
+  }
+}
+
+
+/*
+ * Slightly tighter action controls near the narrow end without
+ * changing the approved phone layout below 701px.
+ */
+@media
+  (min-width: 701px)
+  and
+  (max-width: 850px) {
+
+  .pageActions {
+    gap: 7px !important;
+  }
+
+  .globalSearch {
+    flex-basis: 260px !important;
+  }
+}
+
+/* CAMPAIGN SEAT INTERMEDIATE INBOX LEFT ALIGNMENT — END */

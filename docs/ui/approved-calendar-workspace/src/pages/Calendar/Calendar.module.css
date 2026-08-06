@@ -1,0 +1,8 @@
+/*
+ * The active Calendar interface now lives in:
+ *
+ * src/pages/CalendarReferencePreview/
+ *
+ * The previous Calendar implementation is preserved in the
+ * dated safety backup created before the preview was installed.
+ */
