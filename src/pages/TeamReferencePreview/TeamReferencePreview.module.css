@@ -1364,3 +1364,2960 @@
     grid-column: 1;
   }
 }
+
+/* CAMPAIGN SEAT TEAM INVITATIONS TABLET REVIEW — START */
+
+/*
+ * Team tablet review:
+ *
+ * - retain desktop tables at 901px and wider
+ * - compact the four summary cards into a 2x2 grid
+ * - replace the 900px Invitations table with complete cards
+ * - preserve every invitation field
+ * - remove the floating Support overlap
+ */
+
+
+/* =========================================================
+   SUPPORT OVERLAP
+   ========================================================= */
+
+:global(body):has(.page)
+:global(
+  a[aria-label="Open Campaign Seat Support"]
+) {
+  display:
+    none !important;
+
+  visibility:
+    hidden !important;
+
+  pointer-events:
+    none !important;
+}
+
+
+/* =========================================================
+   TABLET SUMMARY
+   ========================================================= */
+
+@media
+  (min-width: 701px)
+  and
+  (max-width: 900px) {
+
+  .summaryGrid {
+    grid-template-columns:
+      repeat(
+        2,
+        minmax(0, 1fr)
+      ) !important;
+
+    gap:
+      9px !important;
+  }
+
+  .summaryGrid > button {
+    min-height:
+      82px !important;
+
+    padding:
+      11px
+      13px !important;
+  }
+}
+
+
+/* =========================================================
+   INVITATIONS TABLET CARDS
+   ========================================================= */
+
+@media
+  (min-width: 701px)
+  and
+  (max-width: 900px) {
+
+  /*
+   * Apply the card conversion only while the second tab,
+   * Invitations, is active.
+   */
+
+  .workspacePanel:has(
+    .tabs
+    button:nth-child(2).activeTab
+  )
+  .tableWrap {
+    width:
+      100% !important;
+
+    min-width:
+      0 !important;
+
+    overflow:
+      visible !important;
+  }
+
+  .workspacePanel:has(
+    .tabs
+    button:nth-child(2).activeTab
+  )
+  .teamTable {
+    display:
+      block !important;
+
+    width:
+      100% !important;
+
+    min-width:
+      0 !important;
+
+    border-collapse:
+      separate !important;
+  }
+
+  .workspacePanel:has(
+    .tabs
+    button:nth-child(2).activeTab
+  )
+  .teamTable thead {
+    display:
+      none !important;
+  }
+
+  .workspacePanel:has(
+    .tabs
+    button:nth-child(2).activeTab
+  )
+  .teamTable tbody {
+    display:
+      block !important;
+
+    width:
+      100% !important;
+  }
+
+  .workspacePanel:has(
+    .tabs
+    button:nth-child(2).activeTab
+  )
+  .teamTable tbody tr {
+    box-sizing:
+      border-box !important;
+
+    display:
+      grid !important;
+
+    width:
+      100% !important;
+
+    min-width:
+      0 !important;
+
+    min-height:
+      112px !important;
+
+    grid-template-columns:
+      minmax(0, 1.45fr)
+      minmax(118px, 0.8fr)
+      minmax(104px, 0.68fr) !important;
+
+    grid-template-areas:
+      "invitation status expires"
+      "role assignment lastsent"
+      "sentby sentby action" !important;
+
+    align-items:
+      center !important;
+
+    column-gap:
+      11px !important;
+
+    row-gap:
+      7px !important;
+
+    padding:
+      11px
+      13px !important;
+
+    border-bottom:
+      1px
+      solid
+      #edf0f5 !important;
+  }
+
+  .workspacePanel:has(
+    .tabs
+    button:nth-child(2).activeTab
+  )
+  .teamTable td {
+    box-sizing:
+      border-box !important;
+
+    display:
+      block !important;
+
+    width:
+      auto !important;
+
+    min-width:
+      0 !important;
+
+    padding:
+      0 !important;
+
+    border:
+      0 !important;
+  }
+
+  .workspacePanel:has(
+    .tabs
+    button:nth-child(2).activeTab
+  )
+  .teamTable td:nth-child(1) {
+    grid-area:
+      invitation !important;
+  }
+
+  .workspacePanel:has(
+    .tabs
+    button:nth-child(2).activeTab
+  )
+  .teamTable td:nth-child(2) {
+    grid-area:
+      role !important;
+  }
+
+  .workspacePanel:has(
+    .tabs
+    button:nth-child(2).activeTab
+  )
+  .teamTable td:nth-child(3) {
+    grid-area:
+      assignment !important;
+  }
+
+  .workspacePanel:has(
+    .tabs
+    button:nth-child(2).activeTab
+  )
+  .teamTable td:nth-child(4) {
+    grid-area:
+      sentby !important;
+  }
+
+  .workspacePanel:has(
+    .tabs
+    button:nth-child(2).activeTab
+  )
+  .teamTable td:nth-child(5) {
+    grid-area:
+      lastsent !important;
+
+    justify-self:
+      end !important;
+
+    text-align:
+      right !important;
+  }
+
+  .workspacePanel:has(
+    .tabs
+    button:nth-child(2).activeTab
+  )
+  .teamTable td:nth-child(6) {
+    grid-area:
+      expires !important;
+
+    justify-self:
+      end !important;
+
+    text-align:
+      right !important;
+  }
+
+  .workspacePanel:has(
+    .tabs
+    button:nth-child(2).activeTab
+  )
+  .teamTable td:nth-child(7) {
+    grid-area:
+      status !important;
+
+    justify-self:
+      end !important;
+
+    text-align:
+      right !important;
+  }
+
+  .workspacePanel:has(
+    .tabs
+    button:nth-child(2).activeTab
+  )
+  .teamTable td:nth-child(8) {
+    grid-area:
+      action !important;
+
+    justify-self:
+      end !important;
+
+    text-align:
+      right !important;
+  }
+
+  .workspacePanel:has(
+    .tabs
+    button:nth-child(2).activeTab
+  )
+  .teamTable
+  td:nth-child(n+2)::before {
+    display:
+      block !important;
+
+    margin-bottom:
+      3px !important;
+
+    color:
+      #8195a9 !important;
+
+    font-size:
+      0.44rem !important;
+
+    font-weight:
+      900 !important;
+
+    letter-spacing:
+      0.06em !important;
+
+    line-height:
+      1 !important;
+
+    text-transform:
+      uppercase !important;
+  }
+
+  .workspacePanel:has(
+    .tabs
+    button:nth-child(2).activeTab
+  )
+  .teamTable td:nth-child(2)::before {
+    content:
+      "Role" !important;
+  }
+
+  .workspacePanel:has(
+    .tabs
+    button:nth-child(2).activeTab
+  )
+  .teamTable td:nth-child(3)::before {
+    content:
+      "Assignment" !important;
+  }
+
+  .workspacePanel:has(
+    .tabs
+    button:nth-child(2).activeTab
+  )
+  .teamTable td:nth-child(4)::before {
+    content:
+      "Sent by" !important;
+  }
+
+  .workspacePanel:has(
+    .tabs
+    button:nth-child(2).activeTab
+  )
+  .teamTable td:nth-child(5)::before {
+    content:
+      "Last sent" !important;
+  }
+
+  .workspacePanel:has(
+    .tabs
+    button:nth-child(2).activeTab
+  )
+  .teamTable td:nth-child(6)::before {
+    content:
+      "Expires" !important;
+  }
+
+  .workspacePanel:has(
+    .tabs
+    button:nth-child(2).activeTab
+  )
+  .teamTable td:nth-child(7)::before {
+    content:
+      "Status" !important;
+  }
+
+  .workspacePanel:has(
+    .tabs
+    button:nth-child(2).activeTab
+  )
+  .teamTable td:nth-child(8)::before {
+    content:
+      "Action" !important;
+  }
+
+  .workspacePanel:has(
+    .tabs
+    button:nth-child(2).activeTab
+  )
+  .personCell {
+    display:
+      flex !important;
+
+    min-width:
+      0 !important;
+
+    align-items:
+      center !important;
+
+    gap:
+      8px !important;
+  }
+
+  .workspacePanel:has(
+    .tabs
+    button:nth-child(2).activeTab
+  )
+  .inviteAvatar {
+    width:
+      34px !important;
+
+    height:
+      34px !important;
+
+    flex:
+      0
+      0
+      34px !important;
+  }
+
+  .workspacePanel:has(
+    .tabs
+    button:nth-child(2).activeTab
+  )
+  .personCell strong {
+    overflow:
+      hidden !important;
+
+    font-size:
+      0.66rem !important;
+
+    line-height:
+      1.17 !important;
+
+    text-overflow:
+      ellipsis !important;
+
+    white-space:
+      nowrap !important;
+  }
+
+  .workspacePanel:has(
+    .tabs
+    button:nth-child(2).activeTab
+  )
+  .personCell small,
+  .workspacePanel:has(
+    .tabs
+    button:nth-child(2).activeTab
+  )
+  .cellSubtext {
+    margin-top:
+      2px !important;
+
+    font-size:
+      0.53rem !important;
+  }
+
+  .workspacePanel:has(
+    .tabs
+    button:nth-child(2).activeTab
+  )
+  .teamTable td:nth-child(n+2) {
+    overflow:
+      hidden !important;
+
+    font-size:
+      0.55rem !important;
+
+    line-height:
+      1.22 !important;
+
+    text-overflow:
+      ellipsis !important;
+  }
+
+  .workspacePanel:has(
+    .tabs
+    button:nth-child(2).activeTab
+  )
+  .statusBadge {
+    min-height:
+      22px !important;
+
+    padding:
+      0
+      7px !important;
+
+    font-size:
+      0.48rem !important;
+  }
+
+  .workspacePanel:has(
+    .tabs
+    button:nth-child(2).activeTab
+  )
+  .rowAction {
+    min-height:
+      27px !important;
+
+    padding:
+      0
+      8px !important;
+
+    font-size:
+      0.49rem !important;
+  }
+
+  .workspacePanel:has(
+    .tabs
+    button:nth-child(2).activeTab
+  )
+  .mutedAction {
+    font-size:
+      0.51rem !important;
+  }
+}
+
+
+/* =========================================================
+   NARROW TABLET REFINEMENT
+   ========================================================= */
+
+@media
+  (min-width: 701px)
+  and
+  (max-width: 780px) {
+
+  .workspacePanel:has(
+    .tabs
+    button:nth-child(2).activeTab
+  )
+  .teamTable tbody tr {
+    min-height:
+      108px !important;
+
+    grid-template-columns:
+      minmax(0, 1.35fr)
+      minmax(106px, 0.76fr)
+      minmax(94px, 0.66fr) !important;
+
+    column-gap:
+      8px !important;
+
+    row-gap:
+      6px !important;
+
+    padding:
+      10px
+      11px !important;
+  }
+
+  .workspacePanel:has(
+    .tabs
+    button:nth-child(2).activeTab
+  )
+  .personCell strong {
+    font-size:
+      0.62rem !important;
+  }
+
+  .workspacePanel:has(
+    .tabs
+    button:nth-child(2).activeTab
+  )
+  .teamTable td:nth-child(n+2) {
+    font-size:
+      0.51rem !important;
+  }
+}
+
+/* CAMPAIGN SEAT TEAM INVITATIONS TABLET REVIEW — END */
+
+/* CAMPAIGN SEAT TEAM MEMBERS TABLET REVIEW — START */
+
+/*
+ * Campaign Team tablet records:
+ *
+ * Row 1 — member, status, open action
+ * Row 2 — role, department/team, seat
+ *
+ * Desktop at 901px and wider is unchanged.
+ */
+
+@media
+  (min-width: 701px)
+  and
+  (max-width: 900px) {
+
+  .workspacePanel:has(
+    .tabs button:nth-child(1).activeTab
+  ) .tableWrap {
+    width:
+      100% !important;
+
+    min-width:
+      0 !important;
+
+    overflow:
+      visible !important;
+  }
+
+  .workspacePanel:has(
+    .tabs button:nth-child(1).activeTab
+  ) .teamTable {
+    display:
+      block !important;
+
+    width:
+      100% !important;
+
+    min-width:
+      0 !important;
+
+    border-collapse:
+      separate !important;
+  }
+
+  .workspacePanel:has(
+    .tabs button:nth-child(1).activeTab
+  ) .teamTable thead {
+    display:
+      none !important;
+  }
+
+  .workspacePanel:has(
+    .tabs button:nth-child(1).activeTab
+  ) .teamTable tbody {
+    display:
+      block !important;
+
+    width:
+      100% !important;
+
+    min-width:
+      0 !important;
+  }
+
+  .workspacePanel:has(
+    .tabs button:nth-child(1).activeTab
+  ) .teamTable tbody tr {
+    box-sizing:
+      border-box !important;
+
+    display:
+      grid !important;
+
+    width:
+      100% !important;
+
+    min-width:
+      0 !important;
+
+    min-height:
+      91px !important;
+
+    grid-template-columns:
+      minmax(0, 1.38fr)
+      minmax(0, 0.92fr)
+      auto !important;
+
+    grid-template-areas:
+      "member status action"
+      "role department seat" !important;
+
+    align-items:
+      center !important;
+
+    column-gap:
+      11px !important;
+
+    row-gap:
+      8px !important;
+
+    padding:
+      11px
+      13px !important;
+
+    border-bottom:
+      1px
+      solid
+      #edf0f5 !important;
+  }
+
+  .workspacePanel:has(
+    .tabs button:nth-child(1).activeTab
+  ) .teamTable td {
+    box-sizing:
+      border-box !important;
+
+    display:
+      block !important;
+
+    width:
+      auto !important;
+
+    min-width:
+      0 !important;
+
+    padding:
+      0 !important;
+
+    border:
+      0 !important;
+  }
+
+  .workspacePanel:has(
+    .tabs button:nth-child(1).activeTab
+  ) .teamTable td:nth-child(1) {
+    grid-area:
+      member !important;
+  }
+
+  .workspacePanel:has(
+    .tabs button:nth-child(1).activeTab
+  ) .teamTable td:nth-child(2) {
+    grid-area:
+      role !important;
+  }
+
+  .workspacePanel:has(
+    .tabs button:nth-child(1).activeTab
+  ) .teamTable td:nth-child(3) {
+    grid-area:
+      department !important;
+  }
+
+  .workspacePanel:has(
+    .tabs button:nth-child(1).activeTab
+  ) .teamTable td:nth-child(4) {
+    grid-area:
+      seat !important;
+
+    justify-self:
+      end !important;
+
+    text-align:
+      right !important;
+  }
+
+  .workspacePanel:has(
+    .tabs button:nth-child(1).activeTab
+  ) .teamTable td:nth-child(5) {
+    grid-area:
+      status !important;
+
+    justify-self:
+      end !important;
+
+    text-align:
+      right !important;
+  }
+
+  .workspacePanel:has(
+    .tabs button:nth-child(1).activeTab
+  ) .teamTable td:nth-child(6) {
+    display:
+      flex !important;
+
+    grid-area:
+      action !important;
+
+    min-width:
+      24px !important;
+
+    align-items:
+      center !important;
+
+    justify-content:
+      flex-end !important;
+  }
+
+  .workspacePanel:has(
+    .tabs button:nth-child(1).activeTab
+  ) .teamTable td:nth-child(6) svg {
+    width:
+      18px !important;
+
+    height:
+      18px !important;
+  }
+
+  .workspacePanel:has(
+    .tabs button:nth-child(1).activeTab
+  ) .teamTable td:nth-child(n+2):nth-child(-n+5)::before {
+    display:
+      block !important;
+
+    margin-bottom:
+      3px !important;
+
+    color:
+      #8195a9 !important;
+
+    font-size:
+      0.44rem !important;
+
+    font-weight:
+      900 !important;
+
+    letter-spacing:
+      0.06em !important;
+
+    line-height:
+      1 !important;
+
+    text-transform:
+      uppercase !important;
+  }
+
+  .workspacePanel:has(
+    .tabs button:nth-child(1).activeTab
+  ) .teamTable td:nth-child(2)::before {
+    content:
+      "Role" !important;
+  }
+
+  .workspacePanel:has(
+    .tabs button:nth-child(1).activeTab
+  ) .teamTable td:nth-child(3)::before {
+    content:
+      "Department / team" !important;
+  }
+
+  .workspacePanel:has(
+    .tabs button:nth-child(1).activeTab
+  ) .teamTable td:nth-child(4)::before {
+    content:
+      "Seat" !important;
+  }
+
+  .workspacePanel:has(
+    .tabs button:nth-child(1).activeTab
+  ) .teamTable td:nth-child(5)::before {
+    content:
+      "Status" !important;
+  }
+
+  .workspacePanel:has(
+    .tabs button:nth-child(1).activeTab
+  ) .personCell {
+    display:
+      flex !important;
+
+    min-width:
+      0 !important;
+
+    align-items:
+      center !important;
+
+    gap:
+      9px !important;
+  }
+
+  .workspacePanel:has(
+    .tabs button:nth-child(1).activeTab
+  ) .avatar {
+    width:
+      34px !important;
+
+    height:
+      34px !important;
+
+    flex:
+      0
+      0
+      34px !important;
+  }
+
+  .workspacePanel:has(
+    .tabs button:nth-child(1).activeTab
+  ) .personCell > div {
+    min-width:
+      0 !important;
+  }
+
+  .workspacePanel:has(
+    .tabs button:nth-child(1).activeTab
+  ) .personCell strong {
+    overflow:
+      hidden !important;
+
+    font-size:
+      0.67rem !important;
+
+    line-height:
+      1.17 !important;
+
+    text-overflow:
+      ellipsis !important;
+
+    white-space:
+      nowrap !important;
+  }
+
+  .workspacePanel:has(
+    .tabs button:nth-child(1).activeTab
+  ) .personCell small {
+    max-width:
+      245px !important;
+
+    margin-top:
+      2px !important;
+
+    overflow:
+      hidden !important;
+
+    font-size:
+      0.53rem !important;
+
+    text-overflow:
+      ellipsis !important;
+
+    white-space:
+      nowrap !important;
+  }
+
+  .workspacePanel:has(
+    .tabs button:nth-child(1).activeTab
+  ) .teamTable td:nth-child(2),
+  .workspacePanel:has(
+    .tabs button:nth-child(1).activeTab
+  ) .teamTable td:nth-child(3),
+  .workspacePanel:has(
+    .tabs button:nth-child(1).activeTab
+  ) .teamTable td:nth-child(4) {
+    overflow:
+      hidden !important;
+
+    font-size:
+      0.56rem !important;
+
+    line-height:
+      1.22 !important;
+
+    text-overflow:
+      ellipsis !important;
+  }
+
+  .workspacePanel:has(
+    .tabs button:nth-child(1).activeTab
+  ) .cellSubtext {
+    max-width:
+      210px !important;
+
+    margin-top:
+      2px !important;
+
+    overflow:
+      hidden !important;
+
+    font-size:
+      0.5rem !important;
+
+    text-overflow:
+      ellipsis !important;
+
+    white-space:
+      nowrap !important;
+  }
+
+  .workspacePanel:has(
+    .tabs button:nth-child(1).activeTab
+  ) .statusBadge {
+    min-height:
+      22px !important;
+
+    padding:
+      0
+      7px !important;
+
+    font-size:
+      0.48rem !important;
+  }
+}
+
+
+/* Narrow tablet refinement. */
+
+@media
+  (min-width: 701px)
+  and
+  (max-width: 780px) {
+
+  .workspacePanel:has(
+    .tabs button:nth-child(1).activeTab
+  ) .teamTable tbody tr {
+    min-height:
+      88px !important;
+
+    grid-template-columns:
+      minmax(0, 1.3fr)
+      minmax(0, 0.84fr)
+      auto !important;
+
+    column-gap:
+      8px !important;
+
+    row-gap:
+      7px !important;
+
+    padding:
+      10px
+      11px !important;
+  }
+
+  .workspacePanel:has(
+    .tabs button:nth-child(1).activeTab
+  ) .personCell strong {
+    font-size:
+      0.63rem !important;
+  }
+
+  .workspacePanel:has(
+    .tabs button:nth-child(1).activeTab
+  ) .personCell small {
+    max-width:
+      205px !important;
+
+    font-size:
+      0.5rem !important;
+  }
+
+  .workspacePanel:has(
+    .tabs button:nth-child(1).activeTab
+  ) .teamTable td:nth-child(2),
+  .workspacePanel:has(
+    .tabs button:nth-child(1).activeTab
+  ) .teamTable td:nth-child(3),
+  .workspacePanel:has(
+    .tabs button:nth-child(1).activeTab
+  ) .teamTable td:nth-child(4) {
+    font-size:
+      0.52rem !important;
+  }
+}
+
+/* CAMPAIGN SEAT TEAM MEMBERS TABLET REVIEW — END */
+
+/* CAMPAIGN SEAT TEAM PHONE REVIEW — START */
+
+/*
+ * Team layout from 360px through 700px:
+ *
+ * - full-width page introduction
+ * - actions below the title
+ * - compact 2x2 summary cards
+ * - three visible tabs
+ * - complete Campaign Team cards
+ * - complete Invitation cards
+ * - no horizontal table canvas
+ */
+
+
+/* =========================================================
+   PAGE INTRODUCTION AND ACTIONS
+   ========================================================= */
+
+@media (max-width: 700px) {
+
+  .page {
+    box-sizing:
+      border-box !important;
+
+    width:
+      100% !important;
+
+    min-width:
+      0 !important;
+
+    padding:
+      16px
+      12px
+      40px !important;
+  }
+
+  .pageHeader {
+    display:
+      grid !important;
+
+    width:
+      100% !important;
+
+    min-width:
+      0 !important;
+
+    grid-template-columns:
+      minmax(0, 1fr) !important;
+
+    align-items:
+      stretch !important;
+
+    gap:
+      13px !important;
+
+    margin-bottom:
+      12px !important;
+  }
+
+  .pageHeader > div:first-child {
+    width:
+      100% !important;
+
+    min-width:
+      0 !important;
+  }
+
+  .pageHeader h1 {
+    width:
+      100% !important;
+
+    font-size:
+      clamp(
+        2.15rem,
+        10vw,
+        2.7rem
+      ) !important;
+
+    line-height:
+      1 !important;
+  }
+
+  .pageHeader p {
+    width:
+      100% !important;
+
+    max-width:
+      none !important;
+
+    margin-top:
+      8px !important;
+
+    font-size:
+      0.84rem !important;
+
+    line-height:
+      1.47 !important;
+  }
+
+  .eyebrow {
+    max-width:
+      none !important;
+
+    font-size:
+      0.61rem !important;
+
+    line-height:
+      1.45 !important;
+
+    letter-spacing:
+      0.18em !important;
+  }
+
+  .updated {
+    width:
+      100% !important;
+
+    margin-top:
+      7px !important;
+  }
+
+  .headerActions {
+    display:
+      grid !important;
+
+    width:
+      100% !important;
+
+    min-width:
+      0 !important;
+
+    grid-template-columns:
+      minmax(0, 0.92fr)
+      minmax(0, 1.28fr) !important;
+
+    align-items:
+      stretch !important;
+
+    justify-content:
+      stretch !important;
+
+    gap:
+      8px !important;
+  }
+
+  .headerActions button,
+  .headerActions .primaryButton,
+  .headerActions .secondaryButton {
+    box-sizing:
+      border-box !important;
+
+    width:
+      100% !important;
+
+    min-width:
+      0 !important;
+
+    min-height:
+      45px !important;
+
+    margin:
+      0 !important;
+
+    padding:
+      0
+      8px !important;
+
+    overflow:
+      hidden !important;
+
+    font-size:
+      0.72rem !important;
+
+    text-overflow:
+      ellipsis !important;
+
+    white-space:
+      nowrap !important;
+  }
+}
+
+
+/* =========================================================
+   COMPACT SUMMARY CARDS
+   ========================================================= */
+
+@media (max-width: 700px) {
+
+  .summaryGrid {
+    display:
+      grid !important;
+
+    width:
+      100% !important;
+
+    min-width:
+      0 !important;
+
+    grid-template-columns:
+      repeat(
+        2,
+        minmax(0, 1fr)
+      ) !important;
+
+    gap:
+      8px !important;
+
+    margin-bottom:
+      11px !important;
+  }
+
+  .summaryGrid > button {
+    box-sizing:
+      border-box !important;
+
+    min-width:
+      0 !important;
+
+    min-height:
+      82px !important;
+
+    gap:
+      2px
+      8px !important;
+
+    padding:
+      10px !important;
+
+    border-radius:
+      13px !important;
+  }
+
+  .summaryGrid > button > div {
+    width:
+      36px !important;
+
+    height:
+      36px !important;
+
+    border-radius:
+      10px !important;
+  }
+
+  .summaryGrid span {
+    overflow:
+      visible !important;
+
+    font-size:
+      0.59rem !important;
+
+    line-height:
+      1.15 !important;
+
+    text-overflow:
+      clip !important;
+
+    white-space:
+      normal !important;
+  }
+
+  .summaryGrid strong {
+    font-size:
+      1.25rem !important;
+  }
+
+  .summaryGrid p {
+    overflow:
+      visible !important;
+
+    font-size:
+      0.51rem !important;
+
+    line-height:
+      1.18 !important;
+
+    text-overflow:
+      clip !important;
+
+    white-space:
+      normal !important;
+  }
+
+  .summaryGrid > button::after {
+    right:
+      9px !important;
+
+    left:
+      9px !important;
+  }
+}
+
+
+/* =========================================================
+   TABS AND FILTERS
+   ========================================================= */
+
+@media (max-width: 700px) {
+
+  .workspacePanel {
+    width:
+      100% !important;
+
+    min-width:
+      0 !important;
+
+    overflow:
+      hidden !important;
+
+    border-radius:
+      14px !important;
+  }
+
+  .tabs {
+    box-sizing:
+      border-box !important;
+
+    display:
+      grid !important;
+
+    width:
+      100% !important;
+
+    min-width:
+      0 !important;
+
+    grid-template-columns:
+      repeat(
+        3,
+        minmax(0, 1fr)
+      ) !important;
+
+    gap:
+      0 !important;
+
+    padding:
+      7px
+      3px
+      0 !important;
+
+    overflow:
+      hidden !important;
+  }
+
+  .tabs button {
+    box-sizing:
+      border-box !important;
+
+    width:
+      100% !important;
+
+    min-width:
+      0 !important;
+
+    min-height:
+      44px !important;
+
+    padding:
+      0
+      3px !important;
+
+    overflow:
+      hidden !important;
+
+    font-size:
+      0.63rem !important;
+
+    line-height:
+      1.1 !important;
+
+    text-overflow:
+      ellipsis !important;
+
+    white-space:
+      nowrap !important;
+  }
+
+  .tabs button::after {
+    right:
+      5px !important;
+
+    left:
+      5px !important;
+  }
+
+  .toolbar {
+    box-sizing:
+      border-box !important;
+
+    display:
+      grid !important;
+
+    width:
+      100% !important;
+
+    min-width:
+      0 !important;
+
+    grid-template-columns:
+      repeat(
+        2,
+        minmax(0, 1fr)
+      ) !important;
+
+    gap:
+      8px !important;
+
+    padding:
+      10px !important;
+  }
+
+  .searchBox {
+    box-sizing:
+      border-box !important;
+
+    width:
+      100% !important;
+
+    min-width:
+      0 !important;
+
+    grid-column:
+      1 / -1 !important;
+
+    height:
+      42px !important;
+  }
+
+  .toolbar select {
+    box-sizing:
+      border-box !important;
+
+    width:
+      100% !important;
+
+    min-width:
+      0 !important;
+
+    height:
+      42px !important;
+
+    padding-right:
+      27px !important;
+
+    font-size:
+      0.65rem !important;
+  }
+
+  .resultCount {
+    width:
+      100% !important;
+
+    min-width:
+      0 !important;
+
+    grid-column:
+      1 / -1 !important;
+
+    padding:
+      1px
+      1px
+      0 !important;
+
+    font-size:
+      0.62rem !important;
+
+    text-align:
+      left !important;
+  }
+
+  .tableWrap {
+    width:
+      100% !important;
+
+    min-width:
+      0 !important;
+
+    overflow:
+      visible !important;
+  }
+
+  .teamTable {
+    display:
+      block !important;
+
+    width:
+      100% !important;
+
+    min-width:
+      0 !important;
+
+    border-collapse:
+      separate !important;
+  }
+
+  .teamTable thead {
+    display:
+      none !important;
+  }
+
+  .teamTable tbody {
+    display:
+      block !important;
+
+    width:
+      100% !important;
+
+    min-width:
+      0 !important;
+  }
+}
+
+
+/* =========================================================
+   CAMPAIGN TEAM PHONE CARDS
+   ========================================================= */
+
+@media (max-width: 700px) {
+
+  .workspacePanel:has(
+    .tabs button:nth-child(1).activeTab
+  ) .teamTable tbody tr {
+    box-sizing:
+      border-box !important;
+
+    display:
+      grid !important;
+
+    width:
+      100% !important;
+
+    min-width:
+      0 !important;
+
+    min-height:
+      120px !important;
+
+    grid-template-columns:
+      minmax(0, 1fr)
+      minmax(92px, auto) !important;
+
+    grid-template-areas:
+      "member status"
+      "role department"
+      "seat action" !important;
+
+    align-items:
+      center !important;
+
+    column-gap:
+      9px !important;
+
+    row-gap:
+      9px !important;
+
+    padding:
+      11px !important;
+
+    border-bottom:
+      1px
+      solid
+      #edf0f5 !important;
+  }
+
+  .workspacePanel:has(
+    .tabs button:nth-child(1).activeTab
+  ) .teamTable td {
+    box-sizing:
+      border-box !important;
+
+    display:
+      block !important;
+
+    width:
+      auto !important;
+
+    min-width:
+      0 !important;
+
+    padding:
+      0 !important;
+
+    border:
+      0 !important;
+  }
+
+  .workspacePanel:has(
+    .tabs button:nth-child(1).activeTab
+  ) .teamTable td:nth-child(1) {
+    grid-area:
+      member !important;
+  }
+
+  .workspacePanel:has(
+    .tabs button:nth-child(1).activeTab
+  ) .teamTable td:nth-child(2) {
+    grid-area:
+      role !important;
+  }
+
+  .workspacePanel:has(
+    .tabs button:nth-child(1).activeTab
+  ) .teamTable td:nth-child(3) {
+    grid-area:
+      department !important;
+
+    justify-self:
+      end !important;
+
+    text-align:
+      right !important;
+  }
+
+  .workspacePanel:has(
+    .tabs button:nth-child(1).activeTab
+  ) .teamTable td:nth-child(4) {
+    grid-area:
+      seat !important;
+  }
+
+  .workspacePanel:has(
+    .tabs button:nth-child(1).activeTab
+  ) .teamTable td:nth-child(5) {
+    grid-area:
+      status !important;
+
+    justify-self:
+      end !important;
+
+    text-align:
+      right !important;
+  }
+
+  .workspacePanel:has(
+    .tabs button:nth-child(1).activeTab
+  ) .teamTable td:nth-child(6) {
+    display:
+      flex !important;
+
+    grid-area:
+      action !important;
+
+    align-items:
+      center !important;
+
+    justify-content:
+      flex-end !important;
+  }
+
+  .workspacePanel:has(
+    .tabs button:nth-child(1).activeTab
+  ) .teamTable td:nth-child(6) svg {
+    width:
+      18px !important;
+
+    height:
+      18px !important;
+  }
+
+  .workspacePanel:has(
+    .tabs button:nth-child(1).activeTab
+  ) .teamTable td:nth-child(n+2):nth-child(-n+5)::before {
+    display:
+      block !important;
+
+    margin-bottom:
+      3px !important;
+
+    color:
+      #8195a9 !important;
+
+    font-size:
+      0.44rem !important;
+
+    font-weight:
+      900 !important;
+
+    letter-spacing:
+      0.06em !important;
+
+    line-height:
+      1 !important;
+
+    text-transform:
+      uppercase !important;
+  }
+
+  .workspacePanel:has(
+    .tabs button:nth-child(1).activeTab
+  ) .teamTable td:nth-child(2)::before {
+    content:
+      "Role" !important;
+  }
+
+  .workspacePanel:has(
+    .tabs button:nth-child(1).activeTab
+  ) .teamTable td:nth-child(3)::before {
+    content:
+      "Department / team" !important;
+  }
+
+  .workspacePanel:has(
+    .tabs button:nth-child(1).activeTab
+  ) .teamTable td:nth-child(4)::before {
+    content:
+      "Seat" !important;
+  }
+
+  .workspacePanel:has(
+    .tabs button:nth-child(1).activeTab
+  ) .teamTable td:nth-child(5)::before {
+    content:
+      "Status" !important;
+  }
+
+  .workspacePanel:has(
+    .tabs button:nth-child(1).activeTab
+  ) .personCell {
+    display:
+      flex !important;
+
+    min-width:
+      0 !important;
+
+    align-items:
+      center !important;
+
+    gap:
+      8px !important;
+  }
+
+  .workspacePanel:has(
+    .tabs button:nth-child(1).activeTab
+  ) .avatar {
+    width:
+      34px !important;
+
+    height:
+      34px !important;
+
+    flex:
+      0
+      0
+      34px !important;
+  }
+
+  .workspacePanel:has(
+    .tabs button:nth-child(1).activeTab
+  ) .personCell > div {
+    min-width:
+      0 !important;
+  }
+
+  .workspacePanel:has(
+    .tabs button:nth-child(1).activeTab
+  ) .personCell strong {
+    overflow:
+      hidden !important;
+
+    font-size:
+      0.65rem !important;
+
+    line-height:
+      1.17 !important;
+
+    text-overflow:
+      ellipsis !important;
+
+    white-space:
+      nowrap !important;
+  }
+
+  .workspacePanel:has(
+    .tabs button:nth-child(1).activeTab
+  ) .personCell small {
+    max-width:
+      235px !important;
+
+    margin-top:
+      2px !important;
+
+    overflow:
+      hidden !important;
+
+    font-size:
+      0.5rem !important;
+
+    text-overflow:
+      ellipsis !important;
+
+    white-space:
+      nowrap !important;
+  }
+
+  .workspacePanel:has(
+    .tabs button:nth-child(1).activeTab
+  ) .teamTable td:nth-child(2),
+  .workspacePanel:has(
+    .tabs button:nth-child(1).activeTab
+  ) .teamTable td:nth-child(3),
+  .workspacePanel:has(
+    .tabs button:nth-child(1).activeTab
+  ) .teamTable td:nth-child(4) {
+    overflow:
+      hidden !important;
+
+    font-size:
+      0.53rem !important;
+
+    line-height:
+      1.22 !important;
+
+    text-overflow:
+      ellipsis !important;
+  }
+
+  .workspacePanel:has(
+    .tabs button:nth-child(1).activeTab
+  ) .cellSubtext {
+    max-width:
+      180px !important;
+
+    margin-top:
+      2px !important;
+
+    overflow:
+      hidden !important;
+
+    font-size:
+      0.48rem !important;
+
+    text-overflow:
+      ellipsis !important;
+
+    white-space:
+      nowrap !important;
+  }
+
+  .workspacePanel:has(
+    .tabs button:nth-child(1).activeTab
+  ) .statusBadge {
+    min-height:
+      22px !important;
+
+    padding:
+      0
+      7px !important;
+
+    font-size:
+      0.47rem !important;
+  }
+}
+
+
+/* =========================================================
+   INVITATION PHONE CARDS
+   ========================================================= */
+
+@media (max-width: 700px) {
+
+  .workspacePanel:has(
+    .tabs button:nth-child(2).activeTab
+  ) .teamTable tbody tr {
+    box-sizing:
+      border-box !important;
+
+    display:
+      grid !important;
+
+    width:
+      100% !important;
+
+    min-width:
+      0 !important;
+
+    min-height:
+      162px !important;
+
+    grid-template-columns:
+      minmax(0, 1fr)
+      minmax(104px, auto) !important;
+
+    grid-template-areas:
+      "invitation status"
+      "role assignment"
+      "sentby lastsent"
+      "expires action" !important;
+
+    align-items:
+      center !important;
+
+    column-gap:
+      9px !important;
+
+    row-gap:
+      8px !important;
+
+    padding:
+      11px !important;
+
+    border-bottom:
+      1px
+      solid
+      #edf0f5 !important;
+  }
+
+  .workspacePanel:has(
+    .tabs button:nth-child(2).activeTab
+  ) .teamTable td {
+    box-sizing:
+      border-box !important;
+
+    display:
+      block !important;
+
+    width:
+      auto !important;
+
+    min-width:
+      0 !important;
+
+    padding:
+      0 !important;
+
+    border:
+      0 !important;
+  }
+
+  .workspacePanel:has(
+    .tabs button:nth-child(2).activeTab
+  ) .teamTable td:nth-child(1) {
+    grid-area:
+      invitation !important;
+  }
+
+  .workspacePanel:has(
+    .tabs button:nth-child(2).activeTab
+  ) .teamTable td:nth-child(2) {
+    grid-area:
+      role !important;
+  }
+
+  .workspacePanel:has(
+    .tabs button:nth-child(2).activeTab
+  ) .teamTable td:nth-child(3) {
+    grid-area:
+      assignment !important;
+
+    justify-self:
+      end !important;
+
+    text-align:
+      right !important;
+  }
+
+  .workspacePanel:has(
+    .tabs button:nth-child(2).activeTab
+  ) .teamTable td:nth-child(4) {
+    grid-area:
+      sentby !important;
+  }
+
+  .workspacePanel:has(
+    .tabs button:nth-child(2).activeTab
+  ) .teamTable td:nth-child(5) {
+    grid-area:
+      lastsent !important;
+
+    justify-self:
+      end !important;
+
+    text-align:
+      right !important;
+  }
+
+  .workspacePanel:has(
+    .tabs button:nth-child(2).activeTab
+  ) .teamTable td:nth-child(6) {
+    grid-area:
+      expires !important;
+  }
+
+  .workspacePanel:has(
+    .tabs button:nth-child(2).activeTab
+  ) .teamTable td:nth-child(7) {
+    grid-area:
+      status !important;
+
+    justify-self:
+      end !important;
+
+    text-align:
+      right !important;
+  }
+
+  .workspacePanel:has(
+    .tabs button:nth-child(2).activeTab
+  ) .teamTable td:nth-child(8) {
+    grid-area:
+      action !important;
+
+    justify-self:
+      end !important;
+
+    text-align:
+      right !important;
+  }
+
+  .workspacePanel:has(
+    .tabs button:nth-child(2).activeTab
+  ) .teamTable td:nth-child(n+2)::before {
+    display:
+      block !important;
+
+    margin-bottom:
+      3px !important;
+
+    color:
+      #8195a9 !important;
+
+    font-size:
+      0.43rem !important;
+
+    font-weight:
+      900 !important;
+
+    letter-spacing:
+      0.06em !important;
+
+    line-height:
+      1 !important;
+
+    text-transform:
+      uppercase !important;
+  }
+
+  .workspacePanel:has(
+    .tabs button:nth-child(2).activeTab
+  ) .teamTable td:nth-child(2)::before {
+    content:
+      "Role" !important;
+  }
+
+  .workspacePanel:has(
+    .tabs button:nth-child(2).activeTab
+  ) .teamTable td:nth-child(3)::before {
+    content:
+      "Assignment" !important;
+  }
+
+  .workspacePanel:has(
+    .tabs button:nth-child(2).activeTab
+  ) .teamTable td:nth-child(4)::before {
+    content:
+      "Sent by" !important;
+  }
+
+  .workspacePanel:has(
+    .tabs button:nth-child(2).activeTab
+  ) .teamTable td:nth-child(5)::before {
+    content:
+      "Last sent" !important;
+  }
+
+  .workspacePanel:has(
+    .tabs button:nth-child(2).activeTab
+  ) .teamTable td:nth-child(6)::before {
+    content:
+      "Expires" !important;
+  }
+
+  .workspacePanel:has(
+    .tabs button:nth-child(2).activeTab
+  ) .teamTable td:nth-child(7)::before {
+    content:
+      "Status" !important;
+  }
+
+  .workspacePanel:has(
+    .tabs button:nth-child(2).activeTab
+  ) .teamTable td:nth-child(8)::before {
+    content:
+      "Action" !important;
+  }
+
+  .workspacePanel:has(
+    .tabs button:nth-child(2).activeTab
+  ) .personCell {
+    display:
+      flex !important;
+
+    min-width:
+      0 !important;
+
+    align-items:
+      center !important;
+
+    gap:
+      8px !important;
+  }
+
+  .workspacePanel:has(
+    .tabs button:nth-child(2).activeTab
+  ) .inviteAvatar {
+    width:
+      34px !important;
+
+    height:
+      34px !important;
+
+    flex:
+      0
+      0
+      34px !important;
+  }
+
+  .workspacePanel:has(
+    .tabs button:nth-child(2).activeTab
+  ) .personCell > div {
+    min-width:
+      0 !important;
+  }
+
+  .workspacePanel:has(
+    .tabs button:nth-child(2).activeTab
+  ) .personCell strong {
+    max-width:
+      245px !important;
+
+    overflow:
+      hidden !important;
+
+    font-size:
+      0.62rem !important;
+
+    line-height:
+      1.16 !important;
+
+    text-overflow:
+      ellipsis !important;
+
+    white-space:
+      nowrap !important;
+  }
+
+  .workspacePanel:has(
+    .tabs button:nth-child(2).activeTab
+  ) .personCell small,
+  .workspacePanel:has(
+    .tabs button:nth-child(2).activeTab
+  ) .cellSubtext {
+    margin-top:
+      2px !important;
+
+    font-size:
+      0.48rem !important;
+  }
+
+  .workspacePanel:has(
+    .tabs button:nth-child(2).activeTab
+  ) .teamTable td:nth-child(n+2) {
+    overflow:
+      hidden !important;
+
+    font-size:
+      0.5rem !important;
+
+    line-height:
+      1.2 !important;
+
+    text-overflow:
+      ellipsis !important;
+  }
+
+  .workspacePanel:has(
+    .tabs button:nth-child(2).activeTab
+  ) .statusBadge {
+    min-height:
+      21px !important;
+
+    padding:
+      0
+      6px !important;
+
+    font-size:
+      0.45rem !important;
+  }
+
+  .workspacePanel:has(
+    .tabs button:nth-child(2).activeTab
+  ) .rowAction {
+    min-height:
+      26px !important;
+
+    padding:
+      0
+      7px !important;
+
+    font-size:
+      0.46rem !important;
+  }
+
+  .workspacePanel:has(
+    .tabs button:nth-child(2).activeTab
+  ) .mutedAction {
+    font-size:
+      0.47rem !important;
+  }
+}
+
+
+/* =========================================================
+   ACCESS REVIEW PHONE
+   ========================================================= */
+
+@media (max-width: 700px) {
+
+  .accessReview {
+    padding:
+      10px !important;
+  }
+
+  .accessMetrics,
+  .reviewColumns {
+    gap:
+      9px !important;
+  }
+
+  .accessMetrics article,
+  .reviewCard {
+    padding:
+      11px !important;
+  }
+
+  .accessFooter {
+    display:
+      grid !important;
+
+    grid-template-columns:
+      1fr !important;
+
+    gap:
+      9px !important;
+
+    padding:
+      11px !important;
+  }
+
+  .accessFooter button {
+    width:
+      100% !important;
+
+    min-height:
+      38px !important;
+
+    justify-content:
+      center !important;
+  }
+}
+
+
+/* =========================================================
+   NARROW PHONE REFINEMENT
+   ========================================================= */
+
+@media (max-width: 430px) {
+
+  .page {
+    padding:
+      14px
+      9px
+      38px !important;
+  }
+
+  .pageHeader {
+    gap:
+      11px !important;
+  }
+
+  .pageHeader h1 {
+    font-size:
+      2.15rem !important;
+  }
+
+  .pageHeader p {
+    font-size:
+      0.78rem !important;
+  }
+
+  .headerActions {
+    grid-template-columns:
+      minmax(0, 0.9fr)
+      minmax(0, 1.35fr) !important;
+  }
+
+  .headerActions button,
+  .headerActions .primaryButton,
+  .headerActions .secondaryButton {
+    min-height:
+      43px !important;
+
+    font-size:
+      0.65rem !important;
+  }
+
+  .summaryGrid {
+    gap:
+      7px !important;
+  }
+
+  .summaryGrid > button {
+    min-height:
+      78px !important;
+
+    padding:
+      8px !important;
+  }
+
+  .summaryGrid > button > div {
+    width:
+      33px !important;
+
+    height:
+      33px !important;
+  }
+
+  .summaryGrid span {
+    font-size:
+      0.54rem !important;
+  }
+
+  .summaryGrid strong {
+    font-size:
+      1.15rem !important;
+  }
+
+  .summaryGrid p {
+    font-size:
+      0.47rem !important;
+  }
+
+  .tabs button {
+    font-size:
+      0.56rem !important;
+  }
+
+  .toolbar {
+    grid-template-columns:
+      1fr !important;
+  }
+
+  .searchBox,
+  .toolbar select,
+  .resultCount {
+    grid-column:
+      1 !important;
+  }
+
+  .workspacePanel:has(
+    .tabs button:nth-child(1).activeTab
+  ) .teamTable tbody tr {
+    min-height:
+      116px !important;
+
+    grid-template-columns:
+      minmax(0, 1fr)
+      minmax(82px, auto) !important;
+
+    column-gap:
+      7px !important;
+
+    row-gap:
+      8px !important;
+
+    padding:
+      10px
+      9px !important;
+  }
+
+  .workspacePanel:has(
+    .tabs button:nth-child(2).activeTab
+  ) .teamTable tbody tr {
+    min-height:
+      158px !important;
+
+    grid-template-columns:
+      minmax(0, 1fr)
+      minmax(92px, auto) !important;
+
+    column-gap:
+      7px !important;
+
+    row-gap:
+      7px !important;
+
+    padding:
+      10px
+      9px !important;
+  }
+
+  .workspacePanel:has(
+    .tabs button:nth-child(1).activeTab
+  ) .personCell strong,
+  .workspacePanel:has(
+    .tabs button:nth-child(2).activeTab
+  ) .personCell strong {
+    font-size:
+      0.58rem !important;
+  }
+
+  .workspacePanel:has(
+    .tabs button:nth-child(1).activeTab
+  ) .personCell small,
+  .workspacePanel:has(
+    .tabs button:nth-child(2).activeTab
+  ) .personCell small {
+    max-width:
+      190px !important;
+
+    font-size:
+      0.46rem !important;
+  }
+}
+
+/* CAMPAIGN SEAT TEAM PHONE REVIEW — END */
+
+/* CAMPAIGN SEAT TEAM INVITE MODAL PHONE — START */
+
+/*
+ * Only the Invite campaign member dialog:
+ *
+ * - centered inside the actual device viewport
+ * - equal space on the left and right
+ * - rounded on all four corners
+ * - internally scrollable when necessary
+ * - compact sticky actions
+ *
+ * The member access editor is intentionally unchanged.
+ */
+
+@media (max-width: 700px) {
+
+  .modalLayer:has(
+    #invitation-editor-title
+  ) {
+    box-sizing:
+      border-box !important;
+
+    display:
+      grid !important;
+
+    width:
+      100vw !important;
+
+    height:
+      100dvh !important;
+
+    place-items:
+      center !important;
+
+    align-items:
+      center !important;
+
+    justify-items:
+      center !important;
+
+    padding:
+      12px !important;
+
+    overflow:
+      hidden !important;
+  }
+
+  .modalLayer:has(
+    #invitation-editor-title
+  ) .modalBackdrop {
+    position:
+      absolute !important;
+
+    inset:
+      0 !important;
+
+    width:
+      100% !important;
+
+    height:
+      100% !important;
+  }
+
+  .modal:has(
+    #invitation-editor-title
+  ) {
+    position:
+      relative !important;
+
+    inset:
+      auto !important;
+
+    box-sizing:
+      border-box !important;
+
+    display:
+      grid !important;
+
+    width:
+      min(
+        430px,
+        calc(100vw - 24px)
+      ) !important;
+
+    max-width:
+      430px !important;
+
+    height:
+      auto !important;
+
+    max-height:
+      calc(100dvh - 24px) !important;
+
+    grid-template-rows:
+      auto
+      minmax(0, 1fr) !important;
+
+    margin:
+      auto !important;
+
+    overflow:
+      hidden !important;
+
+    border:
+      1px
+      solid
+      #d7e3eb !important;
+
+    border-radius:
+      16px !important;
+
+    background:
+      #ffffff !important;
+
+    box-shadow:
+      0
+      24px
+      70px
+      rgba(
+        13,
+        22,
+        39,
+        0.28
+      ) !important;
+  }
+
+  .modal:has(
+    #invitation-editor-title
+  ) > header {
+    box-sizing:
+      border-box !important;
+
+    min-height:
+      74px !important;
+
+    align-items:
+      center !important;
+
+    gap:
+      10px !important;
+
+    padding:
+      13px
+      14px !important;
+  }
+
+  .modal:has(
+    #invitation-editor-title
+  ) > header > div {
+    min-width:
+      0 !important;
+  }
+
+  .modal:has(
+    #invitation-editor-title
+  ) > header span {
+    font-size:
+      0.52rem !important;
+
+    letter-spacing:
+      0.11em !important;
+  }
+
+  .modal:has(
+    #invitation-editor-title
+  ) > header h2 {
+    margin-top:
+      4px !important;
+
+    overflow:
+      hidden !important;
+
+    font-size:
+      1rem !important;
+
+    line-height:
+      1.15 !important;
+
+    text-overflow:
+      ellipsis !important;
+
+    white-space:
+      nowrap !important;
+  }
+
+  .modal:has(
+    #invitation-editor-title
+  ) > header button {
+    width:
+      38px !important;
+
+    height:
+      38px !important;
+
+    flex:
+      0
+      0
+      38px !important;
+  }
+
+  .modal:has(
+    #invitation-editor-title
+  ) .modalForm {
+    box-sizing:
+      border-box !important;
+
+    display:
+      grid !important;
+
+    width:
+      100% !important;
+
+    min-width:
+      0 !important;
+
+    min-height:
+      0 !important;
+
+    grid-template-columns:
+      minmax(0, 1fr) !important;
+
+    gap:
+      10px !important;
+
+    padding:
+      13px
+      14px
+      14px !important;
+
+    overflow-x:
+      hidden !important;
+
+    overflow-y:
+      auto !important;
+
+    overscroll-behavior:
+      contain !important;
+
+    scrollbar-width:
+      none !important;
+  }
+
+  .modal:has(
+    #invitation-editor-title
+  ) .modalForm::-webkit-scrollbar {
+    display:
+      none !important;
+  }
+
+  .modal:has(
+    #invitation-editor-title
+  ) .modalForm label,
+  .modal:has(
+    #invitation-editor-title
+  ) .fullField,
+  .modal:has(
+    #invitation-editor-title
+  ) .identityNotice,
+  .modal:has(
+    #invitation-editor-title
+  ) .securityNotice,
+  .modal:has(
+    #invitation-editor-title
+  ) .formError,
+  .modal:has(
+    #invitation-editor-title
+  ) .modalForm footer {
+    min-width:
+      0 !important;
+
+    grid-column:
+      1 !important;
+  }
+
+  .modal:has(
+    #invitation-editor-title
+  ) .modalForm label {
+    gap:
+      5px !important;
+  }
+
+  .modal:has(
+    #invitation-editor-title
+  ) .modalForm label > span {
+    font-size:
+      0.57rem !important;
+  }
+
+  .modal:has(
+    #invitation-editor-title
+  ) .modalForm input,
+  .modal:has(
+    #invitation-editor-title
+  ) .modalForm select {
+    box-sizing:
+      border-box !important;
+
+    width:
+      100% !important;
+
+    min-width:
+      0 !important;
+
+    height:
+      42px !important;
+
+    font-size:
+      0.66rem !important;
+  }
+
+  .modal:has(
+    #invitation-editor-title
+  ) .identityNotice,
+  .modal:has(
+    #invitation-editor-title
+  ) .securityNotice {
+    box-sizing:
+      border-box !important;
+
+    width:
+      100% !important;
+
+    gap:
+      7px !important;
+
+    padding:
+      9px
+      10px !important;
+
+    font-size:
+      0.53rem !important;
+
+    line-height:
+      1.4 !important;
+  }
+
+  .modal:has(
+    #invitation-editor-title
+  ) .modalForm footer {
+    position:
+      sticky !important;
+
+    z-index:
+      2 !important;
+
+    bottom:
+      -14px !important;
+
+    display:
+      grid !important;
+
+    grid-template-columns:
+      minmax(0, 0.78fr)
+      minmax(0, 1.32fr) !important;
+
+    align-items:
+      stretch !important;
+
+    gap:
+      8px !important;
+
+    margin:
+      1px
+      -14px
+      -14px !important;
+
+    padding:
+      10px
+      14px
+      14px !important;
+
+    border-top:
+      1px
+      solid
+      #edf1f4 !important;
+
+    background:
+      #ffffff !important;
+  }
+
+  .modal:has(
+    #invitation-editor-title
+  ) .modalForm footer button {
+    box-sizing:
+      border-box !important;
+
+    width:
+      100% !important;
+
+    min-width:
+      0 !important;
+
+    min-height:
+      41px !important;
+
+    margin:
+      0 !important;
+
+    padding:
+      0
+      7px !important;
+
+    font-size:
+      0.59rem !important;
+
+    white-space:
+      nowrap !important;
+  }
+}
+
+
+@media (max-width: 380px) {
+
+  .modalLayer:has(
+    #invitation-editor-title
+  ) {
+    padding:
+      8px !important;
+  }
+
+  .modal:has(
+    #invitation-editor-title
+  ) {
+    width:
+      calc(100vw - 16px) !important;
+
+    max-height:
+      calc(100dvh - 16px) !important;
+
+    border-radius:
+      14px !important;
+  }
+
+  .modal:has(
+    #invitation-editor-title
+  ) > header {
+    min-height:
+      68px !important;
+
+    padding:
+      11px
+      12px !important;
+  }
+
+  .modal:has(
+    #invitation-editor-title
+  ) > header h2 {
+    font-size:
+      0.91rem !important;
+  }
+
+  .modal:has(
+    #invitation-editor-title
+  ) .modalForm {
+    gap:
+      8px !important;
+
+    padding:
+      11px
+      12px
+      12px !important;
+  }
+
+  .modal:has(
+    #invitation-editor-title
+  ) .modalForm footer {
+    bottom:
+      -12px !important;
+
+    margin:
+      1px
+      -12px
+      -12px !important;
+
+    padding:
+      9px
+      12px
+      12px !important;
+  }
+}
+
+/* CAMPAIGN SEAT TEAM INVITE MODAL PHONE — END */

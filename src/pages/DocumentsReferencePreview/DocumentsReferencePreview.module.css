@@ -2303,3 +2303,1509 @@
     flex-basis: 31px !important;
   }
 }
+
+/* CAMPAIGN SEAT DOCUMENTS TABLET REVIEW — START */
+
+/*
+ * Documents responsive review:
+ *
+ * - remove the redundant floating Support overlap
+ * - retain Ask Campaign HQ in the shared header
+ * - use a compact 2x2 summary grid at tablet widths
+ * - preserve all five document data fields
+ * - keep desktop and phone behavior unchanged
+ */
+
+
+/* =========================================================
+   DOCUMENTS SUPPORT OVERLAP
+   ========================================================= */
+
+:global(body):has(.page)
+:global(
+  a[aria-label="Open Campaign Seat Support"]
+) {
+  display:
+    none !important;
+
+  visibility:
+    hidden !important;
+
+  pointer-events:
+    none !important;
+}
+
+
+/* =========================================================
+   TABLET SUMMARY CARDS
+   701px through 850px
+   ========================================================= */
+
+@media
+  (min-width: 701px)
+  and
+  (max-width: 850px) {
+
+  .summaryGrid {
+    grid-template-columns:
+      repeat(
+        2,
+        minmax(0, 1fr)
+      ) !important;
+
+    gap:
+      10px !important;
+
+    margin-bottom:
+      12px !important;
+  }
+
+  .summaryCard {
+    box-sizing:
+      border-box !important;
+
+    min-width:
+      0 !important;
+
+    min-height:
+      92px !important;
+
+    gap:
+      10px !important;
+
+    padding:
+      12px !important;
+
+    border-radius:
+      13px !important;
+  }
+
+  .summaryIcon {
+    width:
+      40px !important;
+
+    height:
+      40px !important;
+
+    flex-basis:
+      40px !important;
+
+    border-radius:
+      10px !important;
+  }
+
+  .summaryCard small {
+    overflow:
+      visible !important;
+
+    font-size:
+      0.66rem !important;
+
+    line-height:
+      1.15 !important;
+
+    text-overflow:
+      clip !important;
+
+    white-space:
+      normal !important;
+  }
+
+  .summaryCard strong {
+    margin:
+      3px
+      0 !important;
+
+    font-size:
+      1.35rem !important;
+  }
+
+  .summaryCard em {
+    overflow:
+      visible !important;
+
+    font-size:
+      0.59rem !important;
+
+    line-height:
+      1.2 !important;
+
+    text-overflow:
+      clip !important;
+
+    white-space:
+      normal !important;
+  }
+}
+
+
+/* =========================================================
+   COMPLETE TABLET DOCUMENT CARDS
+   701px through 850px
+   ========================================================= */
+
+@media
+  (min-width: 701px)
+  and
+  (max-width: 850px) {
+
+  .tableHeader {
+    display:
+      none !important;
+  }
+
+  .tableRow {
+    box-sizing:
+      border-box !important;
+
+    display:
+      grid !important;
+
+    width:
+      100% !important;
+
+    min-width:
+      0 !important;
+
+    min-height:
+      0 !important;
+
+    grid-template-columns:
+      minmax(0, 1.2fr)
+      minmax(105px, 0.82fr)
+      minmax(90px, 0.68fr) !important;
+
+    grid-template-areas:
+      "file file size"
+      "collection owner updated" !important;
+
+    align-items:
+      center !important;
+
+    column-gap:
+      12px !important;
+
+    row-gap:
+      8px !important;
+
+    padding:
+      11px
+      14px !important;
+  }
+
+  .tableRow > span {
+    display:
+      block !important;
+
+    width:
+      auto !important;
+
+    min-width:
+      0 !important;
+  }
+
+  .tableRow > span:nth-child(1) {
+    grid-area:
+      file !important;
+  }
+
+  .tableRow > span:nth-child(2) {
+    grid-area:
+      collection !important;
+  }
+
+  .tableRow > span:nth-child(3) {
+    grid-area:
+      owner !important;
+  }
+
+  .tableRow > span:nth-child(4) {
+    grid-area:
+      updated !important;
+
+    justify-self:
+      end !important;
+
+    text-align:
+      right !important;
+  }
+
+  .tableRow > span:nth-child(5) {
+    grid-area:
+      size !important;
+
+    justify-self:
+      end !important;
+
+    text-align:
+      right !important;
+  }
+
+  .tableRow
+  > span:nth-child(n+2)::before {
+    display:
+      block !important;
+
+    margin-bottom:
+      3px !important;
+
+    color:
+      #7890a5 !important;
+
+    font-size:
+      0.48rem !important;
+
+    font-weight:
+      850 !important;
+
+    letter-spacing:
+      0.05em !important;
+
+    line-height:
+      1 !important;
+
+    text-transform:
+      uppercase !important;
+  }
+
+  .tableRow
+  > span:nth-child(2)::before {
+    content:
+      "Collection" !important;
+  }
+
+  .tableRow
+  > span:nth-child(3)::before {
+    content:
+      "Uploaded by" !important;
+  }
+
+  .tableRow
+  > span:nth-child(4)::before {
+    content:
+      "Updated" !important;
+  }
+
+  .tableRow
+  > span:nth-child(5)::before {
+    content:
+      "Size" !important;
+  }
+
+  .fileCell {
+    gap:
+      9px !important;
+  }
+
+  .fileIcon {
+    width:
+      38px !important;
+
+    height:
+      38px !important;
+
+    flex-basis:
+      38px !important;
+
+    border-radius:
+      10px !important;
+  }
+
+  .fileCell strong {
+    font-size:
+      0.7rem !important;
+  }
+
+  .fileCell small {
+    margin-top:
+      2px !important;
+
+    font-size:
+      0.58rem !important;
+  }
+
+  .tableRow
+  > span:nth-child(n+2) {
+    overflow:
+      hidden !important;
+
+    font-size:
+      0.59rem !important;
+
+    line-height:
+      1.2 !important;
+
+    text-overflow:
+      ellipsis !important;
+
+    white-space:
+      nowrap !important;
+  }
+
+  .libraryFooter {
+    padding-right:
+      18px !important;
+  }
+}
+
+/* CAMPAIGN SEAT DOCUMENTS TABLET REVIEW — END */
+
+/* CAMPAIGN SEAT DOCUMENTS PHONE REVIEW — START */
+
+/*
+ * Documents phone layout:
+ *
+ * - compact 2x2 summary grid
+ * - all four tabs visible
+ * - complete document information cards
+ * - simplified phone footer
+ */
+
+
+/* =========================================================
+   COMPACT PHONE SUMMARY
+   ========================================================= */
+
+@media (max-width: 620px) {
+
+  .summaryGrid {
+    grid-template-columns:
+      repeat(
+        2,
+        minmax(0, 1fr)
+      ) !important;
+
+    gap:
+      8px !important;
+
+    margin-bottom:
+      12px !important;
+  }
+
+  .summaryCard {
+    box-sizing:
+      border-box !important;
+
+    min-width:
+      0 !important;
+
+    min-height:
+      88px !important;
+
+    gap:
+      8px !important;
+
+    padding:
+      10px !important;
+
+    border-radius:
+      13px !important;
+  }
+
+  .summaryIcon {
+    width:
+      36px !important;
+
+    height:
+      36px !important;
+
+    flex-basis:
+      36px !important;
+
+    border-radius:
+      10px !important;
+  }
+
+  .summaryCard small {
+    overflow:
+      visible !important;
+
+    font-size:
+      0.57rem !important;
+
+    line-height:
+      1.12 !important;
+
+    text-overflow:
+      clip !important;
+
+    white-space:
+      normal !important;
+  }
+
+  .summaryCard strong {
+    margin:
+      2px
+      0 !important;
+
+    font-size:
+      1.28rem !important;
+  }
+
+  .summaryCard em {
+    overflow:
+      visible !important;
+
+    font-size:
+      0.52rem !important;
+
+    line-height:
+      1.16 !important;
+
+    text-overflow:
+      clip !important;
+
+    white-space:
+      normal !important;
+  }
+}
+
+
+/* =========================================================
+   FOUR PHONE TABS
+   ========================================================= */
+
+@media (max-width: 620px) {
+
+  .tabs {
+    box-sizing:
+      border-box !important;
+
+    display:
+      grid !important;
+
+    width:
+      100% !important;
+
+    min-width:
+      0 !important;
+
+    min-height:
+      48px !important;
+
+    grid-template-columns:
+      repeat(
+        4,
+        minmax(0, 1fr)
+      ) !important;
+
+    padding:
+      0
+      3px !important;
+
+    overflow:
+      visible !important;
+  }
+
+  .tabs button {
+    box-sizing:
+      border-box !important;
+
+    width:
+      100% !important;
+
+    min-width:
+      0 !important;
+
+    min-height:
+      47px !important;
+
+    padding:
+      0
+      3px !important;
+
+    overflow:
+      hidden !important;
+
+    font-size:
+      0 !important;
+  }
+
+  .tabs button::before {
+    display:
+      block !important;
+
+    overflow:
+      hidden !important;
+
+    color:
+      inherit !important;
+
+    font-size:
+      0.56rem !important;
+
+    font-weight:
+      820 !important;
+
+    line-height:
+      1 !important;
+
+    text-overflow:
+      ellipsis !important;
+
+    white-space:
+      nowrap !important;
+  }
+
+  .tabs button:nth-child(1)::before {
+    content:
+      "All" !important;
+  }
+
+  .tabs button:nth-child(2)::before {
+    content:
+      "Mine" !important;
+  }
+
+  .tabs button:nth-child(3)::before {
+    content:
+      "Recent" !important;
+  }
+
+  .tabs button:nth-child(4)::before {
+    content:
+      "Attention" !important;
+  }
+
+  .tabs button::after {
+    right:
+      4px !important;
+
+    left:
+      4px !important;
+  }
+}
+
+@media (max-width: 380px) {
+
+  .tabs button:nth-child(4)::before {
+    content:
+      "Review" !important;
+  }
+}
+
+
+/* =========================================================
+   COMPLETE PHONE DOCUMENT CARDS
+   ========================================================= */
+
+@media (max-width: 620px) {
+
+  .tableHeader {
+    display:
+      none !important;
+  }
+
+  .tableRow {
+    box-sizing:
+      border-box !important;
+
+    display:
+      grid !important;
+
+    width:
+      100% !important;
+
+    min-width:
+      0 !important;
+
+    min-height:
+      0 !important;
+
+    grid-template-columns:
+      minmax(0, 1fr)
+      auto !important;
+
+    grid-template-areas:
+      "file size"
+      "collection updated"
+      "owner owner" !important;
+
+    align-items:
+      center !important;
+
+    column-gap:
+      9px !important;
+
+    row-gap:
+      7px !important;
+
+    padding:
+      10px
+      10px !important;
+  }
+
+  .tableRow > span {
+    display:
+      block !important;
+
+    width:
+      auto !important;
+
+    min-width:
+      0 !important;
+  }
+
+  .tableRow > span:nth-child(1) {
+    grid-area:
+      file !important;
+  }
+
+  .tableRow > span:nth-child(2) {
+    grid-area:
+      collection !important;
+  }
+
+  .tableRow > span:nth-child(3) {
+    grid-area:
+      owner !important;
+  }
+
+  .tableRow > span:nth-child(4) {
+    grid-area:
+      updated !important;
+
+    justify-self:
+      end !important;
+
+    text-align:
+      right !important;
+  }
+
+  .tableRow > span:nth-child(5) {
+    grid-area:
+      size !important;
+
+    justify-self:
+      end !important;
+
+    text-align:
+      right !important;
+  }
+
+  .tableRow
+  > span:nth-child(n+2)::before {
+    display:
+      block !important;
+
+    margin-bottom:
+      2px !important;
+
+    color:
+      #7890a5 !important;
+
+    font-size:
+      0.44rem !important;
+
+    font-weight:
+      850 !important;
+
+    letter-spacing:
+      0.05em !important;
+
+    line-height:
+      1 !important;
+
+    text-transform:
+      uppercase !important;
+  }
+
+  .tableRow
+  > span:nth-child(2)::before {
+    content:
+      "Collection" !important;
+  }
+
+  .tableRow
+  > span:nth-child(3)::before {
+    content:
+      "Uploaded by" !important;
+  }
+
+  .tableRow
+  > span:nth-child(4)::before {
+    content:
+      "Updated" !important;
+  }
+
+  .tableRow
+  > span:nth-child(5)::before {
+    content:
+      "Size" !important;
+  }
+
+  .fileCell {
+    gap:
+      8px !important;
+  }
+
+  .fileIcon {
+    width:
+      36px !important;
+
+    height:
+      36px !important;
+
+    flex-basis:
+      36px !important;
+
+    border-radius:
+      10px !important;
+  }
+
+  .fileCell strong {
+    font-size:
+      0.66rem !important;
+
+    line-height:
+      1.15 !important;
+  }
+
+  .fileCell small {
+    margin-top:
+      2px !important;
+
+    font-size:
+      0.54rem !important;
+  }
+
+  .tableRow
+  > span:nth-child(n+2) {
+    overflow:
+      hidden !important;
+
+    font-size:
+      0.54rem !important;
+
+    line-height:
+      1.18 !important;
+
+    text-overflow:
+      ellipsis !important;
+
+    white-space:
+      nowrap !important;
+  }
+
+  .libraryFooter {
+    min-height:
+      42px !important;
+
+    align-items:
+      center !important;
+
+    justify-content:
+      center !important;
+
+    padding:
+      8px
+      12px !important;
+
+    text-align:
+      center !important;
+  }
+
+  .libraryFooter span:last-child {
+    display:
+      none !important;
+  }
+}
+
+
+/* =========================================================
+   VERY SMALL PHONE
+   ========================================================= */
+
+@media (max-width: 380px) {
+
+  .tableRow {
+    padding:
+      9px
+      8px !important;
+  }
+
+  .fileIcon {
+    width:
+      34px !important;
+
+    height:
+      34px !important;
+
+    flex-basis:
+      34px !important;
+  }
+
+  .fileCell strong {
+    font-size:
+      0.62rem !important;
+  }
+
+  .tableRow
+  > span:nth-child(n+2) {
+    font-size:
+      0.51rem !important;
+  }
+}
+
+/* CAMPAIGN SEAT DOCUMENTS PHONE REVIEW — END */
+
+/* CAMPAIGN SEAT DOCUMENTS MOBILE DETAILS — START */
+
+/*
+ * Mobile Document Details:
+ *
+ * - fill the device viewport
+ * - hide the underlying library
+ * - remove phone-only Expand control
+ * - keep header, actions, tabs and summary stable
+ * - scroll only the active details content
+ */
+
+@media (max-width: 620px) {
+
+  :global(
+    body[data-documents-focus="true"]
+  ) {
+    overflow:
+      hidden !important;
+
+    overscroll-behavior:
+      none !important;
+  }
+
+  .pageWithDetails
+  .workspaceRow {
+    display:
+      block !important;
+
+    width:
+      100% !important;
+
+    min-width:
+      0 !important;
+  }
+
+  .pageWithDetails
+  .library {
+    display:
+      none !important;
+  }
+
+  .detailsPanel,
+  .detailsPanelExpanded {
+    position:
+      fixed !important;
+
+    z-index:
+      1000001 !important;
+
+    inset:
+      0 !important;
+
+    box-sizing:
+      border-box !important;
+
+    display:
+      grid !important;
+
+    width:
+      100vw !important;
+
+    max-width:
+      none !important;
+
+    height:
+      100dvh !important;
+
+    min-height:
+      100dvh !important;
+
+    max-height:
+      100dvh !important;
+
+    grid-template-rows:
+      auto
+      auto
+      auto
+      auto
+      minmax(0, 1fr) !important;
+
+    margin:
+      0 !important;
+
+    overflow:
+      hidden !important;
+
+    border:
+      0 !important;
+
+    border-radius:
+      0 !important;
+
+    background:
+      #ffffff !important;
+
+    box-shadow:
+      none !important;
+  }
+
+
+  /* =======================================================
+     FIXED DRAWER HEADER
+     ======================================================= */
+
+  .detailsHeader {
+    box-sizing:
+      border-box !important;
+
+    min-height:
+      64px !important;
+
+    gap:
+      9px !important;
+
+    padding:
+      0
+      11px !important;
+
+    background:
+      #ffffff !important;
+  }
+
+  .detailsIdentity {
+    gap:
+      8px !important;
+  }
+
+  .detailsIdentity
+  .fileIcon {
+    width:
+      37px !important;
+
+    height:
+      37px !important;
+
+    flex-basis:
+      37px !important;
+  }
+
+  .detailsIdentity small {
+    font-size:
+      0.52rem !important;
+  }
+
+  .detailsIdentity strong {
+    max-width:
+      205px !important;
+
+    font-size:
+      0.72rem !important;
+  }
+
+  .detailsHeaderActions {
+    gap:
+      6px !important;
+  }
+
+  /*
+   * The drawer is already full screen, so Expand is
+   * unnecessary at phone widths.
+   */
+  .detailsHeaderActions
+  > button:first-child {
+    display:
+      none !important;
+  }
+
+  .detailsHeaderActions
+  > button:last-child {
+    width:
+      38px !important;
+
+    height:
+      38px !important;
+
+    flex:
+      0
+      0
+      38px !important;
+  }
+
+
+  /* =======================================================
+     FIXED FILE ACTIONS
+     ======================================================= */
+
+  .detailsActions {
+    box-sizing:
+      border-box !important;
+
+    display:
+      grid !important;
+
+    grid-template-columns:
+      repeat(
+        2,
+        minmax(0, 1fr)
+      ) !important;
+
+    gap:
+      6px !important;
+
+    padding:
+      8px
+      10px !important;
+
+    background:
+      #fbfdff !important;
+  }
+
+  .detailsActions button {
+    min-width:
+      0 !important;
+
+    min-height:
+      40px !important;
+
+    padding:
+      0
+      7px !important;
+
+    font-size:
+      0.58rem !important;
+
+    white-space:
+      nowrap !important;
+  }
+
+
+  /* =======================================================
+     FIXED FOUR-TAB ROW
+     ======================================================= */
+
+  .detailsTabs {
+    box-sizing:
+      border-box !important;
+
+    width:
+      100% !important;
+
+    min-width:
+      0 !important;
+
+    grid-template-columns:
+      repeat(
+        4,
+        minmax(0, 1fr)
+      ) !important;
+
+    padding:
+      0
+      3px !important;
+
+    overflow:
+      hidden !important;
+
+    background:
+      #ffffff !important;
+  }
+
+  .detailsTabs button {
+    box-sizing:
+      border-box !important;
+
+    width:
+      100% !important;
+
+    min-width:
+      0 !important;
+
+    min-height:
+      46px !important;
+
+    padding:
+      0
+      2px !important;
+
+    overflow:
+      hidden !important;
+
+    font-size:
+      0.57rem !important;
+
+    text-overflow:
+      ellipsis !important;
+
+    white-space:
+      nowrap !important;
+  }
+
+  .detailsTabs button::after {
+    right:
+      4px !important;
+
+    left:
+      4px !important;
+  }
+
+
+  /* =======================================================
+     COMPACT THREE-COLUMN DOCUMENT SUMMARY
+     ======================================================= */
+
+  .documentSummaryStrip {
+    box-sizing:
+      border-box !important;
+
+    grid-template-columns:
+      repeat(
+        3,
+        minmax(0, 1fr)
+      ) !important;
+
+    gap:
+      5px !important;
+
+    padding:
+      7px
+      8px !important;
+
+    background:
+      #f8fbfd !important;
+  }
+
+  .documentSummaryStrip > div {
+    box-sizing:
+      border-box !important;
+
+    min-width:
+      0 !important;
+
+    min-height:
+      48px !important;
+
+    gap:
+      5px !important;
+
+    padding:
+      6px !important;
+
+    border-radius:
+      9px !important;
+  }
+
+  .documentSummaryStrip > div > svg {
+    width:
+      15px !important;
+
+    height:
+      15px !important;
+
+    flex:
+      0
+      0
+      15px !important;
+  }
+
+  .documentSummaryStrip small {
+    font-size:
+      0.41rem !important;
+
+    letter-spacing:
+      0.04em !important;
+  }
+
+  .documentSummaryStrip strong {
+    font-size:
+      0.5rem !important;
+
+    line-height:
+      1.15 !important;
+  }
+
+
+  /* =======================================================
+     ONE INTERNAL SCROLL AREA
+     ======================================================= */
+
+  .detailsScroll {
+    box-sizing:
+      border-box !important;
+
+    width:
+      100% !important;
+
+    min-width:
+      0 !important;
+
+    min-height:
+      0 !important;
+
+    max-height:
+      none !important;
+
+    overflow-x:
+      hidden !important;
+
+    overflow-y:
+      auto !important;
+
+    overscroll-behavior:
+      contain !important;
+
+    scrollbar-width:
+      none !important;
+
+    background:
+      #ffffff !important;
+  }
+
+  .detailsScroll::-webkit-scrollbar {
+    display:
+      none !important;
+  }
+
+  .overviewWorkspace,
+  .detailsPanelExpanded
+  .overviewWorkspace {
+    display:
+      block !important;
+
+    min-height:
+      0 !important;
+  }
+
+  .previewPanel,
+  .detailsPanelExpanded
+  .overviewWorkspace
+  .previewPanel {
+    min-height:
+      245px !important;
+
+    padding:
+      18px
+      14px !important;
+
+    border-right:
+      0 !important;
+
+    border-bottom:
+      1px
+      solid
+      #d7e5ef !important;
+  }
+
+  .largeFileIcon {
+    width:
+      66px !important;
+
+    height:
+      66px !important;
+
+    border-radius:
+      18px !important;
+  }
+
+  .previewPanel strong {
+    margin-top:
+      10px !important;
+
+    font-size:
+      0.78rem !important;
+  }
+
+  .previewPanel p {
+    margin:
+      6px
+      0
+      10px !important;
+
+    font-size:
+      0.62rem !important;
+
+    line-height:
+      1.4 !important;
+  }
+
+  .previewPanel button {
+    min-height:
+      36px !important;
+
+    font-size:
+      0.58rem !important;
+  }
+
+  .metadata,
+  .descriptionBlock {
+    padding:
+      13px
+      14px !important;
+  }
+
+  .metadata h3,
+  .descriptionBlock h3 {
+    margin-bottom:
+      8px !important;
+
+    font-size:
+      0.7rem !important;
+  }
+
+  .metadata dl > div {
+    grid-template-columns:
+      minmax(88px, 0.8fr)
+      minmax(0, 1.2fr) !important;
+
+    gap:
+      8px !important;
+
+    padding:
+      7px
+      0 !important;
+  }
+
+  .metadata dt,
+  .metadata dd {
+    font-size:
+      0.57rem !important;
+  }
+
+  .linkedWorkspace,
+  .activityWorkspace,
+  .securityWorkspace {
+    min-height:
+      0 !important;
+
+    padding:
+      14px
+      12px !important;
+  }
+
+  .linkedWorkspace > header,
+  .activityWorkspace > header,
+  .securityWorkspace > header {
+    gap:
+      8px !important;
+
+    margin-bottom:
+      12px !important;
+  }
+
+  .linkedWorkspace > header > span,
+  .activityWorkspace > header > span,
+  .securityWorkspace > header > span {
+    width:
+      34px !important;
+
+    height:
+      34px !important;
+
+    flex-basis:
+      34px !important;
+  }
+
+  .linkedWorkspace h3,
+  .activityWorkspace h3,
+  .securityWorkspace h3 {
+    font-size:
+      0.72rem !important;
+  }
+
+  .linkedWorkspace header p,
+  .activityWorkspace header p,
+  .securityWorkspace header p {
+    font-size:
+      0.58rem !important;
+  }
+
+  .linkedRecordList article,
+  .activityTimeline article,
+  .securityGrid article {
+    gap:
+      8px !important;
+
+    padding:
+      10px !important;
+
+    border-radius:
+      10px !important;
+  }
+
+  .securityGrid article {
+    min-height:
+      82px !important;
+  }
+
+  .drawerEmptyState {
+    min-height:
+      220px !important;
+
+    padding:
+      24px
+      16px !important;
+  }
+}
+
+
+/* =========================================================
+   VERY SMALL PHONE
+   ========================================================= */
+
+@media (max-width: 380px) {
+
+  .detailsHeader {
+    min-height:
+      60px !important;
+
+    padding:
+      0
+      9px !important;
+  }
+
+  .detailsIdentity strong {
+    max-width:
+      175px !important;
+
+    font-size:
+      0.68rem !important;
+  }
+
+  .detailsActions {
+    padding:
+      7px
+      8px !important;
+  }
+
+  .detailsActions button {
+    font-size:
+      0.54rem !important;
+  }
+
+  .detailsTabs button {
+    font-size:
+      0.52rem !important;
+  }
+
+  .documentSummaryStrip {
+    gap:
+      4px !important;
+
+    padding:
+      6px !important;
+  }
+
+  .documentSummaryStrip > div {
+    gap:
+      3px !important;
+
+    padding:
+      5px !important;
+  }
+
+  .documentSummaryStrip strong {
+    font-size:
+      0.47rem !important;
+  }
+}
+
+/* CAMPAIGN SEAT DOCUMENTS MOBILE DETAILS — END */

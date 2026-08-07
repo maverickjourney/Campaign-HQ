@@ -1502,3 +1502,2139 @@ label > span {
     display: none;
   }
 }
+
+/* CAMPAIGN SEAT APPROVALS TABLET REVIEW — START */
+
+/*
+ * Approvals tablet review:
+ *
+ * - preserve desktop and the approved page architecture
+ * - remove the redundant floating Support overlap
+ * - replace the inherited 980px table canvas at 701–900px
+ * - preserve status, reviewer, due date, submitter and type
+ */
+
+
+/* =========================================================
+   SUPPORT OVERLAP
+   ========================================================= */
+
+:global(body):has(.page)
+:global(
+  a[aria-label="Open Campaign Seat Support"]
+) {
+  display:
+    none !important;
+
+  visibility:
+    hidden !important;
+
+  pointer-events:
+    none !important;
+}
+
+
+/* =========================================================
+   TABLET APPROVAL CARDS
+   701px through 900px
+   ========================================================= */
+
+@media
+  (min-width: 701px)
+  and
+  (max-width: 900px) {
+
+  .tableScroll {
+    width:
+      100% !important;
+
+    min-width:
+      0 !important;
+
+    overflow:
+      visible !important;
+  }
+
+  .tableHeader {
+    display:
+      none !important;
+  }
+
+  .approvalRow {
+    box-sizing:
+      border-box !important;
+
+    display:
+      grid !important;
+
+    width:
+      100% !important;
+
+    min-width:
+      0 !important;
+
+    min-height:
+      0 !important;
+
+    grid-template-columns:
+      minmax(0, 1fr)
+      auto !important;
+
+    grid-template-areas:
+      "identity status"
+      "reviewer due"
+      "submitter type" !important;
+
+    align-items:
+      center !important;
+
+    column-gap:
+      12px !important;
+
+    row-gap:
+      9px !important;
+
+    padding:
+      12px
+      14px !important;
+  }
+
+  .approvalRow > span {
+    display:
+      block !important;
+
+    width:
+      auto !important;
+
+    min-width:
+      0 !important;
+  }
+
+  .approvalRow
+  > span:nth-child(1) {
+    grid-area:
+      identity !important;
+
+    align-self:
+      start !important;
+  }
+
+  .approvalRow
+  > span:nth-child(2) {
+    grid-area:
+      status !important;
+
+    justify-self:
+      end !important;
+
+    text-align:
+      right !important;
+  }
+
+  .approvalRow
+  > span:nth-child(3) {
+    grid-area:
+      reviewer !important;
+  }
+
+  .approvalRow
+  > span:nth-child(4) {
+    grid-area:
+      due !important;
+
+    justify-self:
+      end !important;
+
+    text-align:
+      right !important;
+  }
+
+  .approvalRow
+  > span:nth-child(5) {
+    grid-area:
+      submitter !important;
+  }
+
+  .approvalRow
+  > span:nth-child(6) {
+    grid-area:
+      type !important;
+
+    justify-self:
+      end !important;
+
+    text-align:
+      right !important;
+  }
+
+  /*
+   * The complete row opens the decision record, so the
+   * separate arrow is redundant at tablet widths.
+   */
+  .approvalRow > svg {
+    display:
+      none !important;
+  }
+
+  .approvalRow
+  > span:nth-child(n+2)::before {
+    display:
+      block !important;
+
+    margin-bottom:
+      3px !important;
+
+    color:
+      #7890a5 !important;
+
+    font-size:
+      0.48rem !important;
+
+    font-weight:
+      850 !important;
+
+    letter-spacing:
+      0.05em !important;
+
+    line-height:
+      1 !important;
+
+    text-transform:
+      uppercase !important;
+  }
+
+  .approvalRow
+  > span:nth-child(2)::before {
+    content:
+      "Status" !important;
+  }
+
+  .approvalRow
+  > span:nth-child(3)::before {
+    content:
+      "Reviewer" !important;
+  }
+
+  .approvalRow
+  > span:nth-child(4)::before {
+    content:
+      "Due" !important;
+  }
+
+  .approvalRow
+  > span:nth-child(5)::before {
+    content:
+      "Submitted by" !important;
+  }
+
+  .approvalRow
+  > span:nth-child(6)::before {
+    content:
+      "Type" !important;
+  }
+
+  .approvalIdentity {
+    gap:
+      9px !important;
+  }
+
+  .typeIcon {
+    width:
+      37px !important;
+
+    height:
+      37px !important;
+
+    flex:
+      0
+      0
+      37px !important;
+
+    border-radius:
+      10px !important;
+  }
+
+  .approvalIdentity strong {
+    font-size:
+      0.71rem !important;
+
+    line-height:
+      1.18 !important;
+  }
+
+  .approvalIdentity small {
+    margin-top:
+      2px !important;
+
+    font-size:
+      0.59rem !important;
+  }
+
+  .statusBadge,
+  .typeBadge {
+    min-height:
+      24px !important;
+
+    padding:
+      0
+      8px !important;
+
+    font-size:
+      0.55rem !important;
+  }
+
+  .personCell {
+    gap:
+      6px !important;
+  }
+
+  .personCell i {
+    width:
+      26px !important;
+
+    height:
+      26px !important;
+
+    flex:
+      0
+      0
+      26px !important;
+
+    font-size:
+      0.5rem !important;
+  }
+
+  .personCell strong,
+  .submitterCell,
+  .dateCell strong,
+  .overdueDate strong {
+    max-width:
+      220px !important;
+
+    font-size:
+      0.59rem !important;
+  }
+
+  .overdueDate small {
+    font-size:
+      0.5rem !important;
+  }
+
+  .resultBar p {
+    display:
+      none !important;
+  }
+}
+
+
+/* =========================================================
+   NARROW TABLET REFINEMENT
+   701px through 780px
+   ========================================================= */
+
+@media
+  (min-width: 701px)
+  and
+  (max-width: 780px) {
+
+  .approvalRow {
+    column-gap:
+      9px !important;
+
+    row-gap:
+      8px !important;
+
+    padding:
+      11px
+      12px !important;
+  }
+
+  .approvalIdentity strong {
+    font-size:
+      0.68rem !important;
+  }
+
+  .approvalIdentity small {
+    font-size:
+      0.56rem !important;
+  }
+
+  .personCell strong,
+  .submitterCell,
+  .dateCell strong,
+  .overdueDate strong {
+    font-size:
+      0.56rem !important;
+  }
+
+  .statusBadge,
+  .typeBadge {
+    padding:
+      0
+      7px !important;
+
+    font-size:
+      0.52rem !important;
+  }
+}
+
+/* CAMPAIGN SEAT APPROVALS TABLET REVIEW — END */
+
+/* CAMPAIGN SEAT APPROVALS COMPACT TABLET RECORDS — START */
+
+/*
+ * Compact populated Approvals records:
+ *
+ * Row 1 — approval identity, status and due date
+ * Row 2 — reviewer, submitter and approval type
+ */
+
+@media
+  (min-width: 701px)
+  and
+  (max-width: 900px) {
+
+  .approvalRow {
+    grid-template-columns:
+      minmax(0, 1.45fr)
+      minmax(115px, 0.78fr)
+      minmax(112px, 0.72fr) !important;
+
+    grid-template-areas:
+      "identity status due"
+      "reviewer submitter type" !important;
+
+    min-height:
+      104px !important;
+
+    align-items:
+      center !important;
+
+    column-gap:
+      11px !important;
+
+    row-gap:
+      7px !important;
+
+    padding:
+      10px
+      13px !important;
+  }
+
+  /*
+   * Restore the intended internal layouts that the first
+   * tablet bridge changed to display:block.
+   */
+
+  .approvalRow
+  > .approvalIdentity {
+    display:
+      flex !important;
+
+    align-items:
+      center !important;
+  }
+
+  .approvalRow
+  > .personCell {
+    display:
+      flex !important;
+
+    align-items:
+      center !important;
+  }
+
+  .approvalRow
+  > .dateCell,
+  .approvalRow
+  > .overdueDate {
+    display:
+      grid !important;
+
+    gap:
+      2px !important;
+  }
+
+  .approvalRow
+  > span:nth-child(1) {
+    align-self:
+      center !important;
+  }
+
+  .approvalRow
+  > span:nth-child(2),
+  .approvalRow
+  > span:nth-child(4),
+  .approvalRow
+  > span:nth-child(6) {
+    justify-self:
+      end !important;
+
+    text-align:
+      right !important;
+  }
+
+  .approvalRow
+  > span:nth-child(3),
+  .approvalRow
+  > span:nth-child(5) {
+    justify-self:
+      start !important;
+
+    text-align:
+      left !important;
+  }
+
+  .approvalRow
+  > span:nth-child(n+2)::before {
+    margin-bottom:
+      2px !important;
+
+    font-size:
+      0.43rem !important;
+  }
+
+  .approvalIdentity {
+    gap:
+      8px !important;
+  }
+
+  .typeIcon {
+    width:
+      35px !important;
+
+    height:
+      35px !important;
+
+    flex:
+      0
+      0
+      35px !important;
+  }
+
+  .approvalIdentity strong {
+    font-size:
+      0.68rem !important;
+
+    line-height:
+      1.15 !important;
+  }
+
+  .approvalIdentity small {
+    display:
+      -webkit-box !important;
+
+    margin-top:
+      2px !important;
+
+    overflow:
+      hidden !important;
+
+    font-size:
+      0.55rem !important;
+
+    line-height:
+      1.2 !important;
+
+    -webkit-box-orient:
+      vertical !important;
+
+    -webkit-line-clamp:
+      1 !important;
+
+    white-space:
+      normal !important;
+  }
+
+  .personCell {
+    gap:
+      6px !important;
+  }
+
+  .personCell i {
+    width:
+      25px !important;
+
+    height:
+      25px !important;
+
+    flex:
+      0
+      0
+      25px !important;
+  }
+
+  .personCell strong,
+  .submitterCell,
+  .dateCell strong,
+  .overdueDate strong {
+    max-width:
+      150px !important;
+
+    font-size:
+      0.55rem !important;
+  }
+
+  .overdueDate small {
+    font-size:
+      0.46rem !important;
+  }
+
+  .statusBadge,
+  .typeBadge {
+    min-height:
+      22px !important;
+
+    padding:
+      0
+      7px !important;
+
+    font-size:
+      0.5rem !important;
+  }
+}
+
+
+/* Narrow tablet adjustment. */
+
+@media
+  (min-width: 701px)
+  and
+  (max-width: 780px) {
+
+  .approvalRow {
+    grid-template-columns:
+      minmax(0, 1.35fr)
+      minmax(105px, 0.76fr)
+      minmax(101px, 0.7fr) !important;
+
+    min-height:
+      100px !important;
+
+    column-gap:
+      8px !important;
+
+    row-gap:
+      6px !important;
+
+    padding:
+      9px
+      11px !important;
+  }
+
+  .approvalIdentity strong {
+    font-size:
+      0.65rem !important;
+  }
+
+  .approvalIdentity small {
+    font-size:
+      0.52rem !important;
+  }
+
+  .personCell strong,
+  .submitterCell,
+  .dateCell strong,
+  .overdueDate strong {
+    max-width:
+      125px !important;
+
+    font-size:
+      0.52rem !important;
+  }
+
+  .statusBadge,
+  .typeBadge {
+    padding:
+      0
+      6px !important;
+
+    font-size:
+      0.47rem !important;
+  }
+}
+
+/* CAMPAIGN SEAT APPROVALS COMPACT TABLET RECORDS — END */
+
+/* CAMPAIGN SEAT APPROVALS PHONE REVIEW — START */
+
+/*
+ * Approvals phone layout:
+ *
+ * - compact 2x2 summary grid
+ * - four visible approval tabs
+ * - remove the inherited desktop table canvas
+ * - preserve every populated approval field
+ */
+
+
+/* =========================================================
+   COMPACT PHONE SUMMARY
+   ========================================================= */
+
+@media (max-width: 620px) {
+
+  .summaryGrid {
+    grid-template-columns:
+      repeat(
+        2,
+        minmax(0, 1fr)
+      ) !important;
+
+    gap:
+      8px !important;
+
+    margin-bottom:
+      12px !important;
+  }
+
+  .summaryCard {
+    box-sizing:
+      border-box !important;
+
+    min-width:
+      0 !important;
+
+    min-height:
+      88px !important;
+
+    gap:
+      8px !important;
+
+    padding:
+      10px !important;
+
+    border-radius:
+      13px !important;
+  }
+
+  .summaryIcon {
+    width:
+      36px !important;
+
+    height:
+      36px !important;
+
+    flex:
+      0
+      0
+      36px !important;
+
+    border-radius:
+      10px !important;
+  }
+
+  .summaryCard small {
+    overflow:
+      visible !important;
+
+    font-size:
+      0.57rem !important;
+
+    line-height:
+      1.12 !important;
+
+    text-overflow:
+      clip !important;
+
+    white-space:
+      normal !important;
+  }
+
+  .summaryCard strong {
+    margin:
+      2px
+      0 !important;
+
+    font-size:
+      1.25rem !important;
+  }
+
+  .summaryCard em {
+    overflow:
+      visible !important;
+
+    font-size:
+      0.51rem !important;
+
+    line-height:
+      1.18 !important;
+
+    text-overflow:
+      clip !important;
+
+    white-space:
+      normal !important;
+  }
+}
+
+
+/* =========================================================
+   FOUR VISIBLE PHONE TABS
+   ========================================================= */
+
+@media (max-width: 620px) {
+
+  .tabs {
+    box-sizing:
+      border-box !important;
+
+    display:
+      grid !important;
+
+    width:
+      100% !important;
+
+    min-width:
+      0 !important;
+
+    min-height:
+      48px !important;
+
+    grid-template-columns:
+      repeat(
+        4,
+        minmax(0, 1fr)
+      ) !important;
+
+    padding:
+      0
+      3px !important;
+
+    overflow:
+      hidden !important;
+  }
+
+  .tabs button {
+    box-sizing:
+      border-box !important;
+
+    width:
+      100% !important;
+
+    min-width:
+      0 !important;
+
+    min-height:
+      47px !important;
+
+    padding:
+      0
+      3px !important;
+
+    overflow:
+      hidden !important;
+
+    font-size:
+      0 !important;
+  }
+
+  .tabs button::before {
+    display:
+      block !important;
+
+    overflow:
+      hidden !important;
+
+    color:
+      inherit !important;
+
+    font-size:
+      0.55rem !important;
+
+    font-weight:
+      820 !important;
+
+    line-height:
+      1 !important;
+
+    text-overflow:
+      ellipsis !important;
+
+    white-space:
+      nowrap !important;
+  }
+
+  .tabs button:nth-child(1)::before {
+    content:
+      "All" !important;
+  }
+
+  .tabs button:nth-child(2)::before {
+    content:
+      "Mine" !important;
+  }
+
+  .tabs button:nth-child(3)::before {
+    content:
+      "Revision" !important;
+  }
+
+  .tabs button:nth-child(4)::before {
+    content:
+      "History" !important;
+  }
+
+  .tabs button::after {
+    right:
+      4px !important;
+
+    left:
+      4px !important;
+  }
+}
+
+@media (max-width: 380px) {
+
+  .tabs button:nth-child(3)::before {
+    content:
+      "Revise" !important;
+  }
+}
+
+
+/* =========================================================
+   COMPLETE PHONE APPROVAL CARDS
+   ========================================================= */
+
+@media (max-width: 620px) {
+
+  .tableScroll {
+    width:
+      100% !important;
+
+    min-width:
+      0 !important;
+
+    overflow:
+      visible !important;
+
+    scrollbar-gutter:
+      auto !important;
+  }
+
+  .tableHeader {
+    display:
+      none !important;
+  }
+
+  .approvalRow {
+    box-sizing:
+      border-box !important;
+
+    display:
+      grid !important;
+
+    width:
+      100% !important;
+
+    min-width:
+      0 !important;
+
+    min-height:
+      0 !important;
+
+    grid-template-columns:
+      minmax(0, 1fr)
+      minmax(86px, auto) !important;
+
+    grid-template-areas:
+      "identity status"
+      "reviewer due"
+      "submitter type" !important;
+
+    align-items:
+      center !important;
+
+    column-gap:
+      8px !important;
+
+    row-gap:
+      7px !important;
+
+    padding:
+      10px
+      9px !important;
+  }
+
+  .approvalRow > span {
+    display:
+      block !important;
+
+    width:
+      auto !important;
+
+    min-width:
+      0 !important;
+  }
+
+  .approvalRow
+  > .approvalIdentity {
+    display:
+      flex !important;
+
+    grid-area:
+      identity !important;
+
+    align-items:
+      center !important;
+  }
+
+  .approvalRow
+  > span:nth-child(2) {
+    grid-area:
+      status !important;
+
+    justify-self:
+      end !important;
+
+    text-align:
+      right !important;
+  }
+
+  .approvalRow
+  > .personCell {
+    display:
+      flex !important;
+
+    grid-area:
+      reviewer !important;
+
+    align-items:
+      center !important;
+  }
+
+  .approvalRow
+  > span:nth-child(4) {
+    grid-area:
+      due !important;
+
+    justify-self:
+      end !important;
+
+    text-align:
+      right !important;
+  }
+
+  .approvalRow
+  > span:nth-child(5) {
+    grid-area:
+      submitter !important;
+  }
+
+  .approvalRow
+  > span:nth-child(6) {
+    grid-area:
+      type !important;
+
+    justify-self:
+      end !important;
+
+    text-align:
+      right !important;
+  }
+
+  .approvalRow > svg {
+    display:
+      none !important;
+  }
+
+  .approvalRow
+  > span:nth-child(n+2)::before {
+    display:
+      block !important;
+
+    margin-bottom:
+      2px !important;
+
+    color:
+      #7890a5 !important;
+
+    font-size:
+      0.42rem !important;
+
+    font-weight:
+      850 !important;
+
+    letter-spacing:
+      0.05em !important;
+
+    line-height:
+      1 !important;
+
+    text-transform:
+      uppercase !important;
+  }
+
+  .approvalRow
+  > span:nth-child(2)::before {
+    content:
+      "Status" !important;
+  }
+
+  .approvalRow
+  > span:nth-child(3)::before {
+    content:
+      "Reviewer" !important;
+  }
+
+  .approvalRow
+  > span:nth-child(4)::before {
+    content:
+      "Due" !important;
+  }
+
+  .approvalRow
+  > span:nth-child(5)::before {
+    content:
+      "Submitted by" !important;
+  }
+
+  .approvalRow
+  > span:nth-child(6)::before {
+    content:
+      "Type" !important;
+  }
+
+  .approvalIdentity {
+    gap:
+      7px !important;
+  }
+
+  .typeIcon {
+    width:
+      34px !important;
+
+    height:
+      34px !important;
+
+    flex:
+      0
+      0
+      34px !important;
+
+    border-radius:
+      10px !important;
+  }
+
+  .approvalIdentity strong {
+    font-size:
+      0.64rem !important;
+
+    line-height:
+      1.15 !important;
+  }
+
+  .approvalIdentity small {
+    display:
+      -webkit-box !important;
+
+    margin-top:
+      2px !important;
+
+    overflow:
+      hidden !important;
+
+    font-size:
+      0.51rem !important;
+
+    line-height:
+      1.18 !important;
+
+    -webkit-box-orient:
+      vertical !important;
+
+    -webkit-line-clamp:
+      1 !important;
+
+    white-space:
+      normal !important;
+  }
+
+  .personCell {
+    gap:
+      5px !important;
+  }
+
+  .personCell i {
+    width:
+      24px !important;
+
+    height:
+      24px !important;
+
+    flex:
+      0
+      0
+      24px !important;
+
+    font-size:
+      0.47rem !important;
+  }
+
+  .personCell strong,
+  .submitterCell,
+  .dateCell strong,
+  .overdueDate strong {
+    max-width:
+      135px !important;
+
+    font-size:
+      0.51rem !important;
+  }
+
+  .dateCell,
+  .overdueDate {
+    display:
+      grid !important;
+
+    gap:
+      2px !important;
+  }
+
+  .overdueDate small {
+    font-size:
+      0.44rem !important;
+  }
+
+  .statusBadge,
+  .typeBadge {
+    min-height:
+      22px !important;
+
+    max-width:
+      105px !important;
+
+    padding:
+      0
+      6px !important;
+
+    overflow:
+      hidden !important;
+
+    font-size:
+      0.47rem !important;
+
+    text-overflow:
+      ellipsis !important;
+
+    white-space:
+      nowrap !important;
+  }
+
+  .resultBar {
+    min-height:
+      42px !important;
+
+    padding:
+      0
+      10px !important;
+  }
+
+  .resultBar p {
+    display:
+      none !important;
+  }
+}
+
+
+/* =========================================================
+   VERY SMALL PHONE REFINEMENT
+   ========================================================= */
+
+@media (max-width: 380px) {
+
+  .approvalRow {
+    grid-template-columns:
+      minmax(0, 1fr)
+      minmax(78px, auto) !important;
+
+    column-gap:
+      7px !important;
+
+    row-gap:
+      6px !important;
+
+    padding:
+      9px
+      8px !important;
+  }
+
+  .approvalIdentity strong {
+    font-size:
+      0.61rem !important;
+  }
+
+  .approvalIdentity small {
+    font-size:
+      0.49rem !important;
+  }
+
+  .personCell strong,
+  .submitterCell,
+  .dateCell strong,
+  .overdueDate strong {
+    max-width:
+      112px !important;
+
+    font-size:
+      0.48rem !important;
+  }
+
+  .statusBadge,
+  .typeBadge {
+    max-width:
+      92px !important;
+
+    font-size:
+      0.44rem !important;
+  }
+}
+
+/* CAMPAIGN SEAT APPROVALS PHONE REVIEW — END */
+
+/* CAMPAIGN SEAT APPROVALS PHONE DUE SPACING — START */
+
+@media (max-width: 620px) {
+
+  .approvalRow > .dateCell,
+  .approvalRow > .overdueDate {
+    display:
+      flex !important;
+
+    flex-direction:
+      column !important;
+
+    align-items:
+      flex-end !important;
+
+    justify-content:
+      center !important;
+
+    gap:
+      3px !important;
+
+    line-height:
+      1.1 !important;
+  }
+
+  .approvalRow > .dateCell small,
+  .approvalRow > .dateCell strong,
+  .approvalRow > .overdueDate small,
+  .approvalRow > .overdueDate strong {
+    display:
+      block !important;
+
+    width:
+      100% !important;
+
+    margin:
+      0 !important;
+
+    text-align:
+      right !important;
+
+    white-space:
+      nowrap !important;
+  }
+
+  .approvalRow > .overdueDate small {
+    line-height:
+      1 !important;
+  }
+
+  .approvalRow > .overdueDate strong {
+    line-height:
+      1.2 !important;
+  }
+}
+
+/* CAMPAIGN SEAT APPROVALS PHONE DUE SPACING — END */
+
+/* CAMPAIGN SEAT APPROVALS MOBILE DETAILS — START */
+
+/*
+ * Approval Details on phones:
+ *
+ * - full-device stable drawer
+ * - no phone Expand control
+ * - decision actions arranged in a 2x2 grid
+ * - three equal tabs
+ * - compact Overview information
+ * - one internal scroll area
+ * - fixed Delete footer
+ */
+
+@media (max-width: 620px) {
+
+  :global(
+    body[data-approvals-focus="true"]
+  ) {
+    overflow:
+      hidden !important;
+
+    overscroll-behavior:
+      none !important;
+  }
+
+  .drawerBackdrop {
+    background:
+      #ffffff !important;
+
+    backdrop-filter:
+      none !important;
+  }
+
+  .drawer,
+  .drawerExpanded {
+    position:
+      fixed !important;
+
+    z-index:
+      1200 !important;
+
+    inset:
+      0 !important;
+
+    box-sizing:
+      border-box !important;
+
+    display:
+      grid !important;
+
+    width:
+      100vw !important;
+
+    max-width:
+      none !important;
+
+    height:
+      100dvh !important;
+
+    min-height:
+      100dvh !important;
+
+    max-height:
+      100dvh !important;
+
+    grid-template-rows:
+      auto
+      auto
+      auto
+      minmax(0, 1fr)
+      auto !important;
+
+    margin:
+      0 !important;
+
+    overflow:
+      hidden !important;
+
+    border:
+      0 !important;
+
+    border-radius:
+      0 !important;
+
+    background:
+      #ffffff !important;
+
+    box-shadow:
+      none !important;
+  }
+
+
+  /* =======================================================
+     FIXED DRAWER HEADER
+     ======================================================= */
+
+  .drawerHeader {
+    box-sizing:
+      border-box !important;
+
+    min-height:
+      72px !important;
+
+    gap:
+      9px !important;
+
+    padding:
+      9px
+      11px !important;
+
+    background:
+      #ffffff !important;
+  }
+
+  .drawerHeader > div:first-child {
+    min-width:
+      0 !important;
+  }
+
+  .drawerHeader > div:first-child > span {
+    font-size:
+      0.52rem !important;
+
+    letter-spacing:
+      0.13em !important;
+  }
+
+  .drawerHeader h2 {
+    max-width:
+      245px !important;
+
+    margin:
+      4px
+      0
+      5px !important;
+
+    font-size:
+      0.86rem !important;
+
+    line-height:
+      1.15 !important;
+  }
+
+  .drawerHeader > div > div {
+    gap:
+      4px !important;
+  }
+
+  .drawerHeader
+  .statusBadge,
+  .drawerHeader
+  .typeBadge {
+    min-height:
+      20px !important;
+
+    padding:
+      0
+      6px !important;
+
+    font-size:
+      0.45rem !important;
+  }
+
+  .drawerHeader nav {
+    flex:
+      0
+      0
+      auto !important;
+  }
+
+  /*
+   * The drawer already fills the complete device viewport.
+   */
+  .drawerHeader
+  nav
+  > button:first-child {
+    display:
+      none !important;
+  }
+
+  .drawerHeader
+  nav
+  > button:last-child {
+    width:
+      39px !important;
+
+    height:
+      39px !important;
+
+    flex:
+      0
+      0
+      39px !important;
+  }
+
+
+  /* =======================================================
+     FIXED 2x2 DECISION ACTIONS
+     ======================================================= */
+
+  .decisionBar {
+    box-sizing:
+      border-box !important;
+
+    display:
+      grid !important;
+
+    grid-template-columns:
+      repeat(
+        2,
+        minmax(0, 1fr)
+      ) !important;
+
+    min-height:
+      0 !important;
+
+    gap:
+      6px !important;
+
+    padding:
+      7px
+      9px !important;
+
+    overflow:
+      hidden !important;
+
+    border-bottom:
+      1px
+      solid
+      #dce7ed !important;
+
+    background:
+      #f8fbfd !important;
+  }
+
+  .decisionBar button {
+    box-sizing:
+      border-box !important;
+
+    width:
+      100% !important;
+
+    min-width:
+      0 !important;
+
+    min-height:
+      39px !important;
+
+    margin:
+      0 !important;
+
+    padding:
+      0
+      5px !important;
+
+    overflow:
+      hidden !important;
+
+    gap:
+      4px !important;
+
+    font-size:
+      0.54rem !important;
+
+    line-height:
+      1.1 !important;
+
+    text-overflow:
+      ellipsis !important;
+
+    white-space:
+      nowrap !important;
+  }
+
+  .decisionBar button svg {
+    width:
+      15px !important;
+
+    height:
+      15px !important;
+
+    flex:
+      0
+      0
+      15px !important;
+  }
+
+  .decisionBar
+  > button:only-child {
+    grid-column:
+      1 / -1 !important;
+  }
+
+
+  /* =======================================================
+     FIXED THREE-TAB ROW
+     ======================================================= */
+
+  .drawerTabs {
+    box-sizing:
+      border-box !important;
+
+    display:
+      grid !important;
+
+    width:
+      100% !important;
+
+    min-width:
+      0 !important;
+
+    min-height:
+      47px !important;
+
+    grid-template-columns:
+      repeat(
+        3,
+        minmax(0, 1fr)
+      ) !important;
+
+    gap:
+      0 !important;
+
+    padding:
+      0
+      3px !important;
+
+    overflow:
+      hidden !important;
+
+    background:
+      #ffffff !important;
+  }
+
+  .drawerTabs button {
+    box-sizing:
+      border-box !important;
+
+    width:
+      100% !important;
+
+    min-width:
+      0 !important;
+
+    min-height:
+      46px !important;
+
+    justify-content:
+      center !important;
+
+    gap:
+      4px !important;
+
+    padding:
+      0
+      3px !important;
+
+    overflow:
+      hidden !important;
+
+    font-size:
+      0.56rem !important;
+
+    text-overflow:
+      ellipsis !important;
+
+    white-space:
+      nowrap !important;
+  }
+
+  .drawerTabs button svg {
+    width:
+      14px !important;
+
+    height:
+      14px !important;
+  }
+
+  .drawerTabs button::after {
+    right:
+      5px !important;
+
+    left:
+      5px !important;
+  }
+
+
+  /* =======================================================
+     ONE INTERNAL SCROLL AREA
+     ======================================================= */
+
+  .drawerBody {
+    box-sizing:
+      border-box !important;
+
+    width:
+      100% !important;
+
+    min-width:
+      0 !important;
+
+    min-height:
+      0 !important;
+
+    max-height:
+      none !important;
+
+    padding:
+      9px !important;
+
+    overflow-x:
+      hidden !important;
+
+    overflow-y:
+      auto !important;
+
+    overscroll-behavior:
+      contain !important;
+
+    scrollbar-width:
+      none !important;
+
+    background:
+      #f5f9fb !important;
+  }
+
+  .drawerBody::-webkit-scrollbar {
+    display:
+      none !important;
+  }
+
+  .overviewWorkspace,
+  .drawerExpanded
+  .overviewWorkspace {
+    display:
+      grid !important;
+
+    width:
+      100% !important;
+
+    min-width:
+      0 !important;
+
+    grid-template-columns:
+      1fr !important;
+
+    gap:
+      8px !important;
+  }
+
+
+  /* =======================================================
+     COMPACT OVERVIEW
+     ======================================================= */
+
+  .detailSection,
+  .reviewRecord {
+    box-sizing:
+      border-box !important;
+
+    width:
+      100% !important;
+
+    min-width:
+      0 !important;
+
+    padding:
+      10px !important;
+
+    border-radius:
+      10px !important;
+  }
+
+  .detailSection > span,
+  .reviewRecord > span {
+    font-size:
+      0.51rem !important;
+  }
+
+  .detailSection p,
+  .reviewRecord p {
+    margin-top:
+      5px !important;
+
+    font-size:
+      0.61rem !important;
+
+    line-height:
+      1.42 !important;
+  }
+
+  .detailGrid {
+    display:
+      grid !important;
+
+    width:
+      100% !important;
+
+    min-width:
+      0 !important;
+
+    grid-template-columns:
+      repeat(
+        2,
+        minmax(0, 1fr)
+      ) !important;
+
+    gap:
+      1px !important;
+
+    border-radius:
+      10px !important;
+  }
+
+  .detailGrid article {
+    box-sizing:
+      border-box !important;
+
+    min-width:
+      0 !important;
+
+    min-height:
+      66px !important;
+
+    gap:
+      4px !important;
+
+    padding:
+      8px !important;
+  }
+
+  .detailGrid span {
+    font-size:
+      0.47rem !important;
+
+    letter-spacing:
+      0.04em !important;
+  }
+
+  .detailGrid strong {
+    overflow:
+      visible !important;
+
+    font-size:
+      0.58rem !important;
+
+    line-height:
+      1.22 !important;
+
+    text-overflow:
+      clip !important;
+
+    white-space:
+      normal !important;
+  }
+
+  .nextStep {
+    box-sizing:
+      border-box !important;
+
+    width:
+      100% !important;
+
+    min-width:
+      0 !important;
+
+    gap:
+      8px !important;
+
+    padding:
+      9px !important;
+
+    border-radius:
+      10px !important;
+  }
+
+  .nextStep > svg {
+    width:
+      17px !important;
+
+    height:
+      17px !important;
+
+    flex:
+      0
+      0
+      17px !important;
+  }
+
+  .nextStep strong {
+    font-size:
+      0.61rem !important;
+  }
+
+  .nextStep p {
+    margin-top:
+      2px !important;
+
+    font-size:
+      0.56rem !important;
+  }
+
+
+  /* =======================================================
+     COMPACT HISTORY AND RELATED WORK
+     ======================================================= */
+
+  .timeline,
+  .connections {
+    box-sizing:
+      border-box !important;
+
+    width:
+      100% !important;
+
+    min-width:
+      0 !important;
+
+    padding:
+      11px !important;
+
+    border-radius:
+      10px !important;
+  }
+
+  .timeline article {
+    padding-bottom:
+      17px !important;
+  }
+
+  .timeline strong {
+    font-size:
+      0.63rem !important;
+  }
+
+  .timeline p {
+    font-size:
+      0.57rem !important;
+  }
+
+  .timeline span {
+    font-size:
+      0.53rem !important;
+  }
+
+  .connections {
+    gap:
+      7px !important;
+  }
+
+  .connections header strong {
+    font-size:
+      0.67rem !important;
+  }
+
+  .connections header p {
+    font-size:
+      0.56rem !important;
+
+    line-height:
+      1.4 !important;
+  }
+
+  .connections > button {
+    min-height:
+      56px !important;
+
+    grid-template-columns:
+      29px
+      minmax(0, 1fr)
+      auto !important;
+
+    gap:
+      7px !important;
+
+    padding:
+      8px !important;
+  }
+
+  .connections strong {
+    font-size:
+      0.61rem !important;
+  }
+
+  .connections small {
+    font-size:
+      0.53rem !important;
+  }
+
+
+  /* =======================================================
+     FIXED DELETE FOOTER
+     ======================================================= */
+
+  .drawerFooter {
+    box-sizing:
+      border-box !important;
+
+    display:
+      block !important;
+
+    width:
+      100% !important;
+
+    min-height:
+      52px !important;
+
+    padding:
+      7px
+      9px !important;
+
+    background:
+      #ffffff !important;
+  }
+
+  .drawerFooter button {
+    width:
+      100% !important;
+
+    min-height:
+      38px !important;
+
+    justify-content:
+      center !important;
+
+    font-size:
+      0.57rem !important;
+  }
+
+  .drawerFooter span {
+    display:
+      none !important;
+  }
+}
+
+
+/* =========================================================
+   VERY SMALL PHONE
+   ========================================================= */
+
+@media (max-width: 380px) {
+
+  .drawerHeader h2 {
+    max-width:
+      210px !important;
+
+    font-size:
+      0.81rem !important;
+  }
+
+  .decisionBar {
+    padding:
+      6px
+      7px !important;
+  }
+
+  .decisionBar button {
+    font-size:
+      0.5rem !important;
+  }
+
+  .drawerTabs button {
+    font-size:
+      0.52rem !important;
+  }
+
+  .drawerBody {
+    padding:
+      7px !important;
+  }
+
+  .detailGrid article {
+    min-height:
+      62px !important;
+
+    padding:
+      7px !important;
+  }
+
+  .detailGrid strong {
+    font-size:
+      0.54rem !important;
+  }
+}
+
+/* CAMPAIGN SEAT APPROVALS MOBILE DETAILS — END */

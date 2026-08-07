@@ -9,7 +9,9 @@ import ProtectedRoute from "./components/auth/ProtectedRoute/ProtectedRoute";
 import Calendar from "./pages/Calendar/Calendar";
 import RoleDashboard from "./pages/RoleDashboard/RoleDashboard";
 import ApprovalsReferencePreview from "./pages/ApprovalsReferencePreview/ApprovalsReferencePreview";
-import Communications from "./pages/Communications/Communications";
+import VolunteersReferencePreview from "./pages/VolunteersReferencePreview/VolunteersReferencePreview";
+import CampaignToolComingSoon from "./pages/CampaignToolComingSoon/CampaignToolComingSoon";
+import InboxReferencePreview from "./pages/InboxReferencePreview/InboxReferencePreview";
 import ContactsReferencePreview from "./pages/ContactsReferencePreview/ContactsReferencePreview";
 import DocumentsReferencePreview from "./pages/DocumentsReferencePreview/DocumentsReferencePreview";
 import VolunteerFieldAssignment from "./pages/VolunteerFieldAssignment/VolunteerFieldAssignment";
@@ -182,10 +184,64 @@ export default function Router() {
         />
 
         <Route
-          path="/communications"
+          path="/inbox"
           element={
             <ProtectedRoute allowedExperiences={LEADERSHIP_EXPERIENCES}>
-              <Communications />
+              <InboxReferencePreview />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/volunteers"
+          element={
+            <ProtectedRoute allowedExperiences={LEADERSHIP_EXPERIENCES}>
+              <VolunteersReferencePreview />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/fundraising"
+          element={
+            <ProtectedRoute allowedExperiences={LEADERSHIP_EXPERIENCES}>
+              <CampaignToolComingSoon toolKey="fundraising" />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/events"
+          element={
+            <ProtectedRoute allowedExperiences={LEADERSHIP_EXPERIENCES}>
+              <CampaignToolComingSoon toolKey="events" />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/social-media"
+          element={
+            <ProtectedRoute allowedExperiences={LEADERSHIP_EXPERIENCES}>
+              <CampaignToolComingSoon toolKey="social-media" />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/media-center"
+          element={
+            <ProtectedRoute allowedExperiences={LEADERSHIP_EXPERIENCES}>
+              <CampaignToolComingSoon toolKey="media-center" />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/reports-analytics"
+          element={
+            <ProtectedRoute allowedExperiences={LEADERSHIP_EXPERIENCES}>
+              <CampaignToolComingSoon toolKey="reports-analytics" />
             </ProtectedRoute>
           }
         />
@@ -264,6 +320,15 @@ export default function Router() {
 
         <Route
           path="/workspace/settings"
+          element={
+            <ProtectedRoute allowedExperiences={LEADERSHIP_EXPERIENCES}>
+              <ProfileSettings />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/workspace/campaign-settings"
           element={
             <ProtectedRoute allowedExperiences={LEADERSHIP_EXPERIENCES}>
               <WorkspaceSettings />

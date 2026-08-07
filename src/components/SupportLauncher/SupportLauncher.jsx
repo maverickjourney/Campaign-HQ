@@ -12,6 +12,17 @@ export default function SupportLauncher() {
 
   if (
     location.pathname === "/support" ||
+    location.pathname === "/dashboard" ||
+    location.pathname === "/volunteers" ||
+    location.pathname === "/inbox" ||
+    location.pathname === "/fundraising" ||
+    location.pathname === "/events" ||
+    location.pathname === "/social-media" ||
+    location.pathname === "/media-center" ||
+    location.pathname === "/reports-analytics" ||
+    location.pathname === "/profile/settings" ||
+    location.pathname === "/workspace/settings" ||
+    location.pathname === "/workspace/campaign-settings" ||
     typeof document === "undefined"
   ) {
     return null;
@@ -31,10 +42,16 @@ export default function SupportLauncher() {
   const isAuthenticatedPage =
     location.pathname !== "/";
 
+  const isInboxPage =
+    location.pathname === "/inbox";
+
   const launcherClassName = [
     styles.launcher,
     isAuthenticatedPage
       ? styles.compact
+      : "",
+    isInboxPage
+      ? styles.inbox
       : "",
   ]
     .filter(Boolean)
@@ -45,7 +62,7 @@ export default function SupportLauncher() {
       className={launcherClassName}
       to={destination}
       aria-label="Open Campaign Seat Support"
-      title="Campaign Seat Support"
+      title="Support"
     >
       <LifeBuoy
         size={18}

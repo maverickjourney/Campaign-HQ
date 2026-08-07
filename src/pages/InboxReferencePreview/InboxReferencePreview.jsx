@@ -5,6 +5,8 @@ import {
   Bot,
   CalendarDays,
   CheckCircle2,
+  ListTodo,
+  LoaderCircle,
   ChevronDown,
   CircleDollarSign,
   Clock3,
@@ -28,10 +30,18 @@ import {
   Sparkles,
   Star,
   Tag,
+  UserPlus,
   Users,
+  X,
 } from "lucide-react";
 
 import { CampaignWorkspaceShell } from "../../components/CampaignWorkspaceShell/CampaignWorkspaceShell";
+import { useContactsCommandCenter } from "../../hooks/useContactsCommandCenter";
+import { useTasksCommandCenter } from "../../hooks/useTasksCommandCenter";
+import {
+  getCurrentUser,
+  getCurrentWorkspace,
+} from "../../utils/campaignSession";
 
 import styles from "./InboxReferencePreview.module.css";
 
@@ -117,46 +127,119 @@ const TAGS = [
 
 const SUMMARY_METRICS = [
   {
-    label: "Unseen Messages",
-    value: "24",
-    comparison: "18%",
-    detail: "vs yesterday",
+    id: "unread",
+    label: "Unread",
+    detail: "New conversations",
     icon: Mail,
     tone: "red",
   },
   {
-    label: "Total Conversations",
-    value: "128",
-    comparison: "12%",
-    detail: "vs last 7 days",
-    icon: MessageSquare,
-    tone: "purple",
-  },
-  {
-    label: "Messages Sent",
-    value: "302",
-    comparison: "",
-    detail: "This week",
-    icon: Send,
+    id: "needs-response",
+    label: "Needs Reply",
+    detail: "Waiting on the campaign",
+    icon: Clock3,
     tone: "blue",
   },
   {
-    label: "Avg. Response Time",
-    value: "2.4h",
-    comparison: "18%",
-    detail: "vs last 7 days",
-    icon: Clock3,
-    tone: "green",
-  },
-  {
+    id: "priority",
     label: "High Priority",
-    value: "7",
-    comparison: "",
     detail: "Requires action",
     icon: Star,
     tone: "gold",
   },
 ];
+
+const EMPTY_CONTACT_FORM = {
+  fullName: "",
+  email: "",
+  phone: "",
+  organization: "",
+  emailConsent: false,
+  smsConsent: false,
+};
+
+function getEasternDateInput(daysAhead = 0) {
+  const parts = new Intl.DateTimeFormat(
+    "en-US",
+    {
+      timeZone: "America/New_York",
+      year: "numeric",
+      month: "numeric",
+      day: "numeric",
+    },
+  ).formatToParts(new Date());
+
+  const values = Object.fromEntries(
+    parts
+      .filter((part) =>
+        ["year", "month", "day"].includes(
+          part.type,
+        ),
+      )
+      .map((part) => [
+        part.type,
+        Number(part.value),
+      ]),
+  );
+
+  const date = new Date(
+    Date.UTC(
+      values.year,
+      values.month - 1,
+      values.day + daysAhead,
+    ),
+  );
+
+  return date.toISOString().slice(0, 10);
+}
+
+function defaultTaskForm(conversation, userId) {
+  return {
+    title: `Follow up with ${conversation?.sender || "contact"}`,
+    description: conversation?.subject
+      ? `Inbox follow-up: ${conversation.subject}`
+      : "Inbox follow-up",
+    dueDate: getEasternDateInput(1),
+    dueTime: "17:00",
+    priority: conversation?.priority ? "high" : "normal",
+    assignedTo: userId || "",
+  };
+}
+
+function toTaskDueIso(dateValue, timeValue) {
+  if (!dateValue) {
+    return null;
+  }
+
+  const date = new Date(
+    `${dateValue}T${timeValue || "17:00"}:00`,
+  );
+
+  if (Number.isNaN(date.getTime())) {
+    return null;
+  }
+
+  return date.toISOString();
+}
+
+function contactName(contact) {
+  return (
+    contact?.full_name ||
+    contact?.name ||
+    contact?.email ||
+    contact?.phone ||
+    "Campaign contact"
+  );
+}
+
+function contactInitials(contact) {
+  return contactName(contact)
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((part) => part[0]?.toUpperCase())
+    .join("");
+}
 
 const STARTING_CONVERSATIONS = [
   {
@@ -560,6 +643,31 @@ function getChannelLabel(channel) {
 }
 
 export default function InboxReferencePreview() {
+  const user = getCurrentUser();
+  const workspace = getCurrentWorkspace();
+
+  const {
+    contacts: liveContacts,
+    isLoading: contactsLoading,
+    isSaving: contactsSaving,
+    error: contactsError,
+    saveContact,
+  } = useContactsCommandCenter({
+    workspaceId: workspace.id,
+    userId: user.id,
+  });
+
+  const {
+    team,
+    isSaving: taskSaving,
+    error: taskError,
+    createTask,
+  } = useTasksCommandCenter({
+    workspaceId: workspace.id,
+    userId: user.id,
+    selectedTaskId: "",
+  });
+
   const [conversations, setConversations] =
     useState(STARTING_CONVERSATIONS);
 
@@ -573,6 +681,9 @@ export default function InboxReferencePreview() {
     useState("");
 
   const [activeTag, setActiveTag] = useState("");
+
+  const [mobileFiltersOpen, setMobileFiltersOpen] =
+    useState(false);
 
   const [query, setQuery] = useState("");
 
@@ -596,6 +707,35 @@ export default function InboxReferencePreview() {
   const [newSubject, setNewSubject] =
     useState("");
 
+  const [contactQuery, setContactQuery] =
+    useState("");
+
+  const [selectedContactId, setSelectedContactId] =
+    useState("");
+
+  const [contactCreateMode, setContactCreateMode] =
+    useState(false);
+
+  const [contactForm, setContactForm] =
+    useState(EMPTY_CONTACT_FORM);
+
+  const [contactFormError, setContactFormError] =
+    useState("");
+
+  const [quickTaskOpen, setQuickTaskOpen] =
+    useState(false);
+
+  const [quickTaskForm, setQuickTaskForm] =
+    useState(() =>
+      defaultTaskForm(
+        STARTING_CONVERSATIONS[0],
+        user.id,
+      ),
+    );
+
+  const [quickTaskError, setQuickTaskError] =
+    useState("");
+
   const [activityLog, setActivityLog] =
     useState([
       {
@@ -616,6 +756,133 @@ export default function InboxReferencePreview() {
       (conversation) =>
         conversation.id === selectedId,
     ) || conversations[0];
+
+  const contacts = useMemo(() => {
+    const savedContacts =
+      Array.isArray(liveContacts)
+        ? liveContacts
+        : [];
+
+    const inboxContacts =
+      conversations.map((conversation) => ({
+        id:
+          conversation.contactId ||
+          `inbox-${conversation.id}`,
+        full_name: conversation.sender,
+        email: conversation.email || "",
+        phone: conversation.phone || "",
+        organization:
+          conversation.details?.organization ||
+          "",
+        contact_type: "inbox_contact",
+        precinct:
+          conversation.details?.location ||
+          "",
+        tags:
+          Array.isArray(conversation.tags)
+            ? conversation.tags
+            : [],
+        inboxOnly: true,
+      }));
+
+    const uniqueContacts = [];
+    const seen = new Set();
+
+    [
+      ...savedContacts,
+      ...inboxContacts,
+    ].forEach((contact) => {
+      const key =
+        String(contact.email || "")
+          .trim()
+          .toLowerCase() ||
+        String(contact.phone || "")
+          .replace(/\D/g, "") ||
+        contactName(contact)
+          .trim()
+          .toLowerCase();
+
+      if (!key || seen.has(key)) {
+        return;
+      }
+
+      seen.add(key);
+      uniqueContacts.push(contact);
+    });
+
+    return uniqueContacts.sort(
+      (left, right) =>
+        contactName(left).localeCompare(
+          contactName(right),
+        ),
+    );
+  }, [liveContacts, conversations]);
+
+  const selectedContact =
+    contacts.find(
+      (contact) =>
+        contact.id === selectedContactId,
+    ) || null;
+
+  const subjectEnabled =
+    replyChannel === "email" ||
+    replyChannel === "dashboard";
+
+  const filteredContacts = useMemo(() => {
+    const term = contactQuery
+      .trim()
+      .toLowerCase();
+
+    if (!term) {
+      return contacts;
+    }
+
+    return contacts.filter((contact) =>
+      [
+        contact.full_name,
+        contact.email,
+        contact.phone,
+        contact.organization,
+        contact.contact_type,
+        ...(Array.isArray(contact.tags)
+          ? contact.tags
+          : []),
+      ]
+        .filter(Boolean)
+        .join(" ")
+        .toLowerCase()
+        .includes(term),
+    );
+  }, [contactQuery, contacts]);
+
+  const summaryMetrics = useMemo(
+    () =>
+      SUMMARY_METRICS.map((metric) => {
+        const value =
+          metric.id === "unread"
+            ? conversations.filter(
+                (conversation) =>
+                  conversation.unread,
+              ).length
+            : metric.id === "needs-response"
+              ? conversations.filter(
+                  (conversation) =>
+                    conversation.needsResponse &&
+                    !conversation.archived,
+                ).length
+              : conversations.filter(
+                  (conversation) =>
+                    conversation.priority &&
+                    !conversation.archived,
+                ).length;
+
+        return {
+          ...metric,
+          value,
+        };
+      }),
+    [conversations],
+  );
 
   const filteredConversations = useMemo(() => {
     const normalizedQuery = query
@@ -767,6 +1034,178 @@ export default function InboxReferencePreview() {
     return 0;
   };
 
+  const openNewMessage = () => {
+    setNewMessageMode(true);
+    setReplyText("");
+    setNewRecipient("");
+    setNewSubject("");
+    setContactQuery("");
+    setSelectedContactId("");
+    setContactCreateMode(false);
+    setContactForm(EMPTY_CONTACT_FORM);
+    setContactFormError("");
+    setActiveThreadTab("conversation");
+  };
+
+  const selectContact = (contact) => {
+    const name = contactName(contact);
+
+    setSelectedContactId(contact.id);
+    setContactQuery(name);
+    setNewRecipient(
+      contact.email ||
+        contact.phone ||
+        name,
+    );
+    setContactCreateMode(false);
+    setContactFormError("");
+
+    if (
+      !contact.email &&
+      contact.phone
+    ) {
+      setReplyChannel("text");
+    } else {
+      setReplyChannel("email");
+    }
+  };
+
+  const handleCreateContact = async (event) => {
+    event.preventDefault();
+    setContactFormError("");
+
+    if (!contactForm.fullName.trim()) {
+      setContactFormError(
+        "Enter the contact’s full name.",
+      );
+      return;
+    }
+
+    if (
+      !contactForm.email.trim() &&
+      !contactForm.phone.trim()
+    ) {
+      setContactFormError(
+        "Enter an email address or phone number.",
+      );
+      return;
+    }
+
+    try {
+      const created = await saveContact({
+        fullName: contactForm.fullName,
+        email: contactForm.email,
+        phone: contactForm.phone,
+        organization:
+          contactForm.organization,
+        contactType: "supporter",
+        assignedTo: user.id,
+        precinct: "",
+        source: "Inbox",
+        status: "active",
+        notes:
+          "Created while starting a new Inbox conversation.",
+        tags: ["Inbox"],
+        lastContactAt: null,
+        nextFollowUpAt: null,
+        emailConsent:
+          contactForm.emailConsent,
+        smsConsent:
+          contactForm.smsConsent,
+        consentSource: "Inbox",
+      });
+
+      if (created) {
+        selectContact(created);
+        setContactForm(EMPTY_CONTACT_FORM);
+        setToast(
+          `${contactName(created)} added to Contacts.`,
+        );
+      }
+    } catch (createError) {
+      setContactFormError(
+        createError?.message ||
+          "The contact could not be created.",
+      );
+    }
+  };
+
+  const openQuickTask = () => {
+    setQuickTaskForm(
+      defaultTaskForm(
+        selectedConversation,
+        user.id,
+      ),
+    );
+    setQuickTaskError("");
+    setQuickTaskOpen(true);
+  };
+
+  const handleCreateQuickTask = async (event) => {
+    event.preventDefault();
+    setQuickTaskError("");
+
+    if (!quickTaskForm.title.trim()) {
+      setQuickTaskError(
+        "Enter a task title.",
+      );
+      return;
+    }
+
+    const dueAt = toTaskDueIso(
+      quickTaskForm.dueDate,
+      quickTaskForm.dueTime,
+    );
+
+    try {
+      await createTask({
+        title: quickTaskForm.title.trim(),
+        description: [
+          quickTaskForm.description.trim(),
+          selectedConversation?.email
+            ? `Email: ${selectedConversation.email}`
+            : "",
+          selectedConversation?.phone
+            ? `Phone: ${selectedConversation.phone}`
+            : "",
+        ]
+          .filter(Boolean)
+          .join("\n"),
+        category: "Communications",
+        priority: quickTaskForm.priority,
+        status: "open",
+        visibility: "workspace",
+        tags: [
+          "Inbox",
+          "Follow-up",
+          selectedConversation?.sender ||
+            "Campaign contact",
+        ],
+        due_at: dueAt,
+        assigned_to:
+          quickTaskForm.assignedTo ||
+          user.id ||
+          null,
+      });
+
+      setQuickTaskOpen(false);
+
+      addActivity(
+        "Quick task created",
+        `Follow-up task created for ${selectedConversation.sender}.`,
+      );
+
+      setToast(
+        `Task created for ${selectedConversation.sender}.`,
+      );
+    } catch (createError) {
+      setQuickTaskError(
+        createError?.message ||
+          "The task could not be created.",
+      );
+    }
+  };
+
   const openConversation = (id) => {
     setSelectedId(id);
     setNewMessageMode(false);
@@ -806,8 +1245,10 @@ export default function InboxReferencePreview() {
     );
 
     if (channel === "text") {
-      window.location.href =
-        `sms:${selectedConversation.phone}?&body=${body}`;
+      window.open(
+        `sms:${selectedConversation.phone}?&body=${body}`,
+        "_self",
+      );
     }
 
     if (channel === "whatsapp") {
@@ -830,7 +1271,7 @@ export default function InboxReferencePreview() {
     );
 
     setToast(
-      `${channel} opened. AI follow-up reminder created.`,
+      `${channel} opened. Confirm the result when you return.`,
     );
   };
 
@@ -849,7 +1290,7 @@ export default function InboxReferencePreview() {
     }
 
     const newThreadMessage = {
-      id: `reply-${Date.now()}`,
+      id: `reply-${selectedConversation.id}-${(selectedConversation.messages?.length || 0) + 1}`,
       direction: "outbound",
       author: "You",
       initials: "CI",
@@ -879,7 +1320,7 @@ export default function InboxReferencePreview() {
 
     addActivity(
       `${newThreadMessage.channel} sent`,
-      "Campaign Seat will monitor this connected conversation for a response.",
+      "This preview records the reply in the current browser session. External email delivery is not connected yet.",
     );
 
     setReplyText("");
@@ -890,37 +1331,94 @@ export default function InboxReferencePreview() {
   };
 
   const sendNewMessage = () => {
+    const recipientName =
+      selectedContact
+        ? contactName(selectedContact)
+        : contactQuery.trim() ||
+          newRecipient.trim();
+
+    const recipientEmail =
+      selectedContact?.email ||
+      (
+        newRecipient.includes("@")
+          ? newRecipient.trim()
+          : ""
+      );
+
+    const recipientPhone =
+      selectedContact?.phone ||
+      (
+        !newRecipient.includes("@")
+          ? newRecipient.trim()
+          : ""
+      );
+
+    const destination =
+      replyChannel === "text" ||
+      replyChannel === "whatsapp"
+        ? recipientPhone
+        : replyChannel === "dashboard"
+          ? recipientName
+          : recipientEmail;
+
     if (
-      !newRecipient.trim() ||
-      !newSubject.trim() ||
+      !recipientName ||
+      !destination ||
+      (
+        subjectEnabled &&
+        !newSubject.trim()
+      ) ||
       !replyText.trim()
     ) {
       setToast(
-        "Recipient, subject, and message are required.",
+        subjectEnabled
+          ? "Choose a contact, then enter a subject and message."
+          : "Choose a contact, then enter your message.",
       );
       return;
     }
 
+    const nextConversationOrder =
+      conversations.reduce(
+        (highest, conversation) =>
+          Math.max(
+            highest,
+            Number(conversation.order) || 0,
+          ),
+        0,
+      ) + 1;
+
     const newConversation = {
-      id: `new-${Date.now()}`,
-      sender: newRecipient.trim(),
-      initials: newRecipient
-        .trim()
-        .split(/\s+/)
-        .map((part) => part[0])
-        .join("")
-        .slice(0, 2)
-        .toUpperCase(),
-      email: newRecipient.trim(),
-      phone: "",
+      id: `new-${nextConversationOrder}`,
+      contactId:
+        selectedContact?.inboxOnly
+          ? null
+          : selectedContact?.id || null,
+      sender: recipientName,
+      initials:
+        selectedContact
+          ? contactInitials(selectedContact)
+          : recipientName
+              .split(/\s+/)
+              .map((part) => part[0])
+              .join("")
+              .slice(0, 2)
+              .toUpperCase(),
+      email: recipientEmail,
+      phone: recipientPhone,
       channel:
         replyChannel === "dashboard"
           ? "email"
-          : replyChannel,
-      subject: newSubject.trim(),
+          : replyChannel === "text"
+            ? "sms"
+            : replyChannel,
+      subject:
+        subjectEnabled
+          ? newSubject.trim()
+          : replyText.trim().slice(0, 72),
       preview: replyText.trim().slice(0, 90),
       time: "Just now",
-      order: Date.now(),
+      order: nextConversationOrder,
       unread: false,
       unreadCount: 0,
       priority: false,
@@ -928,17 +1426,30 @@ export default function InboxReferencePreview() {
       mentions: false,
       flagged: false,
       archived: false,
-      tags: [],
-      external: true,
+      tags:
+        Array.isArray(selectedContact?.tags)
+          ? selectedContact.tags
+          : [],
+      external:
+        replyChannel !== "dashboard",
       details: {
-        organization: "New conversation",
-        role: "Campaign contact",
-        location: "Not provided",
+        organization:
+          selectedContact?.organization ||
+          "Campaign contact",
+        role:
+          selectedContact?.contact_type
+            ? String(
+                selectedContact.contact_type,
+              ).replaceAll("_", " ")
+            : "Campaign contact",
+        location:
+          selectedContact?.precinct ||
+          "Not provided",
         lastContact: "Just now",
       },
       messages: [
         {
-          id: `new-message-${Date.now()}`,
+          id: `new-message-${nextConversationOrder}`,
           direction: "outbound",
           author: "You",
           initials: "CI",
@@ -967,13 +1478,17 @@ export default function InboxReferencePreview() {
     setNewRecipient("");
     setNewSubject("");
     setReplyText("");
+    setContactQuery("");
+    setSelectedContactId("");
 
     addActivity(
       "New conversation created",
-      "Campaign Seat will track whether this person responds.",
+      "This preview records the conversation in the current browser session. External delivery is not connected yet.",
     );
 
-    setToast("New conversation created.");
+    setToast(
+      "Conversation added to the Inbox preview.",
+    );
   };
 
   const toggleConversationField = (field) => {
@@ -1020,14 +1535,18 @@ export default function InboxReferencePreview() {
             </label>
 
             <button
+              className={styles.quickTaskButton}
+              type="button"
+              onClick={openQuickTask}
+            >
+              <ListTodo size={18} />
+              Quick Task
+            </button>
+
+            <button
               className={styles.newMessageButton}
               type="button"
-              onClick={() => {
-                setNewMessageMode(true);
-                setReplyText("");
-                setNewRecipient("");
-                setNewSubject("");
-              }}
+              onClick={openNewMessage}
             >
               <Plus size={18} />
               New Message
@@ -1037,19 +1556,29 @@ export default function InboxReferencePreview() {
         </header>
 
         <section className={styles.metricsGrid}>
-          {SUMMARY_METRICS.map((metric) => {
+          {summaryMetrics.map((metric) => {
             const Icon = metric.icon;
 
             return (
               <button
-                key={metric.label}
-                className={styles.metricCard}
+                key={metric.id}
+                className={`${styles.metricCard} ${
+                  activeFilter === metric.id
+                    ? styles.activeMetricCard
+                    : ""
+                }`}
                 type="button"
-                onClick={() =>
-                  setToast(
-                    `${metric.label} selected.`,
-                  )
+                aria-pressed={
+                  activeFilter === metric.id
                 }
+                onClick={() => {
+                  setActiveFilter(
+                    activeFilter === metric.id
+                      ? ""
+                      : metric.id,
+                  );
+                  setActiveChannel("all");
+                }}
               >
                 <span
                   className={`${styles.metricIcon} ${
@@ -1066,12 +1595,6 @@ export default function InboxReferencePreview() {
 
                   <span>
                     <strong>{metric.value}</strong>
-
-                    {metric.comparison ? (
-                      <em>
-                        ↑ {metric.comparison}
-                      </em>
-                    ) : null}
                   </span>
 
                   <small>{metric.detail}</small>
@@ -1081,22 +1604,60 @@ export default function InboxReferencePreview() {
           })}
         </section>
 
+
+        {/* CAMPAIGN SEAT MOBILE INBOX FILTER TOGGLE — START */}
+        <button
+          className={styles.mobileFilterToggle}
+          type="button"
+          aria-controls="inbox-mobile-filters"
+          aria-expanded={mobileFiltersOpen}
+          onClick={() =>
+            setMobileFiltersOpen(
+              (current) => !current,
+            )
+          }
+        >
+          <span className={styles.mobileFilterToggleLabel}>
+            <Filter size={17} />
+            <strong>Filter messages</strong>
+          </span>
+
+          <span className={styles.mobileFilterToggleMeta}>
+            <small>
+              {
+                activeChannel !== "all" ||
+                activeFilter ||
+                activeTag
+                  ? "Active"
+                  : "All"
+              }
+            </small>
+
+            <ChevronDown
+              size={17}
+              className={
+                mobileFiltersOpen
+                  ? styles.mobileFilterChevronOpen
+                  : ""
+              }
+            />
+          </span>
+        </button>
+        {/* CAMPAIGN SEAT MOBILE INBOX FILTER TOGGLE — END */}
+
         <section className={styles.inboxWorkspace}>
-          <aside className={styles.utilityPanel}>
+          <aside
+            id="inbox-mobile-filters"
+            className={`${styles.utilityPanel} ${
+              mobileFiltersOpen
+                ? styles.mobileFiltersOpen
+                : ""
+            }`}
+          >
             <section>
               <header>
                 <strong>Channels</strong>
 
-                <button
-                  type="button"
-                  onClick={() =>
-                    setToast(
-                      "Channel settings selected.",
-                    )
-                  }
-                >
-                  <Settings size={16} />
-                </button>
               </header>
 
               <div className={styles.utilityList}>
@@ -1133,15 +1694,6 @@ export default function InboxReferencePreview() {
               <header>
                 <strong>Filters</strong>
 
-                <button
-                  type="button"
-                  onClick={() => {
-                    setActiveFilter("");
-                    setToast("Filters cleared.");
-                  }}
-                >
-                  <Plus size={16} />
-                </button>
               </header>
 
               <div className={styles.utilityList}>
@@ -1181,15 +1733,6 @@ export default function InboxReferencePreview() {
               <header>
                 <strong>Tags</strong>
 
-                <button
-                  type="button"
-                  onClick={() => {
-                    setActiveTag("");
-                    setToast("Tag filter cleared.");
-                  }}
-                >
-                  <Plus size={16} />
-                </button>
               </header>
 
               <div className={styles.tags}>
@@ -1238,17 +1781,6 @@ export default function InboxReferencePreview() {
                 </select>
               </label>
 
-              <button
-                type="button"
-                onClick={() =>
-                  setToast(
-                    "Advanced filters selected.",
-                  )
-                }
-              >
-                <Filter size={16} />
-                Filter
-              </button>
             </header>
 
             <div className={styles.conversationList}>
@@ -1264,6 +1796,7 @@ export default function InboxReferencePreview() {
                           : ""
                       }
                       type="button"
+                      aria-label={`Open conversation with ${conversation.sender}`}
                       onClick={() =>
                         openConversation(
                           conversation.id,
@@ -1346,21 +1879,30 @@ export default function InboxReferencePreview() {
               )}
             </div>
 
-            <button
-              className={styles.loadMore}
-              type="button"
-              onClick={() =>
-                setToast(
-                  "All showcase conversations are loaded.",
-                )
-              }
-            >
-              Load more conversations
-              <ChevronDown size={15} />
-            </button>
           </section>
 
-          <article className={styles.threadPanel}>
+          {newMessageMode ? (
+            <button
+              className={styles.newMessageScrim}
+              type="button"
+              tabIndex={-1}
+              aria-label="Close New Message"
+              onClick={() =>
+                setNewMessageMode(false)
+              }
+            />
+          ) : null}
+
+          <article
+            className={[
+              styles.threadPanel,
+              newMessageMode
+                ? styles.newMessageModal
+                : "",
+            ]
+              .filter(Boolean)
+              .join(" ")}
+          >
             {newMessageMode ? (
               <header className={styles.threadHeader}>
                 <div>
@@ -1409,6 +1951,16 @@ export default function InboxReferencePreview() {
                 <div>
                   <button
                     type="button"
+                    aria-label={
+                      selectedConversation.flagged
+                        ? "Remove conversation flag"
+                        : "Flag conversation"
+                    }
+                    title={
+                      selectedConversation.flagged
+                        ? "Remove flag"
+                        : "Flag conversation"
+                    }
                     onClick={() =>
                       toggleConversationField(
                         "flagged",
@@ -1420,6 +1972,8 @@ export default function InboxReferencePreview() {
 
                   <button
                     type="button"
+                    aria-label="Reply by email"
+                    title="Reply by email"
                     onClick={() => {
                       setReplyChannel("email");
                       setActiveThreadTab(
@@ -1430,27 +1984,6 @@ export default function InboxReferencePreview() {
                     <Mail size={17} />
                   </button>
 
-                  <button
-                    type="button"
-                    onClick={() =>
-                      setToast(
-                        "Conversation tags selected.",
-                      )
-                    }
-                  >
-                    <Tag size={17} />
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() =>
-                      setToast(
-                        "Conversation options selected.",
-                      )
-                    }
-                  >
-                    <MoreVertical size={17} />
-                  </button>
                 </div>
               </header>
             )}
@@ -1488,34 +2021,381 @@ export default function InboxReferencePreview() {
             ) : null}
 
             {newMessageMode ? (
-              <div className={styles.newMessageFields}>
-                <label>
-                  Recipient
+              <div
+                className={[
+                  styles.newMessageFields,
+                  !subjectEnabled
+                    ? styles.newMessageFieldsSingle
+                    : "",
+                ]
+                  .filter(Boolean)
+                  .join(" ")}
+              >
+                <div className={styles.contactPickerField}>
+                  <span className={styles.fieldLabel}>
+                    Recipient
+                  </span>
 
-                  <input
-                    value={newRecipient}
-                    onChange={(event) =>
-                      setNewRecipient(
-                        event.target.value,
-                      )
-                    }
-                    placeholder="Email, contact, or campaign member"
-                  />
-                </label>
+                  <div className={styles.contactSearchControl}>
+                    <Search size={17} />
 
-                <label>
-                  Subject
+                    <input
+                      value={contactQuery}
+                      onChange={(event) => {
+                        setContactQuery(
+                          event.target.value,
+                        );
+                        setNewRecipient(
+                          event.target.value,
+                        );
+                        setSelectedContactId("");
+                      }}
+                      placeholder="Search campaign contacts"
+                      autoComplete="off"
+                    />
 
-                  <input
-                    value={newSubject}
-                    onChange={(event) =>
-                      setNewSubject(
-                        event.target.value,
-                      )
-                    }
-                    placeholder="Message subject"
-                  />
-                </label>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setContactCreateMode(
+                          (current) => !current,
+                        );
+                        setContactFormError("");
+                      }}
+                    >
+                      <UserPlus size={16} />
+                      New contact
+                    </button>
+                  </div>
+
+                  {selectedContact ? (
+                    <div className={styles.selectedContactCard}>
+                      <span className={styles.avatar}>
+                        {contactInitials(
+                          selectedContact,
+                        )}
+                      </span>
+
+                      <span>
+                        <strong>
+                          {contactName(
+                            selectedContact,
+                          )}
+                        </strong>
+
+                        <small>
+                          {[
+                            selectedContact.email,
+                            selectedContact.phone,
+                            selectedContact.organization,
+                          ]
+                            .filter(Boolean)
+                            .join(" · ")}
+                        </small>
+                      </span>
+
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setSelectedContactId("");
+                          setContactQuery("");
+                          setNewRecipient("");
+                        }}
+                        aria-label="Clear selected contact"
+                      >
+                        <X size={15} />
+                      </button>
+                    </div>
+                  ) : (
+                    <div
+                      className={[
+                        styles.contactResults,
+                        !contactQuery.trim()
+                          ? styles.contactResultsHidden
+                          : "",
+                      ]
+                        .filter(Boolean)
+                        .join(" ")}
+                    >
+                      {contactsLoading ? (
+                        <div className={styles.contactLoading}>
+                          <LoaderCircle size={17} />
+                          Loading campaign contacts…
+                        </div>
+                      ) : filteredContacts.length ? (
+                        filteredContacts.map(
+                          (contact) => (
+                            <button
+                              key={contact.id}
+                              type="button"
+                              onClick={() =>
+                                selectContact(
+                                  contact,
+                                )
+                              }
+                            >
+                              <span className={styles.avatar}>
+                                {contactInitials(
+                                  contact,
+                                )}
+                              </span>
+
+                              <span>
+                                <strong>
+                                  {contactName(
+                                    contact,
+                                  )}
+                                </strong>
+
+                                <small>
+                                  {[
+                                    contact.email,
+                                    contact.phone,
+                                    contact.organization,
+                                  ]
+                                    .filter(Boolean)
+                                    .join(" · ") ||
+                                    "No delivery channel saved"}
+                                </small>
+                              </span>
+
+                              <em>
+                                {String(
+                                  contact.contact_type ||
+                                    "contact",
+                                ).replaceAll(
+                                  "_",
+                                  " ",
+                                )}
+                              </em>
+                            </button>
+                          ),
+                        )
+                      ) : (
+                        <div className={styles.noContactResults}>
+                          <UserPlus size={18} />
+                          {contacts.length
+                            ? "No matching contacts. Try another name, email, phone number, organization, or tag."
+                            : "No Contacts are saved yet. Add a new contact or enter an address manually."}
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {contactsError ? (
+                    <div
+                      className={styles.workflowError}
+                      role="alert"
+                    >
+                      {contactsError}
+                    </div>
+                  ) : null}
+
+                  {contactCreateMode ? (
+                    <>
+                      <button
+                        className={styles.newContactScrim}
+                        type="button"
+                        tabIndex={-1}
+                        aria-label="Close new contact form"
+                        onClick={() =>
+                          setContactCreateMode(false)
+                        }
+                      />
+
+                      <form
+                        className={styles.newContactForm}
+                      onSubmit={handleCreateContact}
+                    >
+                      <header>
+                        <div>
+                          <strong>
+                            Add campaign contact
+                          </strong>
+                          <small>
+                            The person will also appear in Contacts.
+                          </small>
+                        </div>
+
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setContactCreateMode(false)
+                          }
+                          aria-label="Close new contact form"
+                        >
+                          <X size={16} />
+                        </button>
+                      </header>
+
+                      <div>
+                        <label>
+                          Full name
+                          <input
+                            value={
+                              contactForm.fullName
+                            }
+                            onChange={(event) =>
+                              setContactForm(
+                                (current) => ({
+                                  ...current,
+                                  fullName:
+                                    event.target.value,
+                                }),
+                              )
+                            }
+                            required
+                          />
+                        </label>
+
+                        <label>
+                          Organization
+                          <input
+                            value={
+                              contactForm.organization
+                            }
+                            onChange={(event) =>
+                              setContactForm(
+                                (current) => ({
+                                  ...current,
+                                  organization:
+                                    event.target.value,
+                                }),
+                              )
+                            }
+                          />
+                        </label>
+
+                        <label>
+                          Email
+                          <input
+                            type="email"
+                            value={
+                              contactForm.email
+                            }
+                            onChange={(event) =>
+                              setContactForm(
+                                (current) => ({
+                                  ...current,
+                                  email:
+                                    event.target.value,
+                                }),
+                              )
+                            }
+                          />
+                        </label>
+
+                        <label>
+                          Phone
+                          <input
+                            type="tel"
+                            value={
+                              contactForm.phone
+                            }
+                            onChange={(event) =>
+                              setContactForm(
+                                (current) => ({
+                                  ...current,
+                                  phone:
+                                    event.target.value,
+                                }),
+                              )
+                            }
+                          />
+                        </label>
+                      </div>
+
+                      <div className={styles.consentOptions}>
+                        <label>
+                          <input
+                            type="checkbox"
+                            checked={
+                              contactForm.emailConsent
+                            }
+                            onChange={(event) =>
+                              setContactForm(
+                                (current) => ({
+                                  ...current,
+                                  emailConsent:
+                                    event.target.checked,
+                                }),
+                              )
+                            }
+                          />
+                          Email consent confirmed
+                        </label>
+
+                        <label>
+                          <input
+                            type="checkbox"
+                            checked={
+                              contactForm.smsConsent
+                            }
+                            onChange={(event) =>
+                              setContactForm(
+                                (current) => ({
+                                  ...current,
+                                  smsConsent:
+                                    event.target.checked,
+                                }),
+                              )
+                            }
+                          />
+                          Text consent confirmed
+                        </label>
+                      </div>
+
+                      {contactFormError ? (
+                        <div
+                          className={styles.workflowError}
+                          role="alert"
+                        >
+                          {contactFormError}
+                        </div>
+                      ) : null}
+
+                      <footer>
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setContactCreateMode(false)
+                          }
+                          disabled={contactsSaving}
+                        >
+                          Cancel
+                        </button>
+
+                        <button
+                          type="submit"
+                          disabled={contactsSaving}
+                        >
+                          {contactsSaving
+                            ? "Saving…"
+                            : "Add contact"}
+                        </button>
+                      </footer>
+                      </form>
+                    </>
+                  ) : null}
+                </div>
+
+                {subjectEnabled ? (
+                  <label className={styles.subjectField}>
+                    <span className={styles.fieldLabel}>
+                      Subject
+                    </span>
+
+                    <input
+                      value={newSubject}
+                      onChange={(event) =>
+                        setNewSubject(
+                          event.target.value,
+                        )
+                      }
+                      placeholder="Enter a message subject"
+                    />
+                  </label>
+                ) : null}
               </div>
             ) : null}
 
@@ -1632,17 +2512,13 @@ export default function InboxReferencePreview() {
                   </strong>
 
                   {selectedConversation.files.length ? (
-                    <button
-                      type="button"
-                      onClick={() =>
-                        setToast(
-                          "Download all selected.",
-                        )
-                      }
-                    >
-                      <Download size={17} />
-                      Download all
-                    </button>
+                    <span className={styles.fileCount}>
+                      {selectedConversation.files.length}
+                      {" "}
+                      {selectedConversation.files.length === 1
+                        ? "attachment"
+                        : "attachments"}
+                    </span>
                   ) : null}
                 </header>
 
@@ -1650,14 +2526,9 @@ export default function InboxReferencePreview() {
                   <div>
                     {selectedConversation.files.map(
                       (file) => (
-                        <button
+                        <div
                           key={file.name}
-                          type="button"
-                          onClick={() =>
-                            setToast(
-                              `${file.name} selected.`,
-                            )
-                          }
+                          className={styles.fileCard}
                         >
                           <span>
                             <FileText size={20} />
@@ -1672,7 +2543,7 @@ export default function InboxReferencePreview() {
                               {file.size}
                             </small>
                           </span>
-                        </button>
+                        </div>
                       ),
                     )}
                   </div>
@@ -1709,19 +2580,10 @@ export default function InboxReferencePreview() {
 
                   <button
                     type="button"
-                    onClick={() => {
-                      addActivity(
-                        "Follow-up reminder created",
-                        `Check whether ${selectedConversation.sender} replied or whether the request was completed.`,
-                      );
-
-                      setToast(
-                        "AI follow-up reminder created.",
-                      );
-                    }}
+                    onClick={openQuickTask}
                   >
-                    <Bot size={16} />
-                    Create reminder
+                    <ListTodo size={16} />
+                    Create follow-up task
                   </button>
                 </div>
 
@@ -1770,6 +2632,18 @@ export default function InboxReferencePreview() {
                   </div>
                 ) : null}
 
+                <div className={styles.previewNotice}>
+                  <CheckCircle2 size={16} />
+
+                  <span>
+                    {replyChannel === "dashboard"
+                      ? "Dashboard preview uses a subject and records the conversation in this browser session."
+                      : replyChannel === "email"
+                        ? "Email uses a subject line. External email delivery is not connected yet."
+                        : "Text and WhatsApp use only a recipient and message. External delivery is not connected yet."}
+                  </span>
+                </div>
+
                 <textarea
                   value={replyText}
                   onChange={(event) =>
@@ -1787,27 +2661,6 @@ export default function InboxReferencePreview() {
 
                 <div className={styles.composerFooter}>
                   <div>
-                    <button
-                      type="button"
-                      onClick={() =>
-                        setToast(
-                          "Attach file selected.",
-                        )
-                      }
-                    >
-                      <Paperclip size={17} />
-                    </button>
-
-                    <button
-                      type="button"
-                      onClick={() =>
-                        setToast(
-                          "Schedule message selected.",
-                        )
-                      }
-                    >
-                      <CalendarDays size={17} />
-                    </button>
                   </div>
 
                   <div className={styles.replyChannels}>
@@ -1849,7 +2702,13 @@ export default function InboxReferencePreview() {
                     }
                   >
                     <Send size={17} />
-                    Send
+                    {newMessageMode
+                      ? "Start Conversation"
+                      : replyChannel === "text"
+                        ? "Open Text"
+                        : replyChannel === "whatsapp"
+                          ? "Open WhatsApp"
+                          : "Add Reply"}
                     <ChevronDown size={15} />
                   </button>
                 </div>
@@ -1857,6 +2716,266 @@ export default function InboxReferencePreview() {
             ) : null}
           </article>
         </section>
+
+        {quickTaskOpen ? (
+          <div
+            className={styles.modalOverlay}
+            role="presentation"
+            onMouseDown={(event) => {
+              if (
+                event.target ===
+                event.currentTarget
+              ) {
+                setQuickTaskOpen(false);
+              }
+            }}
+          >
+            <form
+              className={styles.quickTaskModal}
+              onSubmit={handleCreateQuickTask}
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="quick-task-title"
+            >
+              <header>
+                <div>
+                  <span>
+                    <ListTodo size={20} />
+                  </span>
+
+                  <div>
+                    <small>
+                      Inbox follow-up
+                    </small>
+                    <h2 id="quick-task-title">
+                      Create Quick Task
+                    </h2>
+                  </div>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() =>
+                    setQuickTaskOpen(false)
+                  }
+                  aria-label="Close Quick Task"
+                >
+                  <X size={18} />
+                </button>
+              </header>
+
+              <div className={styles.quickTaskContact}>
+                <span className={styles.avatar}>
+                  {
+                    selectedConversation.initials
+                  }
+                </span>
+
+                <span>
+                  <strong>
+                    {
+                      selectedConversation.sender
+                    }
+                  </strong>
+
+                  <small>
+                    {
+                      selectedConversation.subject
+                    }
+                  </small>
+                </span>
+              </div>
+
+              <label>
+                Task title
+                <input
+                  value={quickTaskForm.title}
+                  onChange={(event) =>
+                    setQuickTaskForm(
+                      (current) => ({
+                        ...current,
+                        title:
+                          event.target.value,
+                      }),
+                    )
+                  }
+                  required
+                />
+              </label>
+
+              <label>
+                Notes
+                <textarea
+                  rows={3}
+                  value={
+                    quickTaskForm.description
+                  }
+                  onChange={(event) =>
+                    setQuickTaskForm(
+                      (current) => ({
+                        ...current,
+                        description:
+                          event.target.value,
+                      }),
+                    )
+                  }
+                />
+              </label>
+
+              <div className={styles.quickTaskGrid}>
+                <label>
+                  Due date
+                  <input
+                    type="date"
+                    value={
+                      quickTaskForm.dueDate
+                    }
+                    onChange={(event) =>
+                      setQuickTaskForm(
+                        (current) => ({
+                          ...current,
+                          dueDate:
+                            event.target.value,
+                        }),
+                      )
+                    }
+                  />
+                </label>
+
+                <label>
+                  Due time
+                  <input
+                    type="time"
+                    value={
+                      quickTaskForm.dueTime
+                    }
+                    onChange={(event) =>
+                      setQuickTaskForm(
+                        (current) => ({
+                          ...current,
+                          dueTime:
+                            event.target.value,
+                        }),
+                      )
+                    }
+                  />
+                </label>
+
+                <label>
+                  Priority
+                  <select
+                    value={
+                      quickTaskForm.priority
+                    }
+                    onChange={(event) =>
+                      setQuickTaskForm(
+                        (current) => ({
+                          ...current,
+                          priority:
+                            event.target.value,
+                        }),
+                      )
+                    }
+                  >
+                    <option value="low">
+                      Low
+                    </option>
+                    <option value="normal">
+                      Normal
+                    </option>
+                    <option value="high">
+                      High
+                    </option>
+                    <option value="urgent">
+                      Critical
+                    </option>
+                  </select>
+                </label>
+
+                <label>
+                  Assign to
+                  <select
+                    value={
+                      quickTaskForm.assignedTo
+                    }
+                    onChange={(event) =>
+                      setQuickTaskForm(
+                        (current) => ({
+                          ...current,
+                          assignedTo:
+                            event.target.value,
+                        }),
+                      )
+                    }
+                  >
+                    <option value={user.id}>
+                      {user.name || "Me"}
+                    </option>
+
+                    {team
+                      .filter(
+                        (member) =>
+                          member.id !== user.id,
+                      )
+                      .map((member) => (
+                        <option
+                          key={member.id}
+                          value={member.id}
+                        >
+                          {member.fullName}
+                        </option>
+                      ))}
+                  </select>
+                </label>
+              </div>
+
+              {quickTaskError ||
+              taskError ? (
+                <div
+                  className={styles.workflowError}
+                  role="alert"
+                >
+                  {quickTaskError ||
+                    taskError}
+                </div>
+              ) : null}
+
+              <footer>
+                <button
+                  type="button"
+                  onClick={() =>
+                    setQuickTaskOpen(false)
+                  }
+                  disabled={taskSaving}
+                >
+                  Cancel
+                </button>
+
+                <button
+                  type="submit"
+                  disabled={taskSaving}
+                >
+                  {taskSaving ? (
+                    <>
+                      <LoaderCircle
+                        size={16}
+                        className={
+                          styles.spinning
+                        }
+                      />
+                      Creating…
+                    </>
+                  ) : (
+                    <>
+                      <ListTodo size={16} />
+                      Create Task
+                    </>
+                  )}
+                </button>
+              </footer>
+            </form>
+          </div>
+        ) : null}
 
         <div
           className={styles.toast}
