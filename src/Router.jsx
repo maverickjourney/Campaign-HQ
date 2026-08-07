@@ -30,6 +30,7 @@ import RoleTasks from "./pages/RoleTasks/RoleTasks";
 import CommitmentsReferencePreview from "./pages/CommitmentsReferencePreview/CommitmentsReferencePreview";
 import WaitingOnReferencePreview from "./pages/WaitingOnReferencePreview/WaitingOnReferencePreview";
 import WorkspaceSettings from "./pages/WorkspaceSettings/WorkspaceSettings";
+import CampaignSetupWizard from "./pages/CampaignSetupWizard/CampaignSetupWizard";
 import WorkspaceSelector from "./pages/WorkspaceSelector/WorkspaceSelector";
 import Support from "./pages/Support/Support";
 import SupportLauncher from "./components/SupportLauncher/SupportLauncher";
@@ -332,6 +333,15 @@ export default function Router() {
           element={
             <ProtectedRoute allowedExperiences={LEADERSHIP_EXPERIENCES}>
               <WorkspaceSettings />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/workspace/setup"
+          element={
+            <ProtectedRoute allowedExperiences={LEADERSHIP_EXPERIENCES}>
+              <CampaignSetupWizard />
             </ProtectedRoute>
           }
         />

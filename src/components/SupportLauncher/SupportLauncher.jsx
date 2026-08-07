@@ -23,6 +23,7 @@ export default function SupportLauncher() {
     location.pathname === "/profile/settings" ||
     location.pathname === "/workspace/settings" ||
     location.pathname === "/workspace/campaign-settings" ||
+    location.pathname === "/workspace/setup" ||
     typeof document === "undefined"
   ) {
     return null;
