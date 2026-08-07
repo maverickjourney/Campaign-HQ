@@ -1245,8 +1245,10 @@ export default function InboxReferencePreview() {
     );
 
     if (channel === "text") {
-      window.location.href =
-        `sms:${selectedConversation.phone}?&body=${body}`;
+      window.open(
+        `sms:${selectedConversation.phone}?&body=${body}`,
+        "_self",
+      );
     }
 
     if (channel === "whatsapp") {
@@ -1288,7 +1290,7 @@ export default function InboxReferencePreview() {
     }
 
     const newThreadMessage = {
-      id: `reply-${Date.now()}`,
+      id: `reply-${selectedConversation.id}-${(selectedConversation.messages?.length || 0) + 1}`,
       direction: "outbound",
       author: "You",
       initials: "CI",
@@ -1376,8 +1378,18 @@ export default function InboxReferencePreview() {
       return;
     }
 
+    const nextConversationOrder =
+      conversations.reduce(
+        (highest, conversation) =>
+          Math.max(
+            highest,
+            Number(conversation.order) || 0,
+          ),
+        0,
+      ) + 1;
+
     const newConversation = {
-      id: `new-${Date.now()}`,
+      id: `new-${nextConversationOrder}`,
       contactId:
         selectedContact?.inboxOnly
           ? null
@@ -1406,7 +1418,7 @@ export default function InboxReferencePreview() {
           : replyText.trim().slice(0, 72),
       preview: replyText.trim().slice(0, 90),
       time: "Just now",
-      order: Date.now(),
+      order: nextConversationOrder,
       unread: false,
       unreadCount: 0,
       priority: false,
@@ -1437,7 +1449,7 @@ export default function InboxReferencePreview() {
       },
       messages: [
         {
-          id: `new-message-${Date.now()}`,
+          id: `new-message-${nextConversationOrder}`,
           direction: "outbound",
           author: "You",
           initials: "CI",
