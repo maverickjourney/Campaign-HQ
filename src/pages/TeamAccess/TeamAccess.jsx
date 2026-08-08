@@ -48,6 +48,8 @@ import {
   useTeamAccessCommandCenter,
 } from "../../hooks/useTeamAccessCommandCenter";
 
+import TeamOnboardingGate from "../../components/team/TeamOnboardingGate/TeamOnboardingGate";
+
 import {
   getCurrentUser,
   getCurrentWorkspace,
@@ -118,6 +120,8 @@ function isLeadershipMember(member) {
     "candidate",
     "campaign_consultant",
     "campaign_manager",
+    "campaign_admin",
+    "campaign_administrator",
   ].includes(
     member.roleKey,
   );
@@ -163,7 +167,7 @@ export default function TeamAccess() {
     getRoleLabel();
 
   const leadershipAccess =
-    /candidate|consultant|manager|owner/i.test(
+    /candidate|consultant|manager|owner|admin/i.test(
       roleLabel,
     );
 
@@ -921,6 +925,24 @@ export default function TeamAccess() {
                   </p>
                 </div>
               </section>
+
+              <TeamOnboardingGate
+                workspaceId={
+                  workspace.id
+                }
+                activeMembers={
+                  activeMembers
+                }
+                pendingInvitations={
+                  pendingInvitations
+                }
+                canManageAccess={
+                  canManageAccess
+                }
+                pageIsLoading={
+                  isLoading
+                }
+              />
 
               <section
                 className={
