@@ -1,4 +1,5 @@
 import {
+  useEffect,
   useMemo,
   useState,
 } from "react";
@@ -34,8 +35,15 @@ import {
   JURISDICTION_TYPES,
   OFFICE_LEVELS,
   POLITICAL_PARTIES,
-  getRecommendedThemeForParty,
 } from "../../config/campaignSetup";
+
+import {
+  useCampaignSetup,
+} from "../../hooks/useCampaignSetup";
+
+import {
+  getCurrentWorkspace,
+} from "../../utils/campaignSession";
 
 import styles from "./CampaignSetupWizard.module.css";
 
@@ -969,6 +977,39 @@ function WorkspacePreview({
 
 export default function CampaignSetupWizard() {
   const [
+    sessionWorkspace,
+  ] = useState(
+    () =>
+      getCurrentWorkspace(),
+  );
+
+  const {
+    setupWorkspace,
+    isLoading:
+      setupIsLoading,
+    isSaving:
+      setupIsSaving,
+    isActivating:
+      setupIsActivating,
+    error:
+      setupLoadError,
+    lastSavedAt:
+      setupLastSavedAt,
+    saveDraft:
+      saveSetupDraft,
+    activateWorkspace:
+      activateSetupWorkspace,
+  } = useCampaignSetup({
+    workspaceId:
+      sessionWorkspace.id,
+  });
+
+  const [
+    hasHydratedSetup,
+    setHasHydratedSetup,
+  ] = useState(false);
+
+  const [
     activeStep,
     setActiveStep,
   ] = useState(0);
@@ -995,21 +1036,178 @@ export default function CampaignSetupWizard() {
     setWorkspaceTypeLocked,
   ] = useState(false);
 
+  useEffect(() => {
+    if (
+      !setupWorkspace ||
+      hasHydratedSetup
+    ) {
+      return undefined;
+    }
+
+    const hydrationTimeout =
+      window.setTimeout(
+        () => {
+          const setupStarted =
+            setupWorkspace.onboarding_status &&
+            setupWorkspace.onboarding_status !==
+              "not_started";
+
+          const campaignType =
+            setupStarted
+              ? setupWorkspace.campaign_type ||
+                ""
+              : "";
+
+          const activeTheme =
+            setupStarted
+              ? setupWorkspace.active_theme ||
+                ""
+              : "";
+
+          setForm(
+            (current) => ({
+        ...current,
+
+        campaignType,
+
+        candidateName:
+          setupWorkspace.candidate_name ||
+          (
+            setupWorkspace.campaign_type ===
+            "candidate_campaign"
+              ? setupWorkspace.name
+              : ""
+          ) ||
+          "",
+
+        publicCampaignName:
+          setupWorkspace.name ||
+          "",
+
+        legalCommitteeName:
+          setupWorkspace.legal_committee_name ||
+          "",
+
+        officeLevel:
+          setupWorkspace.office_level ||
+          current.officeLevel,
+
+        officeSought:
+          setupWorkspace.office_sought ||
+          setupWorkspace.description ||
+          "",
+
+        jurisdictionType:
+          setupWorkspace.jurisdiction_type ||
+          current.jurisdictionType,
+
+        jurisdictionName:
+          setupWorkspace.jurisdiction_name ||
+          setupWorkspace.location ||
+          "",
+
+        districtLabel:
+          setupWorkspace.district_label ||
+          "",
+
+        politicalParty:
+          setupWorkspace.political_party ||
+          current.politicalParty,
+
+        activeTheme,
+
+        primaryElectionDate:
+          setupWorkspace.primary_election_date ||
+          setupWorkspace.election_date ||
+          "",
+
+        generalElectionDate:
+          setupWorkspace.general_election_date ||
+          "",
+
+        timezone:
+          setupWorkspace.timezone ||
+          current.timezone,
+
+        campaignEmail:
+          setupWorkspace.campaign_email ||
+          "",
+
+        campaignPhone:
+          setupWorkspace.campaign_phone ||
+          "",
+
+        websiteUrl:
+          setupWorkspace.website_url ||
+          "",
+
+        enabledModules:
+          Array.isArray(
+            setupWorkspace.enabled_modules,
+          ) &&
+          setupWorkspace.enabled_modules.length
+            ? setupWorkspace.enabled_modules
+            : current.enabledModules,
+      }),
+    );
+
+          if (setupStarted) {
+            setColorLocked(
+              Boolean(
+                setupWorkspace.active_theme,
+              ),
+            );
+
+            setWorkspaceTypeLocked(
+              Boolean(
+                setupWorkspace.campaign_type,
+              ),
+            );
+          }
+
+          setHasHydratedSetup(
+            true,
+          );
+        },
+        0,
+      );
+
+    return () => {
+      window.clearTimeout(
+        hydrationTimeout,
+      );
+    };
+  }, [
+    hasHydratedSetup,
+    setupWorkspace,
+  ]);
+
   const step =
     STEPS[activeStep];
 
-  const recommendedTheme =
-    useMemo(
-      () =>
-        getRecommendedThemeForParty(
-          form.politicalParty,
-        ),
-      [form.politicalParty],
-    );
+  const visibleError =
+    error ||
+    setupLoadError;
+
+  const draftWritesEnabled =
+    import.meta.env.DEV &&
+    new URLSearchParams(
+      window.location.search,
+    ).get(
+      "draft-writes",
+    ) === "enabled";
+
+  const activationWritesEnabled =
+    import.meta.env.DEV &&
+    new URLSearchParams(
+      window.location.search,
+    ).get(
+      "activation-writes",
+    ) === "enabled";
 
   const effectiveTheme =
     form.activeTheme ||
-    recommendedTheme;
+    "neutral";
 
   const selectedParty =
     POLITICAL_PARTIES.find(
@@ -1282,32 +1480,74 @@ export default function CampaignSetupWizard() {
       return "";
     };
 
-  const moveNext = () => {
-    const validationError =
-      validateCurrentStep();
+  const moveNext =
+    async () => {
+      const validationError =
+        validateCurrentStep();
 
-    if (validationError) {
-      setError(
-        validationError,
+      if (validationError) {
+        setError(
+          validationError,
+        );
+        return;
+      }
+
+      if (
+        setupIsLoading ||
+        setupIsSaving ||
+        !hasHydratedSetup
+      ) {
+        return;
+      }
+
+      setError("");
+
+      const nextSetupStep = {
+        identity:
+          "race",
+        race:
+          "election_details",
+        election:
+          "command_center",
+        dashboard:
+          "review",
+      }[step.key];
+
+      if (
+        draftWritesEnabled
+      ) {
+        try {
+          await saveSetupDraft({
+            form,
+            currentStep:
+              nextSetupStep ||
+              "review",
+          });
+        } catch (
+          saveError
+        ) {
+          setError(
+            saveError?.message ||
+              "Campaign Seat setup could not be saved.",
+          );
+
+          return;
+        }
+      }
+
+      setActiveStep(
+        (current) =>
+          Math.min(
+            STEPS.length - 1,
+            current + 1,
+          ),
       );
-      return;
-    }
 
-    setError("");
-
-    setActiveStep(
-      (current) =>
-        Math.min(
-          STEPS.length - 1,
-          current + 1,
-        ),
-    );
-
-    window.scrollTo({
-      top: 0,
-      behavior: "smooth",
-    });
-  };
+      window.scrollTo({
+        top: 0,
+        behavior: "smooth",
+      });
+    };
 
   const moveBack = () => {
     setError("");
@@ -1373,7 +1613,9 @@ export default function CampaignSetupWizard() {
               styles.secureDot
             }
           />
-          Secure local preview
+          {setupIsLoading
+            ? "Synchronizing workspace"
+            : "Connected to Campaign-HQ"}
         </div>
       </header>
 
@@ -1670,14 +1912,14 @@ export default function CampaignSetupWizard() {
                 </p>
               </header>
 
-              {error && (
+              {visibleError && (
                 <div
                   className={
                     styles.error
                   }
                   role="alert"
                 >
-                  {error}
+                  {visibleError}
                 </div>
               )}
 
@@ -3059,17 +3301,15 @@ export default function CampaignSetupWizard() {
                       </strong>
 
                       <p>
-                        This local preview
-                        is not saving
-                        workspace data yet.
-                        When backend
-                        activation is
-                        enabled, Activate
-                        Workspace will save
-                        the core workspace
-                        and move the campaign
-                        into Security &
-                        Connections setup.
+                        Campaign Seat is
+                        now reading this
+                        workspace directly
+                        from Campaign-HQ.
+                        Changes remain local
+                        until the protected
+                        save and activation
+                        actions are enabled
+                        in the next step.
                       </p>
                     </div>
                   </div>
@@ -3089,9 +3329,15 @@ export default function CampaignSetupWizard() {
               }
             >
               <span />
-              Preview mode · No
-              workspace data is
-              being saved yet
+              {setupIsLoading
+                ? "Synchronizing Campaign-HQ workspace…"
+                : draftWritesEnabled
+                  ? setupIsSaving
+                    ? "Saving protected Campaign Seat draft…"
+                    : setupLastSavedAt
+                      ? "Protected draft saved · Activate Workspace remains locked"
+                      : "Protected draft test enabled · Activate Workspace remains locked"
+                  : "Connected workspace · Draft writes locked"}
             </div>
 
             <div
@@ -3136,8 +3382,15 @@ export default function CampaignSetupWizard() {
                   onClick={
                     moveNext
                   }
+                  disabled={
+                    setupIsLoading ||
+                    setupIsSaving ||
+                    !hasHydratedSetup
+                  }
                 >
-                  Continue
+                  {setupIsSaving
+                    ? "Saving…"
+                    : "Continue"}
                   <ChevronRight
                     size={17}
                   />
@@ -3152,16 +3405,46 @@ export default function CampaignSetupWizard() {
                   className={
                     styles.activateButton
                   }
-                  onClick={() =>
-                    window.alert(
-                      "Core workspace activation is the next controlled backend step. Security and provider connections will follow immediately after.",
-                    )
+                  onClick={
+                    async () => {
+                      if (
+                        !activationWritesEnabled
+                      ) {
+                        window.alert(
+                          "Protected workspace activation remains locked. Use the controlled activation test before making this action live.",
+                        );
+                        return;
+                      }
+
+                      try {
+                        await activateSetupWorkspace(
+                          {
+                            form,
+                          },
+                        );
+
+                        window.location.assign(
+                          "/workspace/settings?tab=security",
+                        );
+                      } catch {
+                        // The protected Setup hook
+                        // surfaces MFA and role errors.
+                      }
+                    }
+                  }
+                  disabled={
+                    setupIsLoading ||
+                    setupIsSaving ||
+                    setupIsActivating ||
+                    !hasHydratedSetup
                   }
                 >
                   <Zap
                     size={17}
                   />
-                  Activate Workspace
+                  {setupIsActivating
+                    ? "Activating…"
+                    : "Activate Workspace"}
                 </button>
               )}
             </div>

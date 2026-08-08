@@ -276,7 +276,22 @@ export default function ProfileSettings() {
   const [
     activeTab,
     setActiveTab,
-  ] = useState("profile");
+  ] = useState(
+    () => {
+      const requestedTab =
+        new URLSearchParams(
+          window.location.search,
+        ).get("tab");
+
+      return TABS.some(
+        (tab) =>
+          tab.id ===
+          requestedTab,
+      )
+        ? requestedTab
+        : "profile";
+    },
+  );
 
   const [
     formError,
