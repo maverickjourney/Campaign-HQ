@@ -53,7 +53,9 @@ function formatFactorDate(value) {
   ).format(date);
 }
 
-export default function MfaSecurityPanel() {
+export default function MfaSecurityPanel({
+  onStateChange = null,
+}) {
   const [
     mfaState,
     setMfaState,
@@ -134,9 +136,36 @@ export default function MfaSecurityPanel() {
     );
 
   useEffect(() => {
-    loadMfaState();
+    const timeoutId =
+      window.setTimeout(
+        () => {
+          loadMfaState();
+        },
+        0,
+      );
+
+    return () => {
+      window.clearTimeout(
+        timeoutId,
+      );
+    };
   }, [
     loadMfaState,
+  ]);
+
+  useEffect(() => {
+    if (
+      mfaState &&
+      typeof onStateChange ===
+        "function"
+    ) {
+      onStateChange(
+        mfaState,
+      );
+    }
+  }, [
+    mfaState,
+    onStateChange,
   ]);
 
   const verifiedFactors =

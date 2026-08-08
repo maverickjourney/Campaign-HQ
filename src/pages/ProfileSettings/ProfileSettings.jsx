@@ -19,7 +19,6 @@ import {
   Eye,
   FileText,
   KeyRound,
-  LayoutGrid,
   Link2,
   LockKeyhole,
   Mail,
@@ -53,7 +52,7 @@ import {
   CampaignMobileSetup,
 } from "../../components/CampaignMobileSetup/CampaignMobileSetup";
 
-import MfaSecurityPanel from "../../components/security/MfaSecurityPanel/MfaSecurityPanel";
+import SecurityOnboardingGate from "../../components/security/SecurityOnboardingGate/SecurityOnboardingGate";
 
 import {
   useProfileSettings,
@@ -2108,7 +2107,7 @@ export default function ProfileSettings() {
             </section>
 
             {leadershipAccess ? (
-              <MfaSecurityPanel />
+              <SecurityOnboardingGate />
             ) : (
               <section
                 className={
