@@ -26,6 +26,7 @@ import {
   Target,
   UserCog,
   Users,
+  Vote,
   Menu,
 } from "lucide-react";
 
@@ -36,6 +37,10 @@ import {
 import {
   CampaignSearch,
 } from "../CampaignSearch/CampaignSearch";
+
+import {
+  supabase,
+} from "../../lib/supabase";
 
 import {
   getCurrentUser,
@@ -102,6 +107,11 @@ const PRIMARY_NAVIGATION = [
     label: "Team",
     icon: UserCog,
     route: "/team",
+  },
+  {
+    label: "Candidate",
+    icon: Vote,
+    route: "/workspace/candidate-profile",
   },
 ];
 
@@ -193,6 +203,156 @@ export function CampaignWorkspaceShell({
   const workspace = getCurrentWorkspace();
   const roleLabel = getRoleLabel();
   const initials = getUserInitials(user.name);
+
+  const [
+    candidateAvatarUrl,
+    setCandidateAvatarUrl,
+  ] = useState("");
+
+  useEffect(() => {
+    let cancelled = false;
+
+    const candidateRole =
+      /candidate/i.test(
+        String(
+          roleLabel || "",
+        ),
+      );
+
+    const loadCandidateAvatar =
+      async (
+        overrideStoragePath,
+      ) => {
+        if (
+          !candidateRole ||
+          !workspace?.id
+        ) {
+          if (!cancelled) {
+            setCandidateAvatarUrl("");
+          }
+
+          return;
+        }
+
+        try {
+          let storagePath =
+            overrideStoragePath;
+
+          if (
+            storagePath ===
+            undefined
+          ) {
+            const {
+              data,
+              error:
+                workspaceError,
+            } =
+              await supabase
+                .from(
+                  "workspaces",
+                )
+                .select(
+                  "candidate_photo_path",
+                )
+                .eq(
+                  "id",
+                  workspace.id,
+                )
+                .maybeSingle();
+
+            if (
+              workspaceError
+            ) {
+              throw workspaceError;
+            }
+
+            storagePath =
+              data
+                ?.candidate_photo_path ||
+              "";
+          }
+
+          if (!storagePath) {
+            if (!cancelled) {
+              setCandidateAvatarUrl(
+                "",
+              );
+            }
+
+            return;
+          }
+
+          const {
+            data,
+            error:
+              signedUrlError,
+          } =
+            await supabase.storage
+              .from(
+                "campaign-files",
+              )
+              .createSignedUrl(
+                storagePath,
+                21600,
+              );
+
+          if (
+            signedUrlError
+          ) {
+            throw signedUrlError;
+          }
+
+          if (!cancelled) {
+            setCandidateAvatarUrl(
+              data?.signedUrl ||
+                "",
+            );
+          }
+        } catch {
+          if (!cancelled) {
+            setCandidateAvatarUrl(
+              "",
+            );
+          }
+        }
+      };
+
+    const handleCandidatePhoto =
+      (event) => {
+        if (!candidateRole) {
+          return;
+        }
+
+        const storagePath =
+          event?.detail
+            ?.storagePath;
+
+        void loadCandidateAvatar(
+          storagePath,
+        );
+      };
+
+    void loadCandidateAvatar(
+      undefined,
+    );
+
+    window.addEventListener(
+      "campaign-seat-candidate-photo-updated",
+      handleCandidatePhoto,
+    );
+
+    return () => {
+      cancelled = true;
+
+      window.removeEventListener(
+        "campaign-seat-candidate-photo-updated",
+        handleCandidatePhoto,
+      );
+    };
+  }, [
+    roleLabel,
+    workspace?.id,
+  ]);
 
 
   const isInboxWorkspace = [
@@ -496,7 +656,20 @@ export function CampaignWorkspaceShell({
               dashboardStyles.profileAvatar
             }
           >
-            {initials}
+            {candidateAvatarUrl ? (
+              <img
+                className={
+                  styles.profileAvatarImage
+                }
+                src={
+                  candidateAvatarUrl
+                }
+                alt=""
+                aria-hidden="true"
+              />
+            ) : (
+              initials
+            )}
           </span>
 
           <div>

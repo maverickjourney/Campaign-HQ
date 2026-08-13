@@ -32,6 +32,7 @@ import RoleTasks from "./pages/RoleTasks/RoleTasks";
 import CommitmentsReferencePreview from "./pages/CommitmentsReferencePreview/CommitmentsReferencePreview";
 import WaitingOnReferencePreview from "./pages/WaitingOnReferencePreview/WaitingOnReferencePreview";
 import WorkspaceSettings from "./pages/WorkspaceSettings/WorkspaceSettings";
+import CandidateProfileManagement from "./pages/CandidateProfileManagement/CandidateProfileManagement";
 import CampaignSetupWizard from "./pages/CampaignSetupWizard/CampaignSetupWizard";
 import WorkspaceSelector from "./pages/WorkspaceSelector/WorkspaceSelector";
 import Support from "./pages/Support/Support";
@@ -352,6 +353,15 @@ export default function Router() {
           element={
             <ProtectedRoute allowedExperiences={LEADERSHIP_EXPERIENCES}>
               <ProfileSettings />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/workspace/candidate-profile"
+          element={
+            <ProtectedRoute allowedExperiences={LEADERSHIP_EXPERIENCES}>
+              <CandidateProfileManagement />
             </ProtectedRoute>
           }
         />

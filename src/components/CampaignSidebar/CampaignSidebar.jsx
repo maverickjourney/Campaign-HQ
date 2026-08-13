@@ -134,6 +134,11 @@ const VOLUNTEER_NAVIGATION = [
 
 const LEADERSHIP_NAVIGATION = [
   {
+    label: "Manage candidate",
+    icon: Vote,
+    route: "/workspace/candidate-profile",
+  },
+  {
     label: "Team access",
     icon: UserCog,
     route: "/team/access",

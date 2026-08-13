@@ -1,0 +1,681 @@
+.page {
+  width: min(100%, 1480px);
+  margin: 0 auto;
+  padding: 34px 34px 72px;
+}
+
+.pageHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 24px;
+  margin-bottom: 20px;
+}
+
+.eyebrow {
+  display: block;
+  margin-bottom: 7px;
+  color: #687386;
+  font-size: 0.76rem;
+  font-weight: 800;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+}
+
+.pageHeader h1 {
+  margin: 0;
+  color: #152238;
+  font-size: clamp(2rem, 4vw, 3rem);
+  letter-spacing: -0.045em;
+}
+
+.pageHeader p {
+  max-width: 760px;
+  margin: 10px 0 0;
+  color: #667085;
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
+.headerActions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.headerActions button,
+.roleBadge {
+  min-height: 42px;
+  border: 1px solid #d8dee8;
+  border-radius: 11px;
+  background: #fff;
+  color: #344054;
+  font-size: 0.88rem;
+  font-weight: 750;
+}
+
+.headerActions button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 14px;
+  cursor: pointer;
+}
+
+.roleBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 14px;
+}
+
+.securityNotice {
+  display: flex;
+  gap: 14px;
+  margin-bottom: 20px;
+  padding: 17px 18px;
+  border: 1px solid #d8e4f4;
+  border-radius: 14px;
+  background: #f7faff;
+  color: #244066;
+}
+
+.securityNotice strong,
+.securityNotice p {
+  display: block;
+}
+
+.securityNotice p {
+  margin: 4px 0 0;
+  color: #5b6e86;
+  line-height: 1.5;
+}
+
+.errorBanner,
+.successBanner {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  margin-bottom: 18px;
+  padding: 15px 17px;
+  border-radius: 13px;
+}
+
+.errorBanner {
+  border: 1px solid #f2c7c7;
+  background: #fff7f7;
+  color: #9f1d1d;
+}
+
+.successBanner {
+  border: 1px solid #bfe1cc;
+  background: #f4fbf6;
+  color: #206a3c;
+}
+
+.errorBanner p {
+  margin: 3px 0 0;
+}
+
+.restricted {
+  padding: 60px 24px;
+  border: 1px solid #e1e6ed;
+  border-radius: 18px;
+  background: #fff;
+  text-align: center;
+}
+
+.restricted h2 {
+  margin: 14px 0 6px;
+}
+
+.restricted p {
+  margin: 0;
+  color: #667085;
+}
+
+.candidateHero {
+  display: grid;
+  grid-template-columns: 210px minmax(0, 1fr);
+  gap: 30px;
+  margin-bottom: 20px;
+  padding: 26px;
+  border: 1px solid #e1e6ed;
+  border-radius: 20px;
+  background:
+    linear-gradient(
+      135deg,
+      rgba(247, 249, 252, 0.98),
+      rgba(255, 255, 255, 1)
+    );
+  box-shadow: 0 12px 34px rgba(27, 39, 58, 0.06);
+}
+
+.photoWrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.photo {
+  width: 164px;
+  height: 164px;
+  overflow: hidden;
+  border: 5px solid #fff;
+  border-radius: 22px;
+  background: #e8edf5;
+  box-shadow: 0 8px 24px rgba(24, 39, 66, 0.14);
+}
+
+.photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.photo > span {
+  display: grid;
+  width: 100%;
+  height: 100%;
+  place-items: center;
+  color: #43536b;
+  font-size: 2.4rem;
+  font-weight: 850;
+}
+
+.photoButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  margin-top: 14px;
+  padding: 10px 12px;
+  border: 1px solid #ccd5e1;
+  border-radius: 10px;
+  background: #fff;
+  color: #344054;
+  font-size: 0.84rem;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.photoButton input {
+  display: none;
+}
+
+.photoWrap small {
+  margin-top: 8px;
+  color: #7b8798;
+  font-size: 0.73rem;
+  line-height: 1.45;
+  text-align: center;
+}
+
+.heroIdentity {
+  align-self: center;
+}
+
+.heroIdentity > span {
+  color: #7a8698;
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.heroIdentity h2 {
+  margin: 7px 0;
+  color: #172337;
+  font-size: clamp(2rem, 4vw, 3.25rem);
+  letter-spacing: -0.05em;
+}
+
+.heroIdentity > p {
+  margin: 0;
+  color: #59687c;
+  font-size: 1rem;
+}
+
+.heroMeta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 9px;
+  margin-top: 18px;
+}
+
+.heroMeta span {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 8px 10px;
+  border: 1px solid #dde3ea;
+  border-radius: 999px;
+  background: #fff;
+  color: #536176;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns:
+    repeat(
+      2,
+      minmax(0, 1fr)
+    );
+  gap: 20px;
+}
+
+.card {
+  overflow: hidden;
+  border: 1px solid #e1e6ed;
+  border-radius: 18px;
+  background: #fff;
+  box-shadow: 0 8px 28px rgba(23, 35, 55, 0.045);
+}
+
+.card:last-child {
+  grid-column: 1 / -1;
+}
+
+.card > header {
+  display: flex;
+  gap: 12px;
+  padding: 19px 21px;
+  border-bottom: 1px solid #edf0f4;
+  background: #fbfcfd;
+}
+
+.cardIcon {
+  display: grid;
+  flex: 0 0 38px;
+  width: 38px;
+  height: 38px;
+  place-items: center;
+  border-radius: 10px;
+  background: #edf1f6;
+  color: #344054;
+}
+
+.card h2 {
+  margin: 0;
+  color: #172337;
+  font-size: 1.04rem;
+}
+
+.card header p {
+  margin: 3px 0 0;
+  color: #7a8698;
+  font-size: 0.82rem;
+  line-height: 1.4;
+}
+
+.fields {
+  display: grid;
+  grid-template-columns:
+    repeat(
+      2,
+      minmax(0, 1fr)
+    );
+  gap: 18px;
+  padding: 22px;
+}
+
+.fields label {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.fields label > span {
+  color: #344054;
+  font-size: 0.79rem;
+  font-weight: 800;
+}
+
+.full {
+  grid-column: 1 / -1;
+}
+
+.fields input,
+.fields select,
+.fields textarea {
+  width: 100%;
+  box-sizing: border-box;
+  border: 1px solid #d5dce6;
+  border-radius: 10px;
+  outline: none;
+  background: #fff;
+  color: #1f2937;
+  font: inherit;
+  font-size: 0.91rem;
+  transition:
+    border-color 120ms ease,
+    box-shadow 120ms ease;
+}
+
+.fields input,
+.fields select {
+  min-height: 44px;
+  padding: 0 12px;
+}
+
+.fields textarea {
+  resize: vertical;
+  min-height: 106px;
+  padding: 11px 12px;
+  line-height: 1.5;
+}
+
+.fields input:focus,
+.fields select:focus,
+.fields textarea:focus {
+  border-color: #8796ab;
+  box-shadow: 0 0 0 3px rgba(91, 112, 142, 0.11);
+}
+
+.fields small {
+  color: #8a95a5;
+  font-size: 0.73rem;
+}
+
+.inputIcon,
+.textareaIcon {
+  position: relative;
+}
+
+.inputIcon > svg,
+.textareaIcon > svg {
+  position: absolute;
+  z-index: 1;
+  left: 12px;
+  top: 50%;
+  color: #8792a3;
+  transform: translateY(-50%);
+  pointer-events: none;
+}
+
+.textareaIcon > svg {
+  top: 13px;
+  transform: none;
+}
+
+.inputIcon input {
+  padding-left: 39px;
+}
+
+.textareaIcon textarea {
+  padding-left: 39px;
+}
+
+.saveBar {
+  position: sticky;
+  z-index: 10;
+  bottom: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  margin-top: 22px;
+  padding: 15px 17px;
+  border: 1px solid #dce2e9;
+  border-radius: 15px;
+  background: rgba(255, 255, 255, 0.96);
+  box-shadow: 0 14px 38px rgba(22, 34, 53, 0.13);
+  backdrop-filter: blur(14px);
+}
+
+.saveBar strong,
+.saveBar span {
+  display: block;
+}
+
+.saveBar strong {
+  color: #253247;
+  font-size: 0.9rem;
+}
+
+.saveBar span {
+  margin-top: 3px;
+  color: #7a8698;
+  font-size: 0.76rem;
+}
+
+.saveActions {
+  display: flex;
+  gap: 9px;
+}
+
+.saveActions button {
+  display: inline-flex;
+  min-height: 42px;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 0 15px;
+  border: 1px solid #d5dce5;
+  border-radius: 10px;
+  background: #fff;
+  color: #344054;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.saveActions .primary {
+  border-color: #152238;
+  background: #152238;
+  color: #fff;
+}
+
+.saveActions button:disabled,
+.headerActions button:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.spinning {
+  animation: spin 0.85s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (max-width: 980px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+
+  .card:last-child {
+    grid-column: auto;
+  }
+}
+
+@media (max-width: 760px) {
+  .page {
+    padding: 22px 16px 90px;
+  }
+
+  .pageHeader {
+    flex-direction: column;
+  }
+
+  .headerActions {
+    width: 100%;
+    flex-wrap: wrap;
+  }
+
+  .candidateHero {
+    grid-template-columns: 1fr;
+    text-align: center;
+  }
+
+  .heroMeta {
+    justify-content: center;
+  }
+
+  .fields {
+    grid-template-columns: 1fr;
+    padding: 18px;
+  }
+
+  .full {
+    grid-column: auto;
+  }
+
+  .saveBar {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .saveActions {
+    width: 100%;
+  }
+
+  .saveActions button {
+    flex: 1;
+  }
+}
+
+@media (max-width: 430px) {
+  .photo {
+    width: 142px;
+    height: 142px;
+  }
+
+  .heroIdentity h2 {
+    font-size: 2rem;
+  }
+
+  .saveActions {
+    flex-direction: column;
+  }
+}
+
+/* CAMPAIGN SEAT — CANDIDATE PROFILE FINAL POLISH */
+
+.page {
+  padding-bottom: 150px;
+}
+
+.saveBar {
+  min-height: 64px;
+  padding-top: 11px;
+  padding-right: 82px;
+  padding-bottom: 11px;
+  padding-left: 17px;
+}
+
+.saveBar strong {
+  line-height: 1.25;
+}
+
+.saveBar span {
+  line-height: 1.35;
+}
+
+.saveActions {
+  flex: 0 0 auto;
+}
+
+.saveActions button {
+  white-space: nowrap;
+}
+
+/*
+ * Reserve the lower-right corner for the global
+ * Support launcher so it cannot cover Save.
+ */
+@media (min-width: 761px) {
+  .saveBar {
+    margin-right: 4px;
+  }
+}
+
+@media (max-width: 760px) {
+  .page {
+    padding-bottom: 185px;
+  }
+
+  .saveBar {
+    bottom: 10px;
+    padding-right: 72px;
+  }
+}
+
+@media (max-width: 520px) {
+  .saveBar {
+    position: static;
+    padding-right: 16px;
+  }
+
+  .page {
+    padding-bottom: 90px;
+  }
+}
+
+/* CAMPAIGN SEAT — CANDIDATE PHOTO CONFIRMATION */
+
+.photoSelection {
+  display: flex;
+  width: 100%;
+  box-sizing: border-box;
+  align-items: flex-start;
+  gap: 8px;
+  margin-top: 9px;
+  padding: 9px 10px;
+  border: 1px solid #cfe1d6;
+  border-radius: 10px;
+  background: #f5fbf7;
+  color: #2c6240;
+  text-align: left;
+}
+
+.photoSelection svg {
+  flex: 0 0 auto;
+  margin-top: 1px;
+}
+
+.photoSelection strong,
+.photoSelection span {
+  display: block;
+}
+
+.photoSelection strong {
+  font-size: 0.73rem;
+}
+
+.photoSelection span {
+  overflow: hidden;
+  margin-top: 2px;
+  color: #587061;
+  font-size: 0.7rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* CAMPAIGN SEAT — CANDIDATE PHOTO FILENAME WRAP */
+
+.photoSelection {
+  max-width: 100%;
+  overflow: hidden;
+}
+
+.photoSelection > div {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.photoSelection span {
+  max-width: 100%;
+  overflow: visible;
+  text-overflow: clip;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  line-height: 1.35;
+}

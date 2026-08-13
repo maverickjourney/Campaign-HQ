@@ -1672,6 +1672,26 @@ export default function ProfileSettings() {
 
                   <SettingsRow
                     icon={
+                      UserRound
+                    }
+                    label="Manage candidate"
+                    description="Manage the candidate photo, bio, race, public contact information and campaign identity."
+                    action={
+                      <button
+                        type="button"
+                        onClick={() =>
+                          navigate(
+                            "/workspace/candidate-profile",
+                          )
+                        }
+                      >
+                        Open
+                      </button>
+                    }
+                  />
+
+                  <SettingsRow
+                    icon={
                       Settings2
                     }
                     label="Campaign identity"
