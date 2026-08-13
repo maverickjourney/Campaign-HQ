@@ -4937,3 +4937,124 @@
 }
 
 /* CAMPAIGN SEAT 701-760 INBOX TOOLBAR BRIDGE — END */
+
+/* CAMPAIGN SEAT INBOX HORIZONTAL CONTAINMENT — START */
+
+/*
+ * The workspace sidebar reduces the real width available to Inbox.
+ * Viewport-only breakpoints cannot assume the entire viewport belongs
+ * to the three Inbox columns.
+ *
+ * Preserve the approved three-column proportions while allowing the
+ * columns to shrink inside the actual workspace instead of overflowing
+ * beyond the right edge.
+ */
+
+@media (min-width: 1100px) {
+
+  .page {
+    box-sizing: border-box !important;
+
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+
+    overflow-x: hidden !important;
+  }
+
+  .inboxWorkspace {
+    box-sizing: border-box !important;
+
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+
+    grid-template-columns:
+      minmax(150px, 0.58fr)
+      minmax(240px, 0.94fr)
+      minmax(0, 1.7fr)
+      !important;
+
+    gap: 9px !important;
+
+    overflow-x: hidden !important;
+  }
+
+  .utilityPanel,
+  .conversationPanel,
+  .threadPanel {
+    box-sizing: border-box !important;
+
+    min-width: 0 !important;
+    max-width: 100% !important;
+  }
+
+  .threadPanel,
+  .threadHeader,
+  .threadTabs,
+  .threadBody,
+  .replyComposer {
+    min-width: 0 !important;
+    max-width: 100% !important;
+  }
+}
+
+/* CAMPAIGN SEAT INBOX HORIZONTAL CONTAINMENT — END */
+
+
+/* CAMPAIGN SEAT FINAL INBOX FUNCTION CONTROLS — START */
+
+.replyOptions {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 7px;
+}
+
+.replyOptions button,
+.fileDownloadButton {
+  box-sizing: border-box;
+  min-height: 34px;
+  padding: 0 11px;
+  border: 1px solid #bfd2e2;
+  border-radius: 9px;
+  color: #17436d;
+  background: #ffffff;
+  font: inherit;
+  font-size: 0.75rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.replyOptions button:hover,
+.fileDownloadButton:hover {
+  border-color: #91aec5;
+  background: #f5f9fc;
+}
+
+.replyAllActive {
+  border-color: #ef3340 !important;
+  color: #c92230 !important;
+  background: rgba(239, 51, 64, 0.07) !important;
+}
+
+.fileDownloadButton {
+  margin-left: auto;
+  flex: 0 0 auto;
+}
+
+@media (max-width: 760px) {
+  .replyOptions {
+    width: 100%;
+  }
+
+  .replyOptions button {
+    width: 100%;
+  }
+
+  .fileDownloadButton {
+    margin-left: 0;
+  }
+}
+
+/* CAMPAIGN SEAT FINAL INBOX FUNCTION CONTROLS — END */

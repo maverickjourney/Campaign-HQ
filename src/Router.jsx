@@ -23,6 +23,8 @@ import MfaChallenge from "./pages/Mfa/MfaChallenge";
 import MfaSetup from "./pages/Mfa/MfaSetup";
 import InvitationAccept from "./pages/InvitationAccept/InvitationAccept";
 import ProfileSettings from "./pages/ProfileSettings/ProfileSettings";
+import NylasOAuthCallback from "./pages/NylasOAuthCallback/NylasOAuthCallback";
+import NylasCalendarOAuthCallback from "./pages/NylasCalendarOAuthCallback/NylasCalendarOAuthCallback";
 import Invitations from "./pages/Team/Invitations";
 import TeamAccess from "./pages/TeamAccess/TeamAccess";
 import TeamReferencePreview from "./pages/TeamReferencePreview/TeamReferencePreview";
@@ -315,6 +317,32 @@ export default function Router() {
           element={
             <ProtectedRoute allowedExperiences={LEADERSHIP_EXPERIENCES}>
               <TeamReferencePreview />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/oauth/nylas/callback"
+          element={
+            <ProtectedRoute
+              allowedExperiences={
+                LEADERSHIP_EXPERIENCES
+              }
+            >
+              <NylasOAuthCallback />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/oauth/nylas/calendar/callback"
+          element={
+            <ProtectedRoute
+              allowedExperiences={
+                LEADERSHIP_EXPERIENCES
+              }
+            >
+              <NylasCalendarOAuthCallback />
             </ProtectedRoute>
           }
         />

@@ -2,15 +2,11 @@ import { useMemo, useState } from "react";
 import {
   Archive,
   AtSign,
-  Bot,
-  CalendarDays,
   CheckCircle2,
   ListTodo,
   LoaderCircle,
   ChevronDown,
-  CircleDollarSign,
   Clock3,
-  Download,
   FileText,
   Filter,
   Flag,
@@ -19,24 +15,20 @@ import {
   Mail,
   MessageCircle,
   MessageSquare,
-  MoreVertical,
-  Paperclip,
   Phone,
   Plus,
-  Reply,
   Search,
   Send,
-  Settings,
   Sparkles,
   Star,
-  Tag,
   UserPlus,
-  Users,
   X,
 } from "lucide-react";
 
 import { CampaignWorkspaceShell } from "../../components/CampaignWorkspaceShell/CampaignWorkspaceShell";
 import { useContactsCommandCenter } from "../../hooks/useContactsCommandCenter";
+import { useInternalInboxThreads } from "../../hooks/useInternalInboxThreads";
+import { useRealInboxMailbox } from "../../hooks/useRealInboxMailbox";
 import { useTasksCommandCenter } from "../../hooks/useTasksCommandCenter";
 import {
   getCurrentUser,
@@ -55,6 +47,11 @@ const CHANNELS = [
     id: "email",
     label: "Email",
     icon: Mail,
+  },
+  {
+    id: "dashboard",
+    label: "Campaign Seat",
+    icon: MessageSquare,
   },
   {
     id: "sms",
@@ -668,11 +665,71 @@ export default function InboxReferencePreview() {
     selectedTaskId: "",
   });
 
-  const [conversations, setConversations] =
+    const [previewConversations, setConversations] =
     useState(STARTING_CONVERSATIONS);
-
   const [selectedId, setSelectedId] =
     useState(STARTING_CONVERSATIONS[0].id);
+
+  const liveMailboxEnabled =
+    !import.meta.env.DEV ||
+    new URLSearchParams(
+      window.location.search,
+    ).get("mailbox-live") === "enabled";
+
+  const {
+    conversations: mailboxConversations,
+    connectedEmail: mailboxConnectedEmail,
+    accountProvider: mailboxAccountProvider,
+    isLoading: mailboxLoading,
+    error: mailboxError,
+    refresh: refreshMailbox,
+    loadThread: loadMailboxThread,
+    sendEmail: sendMailboxEmail,
+    replyEmail: replyMailboxEmail,
+    downloadAttachment: downloadMailboxAttachment,
+  } = useRealInboxMailbox({
+    workspaceId: workspace.id,
+    enabled: liveMailboxEnabled,
+    selectedConversationId: selectedId,
+  });
+
+  const {
+    conversations: internalConversations,
+    error: internalInboxError,
+    refresh: refreshInternalInbox,
+    createThread: createInternalThread,
+    addMessage: addInternalMessage,
+  } = useInternalInboxThreads({
+    workspaceId: workspace.id,
+    userId: user.id,
+    enabled: liveMailboxEnabled,
+  });
+
+  const conversations =
+    useMemo(
+      () =>
+        liveMailboxEnabled
+          ? [
+              ...mailboxConversations,
+              ...internalConversations,
+              ...previewConversations.filter(
+                (conversation) =>
+                  ![
+                    "email",
+                    "dashboard",
+                  ].includes(
+                    conversation.channel,
+                  ),
+              ),
+            ]
+          : previewConversations,
+      [
+        internalConversations,
+        liveMailboxEnabled,
+        mailboxConversations,
+        previewConversations,
+      ],
+    );
 
   const [activeChannel, setActiveChannel] =
     useState("all");
@@ -697,6 +754,9 @@ export default function InboxReferencePreview() {
     useState("email");
 
   const [replyText, setReplyText] = useState("");
+
+  const [replyAllThreadId, setReplyAllThreadId] =
+    useState("");
 
   const [newMessageMode, setNewMessageMode] =
     useState(false);
@@ -756,6 +816,38 @@ export default function InboxReferencePreview() {
       (conversation) =>
         conversation.id === selectedId,
     ) || conversations[0];
+
+  const replyAllEnabled =
+    Boolean(
+      selectedConversation
+        ?.providerThreadId &&
+      replyAllThreadId ===
+        selectedConversation
+          .providerThreadId,
+    );
+
+  const composerNotice =
+    replyChannel === "dashboard"
+      ? liveMailboxEnabled
+        ? internalInboxError
+          ? "Campaign Seat internal messaging needs attention before this message can be saved."
+          : "Campaign Seat messages stay inside this workspace and are visible only to authorized campaign users."
+        : "Campaign Seat internal messaging becomes live after Communications is activated."
+      : replyChannel === "email"
+        ? mailboxLoading
+          ? "Checking connected campaign email..."
+          : mailboxConnectedEmail
+            ? `Connected campaign email: ${mailboxConnectedEmail}${
+                mailboxAccountProvider
+                  ? ` · ${mailboxAccountProvider}`
+                  : ""
+              }.`
+            : liveMailboxEnabled
+              ? mailboxError
+                ? "Campaign email is not connected yet. Connect Gmail or Outlook in Settings → Integrations."
+                : "Connect Gmail or Outlook in Settings → Integrations to send and receive email here."
+              : "Connect campaign email during Email & Contacts setup to send and receive messages here."
+        : "Text and WhatsApp open externally. Confirm the result when you return to Campaign Seat.";
 
   const contacts = useMemo(() => {
     const savedContacts =
@@ -1275,7 +1367,7 @@ export default function InboxReferencePreview() {
     );
   };
 
-  const sendReply = () => {
+  const sendReply = async () => {
     if (!replyText.trim()) {
       setToast("Write a reply first.");
       return;
@@ -1286,6 +1378,150 @@ export default function InboxReferencePreview() {
       replyChannel === "whatsapp"
     ) {
       openExternalChannel(replyChannel);
+      return;
+    }
+
+    if (
+      replyChannel === "dashboard" &&
+      liveMailboxEnabled
+    ) {
+      try {
+        if (
+          selectedConversation
+            ?.internalThreadId
+        ) {
+          await addInternalMessage({
+            threadId:
+              selectedConversation
+                .internalThreadId,
+
+            body:
+              replyText.trim(),
+          });
+
+          setToast(
+            "Campaign Seat reply saved to the internal conversation.",
+          );
+        } else {
+          const created =
+            await createInternalThread({
+              contactId:
+                selectedConversation
+                  ?.contactId ||
+                null,
+
+              subject:
+                selectedConversation
+                  ?.subject ||
+                "Campaign Seat conversation",
+
+              body:
+                replyText.trim(),
+            });
+
+          if (
+            created?.threadId
+          ) {
+            setSelectedId(
+              `internal-thread-${created.threadId}`,
+            );
+          }
+
+          setToast(
+            "New internal Campaign Seat conversation created.",
+          );
+        }
+
+        setReplyText("");
+        await refreshInternalInbox();
+      } catch (internalError) {
+        setToast(
+          internalError?.message ||
+          "Campaign Seat could not save this internal reply.",
+        );
+      }
+
+      return;
+    }
+
+    if (
+      replyChannel === "email" &&
+      liveMailboxEnabled
+    ) {
+      if (
+        !selectedConversation
+          ?.providerThreadId
+      ) {
+        setToast(
+          "Choose a connected email conversation before replying.",
+        );
+        return;
+      }
+
+      try {
+        const hydrated =
+          await loadMailboxThread(
+            selectedConversation.providerThreadId,
+          );
+
+        const replySource =
+          [
+            ...(
+              hydrated?.messages ||
+              selectedConversation.messages ||
+              []
+            ),
+          ]
+            .reverse()
+            .find(
+              (message) =>
+                message.providerMessageId,
+            );
+
+        if (
+          !replySource
+            ?.providerMessageId
+        ) {
+          throw new Error(
+            "Campaign Seat could not identify the source email for this reply.",
+          );
+        }
+
+        await replyMailboxEmail({
+          replyToMessageId:
+            replySource.providerMessageId,
+
+          subject:
+            selectedConversation.subject,
+
+          body:
+            replyText.trim(),
+
+          replyAll:
+            replyAllEnabled,
+        });
+
+        setReplyText("");
+        setReplyAllThreadId("");
+
+        setToast(
+          replyAllEnabled
+            ? "Email Reply All sent from the connected campaign mailbox."
+            : "Email reply sent from the connected campaign mailbox.",
+        );
+
+        await refreshMailbox();
+
+        await loadMailboxThread(
+          selectedConversation.providerThreadId,
+        );
+      } catch (sendError) {
+        setToast(
+          sendError?.message ||
+          "Campaign Seat could not send this email reply.",
+        );
+      }
+
       return;
     }
 
@@ -1330,7 +1566,37 @@ export default function InboxReferencePreview() {
     );
   };
 
-  const sendNewMessage = () => {
+  const downloadConversationFile =
+    async (file) => {
+      if (
+        !file
+          ?.providerAttachmentId ||
+        !file
+          ?.providerMessageId
+      ) {
+        setToast(
+          "This preview file is not attached to a connected mailbox message.",
+        );
+        return;
+      }
+
+      try {
+        await downloadMailboxAttachment(
+          file,
+        );
+
+        setToast(
+          `${file.name || "Attachment"} download started.`,
+        );
+      } catch (downloadError) {
+        setToast(
+          downloadError?.message ||
+          "Campaign Seat could not download this attachment.",
+        );
+      }
+    };
+
+  const sendNewMessage = async () => {
     const recipientName =
       selectedContact
         ? contactName(selectedContact)
@@ -1361,9 +1627,20 @@ export default function InboxReferencePreview() {
           ? recipientName
           : recipientEmail;
 
+    const recipientRequired =
+      !(
+        replyChannel === "dashboard" &&
+        liveMailboxEnabled
+      );
+
     if (
-      !recipientName ||
-      !destination ||
+      (
+        recipientRequired &&
+        (
+          !recipientName ||
+          !destination
+        )
+      ) ||
       (
         subjectEnabled &&
         !newSubject.trim()
@@ -1371,10 +1648,124 @@ export default function InboxReferencePreview() {
       !replyText.trim()
     ) {
       setToast(
-        subjectEnabled
-          ? "Choose a contact, then enter a subject and message."
-          : "Choose a contact, then enter your message.",
+        replyChannel === "dashboard" &&
+        liveMailboxEnabled
+          ? "Enter a subject and message for the Campaign Seat conversation."
+          : subjectEnabled
+            ? "Choose a contact, then enter a subject and message."
+            : "Choose a contact, then enter your message.",
       );
+      return;
+    }
+
+    if (
+      replyChannel === "dashboard" &&
+      liveMailboxEnabled
+    ) {
+      try {
+        const created =
+          await createInternalThread({
+            contactId:
+              selectedContact
+                ?.inboxOnly
+                ? null
+                : selectedContact
+                    ?.id ||
+                  null,
+
+            subject:
+              newSubject.trim(),
+
+            body:
+              replyText.trim(),
+          });
+
+        setReplyText("");
+        setNewRecipient("");
+        setNewSubject("");
+        setContactQuery("");
+        setSelectedContactId("");
+        setNewMessageMode(false);
+        setActiveThreadTab(
+          "conversation",
+        );
+
+        await refreshInternalInbox();
+
+        if (
+          created?.threadId
+        ) {
+          setSelectedId(
+            `internal-thread-${created.threadId}`,
+          );
+        }
+
+        setToast(
+          "Internal Campaign Seat conversation created.",
+        );
+      } catch (internalError) {
+        setToast(
+          internalError?.message ||
+          "Campaign Seat could not create this internal conversation.",
+        );
+      }
+
+      return;
+    }
+
+    if (
+      replyChannel === "email" &&
+      liveMailboxEnabled
+    ) {
+      try {
+        await sendMailboxEmail({
+          to: [
+            {
+              name:
+                recipientName,
+              email:
+                recipientEmail,
+            },
+          ],
+
+          subject:
+            newSubject.trim(),
+
+          body:
+            replyText.trim(),
+        });
+
+        setReplyText("");
+        setNewRecipient("");
+        setNewSubject("");
+        setContactQuery("");
+        setSelectedContactId("");
+        setNewMessageMode(false);
+        setActiveThreadTab(
+          "conversation",
+        );
+
+        setToast(
+          "Email sent from the connected campaign mailbox.",
+        );
+
+        const nextMailbox =
+          await refreshMailbox();
+
+        if (
+          nextMailbox?.[0]?.id
+        ) {
+          setSelectedId(
+            nextMailbox[0].id,
+          );
+        }
+      } catch (sendError) {
+        setToast(
+          sendError?.message ||
+          "Campaign Seat could not send this email.",
+        );
+      }
+
       return;
     }
 
@@ -2033,7 +2424,10 @@ export default function InboxReferencePreview() {
               >
                 <div className={styles.contactPickerField}>
                   <span className={styles.fieldLabel}>
-                    Recipient
+                    {replyChannel === "dashboard" &&
+                    liveMailboxEnabled
+                      ? "Related contact (optional)"
+                      : "Recipient"}
                   </span>
 
                   <div className={styles.contactSearchControl}>
@@ -2050,7 +2444,12 @@ export default function InboxReferencePreview() {
                         );
                         setSelectedContactId("");
                       }}
-                      placeholder="Search campaign contacts"
+                      placeholder={
+                        replyChannel === "dashboard" &&
+                        liveMailboxEnabled
+                          ? "Optional: relate this conversation to a campaign contact"
+                          : "Search campaign contacts"
+                      }
                       autoComplete="off"
                     />
 
@@ -2543,6 +2942,23 @@ export default function InboxReferencePreview() {
                               {file.size}
                             </small>
                           </span>
+
+                            {file.providerAttachmentId &&
+                            file.providerMessageId ? (
+                              <button
+                                className={
+                                  styles.fileDownloadButton
+                                }
+                                type="button"
+                                onClick={() =>
+                                  downloadConversationFile(
+                                    file,
+                                  )
+                                }
+                              >
+                                Download
+                              </button>
+                            ) : null}
                         </div>
                       ),
                     )}
@@ -2570,7 +2986,7 @@ export default function InboxReferencePreview() {
                     </strong>
 
                     <p>
-                      Email and Dashboard activity can
+                      Email and Campaign Seat activity can
                       eventually update automatically.
                       Text and WhatsApp activity remains
                       pending until a team member confirms
@@ -2636,11 +3052,7 @@ export default function InboxReferencePreview() {
                   <CheckCircle2 size={16} />
 
                   <span>
-                    {replyChannel === "dashboard"
-                      ? "Dashboard preview uses a subject and records the conversation in this browser session."
-                      : replyChannel === "email"
-                        ? "Email uses a subject line. External email delivery is not connected yet."
-                        : "Text and WhatsApp use only a recipient and message. External delivery is not connected yet."}
+                    {composerNotice}
                   </span>
                 </div>
 
@@ -2660,7 +3072,31 @@ export default function InboxReferencePreview() {
                 />
 
                 <div className={styles.composerFooter}>
-                  <div>
+                  <div className={styles.replyOptions}>
+                    {!newMessageMode &&
+                    replyChannel === "email" &&
+                    liveMailboxEnabled &&
+                    selectedConversation
+                      ?.providerThreadId ? (
+                      <button
+                        className={
+                          replyAllEnabled
+                            ? styles.replyAllActive
+                            : ""
+                        }
+                        type="button"
+                        onClick={() =>
+                          setReplyAllThreadId(
+                            replyAllEnabled
+                              ? ""
+                              : selectedConversation
+                                  .providerThreadId,
+                          )
+                        }
+                      >
+                        Reply All
+                      </button>
+                    ) : null}
                   </div>
 
                   <div className={styles.replyChannels}>
@@ -2708,7 +3144,15 @@ export default function InboxReferencePreview() {
                         ? "Open Text"
                         : replyChannel === "whatsapp"
                           ? "Open WhatsApp"
-                          : "Add Reply"}
+                          : replyChannel === "email" &&
+                              liveMailboxEnabled
+                            ? replyAllEnabled
+                              ? "Reply All"
+                              : "Send Reply"
+                            : replyChannel === "dashboard" &&
+                                liveMailboxEnabled
+                              ? "Send Internally"
+                              : "Add Reply"}
                     <ChevronDown size={15} />
                   </button>
                 </div>

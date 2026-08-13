@@ -162,12 +162,32 @@ export function useCalendarCommandCenter({
             created_by,
             is_sample,
             created_at,
-            updated_at
+            updated_at,
+            is_all_day,
+            event_timezone,
+            participants,
+            recurrence_rules,
+            reminders,
+            busy,
+            visibility,
+            conferencing,
+            hide_participants,
+            notify_participants,
+            source_provider,
+            external_calendar_id,
+            external_event_id,
+            external_ical_uid,
+            external_updated_at,
+            sync_metadata
           `,
         )
         .eq(
           "workspace_id",
           workspaceId,
+        )
+        .neq(
+          "status",
+          "cancelled",
         )
         .order(
           "starts_at",
@@ -390,19 +410,175 @@ export function useCalendarCommandCenter({
           values.endsAt || null,
         status:
           values.status,
-        capacity:
+      };
+
+      if (
+        Object.prototype.hasOwnProperty.call(
+          values,
+          "capacity",
+        )
+      ) {
+        payload.capacity =
           values.capacity === ""
             ? null
             : Number(
                 values.capacity,
-              ),
-        rsvp_count:
+              );
+      }
+
+      if (
+        Object.prototype.hasOwnProperty.call(
+          values,
+          "rsvpCount",
+        )
+      ) {
+        payload.rsvp_count =
           values.rsvpCount === ""
             ? 0
             : Number(
                 values.rsvpCount,
-              ),
-      };
+              );
+      }
+
+      if (
+        Object.prototype.hasOwnProperty.call(
+          values,
+          "eventTimezone",
+        )
+      ) {
+        payload.event_timezone =
+          String(
+            values.eventTimezone ||
+            "",
+          ).trim() ||
+          null;
+      }
+
+      if (
+        Object.prototype.hasOwnProperty.call(
+          values,
+          "participants",
+        )
+      ) {
+        payload.participants =
+          Array.isArray(
+            values.participants,
+          )
+            ? values.participants
+            : [];
+      }
+
+      if (
+        Object.prototype.hasOwnProperty.call(
+          values,
+          "recurrenceRules",
+        )
+      ) {
+        payload.recurrence_rules =
+          Array.isArray(
+            values.recurrenceRules,
+          )
+            ? values.recurrenceRules
+            : [];
+      }
+
+      if (
+        Object.prototype.hasOwnProperty.call(
+          values,
+          "reminders",
+        )
+      ) {
+        payload.reminders =
+          values.reminders &&
+          typeof values.reminders ===
+            "object"
+            ? values.reminders
+            : {};
+      }
+
+      if (
+        Object.prototype.hasOwnProperty.call(
+          values,
+          "busy",
+        )
+      ) {
+        payload.busy =
+          values.busy !==
+          false;
+      }
+
+      if (
+        Object.prototype.hasOwnProperty.call(
+          values,
+          "visibility",
+        )
+      ) {
+        const requestedVisibility =
+          String(
+            values.visibility ||
+            "",
+          )
+            .trim()
+            .toLowerCase();
+
+        payload.visibility =
+          [
+            "default",
+            "public",
+            "private",
+          ].includes(
+            requestedVisibility,
+          )
+            ? requestedVisibility
+            : null;
+      }
+
+      if (
+        Object.prototype.hasOwnProperty.call(
+          values,
+          "conferencing",
+        )
+      ) {
+        payload.conferencing =
+          values.conferencing &&
+          typeof values.conferencing ===
+            "object"
+            ? values.conferencing
+            : {};
+      }
+
+      if (
+        Object.prototype.hasOwnProperty.call(
+          values,
+          "hideParticipants",
+        )
+      ) {
+        payload.hide_participants =
+          values.hideParticipants ===
+          true;
+      }
+
+      if (
+        Object.prototype.hasOwnProperty.call(
+          values,
+          "notifyParticipants",
+        )
+      ) {
+        payload.notify_participants =
+          values.notifyParticipants !==
+          false;
+      }
+
+      if (
+        Object.prototype.hasOwnProperty.call(
+          values,
+          "isAllDay",
+        )
+      ) {
+        payload.is_all_day =
+          values.isAllDay ===
+          true;
+      }
 
       try {
         let result;

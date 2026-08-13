@@ -66,6 +66,8 @@ import {
   hasCampaignPermission,
 } from "../../utils/campaignSession";
 
+import EmailContactsOnboarding from "../../components/integrations/EmailContactsOnboarding/EmailContactsOnboarding";
+
 import styles from "./ProfileSettings.module.css";
 
 const LOCAL_SETTINGS_KEY =
@@ -2133,7 +2135,13 @@ export default function ProfileSettings() {
               styles.tabPanel
             }
           >
-            <div
+            <EmailContactsOnboarding
+                workspaceId={
+                  workspace.id
+                }
+              />
+
+              <div
               className={
                 styles.integrationGrid
               }

@@ -3809,3 +3809,48 @@
 }
 
 /* CAMPAIGN SEAT DOCUMENTS MOBILE DETAILS — END */
+
+/* CAMPAIGN SEAT — DOCUMENT FILTER CONTROL FIX */
+
+/*
+ * Safari's native select rendering can place the first two
+ * toolbar values underneath their absolutely-positioned SVGs.
+ *
+ * Collection and file-type values are already self-explanatory,
+ * so remove those decorative icons and give the native selects
+ * clean, consistent breathing room.
+ */
+
+.documentsToolbar > label:nth-child(1) > svg,
+.documentsToolbar > label:nth-child(2) > svg {
+  display: none !important;
+}
+
+.documentsToolbar > label:nth-child(1) > select,
+.documentsToolbar > label:nth-child(2) > select {
+  padding-left: 14px !important;
+  padding-right: 34px !important;
+}
+
+/*
+ * Keep all toolbar controls vertically consistent and make
+ * native Safari select text sit cleanly inside the control.
+ */
+.documentsToolbar label {
+  position: relative;
+  overflow: hidden;
+}
+
+.documentsToolbar select {
+  box-sizing: border-box;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Narrow layouts retain full-width, readable controls. */
+@media (max-width: 650px) {
+  .documentsToolbar > label:nth-child(1) > select,
+  .documentsToolbar > label:nth-child(2) > select {
+    padding-left: 13px !important;
+  }
+}

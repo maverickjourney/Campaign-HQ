@@ -78,12 +78,12 @@ const PRIMARY_NAVIGATION = [
   {
     label: "Commitments",
     icon: Target,
-    route: "/tasks",
+    route: "/commitments",
   },
   {
     label: "Waiting On",
     icon: Clock3,
-    route: "/approvals",
+    route: "/waiting-on",
     countKey: "waiting",
   },
   {

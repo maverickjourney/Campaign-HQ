@@ -14,6 +14,96 @@ const EMPTY_STATE = {
   readIds: [],
 };
 
+
+// CAMPAIGN SEAT TARGETED TASK ALERT FEED
+const TASK_ALERT_ID_PREFIX =
+  "task-alert:";
+
+function getTaskAlertFeedId(
+  alertId,
+) {
+  return `${TASK_ALERT_ID_PREFIX}${alertId}`;
+}
+
+function isTaskAlertFeedId(
+  value,
+) {
+  return String(
+    value || "",
+  ).startsWith(
+    TASK_ALERT_ID_PREFIX,
+  );
+}
+
+function getRawTaskAlertId(
+  value,
+) {
+  return String(
+    value || "",
+  ).slice(
+    TASK_ALERT_ID_PREFIX.length,
+  );
+}
+
+function normalizeTaskAlert(
+  alert,
+) {
+  return {
+    id:
+      getTaskAlertFeedId(
+        alert.id,
+      ),
+
+    source_type:
+      "task_alert",
+
+    source_id:
+      alert.id,
+
+    workspace_id:
+      alert.workspace_id,
+
+    actor_user_id:
+      null,
+
+    activity_type:
+      alert.alert_type,
+
+    title:
+      alert.title,
+
+    detail:
+      alert.detail,
+
+    entity_type:
+      "task",
+
+    entity_id:
+      alert.task_id,
+
+    route:
+      alert.route ||
+      "/tasks",
+
+    metadata: {
+      ...(alert.metadata || {}),
+
+      task_alert_id:
+        alert.id,
+
+      reminder_id:
+        alert.reminder_id,
+
+      scheduled_for:
+        alert.scheduled_for,
+    },
+
+    occurred_at:
+      alert.delivered_at ||
+      alert.scheduled_for,
+  };
+}
+
 function getActivityErrorMessage(error) {
   const message =
     error?.message ||
@@ -116,9 +206,76 @@ export function useActivityCenter({
             throw activityError;
           }
 
+          const {
+            data: taskAlerts,
+            error: taskAlertsError,
+          } = await supabase
+            .from(
+              "task_alerts",
+            )
+            .select(
+              `
+                id,
+                workspace_id,
+                task_id,
+                reminder_id,
+                recipient_user_id,
+                alert_type,
+                title,
+                detail,
+                route,
+                scheduled_for,
+                delivered_at,
+                read_at,
+                metadata
+              `,
+            )
+            .eq(
+              "workspace_id",
+              workspaceId,
+            )
+            .eq(
+              "recipient_user_id",
+              userId,
+            )
+            .order(
+              "delivered_at",
+              {
+                ascending: false,
+              },
+            )
+            .limit(60);
+
+          if (taskAlertsError) {
+            throw taskAlertsError;
+          }
+
+          const normalizedTaskAlerts =
+            (taskAlerts || []).map(
+              normalizeTaskAlert,
+            );
+
+          const combinedActivities = [
+            ...(activities || []),
+            ...normalizedTaskAlerts,
+          ]
+            .sort(
+              (left, right) =>
+                new Date(
+                  right.occurred_at,
+                ).getTime() -
+                new Date(
+                  left.occurred_at,
+                ).getTime(),
+            )
+            .slice(
+              0,
+              60,
+            );
+
           const actorIds = [
             ...new Set(
-              (activities || [])
+              combinedActivities
                 .map(
                   (activity) =>
                     activity.actor_user_id,
@@ -185,16 +342,33 @@ export function useActivityCenter({
 
           const nextState = {
             activities:
-              activities || [],
+              combinedActivities,
+
             profiles,
-            readIds:
-              (
+
+            readIds: [
+              ...(
                 readsResult.data ||
                 []
               ).map(
                 (receipt) =>
                   receipt.activity_id,
               ),
+
+              ...(taskAlerts || [])
+                .filter(
+                  (alert) =>
+                    Boolean(
+                      alert.read_at,
+                    ),
+                )
+                .map(
+                  (alert) =>
+                    getTaskAlertFeedId(
+                      alert.id,
+                    ),
+                ),
+            ],
           };
 
           setState(
@@ -292,6 +466,18 @@ export function useActivityCenter({
         },
         scheduleRefresh,
       )
+      .on(
+        "postgres_changes",
+        {
+          event: "*",
+          schema: "public",
+          table:
+            "task_alerts",
+          filter:
+            `workspace_id=eq.${workspaceId}`,
+        },
+        scheduleRefresh,
+      )
       .subscribe();
 
     return () => {
@@ -351,37 +537,63 @@ export function useActivityCenter({
         setError("");
 
         try {
-          const {
-            error: saveError,
-          } = await supabase
-            .from(
-              "activity_read_receipts",
+          if (
+            isTaskAlertFeedId(
+              activityId,
             )
-            .upsert(
+          ) {
+            const {
+              error: saveError,
+            } = await supabase.rpc(
+              "mark_task_alert_read",
               {
-                workspace_id:
-                  workspaceId,
-                activity_id:
-                  activityId,
-                user_id:
-                  userId,
-                read_at:
-                  new Date()
-                    .toISOString(),
-              },
-              {
-                onConflict:
-                  "activity_id,user_id",
+                target_alert_id:
+                  getRawTaskAlertId(
+                    activityId,
+                  ),
               },
             );
 
-          if (saveError) {
-            throw saveError;
+            if (saveError) {
+              throw saveError;
+            }
+          } else {
+            const {
+              error: saveError,
+            } = await supabase
+              .from(
+                "activity_read_receipts",
+              )
+              .upsert(
+                {
+                  workspace_id:
+                    workspaceId,
+
+                  activity_id:
+                    activityId,
+
+                  user_id:
+                    userId,
+
+                  read_at:
+                    new Date()
+                      .toISOString(),
+                },
+                {
+                  onConflict:
+                    "activity_id,user_id",
+                },
+              );
+
+            if (saveError) {
+              throw saveError;
+            }
           }
 
           setState(
             (current) => ({
               ...current,
+
               readIds: [
                 ...new Set([
                   ...current.readIds,
@@ -432,46 +644,106 @@ export function useActivityCenter({
         return;
       }
 
+      const activityIds =
+        unreadIds.filter(
+          (activityId) =>
+            !isTaskAlertFeedId(
+              activityId,
+            ),
+        );
+
+      const taskAlertIds =
+        unreadIds
+          .filter(
+            (activityId) =>
+              isTaskAlertFeedId(
+                activityId,
+              ),
+          )
+          .map(
+            (activityId) =>
+              getRawTaskAlertId(
+                activityId,
+              ),
+          );
+
       setIsSaving(true);
       setError("");
 
       try {
-        const readAt =
-          new Date()
-            .toISOString();
+        const operations = [];
 
-        const {
-          error: saveError,
-        } = await supabase
-          .from(
-            "activity_read_receipts",
-          )
-          .upsert(
-            unreadIds.map(
-              (activityId) => ({
-                workspace_id:
-                  workspaceId,
-                activity_id:
-                  activityId,
-                user_id:
-                  userId,
-                read_at:
-                  readAt,
-              }),
-            ),
-            {
-              onConflict:
-                "activity_id,user_id",
-            },
+        if (
+          activityIds.length
+        ) {
+          const readAt =
+            new Date()
+              .toISOString();
+
+          operations.push(
+            supabase
+              .from(
+                "activity_read_receipts",
+              )
+              .upsert(
+                activityIds.map(
+                  (activityId) => ({
+                    workspace_id:
+                      workspaceId,
+
+                    activity_id:
+                      activityId,
+
+                    user_id:
+                      userId,
+
+                    read_at:
+                      readAt,
+                  }),
+                ),
+                {
+                  onConflict:
+                    "activity_id,user_id",
+                },
+              ),
+          );
+        }
+
+        taskAlertIds.forEach(
+          (taskAlertId) => {
+            operations.push(
+              supabase.rpc(
+                "mark_task_alert_read",
+                {
+                  target_alert_id:
+                    taskAlertId,
+                },
+              ),
+            );
+          },
+        );
+
+        const results =
+          await Promise.all(
+            operations,
           );
 
-        if (saveError) {
-          throw saveError;
+        const failedResult =
+          results.find(
+            (result) =>
+              result?.error,
+          );
+
+        if (
+          failedResult?.error
+        ) {
+          throw failedResult.error;
         }
 
         setState(
           (current) => ({
             ...current,
+
             readIds: [
               ...new Set([
                 ...current.readIds,

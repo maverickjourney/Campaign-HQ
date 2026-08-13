@@ -4273,3 +4273,1372 @@ button[data-campaign-hq-launcher="floating"] {
 }
 
 /* CAMPAIGN SEAT CALENDAR MOBILE LAUNCHER — END */
+
+
+.calendarConnectionStatus {
+  display: grid;
+  grid-template-columns:
+    auto minmax(0, 1fr);
+  align-items: start;
+  gap: 10px;
+  width: 100%;
+  padding: 11px 12px;
+  border: 1px solid
+    rgba(21, 83, 130, 0.16);
+  border-radius: 12px;
+  background:
+    rgba(246, 250, 253, 0.96);
+  color: #153d5d;
+}
+
+.calendarConnectionStatus > svg {
+  margin-top: 2px;
+  flex: 0 0 auto;
+}
+
+.calendarConnectionStatus > div {
+  min-width: 0;
+  display: grid;
+  gap: 2px;
+}
+
+.calendarConnectionStatus strong {
+  font-size: 13px;
+  line-height: 1.25;
+  color: #153d5d;
+}
+
+.calendarConnectionStatus span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 11px;
+  line-height: 1.3;
+  color: #526f86;
+}
+
+.calendarConnectionStatus small {
+  font-size: 10px;
+  line-height: 1.3;
+  color: #7890a3;
+}
+
+
+/* ======================================================
+   RICH CALENDAR EVENT EDITOR
+   ====================================================== */
+
+.richEventOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: grid;
+  place-items: center;
+  padding: 28px;
+  background: rgba(9, 24, 39, 0.48);
+  backdrop-filter: blur(3px);
+}
+
+.richEventEditor {
+  width: min(1120px, calc(100vw - 56px));
+  max-height: calc(100vh - 56px);
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  overflow: hidden;
+  border: 1px solid rgba(17, 53, 80, 0.12);
+  border-radius: 18px;
+  background: #ffffff;
+  box-shadow:
+    0 30px 90px rgba(9, 30, 47, 0.24);
+}
+
+.richEventEditorHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 20px 24px;
+  border-bottom: 1px solid #e8eef3;
+}
+
+.richEventEditorHeader h2 {
+  margin: 3px 0 0;
+  font-size: 22px;
+  line-height: 1.2;
+  color: #173b57;
+}
+
+.richEventHeaderActions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.richEventHeaderActions button,
+.richEventEditorFooter button {
+  min-height: 38px;
+  padding: 0 14px;
+  border: 1px solid #d7e1e9;
+  border-radius: 9px;
+  background: #ffffff;
+  color: #284b65;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.richEventHeaderActions button:disabled,
+.richEventEditorFooter button:disabled {
+  cursor: not-allowed;
+  opacity: 0.58;
+}
+
+.richEventHeaderActions .richEventSaveButton,
+.richEventEditorFooter .richEventSaveButton {
+  border-color: #173f62;
+  background: #173f62;
+  color: #ffffff;
+}
+
+.richEventHeaderActions .richEventClose {
+  width: 38px;
+  padding: 0;
+  display: grid;
+  place-items: center;
+}
+
+.richEventEditorBody {
+  min-height: 0;
+  display: grid;
+  grid-template-columns:
+    minmax(0, 1fr) 320px;
+  overflow: hidden;
+}
+
+.richEventMain {
+  min-width: 0;
+  overflow-y: auto;
+  padding: 30px 34px 42px;
+}
+
+.richEventSidebar {
+  min-width: 0;
+  overflow-y: auto;
+  padding: 26px 24px;
+  border-left: 1px solid #e8eef3;
+  background: #f8fafc;
+}
+
+.richEventTitle {
+  width: 100%;
+  margin: 0 0 28px;
+  padding: 4px 2px 12px;
+  border: 0;
+  border-bottom: 2px solid #cfdae3;
+  outline: none;
+  background: transparent;
+  color: #173b57;
+  font: inherit;
+  font-size: 30px;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.richEventTitle:focus {
+  border-bottom-color: #b51e2c;
+}
+
+.richEditorSection {
+  display: grid;
+  grid-template-columns: 34px minmax(0, 1fr);
+  gap: 14px;
+  margin: 0 0 22px;
+}
+
+.richEditorSectionIcon {
+  min-height: 42px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #607b8e;
+}
+
+.richEditorSectionContent {
+  min-width: 0;
+}
+
+.richEditorSectionContent label,
+.richEditorCompactField {
+  display: grid;
+  gap: 6px;
+  color: #38566c;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.richEditorSectionContent input[type="text"],
+.richEditorSectionContent input[type="date"],
+.richEditorSectionContent input[type="time"],
+.richEditorSectionContent select,
+.richEditorSectionContent textarea,
+.richGuestInput input {
+  width: 100%;
+  min-height: 42px;
+  border: 1px solid #d6e0e8;
+  border-radius: 9px;
+  outline: none;
+  background: #ffffff;
+  color: #173b57;
+  font: inherit;
+  font-size: 13px;
+}
+
+.richEditorSectionContent input[type="text"],
+.richEditorSectionContent input[type="date"],
+.richEditorSectionContent input[type="time"],
+.richEditorSectionContent select,
+.richGuestInput input {
+  padding: 0 11px;
+}
+
+.richEditorSectionContent textarea {
+  min-height: 120px;
+  padding: 11px;
+  resize: vertical;
+}
+
+.richEditorSectionContent input:focus,
+.richEditorSectionContent select:focus,
+.richEditorSectionContent textarea:focus,
+.richGuestInput input:focus {
+  border-color: #7394ac;
+  box-shadow: 0 0 0 3px rgba(74, 117, 149, 0.09);
+}
+
+.richEditorGrid {
+  display: grid;
+  grid-template-columns:
+    minmax(150px, 1.3fr)
+    minmax(110px, 0.8fr)
+    minmax(110px, 0.8fr);
+  gap: 10px;
+}
+
+.richEditorGridTwo {
+  display: grid;
+  grid-template-columns:
+    repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.richEditorInlineOptions {
+  display: flex;
+  align-items: end;
+  flex-wrap: wrap;
+  gap: 18px;
+  margin-top: 12px;
+}
+
+.richEditorCheckbox,
+.richGuestSettings label {
+  display: inline-flex !important;
+  grid-template-columns: none !important;
+  align-items: center;
+  gap: 8px !important;
+  cursor: pointer;
+}
+
+.richEditorCheckbox input,
+.richGuestSettings input {
+  width: 16px;
+  height: 16px;
+  accent-color: #173f62;
+}
+
+.richEditorCompactField {
+  min-width: 190px;
+}
+
+.richEditorFeatureToggle {
+  min-height: 64px;
+  display: flex !important;
+  grid-template-columns: none !important;
+  align-items: center;
+  gap: 12px !important;
+  padding: 12px 14px;
+  border: 1px solid #d7e2e9;
+  border-radius: 10px;
+  background: #f7fafc;
+  cursor: pointer;
+}
+
+.richEditorFeatureToggle input {
+  width: 17px;
+  height: 17px;
+  accent-color: #173f62;
+}
+
+.richEditorFeatureToggle div {
+  display: grid;
+  gap: 2px;
+}
+
+.richEditorFeatureToggle strong {
+  color: #173b57;
+  font-size: 13px;
+}
+
+.richEditorFeatureToggle span {
+  color: #71899b;
+  font-size: 11px;
+  font-weight: 500;
+}
+
+.richGuestPanel {
+  display: grid;
+  gap: 16px;
+}
+
+.richSidebarHeading {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  color: #173b57;
+}
+
+.richSidebarHeading > svg {
+  margin-top: 1px;
+}
+
+.richSidebarHeading > div {
+  display: grid;
+  gap: 2px;
+}
+
+.richSidebarHeading strong {
+  font-size: 15px;
+}
+
+.richSidebarHeading span {
+  color: #72899a;
+  font-size: 11px;
+  line-height: 1.35;
+}
+
+.richGuestInput {
+  display: grid;
+  grid-template-columns:
+    minmax(0, 1fr) auto;
+  gap: 7px;
+}
+
+.richGuestInput button {
+  min-height: 42px;
+  padding: 0 13px;
+  border: 0;
+  border-radius: 9px;
+  background: #173f62;
+  color: #ffffff;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.richGuestList {
+  display: grid;
+  gap: 8px;
+}
+
+.richGuestEmpty {
+  padding: 16px 12px;
+  border: 1px dashed #cfdae3;
+  border-radius: 10px;
+  color: #7c91a0;
+  text-align: center;
+  font-size: 12px;
+}
+
+.richGuestItem {
+  display: grid;
+  grid-template-columns:
+    32px minmax(0, 1fr) 28px;
+  align-items: center;
+  gap: 9px;
+  min-width: 0;
+  padding: 9px;
+  border: 1px solid #e0e7ed;
+  border-radius: 10px;
+  background: #ffffff;
+}
+
+.richGuestAvatar {
+  width: 32px;
+  height: 32px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: #e8f0f5;
+  color: #173f62;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.richGuestItem > div {
+  min-width: 0;
+  display: grid;
+  gap: 1px;
+}
+
+.richGuestItem strong,
+.richGuestItem span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.richGuestItem strong {
+  color: #284b65;
+  font-size: 11px;
+}
+
+.richGuestItem span {
+  color: #8295a3;
+  font-size: 10px;
+}
+
+.richGuestItem button {
+  width: 28px;
+  height: 28px;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  border-radius: 7px;
+  background: transparent;
+  color: #738b9c;
+  cursor: pointer;
+}
+
+.richGuestItem button:hover {
+  background: #f0f4f7;
+}
+
+.richGuestSettings {
+  display: grid;
+  gap: 10px;
+  padding-top: 4px;
+  color: #526d81;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.richConnectedCalendar {
+  display: grid;
+  grid-template-columns:
+    auto minmax(0, 1fr);
+  gap: 10px;
+  margin-top: 24px;
+  padding: 13px;
+  border: 1px solid rgba(23, 63, 98, 0.13);
+  border-radius: 11px;
+  background: #ffffff;
+  color: #173f62;
+}
+
+.richConnectedCalendar > div {
+  min-width: 0;
+  display: grid;
+  gap: 2px;
+}
+
+.richConnectedCalendar strong {
+  font-size: 12px;
+}
+
+.richConnectedCalendar span,
+.richConnectedCalendar small {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: #71899b;
+  font-size: 10px;
+}
+
+.richProviderIdentity {
+  display: grid;
+  gap: 3px;
+  margin-top: 12px;
+  padding: 12px 13px;
+  border-radius: 10px;
+  background: rgba(23, 63, 98, 0.045);
+}
+
+.richProviderIdentity span {
+  color: #8295a3;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.richProviderIdentity strong {
+  color: #45647a;
+  font-size: 11px;
+}
+
+.richEventEditorFooter {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 15px 24px;
+  border-top: 1px solid #e8eef3;
+  background: #ffffff;
+}
+
+.richEventEditorFooter > div {
+  display: flex;
+  gap: 8px;
+}
+
+.richEventEditorFooter .richEventDangerButton {
+  border-color: rgba(181, 30, 44, 0.22);
+  color: #a31f2c;
+}
+
+@media (max-width: 900px) {
+  .richEventOverlay {
+    padding: 12px;
+  }
+
+  .richEventEditor {
+    width: calc(100vw - 24px);
+    max-height: calc(100vh - 24px);
+  }
+
+  .richEventEditorBody {
+    grid-template-columns: 1fr;
+    overflow-y: auto;
+  }
+
+  .richEventMain,
+  .richEventSidebar {
+    overflow: visible;
+  }
+
+  .richEventSidebar {
+    border-top: 1px solid #e8eef3;
+    border-left: 0;
+  }
+
+  .richEditorGrid,
+  .richEditorGridTwo {
+    grid-template-columns: 1fr;
+  }
+
+  .richEventEditorHeader {
+    align-items: flex-start;
+  }
+
+  .richEventHeaderActions > button:first-child {
+    display: none;
+  }
+}
+
+
+/* ======================================================
+   CALENDAR CONFERENCING CONTROL
+   ====================================================== */
+
+.richConferenceCard {
+  display: grid;
+  gap: 13px;
+  padding: 14px;
+  border: 1px solid #d7e2e9;
+  border-radius: 11px;
+  background: #f8fafc;
+}
+
+.richConferenceStatus {
+  display: grid;
+  grid-template-columns:
+    38px minmax(0, 1fr);
+  align-items: center;
+  gap: 11px;
+}
+
+.richConferenceIcon {
+  width: 38px;
+  height: 38px;
+  display: grid;
+  place-items: center;
+  border-radius: 10px;
+  background: #e9f0f5;
+  color: #173f62;
+}
+
+.richConferenceStatus > div {
+  min-width: 0;
+  display: grid;
+  gap: 2px;
+}
+
+.richConferenceStatus strong {
+  color: #173b57;
+  font-size: 13px;
+}
+
+.richConferenceStatus span {
+  color: #70889a;
+  font-size: 11px;
+  line-height: 1.35;
+}
+
+.richConferenceAdd,
+.richConferenceRemove,
+.richConferenceLink {
+  min-height: 38px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  padding: 0 13px;
+  border-radius: 9px;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.richConferenceAdd {
+  width: fit-content;
+  border: 1px solid #173f62;
+  background: #173f62;
+  color: #ffffff;
+}
+
+.richConferenceActions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.richConferenceLink {
+  border: 1px solid #173f62;
+  background: #173f62;
+  color: #ffffff;
+  text-decoration: none;
+}
+
+.richConferenceRemove {
+  border: 1px solid #d7e1e9;
+  background: #ffffff;
+  color: #9f2733;
+}
+
+
+/* ======================================================
+   RICH CALENDAR REMINDERS
+   ====================================================== */
+
+.richReminderCard {
+  display: grid;
+  gap: 13px;
+  padding: 14px;
+  border: 1px solid #d7e2e9;
+  border-radius: 11px;
+  background: #f8fafc;
+}
+
+.richReminderHeading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.richReminderHeading > div {
+  display: grid;
+  gap: 2px;
+}
+
+.richReminderHeading strong {
+  color: #173b57;
+  font-size: 13px;
+}
+
+.richReminderHeading span {
+  color: #71899b;
+  font-size: 11px;
+  line-height: 1.35;
+}
+
+.richReminderDefault {
+  display: inline-flex !important;
+  grid-template-columns: none !important;
+  align-items: center;
+  gap: 7px !important;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.richReminderDefault input {
+  width: 16px;
+  height: 16px;
+  accent-color: #173f62;
+}
+
+.richReminderList {
+  display: grid;
+  gap: 8px;
+}
+
+.richReminderRow {
+  display: grid;
+  grid-template-columns:
+    minmax(0, 1.4fr)
+    minmax(110px, 0.8fr)
+    34px;
+  gap: 8px;
+  align-items: center;
+}
+
+.richReminderRow select {
+  min-height: 40px;
+  padding: 0 10px;
+  border: 1px solid #d6e0e8;
+  border-radius: 9px;
+  background: #ffffff;
+  color: #284b65;
+  font: inherit;
+  font-size: 12px;
+}
+
+.richReminderRow button {
+  width: 34px;
+  height: 34px;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 1px solid #dce4ea;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #8f4a52;
+  cursor: pointer;
+}
+
+.richReminderEmpty,
+.richReminderDefaultNotice {
+  padding: 11px 12px;
+  border: 1px dashed #d4dee6;
+  border-radius: 9px;
+  color: #7d91a0;
+  font-size: 11px;
+}
+
+.richReminderAdd {
+  width: fit-content;
+  min-height: 36px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 11px;
+  border: 1px solid #d4dfe7;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #284b65;
+  font: inherit;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.richReminderAdd:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+/* ======================================================
+   RICH CALENDAR GUEST COMPOSER
+   ====================================================== */
+
+.richGuestComposer {
+  display: grid;
+  gap: 7px;
+}
+
+.richGuestNameInput {
+  width: 100%;
+  min-height: 42px;
+  padding: 0 11px;
+  border: 1px solid #d6e0e8;
+  border-radius: 9px;
+  outline: none;
+  background: #ffffff;
+  color: #173b57;
+  font: inherit;
+  font-size: 12px;
+}
+
+.richGuestNameInput:focus {
+  border-color: #7394ac;
+  box-shadow:
+    0 0 0 3px
+    rgba(74, 117, 149, 0.09);
+}
+
+@media (max-width: 700px) {
+  .richReminderHeading {
+    display: grid;
+  }
+
+  .richReminderRow {
+    grid-template-columns:
+      minmax(0, 1fr) 34px;
+  }
+
+  .richReminderRow select:nth-child(2) {
+    grid-column: 1;
+  }
+
+  .richReminderRow button {
+    grid-column: 2;
+    grid-row: 1 / span 2;
+  }
+}
+
+
+/* ======================================================
+   FIND A TIME
+   ====================================================== */
+
+.richFindTimeCard {
+  display: grid;
+  gap: 15px;
+  padding: 20px 22px;
+  border: 1px solid #d8e3eb;
+  border-radius: 16px;
+  background: #f8fafc;
+}
+
+.richFindTimeHeading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 24px;
+}
+
+.richFindTimeHeading > div:first-child {
+  min-width: 0;
+  display: grid;
+  gap: 4px;
+  padding-top: 1px;
+}
+
+.richFindTimeHeading strong {
+  color: #173b57;
+  font-size: 15px;
+  line-height: 1.25;
+  font-weight: 800;
+}
+
+.richFindTimeHeading span {
+  max-width: 520px;
+  color: #71899b;
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.richFindTimeControls {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  flex: 0 0 auto;
+}
+
+.richFindTimeControls select {
+  width: 172px;
+  min-width: 172px;
+  height: 44px;
+  min-height: 44px;
+  padding: 0 36px 0 13px;
+  border: 1px solid #cdd9e2;
+  border-radius: 10px;
+  outline: none;
+  background: #ffffff;
+  color: #38566c;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  box-shadow: none;
+}
+
+.richFindTimeControls button {
+  height: 44px;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  padding: 0 16px;
+  border: 1px solid #173f62;
+  border-radius: 10px;
+  background: #173f62;
+  color: #ffffff;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 1;
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    background 140ms ease,
+    border-color 140ms ease,
+    transform 140ms ease,
+    box-shadow 140ms ease;
+}
+
+.richFindTimeControls button:disabled {
+  cursor: wait;
+  opacity: 0.62;
+}
+
+.richFindTimeWindow {
+  display: block;
+  margin-top: -4px;
+  color: #8297a7;
+  font-size: 10.5px;
+  line-height: 1.4;
+}
+
+.richFindTimeError,
+.richFindTimeWarning {
+  display: grid;
+  grid-template-columns:
+    auto minmax(0, 1fr);
+  align-items: flex-start;
+  gap: 8px;
+  padding: 10px 11px;
+  border-radius: 9px;
+}
+
+.richFindTimeError {
+  border: 1px solid rgba(174, 34, 46, 0.18);
+  background: rgba(174, 34, 46, 0.055);
+  color: #9d2e39;
+}
+
+.richFindTimeWarning {
+  border: 1px solid rgba(175, 119, 24, 0.2);
+  background: rgba(186, 132, 33, 0.07);
+  color: #846322;
+}
+
+.richFindTimeWarning > div {
+  display: grid;
+  gap: 2px;
+}
+
+.richFindTimeError span,
+.richFindTimeWarning span {
+  font-size: 11px;
+  line-height: 1.4;
+}
+
+.richFindTimeWarning strong {
+  font-size: 11px;
+}
+
+.richFindTimeResults {
+  display: grid;
+  gap: 11px;
+  margin-top: 2px;
+  padding-top: 14px;
+  border-top: 1px solid #e1e8ee;
+}
+
+.richFindTimeResultHeading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.richFindTimeResultHeading strong {
+  color: #284b65;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.richFindTimeResultHeading span {
+  color: #8194a2;
+  font-size: 10.5px;
+}
+
+.richFindTimeSlots {
+  display: grid;
+  grid-template-columns:
+    repeat(
+      3,
+      minmax(0, 1fr)
+    );
+  gap: 9px;
+  max-height: 260px;
+  overflow-y: auto;
+  padding: 1px 3px 2px 1px;
+  scrollbar-width: thin;
+}
+
+.richFindTimeSlots button {
+  min-width: 0;
+  min-height: 76px;
+  display: grid;
+  align-content: center;
+  gap: 5px;
+  padding: 12px 14px;
+  border: 1px solid #d6e1e9;
+  border-radius: 12px;
+  background: #ffffff;
+  text-align: left;
+  box-shadow: 0 1px 2px rgba(18, 47, 69, 0.025);
+  cursor: pointer;
+  transition:
+    border-color 140ms ease,
+    background 140ms ease,
+    transform 140ms ease,
+    box-shadow 140ms ease;
+}
+
+.richFindTimeSlots button:hover {
+  border-color: #8da9bd;
+  background: #fbfdfe;
+  box-shadow:
+    0 7px 18px
+    rgba(21, 61, 93, 0.08);
+  transform: translateY(-1px);
+}
+
+.richFindTimeSlots button strong {
+  overflow: hidden;
+  color: #214863;
+  font-size: 11.5px;
+  line-height: 1.3;
+  font-weight: 800;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.richFindTimeSlots button span {
+  overflow: hidden;
+  color: #668195;
+  font-size: 10.5px;
+  line-height: 1.35;
+  font-weight: 500;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.richFindTimeEmpty {
+  padding: 13px;
+  border: 1px dashed #d4dee6;
+  border-radius: 9px;
+  color: #7f93a2;
+  text-align: center;
+  font-size: 11px;
+}
+
+.richFindTimeMore {
+  display: block;
+  padding-top: 1px;
+  color: #8396a4;
+  font-size: 10px;
+}
+
+@media (max-width: 850px) {
+  .richFindTimeHeading {
+    display: grid;
+  }
+
+  .richFindTimeControls {
+    justify-content: flex-start;
+  }
+
+  .richFindTimeSlots {
+    grid-template-columns:
+      repeat(
+        2,
+        minmax(0, 1fr)
+      );
+  }
+}
+
+@media (max-width: 520px) {
+  .richFindTimeControls {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .richFindTimeSlots {
+    grid-template-columns: 1fr;
+  }
+}
+
+
+.richFindTimeControls select:focus,
+.richFindTimeControls select:focus-visible {
+  border-color: #829fb4;
+  outline: none;
+  box-shadow:
+    0 0 0 3px
+    rgba(57, 98, 128, 0.08);
+}
+
+.richFindTimeControls button:hover:not(:disabled) {
+  border-color: #123653;
+  background: #123653;
+  box-shadow:
+    0 5px 13px
+    rgba(18, 54, 83, 0.14);
+}
+
+.richFindTimeControls button:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+
+/* ======================================================
+   FINAL CALENDAR EDITOR POLISH
+   ====================================================== */
+
+.richEventEditor {
+  width: min(1180px, calc(100vw - 48px));
+  max-height: calc(100vh - 44px);
+  border-radius: 20px;
+  box-shadow:
+    0 28px 80px rgba(8, 27, 43, 0.22),
+    0 4px 14px rgba(8, 27, 43, 0.06);
+}
+
+.richEventEditorHeader {
+  padding: 18px 22px;
+  min-height: 86px;
+}
+
+.richEventEditorHeader h2 {
+  font-size: 23px;
+}
+
+.richEventHeaderActions {
+  gap: 9px;
+}
+
+.richEventHeaderActions button {
+  min-height: 42px;
+  border-radius: 10px;
+}
+
+.richEventEditorBody {
+  grid-template-columns:
+    minmax(0, 1fr) 305px;
+}
+
+.richEventMain {
+  padding: 26px 30px 34px;
+}
+
+.richEventSidebar {
+  padding: 24px 20px 30px;
+  background: #f8fafc;
+}
+
+.richEventTitle {
+  margin-bottom: 24px;
+  padding-bottom: 10px;
+  font-size: 27px;
+}
+
+.richEditorSection {
+  grid-template-columns:
+    32px minmax(0, 1fr);
+  gap: 13px;
+  margin-bottom: 18px;
+}
+
+.richEditorSectionIcon {
+  min-height: 40px;
+}
+
+.richEditorGrid {
+  gap: 9px;
+}
+
+.richEditorInlineOptions {
+  margin-top: 10px;
+}
+
+.richConferenceCard,
+.richReminderCard,
+.richFindTimeCard {
+  border-color: #d9e3ea;
+  background: #f9fbfc;
+  box-shadow:
+    0 1px 2px rgba(19, 49, 71, 0.02);
+}
+
+.richConferenceCard {
+  padding: 13px;
+}
+
+.richReminderCard {
+  padding: 13px;
+}
+
+.richFindTimeCard {
+  padding: 18px 20px;
+  gap: 13px;
+}
+
+.richFindTimeHeading {
+  align-items: center;
+}
+
+.richFindTimeControls {
+  gap: 8px;
+}
+
+.richFindTimeControls select,
+.richFindTimeControls button {
+  height: 42px;
+  min-height: 42px;
+}
+
+.richFindTimeControls select {
+  width: 160px;
+  min-width: 160px;
+}
+
+.richFindTimeSlots {
+  gap: 8px;
+  max-height: 238px;
+}
+
+.richFindTimeSlots button {
+  position: relative;
+  min-height: 70px;
+  padding: 11px 13px;
+  border-radius: 11px;
+}
+
+.richFindTimeSlotSelected {
+  border-color: #173f62 !important;
+  background: #f1f6fa !important;
+  box-shadow:
+    0 0 0 2px rgba(23, 63, 98, 0.08) !important;
+}
+
+.richFindTimeSlotSelected::after {
+  content: "✓";
+  position: absolute;
+  top: 8px;
+  right: 9px;
+  width: 19px;
+  height: 19px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: #173f62;
+  color: #ffffff;
+  font-size: 11px;
+  font-weight: 900;
+}
+
+.richGuestPanel {
+  gap: 14px;
+}
+
+.richSidebarHeading {
+  gap: 9px;
+}
+
+.richSidebarHeading strong {
+  font-size: 14px;
+}
+
+.richGuestComposer {
+  gap: 6px;
+}
+
+.richGuestNameInput,
+.richGuestInput input {
+  min-height: 40px;
+}
+
+.richGuestInput button {
+  min-height: 40px;
+}
+
+.richGuestEmpty {
+  padding: 14px 10px;
+}
+
+.richGuestSettings {
+  gap: 9px;
+  padding-top: 2px;
+}
+
+.richConnectedCalendar {
+  margin-top: 20px;
+  padding: 12px;
+  border-radius: 10px;
+}
+
+.richProviderIdentity {
+  margin-top: 10px;
+  padding: 11px 12px;
+}
+
+.richEventEditorFooter {
+  min-height: 68px;
+  padding: 13px 22px;
+  background: rgba(255, 255, 255, 0.98);
+}
+
+.richEventEditorFooter button {
+  min-height: 40px;
+  border-radius: 9px;
+}
+
+.richEventEditorFooter .richEventSaveButton {
+  padding-left: 18px;
+  padding-right: 18px;
+}
+
+@media (max-width: 1050px) {
+  .richEventEditorBody {
+    grid-template-columns:
+      minmax(0, 1fr) 285px;
+  }
+
+  .richEventMain {
+    padding-left: 24px;
+    padding-right: 24px;
+  }
+}
+
+@media (max-width: 900px) {
+  .richEventEditor {
+    width: calc(100vw - 24px);
+    max-height: calc(100vh - 24px);
+  }
+
+  .richEventMain {
+    padding: 22px 20px 28px;
+  }
+
+  .richEventSidebar {
+    padding: 20px;
+  }
+}
