@@ -775,3 +775,128 @@
 }
 
 /* CAMPAIGN SEAT MOBILE STACKED LOGIN — END */
+
+
+/* ============================================================
+   CAMPAIGN SEAT — FINAL MFA SHELL
+   MFA uses the proven normal login desktop proportions.
+   ============================================================ */
+
+.mfaFormPanel {
+  align-items: center !important;
+
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+
+  padding: 18px !important;
+
+  overscroll-behavior: contain !important;
+  scrollbar-gutter: stable !important;
+}
+
+.mfaFormPanel > * {
+  width: min(100%, 540px) !important;
+  max-width: 540px !important;
+  min-width: 0 !important;
+
+  max-height: none !important;
+
+  margin:
+    auto
+    0 !important;
+
+  zoom: 1 !important;
+
+  transform: none !important;
+  transform-origin: center center !important;
+}
+
+
+/*
+ * Once the window is narrow enough that two panels would begin
+ * squeezing one another, MFA becomes one clean security screen.
+ */
+@media (max-width: 1180px) {
+
+  .mfaLoginLayout {
+    display: block !important;
+
+    width: 100% !important;
+
+    height: 100dvh !important;
+    min-height: 100dvh !important;
+    max-height: 100dvh !important;
+
+    overflow: hidden !important;
+  }
+
+  .mfaHeroPanel {
+    display: none !important;
+  }
+
+  .mfaFormPanel {
+    width: 100% !important;
+    max-width: 100% !important;
+
+    height: 100dvh !important;
+    min-height: 100dvh !important;
+    max-height: 100dvh !important;
+
+    justify-content: center !important;
+
+    padding:
+      20px
+      clamp(18px, 6vw, 56px)
+      24px !important;
+  }
+
+  .mfaFormPanel > * {
+    width: min(100%, 600px) !important;
+    max-width: 600px !important;
+  }
+}
+
+/* ============================================================
+   CAMPAIGN SEAT — FLUID DESKTOP LOGIN
+   One responsive composition. No desktop size jumps.
+   MFA is excluded and keeps its dedicated security shell.
+   ============================================================ */
+
+@media (min-width: 981px) {
+
+  .loginLayout:not(.mfaLoginLayout) {
+    grid-template-columns:
+      minmax(0, 1fr)
+      clamp(
+        540px,
+        41vw,
+        610px
+      ) !important;
+  }
+
+  .loginLayout:not(.mfaLoginLayout)
+  .formPanelStatic {
+    align-items: center !important;
+    justify-content: center !important;
+
+    padding:
+      clamp(12px, 1.6vh, 18px)
+      clamp(12px, 1.4vw, 20px) !important;
+
+    overflow: hidden !important;
+  }
+
+  .loginLayout:not(.mfaLoginLayout)
+  .formPanelStatic > * {
+    width: min(100%, 570px) !important;
+    max-width: 570px !important;
+
+    max-height: calc(100dvh - 24px) !important;
+
+    margin: auto !important;
+
+    zoom: 1 !important;
+    transform: none !important;
+    transform-origin: center center !important;
+  }
+}

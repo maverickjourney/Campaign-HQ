@@ -850,3 +850,201 @@
 }
 
 /* CAMPAIGN SEAT MOBILE LOGIN FORM — END */
+
+/* ============================================================
+   CAMPAIGN SEAT — FLUID DESKTOP LOGIN CARD
+   One design that continuously adapts with the browser.
+   ============================================================ */
+
+@media (min-width: 981px) {
+
+  .wrapper {
+    width: min(100%, 570px) !important;
+    max-height: calc(100dvh - 24px) !important;
+
+    margin: auto !important;
+    padding: 0 !important;
+  }
+
+  .loginCard {
+    width: 100% !important;
+
+    padding:
+      clamp(19px, 2.3vh, 24px)
+      clamp(27px, 2.5vw, 35px) !important;
+
+    border-radius:
+      clamp(21px, 1.6vw, 25px) !important;
+  }
+
+  .security {
+    display: none !important;
+  }
+
+  .eyebrow {
+    margin-bottom: 6px !important;
+
+    font-size:
+      clamp(
+        10.5px,
+        0.82vw,
+        12px
+      ) !important;
+  }
+
+  .heading {
+    margin-bottom:
+      clamp(
+        11px,
+        1.4vh,
+        15px
+      ) !important;
+  }
+
+  .heading h2 {
+    font-size:
+      clamp(
+        44px,
+        min(3.35vw, 5.4vh),
+        50px
+      ) !important;
+
+    line-height: 0.94 !important;
+  }
+
+  .heading > p:last-child {
+    max-width: 480px !important;
+
+    margin-top: 7px !important;
+
+    font-size:
+      clamp(
+        12px,
+        0.88vw,
+        13.5px
+      ) !important;
+
+    line-height: 1.46 !important;
+  }
+
+  .fieldGroup {
+    margin-bottom:
+      clamp(
+        8px,
+        1vh,
+        10px
+      ) !important;
+  }
+
+  .fieldGroup label {
+    margin-bottom: 5px !important;
+
+    font-size:
+      clamp(
+        12.5px,
+        0.9vw,
+        13.5px
+      ) !important;
+
+    font-weight: 800 !important;
+  }
+
+  .inputWrap input {
+    height:
+      clamp(
+        46px,
+        5.2vh,
+        49px
+      ) !important;
+
+    font-size:
+      clamp(
+        13.5px,
+        0.95vw,
+        14.5px
+      ) !important;
+  }
+
+  .options {
+    margin-bottom:
+      clamp(
+        8px,
+        1.1vh,
+        11px
+      ) !important;
+  }
+
+  .remember,
+  .textButton {
+    font-size:
+      clamp(
+        12px,
+        0.86vw,
+        13px
+      ) !important;
+  }
+
+  .submitButton {
+    min-height:
+      clamp(
+        47px,
+        5.3vh,
+        50px
+      ) !important;
+
+    font-size:
+      clamp(
+        12.5px,
+        0.9vw,
+        13.5px
+      ) !important;
+  }
+
+  .divider {
+    margin:
+      8px
+      0 !important;
+
+    font-size: 11.5px !important;
+  }
+
+  .googleButton {
+    min-height:
+      clamp(
+        43px,
+        4.9vh,
+        46px
+      ) !important;
+
+    font-size:
+      clamp(
+        12px,
+        0.86vw,
+        13px
+      ) !important;
+  }
+
+  .help {
+    margin-top: 8px !important;
+
+    font-size:
+      clamp(
+        11px,
+        0.78vw,
+        12px
+      ) !important;
+  }
+
+  .help button {
+    font-size: inherit !important;
+  }
+
+  .footer {
+    font-size:
+      clamp(
+        10.5px,
+        0.76vw,
+        11.5px
+      ) !important;
+  }
+}

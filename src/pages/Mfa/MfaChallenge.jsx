@@ -10,8 +10,9 @@ import {
   KeyRound,
   LoaderCircle,
   LogOut,
+  MessageSquareText,
+  QrCode,
   ShieldCheck,
-  Smartphone,
 } from "lucide-react";
 
 import {
@@ -20,14 +21,19 @@ import {
   useNavigate,
 } from "react-router-dom";
 
-import LoginLayout from "../../layouts/LoginLayout/LoginLayout";
+import LoginLayout
+  from "../../layouts/LoginLayout/LoginLayout";
 
 import {
   restoreCampaignSession,
 } from "../../services/auth";
 
 import {
+  PHONE_MFA_ENABLED,
+  challengePhoneFactor,
   getMfaState,
+  maskPhoneNumber,
+  verifyPhoneFactor,
   verifyTotpFactor,
 } from "../../services/mfa";
 
@@ -35,19 +41,45 @@ import {
   clearCampaignSession,
 } from "../../utils/campaignSession";
 
-import { supabase } from "../../lib/supabase";
+import {
+  supabase,
+} from "../../lib/supabase";
 
 import styles from "./Mfa.module.css";
+
+function getFactorType(
+  factor,
+) {
+  return (
+    factor?.factorType ||
+    factor?.factor_type ||
+    (
+      factor?.phone
+        ? "phone"
+        : "totp"
+    )
+  );
+}
 
 function getFactorLabel(
   factor,
   index,
 ) {
+  if (
+    getFactorType(
+      factor,
+    ) === "phone"
+  ) {
+    return `Text message · ${maskPhoneNumber(
+      factor?.phone,
+    )}`;
+  }
+
   const storedName =
     String(
       factor?.friendly_name ||
-        factor?.friendlyName ||
-        "",
+      factor?.friendlyName ||
+      "",
     )
       .replace(
         /\s+\d{14}$/,
@@ -60,8 +92,8 @@ function getFactorLabel(
   }
 
   return index === 0
-    ? "Primary authenticator"
-    : `Backup authenticator ${index}`;
+    ? "Authenticator app"
+    : `Authenticator ${index + 1}`;
 }
 
 export default function MfaChallenge() {
@@ -93,6 +125,11 @@ export default function MfaChallenge() {
   ] = useState("");
 
   const [
+    challengeId,
+    setChallengeId,
+  ] = useState("");
+
+  const [
     code,
     setCode,
   ] = useState("");
@@ -118,6 +155,15 @@ export default function MfaChallenge() {
       ],
     );
 
+  const selectedType =
+    getFactorType(
+      selectedFactor,
+    );
+
+  const phoneSelected =
+    selectedType ===
+    "phone";
+
   useEffect(() => {
     let active = true;
 
@@ -139,8 +185,7 @@ export default function MfaChallenge() {
           navigate(
             "/",
             {
-              replace:
-                true,
+              replace: true,
             },
           );
 
@@ -159,8 +204,7 @@ export default function MfaChallenge() {
             navigate(
               destination,
               {
-                replace:
-                  true,
+                replace: true,
               },
             );
 
@@ -178,8 +222,7 @@ export default function MfaChallenge() {
             navigate(
               "/mfa/setup",
               {
-                replace:
-                  true,
+                replace: true,
 
                 state: {
                   from:
@@ -212,12 +255,12 @@ export default function MfaChallenge() {
           setErrorMessage(
             error instanceof Error
               ? error.message
-              : "Campaign Seat could not prepare the authenticator challenge.",
+              : "Campaign Seat could not prepare two-step verification.",
           );
         }
       };
 
-    initialize();
+    void initialize();
 
     return () => {
       active = false;
@@ -233,11 +276,63 @@ export default function MfaChallenge() {
         factorId,
       );
 
+      setChallengeId("");
       setCode("");
+      setErrorMessage("");
+    };
 
-      setErrorMessage(
-        "",
+  const sendPhoneCode =
+    async () => {
+      if (
+        !selectedFactor ||
+        !phoneSelected
+      ) {
+        return;
+      }
+
+      if (!PHONE_MFA_ENABLED) {
+        setErrorMessage(
+          "Text-message verification is not enabled in this environment yet.",
+        );
+
+        return;
+      }
+
+      setStatus(
+        "sending",
       );
+
+      setErrorMessage("");
+
+      try {
+        const result =
+          await challengePhoneFactor({
+            factorId:
+              selectedFactor.id,
+          });
+
+        setChallengeId(
+          result.challengeId,
+        );
+
+        setCode("");
+
+        setStatus(
+          "ready",
+        );
+      } catch (
+        error
+      ) {
+        setStatus(
+          "ready",
+        );
+
+        setErrorMessage(
+          error instanceof Error
+            ? error.message
+            : "Campaign Seat could not send the verification text.",
+        );
+      }
     };
 
   const handleSubmit =
@@ -251,7 +346,18 @@ export default function MfaChallenge() {
         code.length !== 6
       ) {
         setErrorMessage(
-          "Choose an authenticator and enter its complete six-digit code.",
+          "Enter the complete six-digit security code.",
+        );
+
+        return;
+      }
+
+      if (
+        phoneSelected &&
+        !challengeId
+      ) {
+        setErrorMessage(
+          "Send a text code first.",
         );
 
         return;
@@ -261,25 +367,35 @@ export default function MfaChallenge() {
         "verifying",
       );
 
-      setErrorMessage(
-        "",
-      );
+      setErrorMessage("");
 
       try {
-        await verifyTotpFactor({
-          factorId:
-            selectedFactor.id,
+        if (
+          phoneSelected
+        ) {
+          await verifyPhoneFactor({
+            factorId:
+              selectedFactor.id,
 
-          code,
-        });
+            challengeId,
+
+            code,
+          });
+        } else {
+          await verifyTotpFactor({
+            factorId:
+              selectedFactor.id,
+
+            code,
+          });
+        }
 
         await restoreCampaignSession();
 
         navigate(
           destination,
           {
-            replace:
-              true,
+            replace: true,
           },
         );
       } catch (
@@ -292,7 +408,7 @@ export default function MfaChallenge() {
         setErrorMessage(
           error instanceof Error
             ? error.message
-            : "The authenticator code could not be verified.",
+            : "The security code could not be verified.",
         );
       }
     };
@@ -304,8 +420,7 @@ export default function MfaChallenge() {
       navigate(
         "/",
         {
-          replace:
-            true,
+          replace: true,
         },
       );
     };
@@ -348,9 +463,9 @@ export default function MfaChallenge() {
               </strong>
 
               <span>
-                Password accepted. Verify
-                an enrolled authenticator
-                to continue.
+                Password accepted.
+                Complete your second
+                security step to continue.
               </span>
             </div>
           </div>
@@ -378,7 +493,7 @@ export default function MfaChallenge() {
               </span>
 
               <h1>
-                Checking authenticators
+                Checking security methods
               </h1>
 
               <p>
@@ -394,9 +509,15 @@ export default function MfaChallenge() {
                   styles.challengeIcon
                 }
               >
-                <Smartphone
-                  size={30}
-                />
+                {phoneSelected ? (
+                  <MessageSquareText
+                    size={30}
+                  />
+                ) : (
+                  <QrCode
+                    size={30}
+                  />
+                )}
               </div>
 
               <div
@@ -409,223 +530,312 @@ export default function MfaChallenge() {
                     styles.eyebrow
                   }
                 >
-                  Authenticator required
+                  Security code required
                 </span>
 
                 <h1>
-                  Enter your six-digit
-                  code
+                  Verify your identity
                 </h1>
 
                 <p>
-                  Use a code from one of
-                  the trusted authenticators
-                  connected to this account.
+                  Choose a trusted security
+                  method connected to this
+                  account.
                 </p>
               </div>
 
-              {factors.length >
-                1 && (
-                <div
-                  className={
-                    styles.factorChoices
-                  }
-                >
-                  <span>
-                    Choose authenticator
-                  </span>
-
-                  <div
-                    className={
-                      styles.factorChoiceList
-                    }
-                  >
-                    {factors.map(
-                      (
-                        factor,
-                        index,
-                      ) => {
-                        const selected =
-                          factor.id ===
-                          selectedFactor
-                            ?.id;
-
-                        return (
-                          <button
-                            className={[
-                              styles.factorChoice,
-
-                              selected
-                                ? styles.factorChoiceSelected
-                                : "",
-                            ]
-                              .filter(Boolean)
-                              .join(" ")}
-                            type="button"
-                            key={
-                              factor.id
-                            }
-                            aria-pressed={
-                              selected
-                            }
-                            onClick={() =>
-                              selectFactor(
-                                factor.id,
-                              )
-                            }
-                            disabled={
-                              status ===
-                              "verifying"
-                            }
-                          >
-                            <Smartphone
-                              size={18}
-                            />
-
-                            <span>
-                              {getFactorLabel(
-                                factor,
-                                index,
-                              )}
-                            </span>
-
-                            {selected && (
-                              <CheckCircle2
-                                size={17}
-                              />
-                            )}
-                          </button>
-                        );
-                      },
-                    )}
-                  </div>
-                </div>
-              )}
-
-              <form
+              <div
                 className={
-                  styles.form
-                }
-                onSubmit={
-                  handleSubmit
+                  styles.factorChoices
                 }
               >
-                <label>
-                  <span>
-                    Authenticator code
-                  </span>
+                <span>
+                  Verification method
+                </span>
 
-                  <div
-                    className={
-                      styles.codeInput
-                    }
-                  >
-                    <KeyRound
-                      size={19}
-                    />
+                <div
+                  className={
+                    styles.factorChoiceList
+                  }
+                >
+                  {factors.map(
+                    (
+                      factor,
+                      index,
+                    ) => {
+                      const selected =
+                        factor.id ===
+                        selectedFactor
+                          ?.id;
 
-                    <input
-                      type="text"
-                      inputMode="numeric"
-                      autoComplete="one-time-code"
-                      value={
-                        code
-                      }
-                      onChange={(
-                        event,
-                      ) => {
-                        setCode(
-                          event.target
-                            .value
-                            .replace(
-                              /\D/g,
-                              "",
+                      const type =
+                        getFactorType(
+                          factor,
+                        );
+
+                      return (
+                        <button
+                          className={[
+                            styles.factorChoice,
+
+                            selected
+                              ? styles.factorChoiceSelected
+                              : "",
+                          ]
+                            .filter(Boolean)
+                            .join(" ")}
+                          type="button"
+                          key={
+                            factor.id
+                          }
+                          aria-pressed={
+                            selected
+                          }
+                          onClick={() =>
+                            selectFactor(
+                              factor.id,
                             )
-                            .slice(
-                              0,
-                              6,
-                            ),
-                        );
+                          }
+                          disabled={
+                            status ===
+                            "verifying" ||
+                            status ===
+                            "sending"
+                          }
+                        >
+                          {type ===
+                          "phone" ? (
+                            <MessageSquareText
+                              size={18}
+                            />
+                          ) : (
+                            <QrCode
+                              size={18}
+                            />
+                          )}
 
-                        setErrorMessage(
-                          "",
-                        );
-                      }}
-                      placeholder="000000"
-                      maxLength={6}
-                      autoFocus
-                      disabled={
-                        status ===
-                        "verifying"
-                      }
-                      required
-                    />
-                  </div>
-                </label>
+                          <span>
+                            {getFactorLabel(
+                              factor,
+                              index,
+                            )}
+                          </span>
 
-                {errorMessage && (
-                  <p
-                    className={
-                      styles.errorMessage
-                    }
-                    role="alert"
-                  >
-                    {errorMessage}
-                  </p>
-                )}
-
-                <button
-                  className={
-                    styles.primaryButton
-                  }
-                  type="submit"
-                  disabled={
-                    status ===
-                      "verifying" ||
-                    code.length !==
-                      6 ||
-                    !selectedFactor
-                  }
-                >
-                  {status ===
-                  "verifying" ? (
-                    <>
-                      <LoaderCircle
-                        className={
-                          styles.buttonSpinner
-                        }
-                        size={18}
-                      />
-
-                      Verifying…
-                    </>
-                  ) : (
-                    <>
-                      <ShieldCheck
-                        size={18}
-                      />
-
-                      Verify and continue
-                    </>
+                          {selected && (
+                            <CheckCircle2
+                              size={17}
+                            />
+                          )}
+                        </button>
+                      );
+                    },
                   )}
-                </button>
+                </div>
+              </div>
 
-                <button
+              {phoneSelected &&
+              !challengeId ? (
+                <div
                   className={
-                    styles.signOutButton
-                  }
-                  type="button"
-                  onClick={
-                    signOut
+                    styles.deliveryPanel
                   }
                 >
-                  <LogOut
-                    size={17}
+                  <MessageSquareText
+                    size={22}
                   />
 
-                  Use another account
-                </button>
-              </form>
+                  <div>
+                    <strong>
+                      Send a security code
+                    </strong>
+
+                    <span>
+                      We&apos;ll text a
+                      six-digit code to{" "}
+                      {maskPhoneNumber(
+                        selectedFactor
+                          ?.phone,
+                      )}
+                      .
+                    </span>
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={
+                      sendPhoneCode
+                    }
+                    disabled={
+                      status ===
+                        "sending" ||
+                      !PHONE_MFA_ENABLED
+                    }
+                  >
+                    {status ===
+                    "sending"
+                      ? "Sending…"
+                      : "Text me a code"}
+                  </button>
+                </div>
+              ) : (
+                <form
+                  className={
+                    styles.form
+                  }
+                  onSubmit={
+                    handleSubmit
+                  }
+                >
+                  <label>
+                    <span>
+                      {phoneSelected
+                        ? "Text message code"
+                        : "Authenticator code"}
+                    </span>
+
+                    <div
+                      className={
+                        styles.codeInput
+                      }
+                    >
+                      <KeyRound
+                        size={19}
+                      />
+
+                      <input
+                        type="text"
+                        inputMode="numeric"
+                        autoComplete="one-time-code"
+                        value={
+                          code
+                        }
+                        onChange={(
+                          event,
+                        ) => {
+                          setCode(
+                            event.target
+                              .value
+                              .replace(
+                                /\D/g,
+                                "",
+                              )
+                              .slice(
+                                0,
+                                6,
+                              ),
+                          );
+
+                          setErrorMessage(
+                            "",
+                          );
+                        }}
+                        placeholder="000000"
+                        maxLength={6}
+                        autoFocus
+                        disabled={
+                          status ===
+                          "verifying"
+                        }
+                        required
+                      />
+                    </div>
+                  </label>
+
+                  {phoneSelected && (
+                    <div
+                      className={
+                        styles.inlineActions
+                      }
+                    >
+                      <button
+                        type="button"
+                        onClick={
+                          sendPhoneCode
+                        }
+                        disabled={
+                          status ===
+                            "verifying"
+                        }
+                      >
+                        Send another code
+                      </button>
+                    </div>
+                  )}
+
+                  {errorMessage && (
+                    <p
+                      className={
+                        styles.errorMessage
+                      }
+                      role="alert"
+                    >
+                      {errorMessage}
+                    </p>
+                  )}
+
+                  <button
+                    className={
+                      styles.primaryButton
+                    }
+                    type="submit"
+                    disabled={
+                      status ===
+                        "verifying" ||
+                      code.length !==
+                        6 ||
+                      !selectedFactor
+                    }
+                  >
+                    {status ===
+                    "verifying" ? (
+                      <>
+                        <LoaderCircle
+                          className={
+                            styles.buttonSpinner
+                          }
+                          size={18}
+                        />
+                        Verifying…
+                      </>
+                    ) : (
+                      <>
+                        <ShieldCheck
+                          size={18}
+                        />
+                        Verify and continue
+                      </>
+                    )}
+                  </button>
+                </form>
+              )}
+
+              {errorMessage &&
+              phoneSelected &&
+              !challengeId ? (
+                <p
+                  className={
+                    styles.errorMessage
+                  }
+                  role="alert"
+                >
+                  {errorMessage}
+                </p>
+              ) : null}
+
+              <button
+                className={
+                  styles.signOutButton
+                }
+                type="button"
+                onClick={
+                  signOut
+                }
+              >
+                <LogOut
+                  size={17}
+                />
+                Use another account
+              </button>
             </>
           )}
         </section>
@@ -635,13 +845,10 @@ export default function MfaChallenge() {
             styles.footer
           }
         >
-          <Link
-            to="/"
-          >
+          <Link to="/">
             <ArrowLeft
               size={15}
             />
-
             Sign in
           </Link>
 

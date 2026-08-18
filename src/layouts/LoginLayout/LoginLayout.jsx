@@ -14,6 +14,12 @@ const SCROLLABLE_ACCOUNT_ROUTES =
     "/mfa/challenge",
   ]);
 
+const MFA_ACCOUNT_ROUTES =
+  new Set([
+    "/mfa/setup",
+    "/mfa/challenge",
+  ]);
+
 export default function LoginLayout({
   children = null,
 }) {
@@ -25,26 +31,45 @@ export default function LoginLayout({
       location.pathname,
     );
 
+  const isMfaRoute =
+    MFA_ACCOUNT_ROUTES.has(
+      location.pathname,
+    );
+
   const formPanelClassName = [
     styles.formPanel,
 
     isScrollableRoute
       ? styles.formPanelScrollable
       : styles.formPanelStatic,
+
+    isMfaRoute
+      ? styles.mfaFormPanel
+      : "",
   ]
     .filter(Boolean)
     .join(" ");
 
   return (
     <main
-      className={
-        styles.loginLayout
-      }
+      className={[
+        styles.loginLayout,
+        isMfaRoute
+          ? styles.mfaLoginLayout
+          : "",
+      ]
+        .filter(Boolean)
+        .join(" ")}
     >
       <section
-        className={
-          styles.heroPanel
-        }
+        className={[
+          styles.heroPanel,
+          isMfaRoute
+            ? styles.mfaHeroPanel
+            : "",
+        ]
+          .filter(Boolean)
+          .join(" ")}
       >
         <Hero />
       </section>

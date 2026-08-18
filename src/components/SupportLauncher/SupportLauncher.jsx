@@ -12,6 +12,10 @@ export default function SupportLauncher() {
 
   if (
     location.pathname === "/support" ||
+    location.pathname === "/mfa/setup" ||
+    location.pathname === "/mfa/challenge" ||
+    location.pathname === "/forgot-password" ||
+    location.pathname === "/reset-password" ||
     location.pathname === "/dashboard" ||
     location.pathname === "/volunteers" ||
     location.pathname === "/inbox" ||
