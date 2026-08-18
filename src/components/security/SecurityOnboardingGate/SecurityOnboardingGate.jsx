@@ -210,7 +210,7 @@ export default function SecurityOnboardingGate() {
               <small>
                 {hasAal2
                   ? "Current session is AAL2 protected."
-                  : "Authenticator verification is required."}
+                  : "A verified second step is required."}
               </small>
             </div>
           </article>
@@ -234,13 +234,13 @@ export default function SecurityOnboardingGate() {
 
             <div>
               <strong>
-                Verified authenticator
+                Verified method
               </strong>
 
               <small>
                 {hasVerifiedFactor
-                  ? `${verifiedFactors.length} verified authenticator${verifiedFactors.length === 1 ? "" : "s"}.`
-                  : "Add and verify an authenticator first."}
+                  ? `${verifiedFactors.length} verified method${verifiedFactors.length === 1 ? "" : "s"}.`
+                  : "Add and verify a two-step method first."}
               </small>
             </div>
           </article>
@@ -258,7 +258,7 @@ export default function SecurityOnboardingGate() {
 
             <div>
               <strong>
-                Backup authenticator
+                Backup verification method
               </strong>
 
               <small>
@@ -323,7 +323,7 @@ export default function SecurityOnboardingGate() {
                 ? "Continue with campaign roles and access."
                 : securityReady
                   ? "Your protected session meets the Security requirement."
-                  : "Complete authenticator verification before continuing."}
+                  : "Complete two-step verification before continuing."}
             </span>
           </div>
 

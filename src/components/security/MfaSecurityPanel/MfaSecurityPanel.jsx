@@ -9,6 +9,7 @@ import {
   Clipboard,
   KeyRound,
   LoaderCircle,
+  MessageSquareText,
   Plus,
   QrCode,
   ShieldCheck,
@@ -18,10 +19,16 @@ import {
 } from "lucide-react";
 
 import {
+  PHONE_MFA_ENABLED,
+  beginPhoneEnrollment,
   beginTotpEnrollment,
+  cancelPhoneEnrollment,
   cancelTotpEnrollment,
+  challengePhoneFactor,
   getMfaState,
+  maskPhoneNumber,
   removeMfaFactor,
+  verifyPhoneFactor,
   verifyTotpFactor,
 } from "../../../services/mfa";
 
@@ -53,6 +60,43 @@ function formatFactorDate(value) {
   ).format(date);
 }
 
+function getFactorType(factor) {
+  return (
+    factor?.factorType ||
+    factor?.factor_type ||
+    (
+      factor?.phone
+        ? "phone"
+        : "totp"
+    )
+  );
+}
+
+function getAuthenticatorName(
+  factor,
+  index,
+) {
+  const storedName =
+    String(
+      factor?.friendly_name ||
+      factor?.friendlyName ||
+      "",
+    )
+      .replace(
+        /\s+\d{14}$/,
+        "",
+      )
+      .trim();
+
+  if (storedName) {
+    return storedName;
+  }
+
+  return index === 0
+    ? "Authenticator app"
+    : `Authenticator app ${index + 1}`;
+}
+
 export default function MfaSecurityPanel({
   onStateChange = null,
 }) {
@@ -67,6 +111,11 @@ export default function MfaSecurityPanel({
   ] = useState(null);
 
   const [
+    phone,
+    setPhone,
+  ] = useState("");
+
+  const [
     code,
     setCode,
   ] = useState("");
@@ -74,7 +123,9 @@ export default function MfaSecurityPanel({
   const [
     status,
     setStatus,
-  ] = useState("loading");
+  ] = useState(
+    "loading",
+  );
 
   const [
     errorMessage,
@@ -103,17 +154,13 @@ export default function MfaSecurityPanel({
           "loading",
         );
 
-        setErrorMessage(
-          "",
-        );
+        setErrorMessage("");
 
         try {
           const state =
             await getMfaState();
 
-          setMfaState(
-            state,
-          );
+          setMfaState(state);
 
           setStatus(
             "ready",
@@ -128,7 +175,7 @@ export default function MfaSecurityPanel({
           setErrorMessage(
             error instanceof Error
               ? error.message
-              : "Campaign Seat could not load authenticator settings.",
+              : "Campaign Seat could not load two-step verification settings.",
           );
         }
       },
@@ -139,7 +186,7 @@ export default function MfaSecurityPanel({
     const timeoutId =
       window.setTimeout(
         () => {
-          loadMfaState();
+          void loadMfaState();
         },
         0,
       );
@@ -173,36 +220,50 @@ export default function MfaSecurityPanel({
       ?.verifiedFactors ||
     [];
 
+  const verifiedTotpFactors =
+    mfaState
+      ?.verifiedTotpFactors ||
+    [];
+
+  const verifiedPhoneFactors =
+    mfaState
+      ?.verifiedPhoneFactors ||
+    [];
+
   const hasBackupFactor =
     verifiedFactors.length >=
     2;
 
-  const startBackupEnrollment =
+  const hasAuthenticator =
+    verifiedTotpFactors.length >
+    0;
+
+  const hasPhone =
+    verifiedPhoneFactors.length >
+    0;
+
+  const startAuthenticatorEnrollment =
     async () => {
       setStatus(
         "starting",
       );
 
-      setErrorMessage(
-        "",
-      );
-
-      setSuccessMessage(
-        "",
-      );
+      setErrorMessage("");
+      setSuccessMessage("");
 
       try {
         const result =
           await beginTotpEnrollment({
             friendlyName:
-              verifiedFactors.length
-                ? "Campaign Seat Backup Authenticator"
+              hasAuthenticator
+                ? `Campaign Seat Authenticator ${verifiedTotpFactors.length + 1}`
                 : "Campaign Seat Authenticator",
           });
 
-        setEnrollment(
-          result,
-        );
+        setEnrollment({
+          ...result,
+          type: "totp",
+        });
 
         setCode("");
 
@@ -219,7 +280,47 @@ export default function MfaSecurityPanel({
         setErrorMessage(
           error instanceof Error
             ? error.message
-            : "Campaign Seat could not begin backup-authenticator setup.",
+            : "Campaign Seat could not begin authenticator setup.",
+        );
+      }
+    };
+
+  const startPhoneEnrollment =
+    async () => {
+      setStatus(
+        "starting-phone",
+      );
+
+      setErrorMessage("");
+      setSuccessMessage("");
+
+      try {
+        const result =
+          await beginPhoneEnrollment({
+            phone,
+          });
+
+        setEnrollment({
+          ...result,
+          type: "phone",
+        });
+
+        setCode("");
+
+        setStatus(
+          "enrolling",
+        );
+      } catch (
+        error
+      ) {
+        setStatus(
+          "ready",
+        );
+
+        setErrorMessage(
+          error instanceof Error
+            ? error.message
+            : "Campaign Seat could not begin text-message verification.",
         );
       }
     };
@@ -237,7 +338,7 @@ export default function MfaSecurityPanel({
           6
       ) {
         setErrorMessage(
-          "Enter the complete six-digit code from the new authenticator.",
+          "Enter the complete six-digit security code.",
         );
 
         return;
@@ -247,27 +348,34 @@ export default function MfaSecurityPanel({
         "verifying",
       );
 
-      setErrorMessage(
-        "",
-      );
+      setErrorMessage("");
 
       try {
         const result =
-          await verifyTotpFactor({
-            factorId:
-              enrollment.factorId,
+          enrollment.type ===
+          "phone"
+            ? await verifyPhoneFactor({
+                factorId:
+                  enrollment.factorId,
 
-            code,
-          });
+                challengeId:
+                  enrollment.challengeId,
+
+                code,
+              })
+            : await verifyTotpFactor({
+                factorId:
+                  enrollment.factorId,
+
+                code,
+              });
 
         setMfaState(
           result.state,
         );
 
-        setEnrollment(
-          null,
-        );
-
+        setEnrollment(null);
+        setPhone("");
         setCode("");
 
         setStatus(
@@ -275,7 +383,10 @@ export default function MfaSecurityPanel({
         );
 
         setSuccessMessage(
-          "The additional authenticator was verified successfully.",
+          enrollment.type ===
+            "phone"
+            ? "Text-message verification was added successfully."
+            : "Authenticator verification was added successfully.",
         );
       } catch (
         error
@@ -287,34 +398,82 @@ export default function MfaSecurityPanel({
         setErrorMessage(
           error instanceof Error
             ? error.message
-            : "The authenticator code could not be verified.",
+            : "The security code could not be verified.",
+        );
+      }
+    };
+
+  const resendPhoneCode =
+    async () => {
+      if (
+        enrollment?.type !==
+          "phone" ||
+        !enrollment
+          ?.factorId
+      ) {
+        return;
+      }
+
+      setErrorMessage("");
+
+      try {
+        const result =
+          await challengePhoneFactor({
+            factorId:
+              enrollment.factorId,
+          });
+
+        setEnrollment(
+          (current) => ({
+            ...current,
+            challengeId:
+              result.challengeId,
+          }),
+        );
+
+        setCode("");
+
+        setSuccessMessage(
+          "A new security code was sent.",
+        );
+      } catch (
+        error
+      ) {
+        setErrorMessage(
+          error instanceof Error
+            ? error.message
+            : "Campaign Seat could not resend the security code.",
         );
       }
     };
 
   const cancelEnrollment =
     async () => {
-      setErrorMessage(
-        "",
-      );
+      setErrorMessage("");
 
       try {
-        await cancelTotpEnrollment(
-          enrollment
-            ?.factorId,
-        );
+        if (
+          enrollment?.type ===
+          "phone"
+        ) {
+          await cancelPhoneEnrollment(
+            enrollment
+              ?.factorId,
+          );
+        } else {
+          await cancelTotpEnrollment(
+            enrollment
+              ?.factorId,
+          );
+        }
       } catch (
         error
       ) {
-        console.error(
-          error,
-        );
+        console.error(error);
       }
 
-      setEnrollment(
-        null,
-      );
-
+      setEnrollment(null);
+      setPhone("");
       setCode("");
 
       setStatus(
@@ -335,19 +494,13 @@ export default function MfaSecurityPanel({
       try {
         await navigator
           .clipboard
-          .writeText(
-            secret,
-          );
+          .writeText(secret);
 
-        setCopied(
-          true,
-        );
+        setCopied(true);
 
         window.setTimeout(
           () => {
-            setCopied(
-              false,
-            );
+            setCopied(false);
           },
           1600,
         );
@@ -367,15 +520,26 @@ export default function MfaSecurityPanel({
         1
       ) {
         setErrorMessage(
-          "The final authenticator cannot be removed from a protected leadership account. Add a backup authenticator first.",
+          "The final verification method cannot be removed from a protected leadership account. Add another method first.",
         );
 
         return;
       }
 
+      const factorType =
+        getFactorType(
+          factor,
+        );
+
+      const methodName =
+        factorType ===
+        "phone"
+          ? "text-message verification"
+          : "this authenticator";
+
       const confirmed =
         window.confirm(
-          "Remove this authenticator from your Campaign Seat account? You will no longer be able to use codes from that device.",
+          `Remove ${methodName} from your Campaign Seat account?`,
         );
 
       if (!confirmed) {
@@ -386,13 +550,8 @@ export default function MfaSecurityPanel({
         factor.id,
       );
 
-      setErrorMessage(
-        "",
-      );
-
-      setSuccessMessage(
-        "",
-      );
+      setErrorMessage("");
+      setSuccessMessage("");
 
       try {
         const state =
@@ -400,12 +559,10 @@ export default function MfaSecurityPanel({
             factor.id,
           );
 
-        setMfaState(
-          state,
-        );
+        setMfaState(state);
 
         setSuccessMessage(
-          "The authenticator was removed successfully.",
+          "The verification method was removed successfully.",
         );
       } catch (
         error
@@ -413,12 +570,10 @@ export default function MfaSecurityPanel({
         setErrorMessage(
           error instanceof Error
             ? error.message
-            : "The authenticator could not be removed.",
+            : "The verification method could not be removed.",
         );
       } finally {
-        setRemovingFactorId(
-          "",
-        );
+        setRemovingFactorId("");
       }
     };
 
@@ -449,11 +604,11 @@ export default function MfaSecurityPanel({
           </span>
 
           <h2>
-            Authenticator protection
+            Two-step verification
           </h2>
 
           <p>
-            Manage the authenticator apps
+            Manage the trusted methods
             permitted to verify this
             Campaign Seat account.
           </p>
@@ -461,12 +616,12 @@ export default function MfaSecurityPanel({
 
         <div
           className={
-            hasBackupFactor
+            verifiedFactors.length
               ? styles.secureBadge
               : styles.warningBadge
           }
         >
-          {hasBackupFactor ? (
+          {verifiedFactors.length ? (
             <CheckCircle2
               size={17}
             />
@@ -478,7 +633,9 @@ export default function MfaSecurityPanel({
 
           {hasBackupFactor
             ? "Backup protected"
-            : "Backup recommended"}
+            : verifiedFactors.length
+              ? "1 method active"
+              : "Setup required"}
         </div>
       </header>
 
@@ -497,8 +654,8 @@ export default function MfaSecurityPanel({
           />
 
           <span>
-            Loading authenticator
-            security…
+            Loading two-step
+            verification…
           </span>
         </div>
       ) : (
@@ -541,38 +698,195 @@ export default function MfaSecurityPanel({
             </div>
           )}
 
-          {!hasBackupFactor &&
-            !enrollment && (
+          <div
+            className={
+              styles.methodOverview
+            }
+          >
+            <article
+              className={[
+                styles.methodCard,
+                !PHONE_MFA_ENABLED &&
+                !hasPhone
+                  ? styles.methodCardPending
+                  : "",
+              ]
+                .filter(Boolean)
+                .join(" ")}
+            >
               <div
                 className={
-                  styles.backupNotice
+                  styles.methodIcon
                 }
               >
-                <Smartphone
-                  size={25}
+                <MessageSquareText
+                  size={22}
                 />
+              </div>
 
-                <div>
-                  <strong>
-                    Add a backup
-                    authenticator
-                  </strong>
+              <div
+                className={
+                  styles.methodCopy
+                }
+              >
+                <strong>
+                  Text message
+                </strong>
 
-                  <p>
-                    Connect a second
-                    trusted phone,
-                    password manager or
-                    authenticator app so
-                    you retain access if
-                    the primary device is
-                    lost.
-                  </p>
+                <span>
+                  Receive a six-digit
+                  security code by SMS.
+                </span>
+
+                {hasPhone && (
+                  <small>
+                    {maskPhoneNumber(
+                      verifiedPhoneFactors[0]
+                        ?.phone,
+                    )}
+                  </small>
+                )}
+              </div>
+
+              <span
+                className={[
+                  styles.methodStatus,
+                  hasPhone
+                    ? styles.methodStatusActive
+                    : "",
+                ]
+                  .filter(Boolean)
+                  .join(" ")}
+              >
+                {hasPhone
+                  ? "Active"
+                  : PHONE_MFA_ENABLED
+                    ? "Available"
+                    : "Activation pending"}
+              </span>
+
+              {PHONE_MFA_ENABLED &&
+              !hasPhone &&
+              !enrollment ? (
+                <div
+                  className={
+                    styles.phoneMethodActions
+                  }
+                >
+                  <div
+                    className={
+                      styles.phoneInput
+                    }
+                  >
+                    <Smartphone
+                      size={17}
+                    />
+
+                    <input
+                      type="tel"
+                      autoComplete="tel"
+                      value={phone}
+                      onChange={(
+                        event,
+                      ) => {
+                        setPhone(
+                          event.target
+                            .value,
+                        );
+
+                        setErrorMessage(
+                          "",
+                        );
+                      }}
+                      placeholder="(561) 555-0123"
+                    />
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={
+                      startPhoneEnrollment
+                    }
+                    disabled={
+                      !phone.trim() ||
+                      status ===
+                        "starting-phone"
+                    }
+                  >
+                    {status ===
+                    "starting-phone" ? (
+                      <LoaderCircle
+                        className={
+                          styles.spinner
+                        }
+                        size={16}
+                      />
+                    ) : (
+                      <MessageSquareText
+                        size={16}
+                      />
+                    )}
+
+                    Send code
+                  </button>
                 </div>
+              ) : null}
+            </article>
 
+            <article
+              className={
+                styles.methodCard
+              }
+            >
+              <div
+                className={
+                  styles.methodIcon
+                }
+              >
+                <QrCode
+                  size={22}
+                />
+              </div>
+
+              <div
+                className={
+                  styles.methodCopy
+                }
+              >
+                <strong>
+                  Authenticator app
+                </strong>
+
+                <span>
+                  Use rotating codes from
+                  a trusted authenticator
+                  app or password manager.
+                </span>
+              </div>
+
+              <span
+                className={[
+                  styles.methodStatus,
+                  hasAuthenticator
+                    ? styles.methodStatusActive
+                    : "",
+                ]
+                  .filter(Boolean)
+                  .join(" ")}
+              >
+                {hasAuthenticator
+                  ? "Active"
+                  : "Available"}
+              </span>
+
+              {!enrollment && (
                 <button
+                  className={
+                    styles.methodAction
+                  }
                   type="button"
                   onClick={
-                    startBackupEnrollment
+                    startAuthenticatorEnrollment
                   }
                   disabled={
                     status ===
@@ -585,18 +899,48 @@ export default function MfaSecurityPanel({
                       className={
                         styles.spinner
                       }
-                      size={17}
+                      size={16}
                     />
                   ) : (
                     <Plus
-                      size={17}
+                      size={16}
                     />
                   )}
 
-                  Add backup
+                  {hasAuthenticator
+                    ? "Add another"
+                    : "Add authenticator"}
                 </button>
+              )}
+            </article>
+          </div>
+
+          {!PHONE_MFA_ENABLED &&
+          !hasPhone ? (
+            <div
+              className={
+                styles.providerNotice
+              }
+            >
+              <MessageSquareText
+                size={18}
+              />
+
+              <div>
+                <strong>
+                  Text-message verification
+                  is being activated
+                </strong>
+
+                <span>
+                  Authenticator verification
+                  remains available while
+                  the SMS provider setup is
+                  completed.
+                </span>
               </div>
-            )}
+            </div>
+          ) : null}
 
           <div
             className={
@@ -610,43 +954,20 @@ export default function MfaSecurityPanel({
             >
               <div>
                 <span>
-                  Verified factors
+                  Verified methods
                 </span>
 
                 <strong>
                   {
                     verifiedFactors.length
                   }{" "}
-                  authenticator
+                  verification method
                   {verifiedFactors.length ===
                   1
                     ? ""
                     : "s"}
                 </strong>
               </div>
-
-              {hasBackupFactor &&
-                !enrollment && (
-                  <button
-                    className={
-                      styles.addButton
-                    }
-                    type="button"
-                    onClick={
-                      startBackupEnrollment
-                    }
-                    disabled={
-                      status ===
-                      "starting"
-                    }
-                  >
-                    <Plus
-                      size={16}
-                    />
-
-                    Add another
-                  </button>
-                )}
             </div>
 
             <div
@@ -658,102 +979,127 @@ export default function MfaSecurityPanel({
                 (
                   factor,
                   index,
-                ) => (
-                  <article
-                    className={
-                      styles.factorRow
-                    }
-                    key={
-                      factor.id
-                    }
-                  >
-                    <div
+                ) => {
+                  const factorType =
+                    getFactorType(
+                      factor,
+                    );
+
+                  const phoneFactor =
+                    factorType ===
+                    "phone";
+
+                  return (
+                    <article
                       className={
-                        styles.factorIcon
+                        styles.factorRow
+                      }
+                      key={
+                        factor.id
                       }
                     >
-                      <Smartphone
-                        size={20}
-                      />
-                    </div>
-
-                    <div
-                      className={
-                        styles.factorDetails
-                      }
-                    >
-                      <strong>
-                        {index ===
-                        0
-                          ? "Primary authenticator"
-                          : `Backup authenticator ${index}`}
-                      </strong>
-
-                      <span>
-                        Verified{" "}
-                        {formatFactorDate(
-                          factor.created_at,
+                      <div
+                        className={
+                          styles.factorIcon
+                        }
+                      >
+                        {phoneFactor ? (
+                          <MessageSquareText
+                            size={20}
+                          />
+                        ) : (
+                          <QrCode
+                            size={20}
+                          />
                         )}
-                      </span>
-                    </div>
+                      </div>
 
-                    <div
-                      className={
-                        styles.verifiedStatus
-                      }
-                    >
-                      <CheckCircle2
-                        size={15}
-                      />
-                      Verified
-                    </div>
+                      <div
+                        className={
+                          styles.factorDetails
+                        }
+                      >
+                        <strong>
+                          {phoneFactor
+                            ? "Text message"
+                            : getAuthenticatorName(
+                                factor,
+                                index,
+                              )}
+                        </strong>
 
-                    <button
-                      className={
-                        styles.removeButton
-                      }
-                      type="button"
-                      onClick={() =>
-                        removeFactor(
-                          factor,
-                        )
-                      }
-                      disabled={
-                        verifiedFactors.length <=
-                          1 ||
-                        removingFactorId ===
-                          factor.id
-                      }
-                      title={
-                        verifiedFactors.length <=
-                        1
-                          ? "Add a backup authenticator before removing this factor."
-                          : "Remove authenticator"
-                      }
-                    >
-                      {removingFactorId ===
-                      factor.id ? (
-                        <LoaderCircle
-                          className={
-                            styles.spinner
-                          }
-                          size={17}
+                        <span>
+                          {phoneFactor
+                            ? `${maskPhoneNumber(
+                                factor.phone,
+                              )} · `
+                            : ""}
+                          Verified{" "}
+                          {formatFactorDate(
+                            factor.created_at,
+                          )}
+                        </span>
+                      </div>
+
+                      <div
+                        className={
+                          styles.verifiedStatus
+                        }
+                      >
+                        <CheckCircle2
+                          size={15}
                         />
-                      ) : (
-                        <Trash2
-                          size={17}
-                        />
-                      )}
+                        Verified
+                      </div>
 
-                      Remove
-                    </button>
-                  </article>
-                ),
+                      <button
+                        className={
+                          styles.removeButton
+                        }
+                        type="button"
+                        onClick={() =>
+                          removeFactor(
+                            factor,
+                          )
+                        }
+                        disabled={
+                          verifiedFactors.length <=
+                            1 ||
+                          removingFactorId ===
+                            factor.id
+                        }
+                        title={
+                          verifiedFactors.length <=
+                          1
+                            ? "Add another verification method before removing this one."
+                            : "Remove verification method"
+                        }
+                      >
+                        {removingFactorId ===
+                        factor.id ? (
+                          <LoaderCircle
+                            className={
+                              styles.spinner
+                            }
+                            size={17}
+                          />
+                        ) : (
+                          <Trash2
+                            size={17}
+                          />
+                        )}
+
+                        Remove
+                      </button>
+                    </article>
+                  );
+                },
               )}
             </div>
           </div>
 
-          {enrollment && (
+          {enrollment?.type ===
+            "totp" && (
             <div
               className={
                 styles.enrollmentPanel
@@ -770,14 +1116,15 @@ export default function MfaSecurityPanel({
 
                 <div>
                   <strong>
-                    Connect the backup
-                    authenticator
+                    Connect authenticator
+                    app
                   </strong>
 
                   <span>
-                    Scan this new QR code
-                    using the additional
-                    trusted device.
+                    Scan this QR code using
+                    the trusted app or
+                    password manager you
+                    want to add.
                   </span>
                 </div>
               </div>
@@ -791,7 +1138,7 @@ export default function MfaSecurityPanel({
                   src={
                     enrollment.qrCode
                   }
-                  alt="Backup authenticator QR code"
+                  alt="Authenticator setup QR code"
                 />
 
                 <div
@@ -841,8 +1188,8 @@ export default function MfaSecurityPanel({
               >
                 <label>
                   <span>
-                    Six-digit code from
-                    the backup device
+                    Six-digit
+                    authenticator code
                   </span>
 
                   <div
@@ -858,9 +1205,7 @@ export default function MfaSecurityPanel({
                       type="text"
                       inputMode="numeric"
                       autoComplete="one-time-code"
-                      value={
-                        code
-                      }
+                      value={code}
                       onChange={(
                         event,
                       ) => {
@@ -923,7 +1268,154 @@ export default function MfaSecurityPanel({
                       />
                     )}
 
-                    Verify backup
+                    Verify authenticator
+                  </button>
+
+                  <button
+                    className={
+                      styles.cancelButton
+                    }
+                    type="button"
+                    onClick={
+                      cancelEnrollment
+                    }
+                    disabled={
+                      status ===
+                      "verifying"
+                    }
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </form>
+            </div>
+          )}
+
+          {enrollment?.type ===
+            "phone" && (
+            <div
+              className={
+                styles.enrollmentPanel
+              }
+            >
+              <div
+                className={
+                  styles.enrollmentHeading
+                }
+              >
+                <MessageSquareText
+                  size={21}
+                />
+
+                <div>
+                  <strong>
+                    Verify text message
+                  </strong>
+
+                  <span>
+                    Enter the six-digit code
+                    sent to{" "}
+                    {enrollment
+                      .maskedPhone}.
+                  </span>
+                </div>
+              </div>
+
+              <form
+                className={
+                  styles.verificationForm
+                }
+                onSubmit={
+                  verifyEnrollment
+                }
+              >
+                <label>
+                  <span>
+                    Text message code
+                  </span>
+
+                  <div
+                    className={
+                      styles.codeInput
+                    }
+                  >
+                    <KeyRound
+                      size={19}
+                    />
+
+                    <input
+                      type="text"
+                      inputMode="numeric"
+                      autoComplete="one-time-code"
+                      value={code}
+                      onChange={(
+                        event,
+                      ) => {
+                        setCode(
+                          event.target
+                            .value
+                            .replace(
+                              /\D/g,
+                              "",
+                            )
+                            .slice(
+                              0,
+                              6,
+                            ),
+                        );
+
+                        setErrorMessage(
+                          "",
+                        );
+                      }}
+                      placeholder="000000"
+                      maxLength={6}
+                      disabled={
+                        status ===
+                        "verifying"
+                      }
+                      required
+                    />
+                  </div>
+                </label>
+
+                <div
+                  className={
+                    styles.enrollmentActions
+                  }
+                >
+                  <button
+                    className={
+                      styles.verifyButton
+                    }
+                    type="submit"
+                    disabled={
+                      code.length !==
+                        6 ||
+                      status ===
+                        "verifying"
+                    }
+                  >
+                    <ShieldCheck
+                      size={17}
+                    />
+                    Verify text message
+                  </button>
+
+                  <button
+                    className={
+                      styles.cancelButton
+                    }
+                    type="button"
+                    onClick={
+                      resendPhoneCode
+                    }
+                    disabled={
+                      status ===
+                      "verifying"
+                    }
+                  >
+                    Send another code
                   </button>
 
                   <button

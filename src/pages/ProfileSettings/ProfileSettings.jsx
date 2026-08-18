@@ -1328,8 +1328,8 @@ export default function ProfileSettings() {
                     icon={
                       KeyRound
                     }
-                    label="Authenticator protection"
-                    description="Manage verified authenticator devices."
+                    label="Two-step verification"
+                    description="Manage verified sign-in methods."
                     status="Enabled"
                     action={
                       <button
@@ -2082,9 +2082,8 @@ export default function ProfileSettings() {
                   </strong>
 
                   <small>
-                    Authenticator
-                    verification is
-                    required for sensitive
+                    Two-step verification
+                    is required for sensitive
                     campaign controls.
                   </small>
                 </div>
@@ -2097,12 +2096,13 @@ export default function ProfileSettings() {
 
                 <div>
                   <strong>
-                    Backup authenticator
+                    Backup verification
+                    method
                   </strong>
 
                   <small>
                     Add a second trusted
-                    authenticator for
+                    verification method for
                     recovery protection.
                   </small>
                 </div>
@@ -2140,9 +2140,9 @@ export default function ProfileSettings() {
                   size={20}
                 />
 
-                Authenticator management
-                is restricted to protected
-                leadership accounts.
+                Two-step verification
+                management is restricted to
+                protected leadership accounts.
               </section>
             )}
           </section>
