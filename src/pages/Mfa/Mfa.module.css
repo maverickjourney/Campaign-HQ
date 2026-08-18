@@ -915,3 +915,57 @@
     min-height: 42px;
   }
 }
+
+/* ============================================================
+   CAMPAIGN SEAT — MFA METHOD CHOICE FINAL POLISH
+   Give method names enough room while preserving two columns.
+   ============================================================ */
+
+.factorChoiceList {
+  grid-template-columns:
+    repeat(2, minmax(0, 1fr));
+  gap: 9px;
+}
+
+.factorChoice {
+  position: relative;
+  grid-template-columns:
+    16px minmax(0, 1fr);
+  gap: 6px;
+  min-height: 50px;
+  padding: 8px 25px 8px 9px;
+  font-size: 0.68rem;
+}
+
+.factorChoice > span {
+  min-width: 0;
+  white-space: nowrap;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+}
+
+.factorChoice > svg:first-child {
+  width: 16px;
+  height: 16px;
+}
+
+.factorChoice > svg:last-child:not(:first-child) {
+  position: absolute;
+  top: 50%;
+  right: 8px;
+  width: 15px;
+  height: 15px;
+  transform: translateY(-50%);
+}
+
+@media (max-width: 620px) {
+  .factorChoiceList {
+    grid-template-columns: 1fr;
+  }
+
+  .factorChoice {
+    min-height: 52px;
+    padding-right: 28px;
+    font-size: 0.73rem;
+  }
+}
