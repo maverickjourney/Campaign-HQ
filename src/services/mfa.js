@@ -284,7 +284,7 @@ export async function beginTotpEnrollment({
 
   for (
     const factor of
-    state.unverifiedFactors
+    state.unverifiedTotpFactors
   ) {
     const {
       error:
@@ -736,7 +736,36 @@ export async function removeMfaFactor(
 ) {
   if (!factorId) {
     throw new Error(
-      "Choose an authenticator factor to remove.",
+      "Choose a verification method to remove.",
+    );
+  }
+
+  const state =
+    await getMfaState();
+
+  const verifiedTarget =
+    state.verifiedFactors.find(
+      (factor) =>
+        factor.id ===
+        factorId,
+    );
+
+  if (
+    verifiedTarget &&
+    !state.isAal2
+  ) {
+    throw new Error(
+      "Verify your identity with a current two-step method before removing a verified method.",
+    );
+  }
+
+  if (
+    verifiedTarget &&
+    state.verifiedFactors.length <=
+      1
+  ) {
+    throw new Error(
+      "The final verified two-step method cannot be removed from a protected leadership account. Add and verify another method first.",
     );
   }
 
@@ -752,13 +781,26 @@ export async function removeMfaFactor(
     throw new Error(
       getMfaErrorMessage(
         error,
-        "The authenticator factor could not be removed.",
+        "The verification method could not be removed.",
       ),
     );
   }
 
-  await supabase.auth
-    .refreshSession();
+  const {
+    error:
+      refreshError,
+  } =
+    await supabase.auth
+      .refreshSession();
+
+  if (refreshError) {
+    throw new Error(
+      getMfaErrorMessage(
+        refreshError,
+        "The verification method was removed, but Campaign Seat could not refresh the secure session.",
+      ),
+    );
+  }
 
   return getMfaState();
 }
