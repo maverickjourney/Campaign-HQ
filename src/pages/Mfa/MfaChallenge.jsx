@@ -107,6 +107,15 @@ export default function MfaChallenge() {
     location.state?.from ||
     "/workspaces";
 
+  const visualPreview =
+    import.meta.env.DEV &&
+    new URLSearchParams(
+      window.location.search,
+    ).get(
+      "preview",
+    ) ===
+      "sms";
+
   const [
     status,
     setStatus,
@@ -139,6 +148,11 @@ export default function MfaChallenge() {
     setErrorMessage,
   ] = useState("");
 
+  const [
+    resendSeconds,
+    setResendSeconds,
+  ] = useState(0);
+
   const selectedFactor =
     useMemo(
       () =>
@@ -166,6 +180,49 @@ export default function MfaChallenge() {
 
   useEffect(() => {
     let active = true;
+
+    if (visualPreview) {
+      const previewFactors = [
+        {
+          id: "preview-phone",
+          factorType: "phone",
+          factor_type: "phone",
+          status: "verified",
+          phone: "+15615550123",
+          friendly_name:
+            "Campaign Seat Text Message",
+        },
+        {
+          id: "preview-totp",
+          factorType: "totp",
+          factor_type: "totp",
+          status: "verified",
+          friendly_name:
+            "Campaign Seat Authenticator",
+        },
+      ];
+
+      setFactors(
+        previewFactors,
+      );
+
+      setSelectedFactorId(
+        "preview-phone",
+      );
+
+      setChallengeId("");
+      setCode("");
+      setErrorMessage("");
+      setResendSeconds(0);
+
+      setStatus(
+        "ready",
+      );
+
+      return () => {
+        active = false;
+      };
+    }
 
     const initialize =
       async () => {
@@ -268,6 +325,35 @@ export default function MfaChallenge() {
   }, [
     destination,
     navigate,
+    visualPreview,
+  ]);
+
+  useEffect(() => {
+    if (resendSeconds <= 0) {
+      return undefined;
+    }
+
+    const timeoutId =
+      window.setTimeout(
+        () => {
+          setResendSeconds(
+            (current) =>
+              Math.max(
+                0,
+                current - 1,
+              ),
+          );
+        },
+        1000,
+      );
+
+    return () => {
+      window.clearTimeout(
+        timeoutId,
+      );
+    };
+  }, [
+    resendSeconds,
   ]);
 
   const selectFactor =
@@ -279,14 +365,33 @@ export default function MfaChallenge() {
       setChallengeId("");
       setCode("");
       setErrorMessage("");
+      setResendSeconds(0);
     };
 
   const sendPhoneCode =
     async () => {
       if (
         !selectedFactor ||
-        !phoneSelected
+        !phoneSelected ||
+        resendSeconds > 0
       ) {
+        return;
+      }
+
+      if (visualPreview) {
+        setErrorMessage("");
+
+        setChallengeId(
+          "preview-sms-challenge",
+        );
+
+        setCode("");
+        setResendSeconds(30);
+
+        setStatus(
+          "ready",
+        );
+
         return;
       }
 
@@ -316,6 +421,7 @@ export default function MfaChallenge() {
         );
 
         setCode("");
+        setResendSeconds(30);
 
         setStatus(
           "ready",
@@ -668,7 +774,11 @@ export default function MfaChallenge() {
                     disabled={
                       status ===
                         "sending" ||
-                      !PHONE_MFA_ENABLED
+                      resendSeconds > 0 ||
+                      (
+                        !PHONE_MFA_ENABLED &&
+                        !visualPreview
+                      )
                     }
                   >
                     {status ===
@@ -754,10 +864,17 @@ export default function MfaChallenge() {
                         }
                         disabled={
                           status ===
-                            "verifying"
+                            "verifying" ||
+                          status ===
+                            "sending" ||
+                          resendSeconds > 0
                         }
                       >
-                        Send another code
+                        {resendSeconds > 0
+                          ? `Send another code in ${resendSeconds}s`
+                          : status === "sending"
+                            ? "Sending…"
+                            : "Send another code"}
                       </button>
                     </div>
                   )}
