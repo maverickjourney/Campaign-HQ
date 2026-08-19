@@ -2427,23 +2427,28 @@ export default function ProfileSettings() {
                   </strong>
 
                   <p>
-                    Google, Microsoft,
-                    contacts and provider
-                    connections will be
-                    verified during the
-                    production rollout.
+                    Manage Google,
+                    Microsoft, campaign
+                    email and provider
+                    contact connections in
+                    Email & Contacts above.
                   </p>
 
                   <span>
-                    Setup required
+                    Managed securely
                   </span>
                 </div>
 
                 <button
                   type="button"
-                  disabled
+                  onClick={() => {
+                    window.scrollTo({
+                      top: 0,
+                      behavior: "smooth",
+                    });
+                  }}
                 >
-                  Production setup
+                  Review connections
                 </button>
               </article>
             </div>
