@@ -14,6 +14,8 @@ export default function SupportLauncher() {
     location.pathname === "/support" ||
     location.pathname === "/mfa/setup" ||
     location.pathname === "/mfa/challenge" ||
+    location.pathname === "/oauth/nylas/callback" ||
+    location.pathname === "/oauth/nylas/calendar/callback" ||
     location.pathname === "/forgot-password" ||
     location.pathname === "/reset-password" ||
     location.pathname === "/dashboard" ||

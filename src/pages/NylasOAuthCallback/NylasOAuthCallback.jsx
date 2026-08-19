@@ -20,6 +20,9 @@ import {
 import styles
   from "./NylasOAuthCallback.module.css";
 
+const activeExchangeStates =
+  new Set();
+
 export default function NylasOAuthCallback() {
   const location =
     useLocation();
@@ -98,23 +101,17 @@ export default function NylasOAuthCallback() {
       return;
     }
 
-    const marker =
-      `campaign-seat-nylas-exchange:${state}`;
-
     if (
-      window.sessionStorage
-        .getItem(
-          marker,
-        )
+      activeExchangeStates.has(
+        state,
+      )
     ) {
       return;
     }
 
-    window.sessionStorage
-      .setItem(
-        marker,
-        "started",
-      );
+    activeExchangeStates.add(
+      state,
+    );
 
     const finish =
       async () => {
