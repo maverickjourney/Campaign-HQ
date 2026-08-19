@@ -5058,3 +5058,294 @@
 }
 
 /* CAMPAIGN SEAT FINAL INBOX FUNCTION CONTROLS — END */
+
+/* ============================================================
+   CAMPAIGN SEAT — LIVE MAILBOX STATUS
+   ============================================================ */
+
+.mailboxStatus {
+  display: grid;
+  grid-template-columns:
+    auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 11px;
+  margin: -4px 0 12px;
+  padding: 10px 12px;
+  border: 1px solid #d7e2eb;
+  border-radius: 10px;
+  background: #ffffff;
+}
+
+.mailboxStatusIcon {
+  display: grid;
+  width: 35px;
+  height: 35px;
+  place-items: center;
+  border-radius: 9px;
+  color: #326da8;
+  background: #edf4fc;
+}
+
+.mailboxStatus > div {
+  display: grid;
+  min-width: 0;
+  gap: 2px;
+}
+
+.mailboxStatus strong {
+  color: #173b60;
+  font-size: 0.61rem;
+}
+
+.mailboxStatus > div > span {
+  overflow: hidden;
+  color: #70869a;
+  font-size: 0.53rem;
+  line-height: 1.4;
+  text-overflow: ellipsis;
+}
+
+.mailboxStatus > button {
+  min-height: 34px;
+  padding: 0 11px;
+  border: 1px solid #ccdbe6;
+  border-radius: 8px;
+  color: #315574;
+  background: #ffffff;
+  font-size: 0.52rem;
+  font-weight: 760;
+}
+
+.mailboxStatus > button:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.mailboxStatusReady {
+  border-color: #bddfce;
+  background: #f4fbf7;
+}
+
+.mailboxStatusReady .mailboxStatusIcon {
+  color: #187352;
+  background: #e6f6ed;
+}
+
+.mailboxStatusError {
+  border-color: #edc2c6;
+  background: #fff7f7;
+}
+
+.mailboxStatusError .mailboxStatusIcon {
+  color: #c72a36;
+  background: #ffedef;
+}
+
+.mailboxStatusPending,
+.mailboxStatusLoading {
+  background: #f8fafc;
+}
+
+.mailboxStatusSpinner {
+  animation: inboxMailboxSpin 0.9s linear infinite;
+}
+
+@keyframes inboxMailboxSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (max-width: 760px) {
+  .mailboxStatus {
+    grid-template-columns:
+      auto minmax(0, 1fr);
+  }
+
+  .mailboxStatus > button {
+    grid-column: 1 / -1;
+    width: 100%;
+  }
+}
+
+/* ============================================================
+   CAMPAIGN SEAT — LIVE INBOX FINAL TRUTH + VIEWPORT LAYOUT
+   ============================================================ */
+
+.utilityList button.unavailableUtility {
+  cursor: default;
+  color: #8b9baa;
+  background: transparent;
+  opacity: 0.72;
+}
+
+.utilityList button.unavailableUtility:hover {
+  background: transparent;
+}
+
+.utilityList button.unavailableUtility strong {
+  min-width: 34px;
+  color: #71869a;
+  background: #edf2f6;
+  font-size: 0.43rem;
+  letter-spacing: 0.02em;
+}
+
+.inboxWorkspace {
+  height:
+    clamp(
+      540px,
+      calc(100vh - 385px),
+      720px
+    );
+  min-height: 540px;
+}
+
+.conversationPanel,
+.threadPanel {
+  height: 100%;
+  min-height: 0;
+}
+
+.threadPanel {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+.threadBody {
+  min-height: 0;
+  max-height: none;
+  flex: 1;
+}
+
+.replyComposer {
+  flex: 0 0 auto;
+}
+
+.detailsPanel,
+.filesPanel,
+.activityPanel {
+  min-height: 0;
+  overflow-y: auto;
+}
+
+.threadEmptyOverlay {
+  position: absolute;
+  z-index: 20;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  align-content: center;
+  gap: 9px;
+  padding: 34px;
+  background:
+    linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.99),
+      rgba(248, 251, 253, 0.99)
+    );
+  text-align: center;
+}
+
+.threadEmptyIcon {
+  display: grid;
+  width: 52px;
+  height: 52px;
+  place-items: center;
+  border-radius: 14px;
+  color: #326da8;
+  background: #edf4fc;
+}
+
+.threadEmptyOverlay strong {
+  color: #173b60;
+  font-size: 0.82rem;
+}
+
+.threadEmptyOverlay p {
+  max-width: 420px;
+  margin: 0;
+  color: #72879a;
+  font-size: 0.59rem;
+  line-height: 1.55;
+}
+
+.threadEmptyOverlay button {
+  min-height: 38px;
+  margin-top: 4px;
+  padding: 0 13px;
+  border: 0;
+  border-radius: 8px;
+  color: #ffffff;
+  background: #173d78;
+  font-size: 0.54rem;
+  font-weight: 800;
+}
+
+@media (max-width: 1040px) {
+  .inboxWorkspace {
+    height: auto;
+    min-height: 0;
+  }
+
+  .conversationPanel {
+    min-height: 520px;
+  }
+
+  .threadPanel {
+    min-height: 560px;
+  }
+}
+
+@media (max-width: 760px) {
+  .conversationPanel,
+  .threadPanel {
+    min-height: 500px;
+  }
+}
+
+/* ============================================================
+   CAMPAIGN SEAT — LIVE INBOX VIEWPORT POLISH
+   ============================================================ */
+
+@media (min-width: 1041px) {
+  .inboxWorkspace {
+    height:
+      clamp(
+        430px,
+        calc(100vh - 390px),
+        700px
+      );
+    min-height: 430px;
+  }
+
+  .conversationPanel,
+  .threadPanel {
+    min-height: 0;
+  }
+}
+
+.threadEmptyOverlay {
+  align-content: start;
+  padding: 82px 34px 34px;
+  background: #ffffff;
+}
+
+.mailboxStatus strong {
+  font-size: 0.67rem;
+}
+
+.mailboxStatus > div > span {
+  font-size: 0.57rem;
+}
+
+.mailboxStatus > button {
+  font-size: 0.56rem;
+}
+
+@media (min-width: 1041px) and (max-height: 850px) {
+  .threadEmptyOverlay {
+    padding-top: 58px;
+  }
+}

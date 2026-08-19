@@ -18,6 +18,40 @@ function clean(value) {
   ).trim();
 }
 
+async function edgeFunctionErrorMessage(
+  error,
+  fallback,
+) {
+  let providerMessage = "";
+
+  if (
+    error?.context instanceof
+      Response
+  ) {
+    try {
+      const payload =
+        await error.context
+          .clone()
+          .json();
+
+      providerMessage =
+        clean(
+          payload?.error ||
+          payload?.message,
+        );
+    } catch {
+      // Use the normal Supabase
+      // function error below.
+    }
+  }
+
+  return (
+    providerMessage ||
+    clean(error?.message) ||
+    fallback
+  );
+}
+
 function normalizedEmail(value) {
   return clean(value)
     .toLowerCase();
@@ -658,8 +692,11 @@ export function useRealInboxMailbox({
         if (
           invokeError
         ) {
-          throw (
-            invokeError
+          throw new Error(
+            await edgeFunctionErrorMessage(
+              invokeError,
+              "Campaign Seat could not reach the connected mailbox.",
+            ),
           );
         }
 

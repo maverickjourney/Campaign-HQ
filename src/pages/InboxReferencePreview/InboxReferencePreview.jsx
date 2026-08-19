@@ -632,6 +632,38 @@ const QUICK_REPLIES = [
   "Can you send details?",
 ];
 
+const LIVE_CONNECTED_CHANNELS =
+  new Set([
+    "all",
+    "email",
+    "dashboard",
+  ]);
+
+const EMPTY_CONVERSATION = {
+  id: "",
+  sender: "No conversation selected",
+  initials: "—",
+  email: "",
+  phone: "",
+  channel: "email",
+  subject: "",
+  preview: "",
+  time: "",
+  order: 0,
+  unread: false,
+  unreadCount: 0,
+  priority: false,
+  needsResponse: false,
+  mentions: false,
+  flagged: false,
+  archived: false,
+  tags: [],
+  external: false,
+  details: {},
+  messages: [],
+  files: [],
+};
+
 function getChannelLabel(channel) {
   return (
     CHANNELS.find((item) => item.id === channel)
@@ -712,15 +744,6 @@ export default function InboxReferencePreview() {
           ? [
               ...mailboxConversations,
               ...internalConversations,
-              ...previewConversations.filter(
-                (conversation) =>
-                  ![
-                    "email",
-                    "dashboard",
-                  ].includes(
-                    conversation.channel,
-                  ),
-              ),
             ]
           : previewConversations,
       [
@@ -815,7 +838,14 @@ export default function InboxReferencePreview() {
     conversations.find(
       (conversation) =>
         conversation.id === selectedId,
-    ) || conversations[0];
+    ) ||
+    conversations[0] ||
+    EMPTY_CONVERSATION;
+
+  const hasSelectedConversation =
+    Boolean(
+      selectedConversation.id,
+    );
 
   const replyAllEnabled =
     Boolean(
@@ -1946,6 +1976,89 @@ export default function InboxReferencePreview() {
           </div>
         </header>
 
+        {liveMailboxEnabled ? (
+          <section
+            className={[
+              styles.mailboxStatus,
+              mailboxError
+                ? styles.mailboxStatusError
+                : mailboxLoading
+                  ? styles.mailboxStatusLoading
+                  : mailboxConnectedEmail
+                    ? styles.mailboxStatusReady
+                    : styles.mailboxStatusPending,
+            ]
+              .filter(Boolean)
+              .join(" ")}
+            role={
+              mailboxError
+                ? "alert"
+                : "status"
+            }
+          >
+            <span
+              className={
+                styles.mailboxStatusIcon
+              }
+            >
+              {mailboxLoading ? (
+                <LoaderCircle
+                  size={19}
+                  className={
+                    styles.mailboxStatusSpinner
+                  }
+                />
+              ) : mailboxConnectedEmail ? (
+                <CheckCircle2
+                  size={19}
+                />
+              ) : (
+                <Mail size={19} />
+              )}
+            </span>
+
+            <div>
+              <strong>
+                {mailboxError
+                  ? "Connected email needs attention"
+                  : mailboxLoading
+                    ? "Checking connected campaign email"
+                    : mailboxConnectedEmail
+                      ? "Live campaign email"
+                      : "Waiting for live mailbox data"}
+              </strong>
+
+              <span>
+                {mailboxError
+                  ? mailboxError
+                  : mailboxLoading
+                    ? "Campaign Seat is loading the connected mailbox."
+                    : mailboxConnectedEmail
+                      ? `${mailboxConnectedEmail}${
+                          mailboxAccountProvider
+                            ? ` · ${mailboxAccountProvider}`
+                            : ""
+                        }`
+                      : "No connected-email data has been returned yet."}
+              </span>
+            </div>
+
+            <button
+              type="button"
+              disabled={
+                mailboxLoading
+              }
+              onClick={() => {
+                void refreshMailbox();
+              }}
+            >
+              {mailboxLoading
+                ? "Checking…"
+                : "Refresh email"}
+            </button>
+          </section>
+        ) : null}
+
         <section className={styles.metricsGrid}>
           {summaryMetrics.map((metric) => {
             const Icon = metric.icon;
@@ -2055,15 +2168,27 @@ export default function InboxReferencePreview() {
                 {CHANNELS.map((channel) => {
                   const Icon = channel.icon;
 
+                  const unavailable =
+                    liveMailboxEnabled &&
+                    !LIVE_CONNECTED_CHANNELS.has(
+                      channel.id,
+                    );
+
                   return (
                     <button
                       key={channel.id}
-                      className={
+                      className={[
                         activeChannel === channel.id
                           ? styles.activeUtility
-                          : ""
-                      }
+                          : "",
+                        unavailable
+                          ? styles.unavailableUtility
+                          : "",
+                      ]
+                        .filter(Boolean)
+                        .join(" ")}
                       type="button"
+                      disabled={unavailable}
                       onClick={() => {
                         setActiveChannel(channel.id);
                         setActiveFilter("");
@@ -2073,7 +2198,11 @@ export default function InboxReferencePreview() {
                       <span>{channel.label}</span>
 
                       <strong>
-                        {getChannelCount(channel.id)}
+                        {unavailable
+                          ? "Soon"
+                          : getChannelCount(
+                              channel.id,
+                            )}
                       </strong>
                     </button>
                   );
@@ -2259,12 +2388,21 @@ export default function InboxReferencePreview() {
                   <Inbox size={28} />
 
                   <strong>
-                    No matching conversations
+                    {liveMailboxEnabled &&
+                    mailboxError
+                      ? "Email connection needs attention"
+                      : liveMailboxEnabled
+                        ? "No live conversations yet"
+                        : "No matching conversations"}
                   </strong>
 
                   <span>
-                    Adjust the selected channel,
-                    filter, tag, or search.
+                    {liveMailboxEnabled &&
+                    mailboxError
+                      ? "Review the connected campaign email before new mailbox conversations can load."
+                      : liveMailboxEnabled
+                        ? "Connected email and Campaign Seat conversations will appear here."
+                        : "Adjust the selected channel, filter, tag, or search."}
                   </span>
                 </div>
               )}
@@ -2294,6 +2432,58 @@ export default function InboxReferencePreview() {
               .filter(Boolean)
               .join(" ")}
           >
+            {!newMessageMode &&
+            !hasSelectedConversation ? (
+              <div
+                className={
+                  styles.threadEmptyOverlay
+                }
+              >
+                <span
+                  className={
+                    styles.threadEmptyIcon
+                  }
+                >
+                  <Mail size={25} />
+                </span>
+
+                <strong>
+                  {mailboxError
+                    ? "Campaign email needs attention"
+                    : mailboxLoading
+                      ? "Loading campaign email"
+                      : "No conversations yet"}
+                </strong>
+
+                <p>
+                  {mailboxError
+                    ? mailboxError
+                    : mailboxLoading
+                      ? "Campaign Seat is checking the connected mailbox."
+                      : "New campaign email and internal Campaign Seat conversations will appear here."}
+                </p>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (mailboxError) {
+                      window.location.assign(
+                        "/workspace/settings?tab=integrations&onboarding=communications",
+                      );
+
+                      return;
+                    }
+
+                    void refreshMailbox();
+                  }}
+                >
+                  {mailboxError
+                    ? "Review email connection"
+                    : "Refresh Inbox"}
+                </button>
+              </div>
+            ) : null}
+
             {newMessageMode ? (
               <header className={styles.threadHeader}>
                 <div>
