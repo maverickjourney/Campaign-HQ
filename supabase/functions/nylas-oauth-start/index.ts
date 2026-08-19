@@ -238,6 +238,14 @@ Deno.serve(
         "",
       ).toLowerCase();
 
+    const mode =
+      String(
+        body.mode ||
+        "connect",
+      )
+        .trim()
+        .toLowerCase();
+
     if (
       !workspaceId
     ) {
@@ -263,6 +271,23 @@ Deno.serve(
         {
           error:
             "Choose Google or Microsoft.",
+        },
+      );
+    }
+
+
+    if (
+      mode !==
+        "connect" &&
+      mode !==
+        "reauthorize"
+    ) {
+      return jsonResponse(
+        request,
+        400,
+        {
+          error:
+            "Choose a valid provider connection mode.",
         },
       );
     }
@@ -297,7 +322,10 @@ Deno.serve(
       error,
     } =
       await supabase.rpc(
-        "begin_email_contacts_oauth",
+        mode ===
+          "reauthorize"
+          ? "begin_email_contacts_reauthorization"
+          : "begin_email_contacts_oauth",
         {
           target_workspace_id:
             workspaceId,
@@ -344,6 +372,15 @@ Deno.serve(
       );
     }
 
+    const loginHint =
+      String(
+        state
+          ?.login_hint ||
+        "",
+      )
+        .trim()
+        .toLowerCase();
+
     const scopes =
       provider ===
         "google"
@@ -389,6 +426,20 @@ Deno.serve(
         provider,
       );
 
+
+    if (
+      mode ===
+        "reauthorize" &&
+      loginHint
+    ) {
+      authorizationUrl
+        .searchParams
+        .set(
+          "login_hint",
+          loginHint,
+        );
+    }
+
     authorizationUrl
       .searchParams
       .set(
@@ -428,6 +479,8 @@ Deno.serve(
       request,
       200,
       {
+        mode,
+
         authorizationUrl:
           authorizationUrl
             .toString(),

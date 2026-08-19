@@ -234,6 +234,11 @@ Deno.serve(
         "",
       );
 
+    const reauthorization =
+      state.startsWith(
+        "reauth.",
+      );
+
     if (
       !code ||
       !state
@@ -307,7 +312,9 @@ Deno.serve(
         stateError,
     } =
       await userClient.rpc(
-        "consume_email_contacts_oauth_state",
+        reauthorization
+          ? "consume_email_contacts_reauthorization_state"
+          : "consume_email_contacts_oauth_state",
         {
           target_state:
             state,
@@ -547,7 +554,9 @@ Deno.serve(
         finalizeError,
     } =
       await adminClient.rpc(
-        "finalize_email_contacts_connection",
+        reauthorization
+          ? "finalize_email_contacts_reauthorization"
+          : "finalize_email_contacts_connection",
         {
           target_workspace_id:
             oauthState
@@ -583,39 +592,43 @@ Deno.serve(
       );
     }
 
-    const {
-      error:
-        sendCapabilityError,
-    } =
-      await adminClient.rpc(
-        "activate_email_send_capability",
-        {
-          target_workspace_id:
-            oauthState
-              .workspace_id,
-
-          target_provider_grant_id:
-            grantId,
-
-          target_provider:
-            oauthState.provider,
-
-          target_scope:
-            connectedScope,
-        },
-      );
-
     if (
-      sendCapabilityError
+      !reauthorization
     ) {
-      return jsonResponse(
-        request,
-        500,
-        {
-          error:
-            "The mailbox connected, but Campaign Seat could not verify its send permission. Restart the connection after the provider permissions are reviewed.",
-        },
-      );
+      const {
+        error:
+          sendCapabilityError,
+      } =
+        await adminClient.rpc(
+          "activate_email_send_capability",
+          {
+            target_workspace_id:
+              oauthState
+                .workspace_id,
+
+            target_provider_grant_id:
+              grantId,
+
+            target_provider:
+              oauthState.provider,
+
+            target_scope:
+              connectedScope,
+          },
+        );
+
+      if (
+        sendCapabilityError
+      ) {
+        return jsonResponse(
+          request,
+          500,
+          {
+            error:
+              "The mailbox connected, but Campaign Seat could not verify its send permission. Restart the connection after the provider permissions are reviewed.",
+          },
+        );
+      }
     }
 
     return jsonResponse(
@@ -624,6 +637,11 @@ Deno.serve(
       {
         success:
           true,
+
+        mode:
+          reauthorization
+            ? "reauthorize"
+            : "connect",
 
         workspaceId:
           oauthState
