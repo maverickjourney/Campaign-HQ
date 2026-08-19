@@ -427,18 +427,101 @@ Deno.serve(
         unknown
       >;
 
-    try {
-      body =
-        await request.json();
-    } catch {
-      return jsonResponse(
-        request,
-        400,
-        {
-          error:
-            "A valid email request is required.",
-        },
-      );
+    let incomingAttachments:
+      File[] = [];
+
+    const requestContentType =
+      (
+        request.headers.get(
+          "content-type",
+        ) || ""
+      ).toLowerCase();
+
+    if (
+      requestContentType
+        .includes(
+          "multipart/form-data",
+        )
+    ) {
+      let form:
+        FormData;
+
+      try {
+        form =
+          await request
+            .formData();
+      } catch {
+        return jsonResponse(
+          request,
+          400,
+          {
+            error:
+              "The email attachment upload could not be read.",
+          },
+        );
+      }
+
+      const rawPayload =
+        form.get(
+          "payload",
+        );
+
+      if (
+        typeof rawPayload !==
+          "string"
+      ) {
+        return jsonResponse(
+          request,
+          400,
+          {
+            error:
+              "The email request is missing its message payload.",
+          },
+        );
+      }
+
+      try {
+        body =
+          JSON.parse(
+            rawPayload,
+          );
+      } catch {
+        return jsonResponse(
+          request,
+          400,
+          {
+            error:
+              "A valid email request is required.",
+          },
+        );
+      }
+
+      incomingAttachments =
+        form
+          .getAll(
+            "attachment",
+          )
+          .filter(
+            (
+              item,
+            ): item is File =>
+              item instanceof File &&
+              item.size > 0,
+          );
+    } else {
+      try {
+        body =
+          await request.json();
+      } catch {
+        return jsonResponse(
+          request,
+          400,
+          {
+            error:
+              "A valid email request is required.",
+          },
+        );
+      }
     }
 
     const workspaceId =
@@ -523,17 +606,41 @@ Deno.serve(
     }
 
     if (
-      Object.hasOwn(
-        body,
-        "attachments",
-      )
+      incomingAttachments.length >
+      10
     ) {
       return jsonResponse(
         request,
         400,
         {
           error:
-            "Outbound attachments are not enabled in this runtime pass yet.",
+            "Attach up to 10 files per email.",
+        },
+      );
+    }
+
+    const attachmentBytes =
+      incomingAttachments
+        .reduce(
+          (
+            total,
+            attachment,
+          ) =>
+            total +
+            attachment.size,
+          0,
+        );
+
+    if (
+      attachmentBytes >
+      20 * 1024 * 1024
+    ) {
+      return jsonResponse(
+        request,
+        400,
+        {
+          error:
+            "Attachments can total up to 20 MB per email.",
         },
       );
     }
@@ -1009,26 +1116,83 @@ Deno.serve(
       Response;
 
     try {
-      sendResponse =
-        await fetch(
-          `${baseUri}/v3/grants/${grant}/messages/send?fields=include_basic_headers`,
-          {
-            method:
-              "POST",
+      if (
+        incomingAttachments.length
+      ) {
+        const providerForm =
+          new FormData();
 
-            headers: {
-              ...providerHeaders,
-
-              "Idempotency-Key":
-                idempotencyKey,
-            },
-
-            body:
-              JSON.stringify(
-                sendPayload,
-              ),
-          },
+        providerForm.append(
+          "message",
+          JSON.stringify(
+            sendPayload,
+          ),
         );
+
+        incomingAttachments
+          .forEach(
+            (
+              attachment,
+              index,
+            ) => {
+              const filename =
+                clean(
+                  attachment.name,
+                ) ||
+                `attachment-${index + 1}`;
+
+              providerForm.append(
+                filename,
+                attachment,
+                filename,
+              );
+            },
+          );
+
+        sendResponse =
+          await fetch(
+            `${baseUri}/v3/grants/${grant}/messages/send?fields=include_basic_headers`,
+            {
+              method:
+                "POST",
+
+              headers: {
+                "Authorization":
+                  `Bearer ${nylasApiKey}`,
+
+                "Accept":
+                  "application/json",
+
+                "Idempotency-Key":
+                  idempotencyKey,
+              },
+
+              body:
+                providerForm,
+            },
+          );
+      } else {
+        sendResponse =
+          await fetch(
+            `${baseUri}/v3/grants/${grant}/messages/send?fields=include_basic_headers`,
+            {
+              method:
+                "POST",
+
+              headers: {
+                ...providerHeaders,
+
+                "Idempotency-Key":
+                  idempotencyKey,
+              },
+
+              body:
+                JSON.stringify(
+                  sendPayload,
+                ),
+            },
+          );
+      }
     } catch {
       return jsonResponse(
         request,

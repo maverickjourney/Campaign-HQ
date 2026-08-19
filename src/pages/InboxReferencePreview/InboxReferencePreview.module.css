@@ -5737,3 +5737,168 @@
   }
 
 }
+
+/* ============================================================
+   CAMPAIGN SEAT — COMPACT EMAIL COMPOSER
+   ============================================================ */
+
+.newMessageScrim {
+  position: fixed !important;
+  z-index: 120 !important;
+  inset: 0 !important;
+  width: 100vw !important;
+  height: 100dvh !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: rgba(15, 31, 48, 0.56) !important;
+}
+
+.newMessageModal {
+  position: fixed !important;
+  z-index: 121 !important;
+  top: 50% !important;
+  left: 50% !important;
+  width:
+    min(
+      980px,
+      calc(100vw - 56px)
+    ) !important;
+  height:
+    min(
+      680px,
+      calc(100dvh - 70px)
+    ) !important;
+  min-height: 520px !important;
+  max-height:
+    calc(100dvh - 70px) !important;
+  transform:
+    translate(-50%, -50%) !important;
+  display: flex !important;
+  flex-direction: column !important;
+  overflow: hidden !important;
+  border-radius: 16px !important;
+  background: #ffffff !important;
+  box-shadow:
+    0 30px 90px
+    rgba(10, 26, 42, 0.3) !important;
+}
+
+.newMessageModal .threadHeader,
+.newMessageModal .newMessageFields {
+  flex: 0 0 auto;
+}
+
+.newMessageModal .replyComposer {
+  display: flex;
+  min-height: 0;
+  flex: 1 1 auto;
+  flex-direction: column;
+  overflow-y: auto;
+}
+
+.newMessageModal .replyComposer textarea {
+  min-height: 210px;
+  flex: 1 1 auto;
+  resize: none;
+}
+
+.attachmentInput {
+  display: none;
+}
+
+.attachmentToolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin: 9px 0;
+}
+
+.attachmentToolbar > button {
+  display: inline-flex;
+  min-height: 34px;
+  align-items: center;
+  gap: 7px;
+  padding: 0 11px;
+  border: 1px solid #d3dfe8;
+  border-radius: 8px;
+  color: #456984;
+  background: #ffffff;
+  font-size: 0.54rem;
+  font-weight: 760;
+}
+
+.attachmentToolbar small {
+  color: #8698a8;
+  font-size: 0.5rem;
+}
+
+.attachmentQueue {
+  display: grid;
+  gap: 7px;
+  margin-bottom: 10px;
+}
+
+.attachmentQueue > div {
+  display: grid;
+  grid-template-columns:
+    auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 9px;
+  padding: 8px 10px;
+  border: 1px solid #dce5ec;
+  border-radius: 9px;
+  background: #f8fafc;
+}
+
+.attachmentQueue > div > span:first-child {
+  display: grid;
+  width: 32px;
+  height: 32px;
+  place-items: center;
+  border-radius: 8px;
+  color: #c82432;
+  background: #fff0f1;
+}
+
+.attachmentQueue strong,
+.attachmentQueue small {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.attachmentQueue strong {
+  color: #315574;
+  font-size: 0.55rem;
+}
+
+.attachmentQueue small {
+  margin-top: 3px;
+  color: #8799a8;
+  font-size: 0.48rem;
+}
+
+.attachmentQueue > div > button {
+  display: grid;
+  width: 28px;
+  height: 28px;
+  place-items: center;
+  border: 0;
+  border-radius: 7px;
+  color: #718698;
+  background: transparent;
+}
+
+@media (max-width: 760px) {
+  .newMessageModal {
+    width:
+      calc(100vw - 20px) !important;
+    height:
+      calc(100dvh - 20px) !important;
+    min-height: 0 !important;
+    max-height:
+      calc(100dvh - 20px) !important;
+  }
+}

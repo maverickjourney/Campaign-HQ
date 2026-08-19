@@ -18,6 +18,7 @@ import {
   Hash,
   Inbox,
   Mail,
+  Paperclip,
   MessageCircle,
   MessageSquare,
   Phone,
@@ -150,6 +151,48 @@ const SUMMARY_METRICS = [
     tone: "gold",
   },
 ];
+
+const MAX_EMAIL_ATTACHMENTS =
+  10;
+
+const MAX_EMAIL_ATTACHMENT_BYTES =
+  20 * 1024 * 1024;
+
+function formatAttachmentSize(
+  value,
+) {
+  const bytes =
+    Number(value || 0);
+
+  if (
+    !Number.isFinite(
+      bytes,
+    ) ||
+    bytes <= 0
+  ) {
+    return "0 KB";
+  }
+
+  if (
+    bytes <
+    1024 * 1024
+  ) {
+    return `${Math.max(
+      1,
+      Math.round(
+        bytes / 1024,
+      ),
+    )} KB`;
+  }
+
+  return `${(
+    bytes /
+    (
+      1024 *
+      1024
+    )
+  ).toFixed(1)} MB`;
+}
 
 const EMPTY_CONTACT_FORM = {
   fullName: "",
@@ -631,12 +674,6 @@ const REPLY_CHANNELS = [
   },
 ];
 
-const QUICK_REPLIES = [
-  "Sounds good",
-  "Let me confirm",
-  "Can you send details?",
-];
-
 const LIVE_CONNECTED_CHANNELS =
   new Set([
     "all",
@@ -785,6 +822,19 @@ export default function InboxReferencePreview() {
     useState("email");
 
   const [replyText, setReplyText] = useState("");
+
+  const [
+    pendingAttachments,
+    setPendingAttachments,
+  ] = useState([]);
+
+  const [
+    attachmentError,
+    setAttachmentError,
+  ] = useState("");
+
+  const attachmentInputRef =
+    useRef(null);
 
   const [replyAllThreadId, setReplyAllThreadId] =
     useState("");
@@ -1260,9 +1310,129 @@ export default function InboxReferencePreview() {
     return 0;
   };
 
+  const handleAttachmentSelection =
+    (event) => {
+      const selected =
+        Array.from(
+          event.target.files ||
+          [],
+        );
+
+      event.target.value =
+        "";
+
+      if (
+        !selected.length
+      ) {
+        return;
+      }
+
+      const combined = [
+        ...pendingAttachments,
+        ...selected,
+      ];
+
+      const unique = [];
+      const seen =
+        new Set();
+
+      combined.forEach(
+        (file) => {
+          const key =
+            [
+              file.name,
+              file.size,
+              file.lastModified,
+            ].join(":");
+
+          if (
+            seen.has(
+              key,
+            )
+          ) {
+            return;
+          }
+
+          seen.add(
+            key,
+          );
+
+          unique.push(
+            file,
+          );
+        },
+      );
+
+      if (
+        unique.length >
+        MAX_EMAIL_ATTACHMENTS
+      ) {
+        setAttachmentError(
+          `Attach up to ${MAX_EMAIL_ATTACHMENTS} files per email.`,
+        );
+
+        return;
+      }
+
+      const totalBytes =
+        unique.reduce(
+          (
+            total,
+            file,
+          ) =>
+            total +
+            Number(
+              file.size || 0,
+            ),
+          0,
+        );
+
+      if (
+        totalBytes >
+        MAX_EMAIL_ATTACHMENT_BYTES
+      ) {
+        setAttachmentError(
+          "Attachments can total up to 20 MB per email.",
+        );
+
+        return;
+      }
+
+      setPendingAttachments(
+        unique,
+      );
+
+      setAttachmentError(
+        "",
+      );
+    };
+
+  const removeAttachment =
+    (
+      attachmentIndex,
+    ) => {
+      setPendingAttachments(
+        (current) =>
+          current.filter(
+            (
+              _file,
+              index,
+            ) =>
+              index !==
+              attachmentIndex,
+          ),
+      );
+
+      setAttachmentError(
+        "",
+      );
+    };
+
   const openNewMessage = () => {
     setNewMessageMode(true);
     setReplyText("");
+    setPendingAttachments([]);
+    setAttachmentError("");
     setNewRecipient("");
     setNewSubject("");
     setContactQuery("");
@@ -1663,10 +1833,15 @@ export default function InboxReferencePreview() {
 
           replyAll:
             replyAllEnabled,
+
+          attachments:
+            pendingAttachments,
         });
 
         setReplyText("");
         setReplyAllThreadId("");
+        setPendingAttachments([]);
+        setAttachmentError("");
 
         setToast(
           replyAllEnabled
@@ -1845,6 +2020,8 @@ export default function InboxReferencePreview() {
           });
 
         setReplyText("");
+        setPendingAttachments([]);
+        setAttachmentError("");
         setNewRecipient("");
         setNewSubject("");
         setContactQuery("");
@@ -1897,6 +2074,9 @@ export default function InboxReferencePreview() {
 
           body:
             replyText.trim(),
+
+          attachments:
+            pendingAttachments,
         });
 
         setReplyText("");
@@ -3357,23 +3537,6 @@ export default function InboxReferencePreview() {
             {activeThreadTab === "conversation" ||
             newMessageMode ? (
               <footer className={styles.replyComposer}>
-                {!newMessageMode ? (
-                  <div className={styles.quickReplies}>
-                    {QUICK_REPLIES.map(
-                      (quickReply) => (
-                        <button
-                          key={quickReply}
-                          type="button"
-                          onClick={() =>
-                            setReplyText(quickReply)
-                          }
-                        >
-                          {quickReply}
-                        </button>
-                      ),
-                    )}
-                  </div>
-                ) : null}
 
                 <div className={styles.previewNotice}>
                   <CheckCircle2 size={16} />
@@ -3382,6 +3545,120 @@ export default function InboxReferencePreview() {
                     {composerNotice}
                   </span>
                 </div>
+
+                {replyChannel ===
+                  "email" &&
+                liveMailboxEnabled ? (
+                  <>
+                    <input
+                      ref={
+                        attachmentInputRef
+                      }
+                      className={
+                        styles.attachmentInput
+                      }
+                      type="file"
+                      multiple
+                      onChange={
+                        handleAttachmentSelection
+                      }
+                    />
+
+                    <div
+                      className={
+                        styles.attachmentToolbar
+                      }
+                    >
+                      <button
+                        type="button"
+                        onClick={() =>
+                          attachmentInputRef
+                            .current
+                            ?.click()
+                        }
+                      >
+                        <Paperclip
+                          size={16}
+                        />
+                        Attach files
+                      </button>
+
+                      <small>
+                        Up to 10 files · 20 MB total
+                      </small>
+                    </div>
+
+                    {pendingAttachments
+                      .length ? (
+                      <div
+                        className={
+                          styles.attachmentQueue
+                        }
+                      >
+                        {pendingAttachments
+                          .map(
+                            (
+                              file,
+                              index,
+                            ) => (
+                              <div
+                                key={`${file.name}-${file.lastModified}-${index}`}
+                              >
+                                <span>
+                                  <FileText
+                                    size={17}
+                                  />
+                                </span>
+
+                                <span>
+                                  <strong>
+                                    {
+                                      file.name
+                                    }
+                                  </strong>
+
+                                  <small>
+                                    {
+                                      formatAttachmentSize(
+                                        file.size,
+                                      )
+                                    }
+                                  </small>
+                                </span>
+
+                                <button
+                                  type="button"
+                                  aria-label={`Remove ${file.name}`}
+                                  onClick={() =>
+                                    removeAttachment(
+                                      index,
+                                    )
+                                  }
+                                >
+                                  <X
+                                    size={14}
+                                  />
+                                </button>
+                              </div>
+                            ),
+                          )}
+                      </div>
+                    ) : null}
+
+                    {attachmentError ? (
+                      <div
+                        className={
+                          styles.workflowError
+                        }
+                        role="alert"
+                      >
+                        {
+                          attachmentError
+                        }
+                      </div>
+                    ) : null}
+                  </>
+                ) : null}
 
                 <textarea
                   value={replyText}

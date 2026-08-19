@@ -1573,10 +1573,44 @@ export function useRealInboxMailbox({
       async (
         payload,
       ) => {
+        const attachments =
+          Array.isArray(
+            payload?.attachments,
+          )
+            ? payload.attachments.filter(
+                (attachment) =>
+                  typeof File !==
+                    "undefined" &&
+                  attachment instanceof File,
+              )
+            : [];
+
+        const requestPayload = {
+          ...payload,
+        };
+
+        delete requestPayload
+          .attachments;
+
         const fingerprint =
-          JSON.stringify(
-            payload,
-          );
+          JSON.stringify({
+            payload:
+              requestPayload,
+
+            attachments:
+              attachments.map(
+                (file) => ({
+                  name:
+                    file.name,
+                  size:
+                    file.size,
+                  type:
+                    file.type,
+                  lastModified:
+                    file.lastModified,
+                }),
+              ),
+          });
 
         let idempotencyKey =
           sendKeysRef
@@ -1599,6 +1633,43 @@ export function useRealInboxMailbox({
             );
         }
 
+        let functionBody;
+
+        if (
+          attachments.length
+        ) {
+          const formData =
+            new FormData();
+
+          formData.append(
+            "payload",
+            JSON.stringify({
+              workspaceId,
+              ...requestPayload,
+              idempotencyKey,
+            }),
+          );
+
+          attachments.forEach(
+            (file) => {
+              formData.append(
+                "attachment",
+                file,
+                file.name,
+              );
+            },
+          );
+
+          functionBody =
+            formData;
+        } else {
+          functionBody = {
+            workspaceId,
+            ...requestPayload,
+            idempotencyKey,
+          };
+        }
+
         const {
           data,
           error:
@@ -1609,19 +1680,19 @@ export function useRealInboxMailbox({
             .invoke(
               "nylas-send",
               {
-                body: {
-                  workspaceId,
-                  ...payload,
-                  idempotencyKey,
-                },
+                body:
+                  functionBody,
               },
             );
 
         if (
           invokeError
         ) {
-          throw (
-            invokeError
+          throw new Error(
+            await edgeFunctionErrorMessage(
+              invokeError,
+              "Campaign Seat could not send this email.",
+            ),
           );
         }
 
@@ -1656,6 +1727,7 @@ export function useRealInboxMailbox({
         bcc = [],
         subject,
         body,
+        attachments = [],
       }) =>
         invokeSend({
           mode:
@@ -1666,6 +1738,7 @@ export function useRealInboxMailbox({
           bcc,
           subject,
           body,
+          attachments,
         }),
       [
         invokeSend,
@@ -1679,6 +1752,7 @@ export function useRealInboxMailbox({
         subject,
         body,
         replyAll = false,
+        attachments = [],
       }) =>
         invokeSend({
           mode:
@@ -1688,6 +1762,7 @@ export function useRealInboxMailbox({
           subject,
           body,
           replyAll,
+          attachments,
         }),
       [
         invokeSend,
