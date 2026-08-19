@@ -45,7 +45,7 @@ declare
       translate(
         replace(
           encode(
-            digest(
+            extensions.digest(
               raw_code_verifier,
               'sha256'
             ),
@@ -78,7 +78,7 @@ begin
       translate(
         replace(
           encode(
-            digest(
+            extensions.digest(
               test_verifier,
               'sha256'
             ),
