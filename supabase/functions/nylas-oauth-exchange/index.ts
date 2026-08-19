@@ -391,6 +391,10 @@ Deno.serve(
                 redirect_uri:
                   nylasRedirectUri,
 
+                code_verifier:
+                  oauthState
+                    .code_verifier,
+
               }),
           },
         );

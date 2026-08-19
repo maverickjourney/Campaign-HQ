@@ -399,6 +399,20 @@ Deno.serve(
     authorizationUrl
       .searchParams
       .set(
+        "code_challenge",
+        state.code_challenge,
+      );
+
+    authorizationUrl
+      .searchParams
+      .set(
+        "code_challenge_method",
+        "S256",
+      );
+
+    authorizationUrl
+      .searchParams
+      .set(
         "access_type",
         "offline",
       );
