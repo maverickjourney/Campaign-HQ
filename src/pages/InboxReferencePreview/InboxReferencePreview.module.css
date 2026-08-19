@@ -5349,3 +5349,391 @@
     padding-top: 58px;
   }
 }
+
+/* ============================================================
+   CAMPAIGN SEAT — INBOX REPLY-ALL LAYOUT
+   ============================================================ */
+
+.replyOptions {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 6px;
+}
+
+.composerFooter > .replyOptions button {
+  display: inline-flex;
+  width: auto;
+  min-width: 76px;
+  height: 31px;
+  align-items: center;
+  justify-content: center;
+  padding: 0 10px;
+  white-space: nowrap;
+}
+
+.replyChannels {
+  min-width: 0;
+}
+
+/* ============================================================
+   CAMPAIGN SEAT — VIEWPORT-SIZED SCROLLABLE INBOX
+   Keep the Inbox workspace on-screen instead of allowing the
+   conversation list to make the entire page indefinitely tall.
+   ============================================================ */
+
+.inboxWorkspace {
+  height:
+    clamp(
+      440px,
+      calc(100dvh - 420px),
+      690px
+    );
+  min-height: 0;
+  align-items: stretch;
+}
+
+.utilityPanel,
+.conversationPanel,
+.threadPanel {
+  height: 100%;
+  min-height: 0;
+}
+
+/* Left-side Channels / Filters / Tags */
+.utilityPanel {
+  overflow-x: hidden;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: #a0b2c1 transparent;
+}
+
+/* Middle mailbox list */
+.conversationPanel {
+  min-height: 0;
+}
+
+.conversationList {
+  min-height: 0;
+  overscroll-behavior: contain;
+}
+
+/* Right-side open conversation */
+.threadPanel {
+  display: flex;
+  min-height: 0;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.threadHeader,
+.threadTabs,
+.replyComposer {
+  flex: 0 0 auto;
+}
+
+.threadBody {
+  min-height: 0;
+  max-height: none;
+  flex: 1 1 auto;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.detailsPanel,
+.filesPanel,
+.activityPanel {
+  min-height: 0;
+  flex: 1 1 auto;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+/* Clean, subtle browser scrollbar */
+.utilityPanel::-webkit-scrollbar,
+.conversationList::-webkit-scrollbar,
+.threadBody::-webkit-scrollbar,
+.detailsPanel::-webkit-scrollbar,
+.filesPanel::-webkit-scrollbar,
+.activityPanel::-webkit-scrollbar {
+  width: 8px;
+}
+
+.utilityPanel::-webkit-scrollbar-thumb,
+.conversationList::-webkit-scrollbar-thumb,
+.threadBody::-webkit-scrollbar-thumb,
+.detailsPanel::-webkit-scrollbar-thumb,
+.filesPanel::-webkit-scrollbar-thumb,
+.activityPanel::-webkit-scrollbar-thumb {
+  border: 2px solid transparent;
+  border-radius: 999px;
+  background: #a9bac7;
+  background-clip: padding-box;
+}
+
+@media (max-height: 800px) and (min-width: 1041px) {
+  .inboxWorkspace {
+    height:
+      clamp(
+        400px,
+        calc(100dvh - 370px),
+        560px
+      );
+  }
+}
+
+/* ============================================================
+   CAMPAIGN SEAT — FIXED DESKTOP INBOX VIEWPORT
+   Explicitly keeps the mailbox in a shorter on-screen box.
+   ============================================================ */
+
+@media (min-width: 1041px) {
+
+  .inboxWorkspace {
+    height: 500px !important;
+    min-height: 500px !important;
+    max-height: 500px !important;
+    overflow: hidden;
+    align-items: stretch;
+  }
+
+  .utilityPanel,
+  .conversationPanel,
+  .threadPanel {
+    height: 500px !important;
+    min-height: 0 !important;
+    max-height: 500px !important;
+    overflow: hidden;
+  }
+
+  /* LEFT COLUMN */
+  .utilityPanel {
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+  }
+
+  /* MIDDLE EMAIL COLUMN */
+  .conversationPanel {
+    display: grid !important;
+    grid-template-rows:
+      48px minmax(0, 1fr);
+  }
+
+  .listHeader {
+    min-height: 48px;
+  }
+
+  .conversationList {
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    overflow-x: hidden !important;
+    overflow-y: scroll !important;
+  }
+
+  /* RIGHT OPEN-MESSAGE COLUMN */
+  .threadPanel {
+    display: flex !important;
+    flex-direction: column;
+  }
+
+  .threadHeader,
+  .threadTabs,
+  .replyComposer {
+    flex: 0 0 auto;
+  }
+
+  .threadBody,
+  .detailsPanel,
+  .filesPanel,
+  .activityPanel {
+    min-height: 0 !important;
+    max-height: none !important;
+    flex: 1 1 0 !important;
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+  }
+
+  .threadBody {
+    height: auto !important;
+  }
+}
+
+
+/* Slightly shorter on laptop-sized displays */
+@media (
+  min-width: 1041px
+) and (
+  max-height: 820px
+) {
+
+  .inboxWorkspace,
+  .utilityPanel,
+  .conversationPanel,
+  .threadPanel {
+    height: 450px !important;
+    min-height: 450px !important;
+    max-height: 450px !important;
+  }
+}
+
+/* ============================================================
+   CAMPAIGN SEAT — LARGER WORKING INBOX PANELS
+   Keep internal scrolling, but give the email list and message
+   reader substantially more usable vertical space.
+   ============================================================ */
+
+@media (min-width: 1041px) {
+
+  .inboxWorkspace {
+    height: 620px !important;
+    min-height: 620px !important;
+    max-height: 620px !important;
+    align-items: start;
+  }
+
+  /* Keep navigation column compact */
+  .utilityPanel {
+    height: 500px !important;
+    min-height: 500px !important;
+    max-height: 500px !important;
+    align-self: start;
+  }
+
+  /* Give the actual work areas more space */
+  .conversationPanel,
+  .threadPanel {
+    height: 620px !important;
+    min-height: 620px !important;
+    max-height: 620px !important;
+  }
+
+  .conversationList {
+    min-height: 0 !important;
+    overflow-y: auto !important;
+  }
+
+  .threadBody,
+  .detailsPanel,
+  .filesPanel,
+  .activityPanel {
+    min-height: 0 !important;
+    max-height: none !important;
+    flex: 1 1 auto !important;
+    overflow-y: auto !important;
+  }
+}
+
+/* Smaller laptop screens still get a useful work area */
+@media (
+  min-width: 1041px
+) and (
+  max-height: 820px
+) {
+
+  .inboxWorkspace,
+  .conversationPanel,
+  .threadPanel {
+    height: 560px !important;
+    min-height: 560px !important;
+    max-height: 560px !important;
+  }
+
+  .utilityPanel {
+    height: 470px !important;
+    min-height: 470px !important;
+    max-height: 470px !important;
+  }
+}
+
+/* ============================================================
+   CAMPAIGN SEAT — FINAL LARGE DESKTOP INBOX WORK AREA
+   This intentionally overrides all earlier desktop/laptop
+   height rules.
+   ============================================================ */
+
+@media (min-width: 1041px) {
+
+  .inboxWorkspace {
+    height: 720px !important;
+    min-height: 720px !important;
+    max-height: 720px !important;
+    align-items: start !important;
+    overflow: visible !important;
+  }
+
+  .conversationPanel,
+  .threadPanel {
+    height: 720px !important;
+    min-height: 720px !important;
+    max-height: 720px !important;
+  }
+
+  .utilityPanel {
+    height: 520px !important;
+    min-height: 520px !important;
+    max-height: 520px !important;
+    align-self: start !important;
+    overflow-y: auto !important;
+  }
+
+  .conversationPanel {
+    display: grid !important;
+    grid-template-rows:
+      48px minmax(0, 1fr) !important;
+  }
+
+  .conversationList {
+    min-height: 0 !important;
+    height: auto !important;
+    max-height: none !important;
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+  }
+
+  .threadPanel {
+    display: flex !important;
+    min-height: 0 !important;
+    flex-direction: column !important;
+    overflow: hidden !important;
+  }
+
+  .threadHeader,
+  .threadTabs,
+  .replyComposer {
+    flex: 0 0 auto !important;
+  }
+
+  .threadBody,
+  .detailsPanel,
+  .filesPanel,
+  .activityPanel {
+    min-height: 0 !important;
+    max-height: none !important;
+    flex: 1 1 0 !important;
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+  }
+
+  .threadBody {
+    height: auto !important;
+  }
+}
+
+/* ============================================================
+   CAMPAIGN SEAT — FINAL SLIGHT HEIGHT INCREASE
+   ============================================================ */
+
+@media (min-width: 1041px) {
+
+  .inboxWorkspace,
+  .conversationPanel,
+  .threadPanel {
+    height: 760px !important;
+    min-height: 760px !important;
+    max-height: 760px !important;
+  }
+
+}

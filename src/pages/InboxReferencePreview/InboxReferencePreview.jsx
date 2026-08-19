@@ -1,4 +1,9 @@
-import { useMemo, useState } from "react";
+import {
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import {
   Archive,
   AtSign,
@@ -125,8 +130,8 @@ const TAGS = [
 const SUMMARY_METRICS = [
   {
     id: "unread",
-    label: "Unread",
-    detail: "New conversations",
+    label: "Mailbox Unread",
+    detail: "Connected inbox unread",
     icon: Mail,
     tone: "red",
   },
@@ -712,10 +717,13 @@ export default function InboxReferencePreview() {
     conversations: mailboxConversations,
     connectedEmail: mailboxConnectedEmail,
     accountProvider: mailboxAccountProvider,
+    inboxTotalCount: mailboxInboxTotalCount,
+    inboxUnreadCount: mailboxInboxUnreadCount,
     isLoading: mailboxLoading,
     error: mailboxError,
     refresh: refreshMailbox,
     loadThread: loadMailboxThread,
+    markThreadRead: markMailboxThreadRead,
     sendEmail: sendMailboxEmail,
     replyEmail: replyMailboxEmail,
     downloadAttachment: downloadMailboxAttachment,
@@ -834,6 +842,9 @@ export default function InboxReferencePreview() {
     "Inbox ready.",
   );
 
+  const threadBodyRef =
+    useRef(null);
+
   const selectedConversation =
     conversations.find(
       (conversation) =>
@@ -846,6 +857,48 @@ export default function InboxReferencePreview() {
     Boolean(
       selectedConversation.id,
     );
+
+  const selectedMessageCount =
+    selectedConversation
+      ?.messages
+      ?.length || 0;
+
+  useEffect(() => {
+    if (
+      newMessageMode ||
+      activeThreadTab !==
+        "conversation" ||
+      !hasSelectedConversation
+    ) {
+      return undefined;
+    }
+
+    const frameId =
+      window.requestAnimationFrame(
+        () => {
+          const threadBody =
+            threadBodyRef.current;
+
+          if (!threadBody) {
+            return;
+          }
+
+          threadBody.scrollTop =
+            threadBody.scrollHeight;
+        },
+      );
+
+    return () =>
+      window.cancelAnimationFrame(
+        frameId,
+      );
+  }, [
+    activeThreadTab,
+    hasSelectedConversation,
+    newMessageMode,
+    selectedConversation.id,
+    selectedMessageCount,
+  ]);
 
   const replyAllEnabled =
     Boolean(
@@ -977,15 +1030,38 @@ export default function InboxReferencePreview() {
     );
   }, [contactQuery, contacts]);
 
+  const providerInboxTotalCount =
+    liveMailboxEnabled &&
+    Number.isFinite(
+      mailboxInboxTotalCount,
+    )
+      ? mailboxInboxTotalCount
+      : null;
+
+  const providerInboxUnreadCount =
+    liveMailboxEnabled &&
+    Number.isFinite(
+      mailboxInboxUnreadCount,
+    )
+      ? mailboxInboxUnreadCount
+      : null;
+
   const summaryMetrics = useMemo(
     () =>
       SUMMARY_METRICS.map((metric) => {
         const value =
           metric.id === "unread"
-            ? conversations.filter(
-                (conversation) =>
-                  conversation.unread,
-              ).length
+            ? providerInboxUnreadCount !==
+                null
+              ? providerInboxUnreadCount +
+                internalConversations.filter(
+                  (conversation) =>
+                    conversation.unread,
+                ).length
+              : conversations.filter(
+                  (conversation) =>
+                    conversation.unread,
+                ).length
             : metric.id === "needs-response"
               ? conversations.filter(
                   (conversation) =>
@@ -1003,7 +1079,11 @@ export default function InboxReferencePreview() {
           value,
         };
       }),
-    [conversations],
+    [
+      conversations,
+      internalConversations,
+      providerInboxUnreadCount,
+    ],
   );
 
   const filteredConversations = useMemo(() => {
@@ -1101,13 +1181,37 @@ export default function InboxReferencePreview() {
   ]);
 
   const getChannelCount = (channelId) => {
+    if (
+      liveMailboxEnabled &&
+      providerInboxTotalCount !==
+        null
+    ) {
+      if (
+        channelId ===
+        "email"
+      ) {
+        return providerInboxTotalCount;
+      }
+
+      if (
+        channelId ===
+        "all"
+      ) {
+        return (
+          providerInboxTotalCount +
+          internalConversations.length
+        );
+      }
+    }
+
     if (channelId === "all") {
       return conversations.length;
     }
 
     return conversations.filter(
       (conversation) =>
-        conversation.channel === channelId,
+        conversation.channel ===
+        channelId,
     ).length;
   };
 
@@ -1329,24 +1433,54 @@ export default function InboxReferencePreview() {
   };
 
   const openConversation = (id) => {
+    const conversationToOpen =
+      conversations.find(
+        (conversation) =>
+          conversation.id ===
+          id,
+      );
+
     setSelectedId(id);
     setNewMessageMode(false);
-    setActiveThreadTab("conversation");
-
-    setConversations((current) =>
-      current.map((conversation) =>
-        conversation.id === id
-          ? {
-              ...conversation,
-              unread: false,
-              unreadCount: 0,
-            }
-          : conversation,
-      ),
+    setActiveThreadTab(
+      "conversation",
     );
 
-    setToast("Conversation opened.");
+    if (
+      liveMailboxEnabled &&
+      conversationToOpen
+        ?.providerThreadId
+    ) {
+      markMailboxThreadRead(
+        conversationToOpen
+          .providerThreadId,
+      );
+    } else {
+      setConversations(
+        (current) =>
+          current.map(
+            (conversation) =>
+              conversation.id === id
+                ? {
+                    ...conversation,
+                    unread:
+                      false,
+                    unreadCount:
+                      0,
+                  }
+                : conversation,
+          ),
+      );
+    }
+
+    setToast(
+      conversationToOpen
+        ?.providerThreadId
+        ? "Conversation opened · read in Campaign Seat."
+        : "Conversation opened.",
+    );
   };
+
 
   const addActivity = (action, detail) => {
     setActivityLog((current) => [
@@ -2990,7 +3124,10 @@ export default function InboxReferencePreview() {
 
             {!newMessageMode &&
             activeThreadTab === "conversation" ? (
-              <div className={styles.threadBody}>
+              <div
+                ref={threadBodyRef}
+                className={styles.threadBody}
+              >
                 <div className={styles.dateDivider}>
                   <span>Today</span>
                 </div>

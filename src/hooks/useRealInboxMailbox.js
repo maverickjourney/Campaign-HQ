@@ -69,9 +69,36 @@ function stripHtml(value) {
     typeof window ===
       "undefined"
   ) {
-    return text.replace(
-      /<[^>]*>/g,
-      " ",
+    return clean(
+      text
+        .replace(
+          /<(style|script|noscript|template)[^>]*>[\s\S]*?<\/\1>/gi,
+          " ",
+        )
+        .replace(
+          /<br\s*\/?\s*>/gi,
+          "\n",
+        )
+        .replace(
+          /<\/(p|div|section|article|header|footer|li|tr|blockquote|h[1-6])>/gi,
+          "\n",
+        )
+        .replace(
+          /<[^>]*>/g,
+          " ",
+        )
+        .replace(
+          /[ \t]+/g,
+          " ",
+        )
+        .replace(
+          /\n[ \t]+/g,
+          "\n",
+        )
+        .replace(
+          /\n{3,}/g,
+          "\n\n",
+        ),
     );
   }
 
@@ -82,10 +109,135 @@ function stripHtml(value) {
         "text/html",
       );
 
+  documentValue
+    .querySelectorAll(
+      "style, script, noscript, template, head, meta, link, svg, canvas, iframe, object, embed",
+    )
+    .forEach(
+      (element) =>
+        element.remove(),
+    );
+
+  documentValue
+    .querySelectorAll(
+      "[hidden], [aria-hidden='true']",
+    )
+    .forEach(
+      (element) =>
+        element.remove(),
+    );
+
+  documentValue
+    .querySelectorAll(
+      "[style]",
+    )
+    .forEach(
+      (element) => {
+        const style =
+          String(
+            element.getAttribute(
+              "style",
+            ) || "",
+          )
+            .toLowerCase()
+            .replace(
+              /\s+/g,
+              "",
+            );
+
+        if (
+          style.includes(
+            "display:none",
+          ) ||
+          style.includes(
+            "visibility:hidden",
+          )
+        ) {
+          element.remove();
+        }
+      },
+    );
+
+  documentValue
+    .querySelectorAll(
+      "br",
+    )
+    .forEach(
+      (element) =>
+        element.replaceWith(
+          "\n",
+        ),
+    );
+
+  documentValue
+    .querySelectorAll(
+      "p, div, section, article, header, footer, li, tr, blockquote, h1, h2, h3, h4, h5, h6",
+    )
+    .forEach(
+      (element) =>
+        element.append(
+          "\n",
+        ),
+    );
+
+  documentValue
+    .querySelectorAll(
+      "img[alt]",
+    )
+    .forEach(
+      (image) => {
+        const alt =
+          clean(
+            image.getAttribute(
+              "alt",
+            ),
+          );
+
+        if (
+          alt &&
+          !image.parentElement
+            ?.textContent
+            ?.includes(
+              alt,
+            )
+        ) {
+          image.replaceWith(
+            ` ${alt} `,
+          );
+        }
+      },
+    );
+
   return clean(
-    documentValue
-      .body
-      .textContent,
+    String(
+      documentValue
+        .body
+        .textContent || "",
+    )
+      .replace(
+        /\u00a0/g,
+        " ",
+      )
+      .replace(
+        /[\u200B-\u200D\uFEFF]/g,
+        "",
+      )
+      .replace(
+        /\r/g,
+        "",
+      )
+      .replace(
+        /[ \t]+/g,
+        " ",
+      )
+      .replace(
+        / *\n */g,
+        "\n",
+      )
+      .replace(
+        /\n{3,}/g,
+        "\n\n",
+      ),
   );
 }
 
@@ -569,7 +721,7 @@ function transformThread({
   };
 }
 
-function inboxFolderId(
+function findInboxFolder(
   folders,
 ) {
   if (
@@ -577,10 +729,10 @@ function inboxFolderId(
       folders,
     )
   ) {
-    return "";
+    return null;
   }
 
-  const inbox =
+  return (
     folders.find(
       (folder) => {
         const values = [
@@ -605,10 +757,28 @@ function inboxFolderId(
             ),
         );
       },
-    );
+    ) ||
+    null
+  );
+}
 
-  return clean(
-    inbox?.id,
+function mailboxCount(
+  value,
+) {
+  const numeric =
+    Number(value);
+
+  if (
+    !Number.isFinite(
+      numeric,
+    ) ||
+    numeric < 0
+  ) {
+    return null;
+  }
+
+  return Math.floor(
+    numeric,
   );
 }
 
@@ -643,6 +813,16 @@ export function useRealInboxMailbox({
   ] = useState("");
 
   const [
+    inboxTotalCount,
+    setInboxTotalCount,
+  ] = useState(null);
+
+  const [
+    inboxUnreadCount,
+    setInboxUnreadCount,
+  ] = useState(null);
+
+  const [
     isLoading,
     setIsLoading,
   ] = useState(false);
@@ -665,6 +845,11 @@ export function useRealInboxMailbox({
   const sendKeysRef =
     useRef(
       new Map(),
+    );
+
+  const readThreadsRef =
+    useRef(
+      new Set(),
     );
 
   const invokeMailbox =
@@ -730,6 +915,14 @@ export function useRealInboxMailbox({
             [],
           );
 
+          setInboxTotalCount(
+            null,
+          );
+
+          setInboxUnreadCount(
+            null,
+          );
+
           setError(
             "",
           );
@@ -766,10 +959,29 @@ export function useRealInboxMailbox({
                 ? folderResult.data
                 : [];
 
-            inboxId =
-              inboxFolderId(
+            const inboxFolder =
+              findInboxFolder(
                 folders,
               );
+
+            inboxId =
+              clean(
+                inboxFolder?.id,
+              );
+
+            setInboxTotalCount(
+              mailboxCount(
+                inboxFolder
+                  ?.total_count,
+              ),
+            );
+
+            setInboxUnreadCount(
+              mailboxCount(
+                inboxFolder
+                  ?.unread_count,
+              ),
+            );
 
             if (
               folderResult
@@ -844,13 +1056,35 @@ export function useRealInboxMailbox({
                 : []
             )
               .map(
-                (thread) =>
-                  transformThread({
-                    thread,
-                    connectedEmail:
-                      mailboxEmail ||
-                      connectedEmail,
-                  }),
+                (thread) => {
+                  const transformed =
+                    transformThread({
+                      thread,
+                      connectedEmail:
+                        mailboxEmail ||
+                        connectedEmail,
+                    });
+
+                  if (
+                    readThreadsRef
+                      .current
+                      .has(
+                        clean(
+                          thread?.id,
+                        ),
+                      )
+                  ) {
+                    return {
+                      ...transformed,
+                      unread:
+                        false,
+                      unreadCount:
+                        0,
+                    };
+                  }
+
+                  return transformed;
+                },
               )
               .sort(
                 (
@@ -902,6 +1136,87 @@ export function useRealInboxMailbox({
         workspaceId,
       ],
     );
+
+  const markThreadRead =
+    useCallback(
+      (
+        threadIdOrConversationId,
+      ) => {
+        const providerThreadId =
+          clean(
+            threadIdOrConversationId,
+          ).replace(
+            THREAD_PREFIX,
+            "",
+          );
+
+        if (
+          !enabled ||
+          !providerThreadId
+        ) {
+          return;
+        }
+
+        readThreadsRef
+          .current
+          .add(
+            providerThreadId,
+          );
+
+        if (
+          typeof window !==
+            "undefined"
+        ) {
+          try {
+            const storageKey =
+              `campaign-seat-mailbox-read:${workspaceId}`;
+
+            const stored =
+              Array.from(
+                readThreadsRef
+                  .current,
+              )
+                .slice(
+                  -1000,
+                );
+
+            window.localStorage
+              .setItem(
+                storageKey,
+                JSON.stringify(
+                  stored,
+                ),
+              );
+          } catch {
+            // Browser storage is only
+            // an enhancement.
+          }
+        }
+
+        setConversations(
+          (current) =>
+            current.map(
+              (conversation) =>
+                conversation
+                  .providerThreadId ===
+                providerThreadId
+                  ? {
+                      ...conversation,
+                      unread:
+                        false,
+                      unreadCount:
+                        0,
+                    }
+                  : conversation,
+            ),
+        );
+      },
+      [
+        enabled,
+        workspaceId,
+      ],
+    );
+
 
   const loadThread =
     useCallback(
@@ -1082,6 +1397,46 @@ export function useRealInboxMailbox({
   useEffect(() => {
     if (
       !enabled ||
+      !workspaceId ||
+      typeof window ===
+        "undefined"
+    ) {
+      return;
+    }
+
+    try {
+      const stored =
+        JSON.parse(
+          window.localStorage
+            .getItem(
+              `campaign-seat-mailbox-read:${workspaceId}`,
+            ) ||
+          "[]",
+        );
+
+      readThreadsRef.current =
+        new Set(
+          Array.isArray(
+            stored,
+          )
+            ? stored
+                .map(clean)
+                .filter(Boolean)
+            : [],
+        );
+    } catch {
+      readThreadsRef.current =
+        new Set();
+    }
+  }, [
+    enabled,
+    workspaceId,
+  ]);
+
+
+  useEffect(() => {
+    if (
+      !enabled ||
       !workspaceId
     ) {
       return undefined;
@@ -1098,6 +1453,81 @@ export function useRealInboxMailbox({
     return () => {
       window.clearTimeout(
         timeoutId,
+      );
+    };
+  }, [
+    enabled,
+    refresh,
+    workspaceId,
+  ]);
+
+  useEffect(() => {
+    if (
+      !enabled ||
+      !workspaceId
+    ) {
+      return undefined;
+    }
+
+    const refreshQuietly =
+      () => {
+        if (
+          document.visibilityState !==
+            "visible"
+        ) {
+          return;
+        }
+
+        void refresh({
+          showLoading:
+            false,
+        });
+      };
+
+    const intervalId =
+      window.setInterval(
+        refreshQuietly,
+        60000,
+      );
+
+    const handleFocus =
+      () => {
+        refreshQuietly();
+      };
+
+    const handleVisibility =
+      () => {
+        if (
+          document.visibilityState ===
+            "visible"
+        ) {
+          refreshQuietly();
+        }
+      };
+
+    window.addEventListener(
+      "focus",
+      handleFocus,
+    );
+
+    document.addEventListener(
+      "visibilitychange",
+      handleVisibility,
+    );
+
+    return () => {
+      window.clearInterval(
+        intervalId,
+      );
+
+      window.removeEventListener(
+        "focus",
+        handleFocus,
+      );
+
+      document.removeEventListener(
+        "visibilitychange",
+        handleVisibility,
       );
     };
   }, [
@@ -1368,12 +1798,15 @@ export function useRealInboxMailbox({
     conversations,
     connectedEmail,
     accountProvider,
+    inboxTotalCount,
+    inboxUnreadCount,
     isLoading,
     error,
     lastUpdated,
 
     refresh,
     loadThread,
+    markThreadRead,
     sendEmail,
     replyEmail,
     downloadAttachment,
