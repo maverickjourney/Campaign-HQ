@@ -40,25 +40,25 @@ declare
   insert_start integer;
 
   correct_assignment text :=
-    E'  encoded_challenge =\n'
-    E'    rtrim(\n'
-    E'      translate(\n'
-    E'        replace(\n'
-    E'          encode(\n'
-    E'            digest(\n'
-    E'              raw_code_verifier,\n'
-    E'              ''sha256''\n'
-    E'            ),\n'
-    E'            ''base64''\n'
-    E'          ),\n'
-    E'          E''\\\\n'',\n'
-    E'          ''''\n'
-    E'        ),\n'
-    E'        ''+/'',\n'
-    E'        ''-_''\n'
-    E'      ),\n'
-    E'      ''=''\n'
-    E'    );';
+    $pkce_assignment$  encoded_challenge =
+    rtrim(
+      translate(
+        replace(
+          encode(
+            digest(
+              raw_code_verifier,
+              'sha256'
+            ),
+            'base64'
+          ),
+          E'\n',
+          ''
+        ),
+        '+/',
+        '-_'
+      ),
+      '='
+    );$pkce_assignment$;
 
   test_verifier text :=
     'dBjftJeZ4CVP-mB92K27uhbUJU1p1r_wW1gFWFOEjXk';
