@@ -6,6 +6,7 @@ import {
   Mail,
   ShieldCheck,
   TriangleAlert,
+  RefreshCw,
 } from "lucide-react";
 
 import {
@@ -174,30 +175,34 @@ export default function EmailContactsOnboarding({
 
         <div>
           <span>
-            Email &amp; Contacts onboarding
+            {communicationsComplete ||
+            calendarStarted
+              ? "Email & Contacts"
+              : "Email & Contacts onboarding"}
           </span>
 
           <h2>
-            Connect the campaign mailbox
+            {communicationsComplete ||
+            calendarStarted
+              ? "Campaign mailbox & contacts"
+              : "Connect the campaign mailbox"}
           </h2>
 
           <p>
-            Connect Google Workspace or
-            Microsoft 365 through a
-            protected provider session.
-            Campaign Seat will connect
-            mailbox read and send access
-            plus provider contacts.
-            Calendar stays separate.
+            {communicationsComplete ||
+            calendarStarted
+              ? "Review the connected campaign mailbox, provider contacts and protected authorization. Calendar remains a separate campaign integration."
+              : "Connect Google Workspace or Microsoft 365 through a protected provider session. Campaign Seat will connect mailbox read and send access plus provider contacts. Calendar stays separate."}
           </p>
         </div>
       </header>
 
-      <div
-        className={
-          styles.providerGrid
-        }
-      >
+      {!connectionReady && (
+        <div
+          className={
+            styles.providerGrid
+          }
+        >
         <article>
           <div
             className={
@@ -271,7 +276,8 @@ export default function EmailContactsOnboarding({
             Connect Microsoft
           </button>
         </article>
-      </div>
+        </div>
+      )}
 
       <div
         className={
@@ -362,6 +368,121 @@ export default function EmailContactsOnboarding({
         </article>
       </div>
 
+      {connectionReady &&
+        (
+          communicationsComplete ||
+          calendarStarted
+        ) && (
+          <section
+            className={
+              styles.connectionMaintenance
+            }
+          >
+            <div
+              className={
+                styles.connectionMaintenanceIcon
+              }
+            >
+              <RefreshCw
+                size={20}
+              />
+            </div>
+
+            <div
+              className={
+                styles.connectionMaintenanceCopy
+              }
+            >
+              <strong>
+                Mailbox connection maintenance
+              </strong>
+
+              <span>
+                Reconnect the existing
+                {" "}
+                {providerLabel(
+                  accountProvider,
+                )}
+                {" "}
+                authorization for
+                {" "}
+                <b>
+                  {
+                    emailConnection
+                      ?.display_email
+                  }
+                </b>.
+                Campaign Seat will require
+                two-step verification and
+                will not change the mailbox,
+                provider, Contacts connection,
+                or current Calendar onboarding
+                step.
+              </span>
+            </div>
+
+            <button
+              className={
+                styles.reconnectButton
+              }
+              type="button"
+              disabled={
+                !controlledWritesEnabled ||
+                isLoading ||
+                isConnecting ||
+                !accountProvider
+              }
+              onClick={() =>
+                startConnection(
+                  accountProvider,
+                  "reauthorize",
+                )
+              }
+            >
+              {isConnecting ? (
+                <LoaderCircle
+                  className={
+                    styles.spinner
+                  }
+                  size={17}
+                />
+              ) : (
+                <RefreshCw
+                  size={17}
+                />
+              )}
+
+              {isConnecting
+                ? "Starting secure reconnect…"
+                : `Reconnect ${
+                    accountProvider ===
+                      "google"
+                      ? "Google"
+                      : "Microsoft"
+                  }`}
+            </button>
+          </section>
+        )}
+
+      {connectionReady &&
+        (
+          communicationsComplete ||
+          calendarStarted
+        ) &&
+        !controlledWritesEnabled && (
+          <div
+            className={
+              styles.reconnectDevelopmentNotice
+            }
+          >
+            Reconnect is intentionally locked
+            on the normal development URL.
+            Controlled provider writes must be
+            explicitly enabled before an OAuth
+            reauthorization can start.
+          </div>
+        )}
+
       {error && (
         <div
           className={
@@ -410,9 +531,12 @@ export default function EmailContactsOnboarding({
           </strong>
 
           <span>
-            {connectionReady
-              ? "The verified mailbox and provider-contact connection are ready to confirm."
-              : "Connect one campaign-managed Google or Microsoft account. Existing Campaign Seat contact consent records remain separate."}
+            {communicationsComplete ||
+            calendarStarted
+              ? "Email & Contacts setup is complete. Use mailbox connection maintenance above if the provider authorization needs to be renewed."
+              : connectionReady
+                ? "The verified mailbox and provider-contact connection are ready to complete setup."
+                : "Connect one campaign-managed Google or Microsoft account. Existing Campaign Seat contact consent records remain separate."}
           </span>
         </div>
 

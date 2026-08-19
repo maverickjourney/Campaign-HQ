@@ -171,18 +171,26 @@ export default function NylasOAuthCallback() {
           return;
         }
 
+        const reauthorized =
+          data?.mode ===
+            "reauthorize";
+
         setStatus(
           "success",
         );
 
         setMessage(
-          `Connected ${data.email}. Returning to Email & Contacts…`,
+          reauthorized
+            ? `Reconnected ${data.email}. Returning to Email & Contacts…`
+            : `Connected ${data.email}. Returning to Email & Contacts…`,
         );
 
         window.setTimeout(
           () => {
             window.location.replace(
-              "/workspace/settings?tab=integrations&onboarding=communications&provider-connection=success",
+              reauthorized
+                ? "/workspace/settings?tab=integrations&onboarding=communications&provider-connection=reauthorized"
+                : "/workspace/settings?tab=integrations&onboarding=communications&provider-connection=success",
             );
           },
           750,

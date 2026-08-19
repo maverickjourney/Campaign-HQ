@@ -293,6 +293,7 @@ export function useEmailContactsOnboarding({
     useCallback(
       async (
         provider,
+        mode = "connect",
       ) => {
         if (!workspaceId) {
           return;
@@ -320,6 +321,7 @@ export function useEmailContactsOnboarding({
                   body: {
                     workspaceId,
                     provider,
+                    mode,
                   },
                 },
               );
@@ -327,8 +329,41 @@ export function useEmailContactsOnboarding({
           if (
             functionError
           ) {
-            throw (
+            let providerMessage =
+              "";
+
+            if (
               functionError
+                ?.context instanceof
+                Response
+            ) {
+              try {
+                const payload =
+                  await functionError
+                    .context
+                    .clone()
+                    .json();
+
+                providerMessage =
+                  payload?.error ||
+                  payload?.message ||
+                  "";
+              } catch {
+                // Fall through to
+                // Supabase's message.
+              }
+            }
+
+            throw new Error(
+              providerMessage ||
+              functionError
+                ?.message ||
+              (
+                mode ===
+                  "reauthorize"
+                  ? "Campaign Seat could not start the secure mailbox reconnect."
+                  : "Campaign Seat could not start the email connection."
+              ),
             );
           }
 
@@ -352,7 +387,10 @@ export function useEmailContactsOnboarding({
           setError(
             errorMessage(
               connectionError,
-              "Campaign Seat could not start the email connection.",
+              mode ===
+                "reauthorize"
+                ? "Campaign Seat could not start the secure mailbox reconnect."
+                : "Campaign Seat could not start the email connection.",
             ),
           );
 

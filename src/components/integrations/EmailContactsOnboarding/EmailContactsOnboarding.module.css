@@ -248,3 +248,99 @@
     width: 100%;
   }
 }
+
+/* ============================================================
+   CAMPAIGN SEAT — POST-ONBOARDING MAILBOX RECONNECT
+   ============================================================ */
+
+.connectionMaintenance {
+  display: grid;
+  grid-template-columns:
+    auto minmax(0, 1fr) auto;
+  gap: 12px;
+  align-items: center;
+  margin: 0 22px 16px;
+  padding: 15px;
+  border: 1px solid rgba(30, 64, 175, 0.14);
+  border-radius: 13px;
+  background: rgba(30, 64, 175, 0.035);
+}
+
+.connectionMaintenanceIcon {
+  display: grid;
+  width: 40px;
+  height: 40px;
+  place-items: center;
+  border-radius: 11px;
+  color: #1e40af;
+  background: rgba(30, 64, 175, 0.09);
+}
+
+.connectionMaintenanceCopy {
+  min-width: 0;
+}
+
+.connectionMaintenanceCopy strong,
+.connectionMaintenanceCopy span {
+  display: block;
+}
+
+.connectionMaintenanceCopy strong {
+  color: #172554;
+}
+
+.connectionMaintenanceCopy span {
+  margin-top: 4px;
+  color: rgba(15, 23, 42, 0.65);
+  font-size: 0.84rem;
+  line-height: 1.45;
+}
+
+.connectionMaintenanceCopy b {
+  color: rgba(15, 23, 42, 0.86);
+  font-weight: 750;
+}
+
+.reconnectButton {
+  display: inline-flex;
+  gap: 8px;
+  align-items: center;
+  justify-content: center;
+  min-height: 40px;
+  padding: 0 14px;
+  border: 1px solid rgba(30, 64, 175, 0.2);
+  border-radius: 10px;
+  color: #1e3a8a;
+  background: #fff;
+  font: inherit;
+  font-weight: 800;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.reconnectButton:disabled {
+  cursor: not-allowed;
+  opacity: 0.42;
+}
+
+.reconnectDevelopmentNotice {
+  margin: -4px 22px 16px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  color: rgba(15, 23, 42, 0.68);
+  background: rgba(15, 23, 42, 0.04);
+  font-size: 0.82rem;
+  line-height: 1.45;
+}
+
+@media (max-width: 800px) {
+  .connectionMaintenance {
+    grid-template-columns:
+      auto minmax(0, 1fr);
+  }
+
+  .reconnectButton {
+    grid-column: 1 / -1;
+    width: 100%;
+  }
+}
