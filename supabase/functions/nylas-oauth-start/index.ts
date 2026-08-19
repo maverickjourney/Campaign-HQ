@@ -458,7 +458,7 @@ Deno.serve(
       .searchParams
       .set(
         "code_challenge_method",
-        "S256",
+        "s256",
       );
 
     authorizationUrl
