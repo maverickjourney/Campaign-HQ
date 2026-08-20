@@ -2859,8 +2859,9 @@ export default function InboxReferencePreview() {
       if (
         channel === "text"
       ) {
-        window.location.href =
-          `sms:${normalizedPhone}?&body=${encodedMessage}`;
+        window.location.assign(
+          `sms:${normalizedPhone}?&body=${encodedMessage}`,
+        );
 
         return;
       }
