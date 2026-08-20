@@ -11409,3 +11409,214 @@
   }
 
 }
+
+/* ============================================================
+   CAMPAIGN SEAT — IPHONE OPEN CONVERSATION POLISH
+
+   Only refines the opened mobile conversation.
+   Main Inbox and shared header are intentionally untouched.
+   ============================================================ */
+
+@media (max-width: 820px) {
+
+  /*
+   * Clean three-zone message header:
+   * Back | sender | actions
+   */
+  .inboxWorkspace.mobileConversationOpen
+    .threadHeader {
+    display: grid !important;
+
+    grid-template-columns:
+      auto
+      minmax(0, 1fr)
+      auto !important;
+
+    align-items: center !important;
+
+    column-gap: 9px !important;
+
+    overflow: hidden !important;
+  }
+
+
+  .inboxWorkspace.mobileConversationOpen
+    .threadHeader
+    > .mobileBackToInbox {
+    grid-column: 1 !important;
+
+    min-width: max-content !important;
+  }
+
+
+  /*
+   * Sender/avatar group.
+   */
+  .inboxWorkspace.mobileConversationOpen
+    .threadHeader
+    > div:first-of-type {
+    display: flex !important;
+
+    grid-column: 2 !important;
+
+    min-width: 0 !important;
+
+    align-items: center !important;
+
+    gap: 9px !important;
+
+    overflow: hidden !important;
+  }
+
+
+  .inboxWorkspace.mobileConversationOpen
+    .threadHeader
+    > div:first-of-type
+    > span:last-child {
+    display: block !important;
+
+    min-width: 0 !important;
+
+    overflow: hidden !important;
+  }
+
+
+  .inboxWorkspace.mobileConversationOpen
+    .threadHeader
+    > div:first-of-type
+    strong,
+  .inboxWorkspace.mobileConversationOpen
+    .threadHeader
+    > div:first-of-type
+    small {
+    display: block !important;
+
+    width: 100% !important;
+
+    min-width: 0 !important;
+
+    overflow: hidden !important;
+
+    text-overflow: ellipsis !important;
+
+    white-space: nowrap !important;
+  }
+
+
+  /*
+   * Expand / Flag / Email actions stay contained.
+   */
+  .inboxWorkspace.mobileConversationOpen
+    .threadHeader
+    > div:last-of-type {
+    display: flex !important;
+
+    grid-column: 3 !important;
+
+    min-width: max-content !important;
+
+    flex: 0 0 auto !important;
+
+    gap: 6px !important;
+
+    overflow: visible !important;
+  }
+
+
+  .inboxWorkspace.mobileConversationOpen
+    .threadHeader
+    > div:last-of-type
+    > button {
+    width: 40px !important;
+
+    min-width: 40px !important;
+
+    height: 40px !important;
+
+    min-height: 40px !important;
+
+    padding: 0 !important;
+  }
+
+
+  /*
+   * Old desktop signature styling was allowing Edit Signature
+   * to escape upward. Keep everything inside the signature card.
+   */
+  .inboxWorkspace.mobileConversationOpen
+    .composerSignature {
+    position: relative !important;
+  }
+
+
+  .inboxWorkspace.mobileConversationOpen
+    .composerSignature
+    > button {
+    position: static !important;
+
+    inset: auto !important;
+
+    top: auto !important;
+
+    right: auto !important;
+
+    bottom: auto !important;
+
+    left: auto !important;
+
+    transform: none !important;
+
+    translate: none !important;
+
+    justify-self: end !important;
+
+    align-self: center !important;
+
+    margin: 0 !important;
+  }
+
+
+  /*
+   * Give Safari enough real scroll clearance that Send Reply
+   * can be moved completely above the browser toolbar.
+   */
+  .inboxWorkspace.mobileConversationOpen {
+    padding-bottom:
+      calc(
+        105px +
+        env(
+          safe-area-inset-bottom,
+          0px
+        )
+      ) !important;
+  }
+
+
+  .inboxWorkspace.mobileConversationOpen
+    .composerFooter
+    > .sendButton {
+    margin-bottom: 12px !important;
+  }
+
+}
+
+
+@media (max-width: 430px) {
+
+  /*
+   * Preserve sender space on narrower iPhones.
+   */
+  .inboxWorkspace.mobileConversationOpen
+    .threadHeader
+    > div:last-of-type
+    > button {
+    width: 38px !important;
+
+    min-width: 38px !important;
+
+    height: 38px !important;
+
+    min-height: 38px !important;
+  }
+
+}
