@@ -336,6 +336,235 @@ function normalizeExternalOutreach(
 }
 
 
+function groupExternalOutreachConversations(
+  conversations,
+) {
+  const grouped =
+    new Map();
+
+  (
+    Array.isArray(
+      conversations,
+    )
+      ? conversations
+      : []
+  ).forEach(
+    (conversation) => {
+      const phoneKey =
+        clean(
+          conversation
+            ?.phone,
+        )
+          .replace(
+            /\D/g,
+            "",
+          );
+
+      const contactKey =
+        clean(
+          conversation
+            ?.contactId,
+        ) ||
+        phoneKey ||
+        clean(
+          conversation
+            ?.sender,
+        )
+          .toLowerCase();
+
+      const threadKey =
+        `${
+          conversation
+            ?.channel ||
+          "external"
+        }:${contactKey}`;
+
+      const messages =
+        (
+          conversation
+            ?.messages ||
+          []
+        ).map(
+          (message) => ({
+            ...message,
+
+            externalOrder:
+              Number(
+                conversation
+                  ?.order ||
+                0,
+              ),
+          }),
+        );
+
+      const current =
+        grouped.get(
+          threadKey,
+        );
+
+      if (
+        !current
+      ) {
+        grouped.set(
+          threadKey,
+          {
+            ...conversation,
+
+            id:
+              `external-thread-${threadKey}`,
+
+            externalOutreachIds:
+              conversation
+                ?.externalOutreachId
+                ? [
+                    conversation
+                      .externalOutreachId,
+                  ]
+                : [],
+
+            messages,
+
+            files: [
+              ...(
+                conversation
+                  ?.files ||
+                []
+              ),
+            ],
+
+            activity: [
+              ...(
+                conversation
+                  ?.activity ||
+                []
+              ),
+            ],
+          },
+        );
+
+        return;
+      }
+
+      if (
+        conversation
+          ?.externalOutreachId &&
+        !current
+          .externalOutreachIds
+          .includes(
+            conversation
+              .externalOutreachId,
+          )
+      ) {
+        current
+          .externalOutreachIds
+          .push(
+            conversation
+              .externalOutreachId,
+          );
+      }
+
+      current.messages.push(
+        ...messages,
+      );
+
+      current.activity.push(
+        ...(
+          conversation
+            ?.activity ||
+          []
+        ),
+      );
+
+      const existingFiles =
+        new Set(
+          current.files.map(
+            (file) =>
+              file
+                ?.campaignFileId ||
+              file?.id ||
+              file?.name,
+          ),
+        );
+
+      (
+        conversation
+          ?.files ||
+        []
+      ).forEach(
+        (file) => {
+          const fileKey =
+            file
+              ?.campaignFileId ||
+            file?.id ||
+            file?.name;
+
+          if (
+            !fileKey ||
+            existingFiles.has(
+              fileKey,
+            )
+          ) {
+            return;
+          }
+
+          existingFiles.add(
+            fileKey,
+          );
+
+          current.files.push(
+            file,
+          );
+        },
+      );
+    },
+  );
+
+  return Array.from(
+    grouped.values(),
+  )
+    .map(
+      (conversation) => ({
+        ...conversation,
+
+        messages:
+          [
+            ...conversation
+              .messages,
+          ].sort(
+            (
+              left,
+              right,
+            ) =>
+              Number(
+                left
+                  ?.externalOrder ||
+                0,
+              ) -
+              Number(
+                right
+                  ?.externalOrder ||
+                0,
+              ),
+          ),
+      }),
+    )
+    .sort(
+      (
+        left,
+        right,
+      ) =>
+        Number(
+          right?.order ||
+          0,
+        ) -
+        Number(
+          left?.order ||
+          0,
+        ),
+    );
+}
+
+
 export function useExternalOutreachHandoff({
   workspaceId,
 }) {
@@ -602,7 +831,7 @@ export function useExternalOutreachHandoff({
             );
           }
 
-          const normalized =
+          const normalizedRows =
             outreachRows.map(
               (outreach) =>
                 normalizeExternalOutreach(
@@ -611,6 +840,11 @@ export function useExternalOutreachHandoff({
                     outreach.id,
                   ) || [],
                 ),
+            );
+
+          const normalized =
+            groupExternalOutreachConversations(
+              normalizedRows,
             );
 
           setOutreachConversations(
