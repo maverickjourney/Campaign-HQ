@@ -11411,20 +11411,23 @@
 }
 
 /* ============================================================
-   CAMPAIGN SEAT — IPHONE OPEN CONVERSATION POLISH
+   CAMPAIGN SEAT — FINAL IPHONE EMAIL READER POLISH
 
-   Only refines the opened mobile conversation.
-   Main Inbox and shared header are intentionally untouched.
+   Opened conversation only.
+   Main Inbox and shared header remain untouched.
    ============================================================ */
 
 @media (max-width: 820px) {
 
-  /*
-   * Clean three-zone message header:
-   * Back | sender | actions
-   */
+  /* ==========================================================
+     CONVERSATION HEADER
+     Back | sender | actions
+     ========================================================== */
+
   .inboxWorkspace.mobileConversationOpen
     .threadHeader {
+    box-sizing: border-box !important;
+
     display: grid !important;
 
     grid-template-columns:
@@ -11436,6 +11439,8 @@
 
     column-gap: 9px !important;
 
+    min-height: 66px !important;
+
     overflow: hidden !important;
   }
 
@@ -11444,14 +11449,10 @@
     .threadHeader
     > .mobileBackToInbox {
     grid-column: 1 !important;
-
     min-width: max-content !important;
   }
 
 
-  /*
-   * Sender/avatar group.
-   */
   .inboxWorkspace.mobileConversationOpen
     .threadHeader
     > div:first-of-type {
@@ -11503,9 +11504,6 @@
   }
 
 
-  /*
-   * Expand / Flag / Email actions stay contained.
-   */
   .inboxWorkspace.mobileConversationOpen
     .threadHeader
     > div:last-of-type {
@@ -11515,11 +11513,9 @@
 
     min-width: max-content !important;
 
-    flex: 0 0 auto !important;
+    align-items: center !important;
 
     gap: 6px !important;
-
-    overflow: visible !important;
   }
 
 
@@ -11528,62 +11524,264 @@
     > div:last-of-type
     > button {
     width: 40px !important;
-
     min-width: 40px !important;
 
     height: 40px !important;
-
     min-height: 40px !important;
 
     padding: 0 !important;
   }
 
 
+  /* ==========================================================
+     EMAIL READING AREA
+
+     Make the actual message the visual priority.
+     The message gets a real phone-sized viewport and scrolls
+     internally when the HTML email is longer.
+     ========================================================== */
+
+  .inboxWorkspace.mobileConversationOpen
+    .threadBody {
+    box-sizing: border-box !important;
+
+    width: 100% !important;
+
+    min-width: 0 !important;
+
+    height:
+      clamp(
+        390px,
+        52dvh,
+        610px
+      ) !important;
+
+    min-height:
+      390px !important;
+
+    max-height:
+      610px !important;
+
+    flex:
+      0 0 auto !important;
+
+    overflow-x:
+      hidden !important;
+
+    overflow-y:
+      auto !important;
+
+    overscroll-behavior:
+      contain !important;
+
+    -webkit-overflow-scrolling:
+      touch !important;
+  }
+
+
   /*
-   * Old desktop signature styling was allowing Edit Signature
-   * to escape upward. Keep everything inside the signature card.
+   * Rich HTML messages should fill the complete reader width.
    */
   .inboxWorkspace.mobileConversationOpen
+    .richMessage {
+    width: 100% !important;
+
+    max-width: 100% !important;
+
+    margin-left: 0 !important;
+
+    margin-right: 0 !important;
+  }
+
+
+  .inboxWorkspace.mobileConversationOpen
+    .richMessage
+    > div {
+    width: 100% !important;
+
+    max-width: 100% !important;
+  }
+
+
+  /*
+   * The iframe already calculates its content height in React.
+   * Give it a useful visible floor inside the mobile reader.
+   */
+  .inboxWorkspace.mobileConversationOpen
+    .richEmailFrame {
+    width: 100% !important;
+
+    min-height:
+      360px !important;
+
+    max-height:
+      1800px !important;
+  }
+
+
+  /* ==========================================================
+     REPLY COMPOSER
+
+     Keep the email reader large while making the composer
+     comfortable instead of dominating the phone.
+     ========================================================== */
+
+  .inboxWorkspace.mobileConversationOpen
+    > .threadPanel
+    > .replyComposer
+    > textarea {
+    height: 125px !important;
+
+    min-height: 125px !important;
+
+    max-height: 125px !important;
+
+    flex-basis: 125px !important;
+  }
+
+
+  /* ==========================================================
+     SIGNATURE CARD
+
+     Row 1:
+       Include signature        Edit signature
+
+     Row 2:
+       Signature preview
+     ========================================================== */
+
+  .inboxWorkspace.mobileConversationOpen
     .composerSignature {
+    box-sizing: border-box !important;
+
     position: relative !important;
+
+    display: grid !important;
+
+    grid-template-columns:
+      minmax(0, 1fr)
+      auto !important;
+
+    grid-template-areas:
+      "toggle edit"
+      "preview preview" !important;
+
+    align-items: center !important;
+
+    column-gap: 10px !important;
+
+    row-gap: 9px !important;
+
+    width: 100% !important;
+
+    max-height: none !important;
+
+    padding:
+      11px
+      12px !important;
+
+    overflow: visible !important;
+  }
+
+
+  .inboxWorkspace.mobileConversationOpen
+    .composerSignature
+    > label {
+    grid-area: toggle !important;
+
+    min-width: 0 !important;
+
+    margin: 0 !important;
   }
 
 
   .inboxWorkspace.mobileConversationOpen
     .composerSignature
     > button {
+    box-sizing: border-box !important;
+
+    grid-area: edit !important;
+
     position: static !important;
 
     inset: auto !important;
 
-    top: auto !important;
+    display: inline-flex !important;
 
-    right: auto !important;
+    min-height: 34px !important;
 
-    bottom: auto !important;
+    align-items: center !important;
 
-    left: auto !important;
+    justify-content: center !important;
+
+    margin: 0 !important;
+
+    padding:
+      0
+      8px !important;
+
+    border:
+      1px solid
+      #d6e2ea !important;
+
+    border-radius:
+      8px !important;
+
+    color:
+      #27679a !important;
+
+    background:
+      #ffffff !important;
+
+    font-size:
+      11px !important;
+
+    font-weight:
+      800 !important;
+
+    white-space: nowrap !important;
 
     transform: none !important;
 
     translate: none !important;
-
-    justify-self: end !important;
-
-    align-self: center !important;
-
-    margin: 0 !important;
   }
 
 
-  /*
-   * Give Safari enough real scroll clearance that Send Reply
-   * can be moved completely above the browser toolbar.
-   */
+  .inboxWorkspace.mobileConversationOpen
+    .composerSignature
+    > div {
+    grid-area: preview !important;
+
+    width: 100% !important;
+
+    max-height: none !important;
+
+    margin: 0 !important;
+
+    padding:
+      10px !important;
+
+    overflow: visible !important;
+  }
+
+
+  .inboxWorkspace.mobileConversationOpen
+    .composerSignature
+    pre {
+    max-height: none !important;
+
+    overflow: visible !important;
+  }
+
+
+  /* ==========================================================
+     BOTTOM CLEARANCE
+     ========================================================== */
+
   .inboxWorkspace.mobileConversationOpen {
     padding-bottom:
       calc(
-        105px +
+        110px +
         env(
           safe-area-inset-bottom,
           0px
@@ -11595,28 +11793,59 @@
   .inboxWorkspace.mobileConversationOpen
     .composerFooter
     > .sendButton {
-    margin-bottom: 12px !important;
+    margin-bottom:
+      14px !important;
   }
 
 }
 
 
+/* ============================================================
+   SMALL IPHONE
+   ============================================================ */
+
 @media (max-width: 430px) {
 
-  /*
-   * Preserve sender space on narrower iPhones.
-   */
+  .inboxWorkspace.mobileConversationOpen
+    .threadBody {
+    height:
+      clamp(
+        360px,
+        49dvh,
+        540px
+      ) !important;
+
+    min-height:
+      360px !important;
+
+    max-height:
+      540px !important;
+  }
+
+
   .inboxWorkspace.mobileConversationOpen
     .threadHeader
     > div:last-of-type
     > button {
     width: 38px !important;
-
     min-width: 38px !important;
 
     height: 38px !important;
-
     min-height: 38px !important;
+  }
+
+
+  .inboxWorkspace.mobileConversationOpen
+    > .threadPanel
+    > .replyComposer
+    > textarea {
+    height: 118px !important;
+
+    min-height: 118px !important;
+
+    max-height: 118px !important;
+
+    flex-basis: 118px !important;
   }
 
 }
