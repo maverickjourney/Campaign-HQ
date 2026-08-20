@@ -54,6 +54,7 @@ function relativeTime(value) {
 function transformMessage({
   message,
   userId,
+  attachments = [],
 }) {
   const own = message.created_by === userId;
 
@@ -67,7 +68,7 @@ function transformMessage({
     order: timestamp(message.created_at),
     channel: "Campaign Seat",
     body: clean(message.body),
-    attachments: [],
+    attachments,
   };
 }
 
@@ -76,18 +77,29 @@ function transformThread({
   messages,
   contact,
   userId,
+  attachmentsByMessage,
 }) {
   const transformedMessages = messages
     .map((message) =>
       transformMessage({
         message,
         userId,
+        attachments:
+          attachmentsByMessage.get(
+            message.id,
+          ) || [],
       }),
     )
     .sort((left, right) => left.order - right.order);
 
   const latest =
     transformedMessages[transformedMessages.length - 1];
+
+  const threadFiles =
+    transformedMessages.flatMap(
+      (message) =>
+        message.attachments || [],
+    );
 
   const updated = thread.updated_at || thread.created_at;
   const relatedContact = clean(contact?.full_name);
@@ -125,7 +137,7 @@ function transformThread({
       lastContact: relativeTime(updated),
     },
     messages: transformedMessages,
-    files: [],
+    files: threadFiles,
   };
 }
 
@@ -246,6 +258,182 @@ export function useInternalInboxThreads({
           throw contactResult.error;
         }
 
+        const internalMessages =
+          messageResult.data || [];
+
+        const messageIds =
+          internalMessages
+            .map(
+              (message) =>
+                message.id,
+            )
+            .filter(Boolean);
+
+        let attachmentRows = [];
+        let fileRows = [];
+
+        if (messageIds.length) {
+          const {
+            data: attachmentData,
+            error: attachmentError,
+          } = await supabase
+            .from(
+              "campaign_communication_attachments",
+            )
+            .select(
+              `
+                id,
+                workspace_id,
+                file_id,
+                internal_message_id,
+                created_at
+              `,
+            )
+            .eq(
+              "workspace_id",
+              workspaceId,
+            )
+            .in(
+              "internal_message_id",
+              messageIds,
+            )
+            .order(
+              "created_at",
+              {
+                ascending: true,
+              },
+            );
+
+          if (attachmentError) {
+            throw attachmentError;
+          }
+
+          attachmentRows =
+            attachmentData || [];
+
+          const fileIds = [
+            ...new Set(
+              attachmentRows
+                .map(
+                  (attachment) =>
+                    attachment.file_id,
+                )
+                .filter(Boolean),
+            ),
+          ];
+
+          if (fileIds.length) {
+            const {
+              data: fileData,
+              error: fileError,
+            } = await supabase
+              .from(
+                "campaign_files",
+              )
+              .select(
+                `
+                  id,
+                  workspace_id,
+                  file_name,
+                  storage_path,
+                  mime_type,
+                  size_bytes,
+                  category,
+                  uploaded_by,
+                  created_at
+                `,
+              )
+              .eq(
+                "workspace_id",
+                workspaceId,
+              )
+              .in(
+                "id",
+                fileIds,
+              );
+
+            if (fileError) {
+              throw fileError;
+            }
+
+            fileRows =
+              fileData || [];
+          }
+        }
+
+        const filesById =
+          new Map(
+            fileRows.map(
+              (file) => [
+                file.id,
+                file,
+              ],
+            ),
+          );
+
+        const attachmentsByMessage =
+          new Map();
+
+        for (
+          const attachment
+          of attachmentRows
+        ) {
+          const file =
+            filesById.get(
+              attachment.file_id,
+            );
+
+          if (
+            !file ||
+            !attachment.internal_message_id
+          ) {
+            continue;
+          }
+
+          const normalized = {
+            id:
+              `campaign-file-${file.id}`,
+
+            campaignFileId:
+              file.id,
+
+            communicationAttachmentId:
+              attachment.id,
+
+            name:
+              file.file_name,
+
+            size:
+              Number(
+                file.size_bytes || 0,
+              ),
+
+            contentType:
+              file.mime_type ||
+              "application/octet-stream",
+
+            storagePath:
+              file.storage_path,
+
+            source:
+              "campaign-file",
+          };
+
+          const existing =
+            attachmentsByMessage.get(
+              attachment.internal_message_id,
+            ) || [];
+
+          existing.push(
+            normalized,
+          );
+
+          attachmentsByMessage.set(
+            attachment.internal_message_id,
+            existing,
+          );
+        }
+
         const messagesByThread = new Map();
 
         for (const message of messageResult.data || []) {
@@ -271,6 +459,7 @@ export function useInternalInboxThreads({
             contact:
               contactsById.get(thread.contact_id) || null,
             userId,
+            attachmentsByMessage,
           }),
         );
 
@@ -337,6 +526,18 @@ export function useInternalInboxThreads({
           schema: "public",
           table: "campaign_internal_messages",
           filter: `workspace_id=eq.${workspaceId}`,
+        },
+        scheduleRefresh,
+      )
+      .on(
+        "postgres_changes",
+        {
+          event: "*",
+          schema: "public",
+          table:
+            "campaign_communication_attachments",
+          filter:
+            `workspace_id=eq.${workspaceId}`,
         },
         scheduleRefresh,
       )

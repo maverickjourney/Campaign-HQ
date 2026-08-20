@@ -38,6 +38,8 @@ import {
 import { CampaignWorkspaceShell } from "../../components/CampaignWorkspaceShell/CampaignWorkspaceShell";
 import { useContactsCommandCenter } from "../../hooks/useContactsCommandCenter";
 import { useInternalInboxThreads } from "../../hooks/useInternalInboxThreads";
+import { useCommunicationAttachments } from "../../hooks/useCommunicationAttachments";
+import { MAX_CAMPAIGN_FILE_SIZE } from "../../hooks/useFilesCommandCenter";
 import { useRealInboxMailbox } from "../../hooks/useRealInboxMailbox";
 import { useWorkspaceEmailSignature } from "../../hooks/useWorkspaceEmailSignature";
 import { useTasksCommandCenter } from "../../hooks/useTasksCommandCenter";
@@ -1757,6 +1759,15 @@ export default function InboxReferencePreview() {
     enabled: liveMailboxEnabled,
   });
 
+  const {
+    attachFilesToInternalMessage,
+    getCommunicationFileUrl,
+    downloadCommunicationFile,
+  } = useCommunicationAttachments({
+    workspaceId: workspace.id,
+    userId: user.id,
+  });
+
   const conversations =
     useMemo(
       () =>
@@ -2399,12 +2410,9 @@ export default function InboxReferencePreview() {
           [],
         );
 
-      event.target.value =
-        "";
+      event.target.value = "";
 
-      if (
-        !selected.length
-      ) {
+      if (!selected.length) {
         return;
       }
 
@@ -2414,33 +2422,22 @@ export default function InboxReferencePreview() {
       ];
 
       const unique = [];
-      const seen =
-        new Set();
+      const seen = new Set();
 
       combined.forEach(
         (file) => {
-          const key =
-            [
-              file.name,
-              file.size,
-              file.lastModified,
-            ].join(":");
+          const key = [
+            file.name,
+            file.size,
+            file.lastModified,
+          ].join(":");
 
-          if (
-            seen.has(
-              key,
-            )
-          ) {
+          if (seen.has(key)) {
             return;
           }
 
-          seen.add(
-            key,
-          );
-
-          unique.push(
-            file,
-          );
+          seen.add(key);
+          unique.push(file);
         },
       );
 
@@ -2449,43 +2446,62 @@ export default function InboxReferencePreview() {
         MAX_EMAIL_ATTACHMENTS
       ) {
         setAttachmentError(
-          `Attach up to ${MAX_EMAIL_ATTACHMENTS} files per email.`,
+          `Attach up to ${MAX_EMAIL_ATTACHMENTS} files per message.`,
         );
 
         return;
       }
 
-      const totalBytes =
-        unique.reduce(
-          (
-            total,
-            file,
-          ) =>
-            total +
-            Number(
-              file.size || 0,
-            ),
-          0,
-        );
-
       if (
-        totalBytes >
-        MAX_EMAIL_ATTACHMENT_BYTES
+        replyChannel === "email"
       ) {
-        setAttachmentError(
-          "Attachments can total up to 20 MB per email.",
-        );
+        const totalBytes =
+          unique.reduce(
+            (
+              total,
+              file,
+            ) =>
+              total +
+              Number(
+                file.size || 0,
+              ),
+            0,
+          );
 
-        return;
+        if (
+          totalBytes >
+          MAX_EMAIL_ATTACHMENT_BYTES
+        ) {
+          setAttachmentError(
+            "Email attachments can total up to 20 MB.",
+          );
+
+          return;
+        }
+      } else {
+        const oversizedFile =
+          unique.find(
+            (file) =>
+              Number(
+                file.size || 0,
+              ) >
+              MAX_CAMPAIGN_FILE_SIZE,
+          );
+
+        if (oversizedFile) {
+          setAttachmentError(
+            `${oversizedFile.name} is larger than the 50 MB Campaign Seat file limit.`,
+          );
+
+          return;
+        }
       }
 
       setPendingAttachments(
         unique,
       );
 
-      setAttachmentError(
-        "",
-      );
+      setAttachmentError("");
     };
 
   const removeAttachment =
@@ -2511,8 +2527,11 @@ export default function InboxReferencePreview() {
 
   const openComposerAttachmentPicker = () => {
     if (
-      replyChannel === "email" &&
-      liveMailboxEnabled
+      replyChannel === "dashboard" ||
+      (
+        replyChannel === "email" &&
+        liveMailboxEnabled
+      )
     ) {
       attachmentInputRef
         .current
@@ -2522,20 +2541,10 @@ export default function InboxReferencePreview() {
     }
 
     if (
-      replyChannel === "dashboard"
-    ) {
-      setToast(
-        "Campaign Seat internal file attachments are not connected yet. Email attachments are available now.",
-      );
-
-      return;
-    }
-
-    if (
       replyChannel === "text"
     ) {
       setToast(
-        "Text file attachments require a connected messaging provider. Campaign Seat currently opens the device text app.",
+        "Text attachment handoff will save the file and prepared message in Campaign Seat before opening the device share flow.",
       );
 
       return;
@@ -2545,7 +2554,7 @@ export default function InboxReferencePreview() {
       replyChannel === "whatsapp"
     ) {
       setToast(
-        "WhatsApp file attachments require a connected WhatsApp Business provider. Campaign Seat currently opens WhatsApp externally.",
+        "WhatsApp attachment handoff will save the file and prepared message in Campaign Seat before opening the device share flow.",
       );
 
       return;
@@ -2864,17 +2873,32 @@ export default function InboxReferencePreview() {
           selectedConversation
             ?.internalThreadId
         ) {
-          await addInternalMessage({
-            threadId:
-              selectedConversation
-                .internalThreadId,
+          const created =
+            await addInternalMessage({
+              threadId:
+                selectedConversation
+                  .internalThreadId,
 
-            body:
-              replyText.trim(),
-          });
+              body:
+                replyText.trim(),
+            });
+
+          if (
+            pendingAttachments.length
+          ) {
+            await attachFilesToInternalMessage({
+              messageId:
+                created?.messageId,
+
+              files:
+                pendingAttachments,
+            });
+          }
 
           setToast(
-            "Campaign Seat reply saved to the internal conversation.",
+            pendingAttachments.length
+              ? "Campaign Seat reply and attachments saved to the internal conversation."
+              : "Campaign Seat reply saved to the internal conversation.",
           );
         } else {
           const created =
@@ -2894,6 +2918,18 @@ export default function InboxReferencePreview() {
             });
 
           if (
+            pendingAttachments.length
+          ) {
+            await attachFilesToInternalMessage({
+              messageId:
+                created?.messageId,
+
+              files:
+                pendingAttachments,
+            });
+          }
+
+          if (
             created?.threadId
           ) {
             setSelectedId(
@@ -2907,6 +2943,8 @@ export default function InboxReferencePreview() {
         }
 
         setReplyText("");
+        setPendingAttachments([]);
+        setAttachmentError("");
         await refreshInternalInbox();
       } catch (internalError) {
         setToast(
@@ -3070,6 +3108,63 @@ export default function InboxReferencePreview() {
       file,
     ) => {
       if (
+        file?.source ===
+          "campaign-file" &&
+        file?.storagePath
+      ) {
+        const kind =
+          attachmentKind(
+            file,
+          );
+
+        if (
+          kind === "file"
+        ) {
+          await downloadConversationFile(
+            file,
+          );
+
+          return;
+        }
+
+        setAttachmentPreviewLoading(
+          file.id ||
+          file.name,
+        );
+
+        try {
+          const signedUrl =
+            await getCommunicationFileUrl(
+              file,
+            );
+
+          setAttachmentPreview({
+            ...file,
+            kind,
+            objectUrl:
+              signedUrl,
+          });
+
+          setToast(
+            `${file.name || "Attachment"} preview opened.`,
+          );
+        } catch (
+          previewError
+        ) {
+          setToast(
+            previewError?.message ||
+            "Campaign Seat could not preview this attachment.",
+          );
+        } finally {
+          setAttachmentPreviewLoading(
+            "",
+          );
+        }
+
+        return;
+      }
+
+      if (
         !file
           ?.providerAttachmentId ||
         !file
@@ -3140,6 +3235,31 @@ export default function InboxReferencePreview() {
 
   const downloadConversationFile =
     async (file) => {
+      if (
+        file?.source ===
+          "campaign-file" &&
+        file?.storagePath
+      ) {
+        try {
+          await downloadCommunicationFile(
+            file,
+          );
+
+          setToast(
+            `${file.name || "Attachment"} download started.`,
+          );
+        } catch (
+          downloadError
+        ) {
+          setToast(
+            downloadError?.message ||
+            "Campaign Seat could not download this attachment.",
+          );
+        }
+
+        return;
+      }
+
       if (
         !file
           ?.providerAttachmentId ||
@@ -3235,6 +3355,10 @@ export default function InboxReferencePreview() {
       liveMailboxEnabled
     ) {
       try {
+        const dashboardAttachments = [
+          ...pendingAttachments,
+        ];
+
         const created =
           await createInternalThread({
             contactId:
@@ -3251,6 +3375,26 @@ export default function InboxReferencePreview() {
             body:
               replyText.trim(),
           });
+
+        if (
+          dashboardAttachments.length
+        ) {
+          if (
+            !created?.messageId
+          ) {
+            throw new Error(
+              "Campaign Seat created the conversation but did not return the message ID required for attachments.",
+            );
+          }
+
+          await attachFilesToInternalMessage({
+            messageId:
+              created.messageId,
+
+            files:
+              dashboardAttachments,
+          });
+        }
 
         setReplyText("");
         setPendingAttachments([]);
@@ -3275,7 +3419,9 @@ export default function InboxReferencePreview() {
         }
 
         setToast(
-          "Internal Campaign Seat conversation created.",
+          dashboardAttachments.length
+            ? "Internal Campaign Seat conversation and attachments created."
+            : "Internal Campaign Seat conversation created.",
         );
       } catch (internalError) {
         setToast(
@@ -4991,8 +5137,12 @@ export default function InboxReferencePreview() {
                             </small>
                           </span>
 
-                            {file.providerAttachmentId &&
-                            file.providerMessageId ? (
+                            {(file.source ===
+                              "campaign-file" ||
+                            (
+                              file.providerAttachmentId &&
+                              file.providerMessageId
+                            )) ? (
                               <div
                                 className={
                                   styles.fileActions
@@ -5133,9 +5283,15 @@ export default function InboxReferencePreview() {
                   </div>
                 ) : null}
 
-                {replyChannel ===
-                  "email" &&
-                liveMailboxEnabled ? (
+                {(
+                  replyChannel ===
+                    "dashboard" ||
+                  (
+                    replyChannel ===
+                      "email" &&
+                    liveMailboxEnabled
+                  )
+                ) ? (
                   <>
                     <input
                       ref={
@@ -5325,6 +5481,7 @@ export default function InboxReferencePreview() {
                 <div className={styles.composerFooter}>
                   <div className={styles.replyOptions}>
                     {(newMessageMode ||
+                    replyChannel === "dashboard" ||
                     (
                       replyChannel === "email" &&
                       liveMailboxEnabled
