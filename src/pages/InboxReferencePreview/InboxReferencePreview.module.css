@@ -10842,12 +10842,99 @@
 
 
   .mobileConversationOpen
-    .replyOptions {
+    .composerFooter {
     box-sizing:
       border-box !important;
 
     order:
       3 !important;
+
+    position:
+      static !important;
+
+    inset:
+      auto !important;
+
+    display:
+      grid !important;
+
+    width:
+      100% !important;
+
+    min-width:
+      0 !important;
+
+    max-width:
+      100% !important;
+
+    height:
+      auto !important;
+
+    min-height:
+      0 !important;
+
+    max-height:
+      none !important;
+
+    grid-template-columns:
+      minmax(0, 1fr) !important;
+
+    grid-auto-rows:
+      auto !important;
+
+    align-items:
+      stretch !important;
+
+    gap:
+      9px !important;
+
+    margin:
+      0 !important;
+
+    padding:
+      0 !important;
+
+    overflow:
+      visible !important;
+
+    transform:
+      none !important;
+  }
+
+
+  .mobileConversationOpen
+    .composerFooter
+    > * {
+    position:
+      static !important;
+
+    inset:
+      auto !important;
+
+    width:
+      100% !important;
+
+    min-width:
+      0 !important;
+
+    max-width:
+      100% !important;
+
+    margin:
+      0 !important;
+
+    transform:
+      none !important;
+  }
+
+
+  .mobileConversationOpen
+    .replyOptions {
+    box-sizing:
+      border-box !important;
+
+    order:
+      1 !important;
 
     display:
       flex !important;
@@ -10909,7 +10996,7 @@
       border-box !important;
 
     order:
-      4 !important;
+      2 !important;
 
     display:
       flex !important;
@@ -10980,7 +11067,7 @@
       border-box !important;
 
     order:
-      5 !important;
+      3 !important;
 
     position:
       static !important;

@@ -1690,6 +1690,11 @@ export default function InboxReferencePreview() {
   const [selectedId, setSelectedId] =
     useState(STARTING_CONVERSATIONS[0].id);
 
+  const [
+    mobileConversationActive,
+    setMobileConversationActive,
+  ] = useState(false);
+
   const liveMailboxEnabled =
     !import.meta.env.DEV ||
     new URLSearchParams(
@@ -2674,6 +2679,7 @@ export default function InboxReferencePreview() {
       );
 
     setSelectedId(id);
+    setMobileConversationActive(true);
     setNewMessageMode(false);
     setActiveThreadTab(
       "conversation",
@@ -3752,8 +3758,8 @@ export default function InboxReferencePreview() {
         <section
           className={[
             styles.inboxWorkspace,
-            hasSelectedConversation &&
-            !newMessageMode
+            mobileConversationActive ||
+            newMessageMode
               ? styles.mobileConversationOpen
               : "",
           ]
@@ -4008,32 +4014,6 @@ export default function InboxReferencePreview() {
 
             {newMessageMode ? (
               <header className={styles.threadHeader}>
-              {!newMessageMode &&
-              hasSelectedConversation ? (
-                <button
-                  type="button"
-                  className={
-                    styles.mobileBackToInbox
-                  }
-                  onClick={() => {
-                    setSelectedConversationId(
-                      "",
-                    );
-
-                    setThreadExpanded(
-                      false,
-                    );
-                  }}
-                >
-                  <ArrowLeft
-                    size={17}
-                  />
-
-                  <span>
-                    Inbox
-                  </span>
-                </button>
-              ) : null}
                 <div>
                   <span className={styles.avatar}>
                     NM
@@ -4061,6 +4041,30 @@ export default function InboxReferencePreview() {
               </header>
             ) : (
               <header className={styles.threadHeader}>
+                <button
+                  type="button"
+                  className={
+                    styles.mobileBackToInbox
+                  }
+                  onClick={() => {
+                    setMobileConversationActive(
+                      false,
+                    );
+
+                    setThreadExpanded(
+                      false,
+                    );
+                  }}
+                >
+                  <ArrowLeft
+                    size={17}
+                  />
+
+                  <span>
+                    Inbox
+                  </span>
+                </button>
+
                 <div>
                   <span className={styles.avatar}>
                     {selectedConversation.initials}
