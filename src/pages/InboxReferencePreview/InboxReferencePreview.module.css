@@ -10495,11 +10495,13 @@
 }
 
 /* ============================================================
-   CAMPAIGN SEAT — MOBILE SINGLE-VIEW INBOX V2
+   CAMPAIGN SEAT — MOBILE SINGLE-VIEW INBOX V3
 
-   Phone:
-   Inbox list OR opened conversation.
-   Composer rows never overlap.
+   Canonical phone architecture:
+   - Inbox list OR conversation, never both
+   - DOM order controls composer order
+   - no mobile grid positioning in composer
+   - no overlapping controls
    ============================================================ */
 
 .mobileBackToInbox {
@@ -10507,109 +10509,209 @@
 }
 
 
-/* ------------------------------------------------------------
-   TABLET PORTRAIT / PHONE
-   ------------------------------------------------------------ */
+/* ============================================================
+   PHONE / PORTRAIT TABLET
+   ============================================================ */
 
 @media (max-width: 820px) {
 
-  .inboxWorkspace {
-    display: block !important;
+  /* ----------------------------------------------------------
+     WORKSPACE STATE
+     ---------------------------------------------------------- */
 
-    width: 100% !important;
-    min-width: 0 !important;
+  .inboxWorkspace {
+    box-sizing:
+      border-box !important;
+
+    display:
+      block !important;
+
+    width:
+      100% !important;
+
+    min-width:
+      0 !important;
+
+    height:
+      auto !important;
+
+    min-height:
+      0 !important;
+
+    max-height:
+      none !important;
+
+    overflow:
+      visible !important;
   }
 
 
-  /* Default mobile state = Inbox list. */
+  /*
+   * CLOSED / NORMAL INBOX
+   */
 
-  .conversationPanel {
-    display: flex !important;
+  .inboxWorkspace:not(.mobileConversationOpen)
+    > .conversationPanel {
+    display:
+      flex !important;
 
-    width: 100% !important;
-    min-width: 0 !important;
+    width:
+      100% !important;
+
+    min-width:
+      0 !important;
 
     height:
       min(
         650px,
-        calc(100dvh - 135px)
+        calc(100dvh - 130px)
       ) !important;
 
     min-height:
-      470px !important;
+      500px !important;
 
     max-height:
+      none !important;
+
+    flex-direction:
+      column !important;
+
+    overflow:
+      hidden !important;
+  }
+
+
+  .inboxWorkspace:not(.mobileConversationOpen)
+    > .threadPanel {
+    display:
       none !important;
   }
 
 
-  .threadPanel {
-    display: none !important;
+  /*
+   * OPEN CONVERSATION
+   */
+
+  .inboxWorkspace.mobileConversationOpen
+    > .conversationPanel {
+    display:
+      none !important;
   }
 
 
-  /* Open message = replace the list. */
+  .inboxWorkspace.mobileConversationOpen
+    > .threadPanel {
+    box-sizing:
+      border-box !important;
 
-  .mobileConversationOpen
-    .conversationPanel {
-    display: none !important;
-  }
+    position:
+      relative !important;
 
+    display:
+      flex !important;
 
-  .mobileConversationOpen
-    .threadPanel {
-    box-sizing: border-box !important;
+    width:
+      100% !important;
 
-    display: flex !important;
+    min-width:
+      0 !important;
 
-    position: relative !important;
+    max-width:
+      100% !important;
 
-    width: 100% !important;
-    min-width: 0 !important;
-    max-width: 100% !important;
+    height:
+      auto !important;
 
-    height: auto !important;
     min-height:
-      calc(100dvh - 90px) !important;
+      calc(
+        100dvh - 92px
+      ) !important;
 
-    max-height: none !important;
+    max-height:
+      none !important;
 
-    flex-direction: column !important;
+    flex:
+      none !important;
 
-    overflow: visible !important;
+    flex-direction:
+      column !important;
+
+    overflow:
+      visible !important;
+  }
+
+
+  /* ----------------------------------------------------------
+     MOBILE CONVERSATION HEADER
+     ---------------------------------------------------------- */
+
+  .inboxWorkspace.mobileConversationOpen
+    .threadHeader {
+    box-sizing:
+      border-box !important;
+
+    display:
+      flex !important;
+
+    width:
+      100% !important;
+
+    min-width:
+      0 !important;
+
+    min-height:
+      64px !important;
+
+    align-items:
+      center !important;
+
+    gap:
+      9px !important;
+
+    padding:
+      9px
+      10px !important;
   }
 
 
   .mobileBackToInbox {
-    box-sizing: border-box !important;
+    box-sizing:
+      border-box !important;
 
-    display: inline-flex !important;
+    display:
+      inline-flex !important;
 
-    min-height: 38px !important;
+    min-width:
+      max-content !important;
+
+    min-height:
+      40px !important;
 
     flex:
       0 0 auto !important;
 
-    align-items: center !important;
+    align-items:
+      center !important;
 
-    gap: 5px !important;
+    justify-content:
+      center !important;
+
+    gap:
+      6px !important;
 
     margin:
-      0
-      5px
-      0
       0 !important;
 
     padding:
       0
-      10px !important;
+      11px !important;
 
     border:
       1px solid
-      #ccdbe7 !important;
+      #cad9e6 !important;
 
     border-radius:
-      9px !important;
+      10px !important;
 
     color:
       #245a84 !important;
@@ -10631,35 +10733,26 @@
   }
 
 
-  .threadHeader {
-    box-sizing: border-box !important;
+  /* ----------------------------------------------------------
+     EMAIL / THREAD READING AREA
+     ---------------------------------------------------------- */
 
-    min-height: 60px !important;
-
-    gap: 7px !important;
-
-    padding:
-      9px
-      10px !important;
-  }
-
-
-  /*
-   * Message itself scrolls.
-   * Composer remains below it.
-   */
-
-  .mobileConversationOpen
+  .inboxWorkspace.mobileConversationOpen
     .threadBody {
-    box-sizing: border-box !important;
+    box-sizing:
+      border-box !important;
 
-    width: 100% !important;
-    min-width: 0 !important;
+    width:
+      100% !important;
 
-    min-height: 330px !important;
+    min-width:
+      0 !important;
+
+    min-height:
+      320px !important;
 
     max-height:
-      58dvh !important;
+      56dvh !important;
 
     flex:
       0 1 auto !important;
@@ -10670,49 +10763,73 @@
     overflow-y:
       auto !important;
 
+    overscroll-behavior:
+      contain !important;
+
     -webkit-overflow-scrolling:
       touch !important;
   }
 
 
-  /*
-   * MASTER MOBILE COMPOSER
-   *
-   * Exact visual order:
-   * textarea
-   * signature
-   * attach / reply all
-   * channels
-   * send
-   */
+  /* ==========================================================
+     MOBILE COMPOSER HARD RESET
 
-  .mobileConversationOpen
-    .replyComposer {
-    box-sizing: border-box !important;
+     Use DOM order only:
+     textarea
+     signature
+     footer
+       options
+       channels
+       send
+     ========================================================== */
 
-    position: static !important;
+  .inboxWorkspace.mobileConversationOpen
+    > .threadPanel
+    > .replyComposer {
+    box-sizing:
+      border-box !important;
 
-    display: grid !important;
+    position:
+      static !important;
 
-    width: 100% !important;
-    min-width: 0 !important;
-    max-width: 100% !important;
-
-    height: auto !important;
-    min-height: 0 !important;
-    max-height: none !important;
-
-    grid-template-columns:
-      minmax(0, 1fr) !important;
-
-    grid-auto-rows:
+    inset:
       auto !important;
+
+    display:
+      flex !important;
+
+    width:
+      100% !important;
+
+    min-width:
+      0 !important;
+
+    max-width:
+      100% !important;
+
+    height:
+      auto !important;
+
+    min-height:
+      0 !important;
+
+    max-height:
+      none !important;
+
+    flex:
+      0 0 auto !important;
+
+    flex-direction:
+      column !important;
 
     align-items:
       stretch !important;
 
+    justify-content:
+      flex-start !important;
+
     gap:
-      10px !important;
+      11px !important;
 
     margin:
       0 !important;
@@ -10721,7 +10838,7 @@
       12px
       12px
       calc(
-        24px +
+        26px +
         env(
           safe-area-inset-bottom,
           0px
@@ -10730,19 +10847,35 @@
 
     overflow:
       visible !important;
+
+    transform:
+      none !important;
   }
 
 
   /*
-   * Kill any older positioning rules that caused
-   * the channel buttons to sit on top of Send Reply.
+   * Remove every previous grid/order/position instruction
+   * from direct composer children.
    */
 
-  .mobileConversationOpen
-    .replyComposer
+  .inboxWorkspace.mobileConversationOpen
+    > .threadPanel
+    > .replyComposer
     > * {
-    position:
-      static !important;
+    order:
+      initial !important;
+
+    grid-column:
+      auto !important;
+
+    grid-row:
+      auto !important;
+
+    align-self:
+      auto !important;
+
+    justify-self:
+      auto !important;
 
     inset:
       auto !important;
@@ -10755,34 +10888,31 @@
 
     translate:
       none !important;
-
-    width:
-      auto;
-
-    max-width:
-      100%;
-
-    margin-left:
-      0 !important;
-
-    margin-right:
-      0 !important;
   }
 
 
-  .mobileConversationOpen
-    .replyComposer
-    textarea {
+  /* TEXTAREA */
+
+  .inboxWorkspace.mobileConversationOpen
+    > .threadPanel
+    > .replyComposer
+    > textarea {
     box-sizing:
       border-box !important;
 
-    order:
-      1 !important;
+    position:
+      static !important;
 
     display:
       block !important;
 
     width:
+      100% !important;
+
+    min-width:
+      0 !important;
+
+    max-width:
       100% !important;
 
     height:
@@ -10794,66 +10924,28 @@
     max-height:
       145px !important;
 
-    margin:
-      0 !important;
-
     flex:
-      none !important;
-
-    resize:
-      vertical;
-  }
-
-
-  .mobileConversationOpen
-    .composerSignature {
-    box-sizing:
-      border-box !important;
-
-    order:
-      2 !important;
-
-    width:
-      100% !important;
-
-    min-width:
-      0 !important;
-
-    max-height:
-      125px !important;
+      0 0 145px !important;
 
     margin:
       0 !important;
 
-    overflow-y:
-      auto !important;
+    transform:
+      none !important;
   }
 
 
-  .mobileConversationOpen
-    .composerSignature
-    > div {
-    max-height:
-      80px !important;
+  /* SIGNATURE */
 
-    overflow-y:
-      auto !important;
-  }
-
-
-  .mobileConversationOpen
-    .composerFooter {
+  .inboxWorkspace.mobileConversationOpen
+    > .threadPanel
+    > .replyComposer
+    > .composerSignature {
     box-sizing:
       border-box !important;
-
-    order:
-      3 !important;
 
     position:
       static !important;
-
-    inset:
-      auto !important;
 
     display:
       grid !important;
@@ -10874,19 +10966,87 @@
       0 !important;
 
     max-height:
+      130px !important;
+
+    flex:
+      0 0 auto !important;
+
+    margin:
+      0 !important;
+
+    overflow-y:
+      auto !important;
+
+    transform:
+      none !important;
+  }
+
+
+  .inboxWorkspace.mobileConversationOpen
+    .composerSignature
+    > div {
+    max-height:
+      82px !important;
+
+    overflow-y:
+      auto !important;
+  }
+
+
+  /* ==========================================================
+     FOOTER
+
+     Flex column deliberately replaces all old grid behavior.
+     ========================================================== */
+
+  .inboxWorkspace.mobileConversationOpen
+    > .threadPanel
+    > .replyComposer
+    > .composerFooter {
+    box-sizing:
+      border-box !important;
+
+    position:
+      static !important;
+
+    inset:
+      auto !important;
+
+    display:
+      flex !important;
+
+    width:
+      100% !important;
+
+    min-width:
+      0 !important;
+
+    max-width:
+      100% !important;
+
+    height:
+      auto !important;
+
+    min-height:
+      0 !important;
+
+    max-height:
       none !important;
 
-    grid-template-columns:
-      minmax(0, 1fr) !important;
+    flex:
+      0 0 auto !important;
 
-    grid-auto-rows:
-      auto !important;
+    flex-direction:
+      column !important;
 
     align-items:
       stretch !important;
 
+    justify-content:
+      flex-start !important;
+
     gap:
-      9px !important;
+      10px !important;
 
     margin:
       0 !important;
@@ -10902,51 +11062,94 @@
   }
 
 
-  .mobileConversationOpen
+  /*
+   * Kill old grid positions that are responsible for
+   * Email/Dashboard/Text/WhatsApp overlapping Send Reply.
+   */
+
+  .inboxWorkspace.mobileConversationOpen
     .composerFooter
-    > * {
+    > .replyOptions,
+
+  .inboxWorkspace.mobileConversationOpen
+    .composerFooter
+    > .replyChannels,
+
+  .inboxWorkspace.mobileConversationOpen
+    .composerFooter
+    > .sendButton {
+    order:
+      initial !important;
+
+    grid-column:
+      auto !important;
+
+    grid-row:
+      auto !important;
+
     position:
       static !important;
 
     inset:
       auto !important;
 
-    width:
-      100% !important;
+    top:
+      auto !important;
 
-    min-width:
-      0 !important;
+    right:
+      auto !important;
 
-    max-width:
-      100% !important;
+    bottom:
+      auto !important;
+
+    left:
+      auto !important;
+
+    z-index:
+      auto !important;
+
+    align-self:
+      stretch !important;
+
+    justify-self:
+      stretch !important;
 
     margin:
       0 !important;
 
     transform:
       none !important;
+
+    translate:
+      none !important;
   }
 
 
-  .mobileConversationOpen
-    .replyOptions {
+  /* ATTACH / SIGNATURE / REPLY ALL */
+
+  .inboxWorkspace.mobileConversationOpen
+    .composerFooter
+    > .replyOptions {
     box-sizing:
       border-box !important;
 
-    order:
-      1 !important;
-
     display:
       flex !important;
-
-    position:
-      static !important;
 
     width:
       100% !important;
 
     min-width:
       0 !important;
+
+    height:
+      auto !important;
+
+    min-height:
+      0 !important;
+
+    flex:
+      0 0 auto !important;
 
     align-items:
       center !important;
@@ -10954,8 +11157,10 @@
     gap:
       8px !important;
 
-    margin:
-      0 !important;
+    padding:
+      0
+      0
+      2px !important;
 
     overflow-x:
       auto !important;
@@ -10963,19 +11168,14 @@
     overflow-y:
       hidden !important;
 
-    padding:
-      0
-      0
-      2px !important;
-
     -webkit-overflow-scrolling:
       touch !important;
   }
 
 
-  .mobileConversationOpen
+  .inboxWorkspace.mobileConversationOpen
     .replyOptions
-    button {
+    > * {
     position:
       static !important;
 
@@ -10990,19 +11190,16 @@
   }
 
 
-  .mobileConversationOpen
-    .replyChannels {
+  /* EMAIL / DASHBOARD / TEXT / WHATSAPP */
+
+  .inboxWorkspace.mobileConversationOpen
+    .composerFooter
+    > .replyChannels {
     box-sizing:
       border-box !important;
 
-    order:
-      2 !important;
-
     display:
       flex !important;
-
-    position:
-      static !important;
 
     width:
       100% !important;
@@ -11010,14 +11207,20 @@
     min-width:
       0 !important;
 
+    height:
+      auto !important;
+
+    min-height:
+      50px !important;
+
+    flex:
+      0 0 auto !important;
+
     align-items:
       stretch !important;
 
     gap:
       7px !important;
-
-    margin:
-      0 !important;
 
     padding:
       0
@@ -11030,22 +11233,22 @@
     overflow-y:
       hidden !important;
 
-    transform:
-      none !important;
-
     -webkit-overflow-scrolling:
       touch !important;
   }
 
 
-  .mobileConversationOpen
+  .inboxWorkspace.mobileConversationOpen
     .replyChannels
-    button {
+    > button {
+    box-sizing:
+      border-box !important;
+
     position:
       static !important;
 
     min-height:
-      48px !important;
+      50px !important;
 
     flex:
       0 0 auto !important;
@@ -11061,19 +11264,13 @@
   }
 
 
-  .mobileConversationOpen
-    .sendButton {
+  /* SEND — ALWAYS ITS OWN FINAL ROW */
+
+  .inboxWorkspace.mobileConversationOpen
+    .composerFooter
+    > .sendButton {
     box-sizing:
       border-box !important;
-
-    order:
-      3 !important;
-
-    position:
-      static !important;
-
-    inset:
-      auto !important;
 
     display:
       flex !important;
@@ -11084,20 +11281,29 @@
     min-width:
       0 !important;
 
+    max-width:
+      100% !important;
+
     height:
-      54px !important;
+      56px !important;
 
     min-height:
-      54px !important;
+      56px !important;
 
     max-height:
-      none !important;
+      56px !important;
+
+    flex:
+      0 0 56px !important;
 
     align-items:
       center !important;
 
     justify-content:
       center !important;
+
+    gap:
+      8px !important;
 
     margin:
       0 !important;
@@ -11108,20 +11314,18 @@
 
     transform:
       none !important;
-
-    flex:
-      none !important;
   }
 
 
   /*
-   * Extra breathing room below the complete conversation card.
+   * Bottom breathing room so Safari chrome does not visually
+   * collide with the send action.
    */
 
-  .mobileConversationOpen {
+  .inboxWorkspace.mobileConversationOpen {
     padding-bottom:
       calc(
-        24px +
+        34px +
         env(
           safe-area-inset-bottom,
           0px
@@ -11133,7 +11337,7 @@
   .page {
     padding-bottom:
       calc(
-        34px +
+        44px +
         env(
           safe-area-inset-bottom,
           0px
@@ -11144,32 +11348,33 @@
 }
 
 
-/* ------------------------------------------------------------
-   SMALL PHONE
-   ------------------------------------------------------------ */
+/* ============================================================
+   SMALL IPHONE
+   ============================================================ */
 
 @media (max-width: 430px) {
 
-  .mobileConversationOpen
+  .inboxWorkspace.mobileConversationOpen
     .threadBody {
     min-height:
-      300px !important;
+      290px !important;
 
     max-height:
-      55dvh !important;
+      53dvh !important;
   }
 
 
-  .mobileConversationOpen
-    .replyComposer {
+  .inboxWorkspace.mobileConversationOpen
+    > .threadPanel
+    > .replyComposer {
     gap:
-      9px !important;
+      10px !important;
 
     padding:
       10px
       10px
       calc(
-        22px +
+        28px +
         env(
           safe-area-inset-bottom,
           0px
@@ -11178,9 +11383,10 @@
   }
 
 
-  .mobileConversationOpen
-    .replyComposer
-    textarea {
+  .inboxWorkspace.mobileConversationOpen
+    > .threadPanel
+    > .replyComposer
+    > textarea {
     height:
       132px !important;
 
@@ -11189,18 +11395,15 @@
 
     max-height:
       132px !important;
+
+    flex-basis:
+      132px !important;
   }
 
 
-  .mobileConversationOpen
-    .composerSignature {
-    max-height:
-      110px !important;
-  }
-
-
-  .mobileConversationOpen
-    .replyChannels {
+  .inboxWorkspace.mobileConversationOpen
+    .composerFooter
+    > .replyChannels {
     gap:
       6px !important;
   }
