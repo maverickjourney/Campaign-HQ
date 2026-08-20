@@ -39,6 +39,7 @@ import { CampaignWorkspaceShell } from "../../components/CampaignWorkspaceShell/
 import { useContactsCommandCenter } from "../../hooks/useContactsCommandCenter";
 import { useInternalInboxThreads } from "../../hooks/useInternalInboxThreads";
 import { useCommunicationAttachments } from "../../hooks/useCommunicationAttachments";
+import { useExternalOutreachHandoff } from "../../hooks/useExternalOutreachHandoff";
 import { MAX_CAMPAIGN_FILE_SIZE } from "../../hooks/useFilesCommandCenter";
 import { useRealInboxMailbox } from "../../hooks/useRealInboxMailbox";
 import { useWorkspaceEmailSignature } from "../../hooks/useWorkspaceEmailSignature";
@@ -1761,11 +1762,20 @@ export default function InboxReferencePreview() {
 
   const {
     attachFilesToInternalMessage,
+    attachFilesToExternalOutreach,
     getCommunicationFileUrl,
     downloadCommunicationFile,
   } = useCommunicationAttachments({
     workspaceId: workspace.id,
     userId: user.id,
+  });
+
+  const {
+    prepareExternalOutreach,
+    markExternalOutreachOpened,
+    confirmExternalOutreachSent,
+  } = useExternalOutreachHandoff({
+    workspaceId: workspace.id,
   });
 
   const conversations =
@@ -1898,6 +1908,26 @@ export default function InboxReferencePreview() {
   const [toast, setToast] = useState(
     "Inbox ready.",
   );
+
+  const [
+    pendingExternalHandoff,
+    setPendingExternalHandoff,
+  ] = useState(null);
+
+  const [
+    externalHandoffOpen,
+    setExternalHandoffOpen,
+  ] = useState(false);
+
+  const [
+    externalHandoffStage,
+    setExternalHandoffStage,
+  ] = useState("ready");
+
+  const [
+    externalHandoffBusy,
+    setExternalHandoffBusy,
+  ] = useState(false);
 
   const threadBodyRef =
     useRef(null);
@@ -2526,36 +2556,21 @@ export default function InboxReferencePreview() {
     };
 
   const openComposerAttachmentPicker = () => {
-    if (
+    const attachmentChannel =
       replyChannel === "dashboard" ||
+      replyChannel === "text" ||
+      replyChannel === "whatsapp" ||
       (
         replyChannel === "email" &&
         liveMailboxEnabled
-      )
+      );
+
+    if (
+      attachmentChannel
     ) {
       attachmentInputRef
         .current
         ?.click();
-
-      return;
-    }
-
-    if (
-      replyChannel === "text"
-    ) {
-      setToast(
-        "Text attachment handoff will save the file and prepared message in Campaign Seat before opening the device share flow.",
-      );
-
-      return;
-    }
-
-    if (
-      replyChannel === "whatsapp"
-    ) {
-      setToast(
-        "WhatsApp attachment handoff will save the file and prepared message in Campaign Seat before opening the device share flow.",
-      );
 
       return;
     }
@@ -2601,14 +2616,13 @@ export default function InboxReferencePreview() {
     setContactCreateMode(false);
     setContactFormError("");
 
-    if (
-      !contact.email &&
-      contact.phone
-    ) {
-      setReplyChannel("text");
-    } else {
-      setReplyChannel("email");
-    }
+    /*
+     * Preserve the message channel the user already selected.
+     *
+     * Choosing a contact should populate the recipient only.
+     * It must not switch Dashboard, Text, or WhatsApp back
+     * to Email just because the contact also has an email.
+     */
   };
 
   const handleCreateContact = async (event) => {
@@ -2813,42 +2827,413 @@ export default function InboxReferencePreview() {
     ]);
   };
 
-  const openExternalChannel = (channel) => {
-    const body = encodeURIComponent(
-      replyText.trim() ||
-        `Hi ${selectedConversation.sender}, following up regarding ${selectedConversation.subject}.`,
-    );
+  const externalChannelLabel =
+    (channel) =>
+      channel === "whatsapp"
+        ? "WhatsApp"
+        : "Text";
 
-    if (channel === "text") {
-      window.open(
-        `sms:${selectedConversation.phone}?&body=${body}`,
-        "_self",
-      );
-    }
 
-    if (channel === "whatsapp") {
-      const phone =
-        selectedConversation.phone.replace(
-          /\D/g,
-          "",
+  const openDirectExternalChannel =
+    ({
+      channel,
+      phone,
+      message,
+    }) => {
+      const encodedMessage =
+        encodeURIComponent(
+          String(
+            message || "",
+          ),
         );
 
-      window.open(
-        `https://wa.me/${phone}?text=${body}`,
-        "_blank",
-        "noopener,noreferrer",
+      const normalizedPhone =
+        String(
+          phone || "",
+        )
+          .replace(
+            /[^0-9+]/g,
+            "",
+          );
+
+      if (
+        channel === "text"
+      ) {
+        window.location.href =
+          `sms:${normalizedPhone}?&body=${encodedMessage}`;
+
+        return;
+      }
+
+      if (
+        channel === "whatsapp"
+      ) {
+        const digits =
+          normalizedPhone
+            .replace(
+              /\D/g,
+              "",
+            );
+
+        window.open(
+          `https://wa.me/${digits}?text=${encodedMessage}`,
+          "_blank",
+          "noopener,noreferrer",
+        );
+      }
+    };
+
+
+  const prepareExternalHandoffFromComposer =
+    async ({
+      channel,
+      contactId,
+      recipientName,
+      recipientPhone,
+      messageBody,
+      files,
+      source,
+    }) => {
+      if (
+        !contactId
+      ) {
+        setToast(
+          "Save or select this person as a Campaign Seat contact before Text or WhatsApp outreach.",
+        );
+
+        return false;
+      }
+
+      setExternalHandoffBusy(
+        true,
       );
-    }
 
-    addActivity(
-      `${channel} opened`,
-      "External messaging activity requires confirmation because Campaign Seat cannot yet read the reply.",
-    );
+      try {
+        const prepared =
+          await prepareExternalOutreach({
+            contactId,
+            channel,
+            messageBody,
+          });
 
-    setToast(
-      `${channel} opened. Confirm the result when you return.`,
-    );
-  };
+        const outreachId =
+          prepared?.outreachId;
+
+        if (
+          !outreachId
+        ) {
+          throw new Error(
+            "Campaign Seat could not identify the prepared outreach.",
+          );
+        }
+
+        const preparedFiles = [
+          ...(files || []),
+        ];
+
+        if (
+          preparedFiles.length
+        ) {
+          await attachFilesToExternalOutreach({
+            outreachId,
+            files:
+              preparedFiles,
+          });
+        }
+
+        const handoff = {
+          outreachId,
+
+          channel,
+
+          recipientName:
+            prepared?.recipientName ||
+            recipientName ||
+            "Campaign contact",
+
+          recipientPhone:
+            prepared?.recipientPhone ||
+            recipientPhone ||
+            "",
+
+          messageBody:
+            prepared?.messageBody ||
+            messageBody,
+
+          files:
+            preparedFiles,
+
+          source,
+        };
+
+        setPendingExternalHandoff(
+          handoff,
+        );
+
+        setExternalHandoffStage(
+          "ready",
+        );
+
+        setExternalHandoffOpen(
+          true,
+        );
+
+        addActivity(
+          `${externalChannelLabel(channel)} prepared`,
+          preparedFiles.length
+            ? `Campaign Seat saved the prepared message and ${preparedFiles.length} attachment${preparedFiles.length === 1 ? "" : "s"} before the external handoff.`
+            : "Campaign Seat saved the exact prepared message before the external handoff.",
+        );
+
+        setToast(
+          `${externalChannelLabel(channel)} outreach prepared in Campaign Seat. Continue when ready.`,
+        );
+
+        return true;
+      } catch (
+        handoffError
+      ) {
+        setToast(
+          handoffError?.message ||
+          "Campaign Seat could not prepare this external outreach.",
+        );
+
+        return false;
+      } finally {
+        setExternalHandoffBusy(
+          false,
+        );
+      }
+    };
+
+
+  const openPreparedExternalHandoff =
+    async () => {
+      const handoff =
+        pendingExternalHandoff;
+
+      if (
+        !handoff
+          ?.outreachId
+      ) {
+        return;
+      }
+
+      setExternalHandoffBusy(
+        true,
+      );
+
+      try {
+        await markExternalOutreachOpened({
+          outreachId:
+            handoff.outreachId,
+        });
+
+        const files =
+          Array.from(
+            handoff.files ||
+            [],
+          );
+
+        const canUseFileShare =
+          files.length > 0 &&
+          typeof navigator !==
+            "undefined" &&
+          typeof navigator.share ===
+            "function" &&
+          (
+            typeof navigator.canShare !==
+              "function" ||
+            navigator.canShare({
+              files,
+            })
+          );
+
+        addActivity(
+          `${externalChannelLabel(handoff.channel)} handoff opened`,
+          files.length
+            ? "Campaign Seat opened the device handoff with the prepared message and selected files where the browser supports native file sharing."
+            : "Campaign Seat opened the prepared message in the selected external channel.",
+        );
+
+        if (
+          canUseFileShare
+        ) {
+          try {
+            await navigator.share({
+              title:
+                `Campaign Seat ${externalChannelLabel(handoff.channel)} message`,
+
+              text:
+                handoff.messageBody,
+
+              files,
+            });
+
+            setExternalHandoffStage(
+              "confirm",
+            );
+
+            setToast(
+              `Share sheet closed. Confirm whether the ${externalChannelLabel(handoff.channel)} message was actually sent.`,
+            );
+          } catch (
+            shareError
+          ) {
+            if (
+              shareError?.name ===
+                "AbortError"
+            ) {
+              setExternalHandoffStage(
+                "ready",
+              );
+
+              setToast(
+                "Share canceled. The prepared message and files remain saved in Campaign Seat.",
+              );
+
+              return;
+            }
+
+            throw shareError;
+          }
+
+          return;
+        }
+
+        openDirectExternalChannel({
+          channel:
+            handoff.channel,
+
+          phone:
+            handoff.recipientPhone,
+
+          message:
+            handoff.messageBody,
+        });
+
+        setExternalHandoffStage(
+          "confirm",
+        );
+
+        setToast(
+          files.length
+            ? `${externalChannelLabel(handoff.channel)} opened. This browser could not inject the selected files automatically, but they remain saved in Campaign Seat for the handoff record.`
+            : `${externalChannelLabel(handoff.channel)} opened. Confirm whether it was sent when you return.`,
+        );
+      } catch (
+        handoffError
+      ) {
+        setExternalHandoffStage(
+          "ready",
+        );
+
+        setToast(
+          handoffError?.message ||
+          "Campaign Seat could not open the external handoff.",
+        );
+      } finally {
+        setExternalHandoffBusy(
+          false,
+        );
+      }
+    };
+
+
+  const confirmPreparedExternalHandoff =
+    async () => {
+      const handoff =
+        pendingExternalHandoff;
+
+      if (
+        !handoff
+          ?.outreachId
+      ) {
+        return;
+      }
+
+      setExternalHandoffBusy(
+        true,
+      );
+
+      try {
+        await confirmExternalOutreachSent({
+          outreachId:
+            handoff.outreachId,
+        });
+
+        addActivity(
+          `${externalChannelLabel(handoff.channel)} confirmed sent`,
+          "A campaign user confirmed the external send. Campaign Seat preserved the prepared message and attachment record as durable outreach history.",
+        );
+
+        setReplyText("");
+        setPendingAttachments([]);
+        setAttachmentError("");
+
+        if (
+          handoff.source ===
+            "new"
+        ) {
+          setNewRecipient("");
+          setNewSubject("");
+          setNewCc("");
+          setNewBcc("");
+          setShowCcBcc(false);
+          setContactQuery("");
+          setSelectedContactId("");
+          setNewMessageMode(false);
+        }
+
+        setExternalHandoffOpen(
+          false,
+        );
+
+        setExternalHandoffStage(
+          "ready",
+        );
+
+        setPendingExternalHandoff(
+          null,
+        );
+
+        setToast(
+          `${externalChannelLabel(handoff.channel)} confirmed sent and saved to Campaign Seat history.`,
+        );
+      } catch (
+        confirmError
+      ) {
+        setToast(
+          confirmError?.message ||
+          "Campaign Seat could not confirm this external send.",
+        );
+      } finally {
+        setExternalHandoffBusy(
+          false,
+        );
+      }
+    };
+
+
+  const closePreparedExternalHandoff =
+    () => {
+      setExternalHandoffOpen(
+        false,
+      );
+
+      setPendingExternalHandoff(
+        null,
+      );
+
+      setExternalHandoffStage(
+        "ready",
+      );
+
+      setToast(
+        "The prepared outreach remains saved in Campaign Seat, but it has not been confirmed as sent.",
+      );
+    };
+
 
   const sendReply = async () => {
     if (!replyText.trim()) {
@@ -2860,7 +3245,35 @@ export default function InboxReferencePreview() {
       replyChannel === "text" ||
       replyChannel === "whatsapp"
     ) {
-      openExternalChannel(replyChannel);
+      await prepareExternalHandoffFromComposer({
+        channel:
+          replyChannel,
+
+        contactId:
+          selectedConversation
+            ?.contactId ||
+          null,
+
+        recipientName:
+          selectedConversation
+            ?.sender ||
+          "Campaign contact",
+
+        recipientPhone:
+          selectedConversation
+            ?.phone ||
+          "",
+
+        messageBody:
+          replyText.trim(),
+
+        files:
+          pendingAttachments,
+
+        source:
+          "reply",
+      });
+
       return;
     }
 
@@ -3347,6 +3760,39 @@ export default function InboxReferencePreview() {
             ? "Choose a contact, then enter a subject and message."
             : "Choose a contact, then enter your message.",
       );
+      return;
+    }
+
+    if (
+      replyChannel === "text" ||
+      replyChannel === "whatsapp"
+    ) {
+      await prepareExternalHandoffFromComposer({
+        channel:
+          replyChannel,
+
+        contactId:
+          selectedContact
+            ?.inboxOnly
+            ? null
+            : selectedContact
+                ?.id ||
+              null,
+
+        recipientName,
+
+        recipientPhone,
+
+        messageBody:
+          replyText.trim(),
+
+        files:
+          pendingAttachments,
+
+        source:
+          "new",
+      });
+
       return;
     }
 
@@ -5286,6 +5732,10 @@ export default function InboxReferencePreview() {
                 {(
                   replyChannel ===
                     "dashboard" ||
+                  replyChannel ===
+                    "text" ||
+                  replyChannel ===
+                    "whatsapp" ||
                   (
                     replyChannel ===
                       "email" &&
@@ -5482,6 +5932,8 @@ export default function InboxReferencePreview() {
                   <div className={styles.replyOptions}>
                     {(newMessageMode ||
                     replyChannel === "dashboard" ||
+                    replyChannel === "text" ||
+                    replyChannel === "whatsapp" ||
                     (
                       replyChannel === "email" &&
                       liveMailboxEnabled
@@ -5603,11 +6055,15 @@ export default function InboxReferencePreview() {
                   >
                     <Send size={17} />
                     {newMessageMode
-                      ? "Send Message"
-                      : replyChannel === "text"
-                        ? "Open Text"
+                      ? replyChannel === "text"
+                        ? "Prepare Text"
                         : replyChannel === "whatsapp"
-                          ? "Open WhatsApp"
+                          ? "Prepare WhatsApp"
+                          : "Send Message"
+                      : replyChannel === "text"
+                        ? "Prepare Text"
+                        : replyChannel === "whatsapp"
+                          ? "Prepare WhatsApp"
                           : replyChannel === "email" &&
                               liveMailboxEnabled
                             ? replyAllEnabled
@@ -5628,6 +6084,236 @@ export default function InboxReferencePreview() {
             ) : null}
           </article>
         </section>
+
+        {externalHandoffOpen &&
+        pendingExternalHandoff ? (
+          <div
+            className={
+              styles.handoffOverlay
+            }
+            role="presentation"
+          >
+            <section
+              className={
+                styles.handoffModal
+              }
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="external-handoff-title"
+            >
+              <header>
+                <span>
+                  {pendingExternalHandoff
+                    .channel ===
+                  "whatsapp" ? (
+                    <MessageCircle
+                      size={21}
+                    />
+                  ) : (
+                    <Phone
+                      size={21}
+                    />
+                  )}
+                </span>
+
+                <div>
+                  <small>
+                    External handoff
+                  </small>
+
+                  <h2 id="external-handoff-title">
+                    {externalHandoffStage ===
+                    "confirm"
+                      ? `Did you send this ${externalChannelLabel(
+                          pendingExternalHandoff.channel,
+                        )}?`
+                      : `${externalChannelLabel(
+                          pendingExternalHandoff.channel,
+                        )} is ready`}
+                  </h2>
+                </div>
+              </header>
+
+              <div
+                className={
+                  styles.handoffBody
+                }
+              >
+                <div
+                  className={
+                    styles.handoffRecipient
+                  }
+                >
+                  <small>
+                    Recipient
+                  </small>
+
+                  <strong>
+                    {
+                      pendingExternalHandoff
+                        .recipientName
+                    }
+                  </strong>
+
+                  <span>
+                    {
+                      pendingExternalHandoff
+                        .recipientPhone
+                    }
+                  </span>
+                </div>
+
+                <div
+                  className={
+                    styles.handoffMessagePreview
+                  }
+                >
+                  <small>
+                    Prepared message
+                  </small>
+
+                  <p>
+                    {
+                      pendingExternalHandoff
+                        .messageBody
+                    }
+                  </p>
+                </div>
+
+                {pendingExternalHandoff
+                  .files
+                  ?.length ? (
+                  <div
+                    className={
+                      styles.handoffFiles
+                    }
+                  >
+                    <Paperclip
+                      size={16}
+                    />
+
+                    <span>
+                      {
+                        pendingExternalHandoff
+                          .files.length
+                      }
+                      {" "}
+                      {
+                        pendingExternalHandoff
+                          .files.length ===
+                        1
+                          ? "file"
+                          : "files"
+                      }
+                      {" "}
+                      ready to share
+                    </span>
+                  </div>
+                ) : null}
+
+                <p
+                  className={
+                    styles.handoffDisclosure
+                  }
+                >
+                  {externalHandoffStage ===
+                  "confirm"
+                    ? "Campaign Seat has not marked this as sent yet. Confirm only if you actually completed the send in the external app."
+                    : "Campaign Seat already saved this prepared message and its files. The external send will not be recorded as sent until you confirm it afterward."}
+                </p>
+              </div>
+
+              <footer
+                className={
+                  styles.handoffActions
+                }
+              >
+                {externalHandoffStage ===
+                "confirm" ? (
+                  <>
+                    <button
+                      type="button"
+                      disabled={
+                        externalHandoffBusy
+                      }
+                      onClick={() =>
+                        setExternalHandoffStage(
+                          "ready",
+                        )
+                      }
+                    >
+                      Not yet — reopen
+                    </button>
+
+                    <button
+                      type="button"
+                      disabled={
+                        externalHandoffBusy
+                      }
+                      onClick={() =>
+                        void confirmPreparedExternalHandoff()
+                      }
+                    >
+                      <CheckCircle2
+                        size={16}
+                      />
+
+                      {externalHandoffBusy
+                        ? "Saving…"
+                        : "Yes, sent"}
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <button
+                      type="button"
+                      disabled={
+                        externalHandoffBusy
+                      }
+                      onClick={
+                        closePreparedExternalHandoff
+                      }
+                    >
+                      Back to Campaign Seat
+                    </button>
+
+                    <button
+                      type="button"
+                      disabled={
+                        externalHandoffBusy
+                      }
+                      onClick={() =>
+                        void openPreparedExternalHandoff()
+                      }
+                    >
+                      {pendingExternalHandoff
+                        .channel ===
+                      "whatsapp" ? (
+                        <MessageCircle
+                          size={16}
+                        />
+                      ) : (
+                        <Phone
+                          size={16}
+                        />
+                      )}
+
+                      {externalHandoffBusy
+                        ? "Opening…"
+                        : pendingExternalHandoff
+                            .files
+                            ?.length
+                          ? "Open share sheet"
+                          : `Open ${externalChannelLabel(
+                              pendingExternalHandoff.channel,
+                            )}`}
+                    </button>
+                  </>
+                )}
+              </footer>
+            </section>
+          </div>
+        ) : null}
 
         {attachmentPreview ? (
           <div

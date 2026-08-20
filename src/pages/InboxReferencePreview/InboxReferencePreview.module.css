@@ -13788,3 +13788,395 @@
   }
 
 }
+
+/* ============================================================
+   CAMPAIGN SEAT — EXTERNAL MESSAGE HANDOFF
+
+   Used for Text / WhatsApp until native providers such as
+   Twilio / WhatsApp Business are connected.
+   ============================================================ */
+
+.handoffOverlay {
+  position: fixed;
+  z-index: 2147483600;
+  inset: 0;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  padding: 20px;
+
+  background:
+    rgba(
+      18,
+      34,
+      46,
+      0.48
+    );
+
+  backdrop-filter:
+    blur(5px);
+
+  -webkit-backdrop-filter:
+    blur(5px);
+}
+
+
+.handoffModal {
+  box-sizing: border-box;
+
+  width:
+    min(
+      520px,
+      calc(100vw - 28px)
+    );
+
+  max-height:
+    calc(100dvh - 28px);
+
+  overflow-x: hidden;
+  overflow-y: auto;
+
+  border:
+    1px solid
+    #d9e4eb;
+
+  border-radius: 18px;
+
+  background:
+    #ffffff;
+
+  box-shadow:
+    0 24px 70px
+    rgba(
+      15,
+      38,
+      54,
+      0.22
+    );
+}
+
+
+.handoffModal > header {
+  display: flex;
+
+  align-items: center;
+
+  gap: 12px;
+
+  padding:
+    17px
+    18px;
+
+  border-bottom:
+    1px solid
+    #e5edf2;
+}
+
+
+.handoffModal > header > span {
+  display: inline-flex;
+
+  width: 42px;
+  height: 42px;
+
+  flex:
+    0 0 42px;
+
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 12px;
+
+  background:
+    #edf5f8;
+}
+
+
+.handoffModal > header > div {
+  min-width: 0;
+}
+
+
+.handoffModal > header small {
+  display: block;
+
+  margin-bottom: 2px;
+
+  font-size: 11px;
+  font-weight: 800;
+
+  letter-spacing: 0.04em;
+
+  text-transform: uppercase;
+
+  color: #70828f;
+}
+
+
+.handoffModal > header h2 {
+  margin: 0;
+
+  font-size: 18px;
+  line-height: 1.25;
+
+  color: #172f40;
+}
+
+
+.handoffBody {
+  display: grid;
+
+  gap: 12px;
+
+  padding:
+    16px
+    18px;
+}
+
+
+.handoffRecipient,
+.handoffMessagePreview {
+  box-sizing: border-box;
+
+  display: grid;
+
+  gap: 3px;
+
+  padding: 12px;
+
+  border:
+    1px solid
+    #e0e8ee;
+
+  border-radius: 12px;
+
+  background:
+    #f8fafc;
+}
+
+
+.handoffRecipient small,
+.handoffMessagePreview small {
+  font-size: 11px;
+  font-weight: 800;
+
+  color: #758793;
+
+  text-transform: uppercase;
+
+  letter-spacing: 0.03em;
+}
+
+
+.handoffRecipient strong {
+  color: #173246;
+}
+
+
+.handoffRecipient span {
+  font-size: 12px;
+
+  color: #687b88;
+}
+
+
+.handoffMessagePreview p {
+  margin:
+    3px
+    0
+    0;
+
+  max-height: 150px;
+
+  overflow-y: auto;
+
+  white-space: pre-wrap;
+
+  font-size: 13px;
+  line-height: 1.45;
+
+  color: #2a4354;
+}
+
+
+.handoffFiles {
+  display: flex;
+
+  align-items: center;
+
+  gap: 8px;
+
+  min-height: 40px;
+
+  padding:
+    0
+    12px;
+
+  border:
+    1px solid
+    #d6e5ed;
+
+  border-radius: 10px;
+
+  background:
+    #f3f8fb;
+
+  font-size: 12px;
+  font-weight: 700;
+
+  color: #315a73;
+}
+
+
+.handoffDisclosure {
+  margin: 0;
+
+  padding:
+    10px
+    12px;
+
+  border-radius: 10px;
+
+  background:
+    #fff9eb;
+
+  font-size: 12px;
+  line-height: 1.45;
+
+  color: #6d5930;
+}
+
+
+.handoffActions {
+  display: flex;
+
+  justify-content:
+    flex-end;
+
+  gap: 9px;
+
+  padding:
+    13px
+    18px
+    17px;
+
+  border-top:
+    1px solid
+    #e5edf2;
+}
+
+
+.handoffActions button {
+  display: inline-flex;
+
+  min-height: 42px;
+
+  align-items: center;
+  justify-content: center;
+
+  gap: 7px;
+
+  padding:
+    0
+    14px;
+
+  border-radius: 10px;
+
+  font: inherit;
+  font-size: 12px;
+  font-weight: 800;
+
+  cursor: pointer;
+}
+
+
+.handoffActions button:first-child {
+  border:
+    1px solid
+    #cfdae1;
+
+  background:
+    #ffffff;
+
+  color:
+    #405766;
+}
+
+
+.handoffActions button:last-child {
+  border:
+    1px solid
+    #1d526f;
+
+  background:
+    #1d526f;
+
+  color:
+    #ffffff;
+}
+
+
+.handoffActions button:disabled {
+  cursor: wait;
+
+  opacity: 0.62;
+}
+
+
+@media (max-width: 520px) {
+
+  .handoffOverlay {
+    align-items:
+      flex-end;
+
+    padding:
+      8px;
+  }
+
+
+  .handoffModal {
+    width: 100%;
+
+    max-height:
+      calc(
+        100dvh -
+        16px
+      );
+
+    border-radius:
+      18px
+      18px
+      12px
+      12px;
+  }
+
+
+  .handoffActions {
+    display: grid;
+
+    grid-template-columns:
+      minmax(0, 1fr);
+
+    padding:
+      12px
+      14px
+      calc(
+        14px +
+        env(
+          safe-area-inset-bottom,
+          0px
+        )
+      );
+  }
+
+
+  .handoffActions button {
+    width: 100%;
+
+    min-height: 46px;
+  }
+
+}
