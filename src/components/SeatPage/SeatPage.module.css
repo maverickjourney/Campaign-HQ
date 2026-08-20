@@ -1,0 +1,190 @@
+.page {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 1600px;
+  min-width: 0;
+  margin: 0 auto;
+  padding: 24px;
+}
+
+.header {
+  display: flex;
+  min-width: 0;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 24px;
+  margin-bottom: 24px;
+}
+
+.headerCopy {
+  min-width: 0;
+  max-width: 800px;
+}
+
+.eyebrow {
+  display: block;
+  margin-bottom: 7px;
+  color: #6f8295;
+  font-size: 0.68rem;
+  font-weight: 900;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+}
+
+.header h1 {
+  margin: 0;
+  color: #173b60;
+  font-size: clamp(1.65rem, 3vw, 2.35rem);
+  line-height: 1.05;
+  letter-spacing: -0.04em;
+}
+
+.header p,
+.sectionHeader p,
+.state p {
+  margin: 8px 0 0;
+  color: #687f94;
+  line-height: 1.55;
+}
+
+.actions,
+.sectionActions {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.actions button,
+.actions a,
+.sectionActions button,
+.sectionActions a {
+  min-height: 44px;
+}
+
+.content {
+  display: grid;
+  min-width: 0;
+  gap: 20px;
+}
+
+.section {
+  box-sizing: border-box;
+  min-width: 0;
+  padding: 20px;
+  border: 1px solid #dce5ee;
+  border-radius: 18px;
+  background: #ffffff;
+  box-shadow:
+    0 12px 32px
+    rgba(18, 53, 87, 0.055);
+}
+
+.sectionHeader {
+  display: flex;
+  min-width: 0;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 18px;
+  margin-bottom: 18px;
+}
+
+.sectionHeader > div {
+  min-width: 0;
+}
+
+.sectionHeader h2 {
+  margin: 0;
+  color: #173b60;
+  font-size: 1rem;
+  letter-spacing: -0.02em;
+}
+
+.state {
+  display: grid;
+  min-height: 220px;
+  place-items: center;
+  align-content: center;
+  gap: 8px;
+  padding: 28px;
+  border:
+    1px dashed
+    #cdd9e4;
+  border-radius: 18px;
+  color: #365b7d;
+  background: #ffffff;
+  text-align: center;
+}
+
+.spinner {
+  width: 28px;
+  height: 28px;
+  border: 3px solid #d9e4ee;
+  border-top-color: #255f94;
+  border-radius: 50%;
+  animation: seatPageSpin 0.8s linear infinite;
+}
+
+@keyframes seatPageSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/*
+ * Seat Mobile Contract
+ *
+ * - no horizontal overflow
+ * - primary controls >= 44px
+ * - headers/actions stack cleanly
+ * - sections reduce padding
+ * - full-width actions on narrow phones
+ */
+
+@media (max-width: 760px) {
+  .page {
+    padding: 16px;
+  }
+
+  .header,
+  .sectionHeader {
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .actions,
+  .sectionActions {
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+  .section {
+    padding: 16px;
+    border-radius: 15px;
+  }
+}
+
+@media (max-width: 480px) {
+  .page {
+    padding:
+      12px
+      max(12px, env(safe-area-inset-right))
+      calc(18px + env(safe-area-inset-bottom))
+      max(12px, env(safe-area-inset-left));
+  }
+
+  .actions > *,
+  .sectionActions > * {
+    width: 100%;
+  }
+
+  .actions button,
+  .actions a,
+  .sectionActions button,
+  .sectionActions a {
+    width: 100%;
+    min-height: 46px;
+  }
+}

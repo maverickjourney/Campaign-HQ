@@ -1,3 +1,9 @@
+import {
+  ACTIVE_SEAT_PRODUCT,
+  getSeatCoreModules,
+  getSeatProductModules,
+} from "./seatPlatform";
+
 export const CAMPAIGN_TYPES = [
   {
     value: "candidate_campaign",
@@ -98,77 +104,17 @@ export const JURISDICTION_TYPES = [
 }));
 
 export const CAMPAIGN_MODULES = [
-  {
-    key: "dashboard",
-    label: "Dashboard",
-    required: true,
-  },
-  {
-    key: "inbox",
-    label: "Inbox & communications",
-  },
-  {
-    key: "calendar",
-    label: "Calendar",
-  },
-  {
-    key: "tasks",
-    label: "Tasks",
-  },
-  {
-    key: "commitments",
-    label: "Commitments",
-  },
-  {
-    key: "waiting_on",
-    label: "Waiting On",
-  },
-  {
-    key: "contacts",
-    label: "Contacts",
-  },
-  {
-    key: "documents",
-    label: "Documents & files",
-  },
-  {
-    key: "inventory",
-    label: "Inventory & materials",
-  },
-  {
-    key: "approvals",
-    label: "Approvals",
-  },
-  {
-    key: "team",
-    label: "Team & access",
-    required: true,
-  },
-  {
-    key: "volunteers",
-    label: "Volunteers & field",
-  },
-  {
-    key: "fundraising",
-    label: "Fundraising",
-  },
-  {
-    key: "events",
-    label: "Events",
-  },
-  {
-    key: "social_media",
-    label: "Social media",
-  },
-  {
-    key: "media_center",
-    label: "Media center",
-  },
-  {
-    key: "reports_analytics",
-    label: "Reports & analytics",
-  },
-];
+  ...getSeatCoreModules(),
+  ...getSeatProductModules(
+    ACTIVE_SEAT_PRODUCT,
+  ),
+].map((module) => ({
+  key: module.key,
+  label: module.label,
+  required: Boolean(
+    module.required,
+  ),
+}));
 
 export const SETUP_STEPS = [
   {
