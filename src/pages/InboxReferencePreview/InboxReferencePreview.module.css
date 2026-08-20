@@ -11551,16 +11551,16 @@
 
     height:
       clamp(
-        390px,
-        52dvh,
-        610px
+        560px,
+        68dvh,
+        760px
       ) !important;
 
     min-height:
-      390px !important;
+      560px !important;
 
     max-height:
-      610px !important;
+      760px !important;
 
     flex:
       0 0 auto !important;
@@ -11612,10 +11612,10 @@
     width: 100% !important;
 
     min-height:
-      360px !important;
+      520px !important;
 
     max-height:
-      1800px !important;
+      2200px !important;
   }
 
 
@@ -11630,13 +11630,13 @@
     > .threadPanel
     > .replyComposer
     > textarea {
-    height: 125px !important;
+    height: 105px !important;
 
-    min-height: 125px !important;
+    min-height: 105px !important;
 
-    max-height: 125px !important;
+    max-height: 105px !important;
 
-    flex-basis: 125px !important;
+    flex-basis: 105px !important;
   }
 
 
@@ -11810,16 +11810,16 @@
     .threadBody {
     height:
       clamp(
-        360px,
-        49dvh,
-        540px
+        520px,
+        64dvh,
+        680px
       ) !important;
 
     min-height:
-      360px !important;
+      520px !important;
 
     max-height:
-      540px !important;
+      680px !important;
   }
 
 
@@ -11839,13 +11839,13 @@
     > .threadPanel
     > .replyComposer
     > textarea {
-    height: 118px !important;
+    height: 100px !important;
 
-    min-height: 118px !important;
+    min-height: 100px !important;
 
-    max-height: 118px !important;
+    max-height: 100px !important;
 
-    flex-basis: 118px !important;
+    flex-basis: 100px !important;
   }
 
 }
