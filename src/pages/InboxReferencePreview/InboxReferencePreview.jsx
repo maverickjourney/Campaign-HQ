@@ -731,6 +731,8 @@ const LIVE_CONNECTED_CHANNELS =
     "all",
     "email",
     "dashboard",
+    "sms",
+    "whatsapp",
   ]);
 
 const EMPTY_CONVERSATION = {
@@ -1771,6 +1773,7 @@ export default function InboxReferencePreview() {
   });
 
   const {
+    outreachConversations,
     prepareExternalOutreach,
     markExternalOutreachOpened,
     confirmExternalOutreachSent,
@@ -1785,12 +1788,14 @@ export default function InboxReferencePreview() {
           ? [
               ...mailboxConversations,
               ...internalConversations,
+              ...outreachConversations,
             ]
           : previewConversations,
       [
         internalConversations,
         liveMailboxEnabled,
         mailboxConversations,
+        outreachConversations,
         previewConversations,
       ],
     );
@@ -2133,28 +2138,99 @@ export default function InboxReferencePreview() {
       }));
 
     const uniqueContacts = [];
-    const seen = new Set();
+    const seenEmails =
+      new Set();
+    const seenPhones =
+      new Set();
+    const seenFallbackNames =
+      new Set();
 
     [
       ...savedContacts,
       ...inboxContacts,
     ].forEach((contact) => {
-      const key =
-        String(contact.email || "")
-          .trim()
-          .toLowerCase() ||
-        String(contact.phone || "")
-          .replace(/\D/g, "") ||
-        contactName(contact)
+      const email =
+        String(
+          contact.email ||
+          "",
+        )
           .trim()
           .toLowerCase();
 
-      if (!key || seen.has(key)) {
+      const phone =
+        String(
+          contact.phone ||
+          "",
+        )
+          .replace(
+            /\D/g,
+            "",
+          );
+
+      const fallbackName =
+        contactName(
+          contact,
+        )
+          .trim()
+          .toLowerCase();
+
+      const duplicate =
+        (
+          email &&
+          seenEmails.has(
+            email,
+          )
+        ) ||
+        (
+          phone &&
+          seenPhones.has(
+            phone,
+          )
+        ) ||
+        (
+          !email &&
+          !phone &&
+          fallbackName &&
+          seenFallbackNames.has(
+            fallbackName,
+          )
+        );
+
+      if (
+        duplicate
+      ) {
         return;
       }
 
-      seen.add(key);
-      uniqueContacts.push(contact);
+      if (
+        email
+      ) {
+        seenEmails.add(
+          email,
+        );
+      }
+
+      if (
+        phone
+      ) {
+        seenPhones.add(
+          phone,
+        );
+      }
+
+      if (
+        !email &&
+        !phone &&
+        fallbackName
+      ) {
+        seenFallbackNames.add(
+          fallbackName,
+        );
+      }
+
+      uniqueContacts.push(
+        contact,
+      );
     });
 
     return uniqueContacts.sort(
@@ -5769,7 +5845,11 @@ export default function InboxReferencePreview() {
                 </div>
 
                 <div className={styles.activityList}>
-                  {activityLog.map((activity) => (
+                  {(
+                    selectedConversation
+                      ?.activity ||
+                    activityLog
+                  ).map((activity) => (
                     <div key={activity.id}>
                       <span>
                         <Clock3 size={16} />
