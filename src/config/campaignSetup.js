@@ -132,6 +132,10 @@ export const CAMPAIGN_MODULES = [
     label: "Documents & files",
   },
   {
+    key: "inventory",
+    label: "Inventory & materials",
+  },
+  {
     key: "approvals",
     label: "Approvals",
   },

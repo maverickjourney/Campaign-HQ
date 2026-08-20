@@ -144,6 +144,7 @@ const MODULE_ICONS = {
   waiting_on: Zap,
   contacts: UsersRound,
   documents: FileText,
+  inventory: FileText,
   approvals: ShieldCheck,
   team: UsersRound,
   volunteers: HeartHandshake,
