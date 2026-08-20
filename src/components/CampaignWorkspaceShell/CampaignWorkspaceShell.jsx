@@ -1,4 +1,8 @@
-import { useMemo } from "react";
+import {
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 import {
   useLocation,
   useNavigate,
@@ -22,6 +26,8 @@ import {
   Target,
   UserCog,
   Users,
+  Vote,
+  Menu,
 } from "lucide-react";
 
 import {
@@ -31,6 +37,10 @@ import {
 import {
   CampaignSearch,
 } from "../CampaignSearch/CampaignSearch";
+
+import {
+  supabase,
+} from "../../lib/supabase";
 
 import {
   getCurrentUser,
@@ -52,7 +62,7 @@ const PRIMARY_NAVIGATION = [
   {
     label: "Inbox",
     icon: Inbox,
-    route: "/communications",
+    route: "/inbox",
     count: 8,
   },
   {
@@ -98,43 +108,43 @@ const PRIMARY_NAVIGATION = [
     icon: UserCog,
     route: "/team",
   },
+  {
+    label: "Candidate",
+    icon: Vote,
+    route: "/workspace/candidate-profile",
+  },
 ];
 
 const CAMPAIGN_TOOLS = [
   {
-    label: "Communications",
-    icon: Mail,
-    route: "/communications",
-  },
-  {
     label: "Volunteers",
     icon: Users,
-    route: "/team",
+    route: "/volunteers",
   },
   {
     label: "Fundraising",
     icon: CircleDollarSign,
-    route: "/workspace/settings",
+    route: "/fundraising",
   },
   {
     label: "Events",
     icon: CalendarDays,
-    route: "/calendar",
+    route: "/events",
   },
   {
     label: "Social Media",
     icon: MessageSquare,
-    route: "/communications?view=social",
+    route: "/social-media",
   },
   {
     label: "Media Center",
     icon: FolderKanban,
-    route: "/files",
+    route: "/media-center",
   },
   {
     label: "Reports & Analytics",
     icon: BarChart3,
-    route: "/dashboard",
+    route: "/reports-analytics",
   },
 ];
 
@@ -145,10 +155,204 @@ export function CampaignWorkspaceShell({
   const navigate = useNavigate();
   const location = useLocation();
 
+  // SYSTEM RESPONSIVE DRAWER STATE — START
+  const [
+    sharedSidebarOpen,
+    setSharedSidebarOpen,
+  ] = useState(false);
+
+  useEffect(() => {
+    setSharedSidebarOpen(false);
+  }, [location.pathname]);
+
+  useEffect(() => {
+    if (!sharedSidebarOpen) {
+      return undefined;
+    }
+
+    const previousOverflow =
+      document.body.style.overflow;
+
+    const closeOnEscape = (event) => {
+      if (event.key === "Escape") {
+        setSharedSidebarOpen(false);
+      }
+    };
+
+    document.body.style.overflow = "hidden";
+
+    window.addEventListener(
+      "keydown",
+      closeOnEscape,
+    );
+
+    return () => {
+      document.body.style.overflow =
+        previousOverflow;
+
+      window.removeEventListener(
+        "keydown",
+        closeOnEscape,
+      );
+    };
+  }, [sharedSidebarOpen]);
+  // SYSTEM RESPONSIVE DRAWER STATE — END
+
+
   const user = getCurrentUser();
   const workspace = getCurrentWorkspace();
   const roleLabel = getRoleLabel();
   const initials = getUserInitials(user.name);
+
+  const [
+    candidateAvatarUrl,
+    setCandidateAvatarUrl,
+  ] = useState("");
+
+  useEffect(() => {
+    let cancelled = false;
+
+    const candidateRole =
+      /candidate/i.test(
+        String(
+          roleLabel || "",
+        ),
+      );
+
+    const loadCandidateAvatar =
+      async (
+        overrideStoragePath,
+      ) => {
+        if (
+          !candidateRole ||
+          !workspace?.id
+        ) {
+          if (!cancelled) {
+            setCandidateAvatarUrl("");
+          }
+
+          return;
+        }
+
+        try {
+          let storagePath =
+            overrideStoragePath;
+
+          if (
+            storagePath ===
+            undefined
+          ) {
+            const {
+              data,
+              error:
+                workspaceError,
+            } =
+              await supabase
+                .from(
+                  "workspaces",
+                )
+                .select(
+                  "candidate_photo_path",
+                )
+                .eq(
+                  "id",
+                  workspace.id,
+                )
+                .maybeSingle();
+
+            if (
+              workspaceError
+            ) {
+              throw workspaceError;
+            }
+
+            storagePath =
+              data
+                ?.candidate_photo_path ||
+              "";
+          }
+
+          if (!storagePath) {
+            if (!cancelled) {
+              setCandidateAvatarUrl(
+                "",
+              );
+            }
+
+            return;
+          }
+
+          const {
+            data,
+            error:
+              signedUrlError,
+          } =
+            await supabase.storage
+              .from(
+                "campaign-files",
+              )
+              .createSignedUrl(
+                storagePath,
+                21600,
+              );
+
+          if (
+            signedUrlError
+          ) {
+            throw signedUrlError;
+          }
+
+          if (!cancelled) {
+            setCandidateAvatarUrl(
+              data?.signedUrl ||
+                "",
+            );
+          }
+        } catch {
+          if (!cancelled) {
+            setCandidateAvatarUrl(
+              "",
+            );
+          }
+        }
+      };
+
+    const handleCandidatePhoto =
+      (event) => {
+        if (!candidateRole) {
+          return;
+        }
+
+        const storagePath =
+          event?.detail
+            ?.storagePath;
+
+        void loadCandidateAvatar(
+          storagePath,
+        );
+      };
+
+    void loadCandidateAvatar(
+      undefined,
+    );
+
+    window.addEventListener(
+      "campaign-seat-candidate-photo-updated",
+      handleCandidatePhoto,
+    );
+
+    return () => {
+      cancelled = true;
+
+      window.removeEventListener(
+        "campaign-seat-candidate-photo-updated",
+        handleCandidatePhoto,
+      );
+    };
+  }, [
+    roleLabel,
+    workspace?.id,
+  ]);
 
 
   const isInboxWorkspace = [
@@ -181,6 +385,20 @@ export function CampaignWorkspaceShell({
     [],
   );
 
+  const shortDateLabel = useMemo(
+    () =>
+      new Intl.DateTimeFormat(
+        "en-US",
+        {
+          month: "short",
+          day: "numeric",
+          timeZone:
+            "America/New_York",
+        },
+      ).format(new Date()),
+    [],
+  );
+
   const timeLabel = useMemo(
     () =>
       new Intl.DateTimeFormat(
@@ -205,27 +423,43 @@ export function CampaignWorkspaceShell({
   ) =>
     navigationItems.map((item) => {
       const Icon = item.icon;
+      const isComingSoon = Boolean(item.comingSoon);
 
       const isActive =
         item.label === activeItem ||
         (
           item.label === "Inbox" &&
           location.pathname ===
-            "/communications"
+            "/inbox"
         );
 
       return (
         <button
           key={item.label}
-          className={
+          className={[
             isActive
               ? dashboardStyles.activeNavigation
-              : ""
-          }
+              : "",
+            isComingSoon
+              ? styles.comingSoonNavigation
+              : "",
+          ]
+            .filter(Boolean)
+            .join(" ")}
           type="button"
-          onClick={() =>
-            openRoute(item.route)
+          aria-disabled={
+            isComingSoon ? "true" : undefined
           }
+          title={
+            isComingSoon
+              ? `${item.label} — Coming soon`
+              : undefined
+          }
+          onClick={() => {
+            if (!isComingSoon) {
+              openRoute(item.route);
+            }
+          }}
         >
           <Icon
             size={17}
@@ -237,13 +471,23 @@ export function CampaignWorkspaceShell({
           {item.count ? (
             <small>{item.count}</small>
           ) : null}
+
         </button>
       );
     });
 
   return (
     <div className={styles.app}>
-      <aside className={dashboardStyles.sidebar}>
+      <aside
+        className={dashboardStyles.sidebar}
+        data-shared-workspace-sidebar="true"
+        data-open={
+          sharedSidebarOpen
+            ? "true"
+            : "false"
+        }
+        aria-label="Campaign navigation"
+      >
         {/* LOCKED WORKSPACE SWITCHER — START */}
         <details
           className={styles.workspaceSwitcher}
@@ -426,7 +670,20 @@ export function CampaignWorkspaceShell({
               dashboardStyles.profileAvatar
             }
           >
-            {initials}
+            {candidateAvatarUrl ? (
+              <img
+                className={
+                  styles.profileAvatarImage
+                }
+                src={
+                  candidateAvatarUrl
+                }
+                alt=""
+                aria-hidden="true"
+              />
+            ) : (
+              initials
+            )}
           </span>
 
           <div>
@@ -438,21 +695,71 @@ export function CampaignWorkspaceShell({
         </button>
       </aside>
 
-      <section className={styles.workspace}>
-        <header className={styles.topbar}>
+
+      {/* SYSTEM RESPONSIVE SIDEBAR SCRIM */}
+      {sharedSidebarOpen && (
+        <button
+          className={styles.sharedSidebarScrim}
+          type="button"
+          aria-label="Close campaign navigation"
+          onClick={() =>
+            setSharedSidebarOpen(false)
+          }
+        />
+      )}
+
+      <section
+        className={styles.workspace}
+        data-shared-workspace-region="true"
+      >
+        <header
+          className={styles.topbar}
+          data-shared-workspace-topbar="true"
+        >
           <div
             className={
-              styles.workspaceIdentity
+              styles.topbarLead
             }
           >
-            <span>{workspaceEyebrow}</span>
+            <button
+              className={
+                styles.sharedMenuButton
+              }
+              type="button"
+              aria-label="Open campaign navigation"
+              aria-expanded={
+                sharedSidebarOpen
+              }
+              onClick={() =>
+                setSharedSidebarOpen(
+                  true,
+                )
+              }
+            >
+              <Menu
+                size={20}
+                strokeWidth={2}
+              />
+            </button>
 
-            <strong>{workspaceTitle}</strong>
+            <div
+              className={
+                styles.workspaceIdentity
+              }
+            >
+              <span>
+                {workspaceEyebrow}
+              </span>
+
+              <strong>
+                {workspaceTitle}
+              </strong>
+            </div>
           </div>
 
           <div
             className={
-              styles.topbarActions
+              styles.topbarUtility
             }
           >
             <button
@@ -466,26 +773,67 @@ export function CampaignWorkspaceShell({
                 )
               }
             >
-              <CalendarDays size={17} />
+              <CalendarDays
+                className={
+                  styles.utilityCalendarIcon
+                }
+                size={17}
+              />
 
-              <span>{dateLabel}</span>
+              <span
+                className={
+                  styles.fullDateLabel
+                }
+              >
+                {dateLabel}
+              </span>
+
+              <span
+                className={
+                  styles.shortDateLabel
+                }
+              >
+                {shortDateLabel}
+              </span>
 
               <i />
 
-              <Clock3 size={17} />
+              <Clock3
+                className={
+                  styles.utilityClockIcon
+                }
+                size={17}
+              />
 
               <strong>
                 {timeLabel}
               </strong>
             </button>
 
+            <div
+              className={
+                styles.utilityDivider
+              }
+              aria-hidden="true"
+            />
+
             <CampaignSearch />
+
+            <div
+              className={
+                styles.utilityDivider
+              }
+              aria-hidden="true"
+            />
 
             <ActivityCenter />
           </div>
         </header>
 
-        <div className={styles.content}>
+        <div
+          className={styles.content}
+          data-shared-workspace-content="true"
+        >
           {children}
         </div>
       </section>

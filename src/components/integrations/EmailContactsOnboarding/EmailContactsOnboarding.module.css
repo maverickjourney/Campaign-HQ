@@ -1,0 +1,576 @@
+.card {
+  margin-bottom: 24px;
+  overflow: hidden;
+  border: 1px solid rgba(15, 23, 42, 0.1);
+  border-radius: 18px;
+  background: #fff;
+  box-shadow:
+    0 16px 44px rgba(15, 23, 42, 0.055);
+}
+
+.header {
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+  padding: 21px 22px;
+  border-bottom: 1px solid rgba(15, 23, 42, 0.08);
+}
+
+.headerIcon {
+  display: grid;
+  flex: 0 0 44px;
+  width: 44px;
+  height: 44px;
+  place-items: center;
+  border-radius: 13px;
+  background: rgba(15, 23, 42, 0.07);
+}
+
+.header span {
+  display: block;
+  margin-bottom: 4px;
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.header h2 {
+  margin: 0;
+  font-size: 1.12rem;
+}
+
+.header p {
+  max-width: 720px;
+  margin: 7px 0 0;
+  color: rgba(15, 23, 42, 0.64);
+  line-height: 1.5;
+}
+
+.providerGrid {
+  display: grid;
+  grid-template-columns:
+    repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  padding: 20px 22px 12px;
+}
+
+.providerGrid article {
+  display: grid;
+  grid-template-columns:
+    42px 1fr auto;
+  gap: 12px;
+  align-items: center;
+  padding: 15px;
+  border: 1px solid rgba(15, 23, 42, 0.09);
+  border-radius: 14px;
+}
+
+.providerIcon {
+  display: grid;
+  width: 40px;
+  height: 40px;
+  place-items: center;
+  border-radius: 12px;
+  background: rgba(15, 23, 42, 0.07);
+  font-weight: 900;
+}
+
+.providerGrid strong,
+.providerGrid span {
+  display: block;
+}
+
+.providerGrid span {
+  margin-top: 3px;
+  color: rgba(15, 23, 42, 0.58);
+  font-size: 0.84rem;
+}
+
+.providerGrid button {
+  min-height: 38px;
+  padding: 0 13px;
+  border: 1px solid rgba(15, 23, 42, 0.13);
+  border-radius: 10px;
+  background: #fff;
+  font: inherit;
+  font-weight: 750;
+  cursor: pointer;
+}
+
+.providerGrid button:disabled {
+  cursor: not-allowed;
+  opacity: 0.42;
+}
+
+.statusGrid {
+  display: grid;
+  grid-template-columns:
+    repeat(3, minmax(0, 1fr));
+  gap: 11px;
+  padding: 6px 22px 18px;
+}
+
+.statusGrid article {
+  display: flex;
+  gap: 10px;
+  min-height: 92px;
+  padding: 14px;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  border-radius: 13px;
+}
+
+.statusGrid strong,
+.statusGrid span {
+  display: block;
+}
+
+.statusGrid span {
+  margin-top: 5px;
+  color: rgba(15, 23, 42, 0.6);
+  font-size: 0.84rem;
+  line-height: 1.4;
+}
+
+.ready {
+  background: rgba(15, 118, 110, 0.055);
+}
+
+.pending {
+  background: rgba(15, 23, 42, 0.03);
+}
+
+.protected {
+  background: rgba(30, 64, 175, 0.045);
+}
+
+.error,
+.controlled {
+  margin: 0 22px 16px;
+  padding: 12px 14px;
+  border-radius: 12px;
+}
+
+.error {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  background: rgba(185, 28, 28, 0.08);
+}
+
+.controlled {
+  color: rgba(15, 23, 42, 0.7);
+  background: rgba(15, 23, 42, 0.045);
+  line-height: 1.45;
+}
+
+.footer {
+  display: flex;
+  gap: 18px;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 22px;
+  border-top: 1px solid rgba(15, 23, 42, 0.08);
+  background: rgba(15, 23, 42, 0.018);
+}
+
+.footer strong,
+.footer span {
+  display: block;
+}
+
+.footer span {
+  max-width: 650px;
+  margin-top: 4px;
+  color: rgba(15, 23, 42, 0.6);
+  font-size: 0.87rem;
+  line-height: 1.4;
+}
+
+.primary {
+  display: inline-flex;
+  gap: 8px;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding: 0 17px;
+  border: 0;
+  border-radius: 12px;
+  background:
+    var(--campaign-primary, #0f172a);
+  color: #fff;
+  font: inherit;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.primary:disabled {
+  cursor: not-allowed;
+  opacity: 0.42;
+}
+
+.spinner {
+  animation:
+    email-contacts-spin 0.8s
+    linear infinite;
+}
+
+@keyframes email-contacts-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (max-width: 950px) {
+  .providerGrid,
+  .statusGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 720px) {
+  .providerGrid article {
+    grid-template-columns:
+      42px 1fr;
+  }
+
+  .providerGrid button {
+    grid-column: 1 / -1;
+    width: 100%;
+  }
+
+  .footer {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .primary {
+    width: 100%;
+  }
+}
+
+/* ============================================================
+   CAMPAIGN SEAT — POST-ONBOARDING MAILBOX RECONNECT
+   ============================================================ */
+
+.connectionMaintenance {
+  display: grid;
+  grid-template-columns:
+    auto minmax(0, 1fr) auto;
+  gap: 12px;
+  align-items: center;
+  margin: 0 22px 16px;
+  padding: 15px;
+  border: 1px solid rgba(30, 64, 175, 0.14);
+  border-radius: 13px;
+  background: rgba(30, 64, 175, 0.035);
+}
+
+.connectionMaintenanceIcon {
+  display: grid;
+  width: 40px;
+  height: 40px;
+  place-items: center;
+  border-radius: 11px;
+  color: #1e40af;
+  background: rgba(30, 64, 175, 0.09);
+}
+
+.connectionMaintenanceCopy {
+  min-width: 0;
+}
+
+.connectionMaintenanceCopy strong,
+.connectionMaintenanceCopy span {
+  display: block;
+}
+
+.connectionMaintenanceCopy strong {
+  color: #172554;
+}
+
+.connectionMaintenanceCopy span {
+  margin-top: 4px;
+  color: rgba(15, 23, 42, 0.65);
+  font-size: 0.84rem;
+  line-height: 1.45;
+}
+
+.connectionMaintenanceCopy b {
+  color: rgba(15, 23, 42, 0.86);
+  font-weight: 750;
+}
+
+.reconnectButton {
+  display: inline-flex;
+  gap: 8px;
+  align-items: center;
+  justify-content: center;
+  min-height: 40px;
+  padding: 0 14px;
+  border: 1px solid rgba(30, 64, 175, 0.2);
+  border-radius: 10px;
+  color: #1e3a8a;
+  background: #fff;
+  font: inherit;
+  font-weight: 800;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.reconnectButton:disabled {
+  cursor: not-allowed;
+  opacity: 0.42;
+}
+
+.reconnectDevelopmentNotice {
+  margin: -4px 22px 16px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  color: rgba(15, 23, 42, 0.68);
+  background: rgba(15, 23, 42, 0.04);
+  font-size: 0.82rem;
+  line-height: 1.45;
+}
+
+@media (max-width: 800px) {
+  .connectionMaintenance {
+    grid-template-columns:
+      auto minmax(0, 1fr);
+  }
+
+  .reconnectButton {
+    grid-column: 1 / -1;
+    width: 100%;
+  }
+}
+
+/* ============================================================
+   CAMPAIGN SEAT — EMAIL SIGNATURE SETTINGS
+   ============================================================ */
+
+.signatureSettings {
+  margin: 0 22px 18px;
+  overflow: hidden;
+  border: 1px solid rgba(15, 118, 110, 0.14);
+  border-radius: 14px;
+  background: rgba(15, 118, 110, 0.025);
+}
+
+.signatureSettings > header {
+  display: flex;
+  gap: 11px;
+  align-items: flex-start;
+  padding: 15px;
+  border-bottom: 1px solid rgba(15, 23, 42, 0.07);
+}
+
+.signatureIcon {
+  display: grid;
+  width: 40px;
+  height: 40px;
+  flex: 0 0 40px;
+  place-items: center;
+  border-radius: 11px;
+  color: #0f766e;
+  background: rgba(15, 118, 110, 0.09);
+}
+
+.signatureSettings > header strong,
+.signatureSettings > header span {
+  display: block;
+}
+
+.signatureSettings > header strong {
+  color: #134e4a;
+}
+
+.signatureSettings > header span {
+  max-width: 760px;
+  margin-top: 4px;
+  color: rgba(15, 23, 42, 0.63);
+  font-size: 0.84rem;
+  line-height: 1.45;
+}
+
+.signatureFields {
+  display: grid;
+  grid-template-columns:
+    minmax(0, 0.48fr)
+    minmax(0, 1.52fr);
+  gap: 12px;
+  padding: 15px;
+}
+
+.signatureFields label > span {
+  display: block;
+  margin-bottom: 6px;
+  color: #334155;
+  font-size: 0.78rem;
+  font-weight: 780;
+}
+
+.signatureFields input,
+.signatureFields textarea {
+  box-sizing: border-box;
+  width: 100%;
+  border: 1px solid rgba(15, 23, 42, 0.13);
+  border-radius: 10px;
+  outline: none;
+  color: #172554;
+  background: #ffffff;
+  font: inherit;
+}
+
+.signatureFields input {
+  min-height: 42px;
+  padding: 0 11px;
+}
+
+.signatureFields textarea {
+  min-height: 145px;
+  padding: 11px;
+  resize: vertical;
+  line-height: 1.5;
+}
+
+.signatureFields input:focus,
+.signatureFields textarea:focus {
+  border-color: rgba(15, 118, 110, 0.44);
+  box-shadow:
+    0 0 0 3px
+    rgba(15, 118, 110, 0.08);
+}
+
+.signatureOptions {
+  display: grid;
+  grid-template-columns:
+    repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  padding: 0 15px 15px;
+}
+
+.signatureOptions > label {
+  display: flex;
+  gap: 9px;
+  align-items: flex-start;
+  padding: 11px;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  border-radius: 10px;
+  background: #ffffff;
+}
+
+.signatureOptions input {
+  margin-top: 3px;
+}
+
+.signatureOptions strong,
+.signatureOptions small {
+  display: block;
+}
+
+.signatureOptions strong {
+  color: #334155;
+  font-size: 0.79rem;
+}
+
+.signatureOptions small {
+  margin-top: 3px;
+  color: rgba(15, 23, 42, 0.58);
+  font-size: 0.74rem;
+  line-height: 1.35;
+}
+
+.signaturePreview {
+  margin: 0 15px 15px;
+  padding: 12px;
+  border: 1px dashed rgba(15, 118, 110, 0.22);
+  border-radius: 10px;
+  background: #ffffff;
+}
+
+.signaturePreview small {
+  display: block;
+  margin-bottom: 7px;
+  color: #64748b;
+  font-size: 0.72rem;
+  font-weight: 780;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.signaturePreview pre {
+  margin: 0;
+  overflow: auto;
+  color: #334155;
+  font-family: inherit;
+  font-size: 0.82rem;
+  line-height: 1.5;
+  white-space: pre-wrap;
+}
+
+.signatureError,
+.signatureSaved {
+  margin: 0 15px 12px;
+  padding: 9px 11px;
+  border-radius: 9px;
+  font-size: 0.79rem;
+}
+
+.signatureError {
+  color: #991b1b;
+  background: rgba(185, 28, 28, 0.08);
+}
+
+.signatureSaved {
+  color: #166534;
+  background: rgba(22, 101, 52, 0.08);
+}
+
+.signatureSettings > footer {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  justify-content: space-between;
+  padding: 13px 15px;
+  border-top: 1px solid rgba(15, 23, 42, 0.07);
+  background: rgba(255, 255, 255, 0.66);
+}
+
+.signatureSettings > footer span {
+  color: #64748b;
+  font-size: 0.78rem;
+}
+
+.signatureSettings > footer button {
+  min-height: 39px;
+  padding: 0 14px;
+  border: 0;
+  border-radius: 10px;
+  color: #ffffff;
+  background: #0f766e;
+  font: inherit;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.signatureSettings > footer button:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+@media (max-width: 800px) {
+  .signatureFields,
+  .signatureOptions {
+    grid-template-columns: 1fr;
+  }
+
+  .signatureSettings > footer {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .signatureSettings > footer button {
+    width: 100%;
+  }
+}

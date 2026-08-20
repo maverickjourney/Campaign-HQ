@@ -17,6 +17,9 @@ import {
   UsersRound,
   Vote,
   X,
+  Inbox,
+  Target,
+  Clock3,
 } from "lucide-react";
 
 import {
@@ -32,21 +35,17 @@ import {
 } from "../../hooks/useActiveTaskCount";
 import "./CampaignSidebarTheme.css";
 
+// CAMPAIGN SEAT UNIFIED OPERATIONAL NAVIGATION
 const CAMPAIGN_NAVIGATION = [
   {
-    label: "Overview",
+    label: "HQ",
     icon: LayoutDashboard,
     route: "/dashboard",
   },
   {
-    label: "Tasks",
-    icon: ClipboardCheck,
-    route: "/tasks",
-  },
-  {
-    label: "Field operations",
-    icon: MapPin,
-    route: "/field-operations",
+    label: "Inbox",
+    icon: Inbox,
+    route: "/inbox",
   },
   {
     label: "Calendar",
@@ -54,9 +53,19 @@ const CAMPAIGN_NAVIGATION = [
     route: "/calendar",
   },
   {
-    label: "Team",
-    icon: UsersRound,
-    route: "/team",
+    label: "Tasks",
+    icon: ClipboardCheck,
+    route: "/tasks",
+  },
+  {
+    label: "Commitments",
+    icon: Target,
+    route: "/commitments",
+  },
+  {
+    label: "Waiting On",
+    icon: Clock3,
+    route: "/approvals",
   },
   {
     label: "Contacts",
@@ -69,17 +78,26 @@ const CAMPAIGN_NAVIGATION = [
     route: "/files",
   },
   {
-    label: "Communications",
-    icon: MessageSquareText,
-    route: "/communications",
-  },
-  {
     label: "Approvals",
     icon: FileCheck2,
     route: "/approvals",
   },
+  {
+    label: "Team",
+    icon: UsersRound,
+    route: "/team",
+  },
+  {
+    label: "Field operations",
+    icon: MapPin,
+    route: "/field-operations",
+  },
+  {
+    label: "Communications",
+    icon: MessageSquareText,
+    route: "/communications",
+  },
 ];
-
 
 const VOLUNTEER_NAVIGATION = [
   {
@@ -115,6 +133,11 @@ const VOLUNTEER_NAVIGATION = [
 ];
 
 const LEADERSHIP_NAVIGATION = [
+  {
+    label: "Manage candidate",
+    icon: Vote,
+    route: "/workspace/candidate-profile",
+  },
   {
     label: "Team access",
     icon: UserCog,
@@ -196,6 +219,15 @@ export function CampaignSidebar({
         item.comingSoon ||
         !item.route
       ) {
+        return;
+      }
+
+      // CAMPAIGN SEAT CANONICAL HQ NAVIGATION
+      //
+      // HQ gets a full application reload so operational
+      // page state/shells cannot leak into the main dashboard.
+      if (item.route === "/dashboard") {
+        window.location.assign("/dashboard");
         return;
       }
 

@@ -1699,7 +1699,7 @@ export default function TeamReferencePreview() {
               ],
               [
                 "invitations",
-                `Invitations (${pendingInvitations.length})`,
+                `Invitations (${invitations.length})`,
               ],
               [
                 "access",

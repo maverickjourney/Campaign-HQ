@@ -1500,3 +1500,1807 @@
     border-radius: 10px !important;
   }
 }
+
+/* CAMPAIGN SEAT LANDSCAPE PAGE ALIGNMENT — START */
+
+/* =========================================================
+   TABLET PAGE HEADER ALIGNMENT
+   ========================================================= */
+
+@media
+  (min-width: 901px)
+  and
+  (max-width: 1240px) {
+
+  .page {
+    padding:
+      20px
+      22px
+      30px !important;
+  }
+
+  /*
+   * Prevent earlier page-specific rules from centering only
+   * the heading while the controls and cards remain left-aligned.
+   */
+  .pageHeader {
+    display: flex !important;
+
+    width: 100% !important;
+    max-width: none !important;
+
+    flex-direction: column !important;
+
+    align-items: stretch !important;
+    justify-content: flex-start !important;
+
+    gap: 14px !important;
+
+    margin:
+      0
+      0
+      14px !important;
+
+    padding: 0 !important;
+  }
+
+  .pageHeader > :first-child {
+    width: 100% !important;
+    max-width: none !important;
+
+    align-self: stretch !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
+
+    text-align: left !important;
+  }
+
+  .pageHeader .eyebrow,
+  .pageHeader h1,
+  .pageHeader p,
+  .pageHeader .updated {
+    margin-right: 0 !important;
+    margin-left: 0 !important;
+
+    text-align: left !important;
+  }
+
+  .pageHeader p {
+    max-width: 780px !important;
+  }
+
+  .headerActions {
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: none !important;
+
+    align-self: stretch !important;
+    justify-content: flex-start !important;
+
+    margin: 0 !important;
+  }
+}
+
+/* CAMPAIGN SEAT LANDSCAPE PAGE ALIGNMENT — END */
+
+/* CAMPAIGN SEAT ACCOUNTABILITY LANDSCAPE GRID — START */
+
+@media
+  (min-width: 1080px)
+  and
+  (max-width: 1240px) {
+
+  /*
+   * Search receives the flexible column. Both action buttons
+   * retain their natural width.
+   */
+  .headerActions {
+    display: grid !important;
+
+    grid-template-columns:
+      minmax(0, 1fr)
+      auto
+      auto !important;
+
+    align-items: center !important;
+
+    gap: 9px !important;
+  }
+
+  .searchBox {
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: none !important;
+
+    flex: none !important;
+  }
+
+  /*
+   * Keep all five accountability metrics in one balanced row.
+   */
+  .summaryGrid {
+    grid-template-columns:
+      repeat(
+        5,
+        minmax(0, 1fr)
+      ) !important;
+
+    gap: 9px !important;
+
+    margin-bottom: 14px !important;
+  }
+
+  .summaryCard {
+    min-width: 0 !important;
+  }
+}
+
+/* CAMPAIGN SEAT ACCOUNTABILITY LANDSCAPE GRID — END */
+
+/* CAMPAIGN SEAT COMMITMENTS TABLET REVIEW — START */
+
+/*
+ * Commitments responsive review:
+ *
+ * - desktop above 1240px remains unchanged
+ * - redundant floating Support does not cover the footer
+ * - tablet commitment rows no longer require horizontal scrolling
+ * - tablet empty and loading states stay compact and centered
+ */
+
+
+/* =========================================================
+   SUPPORT OVERLAP
+   ========================================================= */
+
+@media (max-width: 1240px) {
+
+  /*
+   * Ask Campaign HQ remains available in the shared header.
+   * Hide only the separate floating Support link on Commitments.
+   */
+  :global(body):has(.page)
+  :global(
+    a[aria-label="Open Campaign Seat Support"]
+  ) {
+    display:
+      none !important;
+
+    visibility:
+      hidden !important;
+
+    pointer-events:
+      none !important;
+  }
+
+  .tableFooter {
+    padding-right:
+      18px !important;
+  }
+}
+
+
+/* =========================================================
+   TABLET COMMITMENT CARDS
+   701px through 900px
+   ========================================================= */
+
+@media
+  (min-width: 701px)
+  and
+  (max-width: 900px) {
+
+  .tableScroller {
+    width:
+      100% !important;
+
+    overflow:
+      visible !important;
+
+    scrollbar-gutter:
+      auto !important;
+  }
+
+  .commitmentTable {
+    display:
+      block !important;
+
+    width:
+      100% !important;
+    min-width:
+      0 !important;
+
+    border-collapse:
+      separate !important;
+  }
+
+  .commitmentTable thead {
+    display:
+      none !important;
+  }
+
+  .commitmentTable tbody {
+    display:
+      block !important;
+
+    width:
+      100% !important;
+  }
+
+  .commitmentRow {
+    box-sizing:
+      border-box !important;
+
+    display:
+      grid !important;
+
+    width:
+      100% !important;
+    min-width:
+      0 !important;
+
+    grid-template-columns:
+      minmax(0, 1.45fr)
+      minmax(115px, 0.75fr)
+      minmax(115px, 0.75fr) !important;
+
+    grid-template-areas:
+      "commitment stakeholder health"
+      "owner due source" !important;
+
+    column-gap:
+      14px !important;
+    row-gap:
+      10px !important;
+
+    padding:
+      13px
+      15px !important;
+
+    border-bottom:
+      1px
+      solid
+      #e0e8ef !important;
+  }
+
+  .commitmentRow td {
+    display:
+      block !important;
+
+    width:
+      auto !important;
+    min-width:
+      0 !important;
+    height:
+      auto !important;
+
+    padding:
+      0 !important;
+
+    border:
+      0 !important;
+
+    vertical-align:
+      top !important;
+  }
+
+  .commitmentRow td:nth-child(1) {
+    grid-area:
+      commitment !important;
+  }
+
+  .commitmentRow td:nth-child(2) {
+    grid-area:
+      stakeholder !important;
+  }
+
+  .commitmentRow td:nth-child(3) {
+    grid-area:
+      owner !important;
+  }
+
+  .commitmentRow td:nth-child(4) {
+    grid-area:
+      due !important;
+  }
+
+  .commitmentRow td:nth-child(5) {
+    grid-area:
+      health !important;
+  }
+
+  .commitmentRow td:nth-child(6) {
+    grid-area:
+      source !important;
+  }
+
+  .commitmentRow td:nth-child(n+2)::before {
+    display:
+      block !important;
+
+    margin-bottom:
+      4px !important;
+
+    color:
+      #7890a5 !important;
+
+    font-size:
+      0.55rem !important;
+    font-weight:
+      850 !important;
+
+    letter-spacing:
+      0.055em !important;
+
+    text-transform:
+      uppercase !important;
+  }
+
+  .commitmentRow td:nth-child(2)::before {
+    content:
+      "Stakeholder" !important;
+  }
+
+  .commitmentRow td:nth-child(3)::before {
+    content:
+      "Owner" !important;
+  }
+
+  .commitmentRow td:nth-child(4)::before {
+    content:
+      "Promise date" !important;
+  }
+
+  .commitmentRow td:nth-child(5)::before {
+    content:
+      "Health" !important;
+  }
+
+  .commitmentRow td:nth-child(6)::before {
+    content:
+      "Source" !important;
+  }
+
+  .commitmentName strong {
+    display:
+      -webkit-box !important;
+
+    overflow:
+      hidden !important;
+
+    white-space:
+      normal !important;
+    overflow-wrap:
+      anywhere !important;
+
+    line-height:
+      1.23 !important;
+
+    text-overflow:
+      ellipsis !important;
+
+    -webkit-box-orient:
+      vertical !important;
+    -webkit-line-clamp:
+      2 !important;
+  }
+
+  .commitmentName span {
+    margin-top:
+      4px !important;
+
+    overflow:
+      hidden !important;
+
+    text-overflow:
+      ellipsis !important;
+    white-space:
+      nowrap !important;
+  }
+
+  .stakeholder,
+  .source {
+    font-size:
+      0.64rem !important;
+  }
+
+  .owner strong {
+    max-width:
+      145px !important;
+
+    overflow:
+      hidden !important;
+
+    text-overflow:
+      ellipsis !important;
+    white-space:
+      nowrap !important;
+  }
+
+  .dueDate strong {
+    font-size:
+      0.64rem !important;
+  }
+
+  .dueDate small {
+    font-size:
+      0.57rem !important;
+  }
+
+  .healthBadge {
+    min-height:
+      27px !important;
+
+    padding:
+      0
+      8px !important;
+
+    font-size:
+      0.59rem !important;
+  }
+}
+
+
+/* =========================================================
+   NARROW TABLET
+   701px through 780px
+   ========================================================= */
+
+@media
+  (min-width: 701px)
+  and
+  (max-width: 780px) {
+
+  .commitmentRow {
+    grid-template-columns:
+      minmax(0, 1fr)
+      minmax(145px, 0.7fr) !important;
+
+    grid-template-areas:
+      "commitment commitment"
+      "stakeholder health"
+      "owner due"
+      "source source" !important;
+
+    column-gap:
+      12px !important;
+    row-gap:
+      10px !important;
+
+    padding:
+      13px !important;
+  }
+
+  .commitmentRow td:nth-child(5),
+  .commitmentRow td:nth-child(4) {
+    justify-self:
+      end !important;
+
+    text-align:
+      right !important;
+  }
+
+  .source {
+    max-width:
+      none !important;
+  }
+}
+
+
+/* =========================================================
+   TABLET EMPTY AND LOADING STATES
+   ========================================================= */
+
+@media
+  (min-width: 701px)
+  and
+  (max-width: 900px) {
+
+  .commitmentTable tbody
+  > tr:not(.commitmentRow) {
+    display:
+      block !important;
+
+    width:
+      100% !important;
+  }
+
+  .commitmentTable tbody
+  > tr:not(.commitmentRow)
+  > td,
+  .emptyCell {
+    box-sizing:
+      border-box !important;
+
+    display:
+      grid !important;
+
+    width:
+      100% !important;
+
+    height:
+      auto !important;
+    min-height:
+      225px !important;
+
+    place-items:
+      center !important;
+
+    align-content:
+      center !important;
+    justify-items:
+      center !important;
+
+    gap:
+      9px !important;
+
+    padding:
+      28px
+      18px !important;
+
+    text-align:
+      center !important;
+  }
+
+  .emptyCell svg,
+  .emptyCell strong,
+  .emptyCell span {
+    margin:
+      0
+      auto !important;
+  }
+
+  .emptyCell strong {
+    font-size:
+      0.82rem !important;
+    line-height:
+      1.25 !important;
+  }
+
+  .emptyCell span {
+    max-width:
+      340px !important;
+
+    font-size:
+      0.66rem !important;
+    line-height:
+      1.45 !important;
+  }
+
+  .tableFooter {
+    min-height:
+      42px !important;
+
+    padding:
+      8px
+      16px !important;
+  }
+}
+
+/* CAMPAIGN SEAT COMMITMENTS TABLET REVIEW — END */
+
+/* CAMPAIGN SEAT COMMITMENTS PHONE REVIEW — START */
+
+/*
+ * Commitments phone layout:
+ *
+ * - remove the inherited 900px table canvas
+ * - keep every empty-state element inside the viewport
+ * - convert future populated rows into readable cards
+ * - stack filters consistently
+ * - preserve the shared mobile header and Campaign HQ control
+ */
+
+@media (max-width: 620px) {
+
+  .page {
+    padding:
+      14px
+      10px
+      28px !important;
+  }
+
+  .pageHeader {
+    gap:
+      16px !important;
+
+    margin-bottom:
+      14px !important;
+  }
+
+  .headerActions {
+    display:
+      grid !important;
+
+    width:
+      100% !important;
+    min-width:
+      0 !important;
+
+    grid-template-columns:
+      repeat(
+        2,
+        minmax(0, 1fr)
+      ) !important;
+
+    gap:
+      8px !important;
+  }
+
+  .searchBox {
+    box-sizing:
+      border-box !important;
+
+    width:
+      100% !important;
+    min-width:
+      0 !important;
+
+    grid-column:
+      1 / -1 !important;
+  }
+
+  .secondaryButton,
+  .primaryButton {
+    box-sizing:
+      border-box !important;
+
+    width:
+      100% !important;
+    min-width:
+      0 !important;
+
+    padding-right:
+      9px !important;
+    padding-left:
+      9px !important;
+
+    white-space:
+      nowrap !important;
+  }
+
+  /*
+   * Keep the four view tabs accessible without allowing them
+   * to widen the complete Commitments panel.
+   */
+  .tabs {
+    box-sizing:
+      border-box !important;
+
+    width:
+      100% !important;
+    min-width:
+      0 !important;
+    min-height:
+      50px !important;
+
+    padding:
+      0
+      5px !important;
+
+    overflow-x:
+      auto !important;
+    overflow-y:
+      hidden !important;
+
+    scrollbar-width:
+      none !important;
+  }
+
+  .tabs::-webkit-scrollbar {
+    display:
+      none !important;
+  }
+
+  .tabs button {
+    min-width:
+      max-content !important;
+    min-height:
+      49px !important;
+
+    flex:
+      0
+      0
+      auto !important;
+
+    padding:
+      0
+      11px !important;
+
+    font-size:
+      0.69rem !important;
+
+    white-space:
+      nowrap !important;
+  }
+
+  .tabs button::after {
+    right:
+      9px !important;
+    left:
+      9px !important;
+  }
+
+  .tableActions {
+    box-sizing:
+      border-box !important;
+
+    display:
+      grid !important;
+
+    width:
+      100% !important;
+    min-width:
+      0 !important;
+
+    grid-template-columns:
+      minmax(0, 1fr) !important;
+
+    gap:
+      7px !important;
+
+    padding:
+      8px !important;
+  }
+
+  .selectControl,
+  .sortControl {
+    box-sizing:
+      border-box !important;
+
+    position:
+      relative !important;
+
+    width:
+      100% !important;
+    min-width:
+      0 !important;
+    min-height:
+      42px !important;
+
+    overflow:
+      hidden !important;
+  }
+
+  .selectControl select,
+  .sortControl select {
+    box-sizing:
+      border-box !important;
+
+    width:
+      100% !important;
+    min-width:
+      0 !important;
+
+    padding-right:
+      30px !important;
+  }
+
+  .resultsLine {
+    min-height:
+      42px !important;
+
+    padding:
+      0
+      12px !important;
+  }
+}
+
+
+/* =========================================================
+   PHONE TABLE / CARD ARCHITECTURE
+   ========================================================= */
+
+@media (max-width: 620px) {
+
+  .tableScroller {
+    width:
+      100% !important;
+    min-width:
+      0 !important;
+
+    overflow:
+      visible !important;
+  }
+
+  .commitmentTable {
+    display:
+      block !important;
+
+    width:
+      100% !important;
+    min-width:
+      0 !important;
+
+    border-collapse:
+      separate !important;
+    table-layout:
+      auto !important;
+  }
+
+  .commitmentTable thead {
+    display:
+      none !important;
+  }
+
+  .commitmentTable tbody {
+    display:
+      block !important;
+
+    width:
+      100% !important;
+    min-width:
+      0 !important;
+  }
+
+  .commitmentRow {
+    box-sizing:
+      border-box !important;
+
+    display:
+      grid !important;
+
+    width:
+      100% !important;
+    min-width:
+      0 !important;
+
+    grid-template-columns:
+      minmax(0, 1fr)
+      auto !important;
+
+    grid-template-areas:
+      "commitment health"
+      "stakeholder stakeholder"
+      "owner due"
+      "source source" !important;
+
+    column-gap:
+      10px !important;
+    row-gap:
+      10px !important;
+
+    padding:
+      13px
+      12px !important;
+
+    border-bottom:
+      1px
+      solid
+      #e0e8ef !important;
+  }
+
+  .commitmentRow td {
+    display:
+      block !important;
+
+    width:
+      auto !important;
+    min-width:
+      0 !important;
+    height:
+      auto !important;
+
+    padding:
+      0 !important;
+
+    border:
+      0 !important;
+  }
+
+  .commitmentRow td:nth-child(1) {
+    grid-area:
+      commitment !important;
+  }
+
+  .commitmentRow td:nth-child(2) {
+    grid-area:
+      stakeholder !important;
+  }
+
+  .commitmentRow td:nth-child(3) {
+    grid-area:
+      owner !important;
+  }
+
+  .commitmentRow td:nth-child(4) {
+    grid-area:
+      due !important;
+
+    justify-self:
+      end !important;
+
+    text-align:
+      right !important;
+  }
+
+  .commitmentRow td:nth-child(5) {
+    grid-area:
+      health !important;
+
+    justify-self:
+      end !important;
+  }
+
+  .commitmentRow td:nth-child(6) {
+    grid-area:
+      source !important;
+  }
+
+  .commitmentRow td:nth-child(n+2)::before {
+    display:
+      block !important;
+
+    margin-bottom:
+      4px !important;
+
+    color:
+      #7890a5 !important;
+
+    font-size:
+      0.54rem !important;
+    font-weight:
+      850 !important;
+
+    letter-spacing:
+      0.055em !important;
+
+    text-transform:
+      uppercase !important;
+  }
+
+  .commitmentRow td:nth-child(2)::before {
+    content:
+      "Stakeholder" !important;
+  }
+
+  .commitmentRow td:nth-child(3)::before {
+    content:
+      "Owner" !important;
+  }
+
+  .commitmentRow td:nth-child(4)::before {
+    content:
+      "Promise date" !important;
+  }
+
+  .commitmentRow td:nth-child(5)::before {
+    content:
+      "Health" !important;
+  }
+
+  .commitmentRow td:nth-child(6)::before {
+    content:
+      "Source" !important;
+  }
+
+  .commitmentName strong {
+    display:
+      -webkit-box !important;
+
+    overflow:
+      hidden !important;
+
+    white-space:
+      normal !important;
+    overflow-wrap:
+      anywhere !important;
+
+    line-height:
+      1.23 !important;
+
+    text-overflow:
+      ellipsis !important;
+
+    -webkit-box-orient:
+      vertical !important;
+    -webkit-line-clamp:
+      2 !important;
+  }
+
+  .commitmentName span {
+    overflow:
+      hidden !important;
+
+    text-overflow:
+      ellipsis !important;
+    white-space:
+      nowrap !important;
+  }
+
+  .stakeholder,
+  .source {
+    max-width:
+      none !important;
+
+    font-size:
+      0.63rem !important;
+  }
+
+  .owner strong {
+    max-width:
+      155px !important;
+
+    overflow:
+      hidden !important;
+
+    text-overflow:
+      ellipsis !important;
+    white-space:
+      nowrap !important;
+  }
+}
+
+
+/* =========================================================
+   PHONE EMPTY / LOADING STATE
+   ========================================================= */
+
+@media (max-width: 620px) {
+
+  .commitmentTable tbody
+  > tr:not(.commitmentRow) {
+    display:
+      block !important;
+
+    width:
+      100% !important;
+    min-width:
+      0 !important;
+  }
+
+  .commitmentTable tbody
+  > tr:not(.commitmentRow)
+  > td,
+  .emptyCell {
+    box-sizing:
+      border-box !important;
+
+    display:
+      grid !important;
+
+    width:
+      100% !important;
+    min-width:
+      0 !important;
+
+    height:
+      auto !important;
+    min-height:
+      210px !important;
+
+    place-items:
+      center !important;
+
+    align-content:
+      center !important;
+    justify-items:
+      center !important;
+
+    gap:
+      9px !important;
+
+    padding:
+      28px
+      14px !important;
+
+    overflow:
+      hidden !important;
+
+    text-align:
+      center !important;
+  }
+
+  .emptyCell svg,
+  .emptyCell strong,
+  .emptyCell span {
+    max-width:
+      100% !important;
+
+    margin:
+      0
+      auto !important;
+  }
+
+  .emptyCell svg {
+    width:
+      30px !important;
+    height:
+      30px !important;
+  }
+
+  .emptyCell strong {
+    font-size:
+      0.84rem !important;
+    line-height:
+      1.25 !important;
+
+    white-space:
+      normal !important;
+  }
+
+  .emptyCell span {
+    max-width:
+      280px !important;
+
+    font-size:
+      0.65rem !important;
+    line-height:
+      1.45 !important;
+
+    white-space:
+      normal !important;
+  }
+
+  .tableFooter {
+    min-height:
+      42px !important;
+
+    align-items:
+      center !important;
+    justify-content:
+      center !important;
+
+    padding:
+      8px
+      12px !important;
+
+    text-align:
+      center !important;
+  }
+
+  .tableFooter span:last-child {
+    display:
+      none !important;
+  }
+}
+
+/* CAMPAIGN SEAT COMMITMENTS PHONE REVIEW — END */
+
+/* CAMPAIGN SEAT COMMITMENTS PHONE TABS — START */
+
+/*
+ * Keep all four commitment views visible on phone widths.
+ * The original descriptive labels remain in the DOM for
+ * accessibility; compact visual labels are supplied by CSS.
+ */
+@media (max-width: 430px) {
+
+  .tabs {
+    display:
+      grid !important;
+
+    grid-template-columns:
+      repeat(
+        4,
+        minmax(0, 1fr)
+      ) !important;
+
+    width:
+      100% !important;
+
+    padding:
+      0
+      3px !important;
+
+    overflow:
+      visible !important;
+  }
+
+  .tabs button {
+    box-sizing:
+      border-box !important;
+
+    width:
+      100% !important;
+    min-width:
+      0 !important;
+
+    padding:
+      0
+      4px !important;
+
+    overflow:
+      hidden !important;
+
+    font-size:
+      0 !important;
+
+    text-overflow:
+      clip !important;
+  }
+
+  .tabs button::before {
+    display:
+      block !important;
+
+    overflow:
+      hidden !important;
+
+    color:
+      inherit !important;
+
+    font-size:
+      0.61rem !important;
+    font-weight:
+      820 !important;
+
+    line-height:
+      1 !important;
+
+    text-overflow:
+      ellipsis !important;
+    white-space:
+      nowrap !important;
+  }
+
+  .tabs button:nth-child(1)::before {
+    content:
+      "All" !important;
+  }
+
+  .tabs button:nth-child(2)::before {
+    content:
+      "Mine" !important;
+  }
+
+  .tabs button:nth-child(3)::before {
+    content:
+      "Team" !important;
+  }
+
+  .tabs button:nth-child(4)::before {
+    content:
+      "Fulfilled" !important;
+  }
+
+  .tabs button::after {
+    right:
+      5px !important;
+    left:
+      5px !important;
+  }
+}
+
+/* CAMPAIGN SEAT COMMITMENTS PHONE TABS — END */
+
+/* CAMPAIGN SEAT COMMITMENTS COMPACT TABLET CARDS — START */
+
+/*
+ * Narrow tablet commitment card:
+ *
+ * Row 1 — commitment title/description and health
+ * Row 2 — stakeholder, owner, promise date and source
+ */
+@media
+  (min-width: 701px)
+  and
+  (max-width: 780px) {
+
+  .commitmentRow {
+    grid-template-columns:
+      minmax(0, 1.25fr)
+      minmax(0, 1fr)
+      minmax(90px, 0.75fr)
+      minmax(90px, 0.75fr) !important;
+
+    grid-template-areas:
+      "commitment commitment health health"
+      "stakeholder owner due source" !important;
+
+    column-gap:
+      10px !important;
+    row-gap:
+      7px !important;
+
+    padding:
+      10px
+      12px !important;
+  }
+
+  .commitmentRow td {
+    align-self:
+      center !important;
+  }
+
+  .commitmentRow td:nth-child(1) {
+    align-self:
+      start !important;
+  }
+
+  .commitmentRow td:nth-child(5) {
+    justify-self:
+      end !important;
+
+    text-align:
+      right !important;
+  }
+
+  .commitmentRow td:nth-child(n+2)::before {
+    margin-bottom:
+      2px !important;
+
+    font-size:
+      0.48rem !important;
+    line-height:
+      1.1 !important;
+  }
+
+  .commitmentName strong {
+    font-size:
+      0.7rem !important;
+
+    -webkit-line-clamp:
+      1 !important;
+  }
+
+  .commitmentName span {
+    margin-top:
+      3px !important;
+
+    font-size:
+      0.59rem !important;
+    line-height:
+      1.2 !important;
+
+    white-space:
+      nowrap !important;
+  }
+
+  .stakeholder,
+  .source {
+    display:
+      -webkit-box !important;
+
+    overflow:
+      hidden !important;
+
+    font-size:
+      0.58rem !important;
+    line-height:
+      1.2 !important;
+
+    -webkit-box-orient:
+      vertical !important;
+    -webkit-line-clamp:
+      1 !important;
+  }
+
+  .owner {
+    gap:
+      5px !important;
+  }
+
+  .owner > span {
+    width:
+      23px !important;
+    height:
+      23px !important;
+    min-width:
+      23px !important;
+
+    font-size:
+      0.48rem !important;
+  }
+
+  .owner strong {
+    max-width:
+      118px !important;
+
+    font-size:
+      0.57rem !important;
+  }
+
+  .dueDate strong {
+    font-size:
+      0.58rem !important;
+  }
+
+  .dueDate small {
+    margin-top:
+      1px !important;
+
+    font-size:
+      0.51rem !important;
+  }
+
+  .healthBadge {
+    min-height:
+      23px !important;
+
+    padding:
+      0
+      7px !important;
+
+    font-size:
+      0.52rem !important;
+  }
+}
+
+/* CAMPAIGN SEAT COMMITMENTS COMPACT TABLET CARDS — END */
+
+/* CAMPAIGN SEAT COMMITMENTS 1241-1350 BRIDGE — START */
+
+/*
+ * Fill the breakpoint gap between the approved 901–1240
+ * landscape layout and the full wide-desktop layout.
+ *
+ * Keep the heading left-aligned and give the action controls
+ * the complete available width beside the desktop sidebar.
+ */
+@media
+  (min-width: 1241px)
+  and
+  (max-width: 1350px) {
+
+  .page {
+    padding:
+      20px
+      22px
+      30px !important;
+  }
+
+  .pageHeader {
+    display:
+      flex !important;
+
+    width:
+      100% !important;
+    max-width:
+      none !important;
+
+    flex-direction:
+      column !important;
+
+    align-items:
+      stretch !important;
+    justify-content:
+      flex-start !important;
+
+    gap:
+      14px !important;
+
+    margin:
+      0
+      0
+      14px !important;
+
+    padding:
+      0 !important;
+  }
+
+  .pageHeader > :first-child {
+    width:
+      100% !important;
+    max-width:
+      none !important;
+
+    align-self:
+      stretch !important;
+
+    margin:
+      0 !important;
+
+    padding:
+      0 !important;
+
+    text-align:
+      left !important;
+  }
+
+  .pageHeader .eyebrow,
+  .pageHeader h1,
+  .pageHeader p,
+  .pageHeader .updated {
+    margin-right:
+      0 !important;
+    margin-left:
+      0 !important;
+
+    text-align:
+      left !important;
+  }
+
+  .pageHeader h1 {
+    font-size:
+      clamp(
+        40px,
+        3.25vw,
+        46px
+      ) !important;
+  }
+
+  .pageHeader p {
+    max-width:
+      780px !important;
+  }
+
+  .headerActions {
+    box-sizing:
+      border-box !important;
+
+    display:
+      grid !important;
+
+    width:
+      100% !important;
+    min-width:
+      0 !important;
+    max-width:
+      none !important;
+
+    grid-template-columns:
+      minmax(0, 1fr)
+      auto
+      auto !important;
+
+    align-items:
+      center !important;
+    align-self:
+      stretch !important;
+
+    justify-content:
+      stretch !important;
+
+    gap:
+      9px !important;
+
+    margin:
+      0 !important;
+  }
+
+  .searchBox {
+    box-sizing:
+      border-box !important;
+
+    width:
+      100% !important;
+    min-width:
+      0 !important;
+    max-width:
+      none !important;
+
+    flex:
+      none !important;
+  }
+
+  .secondaryButton,
+  .primaryButton {
+    min-height:
+      42px !important;
+  }
+
+  .summaryGrid {
+    grid-template-columns:
+      repeat(
+        5,
+        minmax(0, 1fr)
+      ) !important;
+
+    gap:
+      9px !important;
+
+    margin-bottom:
+      14px !important;
+  }
+
+  .summaryCard {
+    min-width:
+      0 !important;
+  }
+
+  .commitmentsWorkspace,
+  .commitmentPanel {
+    width:
+      100% !important;
+    min-width:
+      0 !important;
+  }
+}
+
+/* CAMPAIGN SEAT COMMITMENTS 1241-1350 BRIDGE — END */
+
+/* CAMPAIGN SEAT COMMITMENTS 851-900 BRIDGE — START */
+
+/*
+ * At 851px, the compact desktop rule begins while the
+ * max-900px tablet rule is still active. Reassert one
+ * consistent left-aligned tablet architecture.
+ */
+@media
+  (min-width: 851px)
+  and
+  (max-width: 900px) {
+
+  .page {
+    padding:
+      18px
+      16px
+      28px !important;
+  }
+
+  .pageHeader {
+    box-sizing:
+      border-box !important;
+
+    display:
+      flex !important;
+
+    width:
+      100% !important;
+    max-width:
+      none !important;
+
+    flex-direction:
+      column !important;
+
+    align-items:
+      stretch !important;
+    justify-content:
+      flex-start !important;
+
+    gap:
+      14px !important;
+
+    margin:
+      0
+      0
+      14px !important;
+
+    padding:
+      0 !important;
+  }
+
+  .pageHeader > :first-child {
+    width:
+      100% !important;
+    max-width:
+      none !important;
+
+    align-self:
+      stretch !important;
+
+    margin:
+      0 !important;
+
+    padding:
+      0 !important;
+
+    text-align:
+      left !important;
+  }
+
+  .pageHeader .eyebrow,
+  .pageHeader h1,
+  .pageHeader p,
+  .pageHeader .updated {
+    margin-right:
+      0 !important;
+    margin-left:
+      0 !important;
+
+    text-align:
+      left !important;
+  }
+
+  .pageHeader h1 {
+    font-size:
+      clamp(
+        36px,
+        5vw,
+        42px
+      ) !important;
+
+    line-height:
+      1 !important;
+  }
+
+  .pageHeader p {
+    max-width:
+      760px !important;
+
+    margin-top:
+      9px !important;
+  }
+
+  .headerActions {
+    box-sizing:
+      border-box !important;
+
+    display:
+      grid !important;
+
+    width:
+      100% !important;
+    min-width:
+      0 !important;
+    max-width:
+      none !important;
+
+    grid-template-columns:
+      repeat(
+        2,
+        minmax(0, 1fr)
+      ) !important;
+
+    gap:
+      9px !important;
+
+    align-self:
+      stretch !important;
+    justify-content:
+      stretch !important;
+
+    margin:
+      0 !important;
+  }
+
+  .searchBox {
+    box-sizing:
+      border-box !important;
+
+    width:
+      100% !important;
+    min-width:
+      0 !important;
+    max-width:
+      none !important;
+
+    grid-column:
+      1 / -1 !important;
+
+    flex:
+      none !important;
+  }
+
+  .secondaryButton,
+  .primaryButton {
+    box-sizing:
+      border-box !important;
+
+    width:
+      100% !important;
+    min-width:
+      0 !important;
+    min-height:
+      44px !important;
+
+    padding-right:
+      12px !important;
+    padding-left:
+      12px !important;
+  }
+
+  .summaryGrid {
+    grid-template-columns:
+      repeat(
+        2,
+        minmax(0, 1fr)
+      ) !important;
+
+    gap:
+      10px !important;
+
+    margin-bottom:
+      14px !important;
+  }
+
+  .summaryCard:last-child {
+    grid-column:
+      1 / -1 !important;
+  }
+
+  .commitmentsWorkspace,
+  .commitmentPanel {
+    box-sizing:
+      border-box !important;
+
+    width:
+      100% !important;
+    min-width:
+      0 !important;
+  }
+}
+
+/* CAMPAIGN SEAT COMMITMENTS 851-900 BRIDGE — END */

@@ -1,0 +1,64 @@
+.page {
+  display: grid;
+  min-height: 100vh;
+  padding: 28px;
+  place-items: center;
+  background:
+    #f4f6f8;
+}
+
+.card {
+  width: min(520px, 100%);
+  padding: 38px 34px;
+  border: 1px solid rgba(15, 23, 42, 0.09);
+  border-radius: 20px;
+  background: #fff;
+  box-shadow:
+    0 24px 70px rgba(15, 23, 42, 0.08);
+  text-align: center;
+}
+
+.card span {
+  display: block;
+  margin-top: 18px;
+  font-size: 0.76rem;
+  font-weight: 850;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.card h1 {
+  margin: 8px 0 0;
+  font-size: 1.35rem;
+}
+
+.card p {
+  margin: 10px auto 0;
+  color: rgba(15, 23, 42, 0.62);
+  line-height: 1.55;
+}
+
+.card button {
+  margin-top: 22px;
+  min-height: 42px;
+  padding: 0 16px;
+  border: 0;
+  border-radius: 11px;
+  background: #0f172a;
+  color: #fff;
+  font: inherit;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.spinner {
+  animation:
+    callback-spin 0.8s
+    linear infinite;
+}
+
+@keyframes callback-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

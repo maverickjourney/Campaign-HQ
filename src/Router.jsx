@@ -9,7 +9,9 @@ import ProtectedRoute from "./components/auth/ProtectedRoute/ProtectedRoute";
 import Calendar from "./pages/Calendar/Calendar";
 import RoleDashboard from "./pages/RoleDashboard/RoleDashboard";
 import ApprovalsReferencePreview from "./pages/ApprovalsReferencePreview/ApprovalsReferencePreview";
-import Communications from "./pages/Communications/Communications";
+import VolunteersReferencePreview from "./pages/VolunteersReferencePreview/VolunteersReferencePreview";
+import CampaignToolComingSoon from "./pages/CampaignToolComingSoon/CampaignToolComingSoon";
+import InboxReferencePreview from "./pages/InboxReferencePreview/InboxReferencePreview";
 import ContactsReferencePreview from "./pages/ContactsReferencePreview/ContactsReferencePreview";
 import DocumentsReferencePreview from "./pages/DocumentsReferencePreview/DocumentsReferencePreview";
 import VolunteerFieldAssignment from "./pages/VolunteerFieldAssignment/VolunteerFieldAssignment";
@@ -21,6 +23,8 @@ import MfaChallenge from "./pages/Mfa/MfaChallenge";
 import MfaSetup from "./pages/Mfa/MfaSetup";
 import InvitationAccept from "./pages/InvitationAccept/InvitationAccept";
 import ProfileSettings from "./pages/ProfileSettings/ProfileSettings";
+import NylasOAuthCallback from "./pages/NylasOAuthCallback/NylasOAuthCallback";
+import NylasCalendarOAuthCallback from "./pages/NylasCalendarOAuthCallback/NylasCalendarOAuthCallback";
 import Invitations from "./pages/Team/Invitations";
 import TeamAccess from "./pages/TeamAccess/TeamAccess";
 import TeamReferencePreview from "./pages/TeamReferencePreview/TeamReferencePreview";
@@ -28,6 +32,8 @@ import RoleTasks from "./pages/RoleTasks/RoleTasks";
 import CommitmentsReferencePreview from "./pages/CommitmentsReferencePreview/CommitmentsReferencePreview";
 import WaitingOnReferencePreview from "./pages/WaitingOnReferencePreview/WaitingOnReferencePreview";
 import WorkspaceSettings from "./pages/WorkspaceSettings/WorkspaceSettings";
+import CandidateProfileManagement from "./pages/CandidateProfileManagement/CandidateProfileManagement";
+import CampaignSetupWizard from "./pages/CampaignSetupWizard/CampaignSetupWizard";
 import WorkspaceSelector from "./pages/WorkspaceSelector/WorkspaceSelector";
 import Support from "./pages/Support/Support";
 import SupportLauncher from "./components/SupportLauncher/SupportLauncher";
@@ -182,10 +188,64 @@ export default function Router() {
         />
 
         <Route
-          path="/communications"
+          path="/inbox"
           element={
             <ProtectedRoute allowedExperiences={LEADERSHIP_EXPERIENCES}>
-              <Communications />
+              <InboxReferencePreview />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/volunteers"
+          element={
+            <ProtectedRoute allowedExperiences={LEADERSHIP_EXPERIENCES}>
+              <VolunteersReferencePreview />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/fundraising"
+          element={
+            <ProtectedRoute allowedExperiences={LEADERSHIP_EXPERIENCES}>
+              <CampaignToolComingSoon toolKey="fundraising" />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/events"
+          element={
+            <ProtectedRoute allowedExperiences={LEADERSHIP_EXPERIENCES}>
+              <CampaignToolComingSoon toolKey="events" />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/social-media"
+          element={
+            <ProtectedRoute allowedExperiences={LEADERSHIP_EXPERIENCES}>
+              <CampaignToolComingSoon toolKey="social-media" />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/media-center"
+          element={
+            <ProtectedRoute allowedExperiences={LEADERSHIP_EXPERIENCES}>
+              <CampaignToolComingSoon toolKey="media-center" />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/reports-analytics"
+          element={
+            <ProtectedRoute allowedExperiences={LEADERSHIP_EXPERIENCES}>
+              <CampaignToolComingSoon toolKey="reports-analytics" />
             </ProtectedRoute>
           }
         />
@@ -263,10 +323,63 @@ export default function Router() {
         />
 
         <Route
+          path="/oauth/nylas/callback"
+          element={
+            <ProtectedRoute
+              allowedExperiences={
+                LEADERSHIP_EXPERIENCES
+              }
+            >
+              <NylasOAuthCallback />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/oauth/nylas/calendar/callback"
+          element={
+            <ProtectedRoute
+              allowedExperiences={
+                LEADERSHIP_EXPERIENCES
+              }
+            >
+              <NylasCalendarOAuthCallback />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
           path="/workspace/settings"
           element={
             <ProtectedRoute allowedExperiences={LEADERSHIP_EXPERIENCES}>
+              <ProfileSettings />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/workspace/candidate-profile"
+          element={
+            <ProtectedRoute allowedExperiences={LEADERSHIP_EXPERIENCES}>
+              <CandidateProfileManagement />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/workspace/campaign-settings"
+          element={
+            <ProtectedRoute allowedExperiences={LEADERSHIP_EXPERIENCES}>
               <WorkspaceSettings />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/workspace/setup"
+          element={
+            <ProtectedRoute allowedExperiences={LEADERSHIP_EXPERIENCES}>
+              <CampaignSetupWizard />
             </ProtectedRoute>
           }
         />

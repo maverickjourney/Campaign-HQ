@@ -521,3 +521,226 @@
     display: grid;
   }
 }
+
+/* ============================================================
+   CAMPAIGN SEAT — MULTI-METHOD TWO-STEP VERIFICATION
+   ============================================================ */
+
+.methodOverview {
+  display: grid;
+  grid-template-columns:
+    repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.methodCard {
+  display: grid;
+  grid-template-columns:
+    auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+  border: 1px solid #d9e3ee;
+  border-radius: 15px;
+  background: #f9fbfd;
+  padding: 14px;
+}
+
+.methodCardPending {
+  background: #fbfcfd;
+}
+
+.methodIcon {
+  display: grid;
+  width: 43px;
+  height: 43px;
+  place-items: center;
+  border-radius: 12px;
+  color: #326da8;
+  background: #edf4fc;
+}
+
+.methodCopy {
+  display: grid;
+  min-width: 0;
+  gap: 3px;
+}
+
+.methodCopy strong {
+  color: #203957;
+  font-size: 13px;
+}
+
+.methodCopy span {
+  color: #718197;
+  font-size: 11px;
+  line-height: 1.45;
+}
+
+.methodCopy small {
+  margin-top: 2px;
+  color: #536c87;
+  font-size: 10px;
+  font-weight: 750;
+}
+
+.methodStatus {
+  display: inline-flex;
+  min-height: 30px;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #d7e1eb;
+  border-radius: 999px;
+  background: #ffffff;
+  padding: 0 10px;
+  color: #728197;
+  font-size: 9px;
+  font-weight: 850;
+  white-space: nowrap;
+}
+
+.methodStatusActive {
+  border-color: #bfe2d2;
+  color: #1f7457;
+  background: #f0fbf6;
+}
+
+.methodAction {
+  grid-column: 2 / -1;
+  justify-self: start;
+  display: inline-flex;
+  min-height: 37px;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  border: 1px solid #326da8;
+  border-radius: 9px;
+  background: #326da8;
+  padding: 0 12px;
+  color: #ffffff;
+  font: inherit;
+  font-size: 10px;
+  font-weight: 850;
+  cursor: pointer;
+}
+
+.methodAction:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.phoneMethodActions {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns:
+    minmax(0, 1fr) auto;
+  gap: 8px;
+  margin-top: 2px;
+}
+
+.phoneInput {
+  display: flex;
+  min-height: 40px;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid #d4deea;
+  border-radius: 10px;
+  background: #ffffff;
+  padding: 0 11px;
+}
+
+.phoneInput svg {
+  flex: 0 0 auto;
+  color: #718197;
+}
+
+.phoneInput input {
+  min-width: 0;
+  flex: 1;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: #203957;
+  font: inherit;
+  font-size: 11px;
+}
+
+.phoneMethodActions > button {
+  display: inline-flex;
+  min-height: 40px;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  border: 1px solid #326da8;
+  border-radius: 10px;
+  background: #326da8;
+  padding: 0 12px;
+  color: #ffffff;
+  font: inherit;
+  font-size: 10px;
+  font-weight: 850;
+  cursor: pointer;
+}
+
+.phoneMethodActions > button:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.providerNotice {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  border: 1px solid #dfe6ee;
+  border-radius: 13px;
+  background: #f8fafc;
+  padding: 12px 13px;
+  color: #63738a;
+}
+
+.providerNotice > svg {
+  flex: 0 0 auto;
+  margin-top: 1px;
+  color: #326da8;
+}
+
+.providerNotice > div {
+  display: grid;
+  gap: 2px;
+}
+
+.providerNotice strong {
+  color: #314963;
+  font-size: 11px;
+}
+
+.providerNotice span {
+  font-size: 10px;
+  line-height: 1.5;
+}
+
+@media (max-width: 900px) {
+  .methodOverview {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 620px) {
+  .methodCard {
+    grid-template-columns:
+      auto minmax(0, 1fr);
+  }
+
+  .methodStatus {
+    grid-column: 2;
+    justify-self: start;
+  }
+
+  .methodAction {
+    grid-column: 1 / -1;
+  }
+
+  .phoneMethodActions {
+    grid-template-columns: 1fr;
+  }
+}

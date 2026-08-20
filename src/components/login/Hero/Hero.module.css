@@ -931,3 +931,582 @@
     font-size: 12px;
   }
 }
+
+/* CAMPAIGN SEAT PORTRAIT-TABLET FULL HERO — START */
+
+/*
+ * Restore the complete campaign story that the older narrow
+ * breakpoint intentionally hid.
+ */
+@media
+  (min-width: 701px)
+  and
+  (max-width: 900px)
+  and
+  (orientation: portrait) {
+
+  .hero {
+    box-sizing: border-box !important;
+
+    display: flex !important;
+    flex-direction: column !important;
+
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+
+    height: auto !important;
+    min-height: 100svh !important;
+    max-height: none !important;
+
+    padding:
+      34px
+      clamp(32px, 6vw, 52px)
+      40px !important;
+
+    overflow: hidden !important;
+
+    background-size: cover !important;
+  }
+
+  .header {
+    box-sizing: border-box !important;
+
+    display: grid !important;
+
+    grid-template-columns:
+      minmax(0, 1fr)
+      minmax(280px, 340px) !important;
+
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+
+    align-items: start !important;
+
+    gap: 24px !important;
+  }
+
+  .header > :first-child {
+    min-width: 0 !important;
+  }
+
+  .headerDetails {
+    box-sizing: border-box !important;
+
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 340px !important;
+
+    justify-self: end !important;
+  }
+
+  .headerTime,
+  .headerElections {
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+  }
+
+  .content {
+    width: min(100%, 660px) !important;
+    min-width: 0 !important;
+    max-width: 660px !important;
+
+    margin-top:
+      clamp(42px, 6svh, 68px) !important;
+  }
+
+  .content h1 {
+    font-size:
+      clamp(54px, 8vw, 72px) !important;
+
+    line-height: 0.98 !important;
+  }
+
+  .description {
+    display: block !important;
+
+    width: min(100%, 630px) !important;
+    max-width: 630px !important;
+
+    margin-top: 16px !important;
+  }
+
+  /*
+   * Support both the current and earlier overview class names.
+   */
+  .platformPulse,
+  .platformOverview {
+    display: block !important;
+
+    width: min(100%, 760px) !important;
+    max-width: 760px !important;
+
+    margin-top: 22px !important;
+  }
+
+  /*
+   * Support both the current and earlier feature-grid names.
+   */
+  .features,
+  .cards {
+    box-sizing: border-box !important;
+
+    display: grid !important;
+
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+
+    grid-template-columns:
+      repeat(
+        2,
+        minmax(0, 1fr)
+      ) !important;
+
+    gap: 12px !important;
+
+    margin-top: 22px !important;
+  }
+
+  .featureCard,
+  .card {
+    box-sizing: border-box !important;
+
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+
+    min-height: 98px !important;
+
+    padding:
+      14px
+      15px !important;
+  }
+
+  .featureCard h3,
+  .card h3,
+  .featureCard p,
+  .card p {
+    min-width: 0 !important;
+    max-width: 100% !important;
+  }
+}
+
+/* CAMPAIGN SEAT PORTRAIT-TABLET FULL HERO — END */
+
+/* CAMPAIGN SEAT MOBILE FULL HERO — START */
+
+@media (max-width: 700px) {
+
+  .hero {
+    box-sizing: border-box !important;
+
+    display: flex !important;
+    flex-direction: column !important;
+
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+
+    height: auto !important;
+    min-height: 100svh !important;
+    max-height: none !important;
+
+    padding:
+      24px
+      18px
+      30px !important;
+
+    overflow: hidden !important;
+
+    background-position: center center !important;
+    background-size: cover !important;
+  }
+
+  /*
+   * Brand first, campaign status beneath it.
+   */
+  .header {
+    box-sizing: border-box !important;
+
+    display: grid !important;
+
+    grid-template-columns:
+      minmax(0, 1fr) !important;
+
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+
+    gap: 18px !important;
+  }
+
+  .header > :first-child {
+    min-width: 0 !important;
+    max-width: 100% !important;
+  }
+
+  .headerDetails {
+    box-sizing: border-box !important;
+
+    display: grid !important;
+
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+
+    justify-self: stretch !important;
+
+    gap: 8px !important;
+  }
+
+  .headerTime {
+    display: grid !important;
+
+    grid-template-columns:
+      repeat(
+        2,
+        minmax(0, 1fr)
+      ) !important;
+
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+
+    gap: 7px !important;
+  }
+
+  .headerElections {
+    display: grid !important;
+
+    grid-template-columns:
+      minmax(0, 1fr) !important;
+
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+
+    gap: 7px !important;
+  }
+
+  .content {
+    box-sizing: border-box !important;
+
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+
+    margin-top: 38px !important;
+  }
+
+  .content h1 {
+    font-size:
+      clamp(
+        42px,
+        12vw,
+        58px
+      ) !important;
+
+    line-height: 0.98 !important;
+  }
+
+  .description {
+    display: block !important;
+
+    width: 100% !important;
+    max-width: 100% !important;
+
+    margin-top: 14px !important;
+
+    font-size: 14px !important;
+    line-height: 1.52 !important;
+  }
+
+  /*
+   * Restore the campaign overview panel.
+   */
+  .platformPulse,
+  .platformOverview {
+    display: block !important;
+
+    box-sizing: border-box !important;
+
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+
+    margin-top: 20px !important;
+  }
+
+  /*
+   * Use one readable feature card per row on phones.
+   */
+  .features,
+  .cards {
+    box-sizing: border-box !important;
+
+    display: grid !important;
+
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+
+    grid-template-columns:
+      minmax(0, 1fr) !important;
+
+    gap: 10px !important;
+
+    margin-top: 18px !important;
+  }
+
+  .featureCard,
+  .card {
+    box-sizing: border-box !important;
+
+    display: block !important;
+
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+
+    min-height: 92px !important;
+
+    padding:
+      14px
+      15px !important;
+
+    border-radius: 16px !important;
+  }
+
+  .featureCard h3,
+  .card h3,
+  .featureCard p,
+  .card p {
+    min-width: 0 !important;
+    max-width: 100% !important;
+  }
+}
+
+@media (max-width: 430px) {
+
+  .hero {
+    padding:
+      22px
+      14px
+      28px !important;
+  }
+
+  .headerTime {
+    grid-template-columns:
+      minmax(0, 1fr) !important;
+  }
+
+  .content {
+    margin-top: 32px !important;
+  }
+
+  .content h1 {
+    font-size:
+      clamp(
+        39px,
+        11vw,
+        50px
+      ) !important;
+  }
+}
+
+/* CAMPAIGN SEAT MOBILE FULL HERO — END */
+
+
+/* ============================================================
+   CAMPAIGN SEAT — FINAL SHORT DESKTOP HERO FIT
+   Prevents the 900px Hero from being cropped inside a shorter
+   viewport. Applies to login + MFA shared Hero.
+   ============================================================ */
+
+@media
+  (min-width: 1051px)
+  and
+  (max-height: 820px) {
+
+  .hero {
+    height: 100% !important;
+    min-height: 100% !important;
+    max-height: 100% !important;
+
+    padding:
+      16px
+      clamp(24px, 2.6vw, 38px)
+      14px !important;
+
+    overflow: hidden !important;
+  }
+
+  .header {
+    min-height: 0 !important;
+    gap: 14px !important;
+  }
+
+  .brand {
+    font-size:
+      clamp(
+        36px,
+        2.8vw,
+        46px
+      ) !important;
+  }
+
+  .platform {
+    margin-top: 6px !important;
+    font-size: 10px !important;
+  }
+
+  .headerDetails {
+    width: 340px !important;
+    gap: 4px !important;
+  }
+
+  .headerTime {
+    gap: 5px !important;
+  }
+
+  .headerTime > div {
+    min-height: 24px !important;
+    padding:
+      3px
+      8px !important;
+  }
+
+  .headerDetails .security {
+    margin-bottom: 0 !important;
+    padding:
+      6px
+      9px !important;
+  }
+
+  .headerElections {
+    gap: 4px !important;
+    margin-top: 0 !important;
+  }
+
+  .headerElections article {
+    min-height: 41px !important;
+
+    padding:
+      4px
+      8px !important;
+  }
+
+  .headerElections .dateIcon {
+    width: 25px !important;
+    height: 25px !important;
+  }
+
+  .headerElections .countdown strong {
+    font-size: 14px !important;
+  }
+
+  .content {
+    margin-top: 10px !important;
+  }
+
+  .content h1 {
+    font-size:
+      clamp(
+        40px,
+        3.7vw,
+        56px
+      ) !important;
+
+    line-height: 0.92 !important;
+  }
+
+  .description {
+    margin-top: 10px !important;
+
+    font-size: 13px !important;
+    line-height: 1.42 !important;
+  }
+
+  .overview {
+    margin-top: 10px !important;
+
+    padding:
+      10px
+      12px !important;
+  }
+
+  .overviewHeader {
+    padding-bottom: 7px !important;
+  }
+
+  .overviewBody {
+    gap: 9px !important;
+    padding-top: 8px !important;
+  }
+
+  .overviewIcon {
+    width: 34px !important;
+    height: 34px !important;
+  }
+
+  .overviewBody strong {
+    font-size: 13px !important;
+  }
+
+  .overviewBody p {
+    font-size: 10.5px !important;
+    line-height: 1.32 !important;
+  }
+
+  .dots {
+    margin-top: 8px !important;
+  }
+
+  .features {
+    grid-template-columns:
+      repeat(
+        2,
+        minmax(0, 1fr)
+      ) !important;
+
+    gap: 7px !important;
+
+    margin-top: auto !important;
+    padding-top: 9px !important;
+  }
+
+  .featureCard {
+    min-height: 76px !important;
+
+    padding:
+      9px
+      11px !important;
+
+    border-radius: 13px !important;
+  }
+
+  .featureIcon {
+    width: 27px !important;
+    height: 27px !important;
+  }
+
+  .featureCard h3 {
+    margin-top: 6px !important;
+    font-size: 12px !important;
+  }
+
+  .featureCard p {
+    margin-top: 2px !important;
+
+    font-size: 9.5px !important;
+    line-height: 1.3 !important;
+  }
+
+  .check {
+    top: 10px !important;
+    right: 10px !important;
+  }
+}

@@ -9,7 +9,9 @@ import {
   Clipboard,
   KeyRound,
   LoaderCircle,
+  LockKeyhole,
   LogOut,
+  MessageSquareText,
   QrCode,
   ShieldCheck,
   Smartphone,
@@ -21,16 +23,22 @@ import {
   useNavigate,
 } from "react-router-dom";
 
-import LoginLayout from "../../layouts/LoginLayout/LoginLayout";
+import LoginLayout
+  from "../../layouts/LoginLayout/LoginLayout";
 
 import {
   restoreCampaignSession,
 } from "../../services/auth";
 
 import {
+  PHONE_MFA_ENABLED,
+  beginPhoneEnrollment,
   beginTotpEnrollment,
+  cancelPhoneEnrollment,
   cancelTotpEnrollment,
+  challengePhoneFactor,
   getMfaState,
+  verifyPhoneFactor,
   verifyTotpFactor,
 } from "../../services/mfa";
 
@@ -38,7 +46,9 @@ import {
   clearCampaignSession,
 } from "../../utils/campaignSession";
 
-import { supabase } from "../../lib/supabase";
+import {
+  supabase,
+} from "../../lib/supabase";
 
 import styles from "./Mfa.module.css";
 
@@ -53,12 +63,35 @@ export default function MfaSetup() {
     location.state?.from ||
     "/workspaces";
 
+  const visualPreview =
+    import.meta.env.DEV &&
+    new URLSearchParams(
+      window.location.search,
+    ).get(
+      "preview",
+    ) ===
+      "methods";
+
   const [
     status,
     setStatus,
   ] = useState(
     "checking",
   );
+
+  const [
+    method,
+    setMethod,
+  ] = useState(
+    PHONE_MFA_ENABLED
+      ? "phone"
+      : "totp",
+  );
+
+  const [
+    phone,
+    setPhone,
+  ] = useState("");
 
   const [
     enrollment,
@@ -83,6 +116,16 @@ export default function MfaSetup() {
   useEffect(() => {
     let active = true;
 
+    if (visualPreview) {
+      setStatus(
+        "ready",
+      );
+
+      return () => {
+        active = false;
+      };
+    }
+
     const initialize =
       async () => {
         const {
@@ -93,9 +136,7 @@ export default function MfaSetup() {
           await supabase.auth
             .getUser();
 
-        if (
-          !active
-        ) {
+        if (!active) {
           return;
         }
 
@@ -103,8 +144,7 @@ export default function MfaSetup() {
           navigate(
             "/",
             {
-              replace:
-                true,
+              replace: true,
             },
           );
 
@@ -116,16 +156,14 @@ export default function MfaSetup() {
             await getMfaState();
 
           if (
-            mfaState
-              .isAal2
+            mfaState.isAal2
           ) {
             await restoreCampaignSession();
 
             navigate(
               destination,
               {
-                replace:
-                  true,
+                replace: true,
               },
             );
 
@@ -140,9 +178,7 @@ export default function MfaSetup() {
             navigate(
               "/mfa/challenge",
               {
-                replace:
-                  true,
-
+                replace: true,
                 state: {
                   from:
                     destination,
@@ -166,12 +202,12 @@ export default function MfaSetup() {
           setErrorMessage(
             error instanceof Error
               ? error.message
-              : "Campaign Seat could not load authenticator setup.",
+              : "Campaign Seat could not prepare two-step verification.",
           );
         }
       };
 
-    initialize();
+    void initialize();
 
     return () => {
       active = false;
@@ -179,7 +215,29 @@ export default function MfaSetup() {
   }, [
     destination,
     navigate,
+    visualPreview,
   ]);
+
+  const chooseMethod =
+    (nextMethod) => {
+      if (
+        nextMethod === "phone" &&
+        !PHONE_MFA_ENABLED
+      ) {
+        return;
+      }
+
+      setMethod(
+        nextMethod,
+      );
+
+      setEnrollment(
+        null,
+      );
+
+      setCode("");
+      setErrorMessage("");
+    };
 
   const startEnrollment =
     async () => {
@@ -187,11 +245,28 @@ export default function MfaSetup() {
         "starting",
       );
 
-      setErrorMessage(
-        "",
-      );
+      setErrorMessage("");
 
       try {
+        if (
+          method === "phone"
+        ) {
+          const result =
+            await beginPhoneEnrollment({
+              phone,
+            });
+
+          setEnrollment(
+            result,
+          );
+
+          setStatus(
+            "enrolling",
+          );
+
+          return;
+        }
+
         const result =
           await beginTotpEnrollment();
 
@@ -212,7 +287,7 @@ export default function MfaSetup() {
         setErrorMessage(
           error instanceof Error
             ? error.message
-            : "Authenticator setup could not begin.",
+            : "Two-step verification setup could not begin.",
         );
       }
     };
@@ -227,18 +302,32 @@ export default function MfaSetup() {
         "verifying",
       );
 
-      setErrorMessage(
-        "",
-      );
+      setErrorMessage("");
 
       try {
-        await verifyTotpFactor({
-          factorId:
-            enrollment
-              ?.factorId,
+        if (
+          method === "phone"
+        ) {
+          await verifyPhoneFactor({
+            factorId:
+              enrollment
+                ?.factorId,
 
-          code,
-        });
+            challengeId:
+              enrollment
+                ?.challengeId,
+
+            code,
+          });
+        } else {
+          await verifyTotpFactor({
+            factorId:
+              enrollment
+                ?.factorId,
+
+            code,
+          });
+        }
 
         await restoreCampaignSession();
 
@@ -251,8 +340,7 @@ export default function MfaSetup() {
             navigate(
               destination,
               {
-                replace:
-                  true,
+                replace: true,
               },
             );
           },
@@ -268,7 +356,59 @@ export default function MfaSetup() {
         setErrorMessage(
           error instanceof Error
             ? error.message
-            : "The authenticator code could not be verified.",
+            : "The security code could not be verified.",
+        );
+      }
+    };
+
+  const resendPhoneCode =
+    async () => {
+      if (
+        !enrollment
+          ?.factorId
+      ) {
+        return;
+      }
+
+      setStatus(
+        "starting",
+      );
+
+      setErrorMessage("");
+
+      try {
+        const challenge =
+          await challengePhoneFactor({
+            factorId:
+              enrollment
+                .factorId,
+          });
+
+        setEnrollment(
+          (current) => ({
+            ...current,
+            challengeId:
+              challenge
+                .challengeId,
+          }),
+        );
+
+        setCode("");
+
+        setStatus(
+          "enrolling",
+        );
+      } catch (
+        error
+      ) {
+        setStatus(
+          "enrolling",
+        );
+
+        setErrorMessage(
+          error instanceof Error
+            ? error.message
+            : "Campaign Seat could not resend the verification text.",
         );
       }
     };
@@ -276,10 +416,19 @@ export default function MfaSetup() {
   const cancelEnrollment =
     async () => {
       try {
-        await cancelTotpEnrollment(
-          enrollment
-            ?.factorId,
-        );
+        if (
+          method === "phone"
+        ) {
+          await cancelPhoneEnrollment(
+            enrollment
+              ?.factorId,
+          );
+        } else {
+          await cancelTotpEnrollment(
+            enrollment
+              ?.factorId,
+          );
+        }
       } catch (
         error
       ) {
@@ -298,9 +447,7 @@ export default function MfaSetup() {
         "ready",
       );
 
-      setErrorMessage(
-        "",
-      );
+      setErrorMessage("");
     };
 
   const copySecret =
@@ -319,15 +466,11 @@ export default function MfaSetup() {
             .secret,
         );
 
-      setCopied(
-        true,
-      );
+      setCopied(true);
 
       window.setTimeout(
         () =>
-          setCopied(
-            false,
-          ),
+          setCopied(false),
         1600,
       );
     };
@@ -339,11 +482,13 @@ export default function MfaSetup() {
       navigate(
         "/",
         {
-          replace:
-            true,
+          replace: true,
         },
       );
     };
+
+  const phoneEnrollment =
+    method === "phone";
 
   return (
     <LoginLayout>
@@ -383,9 +528,9 @@ export default function MfaSetup() {
               </strong>
 
               <span>
-                Add an authenticator app
-                before opening sensitive
-                campaign tools.
+                Two-step verification protects
+                sensitive campaign operations
+                after your password.
               </span>
             </div>
           </div>
@@ -415,13 +560,12 @@ export default function MfaSetup() {
               </span>
 
               <h1>
-                Preparing authenticator
+                Preparing verification
               </h1>
 
               <p>
-                Campaign Seat is checking
-                the current account and
-                security factors.
+                Campaign Seat is preparing
+                your secure account.
               </p>
             </div>
           ) : status ===
@@ -450,222 +594,404 @@ export default function MfaSetup() {
               </span>
 
               <h1>
-                Authenticator confirmed
+                Security confirmed
               </h1>
 
               <p>
-                This account now has
-                two-step verification.
-                Opening Campaign Seat…
+                Two-step verification is
+                active. Opening Campaign
+                Seat…
               </p>
             </div>
           ) : status ===
-            "enrolling" ||
-          status ===
-            "verifying" ? (
-            <>
-              <div
-                className={
-                  styles.heading
-                }
-              >
-                <span
+              "enrolling" ||
+            status ===
+              "verifying" ? (
+            phoneEnrollment ? (
+              <>
+                <div
                   className={
-                    styles.eyebrow
+                    styles.challengeIcon
                   }
                 >
-                  Authenticator setup
-                </span>
-
-                <h1>
-                  Scan the QR code
-                </h1>
-
-                <p>
-                  Open Google Authenticator,
-                  Microsoft Authenticator,
-                  Authy, 1Password, or your
-                  phone’s password manager.
-                </p>
-              </div>
-
-              <div
-                className={
-                  styles.qrPanel
-                }
-              >
-                {enrollment
-                  ?.qrCode ? (
-                  <img
-                    src={
-                      enrollment
-                        .qrCode
-                    }
-                    alt="Campaign Seat authenticator QR code"
+                  <MessageSquareText
+                    size={30}
                   />
-                ) : (
-                  <QrCode
-                    size={84}
-                  />
-                )}
+                </div>
 
-                <div>
-                  <strong>
-                    Cannot scan it?
-                  </strong>
-
-                  <span>
-                    Enter this setup key
-                    manually:
-                  </span>
-
-                  <code>
-                    {
-                      enrollment
-                        ?.secret
-                    }
-                  </code>
-
-                  <button
-                    type="button"
-                    onClick={
-                      copySecret
+                <div
+                  className={
+                    styles.heading
+                  }
+                >
+                  <span
+                    className={
+                      styles.eyebrow
                     }
                   >
-                    <Clipboard
-                      size={15}
-                    />
-
-                    {copied
-                      ? "Copied"
-                      : "Copy setup key"}
-                  </button>
-                </div>
-              </div>
-
-              <form
-                className={
-                  styles.form
-                }
-                onSubmit={
-                  verifyEnrollment
-                }
-              >
-                <label>
-                  <span>
-                    Six-digit authenticator
-                    code
+                    Text message verification
                   </span>
+
+                  <h1>
+                    Enter the code we texted
+                    you
+                  </h1>
+
+                  <p>
+                    Campaign Seat sent a
+                    six-digit security code
+                    to{" "}
+                    <strong>
+                      {enrollment
+                        ?.maskedPhone ||
+                        "your phone"}
+                    </strong>
+                    .
+                  </p>
+                </div>
+
+                <form
+                  className={
+                    styles.form
+                  }
+                  onSubmit={
+                    verifyEnrollment
+                  }
+                >
+                  <label>
+                    <span>
+                      Security code
+                    </span>
+
+                    <div
+                      className={
+                        styles.codeInput
+                      }
+                    >
+                      <KeyRound
+                        size={19}
+                      />
+
+                      <input
+                        type="text"
+                        inputMode="numeric"
+                        autoComplete="one-time-code"
+                        value={
+                          code
+                        }
+                        onChange={(
+                          event,
+                        ) => {
+                          setCode(
+                            event.target
+                              .value
+                              .replace(
+                                /\D/g,
+                                "",
+                              )
+                              .slice(
+                                0,
+                                6,
+                              ),
+                          );
+
+                          setErrorMessage(
+                            "",
+                          );
+                        }}
+                        placeholder="000000"
+                        maxLength={6}
+                        autoFocus
+                        disabled={
+                          status ===
+                          "verifying"
+                        }
+                        required
+                      />
+                    </div>
+                  </label>
+
+                  {errorMessage && (
+                    <p
+                      className={
+                        styles.errorMessage
+                      }
+                      role="alert"
+                    >
+                      {errorMessage}
+                    </p>
+                  )}
+
+                  <button
+                    className={
+                      styles.primaryButton
+                    }
+                    type="submit"
+                    disabled={
+                      status ===
+                        "verifying" ||
+                      code.length !==
+                        6
+                    }
+                  >
+                    {status ===
+                    "verifying" ? (
+                      <>
+                        <LoaderCircle
+                          className={
+                            styles.buttonSpinner
+                          }
+                          size={18}
+                        />
+                        Verifying code…
+                      </>
+                    ) : (
+                      <>
+                        <ShieldCheck
+                          size={18}
+                        />
+                        Verify and continue
+                      </>
+                    )}
+                  </button>
 
                   <div
                     className={
-                      styles.codeInput
+                      styles.inlineActions
                     }
                   >
-                    <KeyRound
-                      size={19}
-                    />
-
-                    <input
-                      type="text"
-                      inputMode="numeric"
-                      autoComplete="one-time-code"
-                      value={
-                        code
+                    <button
+                      type="button"
+                      onClick={
+                        resendPhoneCode
                       }
-                      onChange={(
-                        event,
-                      ) => {
-                        setCode(
-                          event.target
-                            .value
-                            .replace(
-                              /\D/g,
-                              "",
-                            )
-                            .slice(
-                              0,
-                              6,
-                            ),
-                        );
-
-                        setErrorMessage(
-                          "",
-                        );
-                      }}
-                      placeholder="000000"
-                      maxLength={6}
-                      autoFocus
                       disabled={
                         status ===
                         "verifying"
                       }
-                      required
-                    />
+                    >
+                      Send another code
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={
+                        cancelEnrollment
+                      }
+                      disabled={
+                        status ===
+                        "verifying"
+                      }
+                    >
+                      Use another method
+                    </button>
                   </div>
-                </label>
-
-                {errorMessage && (
-                  <p
+                </form>
+              </>
+            ) : (
+              <>
+                <div
+                  className={
+                    styles.heading
+                  }
+                >
+                  <span
                     className={
-                      styles.errorMessage
+                      styles.eyebrow
                     }
-                    role="alert"
                   >
-                    {errorMessage}
+                    Authenticator setup
+                  </span>
+
+                  <h1>
+                    Scan the QR code
+                  </h1>
+
+                  <p>
+                    Open Google Authenticator,
+                    Microsoft Authenticator,
+                    Authy, 1Password, or your
+                    phone&apos;s password
+                    manager.
                   </p>
-                )}
+                </div>
 
-                <button
+                <div
                   className={
-                    styles.primaryButton
-                  }
-                  type="submit"
-                  disabled={
-                    status ===
-                      "verifying" ||
-                    code.length !==
-                      6
+                    styles.qrPanel
                   }
                 >
-                  {status ===
-                  "verifying" ? (
-                    <>
-                      <LoaderCircle
-                        className={
-                          styles.buttonSpinner
-                        }
-                        size={18}
-                      />
-                      Verifying code…
-                    </>
+                  {enrollment
+                    ?.qrCode ? (
+                    <img
+                      src={
+                        enrollment
+                          .qrCode
+                      }
+                      alt="Campaign Seat authenticator QR code"
+                    />
                   ) : (
-                    <>
-                      <ShieldCheck
-                        size={18}
-                      />
-                      Enable authenticator
-                    </>
+                    <QrCode
+                      size={84}
+                    />
                   )}
-                </button>
 
-                <button
+                  <div>
+                    <strong>
+                      Cannot scan it?
+                    </strong>
+
+                    <span>
+                      Enter this setup key
+                      manually:
+                    </span>
+
+                    <code>
+                      {enrollment
+                        ?.secret}
+                    </code>
+
+                    <button
+                      type="button"
+                      onClick={
+                        copySecret
+                      }
+                    >
+                      <Clipboard
+                        size={15}
+                      />
+
+                      {copied
+                        ? "Copied"
+                        : "Copy setup key"}
+                    </button>
+                  </div>
+                </div>
+
+                <form
                   className={
-                    styles.secondaryButton
+                    styles.form
                   }
-                  type="button"
-                  onClick={
-                    cancelEnrollment
-                  }
-                  disabled={
-                    status ===
-                    "verifying"
+                  onSubmit={
+                    verifyEnrollment
                   }
                 >
-                  Cancel setup
-                </button>
-              </form>
-            </>
+                  <label>
+                    <span>
+                      Six-digit authenticator
+                      code
+                    </span>
+
+                    <div
+                      className={
+                        styles.codeInput
+                      }
+                    >
+                      <KeyRound
+                        size={19}
+                      />
+
+                      <input
+                        type="text"
+                        inputMode="numeric"
+                        autoComplete="one-time-code"
+                        value={
+                          code
+                        }
+                        onChange={(
+                          event,
+                        ) => {
+                          setCode(
+                            event.target
+                              .value
+                              .replace(
+                                /\D/g,
+                                "",
+                              )
+                              .slice(
+                                0,
+                                6,
+                              ),
+                          );
+
+                          setErrorMessage(
+                            "",
+                          );
+                        }}
+                        placeholder="000000"
+                        maxLength={6}
+                        autoFocus
+                        disabled={
+                          status ===
+                          "verifying"
+                        }
+                        required
+                      />
+                    </div>
+                  </label>
+
+                  {errorMessage && (
+                    <p
+                      className={
+                        styles.errorMessage
+                      }
+                      role="alert"
+                    >
+                      {errorMessage}
+                    </p>
+                  )}
+
+                  <button
+                    className={
+                      styles.primaryButton
+                    }
+                    type="submit"
+                    disabled={
+                      status ===
+                        "verifying" ||
+                      code.length !==
+                        6
+                    }
+                  >
+                    {status ===
+                    "verifying" ? (
+                      <>
+                        <LoaderCircle
+                          className={
+                            styles.buttonSpinner
+                          }
+                          size={18}
+                        />
+                        Verifying code…
+                      </>
+                    ) : (
+                      <>
+                        <ShieldCheck
+                          size={18}
+                        />
+                        Enable authenticator
+                      </>
+                    )}
+                  </button>
+
+                  <button
+                    className={
+                      styles.secondaryButton
+                    }
+                    type="button"
+                    onClick={
+                      cancelEnrollment
+                    }
+                    disabled={
+                      status ===
+                      "verifying"
+                    }
+                  >
+                    Use another method
+                  </button>
+                </form>
+              </>
+            )
           ) : (
             <>
               <div
@@ -682,45 +1008,222 @@ export default function MfaSetup() {
                 </span>
 
                 <h1>
-                  Protect your campaign
+                  Secure your campaign
                   account
                 </h1>
 
                 <p>
-                  After your password,
-                  Campaign Seat will ask
-                  for a rotating six-digit
-                  code from your phone.
+                  Choose how you want to
+                  receive security codes.
+                  You can change or add
+                  another method later.
                 </p>
               </div>
 
               <div
                 className={
-                  styles.featureList
+                  styles.methodGrid
                 }
               >
-                <div>
-                  <Smartphone
-                    size={21}
-                  />
+                <button
+                  className={[
+                    styles.methodCard,
 
-                  <span>
-                    Works with standard
-                    authenticator apps
+                    method ===
+                      "phone"
+                      ? styles
+                          .methodCardSelected
+                      : "",
+
+                    !PHONE_MFA_ENABLED
+                      ? styles
+                          .methodCardDisabled
+                      : "",
+                  ]
+                    .filter(Boolean)
+                    .join(" ")}
+                  type="button"
+                  disabled={
+                    !PHONE_MFA_ENABLED
+                  }
+                  onClick={() =>
+                    chooseMethod(
+                      "phone",
+                    )
+                  }
+                >
+                  <span
+                    className={
+                      styles.methodIcon
+                    }
+                  >
+                    <MessageSquareText
+                      size={24}
+                    />
                   </span>
-                </div>
 
-                <div>
-                  <ShieldCheck
-                    size={21}
-                  />
+                  <span
+                    className={
+                      styles.methodCopy
+                    }
+                  >
+                    <strong>
+                      Text message
+                    </strong>
 
-                  <span>
-                    Required for sensitive
-                    leadership access
+                    <small>
+                      Easiest setup
+                    </small>
+
+                    <p>
+                      Receive a six-digit
+                      security code by SMS.
+                    </p>
                   </span>
-                </div>
+
+                  <span
+                    className={
+                      styles.methodBadge
+                    }
+                  >
+                    {PHONE_MFA_ENABLED
+                      ? "Recommended"
+                      : "Provider setup pending"}
+                  </span>
+                </button>
+
+                <button
+                  className={[
+                    styles.methodCard,
+
+                    method ===
+                      "totp"
+                      ? styles
+                          .methodCardSelected
+                      : "",
+                  ]
+                    .filter(Boolean)
+                    .join(" ")}
+                  type="button"
+                  onClick={() =>
+                    chooseMethod(
+                      "totp",
+                    )
+                  }
+                >
+                  <span
+                    className={
+                      styles.methodIcon
+                    }
+                  >
+                    <QrCode
+                      size={24}
+                    />
+                  </span>
+
+                  <span
+                    className={
+                      styles.methodCopy
+                    }
+                  >
+                    <strong>
+                      Authenticator app
+                    </strong>
+
+                    <small>
+                      Advanced option
+                    </small>
+
+                    <p>
+                      Use a rotating code
+                      from an authenticator
+                      app.
+                    </p>
+                  </span>
+
+                  <LockKeyhole
+                    size={18}
+                  />
+                </button>
               </div>
+
+              {method ===
+                "phone" &&
+              PHONE_MFA_ENABLED ? (
+                <div
+                  className={
+                    styles.phoneSetup
+                  }
+                >
+                  <label>
+                    <span>
+                      Mobile phone number
+                    </span>
+
+                    <div
+                      className={
+                        styles.phoneInput
+                      }
+                    >
+                      <Smartphone
+                        size={19}
+                      />
+
+                      <input
+                        type="tel"
+                        autoComplete="tel"
+                        value={
+                          phone
+                        }
+                        onChange={(
+                          event,
+                        ) => {
+                          setPhone(
+                            event.target
+                              .value,
+                          );
+
+                          setErrorMessage(
+                            "",
+                          );
+                        }}
+                        placeholder="(561) 555-0123"
+                      />
+                    </div>
+                  </label>
+
+                  <p
+                    className={
+                      styles.consentCopy
+                    }
+                  >
+                    By choosing Text message,
+                    you agree to receive
+                    security codes at this
+                    number. Standard messaging
+                    rates may apply.
+                  </p>
+                </div>
+              ) : null}
+
+              {!PHONE_MFA_ENABLED && (
+                <div
+                  className={
+                    styles.providerNotice
+                  }
+                >
+                  <MessageSquareText
+                    size={18}
+                  />
+
+                  <span>
+                    Text-message verification
+                    is being activated.
+                    Authenticator setup remains
+                    available now.
+                  </span>
+                </div>
+              )}
 
               {errorMessage && (
                 <p
@@ -738,14 +1241,34 @@ export default function MfaSetup() {
                   styles.primaryButton
                 }
                 type="button"
+                disabled={
+                  method ===
+                    "phone" &&
+                  (
+                    !PHONE_MFA_ENABLED ||
+                    !phone.trim()
+                  )
+                }
                 onClick={
                   startEnrollment
                 }
               >
-                <QrCode
-                  size={18}
-                />
-                Start authenticator setup
+                {method ===
+                "phone" ? (
+                  <>
+                    <MessageSquareText
+                      size={18}
+                    />
+                    Text me a code
+                  </>
+                ) : (
+                  <>
+                    <QrCode
+                      size={18}
+                    />
+                    Set up authenticator
+                  </>
+                )}
               </button>
 
               <button
@@ -771,9 +1294,7 @@ export default function MfaSetup() {
             styles.footer
           }
         >
-          <Link
-            to="/"
-          >
+          <Link to="/">
             <ArrowLeft
               size={15}
             />

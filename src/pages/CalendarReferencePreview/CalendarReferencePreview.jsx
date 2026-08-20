@@ -29,6 +29,19 @@ import {
 
 import { CampaignWorkspaceShell } from "../../components/CampaignWorkspaceShell/CampaignWorkspaceShell";
 
+import {
+  useCalendarCommandCenter,
+} from "../../hooks/useCalendarCommandCenter";
+
+import {
+  getCurrentUser,
+  getCurrentWorkspace,
+} from "../../utils/campaignSession";
+
+import {
+  supabase,
+} from "../../lib/supabase";
+
 import styles from "./CalendarReferencePreview.module.css";
 
 const HOUR_START = 4;
@@ -883,11 +896,736 @@ function MiniMonth({
   );
 }
 
+function normalizeStoredEvent(event) {
+  if (!event?.starts_at) {
+    return null;
+  }
+
+  const start =
+    new Date(event.starts_at);
+
+  if (
+    Number.isNaN(
+      start.getTime(),
+    )
+  ) {
+    return null;
+  }
+
+  const requestedType =
+    String(
+      event.event_type ||
+        "meeting",
+    ).toLowerCase();
+
+  const type =
+    EVENT_TONES[requestedType]
+      ? requestedType
+      : "meeting";
+
+  const requestedEnd =
+    event.ends_at
+      ? new Date(event.ends_at)
+      : addMinutes(
+          start,
+          60,
+        );
+
+  const end =
+    !Number.isNaN(
+      requestedEnd.getTime(),
+    ) &&
+    requestedEnd > start
+      ? requestedEnd
+      : addMinutes(
+          start,
+          60,
+        );
+
+  return {
+    id: event.id,
+    title:
+      event.title ||
+      "Campaign event",
+    description:
+      event.description ||
+      "",
+    location:
+      event.location ||
+      "Location pending",
+    type,
+    tone:
+      EVENT_TONES[type] ||
+      "blue",
+    allDay:
+      event.is_all_day ===
+      true,
+    start,
+    end,
+    status:
+      event.status ||
+      "scheduled",
+
+    eventTimezone:
+      event.event_timezone ||
+      Intl.DateTimeFormat()
+        .resolvedOptions()
+        .timeZone ||
+      "America/New_York",
+
+    participants:
+      Array.isArray(
+        event.participants,
+      )
+        ? event.participants
+        : [],
+
+    recurrenceRules:
+      Array.isArray(
+        event.recurrence_rules,
+      )
+        ? event.recurrence_rules
+        : [],
+
+    reminders:
+      event.reminders &&
+      typeof event.reminders ===
+        "object"
+        ? event.reminders
+        : {},
+
+    busy:
+      event.busy !==
+      false,
+
+    visibility:
+      event.visibility ||
+      "default",
+
+    conferencing:
+      event.conferencing &&
+      typeof event.conferencing ===
+        "object"
+        ? event.conferencing
+        : {},
+
+    hideParticipants:
+      event.hide_participants ===
+      true,
+
+    notifyParticipants:
+      event.notify_participants !==
+      false,
+
+    sourceProvider:
+      event.source_provider ||
+      null,
+
+    externalCalendarId:
+      event.external_calendar_id ||
+      null,
+
+    externalEventId:
+      event.external_event_id ||
+      null,
+
+    externalIcalUid:
+      event.external_ical_uid ||
+      null,
+
+    syncMetadata:
+      event.sync_metadata &&
+      typeof event.sync_metadata ===
+        "object"
+        ? event.sync_metadata
+        : {},
+
+    source:
+      event.source_provider ===
+      "nylas"
+        ? "provider"
+        : "campaign-seat",
+  };
+}
+
+
+function formatTimeInputValue(date) {
+  if (!(date instanceof Date)) {
+    return "10:00";
+  }
+
+  return [
+    String(
+      date.getHours(),
+    ).padStart(
+      2,
+      "0",
+    ),
+    String(
+      date.getMinutes(),
+    ).padStart(
+      2,
+      "0",
+    ),
+  ].join(":");
+}
+
+function recurrenceModeFromRules(rules) {
+  if (!Array.isArray(rules)) {
+    return "none";
+  }
+
+  const rule =
+    rules.find(
+      (value) =>
+        String(value)
+          .toUpperCase()
+          .startsWith(
+            "RRULE:",
+          ),
+    ) || "";
+
+  const upper =
+    String(rule)
+      .toUpperCase();
+
+  if (
+    upper.includes(
+      "FREQ=DAILY",
+    )
+  ) {
+    return "daily";
+  }
+
+  if (
+    upper.includes(
+      "FREQ=WEEKLY",
+    )
+  ) {
+    return "weekly";
+  }
+
+  if (
+    upper.includes(
+      "FREQ=MONTHLY",
+    )
+  ) {
+    return "monthly";
+  }
+
+  if (upper) {
+    return "custom";
+  }
+
+  return "none";
+}
+
+function recurrenceRulesFromMode(
+  mode,
+  existingRules,
+) {
+  if (mode === "daily") {
+    return [
+      "RRULE:FREQ=DAILY",
+    ];
+  }
+
+  if (mode === "weekly") {
+    return [
+      "RRULE:FREQ=WEEKLY",
+    ];
+  }
+
+  if (mode === "monthly") {
+    return [
+      "RRULE:FREQ=MONTHLY",
+    ];
+  }
+
+  if (mode === "custom") {
+    return Array.isArray(
+      existingRules,
+    )
+      ? existingRules
+      : [];
+  }
+
+  return [];
+}
+
+function reminderEditorStateFromObject(
+  reminders,
+) {
+  if (
+    reminders?.use_default ===
+    true
+  ) {
+    return {
+      useDefaultReminders:
+        true,
+
+      reminderRows:
+        [],
+    };
+  }
+
+  const overrides =
+    Array.isArray(
+      reminders?.overrides,
+    )
+      ? reminders
+          .overrides
+          .map(
+            (reminder) => {
+              const minutes =
+                Number(
+                  reminder
+                    ?.reminder_minutes,
+                );
+
+              const method =
+                String(
+                  reminder
+                    ?.reminder_method ||
+                  "popup",
+                )
+                  .trim()
+                  .toLowerCase();
+
+              if (
+                !Number.isFinite(
+                  minutes,
+                )
+              ) {
+                return null;
+              }
+
+              return {
+                minutes:
+                  String(minutes),
+
+                method:
+                  [
+                    "popup",
+                    "email",
+                  ].includes(
+                    method,
+                  )
+                    ? method
+                    : "popup",
+              };
+            },
+          )
+          .filter(Boolean)
+      : [];
+
+  return {
+    useDefaultReminders:
+      false,
+
+    reminderRows:
+      overrides,
+  };
+}
+
+function remindersFromEditor(
+  useDefaultReminders,
+  reminderRows,
+) {
+  if (
+    useDefaultReminders
+  ) {
+    return {
+      use_default:
+        true,
+    };
+  }
+
+  const overrides =
+    (
+      Array.isArray(
+        reminderRows,
+      )
+        ? reminderRows
+        : []
+    )
+      .map(
+        (reminder) => {
+          const minutes =
+            Number(
+              reminder
+                ?.minutes,
+            );
+
+          const method =
+            String(
+              reminder
+                ?.method ||
+              "popup",
+            )
+              .trim()
+              .toLowerCase();
+
+          if (
+            !Number.isFinite(
+              minutes,
+            ) ||
+            minutes < 0
+          ) {
+            return null;
+          }
+
+          return {
+            reminder_minutes:
+              Math.round(
+                minutes,
+              ),
+
+            reminder_method:
+              [
+                "popup",
+                "email",
+              ].includes(
+                method,
+              )
+                ? method
+                : "popup",
+          };
+        },
+      )
+      .filter(Boolean)
+      .slice(
+        0,
+        5,
+      );
+
+  if (
+    overrides.length ===
+    0
+  ) {
+    return {};
+  }
+
+  return {
+    use_default:
+      false,
+
+    overrides,
+  };
+}
+
+
+
+function addDaysToDateKey(
+  dateKey,
+  days,
+) {
+  const [
+    year,
+    month,
+    day,
+  ] =
+    String(
+      dateKey ||
+      "",
+    )
+      .split("-")
+      .map(Number);
+
+  if (
+    !year ||
+    !month ||
+    !day
+  ) {
+    return "";
+  }
+
+  const date =
+    new Date(
+      Date.UTC(
+        year,
+        month - 1,
+        day + days,
+      ),
+    );
+
+  return [
+    date.getUTCFullYear(),
+    String(
+      date.getUTCMonth() + 1,
+    ).padStart(
+      2,
+      "0",
+    ),
+    String(
+      date.getUTCDate(),
+    ).padStart(
+      2,
+      "0",
+    ),
+  ].join("-");
+}
+
+function zonedDateTimeToEpochSeconds(
+  dateKey,
+  timeValue,
+  timeZone,
+) {
+  const [
+    year,
+    month,
+    day,
+  ] =
+    String(
+      dateKey ||
+      "",
+    )
+      .split("-")
+      .map(Number);
+
+  const [
+    hour,
+    minute,
+  ] =
+    String(
+      timeValue ||
+      "00:00",
+    )
+      .split(":")
+      .map(Number);
+
+  if (
+    !year ||
+    !month ||
+    !day ||
+    !Number.isFinite(hour) ||
+    !Number.isFinite(minute)
+  ) {
+    return null;
+  }
+
+  const targetUtc =
+    Date.UTC(
+      year,
+      month - 1,
+      day,
+      hour,
+      minute,
+      0,
+      0,
+    );
+
+  let guess =
+    targetUtc;
+
+  for (
+    let attempt = 0;
+    attempt < 3;
+    attempt += 1
+  ) {
+    const parts =
+      new Intl.DateTimeFormat(
+        "en-US",
+        {
+          timeZone,
+
+          year:
+            "numeric",
+
+          month:
+            "2-digit",
+
+          day:
+            "2-digit",
+
+          hour:
+            "2-digit",
+
+          minute:
+            "2-digit",
+
+          hourCycle:
+            "h23",
+        },
+      ).formatToParts(
+        new Date(
+          guess,
+        ),
+      );
+
+    const values =
+      Object.fromEntries(
+        parts.map(
+          (part) => [
+            part.type,
+            part.value,
+          ],
+        ),
+      );
+
+    const representedUtc =
+      Date.UTC(
+        Number(
+          values.year,
+        ),
+        Number(
+          values.month,
+        ) - 1,
+        Number(
+          values.day,
+        ),
+        Number(
+          values.hour,
+        ),
+        Number(
+          values.minute,
+        ),
+        0,
+        0,
+      );
+
+    const correction =
+      targetUtc -
+      representedUtc;
+
+    if (
+      Math.abs(
+        correction,
+      ) < 1000
+    ) {
+      break;
+    }
+
+    guess +=
+      correction;
+  }
+
+  return Math.floor(
+    guess /
+    1000,
+  );
+}
+
+function dateKeyFromEpochInZone(
+  epochSeconds,
+  timeZone,
+) {
+  const parts =
+    new Intl.DateTimeFormat(
+      "en-CA",
+      {
+        timeZone,
+
+        year:
+          "numeric",
+
+        month:
+          "2-digit",
+
+        day:
+          "2-digit",
+      },
+    ).formatToParts(
+      new Date(
+        epochSeconds *
+        1000,
+      ),
+    );
+
+  const values =
+    Object.fromEntries(
+      parts.map(
+        (part) => [
+          part.type,
+          part.value,
+        ],
+      ),
+    );
+
+  return (
+    `${values.year}-${values.month}-${values.day}`
+  );
+}
+
+function timeInputFromEpochInZone(
+  epochSeconds,
+  timeZone,
+) {
+  const parts =
+    new Intl.DateTimeFormat(
+      "en-US",
+      {
+        timeZone,
+
+        hour:
+          "2-digit",
+
+        minute:
+          "2-digit",
+
+        hourCycle:
+          "h23",
+      },
+    ).formatToParts(
+      new Date(
+        epochSeconds *
+        1000,
+      ),
+    );
+
+  const values =
+    Object.fromEntries(
+      parts.map(
+        (part) => [
+          part.type,
+          part.value,
+        ],
+      ),
+    );
+
+  return (
+    `${values.hour}:${values.minute}`
+  );
+}
+
 export default function CalendarReferencePreview() {
   const initialNow = useMemo(
     () => new Date(),
     [],
   );
+
+  const sessionWorkspace =
+    useMemo(
+      () =>
+        getCurrentWorkspace(),
+      [],
+    );
+
+  const sessionUser =
+    useMemo(
+      () =>
+        getCurrentUser(),
+      [],
+    );
+
+  const {
+    events:
+      storedEvents,
+    refresh:
+      refreshCalendar,
+    saveEvent:
+      saveCalendarEvent,
+    cancelEvent:
+      cancelCalendarEvent,
+  } =
+    useCalendarCommandCenter({
+      workspaceId:
+        sessionWorkspace?.id ||
+        "",
+      userId:
+        sessionUser?.id ||
+        "",
+    });
 
   const [now, setNow] =
     useState(initialNow);
@@ -898,9 +1636,25 @@ export default function CalendarReferencePreview() {
   const [viewMode, setViewMode] =
     useState("week");
 
-  const [events, setEvents] = useState(() =>
-    buildInitialEvents(initialNow),
-  );
+  const [
+    events,
+    setEvents,
+  ] = useState([]);
+
+  useEffect(() => {
+    const normalizedEvents =
+      (storedEvents || [])
+        .map(
+          normalizeStoredEvent,
+        )
+        .filter(Boolean);
+
+    setEvents(
+      normalizedEvents,
+    );
+  }, [
+    storedEvents,
+  ]);
 
   const [search, setSearch] =
     useState("");
@@ -922,6 +1676,170 @@ export default function CalendarReferencePreview() {
   const [syncing, setSyncing] =
     useState(false);
 
+  const [
+    calendarConnecting,
+    setCalendarConnecting,
+  ] = useState(false);
+
+  const [
+    calendarConnection,
+    setCalendarConnection,
+  ] = useState(null);
+
+  const [
+    calendarConnectionLoading,
+    setCalendarConnectionLoading,
+  ] = useState(true);
+
+  useEffect(() => {
+    if (syncing) {
+      return undefined;
+    }
+
+    let active =
+      true;
+
+    const loadCalendarConnection =
+      async () => {
+        const workspaceId =
+          sessionWorkspace?.id ||
+          "";
+
+        if (!workspaceId) {
+          if (active) {
+            setCalendarConnection(
+              null,
+            );
+
+            setCalendarConnectionLoading(
+              false,
+            );
+          }
+
+          return;
+        }
+
+        setCalendarConnectionLoading(
+          true,
+        );
+
+        const {
+          data,
+          error,
+        } =
+          await supabase
+            .from(
+              "workspace_integrations",
+            )
+            .select(
+              "id,status,display_email,settings,last_sync_at,last_success_at,connected_at",
+            )
+            .eq(
+              "workspace_id",
+              workspaceId,
+            )
+            .eq(
+              "provider",
+              "nylas",
+            )
+            .eq(
+              "integration_type",
+              "calendar",
+            )
+            .eq(
+              "status",
+              "connected",
+            )
+            .order(
+              "connected_at",
+              {
+                ascending:
+                  false,
+              },
+            )
+            .limit(
+              1,
+            )
+            .maybeSingle();
+
+        if (!active) {
+          return;
+        }
+
+        if (error) {
+          console.error(
+            "Calendar connection status load failed",
+            error,
+          );
+
+          setCalendarConnection(
+            null,
+          );
+        } else {
+          setCalendarConnection(
+            data ||
+            null,
+          );
+        }
+
+        setCalendarConnectionLoading(
+          false,
+        );
+      };
+
+    loadCalendarConnection();
+
+    return () => {
+      active =
+        false;
+    };
+  }, [
+    sessionWorkspace?.id,
+    syncing,
+  ]);
+
+  const calendarConnected =
+    calendarConnection?.status ===
+    "connected";
+
+  const calendarProvider =
+    String(
+      calendarConnection
+        ?.settings
+        ?.account_provider ||
+      "",
+    )
+      .trim()
+      .toLowerCase();
+
+  const calendarProviderLabel =
+    calendarProvider ===
+      "google"
+      ? "Google Calendar"
+      : calendarProvider ===
+          "microsoft"
+        ? "Microsoft Calendar"
+        : "Calendar";
+
+  const calendarLastSyncLabel =
+    calendarConnection
+      ?.last_sync_at
+      ? new Intl.DateTimeFormat(
+          undefined,
+          {
+            dateStyle:
+              "medium",
+            timeStyle:
+              "short",
+          },
+        ).format(
+          new Date(
+            calendarConnection
+              .last_sync_at,
+          ),
+        )
+      : "";
+
   const [completedTasks, setCompletedTasks] =
     useState([]);
 
@@ -934,6 +1852,100 @@ export default function CalendarReferencePreview() {
       location: "Campaign HQ",
       type: "meeting",
     });
+
+  const [
+    editEventOpen,
+    setEditEventOpen,
+  ] = useState(false);
+
+  const [
+    editSaving,
+    setEditSaving,
+  ] = useState(false);
+
+  const [
+    eventCancelling,
+    setEventCancelling,
+  ] = useState(false);
+
+  const [
+    guestDraft,
+    setGuestDraft,
+  ] = useState("");
+
+  const [
+    guestNameDraft,
+    setGuestNameDraft,
+  ] = useState("");
+
+  const [
+    findingTime,
+    setFindingTime,
+  ] = useState(false);
+
+  const [
+    findTimeDays,
+    setFindTimeDays,
+  ] = useState(7);
+
+  const [
+    findTimeResult,
+    setFindTimeResult,
+  ] = useState(null);
+
+  const [
+    selectedFindTimeStart,
+    setSelectedFindTimeStart,
+  ] = useState(null);
+
+  const [
+    findTimeError,
+    setFindTimeError,
+  ] = useState("");
+
+  const [
+    editEventForm,
+    setEditEventForm,
+  ] = useState({
+    title: "",
+    date: formatDateKey(initialNow),
+    start: "10:00",
+    end: "11:00",
+    location: "",
+    type: "meeting",
+    description: "",
+    timezone:
+      "America/New_York",
+    allDay: false,
+    recurrenceMode:
+      "none",
+    useDefaultReminders:
+      false,
+
+    reminderRows: [
+      {
+        minutes:
+          "30",
+
+        method:
+          "popup",
+      },
+    ],
+
+    participants: [],
+    busy: true,
+    visibility:
+      "default",
+    addConference:
+      false,
+    conferencing: {},
+    hideParticipants:
+      false,
+    notifyParticipants:
+      true,
+    existingRecurrenceRules:
+      [],
+  });
 
   useEffect(() => {
     const interval = window.setInterval(
@@ -1239,63 +2251,1506 @@ export default function CalendarReferencePreview() {
     setViewDate(next);
   };
 
-  const handleSync = () => {
-    setSyncing(true);
+  const handleConnectCalendar =
+    async () => {
+      const workspaceId =
+        sessionWorkspace?.id ||
+        "";
 
-    window.setTimeout(
-      () => setSyncing(false),
-      1100,
-    );
-  };
+      if (!workspaceId) {
+        window.alert(
+          "Campaign Seat could not resolve the current campaign workspace.",
+        );
 
-  const saveEvent = (submitEvent) => {
-    submitEvent.preventDefault();
+        return;
+      }
 
-    const start = new Date(
-      `${eventForm.date}T${eventForm.start}:00`,
-    );
+      setCalendarConnecting(
+        true,
+      );
 
-    const end = new Date(
-      `${eventForm.date}T${eventForm.end}:00`,
-    );
+      try {
+        const {
+          data,
+          error,
+        } =
+          await supabase
+            .functions
+            .invoke(
+              "nylas-calendar-oauth-start",
+              {
+                body: {
+                  workspaceId,
+                },
+              },
+            );
 
-    const nextEvent = {
-      id: `custom-${Date.now()}`,
-      title:
-        eventForm.title.trim() ||
-        "New campaign event",
-      location:
-        eventForm.location.trim() ||
-        "Location pending",
-      type: eventForm.type,
-      tone:
-        EVENT_TONES[eventForm.type] ||
-        "blue",
-      allDay: false,
-      start,
-      end:
-        end > start
-          ? end
-          : addMinutes(start, 60),
+        if (
+          error ||
+          !data
+            ?.authorizationUrl
+        ) {
+          throw new Error(
+            data?.error ||
+            error?.message ||
+            "Campaign Seat could not start the Calendar connection.",
+          );
+        }
+
+        window.location.assign(
+          data.authorizationUrl,
+        );
+      } catch (
+        connectionError
+      ) {
+        console.error(
+          "Calendar connection start failed",
+          connectionError,
+        );
+
+        window.alert(
+          connectionError
+            ?.message ||
+          "Campaign Seat could not start the Calendar connection.",
+        );
+
+        setCalendarConnecting(
+          false,
+        );
+      }
     };
 
-    setEvents((current) => [
-      ...current,
-      nextEvent,
-    ]);
+  const handleSync =
+    async () => {
+      const workspaceId =
+        sessionWorkspace?.id ||
+        "";
 
-    setSelectedEvent(nextEvent);
-    setNewEventOpen(false);
+      if (!workspaceId) {
+        window.alert(
+          "Campaign Seat could not resolve the current campaign workspace.",
+        );
 
-    setEventForm({
-      title: "",
-      date: eventForm.date,
-      start: "10:00",
-      end: "11:00",
-      location: "Campaign HQ",
-      type: "meeting",
-    });
-  };
+        return;
+      }
+
+      setSyncing(true);
+
+      try {
+        const {
+          data,
+          error,
+        } =
+          await supabase
+            .functions
+            .invoke(
+              "nylas-calendar-sync",
+              {
+                body: {
+                  workspaceId,
+                },
+              },
+            );
+
+        if (
+          error ||
+          data?.success !== true
+        ) {
+          throw new Error(
+            data?.error ||
+            error?.message ||
+            "Campaign Seat could not sync the connected Calendar.",
+          );
+        }
+
+        await refreshCalendar();
+
+        window.alert(
+          `Google Calendar sync complete. ${data.importedCount ?? 0} event${data.importedCount === 1 ? "" : "s"} synced${data.skippedCount ? ` · ${data.skippedCount} skipped` : ""}.`,
+        );
+      } catch (
+        syncError
+      ) {
+        console.error(
+          "Calendar provider sync failed",
+          syncError,
+        );
+
+        window.alert(
+          syncError?.message ||
+          "Campaign Seat could not sync the connected Calendar.",
+        );
+      } finally {
+        setSyncing(false);
+      }
+    };
+
+  const saveEvent =
+    async (
+      submitEvent,
+    ) => {
+      submitEvent.preventDefault();
+
+      const form =
+        submitEvent.currentTarget;
+
+      const formData =
+        new FormData(form);
+
+      const submittedTitle =
+        String(
+          formData.get("title") ||
+            "",
+        ).trim();
+
+      const submittedDate =
+        String(
+          formData.get("date") ||
+            "",
+        );
+
+      const submittedType =
+        String(
+          formData.get("type") ||
+            "meeting",
+        );
+
+      const submittedStart =
+        String(
+          formData.get("start") ||
+            "10:00",
+        );
+
+      const submittedEnd =
+        String(
+          formData.get("end") ||
+            "11:00",
+        );
+
+      const submittedLocation =
+        String(
+          formData.get("location") ||
+            "",
+        ).trim();
+
+      const [
+        year,
+        month,
+        day,
+      ] =
+        submittedDate
+          .split("-")
+          .map(Number);
+
+      const [
+        startHour,
+        startMinute,
+      ] =
+        submittedStart
+          .split(":")
+          .map(Number);
+
+      const [
+        endHour,
+        endMinute,
+      ] =
+        submittedEnd
+          .split(":")
+          .map(Number);
+
+      const dateParts = [
+        year,
+        month,
+        day,
+        startHour,
+        startMinute,
+        endHour,
+        endMinute,
+      ];
+
+      if (
+        dateParts.some(
+          (value) =>
+            !Number.isFinite(value),
+        )
+      ) {
+        return;
+      }
+
+      const start =
+        new Date(
+          year,
+          month - 1,
+          day,
+          startHour,
+          startMinute,
+          0,
+          0,
+        );
+
+      const requestedEnd =
+        new Date(
+          year,
+          month - 1,
+          day,
+          endHour,
+          endMinute,
+          0,
+          0,
+        );
+
+      const end =
+        requestedEnd > start
+          ? requestedEnd
+          : addMinutes(
+              start,
+              60,
+            );
+
+      try {
+        const savedEvent =
+          await saveCalendarEvent({
+            values: {
+              title:
+                submittedTitle ||
+                "New campaign event",
+              description: "",
+              eventType:
+                submittedType,
+              location:
+                submittedLocation ||
+                "Location pending",
+              startsAt:
+                start.toISOString(),
+              endsAt:
+                end.toISOString(),
+              status:
+                "scheduled",
+              capacity: "",
+              rsvpCount:
+                "0",
+            },
+          });
+
+        let finalSavedEvent =
+          savedEvent;
+
+        let providerWriteWarning =
+          "";
+
+        if (
+          calendarConnected &&
+          savedEvent?.id
+        ) {
+          const workspaceId =
+            sessionWorkspace?.id ||
+            "";
+
+          try {
+            const {
+              data:
+                providerData,
+              error:
+                providerError,
+            } =
+              await supabase
+                .functions
+                .invoke(
+                  "nylas-calendar-event-create",
+                  {
+                    body: {
+                      workspaceId,
+                      eventId:
+                        savedEvent.id,
+                    },
+                  },
+                );
+
+            if (
+              providerError ||
+              providerData
+                ?.success !== true
+            ) {
+              throw new Error(
+                providerData
+                  ?.error ||
+                providerError
+                  ?.message ||
+                "The event was saved in Campaign Seat, but could not be added to Google Calendar.",
+              );
+            }
+
+            if (
+              providerData?.event
+            ) {
+              finalSavedEvent =
+                providerData.event;
+            }
+
+            await refreshCalendar();
+          } catch (
+            providerWriteError
+          ) {
+            console.error(
+              "Calendar provider event creation failed",
+              providerWriteError,
+            );
+
+            providerWriteWarning =
+              providerWriteError
+                ?.message ||
+              "The event was saved in Campaign Seat, but could not be added to Google Calendar.";
+          }
+        }
+
+        const normalizedEvent =
+          normalizeStoredEvent(
+            finalSavedEvent,
+          );
+
+        if (normalizedEvent) {
+          setSelectedEvent(
+            normalizedEvent,
+          );
+        }
+
+        setNewEventOpen(
+          false,
+        );
+
+        if (
+          providerWriteWarning
+        ) {
+          window.alert(
+            providerWriteWarning,
+          );
+        }
+
+        setEventForm({
+          title: "",
+          date:
+            submittedDate,
+          start:
+            "10:00",
+          end:
+            "11:00",
+          location:
+            "Campaign HQ",
+          type:
+            "meeting",
+        });
+      } catch {
+        // The calendar hook exposes
+        // the protected save error.
+      }
+    };
+
+  const openEditSelectedEvent =
+    () => {
+      if (!selectedEvent) {
+        return;
+      }
+
+      const participants =
+        Array.isArray(
+          selectedEvent.participants,
+        )
+          ? selectedEvent
+              .participants
+              .map(
+                (participant) => ({
+                  ...participant,
+                }),
+              )
+          : [];
+
+      const conferencing =
+        selectedEvent
+          .conferencing &&
+        typeof selectedEvent
+          .conferencing ===
+          "object"
+          ? selectedEvent
+              .conferencing
+          : {};
+
+      const reminderEditor =
+        reminderEditorStateFromObject(
+          selectedEvent.reminders,
+        );
+
+      setEditEventForm({
+        title:
+          selectedEvent.title ||
+          "",
+
+        date:
+          formatDateKey(
+            selectedEvent.start,
+          ),
+
+        start:
+          formatTimeInputValue(
+            selectedEvent.start,
+          ),
+
+        end:
+          formatTimeInputValue(
+            selectedEvent.end,
+          ),
+
+        location:
+          selectedEvent.location ||
+          "",
+
+        type:
+          selectedEvent.type ||
+          "meeting",
+
+        description:
+          selectedEvent.description ||
+          "",
+
+        timezone:
+          selectedEvent
+            .eventTimezone ||
+          "America/New_York",
+
+        allDay:
+          selectedEvent.allDay ===
+          true,
+
+        recurrenceMode:
+          recurrenceModeFromRules(
+            selectedEvent
+              .recurrenceRules,
+          ),
+
+        useDefaultReminders:
+          reminderEditor
+            .useDefaultReminders,
+
+        reminderRows:
+          reminderEditor
+            .reminderRows,
+
+        participants,
+
+        busy:
+          selectedEvent.busy !==
+          false,
+
+        visibility:
+          selectedEvent.visibility ||
+          "default",
+
+        addConference:
+          Boolean(
+            conferencing.provider ||
+            conferencing.details ||
+            conferencing.autocreate,
+          ),
+
+        conferencing,
+
+        hideParticipants:
+          selectedEvent
+            .hideParticipants ===
+          true,
+
+        notifyParticipants:
+          selectedEvent
+            .notifyParticipants !==
+          false,
+
+        existingRecurrenceRules:
+          Array.isArray(
+            selectedEvent
+              .recurrenceRules,
+          )
+            ? selectedEvent
+                .recurrenceRules
+            : [],
+      });
+
+      setGuestDraft("");
+      setGuestNameDraft("");
+
+      setFindTimeResult(
+        null,
+      );
+
+      setSelectedFindTimeStart(
+        null,
+      );
+
+      setFindTimeError(
+        "",
+      );
+
+      setFindingTime(
+        false,
+      );
+
+      setEditEventOpen(true);
+    };
+
+  const handleFindTime =
+    async () => {
+      const workspaceId =
+        sessionWorkspace?.id ||
+        "";
+
+      if (!workspaceId) {
+        setFindTimeError(
+          "Campaign Seat could not resolve the current campaign workspace.",
+        );
+
+        return;
+      }
+
+      if (
+        editEventForm.allDay
+      ) {
+        setFindTimeError(
+          "Find a Time is available for timed events. Turn off All day first.",
+        );
+
+        return;
+      }
+
+      const [
+        startHour,
+        startMinute,
+      ] =
+        String(
+          editEventForm.start ||
+          "10:00",
+        )
+          .split(":")
+          .map(Number);
+
+      const [
+        endHour,
+        endMinute,
+      ] =
+        String(
+          editEventForm.end ||
+          "11:00",
+        )
+          .split(":")
+          .map(Number);
+
+      let durationMinutes =
+        (
+          endHour * 60 +
+          endMinute
+        ) -
+        (
+          startHour * 60 +
+          startMinute
+        );
+
+      if (
+        !Number.isFinite(
+          durationMinutes,
+        ) ||
+        durationMinutes <= 0
+      ) {
+        durationMinutes =
+          60;
+      }
+
+      if (
+        durationMinutes >
+        240
+      ) {
+        setFindTimeError(
+          "Find a Time currently supports meetings up to four hours long.",
+        );
+
+        return;
+      }
+
+      const timezone =
+        editEventForm
+          .timezone ||
+        "America/New_York";
+
+      const searchStartTime =
+        zonedDateTimeToEpochSeconds(
+          editEventForm.date,
+          "00:00",
+          timezone,
+        );
+
+      const searchEndDate =
+        addDaysToDateKey(
+          editEventForm.date,
+          Number(
+            findTimeDays,
+          ),
+        );
+
+      const searchEndTime =
+        zonedDateTimeToEpochSeconds(
+          searchEndDate,
+          "00:00",
+          timezone,
+        );
+
+      if (
+        !searchStartTime ||
+        !searchEndTime
+      ) {
+        setFindTimeError(
+          "Campaign Seat could not resolve the availability search dates.",
+        );
+
+        return;
+      }
+
+      const guestEmails =
+        editEventForm
+          .participants
+          .map(
+            (participant) =>
+              String(
+                participant
+                  ?.email ||
+                "",
+              )
+                .trim()
+                .toLowerCase(),
+          )
+          .filter(Boolean);
+
+      setFindingTime(
+        true,
+      );
+
+      setFindTimeError(
+        "",
+      );
+
+      setFindTimeResult(
+        null,
+      );
+
+      setSelectedFindTimeStart(
+        null,
+      );
+
+      try {
+        const {
+          data,
+          error,
+        } =
+          await supabase
+            .functions
+            .invoke(
+              "nylas-calendar-find-time",
+              {
+                body: {
+                  workspaceId,
+
+                  guestEmails,
+
+                  searchStartTime,
+
+                  searchEndTime,
+
+                  durationMinutes,
+
+                  intervalMinutes:
+                    15,
+
+                  dayStartMinutes:
+                    8 * 60,
+
+                  dayEndMinutes:
+                    20 * 60,
+
+                  timezone,
+                },
+              },
+            );
+
+        let detailedError =
+          data?.error ||
+          "";
+
+        if (
+          error?.context &&
+          typeof error
+            .context
+            .clone ===
+            "function"
+        ) {
+          try {
+            const errorBody =
+              await error
+                .context
+                .clone()
+                .json();
+
+            if (
+              errorBody
+                ?.error
+            ) {
+              detailedError =
+                errorBody.error;
+            }
+          } catch {
+            // Keep the Supabase error message.
+          }
+        }
+
+        if (
+          error ||
+          data?.success !==
+            true
+        ) {
+          throw new Error(
+            detailedError ||
+            error?.message ||
+            "Campaign Seat could not check Calendar availability.",
+          );
+        }
+
+        setFindTimeResult(
+          data,
+        );
+      } catch (
+        availabilityError
+      ) {
+        console.error(
+          "Calendar Find a Time failed",
+          availabilityError,
+        );
+
+        setFindTimeError(
+          availabilityError
+            ?.message ||
+          "Campaign Seat could not check Calendar availability.",
+        );
+      } finally {
+        setFindingTime(
+          false,
+        );
+      }
+    };
+
+  const applyFindTimeSuggestion =
+    (suggestion) => {
+      const timezone =
+        editEventForm
+          .timezone ||
+        "America/New_York";
+
+      const startTime =
+        Number(
+          suggestion
+            ?.start_time,
+        );
+
+      const endTime =
+        Number(
+          suggestion
+            ?.end_time,
+        );
+
+      if (
+        !Number.isFinite(
+          startTime,
+        ) ||
+        !Number.isFinite(
+          endTime,
+        )
+      ) {
+        return;
+      }
+
+      setSelectedFindTimeStart(
+        startTime,
+      );
+
+      setEditEventForm(
+        (current) => ({
+          ...current,
+
+          allDay:
+            false,
+
+          date:
+            dateKeyFromEpochInZone(
+              startTime,
+              timezone,
+            ),
+
+          start:
+            timeInputFromEpochInZone(
+              startTime,
+              timezone,
+            ),
+
+          end:
+            timeInputFromEpochInZone(
+              endTime,
+              timezone,
+            ),
+        }),
+      );
+
+      setFindTimeError(
+        "",
+      );
+    };
+
+  const addEditGuest =
+    () => {
+      const email =
+        String(
+          guestDraft ||
+          "",
+        )
+          .trim()
+          .toLowerCase();
+
+      const name =
+        String(
+          guestNameDraft ||
+          "",
+        ).trim();
+
+      if (
+        !email ||
+        !email.includes("@")
+      ) {
+        return;
+      }
+
+      setEditEventForm(
+        (current) => {
+          const exists =
+            current
+              .participants
+              .some(
+                (participant) =>
+                  String(
+                    participant
+                      ?.email ||
+                    "",
+                  )
+                    .trim()
+                    .toLowerCase() ===
+                  email,
+              );
+
+          if (exists) {
+            return current;
+          }
+
+          return {
+            ...current,
+
+            participants: [
+              ...current.participants,
+              {
+                email,
+
+                ...(name
+                  ? {
+                      name,
+                    }
+                  : {}),
+              },
+            ],
+          };
+        },
+      );
+
+      setGuestDraft("");
+      setGuestNameDraft("");
+    };
+
+  const addReminderRow =
+    () => {
+      setEditEventForm(
+        (current) => {
+          if (
+            current
+              .reminderRows
+              .length >= 5
+          ) {
+            return current;
+          }
+
+          return {
+            ...current,
+
+            useDefaultReminders:
+              false,
+
+            reminderRows: [
+              ...current.reminderRows,
+              {
+                minutes:
+                  "30",
+
+                method:
+                  "popup",
+              },
+            ],
+          };
+        },
+      );
+    };
+
+  const updateReminderRow =
+    (
+      index,
+      changes,
+    ) => {
+      setEditEventForm(
+        (current) => ({
+          ...current,
+
+          reminderRows:
+            current
+              .reminderRows
+              .map(
+                (
+                  reminder,
+                  reminderIndex,
+                ) =>
+                  reminderIndex ===
+                  index
+                    ? {
+                        ...reminder,
+                        ...changes,
+                      }
+                    : reminder,
+              ),
+        }),
+      );
+    };
+
+  const removeReminderRow =
+    (index) => {
+      setEditEventForm(
+        (current) => ({
+          ...current,
+
+          reminderRows:
+            current
+              .reminderRows
+              .filter(
+                (
+                  _reminder,
+                  reminderIndex,
+                ) =>
+                  reminderIndex !==
+                  index,
+              ),
+        }),
+      );
+    };
+
+  const removeEditGuest =
+    (email) => {
+      setEditEventForm(
+        (current) => ({
+          ...current,
+
+          participants:
+            current
+              .participants
+              .filter(
+                (participant) =>
+                  String(
+                    participant
+                      ?.email ||
+                    "",
+                  )
+                    .trim()
+                    .toLowerCase() !==
+                  String(
+                    email ||
+                    "",
+                  )
+                    .trim()
+                    .toLowerCase(),
+              ),
+        }),
+      );
+    };
+
+  const saveEditedEvent =
+    async (
+      submitEvent,
+    ) => {
+      submitEvent.preventDefault();
+
+      if (
+        !selectedEvent?.id
+      ) {
+        return;
+      }
+
+      const workspaceId =
+        sessionWorkspace?.id ||
+        "";
+
+      if (!workspaceId) {
+        window.alert(
+          "Campaign Seat could not resolve the current campaign workspace.",
+        );
+
+        return;
+      }
+
+      const [
+        year,
+        month,
+        day,
+      ] =
+        editEventForm
+          .date
+          .split("-")
+          .map(Number);
+
+      if (
+        !year ||
+        !month ||
+        !day
+      ) {
+        return;
+      }
+
+      let start;
+      let end;
+
+      if (
+        editEventForm.allDay
+      ) {
+        start =
+          new Date(
+            Date.UTC(
+              year,
+              month - 1,
+              day,
+              12,
+              0,
+              0,
+            ),
+          );
+
+        end =
+          new Date(
+            start.getTime() +
+            24 * 60 * 60 * 1000,
+          );
+      } else {
+        const [
+          startHour,
+          startMinute,
+        ] =
+          editEventForm
+            .start
+            .split(":")
+            .map(Number);
+
+        const [
+          endHour,
+          endMinute,
+        ] =
+          editEventForm
+            .end
+            .split(":")
+            .map(Number);
+
+        start =
+          new Date(
+            year,
+            month - 1,
+            day,
+            startHour,
+            startMinute,
+            0,
+            0,
+          );
+
+        end =
+          new Date(
+            year,
+            month - 1,
+            day,
+            endHour,
+            endMinute,
+            0,
+            0,
+          );
+
+        if (
+          end <= start
+        ) {
+          end =
+            addMinutes(
+              start,
+              60,
+            );
+        }
+      }
+
+      const recurrenceRules =
+        recurrenceRulesFromMode(
+          editEventForm
+            .recurrenceMode,
+          editEventForm
+            .existingRecurrenceRules,
+        );
+
+      const reminders =
+        remindersFromEditor(
+          editEventForm
+            .useDefaultReminders,
+
+          editEventForm
+            .reminderRows,
+        );
+
+      let conferencing =
+        {};
+
+      if (
+        editEventForm
+          .addConference
+      ) {
+        const existing =
+          editEventForm
+            .conferencing &&
+          typeof editEventForm
+            .conferencing ===
+            "object"
+            ? editEventForm
+                .conferencing
+            : {};
+
+        if (
+          existing.details ||
+          existing.autocreate
+        ) {
+          conferencing =
+            existing;
+        } else {
+          conferencing = {
+            provider:
+              calendarProvider ===
+              "microsoft"
+                ? "Microsoft Teams"
+                : "Google Meet",
+
+            autocreate:
+              {},
+          };
+        }
+      }
+
+      setEditSaving(true);
+
+      try {
+        const localSavedEvent =
+          await saveCalendarEvent({
+            eventId:
+              selectedEvent.id,
+
+            values: {
+              title:
+                editEventForm
+                  .title
+                  .trim() ||
+                "Campaign event",
+
+              description:
+                editEventForm
+                  .description ||
+                "",
+
+              eventType:
+                editEventForm.type,
+
+              location:
+                editEventForm
+                  .location
+                  .trim(),
+
+              startsAt:
+                start.toISOString(),
+
+              endsAt:
+                end.toISOString(),
+
+              status:
+                selectedEvent.status ||
+                "scheduled",
+
+              eventTimezone:
+                editEventForm
+                  .timezone,
+
+              participants:
+                editEventForm
+                  .participants,
+
+              recurrenceRules,
+
+              reminders,
+
+              busy:
+                editEventForm.busy,
+
+              visibility:
+                editEventForm
+                  .visibility,
+
+              conferencing,
+
+              hideParticipants:
+                editEventForm
+                  .hideParticipants,
+
+              notifyParticipants:
+                editEventForm
+                  .notifyParticipants,
+
+              isAllDay:
+                editEventForm
+                  .allDay,
+            },
+          });
+
+        let finalEvent =
+          localSavedEvent;
+
+        let providerWarning =
+          "";
+
+        if (
+          calendarConnected &&
+          localSavedEvent
+            ?.source_provider ===
+            "nylas" &&
+          localSavedEvent
+            ?.external_event_id &&
+          localSavedEvent
+            ?.external_calendar_id
+        ) {
+          try {
+            const {
+              data:
+                providerData,
+              error:
+                providerError,
+            } =
+              await supabase
+                .functions
+                .invoke(
+                  "nylas-calendar-event-update",
+                  {
+                    body: {
+                      workspaceId,
+
+                      eventId:
+                        localSavedEvent.id,
+                    },
+                  },
+                );
+
+            if (
+              providerError ||
+              providerData
+                ?.success !== true
+            ) {
+              throw new Error(
+                providerData
+                  ?.error ||
+                providerError
+                  ?.message ||
+                "Campaign Seat saved the event, but the connected Calendar could not be updated.",
+              );
+            }
+
+            if (
+              providerData?.event
+            ) {
+              finalEvent =
+                providerData.event;
+            }
+
+            await refreshCalendar();
+          } catch (
+            providerUpdateError
+          ) {
+            console.error(
+              "Calendar provider event update failed",
+              providerUpdateError,
+            );
+
+            providerWarning =
+              providerUpdateError
+                ?.message ||
+              "Campaign Seat saved the event, but the connected Calendar could not be updated.";
+          }
+        }
+
+        const normalized =
+          normalizeStoredEvent(
+            finalEvent,
+          );
+
+        if (normalized) {
+          setSelectedEvent(
+            normalized,
+          );
+        }
+
+        setEditEventOpen(
+          false,
+        );
+
+        if (providerWarning) {
+          window.alert(
+            providerWarning,
+          );
+        }
+      } catch (
+        editError
+      ) {
+        console.error(
+          "Campaign Seat event edit failed",
+          editError,
+        );
+
+        window.alert(
+          editError?.message ||
+          "The event could not be updated.",
+        );
+      } finally {
+        setEditSaving(false);
+      }
+    };
+
+  const handleCancelSelectedEvent =
+    async () => {
+      if (
+        !selectedEvent?.id ||
+        eventCancelling
+      ) {
+        return;
+      }
+
+      const workspaceId =
+        sessionWorkspace?.id ||
+        "";
+
+      const providerLinked =
+        selectedEvent
+          .sourceProvider ===
+          "nylas" &&
+        Boolean(
+          selectedEvent
+            .externalEventId,
+        ) &&
+        Boolean(
+          selectedEvent
+            .externalCalendarId,
+        );
+
+      const confirmed =
+        window.confirm(
+          providerLinked
+            ? `Cancel this event in Campaign Seat and delete it from ${calendarProviderLabel}? This cannot be undone.`
+            : "Cancel this event in Campaign Seat? This cannot be undone.",
+        );
+
+      if (!confirmed) {
+        return;
+      }
+
+      setEventCancelling(
+        true,
+      );
+
+      try {
+        if (providerLinked) {
+          if (!workspaceId) {
+            throw new Error(
+              "Campaign Seat could not resolve the current campaign workspace.",
+            );
+          }
+
+          const {
+            data,
+            error,
+          } =
+            await supabase
+              .functions
+              .invoke(
+                "nylas-calendar-event-cancel",
+                {
+                  body: {
+                    workspaceId,
+
+                    eventId:
+                      selectedEvent.id,
+                  },
+                },
+              );
+
+          if (
+            error ||
+            data?.success !== true
+          ) {
+            throw new Error(
+              data?.error ||
+              error?.message ||
+              "Campaign Seat could not cancel the connected Calendar event.",
+            );
+          }
+
+          await refreshCalendar();
+        } else {
+          await cancelCalendarEvent(
+            selectedEvent.id,
+          );
+        }
+
+        setEditEventOpen(
+          false,
+        );
+
+        setSelectedEvent(
+          null,
+        );
+      } catch (
+        cancelError
+      ) {
+        console.error(
+          "Calendar event cancellation failed",
+          cancelError,
+        );
+
+        window.alert(
+          cancelError?.message ||
+          "The event could not be cancelled.",
+        );
+      } finally {
+        setEventCancelling(
+          false,
+        );
+      }
+    };
 
   const renderMainView = () => {
     if (viewMode === "month") {
@@ -1866,18 +4321,84 @@ export default function CalendarReferencePreview() {
                 })}
               </div>
 
-              <button
-                className={styles.connectButton}
-                type="button"
-              >
-                <CalendarDays size={17} />
-                Connect calendar
-              </button>
+              {calendarConnectionLoading ? (
+                <div
+                  className={
+                    styles.calendarConnectionStatus
+                  }
+                >
+                  <RefreshCw
+                    className={
+                      styles.spinning
+                    }
+                    size={17}
+                  />
+
+                  <div>
+                    <strong>
+                      Checking calendar…
+                    </strong>
+
+                    <span>
+                      Verifying provider connection
+                    </span>
+                  </div>
+                </div>
+              ) : calendarConnected ? (
+                <div
+                  className={
+                    styles.calendarConnectionStatus
+                  }
+                >
+                  <CheckCircle2
+                    size={18}
+                  />
+
+                  <div>
+                    <strong>
+                      {calendarProviderLabel} connected
+                    </strong>
+
+                    <span>
+                      {calendarConnection
+                        ?.display_email ||
+                        "Connected campaign calendar"}
+                    </span>
+
+                    <small>
+                      {calendarLastSyncLabel
+                        ? `Last synced ${calendarLastSyncLabel}`
+                        : "Connected · Ready to sync"}
+                    </small>
+                  </div>
+                </div>
+              ) : (
+                <button
+                  className={
+                    styles.connectButton
+                  }
+                  type="button"
+                  onClick={
+                    handleConnectCalendar
+                  }
+                  disabled={
+                    calendarConnecting
+                  }
+                >
+                  <CalendarDays
+                    size={17}
+                  />
+
+                  {calendarConnecting
+                    ? "Connecting calendar…"
+                    : "Connect calendar"}
+                </button>
+              )}
             </section>
           </aside>
         </section>
 
-        {selectedEvent ? (
+        {selectedEvent && !editEventOpen ? (
           <div
             className={styles.overlay}
             role="presentation"
@@ -2002,28 +4523,1777 @@ export default function CalendarReferencePreview() {
               </section>
 
               <div className={styles.drawerActions}>
-                <button type="button">
+                <button
+                  type="button"
+                  onClick={
+                    openEditSelectedEvent
+                  }
+                >
                   Edit event
                 </button>
 
                 <button
                   type="button"
-                  onClick={() => {
-                    setEvents((current) =>
-                      current.filter(
-                        (event) =>
-                          event.id !==
-                          selectedEvent.id,
-                      ),
-                    );
-
-                    setSelectedEvent(null);
-                  }}
+                  onClick={
+                    handleCancelSelectedEvent
+                  }
+                  disabled={
+                    eventCancelling
+                  }
                 >
-                  Cancel event
+                  {eventCancelling
+                    ? "Cancelling…"
+                    : "Cancel event"}
                 </button>
               </div>
             </aside>
+          </div>
+        ) : null}
+
+        {editEventOpen && selectedEvent ? (
+          <div
+            className={
+              styles.richEventOverlay
+            }
+            role="presentation"
+            onMouseDown={(event) => {
+              if (
+                event.target ===
+                event.currentTarget &&
+                !editSaving
+              ) {
+                setEditEventOpen(
+                  false,
+                );
+              }
+            }}
+          >
+            <form
+              className={
+                styles.richEventEditor
+              }
+              onSubmit={
+                saveEditedEvent
+              }
+            >
+              <header
+                className={
+                  styles.richEventEditorHeader
+                }
+              >
+                <div>
+                  <span
+                    className={
+                      styles.eyebrow
+                    }
+                  >
+                    Campaign calendar
+                  </span>
+
+                  <h2>
+                    Edit event
+                  </h2>
+                </div>
+
+                <div
+                  className={
+                    styles.richEventHeaderActions
+                  }
+                >
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setEditEventOpen(
+                        false,
+                      )
+                    }
+                    disabled={
+                      editSaving
+                    }
+                  >
+                    Cancel
+                  </button>
+
+                  <button
+                    type="submit"
+                    className={
+                      styles.richEventSaveButton
+                    }
+                    disabled={
+                      editSaving
+                    }
+                  >
+                    {editSaving
+                      ? "Saving…"
+                      : "Save changes"}
+                  </button>
+
+                  <button
+                    type="button"
+                    className={
+                      styles.richEventClose
+                    }
+                    aria-label="Close event editor"
+                    onClick={() =>
+                      setEditEventOpen(
+                        false,
+                      )
+                    }
+                    disabled={
+                      editSaving
+                    }
+                  >
+                    <X size={20} />
+                  </button>
+                </div>
+              </header>
+
+              <div
+                className={
+                  styles.richEventEditorBody
+                }
+              >
+                <main
+                  className={
+                    styles.richEventMain
+                  }
+                >
+                  <input
+                    className={
+                      styles.richEventTitle
+                    }
+                    type="text"
+                    required
+                    value={
+                      editEventForm.title
+                    }
+                    placeholder="Add title"
+                    onChange={(event) =>
+                      setEditEventForm(
+                        (current) => ({
+                          ...current,
+                          title:
+                            event
+                              .target
+                              .value,
+                        }),
+                      )
+                    }
+                  />
+
+                  <section
+                    className={
+                      styles.richEditorSection
+                    }
+                  >
+                    <div
+                      className={
+                        styles.richEditorSectionIcon
+                      }
+                    >
+                      <Clock3
+                        size={20}
+                      />
+                    </div>
+
+                    <div
+                      className={
+                        styles.richEditorSectionContent
+                      }
+                    >
+                      <div
+                        className={
+                          styles.richEditorGrid
+                        }
+                      >
+                        <label>
+                          <span>
+                            Date
+                          </span>
+
+                          <input
+                            type="date"
+                            value={
+                              editEventForm
+                                .date
+                            }
+                            onChange={(event) =>
+                              setEditEventForm(
+                                (current) => ({
+                                  ...current,
+                                  date:
+                                    event
+                                      .target
+                                      .value,
+                                }),
+                              )
+                            }
+                          />
+                        </label>
+
+                        {!editEventForm
+                          .allDay ? (
+                          <>
+                            <label>
+                              <span>
+                                Start
+                              </span>
+
+                              <input
+                                type="time"
+                                value={
+                                  editEventForm
+                                    .start
+                                }
+                                onChange={(event) =>
+                                  setEditEventForm(
+                                    (current) => ({
+                                      ...current,
+                                      start:
+                                        event
+                                          .target
+                                          .value,
+                                    }),
+                                  )
+                                }
+                              />
+                            </label>
+
+                            <label>
+                              <span>
+                                End
+                              </span>
+
+                              <input
+                                type="time"
+                                value={
+                                  editEventForm
+                                    .end
+                                }
+                                onChange={(event) =>
+                                  setEditEventForm(
+                                    (current) => ({
+                                      ...current,
+                                      end:
+                                        event
+                                          .target
+                                          .value,
+                                    }),
+                                  )
+                                }
+                              />
+                            </label>
+                          </>
+                        ) : null}
+                      </div>
+
+                      <div
+                        className={
+                          styles.richEditorInlineOptions
+                        }
+                      >
+                        <label
+                          className={
+                            styles.richEditorCheckbox
+                          }
+                        >
+                          <input
+                            type="checkbox"
+                            checked={
+                              editEventForm
+                                .allDay
+                            }
+                            onChange={(event) =>
+                              setEditEventForm(
+                                (current) => ({
+                                  ...current,
+                                  allDay:
+                                    event
+                                      .target
+                                      .checked,
+                                }),
+                              )
+                            }
+                          />
+
+                          <span>
+                            All day
+                          </span>
+                        </label>
+
+                        <label
+                          className={
+                            styles.richEditorCompactField
+                          }
+                        >
+                          <span>
+                            Time zone
+                          </span>
+
+                          <select
+                            value={
+                              editEventForm
+                                .timezone
+                            }
+                            onChange={(event) =>
+                              setEditEventForm(
+                                (current) => ({
+                                  ...current,
+                                  timezone:
+                                    event
+                                      .target
+                                      .value,
+                                }),
+                              )
+                            }
+                          >
+                            <option
+                              value="America/New_York"
+                            >
+                              Eastern Time
+                            </option>
+
+                            <option
+                              value="America/Chicago"
+                            >
+                              Central Time
+                            </option>
+
+                            <option
+                              value="America/Denver"
+                            >
+                              Mountain Time
+                            </option>
+
+                            <option
+                              value="America/Los_Angeles"
+                            >
+                              Pacific Time
+                            </option>
+                          </select>
+                        </label>
+                      </div>
+                    </div>
+                  </section>
+
+                  <section
+                    className={
+                      styles.richEditorSection
+                    }
+                  >
+                    <div
+                      className={
+                        styles.richEditorSectionIcon
+                      }
+                    >
+                      <Search
+                        size={20}
+                      />
+                    </div>
+
+                    <div
+                      className={
+                        styles.richEditorSectionContent
+                      }
+                    >
+                      <div
+                        className={
+                          styles.richFindTimeCard
+                        }
+                      >
+                        <div
+                          className={
+                            styles.richFindTimeHeading
+                          }
+                        >
+                          <div>
+                            <strong>
+                              Find a time
+                            </strong>
+
+                            <span>
+                              Check your connected calendar
+                              {editEventForm
+                                .participants
+                                .length
+                                ? ` and ${editEventForm.participants.length} guest${editEventForm.participants.length === 1 ? "" : "s"}`
+                                : ""}
+                              {" "}for shared openings.
+                            </span>
+                          </div>
+
+                          <div
+                            className={
+                              styles.richFindTimeControls
+                            }
+                          >
+                            <select
+                              aria-label="Availability search range"
+                              value={
+                                findTimeDays
+                              }
+                              onChange={(event) =>
+                                setFindTimeDays(
+                                  Number(
+                                    event
+                                      .target
+                                      .value,
+                                  ),
+                                )
+                              }
+                            >
+                              <option value={3}>
+                                Next 3 days
+                              </option>
+
+                              <option value={7}>
+                                Next 7 days
+                              </option>
+
+                              <option value={14}>
+                                Next 14 days
+                              </option>
+                            </select>
+
+                            <button
+                              type="button"
+                              onClick={
+                                handleFindTime
+                              }
+                              disabled={
+                                findingTime
+                              }
+                            >
+                              <Search
+                                size={15}
+                              />
+
+                              {findingTime
+                                ? "Checking…"
+                                : "Find a time"}
+                            </button>
+                          </div>
+                        </div>
+
+                        <small
+                          className={
+                            styles.richFindTimeWindow
+                          }
+                        >
+                          Searches 8:00 AM–8:00 PM in {
+                            editEventForm
+                              .timezone ===
+                            "America/New_York"
+                              ? "Eastern Time"
+                              : editEventForm
+                                  .timezone ===
+                                "America/Chicago"
+                                ? "Central Time"
+                                : editEventForm
+                                    .timezone ===
+                                  "America/Denver"
+                                  ? "Mountain Time"
+                                  : editEventForm
+                                      .timezone ===
+                                    "America/Los_Angeles"
+                                    ? "Pacific Time"
+                                    : editEventForm
+                                        .timezone
+                          }.
+                        </small>
+
+                        {findTimeError ? (
+                          <div
+                            className={
+                              styles.richFindTimeError
+                            }
+                          >
+                            <AlertTriangle
+                              size={16}
+                            />
+
+                            <span>
+                              {findTimeError}
+                            </span>
+                          </div>
+                        ) : null}
+
+                        {findTimeResult
+                          ?.unresolved
+                          ?.length ? (
+                          <div
+                            className={
+                              styles.richFindTimeWarning
+                            }
+                          >
+                            <AlertTriangle
+                              size={16}
+                            />
+
+                            <div>
+                              <strong>
+                                Partial availability
+                              </strong>
+
+                              <span>
+                                Campaign Seat could not verify:
+                                {" "}
+                                {findTimeResult
+                                  .unresolved
+                                  .map(
+                                    (item) =>
+                                      item.email,
+                                  )
+                                  .join(", ")}
+                                .
+                                Suggested times only account
+                                for calendars we could verify.
+                              </span>
+                            </div>
+                          </div>
+                        ) : null}
+
+                        {findTimeResult ? (
+                          <div
+                            className={
+                              styles.richFindTimeResults
+                            }
+                          >
+                            <div
+                              className={
+                                styles.richFindTimeResultHeading
+                              }
+                            >
+                              <strong>
+                                Suggested times
+                              </strong>
+
+                              <span>
+                                {findTimeResult
+                                  .suggestions
+                                  ?.length ||
+                                  0}
+                                {" "}opening{
+                                  (
+                                    findTimeResult
+                                      .suggestions
+                                      ?.length ||
+                                    0
+                                  ) === 1
+                                    ? ""
+                                    : "s"
+                                } found
+                              </span>
+                            </div>
+
+                            {findTimeResult
+                              .suggestions
+                              ?.length ? (
+                              <div
+                                className={
+                                  styles.richFindTimeSlots
+                                }
+                              >
+                                {findTimeResult
+                                  .suggestions
+                                  .slice(
+                                    0,
+                                    12,
+                                  )
+                                  .map(
+                                    (
+                                      suggestion,
+                                      index,
+                                    ) => {
+                                      const startDate =
+                                        new Date(
+                                          suggestion
+                                            .start_time *
+                                            1000,
+                                        );
+
+                                      const endDate =
+                                        new Date(
+                                          suggestion
+                                            .end_time *
+                                            1000,
+                                        );
+
+                                      const timezone =
+                                        findTimeResult
+                                          .timezone ||
+                                        editEventForm
+                                          .timezone;
+
+                                      return (
+                                        <button
+                                          type="button"
+                                          className={
+                                            selectedFindTimeStart ===
+                                            Number(
+                                              suggestion.start_time,
+                                            )
+                                              ? styles.richFindTimeSlotSelected
+                                              : ""
+                                          }
+                                          aria-pressed={
+                                            selectedFindTimeStart ===
+                                            Number(
+                                              suggestion.start_time,
+                                            )
+                                          }
+                                          key={`${suggestion.start_time}-${index}`}
+                                          onClick={() =>
+                                            applyFindTimeSuggestion(
+                                              suggestion,
+                                            )
+                                          }
+                                        >
+                                          <strong>
+                                            {new Intl.DateTimeFormat(
+                                              "en-US",
+                                              {
+                                                timeZone:
+                                                  timezone,
+
+                                                weekday:
+                                                  "short",
+
+                                                month:
+                                                  "short",
+
+                                                day:
+                                                  "numeric",
+                                              },
+                                            ).format(
+                                              startDate,
+                                            )}
+                                          </strong>
+
+                                          <span>
+                                            {new Intl.DateTimeFormat(
+                                              "en-US",
+                                              {
+                                                timeZone:
+                                                  timezone,
+
+                                                hour:
+                                                  "numeric",
+
+                                                minute:
+                                                  "2-digit",
+                                              },
+                                            ).format(
+                                              startDate,
+                                            )}
+                                            {" – "}
+                                            {new Intl.DateTimeFormat(
+                                              "en-US",
+                                              {
+                                                timeZone:
+                                                  timezone,
+
+                                                hour:
+                                                  "numeric",
+
+                                                minute:
+                                                  "2-digit",
+                                              },
+                                            ).format(
+                                              endDate,
+                                            )}
+                                          </span>
+                                        </button>
+                                      );
+                                    },
+                                  )}
+                              </div>
+                            ) : (
+                              <div
+                                className={
+                                  styles.richFindTimeEmpty
+                                }
+                              >
+                                No shared openings were found
+                                in this search window.
+                              </div>
+                            )}
+
+                            {(
+                              findTimeResult
+                                .suggestions
+                                ?.length ||
+                              0
+                            ) > 12 ? (
+                              <small
+                                className={
+                                  styles.richFindTimeMore
+                                }
+                              >
+                                Showing the first 12 openings.
+                              </small>
+                            ) : null}
+                          </div>
+                        ) : null}
+                      </div>
+                    </div>
+                  </section>
+
+                  <section
+                    className={
+                      styles.richEditorSection
+                    }
+                  >
+                    <div
+                      className={
+                        styles.richEditorSectionIcon
+                      }
+                    >
+                      <CalendarRange
+                        size={20}
+                      />
+                    </div>
+
+                    <div
+                      className={
+                        styles.richEditorSectionContent
+                      }
+                    >
+                      <label>
+                        <span>
+                          Repeat
+                        </span>
+
+                        <select
+                          value={
+                            editEventForm
+                              .recurrenceMode
+                          }
+                          onChange={(event) =>
+                            setEditEventForm(
+                              (current) => ({
+                                ...current,
+                                recurrenceMode:
+                                  event
+                                    .target
+                                    .value,
+                              }),
+                            )
+                          }
+                        >
+                          <option value="none">
+                            Does not repeat
+                          </option>
+
+                          <option value="daily">
+                            Daily
+                          </option>
+
+                          <option value="weekly">
+                            Weekly
+                          </option>
+
+                          <option value="monthly">
+                            Monthly
+                          </option>
+
+                          {editEventForm
+                            .recurrenceMode ===
+                          "custom" ? (
+                            <option value="custom">
+                              Custom recurrence
+                            </option>
+                          ) : null}
+                        </select>
+                      </label>
+                    </div>
+                  </section>
+
+                  <section
+                    className={
+                      styles.richEditorSection
+                    }
+                  >
+                    <div
+                      className={
+                        styles.richEditorSectionIcon
+                      }
+                    >
+                      <Video
+                        size={20}
+                      />
+                    </div>
+
+                    <div
+                      className={
+                        styles.richEditorSectionContent
+                      }
+                    >
+                      <div
+                        className={
+                          styles.richConferenceCard
+                        }
+                      >
+                        <div
+                          className={
+                            styles.richConferenceStatus
+                          }
+                        >
+                          <span
+                            className={
+                              styles.richConferenceIcon
+                            }
+                          >
+                            <Video
+                              size={18}
+                            />
+                          </span>
+
+                          <div>
+                            <strong>
+                              {calendarProvider ===
+                              "microsoft"
+                                ? "Microsoft Teams"
+                                : "Google Meet"}
+                            </strong>
+
+                            <span>
+                              {editEventForm
+                                .addConference
+                                ? editEventForm
+                                    .conferencing
+                                    ?.details
+                                    ?.url
+                                  ? "Video meeting attached"
+                                  : "Meeting link will be created when you save"
+                                : "Add a video meeting to this event"}
+                            </span>
+                          </div>
+                        </div>
+
+                        {editEventForm
+                          .addConference ? (
+                          <div
+                            className={
+                              styles.richConferenceActions
+                            }
+                          >
+                            {editEventForm
+                              .conferencing
+                              ?.details
+                              ?.url ? (
+                              <a
+                                className={
+                                  styles.richConferenceLink
+                                }
+                                href={
+                                  editEventForm
+                                    .conferencing
+                                    .details
+                                    .url
+                                }
+                                target="_blank"
+                                rel="noreferrer"
+                              >
+                                Join meeting
+                              </a>
+                            ) : null}
+
+                            <button
+                              type="button"
+                              className={
+                                styles.richConferenceRemove
+                              }
+                              onClick={() =>
+                                setEditEventForm(
+                                  (current) => ({
+                                    ...current,
+
+                                    addConference:
+                                      false,
+
+                                    conferencing:
+                                      {},
+                                  }),
+                                )
+                              }
+                            >
+                              Remove
+                            </button>
+                          </div>
+                        ) : (
+                          <button
+                            type="button"
+                            className={
+                              styles.richConferenceAdd
+                            }
+                            onClick={() =>
+                              setEditEventForm(
+                                (current) => ({
+                                  ...current,
+
+                                  addConference:
+                                    true,
+
+                                  conferencing: {
+                                    provider:
+                                      calendarProvider ===
+                                      "microsoft"
+                                        ? "Microsoft Teams"
+                                        : "Google Meet",
+
+                                    autocreate:
+                                      {},
+                                  },
+                                }),
+                              )
+                            }
+                          >
+                            <Video
+                              size={16}
+                            />
+
+                            {calendarProvider ===
+                            "microsoft"
+                              ? "Add Microsoft Teams"
+                              : "Add Google Meet"}
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  </section>
+
+                  <section
+                    className={
+                      styles.richEditorSection
+                    }
+                  >
+                    <div
+                      className={
+                        styles.richEditorSectionIcon
+                      }
+                    >
+                      <MapPin
+                        size={20}
+                      />
+                    </div>
+
+                    <div
+                      className={
+                        styles.richEditorSectionContent
+                      }
+                    >
+                      <label>
+                        <span>
+                          Location
+                        </span>
+
+                        <input
+                          type="text"
+                          value={
+                            editEventForm
+                              .location
+                          }
+                          placeholder="Add location or meeting link"
+                          onChange={(event) =>
+                            setEditEventForm(
+                              (current) => ({
+                                ...current,
+                                location:
+                                  event
+                                    .target
+                                    .value,
+                              }),
+                            )
+                          }
+                        />
+                      </label>
+                    </div>
+                  </section>
+
+                  <section
+                    className={
+                      styles.richEditorSection
+                    }
+                  >
+                    <div
+                      className={
+                        styles.richEditorSectionIcon
+                      }
+                    >
+                      <CalendarClock
+                        size={20}
+                      />
+                    </div>
+
+                    <div
+                      className={
+                        styles.richEditorSectionContent
+                      }
+                    >
+                      <div
+                        className={
+                          styles.richReminderCard
+                        }
+                      >
+                        <div
+                          className={
+                            styles.richReminderHeading
+                          }
+                        >
+                          <div>
+                            <strong>
+                              Notifications
+                            </strong>
+
+                            <span>
+                              Choose when guests and organizers are reminded.
+                            </span>
+                          </div>
+
+                          <label
+                            className={
+                              styles.richReminderDefault
+                            }
+                          >
+                            <input
+                              type="checkbox"
+                              checked={
+                                editEventForm
+                                  .useDefaultReminders
+                              }
+                              onChange={(event) =>
+                                setEditEventForm(
+                                  (current) => ({
+                                    ...current,
+
+                                    useDefaultReminders:
+                                      event
+                                        .target
+                                        .checked,
+                                  }),
+                                )
+                              }
+                            />
+
+                            <span>
+                              Use calendar default
+                            </span>
+                          </label>
+                        </div>
+
+                        {!editEventForm
+                          .useDefaultReminders ? (
+                          <>
+                            <div
+                              className={
+                                styles.richReminderList
+                              }
+                            >
+                              {editEventForm
+                                .reminderRows
+                                .length ===
+                              0 ? (
+                                <div
+                                  className={
+                                    styles.richReminderEmpty
+                                  }
+                                >
+                                  No notifications
+                                </div>
+                              ) : (
+                                editEventForm
+                                  .reminderRows
+                                  .map(
+                                    (
+                                      reminder,
+                                      index,
+                                    ) => (
+                                      <div
+                                        className={
+                                          styles.richReminderRow
+                                        }
+                                        key={`reminder-${index}`}
+                                      >
+                                        <select
+                                          aria-label="Reminder time"
+                                          value={
+                                            reminder
+                                              .minutes
+                                          }
+                                          onChange={(event) =>
+                                            updateReminderRow(
+                                              index,
+                                              {
+                                                minutes:
+                                                  event
+                                                    .target
+                                                    .value,
+                                              },
+                                            )
+                                          }
+                                        >
+                                          <option value="5">
+                                            5 minutes before
+                                          </option>
+
+                                          <option value="10">
+                                            10 minutes before
+                                          </option>
+
+                                          <option value="15">
+                                            15 minutes before
+                                          </option>
+
+                                          <option value="30">
+                                            30 minutes before
+                                          </option>
+
+                                          <option value="60">
+                                            1 hour before
+                                          </option>
+
+                                          <option value="120">
+                                            2 hours before
+                                          </option>
+
+                                          <option value="1440">
+                                            1 day before
+                                          </option>
+
+                                          <option value="2880">
+                                            2 days before
+                                          </option>
+
+                                          {![
+                                            "5",
+                                            "10",
+                                            "15",
+                                            "30",
+                                            "60",
+                                            "120",
+                                            "1440",
+                                            "2880",
+                                          ].includes(
+                                            String(
+                                              reminder
+                                                .minutes,
+                                            ),
+                                          ) ? (
+                                            <option
+                                              value={
+                                                reminder
+                                                  .minutes
+                                              }
+                                            >
+                                              {reminder
+                                                .minutes} minutes before
+                                            </option>
+                                          ) : null}
+                                        </select>
+
+                                        <select
+                                          aria-label="Reminder method"
+                                          value={
+                                            reminder
+                                              .method
+                                          }
+                                          onChange={(event) =>
+                                            updateReminderRow(
+                                              index,
+                                              {
+                                                method:
+                                                  event
+                                                    .target
+                                                    .value,
+                                              },
+                                            )
+                                          }
+                                        >
+                                          <option value="popup">
+                                            Notification
+                                          </option>
+
+                                          <option value="email">
+                                            Email
+                                          </option>
+                                        </select>
+
+                                        <button
+                                          type="button"
+                                          aria-label="Remove notification"
+                                          onClick={() =>
+                                            removeReminderRow(
+                                              index,
+                                            )
+                                          }
+                                        >
+                                          <X
+                                            size={16}
+                                          />
+                                        </button>
+                                      </div>
+                                    ),
+                                  )
+                              )}
+                            </div>
+
+                            <button
+                              type="button"
+                              className={
+                                styles.richReminderAdd
+                              }
+                              onClick={
+                                addReminderRow
+                              }
+                              disabled={
+                                editEventForm
+                                  .reminderRows
+                                  .length >= 5
+                              }
+                            >
+                              <Plus
+                                size={15}
+                              />
+
+                              Add notification
+                            </button>
+                          </>
+                        ) : (
+                          <div
+                            className={
+                              styles.richReminderDefaultNotice
+                            }
+                          >
+                            This event will use the connected calendar’s default notification settings.
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </section>
+
+                  <section
+                    className={
+                      styles.richEditorSection
+                    }
+                  >
+                    <div
+                      className={
+                        styles.richEditorSectionIcon
+                      }
+                    >
+                      <ListChecks
+                        size={20}
+                      />
+                    </div>
+
+                    <div
+                      className={
+                        styles.richEditorSectionContent
+                      }
+                    >
+                      <div
+                        className={
+                          styles.richEditorGridTwo
+                        }
+                      >
+                        <label>
+                          <span>
+                            Event type
+                          </span>
+
+                          <select
+                            value={
+                              editEventForm
+                                .type
+                            }
+                            onChange={(event) =>
+                              setEditEventForm(
+                                (current) => ({
+                                  ...current,
+                                  type:
+                                    event
+                                      .target
+                                      .value,
+                                }),
+                              )
+                            }
+                          >
+                            {Object.entries(
+                              EVENT_TYPE_LABELS,
+                            ).map(
+                              ([value, label]) => (
+                                <option
+                                  key={value}
+                                  value={value}
+                                >
+                                  {label}
+                                </option>
+                              ),
+                            )}
+                          </select>
+                        </label>
+
+                        <label>
+                          <span>
+                            Show as
+                          </span>
+
+                          <select
+                            value={
+                              editEventForm
+                                .busy
+                                ? "busy"
+                                : "free"
+                            }
+                            onChange={(event) =>
+                              setEditEventForm(
+                                (current) => ({
+                                  ...current,
+                                  busy:
+                                    event
+                                      .target
+                                      .value ===
+                                    "busy",
+                                }),
+                              )
+                            }
+                          >
+                            <option value="busy">
+                              Busy
+                            </option>
+
+                            <option value="free">
+                              Free
+                            </option>
+                          </select>
+                        </label>
+
+                        <label>
+                          <span>
+                            Visibility
+                          </span>
+
+                          <select
+                            value={
+                              editEventForm
+                                .visibility
+                            }
+                            onChange={(event) =>
+                              setEditEventForm(
+                                (current) => ({
+                                  ...current,
+                                  visibility:
+                                    event
+                                      .target
+                                      .value,
+                                }),
+                              )
+                            }
+                          >
+                            {calendarProvider ===
+                            "google" ? (
+                              <option value="default">
+                                Default visibility
+                              </option>
+                            ) : null}
+
+                            <option value="public">
+                              Public
+                            </option>
+
+                            <option value="private">
+                              Private
+                            </option>
+                          </select>
+                        </label>
+                      </div>
+                    </div>
+                  </section>
+
+                  <section
+                    className={
+                      styles.richEditorSection
+                    }
+                  >
+                    <div
+                      className={
+                        styles.richEditorSectionIcon
+                      }
+                    >
+                      <MoreVertical
+                        size={20}
+                      />
+                    </div>
+
+                    <div
+                      className={
+                        styles.richEditorSectionContent
+                      }
+                    >
+                      <label>
+                        <span>
+                          Description or notes
+                        </span>
+
+                        <textarea
+                          rows={6}
+                          value={
+                            editEventForm
+                              .description
+                          }
+                          placeholder="Add notes, agenda, talking points, or event details…"
+                          onChange={(event) =>
+                            setEditEventForm(
+                              (current) => ({
+                                ...current,
+                                description:
+                                  event
+                                    .target
+                                    .value,
+                              }),
+                            )
+                          }
+                        />
+                      </label>
+                    </div>
+                  </section>
+                </main>
+
+                <aside
+                  className={
+                    styles.richEventSidebar
+                  }
+                >
+                  <section
+                    className={
+                      styles.richGuestPanel
+                    }
+                  >
+                    <div
+                      className={
+                        styles.richSidebarHeading
+                      }
+                    >
+                      <UsersRound
+                        size={20}
+                      />
+
+                      <div>
+                        <strong>
+                          Guests
+                        </strong>
+
+                        <span>
+                          Add campaign staff or outside attendees
+                        </span>
+                      </div>
+                    </div>
+
+                    <div
+                      className={
+                        styles.richGuestComposer
+                      }
+                    >
+                      <input
+                        className={
+                          styles.richGuestNameInput
+                        }
+                        type="text"
+                        value={
+                          guestNameDraft
+                        }
+                        placeholder="Guest name (optional)"
+                        onChange={(event) =>
+                          setGuestNameDraft(
+                            event
+                              .target
+                              .value,
+                          )
+                        }
+                      />
+
+                      <div
+                        className={
+                          styles.richGuestInput
+                        }
+                      >
+                        <input
+                          type="email"
+                          value={
+                            guestDraft
+                          }
+                          placeholder="Email address"
+                          onChange={(event) =>
+                            setGuestDraft(
+                              event
+                                .target
+                                .value,
+                            )
+                          }
+                          onKeyDown={(event) => {
+                            if (
+                              event.key ===
+                              "Enter"
+                            ) {
+                              event.preventDefault();
+                              addEditGuest();
+                            }
+                          }}
+                        />
+
+                        <button
+                          type="button"
+                          onClick={
+                            addEditGuest
+                          }
+                        >
+                          Add
+                        </button>
+                      </div>
+                    </div>
+
+                    <div
+                      className={
+                        styles.richGuestList
+                      }
+                    >
+                      {editEventForm
+                        .participants
+                        .length ===
+                      0 ? (
+                        <div
+                          className={
+                            styles.richGuestEmpty
+                          }
+                        >
+                          No guests added
+                        </div>
+                      ) : (
+                        editEventForm
+                          .participants
+                          .map(
+                            (
+                              participant,
+                            ) => (
+                              <div
+                                className={
+                                  styles.richGuestItem
+                                }
+                                key={
+                                  participant
+                                    .email
+                                }
+                              >
+                                <span
+                                  className={
+                                    styles.richGuestAvatar
+                                  }
+                                >
+                                  {String(
+                                    participant
+                                      ?.name ||
+                                    participant
+                                      ?.email ||
+                                    "?",
+                                  )
+                                    .charAt(0)
+                                    .toUpperCase()}
+                                </span>
+
+                                <div>
+                                  <strong>
+                                    {participant
+                                      ?.name ||
+                                      participant
+                                        ?.email}
+                                  </strong>
+
+                                  {participant
+                                    ?.name ? (
+                                    <span>
+                                      {participant
+                                        .email}
+                                    </span>
+                                  ) : null}
+                                </div>
+
+                                <button
+                                  type="button"
+                                  aria-label={`Remove ${participant.email}`}
+                                  onClick={() =>
+                                    removeEditGuest(
+                                      participant
+                                        .email,
+                                    )
+                                  }
+                                >
+                                  <X
+                                    size={15}
+                                  />
+                                </button>
+                              </div>
+                            ),
+                          )
+                      )}
+                    </div>
+
+                    <div
+                      className={
+                        styles.richGuestSettings
+                      }
+                    >
+                      <label>
+                        <input
+                          type="checkbox"
+                          checked={
+                            editEventForm
+                              .notifyParticipants
+                          }
+                          onChange={(event) =>
+                            setEditEventForm(
+                              (current) => ({
+                                ...current,
+                                notifyParticipants:
+                                  event
+                                    .target
+                                    .checked,
+                              }),
+                            )
+                          }
+                        />
+
+                        <span>
+                          Email guests about changes
+                        </span>
+                      </label>
+
+                      <label>
+                        <input
+                          type="checkbox"
+                          checked={
+                            editEventForm
+                              .hideParticipants
+                          }
+                          onChange={(event) =>
+                            setEditEventForm(
+                              (current) => ({
+                                ...current,
+                                hideParticipants:
+                                  event
+                                    .target
+                                    .checked,
+                              }),
+                            )
+                          }
+                        />
+
+                        <span>
+                          Hide guest list
+                        </span>
+                      </label>
+                    </div>
+                  </section>
+
+                  <section
+                    className={
+                      styles.richConnectedCalendar
+                    }
+                  >
+                    <CheckCircle2
+                      size={19}
+                    />
+
+                    <div>
+                      <strong>
+                        {calendarProviderLabel}
+                      </strong>
+
+                      <span>
+                        {calendarConnection
+                          ?.display_email ||
+                          "Connected calendar"}
+                      </span>
+
+                      <small>
+                        Changes sync to this calendar
+                      </small>
+                    </div>
+                  </section>
+
+                  <section
+                    className={
+                      styles.richProviderIdentity
+                    }
+                  >
+                    <span>
+                      Calendar event
+                    </span>
+
+                    <strong>
+                      {selectedEvent
+                        .externalEventId
+                        ? "Synced with provider"
+                        : "Campaign Seat only"}
+                    </strong>
+                  </section>
+                </aside>
+              </div>
+
+              <footer
+                className={
+                  styles.richEventEditorFooter
+                }
+              >
+                <button
+                  type="button"
+                  className={
+                    styles.richEventDangerButton
+                  }
+                  onClick={
+                    handleCancelSelectedEvent
+                  }
+                  disabled={
+                    editSaving ||
+                    eventCancelling
+                  }
+                >
+                  {eventCancelling
+                    ? "Cancelling…"
+                    : "Cancel event"}
+                </button>
+
+                <div>
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setEditEventOpen(
+                        false,
+                      )
+                    }
+                    disabled={
+                      editSaving
+                    }
+                  >
+                    Close
+                  </button>
+
+                  <button
+                    type="submit"
+                    className={
+                      styles.richEventSaveButton
+                    }
+                    disabled={
+                      editSaving
+                    }
+                  >
+                    {editSaving
+                      ? "Saving changes…"
+                      : "Save changes"}
+                  </button>
+                </div>
+              </footer>
+            </form>
           </div>
         ) : null}
 
@@ -2068,6 +6338,7 @@ export default function CalendarReferencePreview() {
                 Event name
                 <input
                   required
+                  name="title"
                   type="text"
                   value={eventForm.title}
                   placeholder="Enter event name"
@@ -2087,6 +6358,7 @@ export default function CalendarReferencePreview() {
                 <label>
                   Date
                   <input
+                    name="date"
                     type="date"
                     value={eventForm.date}
                     onChange={(event) =>
@@ -2104,6 +6376,7 @@ export default function CalendarReferencePreview() {
                 <label>
                   Type
                   <select
+                    name="type"
                     value={eventForm.type}
                     onChange={(event) =>
                       setEventForm(
@@ -2133,6 +6406,7 @@ export default function CalendarReferencePreview() {
                 <label>
                   Start
                   <input
+                    name="start"
                     type="time"
                     value={eventForm.start}
                     onChange={(event) =>
@@ -2150,6 +6424,7 @@ export default function CalendarReferencePreview() {
                 <label>
                   End
                   <input
+                    name="end"
                     type="time"
                     value={eventForm.end}
                     onChange={(event) =>
@@ -2168,6 +6443,7 @@ export default function CalendarReferencePreview() {
               <label>
                 Location or meeting link
                 <input
+                  name="location"
                   type="text"
                   value={eventForm.location}
                   placeholder="Campaign HQ, Zoom, address…"

@@ -1,5 +1,15 @@
 import { supabase } from "../lib/supabase";
 
+export const PHONE_MFA_ENABLED =
+  String(
+    import.meta.env
+      .VITE_PHONE_MFA_ENABLED ||
+      "",
+  )
+    .trim()
+    .toLowerCase() ===
+  "true";
+
 export const LEADERSHIP_MFA_ROLES =
   new Set([
     "campaign_owner",
@@ -65,7 +75,7 @@ function getMfaErrorMessage(
       "verification code",
     )
   ) {
-    return "The six-digit authenticator code is incorrect or has expired.";
+    return "The six-digit security code is incorrect or has expired.";
   }
 
   if (
@@ -76,7 +86,7 @@ function getMfaErrorMessage(
       "not found",
     )
   ) {
-    return "This authenticator setup is no longer available. Start the setup again.";
+    return "This security-factor setup is no longer available. Start the setup again.";
   }
 
   return (
@@ -140,7 +150,7 @@ export async function getMfaState() {
     throw new Error(
       getMfaErrorMessage(
         factorsResult.error,
-        "Campaign Seat could not load the account's authenticator factors.",
+        "Campaign Seat could not load the account's security factors.",
       ),
     );
   }
@@ -149,19 +159,73 @@ export async function getMfaState() {
     factorsResult.data?.totp ||
     [];
 
-  const verifiedFactors =
+  const phoneFactors =
+    factorsResult.data?.phone ||
+    [];
+
+  const verifiedTotpFactors =
     totpFactors.filter(
       (factor) =>
         factor.status ===
         "verified",
     );
 
-  const unverifiedFactors =
+  const verifiedPhoneFactors =
+    phoneFactors.filter(
+      (factor) =>
+        factor.status ===
+        "verified",
+    );
+
+  const unverifiedTotpFactors =
     totpFactors.filter(
       (factor) =>
         factor.status !==
         "verified",
     );
+
+  const unverifiedPhoneFactors =
+    phoneFactors.filter(
+      (factor) =>
+        factor.status !==
+        "verified",
+    );
+
+  const verifiedFactors = [
+    ...verifiedPhoneFactors.map(
+      (factor) => ({
+        ...factor,
+        factorType:
+          "phone",
+      }),
+    ),
+
+    ...verifiedTotpFactors.map(
+      (factor) => ({
+        ...factor,
+        factorType:
+          "totp",
+      }),
+    ),
+  ];
+
+  const unverifiedFactors = [
+    ...unverifiedPhoneFactors.map(
+      (factor) => ({
+        ...factor,
+        factorType:
+          "phone",
+      }),
+    ),
+
+    ...unverifiedTotpFactors.map(
+      (factor) => ({
+        ...factor,
+        factorType:
+          "totp",
+      }),
+    ),
+  ];
 
   const currentLevel =
     assuranceResult.data
@@ -177,8 +241,28 @@ export async function getMfaState() {
     currentLevel,
     nextLevel,
 
+    totpFactors,
+    phoneFactors,
+
+    verifiedTotpFactors,
+    verifiedPhoneFactors,
+
+    unverifiedTotpFactors,
+    unverifiedPhoneFactors,
+
     verifiedFactors,
     unverifiedFactors,
+
+    hasVerifiedTotp:
+      verifiedTotpFactors
+        .length > 0,
+
+    hasVerifiedPhone:
+      verifiedPhoneFactors
+        .length > 0,
+
+    phoneMfaAvailable:
+      PHONE_MFA_ENABLED,
 
     isAal2:
       currentLevel ===
@@ -200,7 +284,7 @@ export async function beginTotpEnrollment({
 
   for (
     const factor of
-    state.unverifiedFactors
+    state.unverifiedTotpFactors
   ) {
     const {
       error:
@@ -349,12 +433,339 @@ export async function cancelTotpEnrollment(
   }
 }
 
+
+function normalizePhoneNumber(
+  value,
+) {
+  const raw =
+    String(value || "")
+      .trim();
+
+  if (!raw) {
+    return "";
+  }
+
+  const compact =
+    raw.replace(
+      /[^\d+]/g,
+      "",
+    );
+
+  if (
+    compact.startsWith(
+      "+",
+    )
+  ) {
+    return compact;
+  }
+
+  const digits =
+    compact.replace(
+      /\D/g,
+      "",
+    );
+
+  if (
+    digits.length ===
+    10
+  ) {
+    return `+1${digits}`;
+  }
+
+  return digits
+    ? `+${digits}`
+    : "";
+}
+
+export function maskPhoneNumber(
+  value,
+) {
+  const digits =
+    String(value || "")
+      .replace(
+        /\D/g,
+        "",
+      );
+
+  if (digits.length < 4) {
+    return "Phone";
+  }
+
+  return `••• ••• ${digits.slice(-4)}`;
+}
+
+export async function beginPhoneEnrollment({
+  phone,
+  friendlyName =
+    "Campaign Seat Text Message",
+} = {}) {
+  if (!PHONE_MFA_ENABLED) {
+    throw new Error(
+      "Text-message verification is not enabled for this Campaign Seat environment yet.",
+    );
+  }
+
+  const normalizedPhone =
+    normalizePhoneNumber(
+      phone,
+    );
+
+  if (
+    !/^\+\d{10,15}$/.test(
+      normalizedPhone,
+    )
+  ) {
+    throw new Error(
+      "Enter a valid mobile phone number including area code.",
+    );
+  }
+
+  const state =
+    await getMfaState();
+
+  for (
+    const factor of
+    state.unverifiedPhoneFactors
+  ) {
+    const {
+      error:
+        cleanupError,
+    } =
+      await supabase.auth.mfa
+        .unenroll({
+          factorId:
+            factor.id,
+        });
+
+    if (cleanupError) {
+      console.warn(
+        "An unfinished phone MFA factor could not be removed:",
+        cleanupError,
+      );
+    }
+  }
+
+  const {
+    data,
+    error,
+  } =
+    await supabase.auth.mfa
+      .enroll({
+        factorType:
+          "phone",
+
+        phone:
+          normalizedPhone,
+
+        friendlyName:
+          String(
+            friendlyName ||
+              "Campaign Seat Text Message",
+          ).slice(
+            0,
+            100,
+          ),
+      });
+
+  if (
+    error ||
+    !data?.id
+  ) {
+    throw new Error(
+      getMfaErrorMessage(
+        error,
+        "Campaign Seat could not begin text-message verification.",
+      ),
+    );
+  }
+
+  const challenge =
+    await challengePhoneFactor({
+      factorId:
+        data.id,
+    });
+
+  return {
+    factorId:
+      data.id,
+
+    challengeId:
+      challenge.challengeId,
+
+    phone:
+      data.phone ||
+      normalizedPhone,
+
+    maskedPhone:
+      maskPhoneNumber(
+        data.phone ||
+        normalizedPhone,
+      ),
+
+    friendlyName:
+      data.friendly_name ||
+      friendlyName,
+  };
+}
+
+export async function challengePhoneFactor({
+  factorId,
+} = {}) {
+  if (!PHONE_MFA_ENABLED) {
+    throw new Error(
+      "Text-message verification is not enabled for this Campaign Seat environment yet.",
+    );
+  }
+
+  if (!factorId) {
+    throw new Error(
+      "Choose a phone security factor.",
+    );
+  }
+
+  const {
+    data,
+    error,
+  } =
+    await supabase.auth.mfa
+      .challenge({
+        factorId,
+      });
+
+  if (
+    error ||
+    !data?.id
+  ) {
+    throw new Error(
+      getMfaErrorMessage(
+        error,
+        "Campaign Seat could not send the verification text.",
+      ),
+    );
+  }
+
+  return {
+    challengeId:
+      data.id,
+  };
+}
+
+export async function verifyPhoneFactor({
+  factorId,
+  challengeId,
+  code,
+}) {
+  const normalizedCode =
+    normalizeCode(code);
+
+  if (
+    !factorId ||
+    !challengeId ||
+    !/^\d{6}$/.test(
+      normalizedCode,
+    )
+  ) {
+    throw new Error(
+      "Enter the complete six-digit code from the text message.",
+    );
+  }
+
+  const {
+    data,
+    error,
+  } =
+    await supabase.auth.mfa
+      .verify({
+        factorId,
+        challengeId,
+        code:
+          normalizedCode,
+      });
+
+  if (error) {
+    throw new Error(
+      getMfaErrorMessage(
+        error,
+        "Campaign Seat could not verify the text-message code.",
+      ),
+    );
+  }
+
+  const state =
+    await getMfaState();
+
+  if (!state.isAal2) {
+    throw new Error(
+      "The code was accepted, but the secure session was not upgraded. Try again.",
+    );
+  }
+
+  return {
+    data,
+    state,
+  };
+}
+
+export async function cancelPhoneEnrollment(
+  factorId,
+) {
+  if (!factorId) {
+    return;
+  }
+
+  const {
+    error,
+  } =
+    await supabase.auth.mfa
+      .unenroll({
+        factorId,
+      });
+
+  if (error) {
+    throw new Error(
+      getMfaErrorMessage(
+        error,
+        "The unfinished text-message setup could not be cancelled.",
+      ),
+    );
+  }
+}
+
 export async function removeMfaFactor(
   factorId,
 ) {
   if (!factorId) {
     throw new Error(
-      "Choose an authenticator factor to remove.",
+      "Choose a verification method to remove.",
+    );
+  }
+
+  const state =
+    await getMfaState();
+
+  const verifiedTarget =
+    state.verifiedFactors.find(
+      (factor) =>
+        factor.id ===
+        factorId,
+    );
+
+  if (
+    verifiedTarget &&
+    !state.isAal2
+  ) {
+    throw new Error(
+      "Verify your identity with a current two-step method before removing a verified method.",
+    );
+  }
+
+  if (
+    verifiedTarget &&
+    state.verifiedFactors.length <=
+      1
+  ) {
+    throw new Error(
+      "The final verified two-step method cannot be removed from a protected leadership account. Add and verify another method first.",
     );
   }
 
@@ -370,13 +781,26 @@ export async function removeMfaFactor(
     throw new Error(
       getMfaErrorMessage(
         error,
-        "The authenticator factor could not be removed.",
+        "The verification method could not be removed.",
       ),
     );
   }
 
-  await supabase.auth
-    .refreshSession();
+  const {
+    error:
+      refreshError,
+  } =
+    await supabase.auth
+      .refreshSession();
+
+  if (refreshError) {
+    throw new Error(
+      getMfaErrorMessage(
+        refreshError,
+        "The verification method was removed, but Campaign Seat could not refresh the secure session.",
+      ),
+    );
+  }
 
   return getMfaState();
 }

@@ -292,3 +292,611 @@
     overflow: hidden !important;
   }
 }
+
+/* CAMPAIGN SEAT COMPACT 1180 LOGIN — START */
+
+/*
+ * Purpose:
+ *
+ * Preserve the complete approved 900px login composition inside
+ * an 820px-high medium desktop viewport without page scrolling.
+ *
+ * The campaign side and account side use the same 0.91 visual
+ * scale so both columns remain balanced and readable.
+ *
+ * Scope:
+ * - Desktop and landscape-tablet widths only
+ * - Viewport heights from 801px through 820px
+ * - Does not affect 1440 × 900
+ * - Does not affect widths at or below 900px
+ */
+@media
+  (min-width: 901px)
+  and
+  (max-width: 1180px)
+  and
+  (min-height: 801px)
+  and
+  (max-height: 820px) {
+
+  /*
+   * Lock the complete login experience to the viewport.
+   * No document scrollbar and no nested panel scrollbar.
+   */
+  .loginLayout {
+    display: grid !important;
+
+    grid-template-columns:
+      minmax(0, 1fr)
+      minmax(400px, 480px) !important;
+
+    grid-template-rows:
+      100dvh !important;
+
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+
+    height: 100dvh !important;
+    min-height: 100dvh !important;
+    max-height: 100dvh !important;
+
+    margin: 0 auto 0 0 !important;
+
+    overflow: hidden !important;
+
+    overscroll-behavior: none !important;
+    scrollbar-gutter: auto !important;
+    scrollbar-width: none !important;
+  }
+
+  .loginLayout::-webkit-scrollbar {
+    display: none !important;
+
+    width: 0 !important;
+    height: 0 !important;
+  }
+
+  /*
+   * Left campaign panel remains exactly one viewport tall.
+   */
+  .heroPanel {
+    position: relative !important;
+
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+
+    height: 100dvh !important;
+    min-height: 100dvh !important;
+    max-height: 100dvh !important;
+
+    overflow: hidden !important;
+
+    overscroll-behavior: none !important;
+    scrollbar-width: none !important;
+  }
+
+  .heroPanel::-webkit-scrollbar {
+    display: none !important;
+  }
+
+  /*
+   * The approved campaign story was designed around 900px.
+   *
+   * 900px × 0.91 = 819px, allowing the complete composition
+   * to fit inside an 820px viewport.
+   *
+   * The controlled width leaves a deliberate visible gutter at
+   * the center divider so every Hero element remains contained.
+   */
+  .heroPanel > * {
+    position: relative !important;
+
+    display: flex !important;
+
+    box-sizing: border-box !important;
+
+    width: 100% !important;
+    min-width: 100% !important;
+    max-width: 100% !important;
+
+    height: 900px !important;
+    min-height: 900px !important;
+    max-height: 900px !important;
+
+    margin: 0 !important;
+
+    overflow: hidden !important;
+
+    zoom: 0.91 !important;
+
+    transform: none !important;
+    transform-origin: top left !important;
+
+    overscroll-behavior: none !important;
+    scrollbar-width: none !important;
+  }
+
+  .heroPanel > *::-webkit-scrollbar {
+    display: none !important;
+  }
+
+  /*
+   * Right account panel fills the same viewport height.
+   */
+  .formPanel {
+    position: relative !important;
+
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+
+    height: 100dvh !important;
+    min-height: 100dvh !important;
+    max-height: 100dvh !important;
+
+    align-items: center !important;
+    justify-content: center !important;
+
+    padding: 16px !important;
+
+    overflow: hidden !important;
+
+    overscroll-behavior: none !important;
+    scrollbar-width: none !important;
+  }
+
+  .formPanel::-webkit-scrollbar {
+    display: none !important;
+  }
+
+  /*
+   * Preserve the existing compact login-card scale.
+   * The form remains centered and does not receive a scrollbar.
+   */
+  .formPanelStatic {
+    align-items: center !important;
+
+    height: 100dvh !important;
+    min-height: 100dvh !important;
+    max-height: 100dvh !important;
+
+    overflow: hidden !important;
+
+    overscroll-behavior: none !important;
+    scrollbar-gutter: auto !important;
+    scrollbar-width: none !important;
+  }
+
+  .formPanelStatic::-webkit-scrollbar {
+    display: none !important;
+  }
+
+  .formPanelStatic > * {
+    max-height: none !important;
+
+    zoom: 0.91 !important;
+
+    transform: none !important;
+    transform-origin: center center !important;
+  }
+}
+
+/*
+ * Emergency fallback for desktop windows shorter than the
+ * approved 1180 × 820 test size.
+ *
+ * Normal 1180 × 820 remains completely no-scroll.
+ */
+@media
+  (min-width: 901px)
+  and
+  (max-width: 1180px)
+  and
+  (max-height: 800px) {
+
+  .loginLayout {
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+
+    overscroll-behavior-y: contain !important;
+    scrollbar-width: thin !important;
+
+    -webkit-overflow-scrolling: touch !important;
+  }
+}
+
+/* CAMPAIGN SEAT COMPACT 1180 LOGIN — END */
+
+/* CAMPAIGN SEAT PORTRAIT-TABLET STACKED LOGIN — START */
+
+/*
+ * Portrait tablets receive two complete vertical sections:
+ *
+ * 1. Campaign Seat story
+ * 2. Secure login
+ *
+ * LoginLayout owns the only scrollbar.
+ */
+@media
+  (min-width: 701px)
+  and
+  (max-width: 900px)
+  and
+  (orientation: portrait) {
+
+  .loginLayout {
+    display: block !important;
+
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+
+    height: 100dvh !important;
+    min-height: 100dvh !important;
+    max-height: 100dvh !important;
+
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+
+    overscroll-behavior-x: none !important;
+    overscroll-behavior-y: contain !important;
+
+    scrollbar-gutter: stable !important;
+    scrollbar-width: thin !important;
+
+    scroll-behavior: smooth !important;
+
+    -webkit-overflow-scrolling: touch !important;
+  }
+
+  .heroPanel {
+    display: block !important;
+
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+
+    height: auto !important;
+    min-height: 100svh !important;
+    max-height: none !important;
+
+    overflow: hidden !important;
+  }
+
+  .heroPanel > * {
+    box-sizing: border-box !important;
+
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+
+    height: auto !important;
+    min-height: 100svh !important;
+    max-height: none !important;
+
+    zoom: 1 !important;
+
+    transform: none !important;
+    transform-origin: top left !important;
+  }
+
+  .formPanel,
+  .formPanelStatic {
+    box-sizing: border-box !important;
+
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+
+    height: auto !important;
+    min-height: 100svh !important;
+    max-height: none !important;
+
+    align-items: center !important;
+    justify-content: center !important;
+
+    padding:
+      56px
+      clamp(24px, 6vw, 52px)
+      44px !important;
+
+    overflow: visible !important;
+
+    overscroll-behavior: auto !important;
+    scrollbar-gutter: auto !important;
+  }
+
+  .formPanelStatic > * {
+    width: min(100%, 640px) !important;
+    max-width: 640px !important;
+
+    margin-right: auto !important;
+    margin-left: auto !important;
+
+    zoom: 1 !important;
+
+    transform: none !important;
+    transform-origin: center center !important;
+  }
+
+  .loginLayout::-webkit-scrollbar {
+    width: 8px !important;
+  }
+
+  .loginLayout::-webkit-scrollbar-track {
+    background: transparent !important;
+  }
+
+  .loginLayout::-webkit-scrollbar-thumb {
+    border:
+      2px
+      solid
+      transparent !important;
+
+    border-radius: 999px !important;
+
+    background:
+      rgba(135, 157, 182, 0.72) !important;
+
+    background-clip: padding-box !important;
+  }
+}
+
+/* CAMPAIGN SEAT PORTRAIT-TABLET STACKED LOGIN — END */
+
+/* CAMPAIGN SEAT MOBILE STACKED LOGIN — START */
+
+/*
+ * Mobile login architecture:
+ *
+ * 1. Campaign story
+ * 2. Login section
+ *
+ * LoginLayout is the only vertical scroll container.
+ */
+@media (max-width: 700px) {
+
+  .loginLayout {
+    display: block !important;
+
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+
+    height: 100dvh !important;
+    min-height: 100dvh !important;
+    max-height: 100dvh !important;
+
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+
+    overscroll-behavior-x: none !important;
+    overscroll-behavior-y: contain !important;
+
+    scrollbar-gutter: auto !important;
+    scrollbar-width: thin !important;
+
+    -webkit-overflow-scrolling: touch !important;
+  }
+
+  .heroPanel {
+    display: block !important;
+
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+
+    height: auto !important;
+    min-height: 100svh !important;
+    max-height: none !important;
+
+    overflow: hidden !important;
+  }
+
+  .heroPanel > * {
+    box-sizing: border-box !important;
+
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+
+    height: auto !important;
+    min-height: 100svh !important;
+    max-height: none !important;
+
+    zoom: 1 !important;
+
+    transform: none !important;
+    transform-origin: top left !important;
+  }
+
+  .formPanel,
+  .formPanelStatic {
+    box-sizing: border-box !important;
+
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+
+    height: auto !important;
+    min-height: 100svh !important;
+    max-height: none !important;
+
+    align-items: center !important;
+    justify-content: center !important;
+
+    padding:
+      34px
+      16px
+      32px !important;
+
+    overflow: visible !important;
+
+    overscroll-behavior: auto !important;
+    scrollbar-gutter: auto !important;
+  }
+
+  .formPanelStatic > * {
+    width: min(100%, 430px) !important;
+    max-width: 430px !important;
+
+    margin-right: auto !important;
+    margin-left: auto !important;
+
+    zoom: 1 !important;
+
+    transform: none !important;
+    transform-origin: center center !important;
+  }
+
+  .loginLayout::-webkit-scrollbar {
+    width: 6px !important;
+  }
+
+  .loginLayout::-webkit-scrollbar-track {
+    background: transparent !important;
+  }
+
+  .loginLayout::-webkit-scrollbar-thumb {
+    border:
+      1px
+      solid
+      transparent !important;
+
+    border-radius: 999px !important;
+
+    background:
+      rgba(135, 157, 182, 0.72) !important;
+
+    background-clip: padding-box !important;
+  }
+}
+
+/* CAMPAIGN SEAT MOBILE STACKED LOGIN — END */
+
+
+/* ============================================================
+   CAMPAIGN SEAT — FINAL MFA SHELL
+   MFA uses the proven normal login desktop proportions.
+   ============================================================ */
+
+.mfaFormPanel {
+  align-items: center !important;
+
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+
+  padding: 18px !important;
+
+  overscroll-behavior: contain !important;
+  scrollbar-gutter: stable !important;
+}
+
+.mfaFormPanel > * {
+  width: min(100%, 540px) !important;
+  max-width: 540px !important;
+  min-width: 0 !important;
+
+  max-height: none !important;
+
+  margin:
+    auto
+    0 !important;
+
+  zoom: 1 !important;
+
+  transform: none !important;
+  transform-origin: center center !important;
+}
+
+
+/*
+ * Once the window is narrow enough that two panels would begin
+ * squeezing one another, MFA becomes one clean security screen.
+ */
+@media (max-width: 1180px) {
+
+  .mfaLoginLayout {
+    display: block !important;
+
+    width: 100% !important;
+
+    height: 100dvh !important;
+    min-height: 100dvh !important;
+    max-height: 100dvh !important;
+
+    overflow: hidden !important;
+  }
+
+  .mfaHeroPanel {
+    display: none !important;
+  }
+
+  .mfaFormPanel {
+    width: 100% !important;
+    max-width: 100% !important;
+
+    height: 100dvh !important;
+    min-height: 100dvh !important;
+    max-height: 100dvh !important;
+
+    justify-content: center !important;
+
+    padding:
+      20px
+      clamp(18px, 6vw, 56px)
+      24px !important;
+  }
+
+  .mfaFormPanel > * {
+    width: min(100%, 600px) !important;
+    max-width: 600px !important;
+  }
+}
+
+/* ============================================================
+   CAMPAIGN SEAT — FLUID DESKTOP LOGIN
+   One responsive composition. No desktop size jumps.
+   MFA is excluded and keeps its dedicated security shell.
+   ============================================================ */
+
+@media (min-width: 981px) {
+
+  .loginLayout:not(.mfaLoginLayout) {
+    grid-template-columns:
+      minmax(0, 1fr)
+      clamp(
+        540px,
+        41vw,
+        610px
+      ) !important;
+  }
+
+  .loginLayout:not(.mfaLoginLayout)
+  .formPanelStatic {
+    align-items: center !important;
+    justify-content: center !important;
+
+    padding:
+      clamp(12px, 1.6vh, 18px)
+      clamp(12px, 1.4vw, 20px) !important;
+
+    overflow: hidden !important;
+  }
+
+  .loginLayout:not(.mfaLoginLayout)
+  .formPanelStatic > * {
+    width: min(100%, 570px) !important;
+    max-width: 570px !important;
+
+    max-height: calc(100dvh - 24px) !important;
+
+    margin: auto !important;
+
+    zoom: 1 !important;
+    transform: none !important;
+    transform-origin: center center !important;
+  }
+}
