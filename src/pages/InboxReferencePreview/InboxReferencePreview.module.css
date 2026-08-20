@@ -10493,3 +10493,629 @@
   }
 
 }
+
+/* ============================================================
+   CAMPAIGN SEAT — MOBILE SINGLE-VIEW INBOX V2
+
+   Phone:
+   Inbox list OR opened conversation.
+   Composer rows never overlap.
+   ============================================================ */
+
+.mobileBackToInbox {
+  display: none;
+}
+
+
+/* ------------------------------------------------------------
+   TABLET PORTRAIT / PHONE
+   ------------------------------------------------------------ */
+
+@media (max-width: 820px) {
+
+  .inboxWorkspace {
+    display: block !important;
+
+    width: 100% !important;
+    min-width: 0 !important;
+  }
+
+
+  /* Default mobile state = Inbox list. */
+
+  .conversationPanel {
+    display: flex !important;
+
+    width: 100% !important;
+    min-width: 0 !important;
+
+    height:
+      min(
+        650px,
+        calc(100dvh - 135px)
+      ) !important;
+
+    min-height:
+      470px !important;
+
+    max-height:
+      none !important;
+  }
+
+
+  .threadPanel {
+    display: none !important;
+  }
+
+
+  /* Open message = replace the list. */
+
+  .mobileConversationOpen
+    .conversationPanel {
+    display: none !important;
+  }
+
+
+  .mobileConversationOpen
+    .threadPanel {
+    box-sizing: border-box !important;
+
+    display: flex !important;
+
+    position: relative !important;
+
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+
+    height: auto !important;
+    min-height:
+      calc(100dvh - 90px) !important;
+
+    max-height: none !important;
+
+    flex-direction: column !important;
+
+    overflow: visible !important;
+  }
+
+
+  .mobileBackToInbox {
+    box-sizing: border-box !important;
+
+    display: inline-flex !important;
+
+    min-height: 38px !important;
+
+    flex:
+      0 0 auto !important;
+
+    align-items: center !important;
+
+    gap: 5px !important;
+
+    margin:
+      0
+      5px
+      0
+      0 !important;
+
+    padding:
+      0
+      10px !important;
+
+    border:
+      1px solid
+      #ccdbe7 !important;
+
+    border-radius:
+      9px !important;
+
+    color:
+      #245a84 !important;
+
+    background:
+      #ffffff !important;
+
+    font:
+      inherit !important;
+
+    font-size:
+      12px !important;
+
+    font-weight:
+      800 !important;
+
+    white-space:
+      nowrap !important;
+  }
+
+
+  .threadHeader {
+    box-sizing: border-box !important;
+
+    min-height: 60px !important;
+
+    gap: 7px !important;
+
+    padding:
+      9px
+      10px !important;
+  }
+
+
+  /*
+   * Message itself scrolls.
+   * Composer remains below it.
+   */
+
+  .mobileConversationOpen
+    .threadBody {
+    box-sizing: border-box !important;
+
+    width: 100% !important;
+    min-width: 0 !important;
+
+    min-height: 330px !important;
+
+    max-height:
+      58dvh !important;
+
+    flex:
+      0 1 auto !important;
+
+    overflow-x:
+      hidden !important;
+
+    overflow-y:
+      auto !important;
+
+    -webkit-overflow-scrolling:
+      touch !important;
+  }
+
+
+  /*
+   * MASTER MOBILE COMPOSER
+   *
+   * Exact visual order:
+   * textarea
+   * signature
+   * attach / reply all
+   * channels
+   * send
+   */
+
+  .mobileConversationOpen
+    .replyComposer {
+    box-sizing: border-box !important;
+
+    position: static !important;
+
+    display: grid !important;
+
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+
+    grid-template-columns:
+      minmax(0, 1fr) !important;
+
+    grid-auto-rows:
+      auto !important;
+
+    align-items:
+      stretch !important;
+
+    gap:
+      10px !important;
+
+    margin:
+      0 !important;
+
+    padding:
+      12px
+      12px
+      calc(
+        24px +
+        env(
+          safe-area-inset-bottom,
+          0px
+        )
+      ) !important;
+
+    overflow:
+      visible !important;
+  }
+
+
+  /*
+   * Kill any older positioning rules that caused
+   * the channel buttons to sit on top of Send Reply.
+   */
+
+  .mobileConversationOpen
+    .replyComposer
+    > * {
+    position:
+      static !important;
+
+    inset:
+      auto !important;
+
+    float:
+      none !important;
+
+    transform:
+      none !important;
+
+    translate:
+      none !important;
+
+    width:
+      auto;
+
+    max-width:
+      100%;
+
+    margin-left:
+      0 !important;
+
+    margin-right:
+      0 !important;
+  }
+
+
+  .mobileConversationOpen
+    .replyComposer
+    textarea {
+    box-sizing:
+      border-box !important;
+
+    order:
+      1 !important;
+
+    display:
+      block !important;
+
+    width:
+      100% !important;
+
+    height:
+      145px !important;
+
+    min-height:
+      145px !important;
+
+    max-height:
+      145px !important;
+
+    margin:
+      0 !important;
+
+    flex:
+      none !important;
+
+    resize:
+      vertical;
+  }
+
+
+  .mobileConversationOpen
+    .composerSignature {
+    box-sizing:
+      border-box !important;
+
+    order:
+      2 !important;
+
+    width:
+      100% !important;
+
+    min-width:
+      0 !important;
+
+    max-height:
+      125px !important;
+
+    margin:
+      0 !important;
+
+    overflow-y:
+      auto !important;
+  }
+
+
+  .mobileConversationOpen
+    .composerSignature
+    > div {
+    max-height:
+      80px !important;
+
+    overflow-y:
+      auto !important;
+  }
+
+
+  .mobileConversationOpen
+    .replyOptions {
+    box-sizing:
+      border-box !important;
+
+    order:
+      3 !important;
+
+    display:
+      flex !important;
+
+    position:
+      static !important;
+
+    width:
+      100% !important;
+
+    min-width:
+      0 !important;
+
+    align-items:
+      center !important;
+
+    gap:
+      8px !important;
+
+    margin:
+      0 !important;
+
+    overflow-x:
+      auto !important;
+
+    overflow-y:
+      hidden !important;
+
+    padding:
+      0
+      0
+      2px !important;
+
+    -webkit-overflow-scrolling:
+      touch !important;
+  }
+
+
+  .mobileConversationOpen
+    .replyOptions
+    button {
+    position:
+      static !important;
+
+    flex:
+      0 0 auto !important;
+
+    margin:
+      0 !important;
+
+    transform:
+      none !important;
+  }
+
+
+  .mobileConversationOpen
+    .replyChannels {
+    box-sizing:
+      border-box !important;
+
+    order:
+      4 !important;
+
+    display:
+      flex !important;
+
+    position:
+      static !important;
+
+    width:
+      100% !important;
+
+    min-width:
+      0 !important;
+
+    align-items:
+      stretch !important;
+
+    gap:
+      7px !important;
+
+    margin:
+      0 !important;
+
+    padding:
+      0
+      0
+      2px !important;
+
+    overflow-x:
+      auto !important;
+
+    overflow-y:
+      hidden !important;
+
+    transform:
+      none !important;
+
+    -webkit-overflow-scrolling:
+      touch !important;
+  }
+
+
+  .mobileConversationOpen
+    .replyChannels
+    button {
+    position:
+      static !important;
+
+    min-height:
+      48px !important;
+
+    flex:
+      0 0 auto !important;
+
+    margin:
+      0 !important;
+
+    transform:
+      none !important;
+
+    white-space:
+      nowrap !important;
+  }
+
+
+  .mobileConversationOpen
+    .sendButton {
+    box-sizing:
+      border-box !important;
+
+    order:
+      5 !important;
+
+    position:
+      static !important;
+
+    inset:
+      auto !important;
+
+    display:
+      flex !important;
+
+    width:
+      100% !important;
+
+    min-width:
+      0 !important;
+
+    height:
+      54px !important;
+
+    min-height:
+      54px !important;
+
+    max-height:
+      none !important;
+
+    align-items:
+      center !important;
+
+    justify-content:
+      center !important;
+
+    margin:
+      0 !important;
+
+    padding:
+      0
+      16px !important;
+
+    transform:
+      none !important;
+
+    flex:
+      none !important;
+  }
+
+
+  /*
+   * Extra breathing room below the complete conversation card.
+   */
+
+  .mobileConversationOpen {
+    padding-bottom:
+      calc(
+        24px +
+        env(
+          safe-area-inset-bottom,
+          0px
+        )
+      ) !important;
+  }
+
+
+  .page {
+    padding-bottom:
+      calc(
+        34px +
+        env(
+          safe-area-inset-bottom,
+          0px
+        )
+      ) !important;
+  }
+
+}
+
+
+/* ------------------------------------------------------------
+   SMALL PHONE
+   ------------------------------------------------------------ */
+
+@media (max-width: 430px) {
+
+  .mobileConversationOpen
+    .threadBody {
+    min-height:
+      300px !important;
+
+    max-height:
+      55dvh !important;
+  }
+
+
+  .mobileConversationOpen
+    .replyComposer {
+    gap:
+      9px !important;
+
+    padding:
+      10px
+      10px
+      calc(
+        22px +
+        env(
+          safe-area-inset-bottom,
+          0px
+        )
+      ) !important;
+  }
+
+
+  .mobileConversationOpen
+    .replyComposer
+    textarea {
+    height:
+      132px !important;
+
+    min-height:
+      132px !important;
+
+    max-height:
+      132px !important;
+  }
+
+
+  .mobileConversationOpen
+    .composerSignature {
+    max-height:
+      110px !important;
+  }
+
+
+  .mobileConversationOpen
+    .replyChannels {
+    gap:
+      6px !important;
+  }
+
+}

@@ -6,6 +6,7 @@ import {
 } from "react";
 import {
   Archive,
+  ArrowLeft,
   AtSign,
   CheckCircle2,
   ListTodo,
@@ -3748,7 +3749,17 @@ export default function InboxReferencePreview() {
           </div>
         </section>
 
-        <section className={styles.inboxWorkspace}>
+        <section
+          className={[
+            styles.inboxWorkspace,
+            hasSelectedConversation &&
+            !newMessageMode
+              ? styles.mobileConversationOpen
+              : "",
+          ]
+            .filter(Boolean)
+            .join(" ")}
+        >
           <section className={styles.conversationPanel}>
             <header className={styles.listHeader}>
               <div
@@ -3997,6 +4008,32 @@ export default function InboxReferencePreview() {
 
             {newMessageMode ? (
               <header className={styles.threadHeader}>
+              {!newMessageMode &&
+              hasSelectedConversation ? (
+                <button
+                  type="button"
+                  className={
+                    styles.mobileBackToInbox
+                  }
+                  onClick={() => {
+                    setSelectedConversationId(
+                      "",
+                    );
+
+                    setThreadExpanded(
+                      false,
+                    );
+                  }}
+                >
+                  <ArrowLeft
+                    size={17}
+                  />
+
+                  <span>
+                    Inbox
+                  </span>
+                </button>
+              ) : null}
                 <div>
                   <span className={styles.avatar}>
                     NM

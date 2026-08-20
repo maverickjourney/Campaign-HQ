@@ -3305,81 +3305,87 @@
 /* ============================================================
    CAMPAIGN SEAT — MASTER WORKSPACE HEADER
 
-   DESKTOP / LAPTOP
-   [ menu + workspace ]    [ date · time | AI | notifications ]
-
-   MOBILE
-   [ menu + workspace ]    [ compact date/time | AI | bell ]
-
-   Exactly one row.
-   Never sticky.
+   One row.
+   Non-sticky.
+   Workspace truncates before controls wrap.
+   Mobile controls intentionally larger.
    ============================================================ */
-
-
-/* ------------------------------------------------------------
-   SHELL HEADER
-   ------------------------------------------------------------ */
 
 .topbar,
 [data-shared-workspace-topbar="true"] {
   position: static !important;
   inset: auto !important;
 
-  box-sizing: border-box;
+  box-sizing: border-box !important;
 
   display: flex !important;
 
   width: 100% !important;
   min-width: 0 !important;
 
-  min-height: 68px !important;
+  min-height: 70px !important;
 
-  flex: 0 0 auto !important;
-  flex-direction: row !important;
-  flex-wrap: nowrap !important;
+  flex:
+    0 0 auto !important;
 
-  align-items: center !important;
-  justify-content: space-between !important;
+  flex-direction:
+    row !important;
 
-  gap: 12px !important;
+  flex-wrap:
+    nowrap !important;
+
+  align-items:
+    center !important;
+
+  justify-content:
+    space-between !important;
+
+  gap:
+    12px !important;
 
   padding:
     10px
     16px !important;
 
-  overflow: visible !important;
+  overflow:
+    visible !important;
 
   border-bottom:
-    1px solid #dfe6ee;
+    1px solid
+    #dfe6ee !important;
 
   background:
     #ffffff !important;
 
-  backdrop-filter: none !important;
-  -webkit-backdrop-filter: none !important;
+  backdrop-filter:
+    none !important;
+
+  -webkit-backdrop-filter:
+    none !important;
 }
 
 
-/* ------------------------------------------------------------
-   LEFT GROUP
-   ------------------------------------------------------------ */
+/* LEFT */
 
 .topbarLead {
-  display: flex;
+  display: flex !important;
 
-  min-width: 0;
+  min-width: 0 !important;
 
   flex:
-    1 1 auto;
+    1 1 auto !important;
 
-  align-items: center;
+  align-items:
+    center !important;
 
-  gap: 11px;
+  gap:
+    11px !important;
 }
 
 
 .sharedMenuButton {
-  box-sizing: border-box;
+  box-sizing:
+    border-box !important;
 
   flex:
     0 0 auto !important;
@@ -3390,7 +3396,8 @@
 
 
 .workspaceIdentity {
-  min-width: 0 !important;
+  min-width:
+    0 !important;
 
   flex:
     1 1 auto !important;
@@ -3402,104 +3409,132 @@
 
 .workspaceIdentity span,
 .workspaceIdentity strong {
-  display: block;
+  display:
+    block !important;
 }
 
 
 .workspaceIdentity strong {
-  width: 100%;
-  min-width: 0;
+  width:
+    100% !important;
 
-  overflow: hidden;
+  min-width:
+    0 !important;
 
-  text-overflow: ellipsis;
+  overflow:
+    hidden !important;
 
-  white-space: nowrap;
+  text-overflow:
+    ellipsis !important;
+
+  white-space:
+    nowrap !important;
 }
 
 
-/* ------------------------------------------------------------
-   RIGHT UTILITY BAR
-   ------------------------------------------------------------ */
+/* RIGHT UTILITY BAR */
 
 .topbarUtility {
-  box-sizing: border-box;
+  box-sizing:
+    border-box !important;
 
-  display: flex;
+  display:
+    flex !important;
 
-  width: auto;
+  width:
+    auto !important;
 
-  min-width: max-content;
-  height: 46px;
+  min-width:
+    max-content !important;
+
+  height:
+    48px !important;
 
   flex:
-    0 0 auto;
+    0 0 auto !important;
 
-  align-items: center;
+  align-items:
+    center !important;
 
-  gap: 0;
+  gap:
+    0 !important;
 
   padding:
-    2px;
+    2px !important;
 
   border:
-    1px solid #d4e0ea;
+    1px solid
+    #d4e0ea !important;
 
   border-radius:
-    12px;
+    13px !important;
 
   background:
-    #ffffff;
+    #ffffff !important;
 
   box-shadow:
-    0 3px 10px
+    0
+    3px
+    10px
     rgba(
       28,
       65,
       101,
       0.04
-    );
+    ) !important;
 }
 
 
 .topbarUtility > * {
   flex:
-    0 0 auto;
+    0 0 auto !important;
 }
 
 
 .utilityDivider {
-  width: 1px;
-  height: 26px;
+  width:
+    1px !important;
+
+  height:
+    27px !important;
 
   flex:
-    0 0 1px;
+    0 0 1px !important;
 
   background:
-    #e0e7ed;
+    #e0e7ed !important;
 }
 
 
-/* ------------------------------------------------------------
-   DATE + TIME
-   ------------------------------------------------------------ */
+/* DATE / TIME */
 
 .dateTime {
-  box-sizing: border-box;
+  box-sizing:
+    border-box !important;
 
-  display: flex !important;
+  display:
+    flex !important;
 
-  width: auto !important;
+  width:
+    auto !important;
 
-  min-width: 0 !important;
-  height: 40px !important;
-  min-height: 40px !important;
+  min-width:
+    0 !important;
 
-  align-items: center !important;
+  height:
+    42px !important;
 
-  gap: 7px !important;
+  min-height:
+    42px !important;
 
-  margin: 0 !important;
+  align-items:
+    center !important;
+
+  gap:
+    7px !important;
+
+  margin:
+    0 !important;
 
   padding:
     0
@@ -3509,7 +3544,10 @@
     0 !important;
 
   border-radius:
-    9px 0 0 9px !important;
+    10px
+    0
+    0
+    10px !important;
 
   background:
     transparent !important;
@@ -3517,34 +3555,32 @@
   box-shadow:
     none !important;
 
-  color:
-    #365b7d;
-
   white-space:
-    nowrap;
+    nowrap !important;
 }
 
 
 .fullDateLabel {
-  display: inline;
+  display:
+    inline !important;
 }
 
 
 .shortDateLabel {
-  display: none;
+  display:
+    none !important;
 }
 
 
-/* ------------------------------------------------------------
-   SEARCH / AI BUTTON INSIDE UTILITY BAR
-   ------------------------------------------------------------ */
+/* AI */
 
 .topbarUtility
-  [data-campaign-hq-launcher="floating"] {
-  box-sizing: border-box;
+[data-campaign-hq-launcher="floating"] {
+  box-sizing:
+    border-box !important;
 
   min-height:
-    40px !important;
+    42px !important;
 
   margin:
     0 !important;
@@ -3563,16 +3599,15 @@
 }
 
 
-/* ------------------------------------------------------------
-   ACTIVITY BUTTON INSIDE UTILITY BAR
-   ------------------------------------------------------------ */
+/* ACTIVITY */
 
 .topbarUtility
-  button[aria-label^="Activity Center"] {
-  box-sizing: border-box;
+button[aria-label^="Activity Center"] {
+  box-sizing:
+    border-box !important;
 
   min-height:
-    40px !important;
+    42px !important;
 
   margin:
     0 !important;
@@ -3581,7 +3616,10 @@
     0 !important;
 
   border-radius:
-    0 9px 9px 0 !important;
+    0
+    10px
+    10px
+    0 !important;
 
   background:
     transparent !important;
@@ -3599,7 +3637,7 @@
 
   .topbar {
     min-height:
-      62px !important;
+      64px !important;
 
     gap:
       8px !important;
@@ -3612,13 +3650,13 @@
 
   .topbarLead {
     gap:
-      8px;
+      8px !important;
   }
 
 
   .workspaceIdentity > span {
     display:
-      none;
+      none !important;
   }
 
 
@@ -3627,37 +3665,40 @@
       0 !important;
 
     font-size:
-      0.65rem !important;
+      12px !important;
+
+    font-weight:
+      820 !important;
   }
 
 
   .topbarUtility {
-    height:
-      42px;
-
     min-width:
-      0;
+      0 !important;
+
+    height:
+      44px !important;
   }
 
 
   .fullDateLabel {
     display:
-      none;
+      none !important;
   }
 
 
   .shortDateLabel {
     display:
-      inline;
+      inline !important;
   }
 
 
   .dateTime {
     height:
-      36px !important;
+      38px !important;
 
     min-height:
-      36px !important;
+      38px !important;
 
     padding:
       0
@@ -3667,48 +3708,39 @@
       5px !important;
 
     font-size:
-      0.49rem !important;
+      10px !important;
   }
 
 
-  /*
-   * AI text disappears before header is ever allowed to wrap.
-   */
   .topbarUtility
-    [data-campaign-hq-launcher="floating"]
-    span,
+  [data-campaign-hq-launcher="floating"]
+  span,
   .topbarUtility
-    [data-campaign-hq-launcher="floating"]
-    kbd {
+  [data-campaign-hq-launcher="floating"]
+  kbd {
     display:
       none !important;
   }
 
 
   .topbarUtility
-    [data-campaign-hq-launcher="floating"],
+  [data-campaign-hq-launcher="floating"],
   .topbarUtility
-    button[aria-label^="Activity Center"] {
+  button[aria-label^="Activity Center"] {
     width:
-      36px !important;
+      38px !important;
 
     min-width:
-      36px !important;
+      38px !important;
 
     height:
-      36px !important;
+      38px !important;
 
     min-height:
-      36px !important;
+      38px !important;
 
     padding:
       0 !important;
-  }
-
-
-  .utilityDivider {
-    height:
-      24px;
   }
 
 }
@@ -3722,115 +3754,149 @@
 
   .topbar {
     min-height:
-      56px !important;
+      66px !important;
 
     gap:
-      6px !important;
+      7px !important;
 
     padding:
-      7px
-      7px !important;
+      8px !important;
   }
 
 
   .sharedMenuButton {
     width:
-      40px !important;
+      46px !important;
 
     height:
-      40px !important;
+      46px !important;
 
     min-width:
-      40px !important;
+      46px !important;
 
     min-height:
-      40px !important;
+      46px !important;
+  }
+
+
+  .sharedMenuButton svg {
+    width:
+      23px !important;
+
+    height:
+      23px !important;
   }
 
 
   .topbarLead {
     min-width:
-      0;
+      0 !important;
 
     gap:
-      6px;
+      7px !important;
   }
 
 
   .workspaceIdentity strong {
+    margin:
+      0 !important;
+
     font-size:
-      0.57rem !important;
+      13px !important;
+
+    font-weight:
+      850 !important;
+
+    line-height:
+      1.1 !important;
   }
 
 
   .topbarUtility {
     min-width:
-      0;
+      0 !important;
 
     height:
-      40px;
+      46px !important;
 
     padding:
-      1px;
+      1px !important;
+
+    border-radius:
+      13px !important;
   }
 
 
   .dateTime {
     height:
-      36px !important;
+      42px !important;
 
     min-height:
-      36px !important;
+      42px !important;
 
     padding:
       0
-      6px !important;
+      8px !important;
 
     gap:
-      4px !important;
+      5px !important;
 
     font-size:
-      0.43rem !important;
+      10px !important;
   }
 
 
   .dateTime svg {
     width:
-      14px !important;
+      18px !important;
 
     height:
-      14px !important;
+      18px !important;
   }
 
 
   .dateTime strong,
   .shortDateLabel {
     font-size:
-      0.42rem !important;
+      10px !important;
   }
 
 
   .topbarUtility
-    [data-campaign-hq-launcher="floating"],
+  [data-campaign-hq-launcher="floating"],
   .topbarUtility
-    button[aria-label^="Activity Center"] {
+  button[aria-label^="Activity Center"] {
     width:
-      34px !important;
+      40px !important;
 
     min-width:
-      34px !important;
+      40px !important;
 
     height:
-      36px !important;
+      42px !important;
 
     min-height:
-      36px !important;
+      42px !important;
+  }
+
+
+  .topbarUtility
+  [data-campaign-hq-launcher="floating"]
+  svg,
+  .topbarUtility
+  button[aria-label^="Activity Center"]
+  svg {
+    width:
+      21px !important;
+
+    height:
+      21px !important;
   }
 
 
   .utilityDivider {
     height:
-      22px;
+      25px !important;
   }
 
 }
@@ -3838,46 +3904,46 @@
 
 /* ============================================================
    NARROW PHONE
-   Keep time / AI / bell.
-   Remove date.
+   Keep time + AI + notification.
+   Hide date before allowing wrap.
    ============================================================ */
 
 @media (max-width: 560px) {
 
   .topbar {
     gap:
-      4px !important;
+      5px !important;
 
     padding:
-      6px
-      5px !important;
+      7px
+      6px !important;
   }
 
 
   .sharedMenuButton {
     width:
-      38px !important;
+      44px !important;
 
     height:
-      38px !important;
+      44px !important;
 
     min-width:
-      38px !important;
+      44px !important;
 
     min-height:
-      38px !important;
+      44px !important;
   }
 
 
   .workspaceIdentity strong {
     font-size:
-      0.51rem !important;
+      12px !important;
   }
 
 
   .topbarUtility {
     height:
-      38px;
+      44px !important;
   }
 
 
@@ -3891,32 +3957,32 @@
 
   .dateTime {
     height:
-      34px !important;
+      40px !important;
 
     min-height:
-      34px !important;
+      40px !important;
 
     padding:
       0
-      5px !important;
+      7px !important;
   }
 
 
   .topbarUtility
-    [data-campaign-hq-launcher="floating"],
+  [data-campaign-hq-launcher="floating"],
   .topbarUtility
-    button[aria-label^="Activity Center"] {
+  button[aria-label^="Activity Center"] {
     width:
-      32px !important;
+      38px !important;
 
     min-width:
-      32px !important;
+      38px !important;
 
     height:
-      34px !important;
+      40px !important;
 
     min-height:
-      34px !important;
+      40px !important;
   }
 
 }
@@ -3924,15 +3990,14 @@
 
 /* ============================================================
    VERY NARROW PHONE
-   Keep clock icon / AI / bell.
-   Workspace remains visible with ellipsis.
+   Keep clock icon + AI + bell.
    ============================================================ */
 
 @media (max-width: 390px) {
 
   .workspaceIdentity strong {
     font-size:
-      0.48rem !important;
+      11px !important;
   }
 
 
@@ -3944,10 +4009,10 @@
 
   .dateTime {
     width:
-      30px !important;
+      36px !important;
 
     min-width:
-      30px !important;
+      36px !important;
 
     padding:
       0 !important;
@@ -3958,20 +4023,20 @@
 
 
   .topbarUtility
-    [data-campaign-hq-launcher="floating"],
+  [data-campaign-hq-launcher="floating"],
   .topbarUtility
-    button[aria-label^="Activity Center"] {
+  button[aria-label^="Activity Center"] {
     width:
-      30px !important;
+      36px !important;
 
     min-width:
-      30px !important;
+      36px !important;
   }
 
 
   .utilityDivider {
     height:
-      20px;
+      22px !important;
   }
 
 }
