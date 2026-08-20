@@ -17,6 +17,7 @@ import {
   Flag,
   Hash,
   Inbox,
+  Image,
   Mail,
   Paperclip,
   MessageCircle,
@@ -751,6 +752,89 @@ const EMPTY_CONVERSATION = {
   files: [],
 };
 
+function attachmentKind(
+  file,
+) {
+  const contentType =
+    String(
+      file?.contentType ||
+      "",
+    )
+      .toLowerCase();
+
+  const name =
+    String(
+      file?.name ||
+      "",
+    )
+      .toLowerCase();
+
+  if (
+    contentType
+      .startsWith(
+        "image/",
+      ) ||
+    /\.(png|jpe?g|gif|webp|bmp|avif)$/i
+      .test(
+        name,
+      )
+  ) {
+    return "image";
+  }
+
+  if (
+    contentType ===
+      "application/pdf" ||
+    /\.pdf$/i.test(
+      name,
+    )
+  ) {
+    return "pdf";
+  }
+
+  return "file";
+}
+
+
+function humanFileSize(
+  value,
+) {
+  const bytes =
+    Number(
+      value || 0,
+    );
+
+  if (
+    !Number.isFinite(
+      bytes,
+    ) ||
+    bytes <= 0
+  ) {
+    return "File";
+  }
+
+  if (
+    bytes <
+    1024 * 1024
+  ) {
+    return `${Math.max(
+      1,
+      Math.round(
+        bytes / 1024,
+      ),
+    )} KB`;
+  }
+
+  return `${(
+    bytes /
+    (
+      1024 *
+      1024
+    )
+  ).toFixed(1)} MB`;
+}
+
+
 function getChannelLabel(channel) {
   return (
     CHANNELS.find((item) => item.id === channel)
@@ -808,6 +892,7 @@ export default function InboxReferencePreview() {
     markThreadRead: markMailboxThreadRead,
     sendEmail: sendMailboxEmail,
     replyEmail: replyMailboxEmail,
+    getAttachmentBlob: getMailboxAttachmentBlob,
     downloadAttachment: downloadMailboxAttachment,
   } = useRealInboxMailbox({
     workspaceId: workspace.id,
@@ -895,6 +980,16 @@ export default function InboxReferencePreview() {
     setAttachmentError,
   ] = useState("");
 
+  const [
+    attachmentPreview,
+    setAttachmentPreview,
+  ] = useState(null);
+
+  const [
+    attachmentPreviewLoading,
+    setAttachmentPreviewLoading,
+  ] = useState("");
+
   const attachmentInputRef =
     useRef(null);
 
@@ -956,6 +1051,23 @@ export default function InboxReferencePreview() {
 
   const threadBodyRef =
     useRef(null);
+
+  useEffect(() => {
+    return () => {
+      if (
+        attachmentPreview
+          ?.objectUrl
+      ) {
+        URL.revokeObjectURL(
+          attachmentPreview
+            .objectUrl,
+        );
+      }
+    };
+  }, [
+    attachmentPreview,
+  ]);
+
 
   const selectedConversation =
     conversations.find(
@@ -2008,6 +2120,91 @@ export default function InboxReferencePreview() {
       `${newThreadMessage.channel} reply added.`,
     );
   };
+
+  const closeAttachmentPreview =
+    () => {
+      setAttachmentPreview(
+        null,
+      );
+
+      setAttachmentPreviewLoading(
+        "",
+      );
+    };
+
+
+  const previewConversationFile =
+    async (
+      file,
+    ) => {
+      if (
+        !file
+          ?.providerAttachmentId ||
+        !file
+          ?.providerMessageId
+      ) {
+        setToast(
+          "This file is not attached to a connected mailbox message.",
+        );
+
+        return;
+      }
+
+      const kind =
+        attachmentKind(
+          file,
+        );
+
+      if (
+        kind ===
+        "file"
+      ) {
+        await downloadConversationFile(
+          file,
+        );
+
+        return;
+      }
+
+      setAttachmentPreviewLoading(
+        file.id ||
+        file.name,
+      );
+
+      try {
+        const blob =
+          await getMailboxAttachmentBlob(
+            file,
+          );
+
+        const objectUrl =
+          URL.createObjectURL(
+            blob,
+          );
+
+        setAttachmentPreview({
+          ...file,
+          kind,
+          objectUrl,
+        });
+
+        setToast(
+          `${file.name || "Attachment"} preview opened.`,
+        );
+      } catch (
+        previewError
+      ) {
+        setToast(
+          previewError?.message ||
+          "Campaign Seat could not preview this attachment.",
+        );
+      } finally {
+        setAttachmentPreviewLoading(
+          "",
+        );
+      }
+    };
+
 
   const downloadConversationFile =
     async (file) => {
@@ -3455,6 +3652,95 @@ export default function InboxReferencePreview() {
                         </small>
 
                         <p>{message.body}</p>
+
+                        {message.attachments
+                          ?.length ? (
+                          <div
+                            className={
+                              styles.messageAttachments
+                            }
+                          >
+                            {message.attachments
+                              .map(
+                                (
+                                  file,
+                                ) => {
+                                  const kind =
+                                    attachmentKind(
+                                      file,
+                                    );
+
+                                  return (
+                                    <button
+                                      key={
+                                        file.id ||
+                                        file.name
+                                      }
+                                      type="button"
+                                      className={
+                                        styles.messageAttachmentCard
+                                      }
+                                      onClick={() =>
+                                        void previewConversationFile(
+                                          file,
+                                        )
+                                      }
+                                    >
+                                      <span
+                                        className={
+                                          styles.messageAttachmentIcon
+                                        }
+                                      >
+                                        {kind ===
+                                        "image" ? (
+                                          <Image
+                                            size={18}
+                                          />
+                                        ) : (
+                                          <FileText
+                                            size={18}
+                                          />
+                                        )}
+                                      </span>
+
+                                      <span>
+                                        <strong>
+                                          {
+                                            file.name
+                                          }
+                                        </strong>
+
+                                        <small>
+                                          {kind ===
+                                            "image"
+                                            ? "Image · Preview"
+                                            : kind ===
+                                                "pdf"
+                                              ? "PDF · Preview"
+                                              : humanFileSize(
+                                                  file.size,
+                                                )}
+                                        </small>
+                                      </span>
+
+                                      {attachmentPreviewLoading ===
+                                      (
+                                        file.id ||
+                                        file.name
+                                      ) ? (
+                                        <LoaderCircle
+                                          size={16}
+                                          className={
+                                            styles.attachmentPreviewSpinner
+                                          }
+                                        />
+                                      ) : null}
+                                    </button>
+                                  );
+                                },
+                              )}
+                          </div>
+                        ) : null}
                       </div>
                     </div>
                   ),
@@ -3558,25 +3844,68 @@ export default function InboxReferencePreview() {
                             </strong>
 
                             <small>
-                              {file.size}
+                              {humanFileSize(
+                                file.size,
+                              )}
+                              {file.contentType
+                                ? ` · ${file.contentType}`
+                                : ""}
                             </small>
                           </span>
 
                             {file.providerAttachmentId &&
                             file.providerMessageId ? (
-                              <button
+                              <div
                                 className={
-                                  styles.fileDownloadButton
-                                }
-                                type="button"
-                                onClick={() =>
-                                  downloadConversationFile(
-                                    file,
-                                  )
+                                  styles.fileActions
                                 }
                               >
-                                Download
-                              </button>
+                                {attachmentKind(
+                                  file,
+                                ) !==
+                                "file" ? (
+                                  <button
+                                    className={
+                                      styles.filePreviewButton
+                                    }
+                                    type="button"
+                                    disabled={
+                                      attachmentPreviewLoading ===
+                                      (
+                                        file.id ||
+                                        file.name
+                                      )
+                                    }
+                                    onClick={() =>
+                                      void previewConversationFile(
+                                        file,
+                                      )
+                                    }
+                                  >
+                                    {attachmentPreviewLoading ===
+                                    (
+                                      file.id ||
+                                      file.name
+                                    )
+                                      ? "Loading…"
+                                      : "Preview"}
+                                  </button>
+                                ) : null}
+
+                                <button
+                                  className={
+                                    styles.fileDownloadButton
+                                  }
+                                  type="button"
+                                  onClick={() =>
+                                    downloadConversationFile(
+                                      file,
+                                    )
+                                  }
+                                >
+                                  Download
+                                </button>
+                              </div>
                             ) : null}
                         </div>
                       ),
@@ -3717,9 +4046,20 @@ export default function InboxReferencePreview() {
                                 key={`${file.name}-${file.lastModified}-${index}`}
                               >
                                 <span>
-                                  <FileText
-                                    size={17}
-                                  />
+                                  {String(
+                                    file.type ||
+                                    "",
+                                  ).startsWith(
+                                    "image/",
+                                  ) ? (
+                                    <Image
+                                      size={17}
+                                    />
+                                  ) : (
+                                    <FileText
+                                      size={17}
+                                    />
+                                  )}
                                 </span>
 
                                 <span>
@@ -3948,6 +4288,128 @@ export default function InboxReferencePreview() {
             ) : null}
           </article>
         </section>
+
+        {attachmentPreview ? (
+          <div
+            className={
+              styles.attachmentPreviewOverlay
+            }
+            role="presentation"
+            onMouseDown={(
+              event,
+            ) => {
+              if (
+                event.target ===
+                event.currentTarget
+              ) {
+                closeAttachmentPreview();
+              }
+            }}
+          >
+            <section
+              className={
+                styles.attachmentPreviewModal
+              }
+              role="dialog"
+              aria-modal="true"
+              aria-label={
+                attachmentPreview
+                  .name ||
+                "Attachment preview"
+              }
+            >
+              <header>
+                <div>
+                  <strong>
+                    {
+                      attachmentPreview
+                        .name
+                    }
+                  </strong>
+
+                  <small>
+                    {humanFileSize(
+                      attachmentPreview
+                        .size,
+                    )}
+                    {attachmentPreview
+                      .contentType
+                      ? ` · ${attachmentPreview.contentType}`
+                      : ""}
+                  </small>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={
+                    closeAttachmentPreview
+                  }
+                  aria-label="Close attachment preview"
+                >
+                  <X
+                    size={18}
+                  />
+                </button>
+              </header>
+
+              <div
+                className={
+                  styles.attachmentPreviewBody
+                }
+              >
+                {attachmentPreview
+                  .kind ===
+                "image" ? (
+                  <img
+                    src={
+                      attachmentPreview
+                        .objectUrl
+                    }
+                    alt={
+                      attachmentPreview
+                        .name ||
+                      "Email attachment"
+                    }
+                  />
+                ) : (
+                  <iframe
+                    title={
+                      attachmentPreview
+                        .name ||
+                      "PDF preview"
+                    }
+                    src={
+                      attachmentPreview
+                        .objectUrl
+                    }
+                  />
+                )}
+              </div>
+
+              <footer>
+                <button
+                  type="button"
+                  onClick={() =>
+                    void downloadConversationFile(
+                      attachmentPreview,
+                    )
+                  }
+                >
+                  Download
+                </button>
+
+                <button
+                  type="button"
+                  onClick={
+                    closeAttachmentPreview
+                  }
+                >
+                  Close
+                </button>
+              </footer>
+            </section>
+          </div>
+        ) : null}
 
         {quickTaskOpen ? (
           <div

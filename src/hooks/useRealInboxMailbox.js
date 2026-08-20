@@ -1769,12 +1769,12 @@ export function useRealInboxMailbox({
       ],
     );
 
-  const downloadAttachment =
+  const getAttachmentBlob =
     useCallback(
       async ({
         providerAttachmentId,
         providerMessageId,
-        name,
+        contentType,
       }) => {
         const {
           data,
@@ -1804,8 +1804,11 @@ export function useRealInboxMailbox({
         if (
           invokeError
         ) {
-          throw (
-            invokeError
+          throw new Error(
+            await edgeFunctionErrorMessage(
+              invokeError,
+              "Campaign Seat could not load this attachment.",
+            ),
           );
         }
 
@@ -1827,9 +1830,48 @@ export function useRealInboxMailbox({
             ]);
         } else {
           throw new Error(
-            "The attachment response was not a downloadable file.",
+            "The attachment response was not a readable file.",
           );
         }
+
+        const preferredType =
+          clean(
+            contentType,
+          );
+
+        if (
+          preferredType &&
+          blob.type !==
+            preferredType
+        ) {
+          blob =
+            new Blob(
+              [
+                await blob
+                  .arrayBuffer(),
+              ],
+              {
+                type:
+                  preferredType,
+              },
+            );
+        }
+
+        return blob;
+      },
+      [
+        workspaceId,
+      ],
+    );
+
+
+  const downloadAttachment =
+    useCallback(
+      async (file) => {
+        const blob =
+          await getAttachmentBlob(
+            file,
+          );
 
         const objectUrl =
           URL.createObjectURL(
@@ -1845,7 +1887,9 @@ export function useRealInboxMailbox({
           objectUrl;
 
         anchor.download =
-          clean(name) ||
+          clean(
+            file?.name,
+          ) ||
           "attachment";
 
         document.body
@@ -1865,9 +1909,10 @@ export function useRealInboxMailbox({
         );
       },
       [
-        workspaceId,
+        getAttachmentBlob,
       ],
     );
+
 
   return {
     conversations,
@@ -1884,6 +1929,7 @@ export function useRealInboxMailbox({
     markThreadRead,
     sendEmail,
     replyEmail,
+    getAttachmentBlob,
     downloadAttachment,
   };
 }
