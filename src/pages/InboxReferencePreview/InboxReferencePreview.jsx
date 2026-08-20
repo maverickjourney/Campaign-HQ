@@ -1652,6 +1652,17 @@ function SafeEmailBody({
 }
 
 
+function parseComposerRecipients(value) {
+  return String(value || "")
+    .split(/[;,\n]+/)
+    .map((entry) => entry.trim())
+    .filter(Boolean)
+    .map((email) => ({
+      email,
+    }));
+}
+
+
 function getChannelLabel(channel) {
   return (
     CHANNELS.find((item) => item.id === channel)
@@ -1823,6 +1834,15 @@ export default function InboxReferencePreview() {
 
   const [newSubject, setNewSubject] =
     useState("");
+
+  const [newCc, setNewCc] =
+    useState("");
+
+  const [newBcc, setNewBcc] =
+    useState("");
+
+  const [showCcBcc, setShowCcBcc] =
+    useState(false);
 
   const [contactQuery, setContactQuery] =
     useState("");
@@ -2489,6 +2509,54 @@ export default function InboxReferencePreview() {
       );
     };
 
+  const openComposerAttachmentPicker = () => {
+    if (
+      replyChannel === "email" &&
+      liveMailboxEnabled
+    ) {
+      attachmentInputRef
+        .current
+        ?.click();
+
+      return;
+    }
+
+    if (
+      replyChannel === "dashboard"
+    ) {
+      setToast(
+        "Campaign Seat internal file attachments are not connected yet. Email attachments are available now.",
+      );
+
+      return;
+    }
+
+    if (
+      replyChannel === "text"
+    ) {
+      setToast(
+        "Text file attachments require a connected messaging provider. Campaign Seat currently opens the device text app.",
+      );
+
+      return;
+    }
+
+    if (
+      replyChannel === "whatsapp"
+    ) {
+      setToast(
+        "WhatsApp file attachments require a connected WhatsApp Business provider. Campaign Seat currently opens WhatsApp externally.",
+      );
+
+      return;
+    }
+
+    setToast(
+      "File attachments are not available for this channel yet.",
+    );
+  };
+
+
   const openNewMessage = () => {
     setThreadExpanded(false);
     setNewMessageMode(true);
@@ -2500,6 +2568,9 @@ export default function InboxReferencePreview() {
     setAttachmentError("");
     setNewRecipient("");
     setNewSubject("");
+    setNewCc("");
+    setNewBcc("");
+    setShowCcBcc(false);
     setContactQuery("");
     setSelectedContactId("");
     setContactCreateMode(false);
@@ -3231,6 +3302,16 @@ export default function InboxReferencePreview() {
             },
           ],
 
+          cc:
+            parseComposerRecipients(
+              newCc,
+            ),
+
+          bcc:
+            parseComposerRecipients(
+              newBcc,
+            ),
+
           subject:
             newSubject.trim(),
 
@@ -3252,6 +3333,9 @@ export default function InboxReferencePreview() {
         setReplyText("");
         setNewRecipient("");
         setNewSubject("");
+        setNewCc("");
+        setNewBcc("");
+        setShowCcBcc(false);
         setContactQuery("");
         setSelectedContactId("");
         setNewMessageMode(false);
@@ -3758,9 +3842,13 @@ export default function InboxReferencePreview() {
         <section
           className={[
             styles.inboxWorkspace,
-            mobileConversationActive ||
-            newMessageMode
+
+            mobileConversationActive
               ? styles.mobileConversationOpen
+              : "",
+
+            newMessageMode
+              ? styles.newMessageWorkspace
               : "",
           ]
             .filter(Boolean)
@@ -4550,6 +4638,82 @@ export default function InboxReferencePreview() {
                   ) : null}
                 </div>
 
+                {replyChannel === "email" &&
+                liveMailboxEnabled ? (
+                  <div
+                    className={
+                      styles.copyRecipientSection
+                    }
+                  >
+                    <button
+                      type="button"
+                      className={
+                        styles.copyRecipientToggle
+                      }
+                      onClick={() =>
+                        setShowCcBcc(
+                          (current) =>
+                            !current,
+                        )
+                      }
+                    >
+                      {showCcBcc
+                        ? "Hide Cc / Bcc"
+                        : "Add Cc / Bcc"}
+                    </button>
+
+                    {showCcBcc ? (
+                      <div
+                        className={
+                          styles.copyRecipientFields
+                        }
+                      >
+                        <label>
+                          <span
+                            className={
+                              styles.fieldLabel
+                            }
+                          >
+                            Cc
+                          </span>
+
+                          <input
+                            value={newCc}
+                            onChange={(event) =>
+                              setNewCc(
+                                event.target.value,
+                              )
+                            }
+                            placeholder="person@example.com"
+                            autoComplete="off"
+                          />
+                        </label>
+
+                        <label>
+                          <span
+                            className={
+                              styles.fieldLabel
+                            }
+                          >
+                            Bcc
+                          </span>
+
+                          <input
+                            value={newBcc}
+                            onChange={(event) =>
+                              setNewBcc(
+                                event.target.value,
+                              )
+                            }
+                            placeholder="private@example.com"
+                            autoComplete="off"
+                          />
+                        </label>
+                      </div>
+                    ) : null}
+                  </div>
+                ) : null}
+
                 {subjectEnabled ? (
                   <label className={styles.subjectField}>
                     <span className={styles.fieldLabel}>
@@ -4987,31 +5151,6 @@ export default function InboxReferencePreview() {
                       }
                     />
 
-                    {newMessageMode ? (
-                    <div
-                      className={
-                        styles.attachmentToolbar
-                      }
-                    >
-                      <button
-                        type="button"
-                        onClick={() =>
-                          attachmentInputRef
-                            .current
-                            ?.click()
-                        }
-                      >
-                        <Paperclip
-                          size={16}
-                        />
-                        Attach files
-                      </button>
-
-                      <small>
-                        Up to 10 files · 20 MB total
-                      </small>
-                    </div>
-                    ) : null}
 
                     {pendingAttachments
                       .length ? (
@@ -5185,24 +5324,26 @@ export default function InboxReferencePreview() {
 
                 <div className={styles.composerFooter}>
                   <div className={styles.replyOptions}>
-                    {!newMessageMode &&
-                    replyChannel === "email" &&
-                    liveMailboxEnabled ? (
+                    {(newMessageMode ||
+                    (
+                      replyChannel === "email" &&
+                      liveMailboxEnabled
+                    )) ? (
                       <button
                         type="button"
                         className={
                           styles.compactAttachButton
                         }
-                        onClick={() =>
-                          attachmentInputRef
-                            .current
-                            ?.click()
+                        onClick={
+                          openComposerAttachmentPicker
                         }
                       >
                         <Paperclip
                           size={15}
                         />
-                        Attach
+                        {newMessageMode
+                          ? "Attach files"
+                          : "Attach"}
                       </button>
                     ) : null}
 
@@ -5305,7 +5446,7 @@ export default function InboxReferencePreview() {
                   >
                     <Send size={17} />
                     {newMessageMode
-                      ? "Start Conversation"
+                      ? "Send Message"
                       : replyChannel === "text"
                         ? "Open Text"
                         : replyChannel === "whatsapp"
@@ -5319,7 +5460,11 @@ export default function InboxReferencePreview() {
                                 liveMailboxEnabled
                               ? "Send Internally"
                               : "Add Reply"}
-                    <ChevronDown size={15} />
+                    {!newMessageMode ? (
+                      <ChevronDown
+                        size={15}
+                      />
+                    ) : null}
                   </button>
                 </div>
               </footer>
