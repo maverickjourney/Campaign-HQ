@@ -344,3 +344,233 @@
     width: 100%;
   }
 }
+
+/* ============================================================
+   CAMPAIGN SEAT — EMAIL SIGNATURE SETTINGS
+   ============================================================ */
+
+.signatureSettings {
+  margin: 0 22px 18px;
+  overflow: hidden;
+  border: 1px solid rgba(15, 118, 110, 0.14);
+  border-radius: 14px;
+  background: rgba(15, 118, 110, 0.025);
+}
+
+.signatureSettings > header {
+  display: flex;
+  gap: 11px;
+  align-items: flex-start;
+  padding: 15px;
+  border-bottom: 1px solid rgba(15, 23, 42, 0.07);
+}
+
+.signatureIcon {
+  display: grid;
+  width: 40px;
+  height: 40px;
+  flex: 0 0 40px;
+  place-items: center;
+  border-radius: 11px;
+  color: #0f766e;
+  background: rgba(15, 118, 110, 0.09);
+}
+
+.signatureSettings > header strong,
+.signatureSettings > header span {
+  display: block;
+}
+
+.signatureSettings > header strong {
+  color: #134e4a;
+}
+
+.signatureSettings > header span {
+  max-width: 760px;
+  margin-top: 4px;
+  color: rgba(15, 23, 42, 0.63);
+  font-size: 0.84rem;
+  line-height: 1.45;
+}
+
+.signatureFields {
+  display: grid;
+  grid-template-columns:
+    minmax(0, 0.48fr)
+    minmax(0, 1.52fr);
+  gap: 12px;
+  padding: 15px;
+}
+
+.signatureFields label > span {
+  display: block;
+  margin-bottom: 6px;
+  color: #334155;
+  font-size: 0.78rem;
+  font-weight: 780;
+}
+
+.signatureFields input,
+.signatureFields textarea {
+  box-sizing: border-box;
+  width: 100%;
+  border: 1px solid rgba(15, 23, 42, 0.13);
+  border-radius: 10px;
+  outline: none;
+  color: #172554;
+  background: #ffffff;
+  font: inherit;
+}
+
+.signatureFields input {
+  min-height: 42px;
+  padding: 0 11px;
+}
+
+.signatureFields textarea {
+  min-height: 145px;
+  padding: 11px;
+  resize: vertical;
+  line-height: 1.5;
+}
+
+.signatureFields input:focus,
+.signatureFields textarea:focus {
+  border-color: rgba(15, 118, 110, 0.44);
+  box-shadow:
+    0 0 0 3px
+    rgba(15, 118, 110, 0.08);
+}
+
+.signatureOptions {
+  display: grid;
+  grid-template-columns:
+    repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  padding: 0 15px 15px;
+}
+
+.signatureOptions > label {
+  display: flex;
+  gap: 9px;
+  align-items: flex-start;
+  padding: 11px;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  border-radius: 10px;
+  background: #ffffff;
+}
+
+.signatureOptions input {
+  margin-top: 3px;
+}
+
+.signatureOptions strong,
+.signatureOptions small {
+  display: block;
+}
+
+.signatureOptions strong {
+  color: #334155;
+  font-size: 0.79rem;
+}
+
+.signatureOptions small {
+  margin-top: 3px;
+  color: rgba(15, 23, 42, 0.58);
+  font-size: 0.74rem;
+  line-height: 1.35;
+}
+
+.signaturePreview {
+  margin: 0 15px 15px;
+  padding: 12px;
+  border: 1px dashed rgba(15, 118, 110, 0.22);
+  border-radius: 10px;
+  background: #ffffff;
+}
+
+.signaturePreview small {
+  display: block;
+  margin-bottom: 7px;
+  color: #64748b;
+  font-size: 0.72rem;
+  font-weight: 780;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.signaturePreview pre {
+  margin: 0;
+  overflow: auto;
+  color: #334155;
+  font-family: inherit;
+  font-size: 0.82rem;
+  line-height: 1.5;
+  white-space: pre-wrap;
+}
+
+.signatureError,
+.signatureSaved {
+  margin: 0 15px 12px;
+  padding: 9px 11px;
+  border-radius: 9px;
+  font-size: 0.79rem;
+}
+
+.signatureError {
+  color: #991b1b;
+  background: rgba(185, 28, 28, 0.08);
+}
+
+.signatureSaved {
+  color: #166534;
+  background: rgba(22, 101, 52, 0.08);
+}
+
+.signatureSettings > footer {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  justify-content: space-between;
+  padding: 13px 15px;
+  border-top: 1px solid rgba(15, 23, 42, 0.07);
+  background: rgba(255, 255, 255, 0.66);
+}
+
+.signatureSettings > footer span {
+  color: #64748b;
+  font-size: 0.78rem;
+}
+
+.signatureSettings > footer button {
+  min-height: 39px;
+  padding: 0 14px;
+  border: 0;
+  border-radius: 10px;
+  color: #ffffff;
+  background: #0f766e;
+  font: inherit;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.signatureSettings > footer button:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+@media (max-width: 800px) {
+  .signatureFields,
+  .signatureOptions {
+    grid-template-columns: 1fr;
+  }
+
+  .signatureSettings > footer {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .signatureSettings > footer button {
+    width: 100%;
+  }
+}

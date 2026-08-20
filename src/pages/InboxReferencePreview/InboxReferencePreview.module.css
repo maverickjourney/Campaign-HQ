@@ -5902,3 +5902,69 @@
       calc(100dvh - 20px) !important;
   }
 }
+
+/* ============================================================
+   CAMPAIGN SEAT — COMPOSER EMAIL SIGNATURE
+   ============================================================ */
+
+.composerSignature {
+  position: relative;
+  margin-top: 9px;
+  padding: 10px 11px;
+  border: 1px solid #d9e4eb;
+  border-radius: 9px;
+  background: #f9fbfc;
+}
+
+.composerSignature > label {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  color: #536f86;
+  font-size: 0.53rem;
+  font-weight: 780;
+}
+
+.composerSignature > div {
+  margin-top: 8px;
+  padding: 10px;
+  border-left: 2px solid #b9c8d4;
+  background: #ffffff;
+}
+
+.composerSignature > div small {
+  display: block;
+  margin-bottom: 5px;
+  color: #8395a5;
+  font-size: 0.47rem;
+  font-weight: 760;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.composerSignature pre {
+  margin: 0;
+  overflow: auto;
+  color: #526d84;
+  font-family: inherit;
+  font-size: 0.54rem;
+  line-height: 1.5;
+  white-space: pre-wrap;
+}
+
+.composerSignature > button {
+  position: absolute;
+  top: 8px;
+  right: 9px;
+  border: 0;
+  color: #27679a;
+  background: transparent;
+  font-size: 0.49rem;
+  font-weight: 780;
+}
+
+.signatureLoading {
+  margin-top: 9px;
+  color: #8296a7;
+  font-size: 0.51rem;
+}

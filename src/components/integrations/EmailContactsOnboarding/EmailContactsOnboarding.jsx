@@ -1,9 +1,15 @@
 import {
+  useEffect,
+  useState,
+} from "react";
+
+import {
   ArrowRight,
   CheckCircle2,
   ContactRound,
   LoaderCircle,
   Mail,
+  PenLine,
   ShieldCheck,
   TriangleAlert,
   RefreshCw,
@@ -12,6 +18,10 @@ import {
 import {
   useEmailContactsOnboarding,
 } from "../../../hooks/useEmailContactsOnboarding";
+
+import {
+  useWorkspaceEmailSignature,
+} from "../../../hooks/useWorkspaceEmailSignature";
 
 import styles
   from "./EmailContactsOnboarding.module.css";
@@ -56,6 +66,88 @@ export default function EmailContactsOnboarding({
     useEmailContactsOnboarding({
       workspaceId,
     });
+
+  const {
+    signature:
+      emailSignature,
+    isLoading:
+      signatureLoading,
+    isSaving:
+      signatureSaving,
+    error:
+      signatureError,
+    saveSignature,
+  } =
+    useWorkspaceEmailSignature({
+      workspaceId,
+    });
+
+  const [
+    signatureName,
+    setSignatureName,
+  ] = useState(
+    "Campaign signature",
+  );
+
+  const [
+    signatureText,
+    setSignatureText,
+  ] = useState("");
+
+  const [
+    signatureEnabled,
+    setSignatureEnabled,
+  ] = useState(false);
+
+  const [
+    signatureOnNew,
+    setSignatureOnNew,
+  ] = useState(true);
+
+  const [
+    signatureOnReply,
+    setSignatureOnReply,
+  ] = useState(true);
+
+  const [
+    signatureSaved,
+    setSignatureSaved,
+  ] = useState("");
+
+  useEffect(() => {
+    setSignatureName(
+      emailSignature
+        ?.signature_name ||
+      "Campaign signature",
+    );
+
+    setSignatureText(
+      emailSignature
+        ?.signature_text ||
+      "",
+    );
+
+    setSignatureEnabled(
+      emailSignature
+        ?.enabled ===
+      true,
+    );
+
+    setSignatureOnNew(
+      emailSignature
+        ?.include_on_new !==
+      false,
+    );
+
+    setSignatureOnReply(
+      emailSignature
+        ?.include_on_reply !==
+      false,
+    );
+  }, [
+    emailSignature,
+  ]);
+
 
   const productionProviderWritesEnabled =
     window.location.hostname ===
@@ -137,6 +229,38 @@ export default function EmailContactsOnboarding({
     calendarStep
       ?.status ===
       "in_progress";
+
+  const handleSaveSignature =
+    async (
+      event,
+    ) => {
+      event.preventDefault();
+
+      setSignatureSaved(
+        "",
+      );
+
+      try {
+        await saveSignature({
+          signatureName,
+          signatureText,
+          enabled:
+            signatureEnabled,
+          includeOnNew:
+            signatureOnNew,
+          includeOnReply:
+            signatureOnReply,
+        });
+
+        setSignatureSaved(
+          "Email signature saved.",
+        );
+      } catch {
+        // Protected hook error
+        // is rendered below.
+      }
+    };
+
 
   const handleComplete =
     async () => {
@@ -481,6 +605,290 @@ export default function EmailContactsOnboarding({
             explicitly enabled before an OAuth
             reauthorization can start.
           </div>
+        )}
+
+      {connectionReady &&
+        (
+          communicationsComplete ||
+          calendarStarted
+        ) && (
+          <form
+            className={
+              styles.signatureSettings
+            }
+            onSubmit={
+              handleSaveSignature
+            }
+          >
+            <header>
+              <div
+                className={
+                  styles.signatureIcon
+                }
+              >
+                <PenLine
+                  size={20}
+                />
+              </div>
+
+              <div>
+                <strong>
+                  Email signature
+                </strong>
+
+                <span>
+                  Set the campaign signature
+                  that appears on outbound
+                  mailbox email. Team members
+                  see the same saved signature
+                  across devices.
+                </span>
+              </div>
+            </header>
+
+            <div
+              className={
+                styles.signatureFields
+              }
+            >
+              <label>
+                <span>
+                  Signature name
+                </span>
+
+                <input
+                  value={
+                    signatureName
+                  }
+                  maxLength={120}
+                  onChange={(
+                    event,
+                  ) => {
+                    setSignatureName(
+                      event.target
+                        .value,
+                    );
+
+                    setSignatureSaved(
+                      "",
+                    );
+                  }}
+                  placeholder="Campaign signature"
+                />
+              </label>
+
+              <label
+                className={
+                  styles.signatureBodyField
+                }
+              >
+                <span>
+                  Signature
+                </span>
+
+                <textarea
+                  value={
+                    signatureText
+                  }
+                  maxLength={10000}
+                  rows={7}
+                  onChange={(
+                    event,
+                  ) => {
+                    setSignatureText(
+                      event.target
+                        .value,
+                    );
+
+                    setSignatureSaved(
+                      "",
+                    );
+                  }}
+                  placeholder={
+                    `Example:
+Chris Herrerias
+Campaign Team
+Elizabeth Accomando for Palm Beach County Commission · District 6`
+                  }
+                />
+              </label>
+            </div>
+
+            <div
+              className={
+                styles.signatureOptions
+              }
+            >
+              <label>
+                <input
+                  type="checkbox"
+                  checked={
+                    signatureEnabled
+                  }
+                  onChange={(
+                    event,
+                  ) => {
+                    setSignatureEnabled(
+                      event.target
+                        .checked,
+                    );
+
+                    setSignatureSaved(
+                      "",
+                    );
+                  }}
+                />
+
+                <span>
+                  <strong>
+                    Enable signature
+                  </strong>
+
+                  <small>
+                    Make this signature
+                    available to outbound
+                    campaign email.
+                  </small>
+                </span>
+              </label>
+
+              <label>
+                <input
+                  type="checkbox"
+                  checked={
+                    signatureOnNew
+                  }
+                  disabled={
+                    !signatureEnabled
+                  }
+                  onChange={(
+                    event,
+                  ) => {
+                    setSignatureOnNew(
+                      event.target
+                        .checked,
+                    );
+
+                    setSignatureSaved(
+                      "",
+                    );
+                  }}
+                />
+
+                <span>
+                  <strong>
+                    New emails
+                  </strong>
+
+                  <small>
+                    Include by default when
+                    starting an email.
+                  </small>
+                </span>
+              </label>
+
+              <label>
+                <input
+                  type="checkbox"
+                  checked={
+                    signatureOnReply
+                  }
+                  disabled={
+                    !signatureEnabled
+                  }
+                  onChange={(
+                    event,
+                  ) => {
+                    setSignatureOnReply(
+                      event.target
+                        .checked,
+                    );
+
+                    setSignatureSaved(
+                      "",
+                    );
+                  }}
+                />
+
+                <span>
+                  <strong>
+                    Replies
+                  </strong>
+
+                  <small>
+                    Include by default when
+                    replying to email.
+                  </small>
+                </span>
+              </label>
+            </div>
+
+            {signatureText
+              .trim() ? (
+              <div
+                className={
+                  styles.signaturePreview
+                }
+              >
+                <small>
+                  Preview
+                </small>
+
+                <pre>
+                  {
+                    signatureText
+                  }
+                </pre>
+              </div>
+            ) : null}
+
+            {signatureError ? (
+              <div
+                className={
+                  styles.signatureError
+                }
+                role="alert"
+              >
+                {
+                  signatureError
+                }
+              </div>
+            ) : null}
+
+            {signatureSaved ? (
+              <div
+                className={
+                  styles.signatureSaved
+                }
+              >
+                {
+                  signatureSaved
+                }
+              </div>
+            ) : null}
+
+            <footer>
+              <span>
+                {signatureLoading
+                  ? "Loading signature…"
+                  : signatureEnabled
+                    ? "Signature is enabled."
+                    : "Signature is currently disabled."}
+              </span>
+
+              <button
+                type="submit"
+                disabled={
+                  signatureLoading ||
+                  signatureSaving
+                }
+              >
+                {signatureSaving
+                  ? "Saving…"
+                  : "Save signature"}
+              </button>
+            </footer>
+          </form>
         )}
 
       {error && (

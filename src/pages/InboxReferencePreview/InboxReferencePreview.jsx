@@ -35,6 +35,7 @@ import { CampaignWorkspaceShell } from "../../components/CampaignWorkspaceShell/
 import { useContactsCommandCenter } from "../../hooks/useContactsCommandCenter";
 import { useInternalInboxThreads } from "../../hooks/useInternalInboxThreads";
 import { useRealInboxMailbox } from "../../hooks/useRealInboxMailbox";
+import { useWorkspaceEmailSignature } from "../../hooks/useWorkspaceEmailSignature";
 import { useTasksCommandCenter } from "../../hooks/useTasksCommandCenter";
 import {
   getCurrentUser,
@@ -202,6 +203,50 @@ const EMPTY_CONTACT_FORM = {
   emailConsent: false,
   smsConsent: false,
 };
+
+function buildOutboundEmailBody({
+  message,
+  signatureText,
+  includeSignature,
+}) {
+  const body =
+    String(
+      message || "",
+    )
+      .replace(
+        /\r\n/g,
+        "\n",
+      )
+      .replace(
+        /\r/g,
+        "\n",
+      )
+      .trim();
+
+  const signature =
+    String(
+      signatureText || "",
+    )
+      .replace(
+        /\r\n/g,
+        "\n",
+      )
+      .replace(
+        /\r/g,
+        "\n",
+      )
+      .trim();
+
+  if (
+    !includeSignature ||
+    !signature
+  ) {
+    return body;
+  }
+
+  return `${body}\n\n--\n${signature}`;
+}
+
 
 function getEasternDateInput(daysAhead = 0) {
   const parts = new Intl.DateTimeFormat(
@@ -771,6 +816,18 @@ export default function InboxReferencePreview() {
   });
 
   const {
+    signature:
+      workspaceEmailSignature,
+    isLoading:
+      signatureLoading,
+  } =
+    useWorkspaceEmailSignature({
+      workspaceId:
+        workspace.id,
+    });
+
+
+  const {
     conversations: internalConversations,
     error: internalInboxError,
     refresh: refreshInternalInbox,
@@ -822,6 +879,11 @@ export default function InboxReferencePreview() {
     useState("email");
 
   const [replyText, setReplyText] = useState("");
+
+  const [
+    includeSignature,
+    setIncludeSignature,
+  ] = useState(false);
 
   const [
     pendingAttachments,
@@ -981,6 +1043,34 @@ export default function InboxReferencePreview() {
                 : "Connect Gmail or Outlook in Settings → Integrations to send and receive email here."
               : "Connect campaign email during Email & Contacts setup to send and receive messages here."
         : "Text and WhatsApp open externally. Confirm the result when you return to Campaign Seat.";
+
+  const configuredSignatureText =
+    String(
+      workspaceEmailSignature
+        ?.signature_text ||
+      "",
+    ).trim();
+
+  const signatureEnabled =
+    workspaceEmailSignature
+      ?.enabled ===
+      true &&
+    Boolean(
+      configuredSignatureText,
+    );
+
+  const defaultSignatureOnNew =
+    signatureEnabled &&
+    workspaceEmailSignature
+      ?.include_on_new ===
+      true;
+
+  const defaultSignatureOnReply =
+    signatureEnabled &&
+    workspaceEmailSignature
+      ?.include_on_reply ===
+      true;
+
 
   const contacts = useMemo(() => {
     const savedContacts =
@@ -1431,6 +1521,9 @@ export default function InboxReferencePreview() {
   const openNewMessage = () => {
     setNewMessageMode(true);
     setReplyText("");
+    setIncludeSignature(
+      defaultSignatureOnNew,
+    );
     setPendingAttachments([]);
     setAttachmentError("");
     setNewRecipient("");
@@ -1603,6 +1696,9 @@ export default function InboxReferencePreview() {
   };
 
   const openConversation = (id) => {
+    setIncludeSignature(
+      defaultSignatureOnReply,
+    );
     const conversationToOpen =
       conversations.find(
         (conversation) =>
@@ -1829,7 +1925,15 @@ export default function InboxReferencePreview() {
             selectedConversation.subject,
 
           body:
-            replyText.trim(),
+            buildOutboundEmailBody({
+              message:
+                replyText,
+              signatureText:
+                configuredSignatureText,
+              includeSignature:
+                includeSignature &&
+                signatureEnabled,
+            }),
 
           replyAll:
             replyAllEnabled,
@@ -2073,7 +2177,15 @@ export default function InboxReferencePreview() {
             newSubject.trim(),
 
           body:
-            replyText.trim(),
+            buildOutboundEmailBody({
+              message:
+                replyText,
+              signatureText:
+                configuredSignatureText,
+              includeSignature:
+                includeSignature &&
+                signatureEnabled,
+            }),
 
           attachments:
             pendingAttachments,
@@ -3674,6 +3786,78 @@ export default function InboxReferencePreview() {
                       : "Type your reply..."
                   }
                 />
+
+                {replyChannel ===
+                  "email" &&
+                liveMailboxEnabled &&
+                signatureEnabled ? (
+                  <section
+                    className={
+                      styles.composerSignature
+                    }
+                  >
+                    <label>
+                      <input
+                        type="checkbox"
+                        checked={
+                          includeSignature
+                        }
+                        onChange={(
+                          event,
+                        ) =>
+                          setIncludeSignature(
+                            event.target
+                              .checked,
+                          )
+                        }
+                      />
+
+                      <span>
+                        Include signature
+                      </span>
+                    </label>
+
+                    {includeSignature ? (
+                      <div>
+                        <small>
+                          {
+                            workspaceEmailSignature
+                              ?.signature_name ||
+                            "Campaign signature"
+                          }
+                        </small>
+
+                        <pre>
+                          {
+                            configuredSignatureText
+                          }
+                        </pre>
+                      </div>
+                    ) : null}
+
+                    <button
+                      type="button"
+                      onClick={() =>
+                        window.location.assign(
+                          "/workspace/settings?tab=integrations&onboarding=communications",
+                        )
+                      }
+                    >
+                      Edit signature
+                    </button>
+                  </section>
+                ) : signatureLoading &&
+                  replyChannel ===
+                    "email" &&
+                  liveMailboxEnabled ? (
+                  <div
+                    className={
+                      styles.signatureLoading
+                    }
+                  >
+                    Loading campaign signature…
+                  </div>
+                ) : null}
 
                 <div className={styles.composerFooter}>
                   <div className={styles.replyOptions}>
