@@ -11550,17 +11550,15 @@
     min-width: 0 !important;
 
     height:
-      clamp(
-        560px,
-        68dvh,
-        760px
-      ) !important;
+      auto !important;
 
     min-height:
-      560px !important;
+      calc(
+        100dvh - 250px
+      ) !important;
 
     max-height:
-      760px !important;
+      none !important;
 
     flex:
       0 0 auto !important;
@@ -11569,10 +11567,10 @@
       hidden !important;
 
     overflow-y:
-      auto !important;
+      visible !important;
 
     overscroll-behavior:
-      contain !important;
+      auto !important;
 
     -webkit-overflow-scrolling:
       touch !important;
@@ -11612,10 +11610,12 @@
     width: 100% !important;
 
     min-height:
-      520px !important;
+      calc(
+        100dvh - 300px
+      ) !important;
 
     max-height:
-      2200px !important;
+      2600px !important;
   }
 
 
@@ -11800,6 +11800,112 @@
 }
 
 
+
+  /*
+   * Mobile reply utility cleanup.
+   *
+   * Reply All is hidden on phones until recipient-aware
+   * behavior is implemented. Attach remains available.
+   */
+  .inboxWorkspace.mobileConversationOpen
+    .replyAllButton {
+    display:
+      none !important;
+  }
+
+
+  .inboxWorkspace.mobileConversationOpen
+    .composerFooter {
+    border-top:
+      0 !important;
+  }
+
+
+  .inboxWorkspace.mobileConversationOpen
+    .replyOptions {
+    display:
+      flex !important;
+
+    width:
+      100% !important;
+
+    min-height:
+      42px !important;
+
+    align-items:
+      center !important;
+
+    gap:
+      8px !important;
+
+    margin:
+      0 !important;
+
+    padding:
+      0 !important;
+
+    border:
+      0 !important;
+
+    overflow:
+      visible !important;
+  }
+
+
+  .inboxWorkspace.mobileConversationOpen
+    .compactAttachButton {
+    box-sizing:
+      border-box !important;
+
+    display:
+      inline-flex !important;
+
+    width:
+      auto !important;
+
+    min-width:
+      104px !important;
+
+    height:
+      42px !important;
+
+    min-height:
+      42px !important;
+
+    align-items:
+      center !important;
+
+    justify-content:
+      center !important;
+
+    gap:
+      7px !important;
+
+    margin:
+      0 !important;
+
+    padding:
+      0
+      13px !important;
+
+    border:
+      1px solid
+      #cad9e5 !important;
+
+    border-radius:
+      9px !important;
+
+    color:
+      #406783 !important;
+
+    background:
+      #ffffff !important;
+
+    box-shadow:
+      none !important;
+  }
+
+
 /* ============================================================
    SMALL IPHONE
    ============================================================ */
@@ -11809,17 +11915,15 @@
   .inboxWorkspace.mobileConversationOpen
     .threadBody {
     height:
-      clamp(
-        520px,
-        64dvh,
-        680px
-      ) !important;
+      auto !important;
 
     min-height:
-      520px !important;
+      calc(
+        100dvh - 235px
+      ) !important;
 
     max-height:
-      680px !important;
+      none !important;
   }
 
 
