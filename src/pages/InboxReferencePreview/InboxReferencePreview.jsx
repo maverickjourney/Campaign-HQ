@@ -3236,6 +3236,88 @@ export default function InboxReferencePreview() {
     };
 
 
+  const getSavedContactIdForConversation =
+    (conversation) => {
+      if (
+        conversation
+          ?.contactId
+      ) {
+        return conversation
+          .contactId;
+      }
+
+      const conversationEmail =
+        String(
+          conversation
+            ?.email ||
+          "",
+        )
+          .trim()
+          .toLowerCase();
+
+      const conversationPhone =
+        String(
+          conversation
+            ?.phone ||
+          "",
+        )
+          .replace(
+            /\D/g,
+            "",
+          );
+
+      const matchingContact =
+        (
+          Array.isArray(
+            liveContacts,
+          )
+            ? liveContacts
+            : []
+        ).find(
+          (contact) => {
+            const contactEmail =
+              String(
+                contact
+                  ?.email ||
+                "",
+              )
+                .trim()
+                .toLowerCase();
+
+            const contactPhone =
+              String(
+                contact
+                  ?.phone ||
+                "",
+              )
+                .replace(
+                  /\D/g,
+                  "",
+                );
+
+            return (
+              (
+                conversationEmail &&
+                contactEmail ===
+                  conversationEmail
+              ) ||
+              (
+                conversationPhone &&
+                contactPhone ===
+                  conversationPhone
+              )
+            );
+          },
+        );
+
+      return (
+        matchingContact
+          ?.id ||
+        null
+      );
+    };
+
+
   const sendReply = async () => {
     if (!replyText.trim()) {
       setToast("Write a reply first.");
@@ -3251,9 +3333,9 @@ export default function InboxReferencePreview() {
           replyChannel,
 
         contactId:
-          selectedConversation
-            ?.contactId ||
-          null,
+          getSavedContactIdForConversation(
+            selectedConversation,
+          ),
 
         recipientName:
           selectedConversation
@@ -6243,7 +6325,7 @@ export default function InboxReferencePreview() {
                         )
                       }
                     >
-                      Not yet — reopen
+                      No, not sent
                     </button>
 
                     <button
