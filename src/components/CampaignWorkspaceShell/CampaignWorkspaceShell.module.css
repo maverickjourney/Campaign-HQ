@@ -3301,3 +3301,677 @@
   object-fit: cover;
   object-position: center;
 }
+
+/* ============================================================
+   CAMPAIGN SEAT — MASTER WORKSPACE HEADER
+
+   DESKTOP / LAPTOP
+   [ menu + workspace ]    [ date · time | AI | notifications ]
+
+   MOBILE
+   [ menu + workspace ]    [ compact date/time | AI | bell ]
+
+   Exactly one row.
+   Never sticky.
+   ============================================================ */
+
+
+/* ------------------------------------------------------------
+   SHELL HEADER
+   ------------------------------------------------------------ */
+
+.topbar,
+[data-shared-workspace-topbar="true"] {
+  position: static !important;
+  inset: auto !important;
+
+  box-sizing: border-box;
+
+  display: flex !important;
+
+  width: 100% !important;
+  min-width: 0 !important;
+
+  min-height: 68px !important;
+
+  flex: 0 0 auto !important;
+  flex-direction: row !important;
+  flex-wrap: nowrap !important;
+
+  align-items: center !important;
+  justify-content: space-between !important;
+
+  gap: 12px !important;
+
+  padding:
+    10px
+    16px !important;
+
+  overflow: visible !important;
+
+  border-bottom:
+    1px solid #dfe6ee;
+
+  background:
+    #ffffff !important;
+
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+
+/* ------------------------------------------------------------
+   LEFT GROUP
+   ------------------------------------------------------------ */
+
+.topbarLead {
+  display: flex;
+
+  min-width: 0;
+
+  flex:
+    1 1 auto;
+
+  align-items: center;
+
+  gap: 11px;
+}
+
+
+.sharedMenuButton {
+  box-sizing: border-box;
+
+  flex:
+    0 0 auto !important;
+
+  margin:
+    0 !important;
+}
+
+
+.workspaceIdentity {
+  min-width: 0 !important;
+
+  flex:
+    1 1 auto !important;
+
+  margin:
+    0 !important;
+}
+
+
+.workspaceIdentity span,
+.workspaceIdentity strong {
+  display: block;
+}
+
+
+.workspaceIdentity strong {
+  width: 100%;
+  min-width: 0;
+
+  overflow: hidden;
+
+  text-overflow: ellipsis;
+
+  white-space: nowrap;
+}
+
+
+/* ------------------------------------------------------------
+   RIGHT UTILITY BAR
+   ------------------------------------------------------------ */
+
+.topbarUtility {
+  box-sizing: border-box;
+
+  display: flex;
+
+  width: auto;
+
+  min-width: max-content;
+  height: 46px;
+
+  flex:
+    0 0 auto;
+
+  align-items: center;
+
+  gap: 0;
+
+  padding:
+    2px;
+
+  border:
+    1px solid #d4e0ea;
+
+  border-radius:
+    12px;
+
+  background:
+    #ffffff;
+
+  box-shadow:
+    0 3px 10px
+    rgba(
+      28,
+      65,
+      101,
+      0.04
+    );
+}
+
+
+.topbarUtility > * {
+  flex:
+    0 0 auto;
+}
+
+
+.utilityDivider {
+  width: 1px;
+  height: 26px;
+
+  flex:
+    0 0 1px;
+
+  background:
+    #e0e7ed;
+}
+
+
+/* ------------------------------------------------------------
+   DATE + TIME
+   ------------------------------------------------------------ */
+
+.dateTime {
+  box-sizing: border-box;
+
+  display: flex !important;
+
+  width: auto !important;
+
+  min-width: 0 !important;
+  height: 40px !important;
+  min-height: 40px !important;
+
+  align-items: center !important;
+
+  gap: 7px !important;
+
+  margin: 0 !important;
+
+  padding:
+    0
+    11px !important;
+
+  border:
+    0 !important;
+
+  border-radius:
+    9px 0 0 9px !important;
+
+  background:
+    transparent !important;
+
+  box-shadow:
+    none !important;
+
+  color:
+    #365b7d;
+
+  white-space:
+    nowrap;
+}
+
+
+.fullDateLabel {
+  display: inline;
+}
+
+
+.shortDateLabel {
+  display: none;
+}
+
+
+/* ------------------------------------------------------------
+   SEARCH / AI BUTTON INSIDE UTILITY BAR
+   ------------------------------------------------------------ */
+
+.topbarUtility
+  [data-campaign-hq-launcher="floating"] {
+  box-sizing: border-box;
+
+  min-height:
+    40px !important;
+
+  margin:
+    0 !important;
+
+  border:
+    0 !important;
+
+  border-radius:
+    0 !important;
+
+  background:
+    transparent !important;
+
+  box-shadow:
+    none !important;
+}
+
+
+/* ------------------------------------------------------------
+   ACTIVITY BUTTON INSIDE UTILITY BAR
+   ------------------------------------------------------------ */
+
+.topbarUtility
+  button[aria-label^="Activity Center"] {
+  box-sizing: border-box;
+
+  min-height:
+    40px !important;
+
+  margin:
+    0 !important;
+
+  border:
+    0 !important;
+
+  border-radius:
+    0 9px 9px 0 !important;
+
+  background:
+    transparent !important;
+
+  box-shadow:
+    none !important;
+}
+
+
+/* ============================================================
+   SMALL LAPTOP / TABLET
+   ============================================================ */
+
+@media (max-width: 1100px) {
+
+  .topbar {
+    min-height:
+      62px !important;
+
+    gap:
+      8px !important;
+
+    padding:
+      8px
+      11px !important;
+  }
+
+
+  .topbarLead {
+    gap:
+      8px;
+  }
+
+
+  .workspaceIdentity > span {
+    display:
+      none;
+  }
+
+
+  .workspaceIdentity strong {
+    margin:
+      0 !important;
+
+    font-size:
+      0.65rem !important;
+  }
+
+
+  .topbarUtility {
+    height:
+      42px;
+
+    min-width:
+      0;
+  }
+
+
+  .fullDateLabel {
+    display:
+      none;
+  }
+
+
+  .shortDateLabel {
+    display:
+      inline;
+  }
+
+
+  .dateTime {
+    height:
+      36px !important;
+
+    min-height:
+      36px !important;
+
+    padding:
+      0
+      8px !important;
+
+    gap:
+      5px !important;
+
+    font-size:
+      0.49rem !important;
+  }
+
+
+  /*
+   * AI text disappears before header is ever allowed to wrap.
+   */
+  .topbarUtility
+    [data-campaign-hq-launcher="floating"]
+    span,
+  .topbarUtility
+    [data-campaign-hq-launcher="floating"]
+    kbd {
+    display:
+      none !important;
+  }
+
+
+  .topbarUtility
+    [data-campaign-hq-launcher="floating"],
+  .topbarUtility
+    button[aria-label^="Activity Center"] {
+    width:
+      36px !important;
+
+    min-width:
+      36px !important;
+
+    height:
+      36px !important;
+
+    min-height:
+      36px !important;
+
+    padding:
+      0 !important;
+  }
+
+
+  .utilityDivider {
+    height:
+      24px;
+  }
+
+}
+
+
+/* ============================================================
+   MOBILE
+   ============================================================ */
+
+@media (max-width: 760px) {
+
+  .topbar {
+    min-height:
+      56px !important;
+
+    gap:
+      6px !important;
+
+    padding:
+      7px
+      7px !important;
+  }
+
+
+  .sharedMenuButton {
+    width:
+      40px !important;
+
+    height:
+      40px !important;
+
+    min-width:
+      40px !important;
+
+    min-height:
+      40px !important;
+  }
+
+
+  .topbarLead {
+    min-width:
+      0;
+
+    gap:
+      6px;
+  }
+
+
+  .workspaceIdentity strong {
+    font-size:
+      0.57rem !important;
+  }
+
+
+  .topbarUtility {
+    min-width:
+      0;
+
+    height:
+      40px;
+
+    padding:
+      1px;
+  }
+
+
+  .dateTime {
+    height:
+      36px !important;
+
+    min-height:
+      36px !important;
+
+    padding:
+      0
+      6px !important;
+
+    gap:
+      4px !important;
+
+    font-size:
+      0.43rem !important;
+  }
+
+
+  .dateTime svg {
+    width:
+      14px !important;
+
+    height:
+      14px !important;
+  }
+
+
+  .dateTime strong,
+  .shortDateLabel {
+    font-size:
+      0.42rem !important;
+  }
+
+
+  .topbarUtility
+    [data-campaign-hq-launcher="floating"],
+  .topbarUtility
+    button[aria-label^="Activity Center"] {
+    width:
+      34px !important;
+
+    min-width:
+      34px !important;
+
+    height:
+      36px !important;
+
+    min-height:
+      36px !important;
+  }
+
+
+  .utilityDivider {
+    height:
+      22px;
+  }
+
+}
+
+
+/* ============================================================
+   NARROW PHONE
+   Keep time / AI / bell.
+   Remove date.
+   ============================================================ */
+
+@media (max-width: 560px) {
+
+  .topbar {
+    gap:
+      4px !important;
+
+    padding:
+      6px
+      5px !important;
+  }
+
+
+  .sharedMenuButton {
+    width:
+      38px !important;
+
+    height:
+      38px !important;
+
+    min-width:
+      38px !important;
+
+    min-height:
+      38px !important;
+  }
+
+
+  .workspaceIdentity strong {
+    font-size:
+      0.51rem !important;
+  }
+
+
+  .topbarUtility {
+    height:
+      38px;
+  }
+
+
+  .shortDateLabel,
+  .utilityCalendarIcon,
+  .dateTime > i {
+    display:
+      none !important;
+  }
+
+
+  .dateTime {
+    height:
+      34px !important;
+
+    min-height:
+      34px !important;
+
+    padding:
+      0
+      5px !important;
+  }
+
+
+  .topbarUtility
+    [data-campaign-hq-launcher="floating"],
+  .topbarUtility
+    button[aria-label^="Activity Center"] {
+    width:
+      32px !important;
+
+    min-width:
+      32px !important;
+
+    height:
+      34px !important;
+
+    min-height:
+      34px !important;
+  }
+
+}
+
+
+/* ============================================================
+   VERY NARROW PHONE
+   Keep clock icon / AI / bell.
+   Workspace remains visible with ellipsis.
+   ============================================================ */
+
+@media (max-width: 390px) {
+
+  .workspaceIdentity strong {
+    font-size:
+      0.48rem !important;
+  }
+
+
+  .dateTime strong {
+    display:
+      none !important;
+  }
+
+
+  .dateTime {
+    width:
+      30px !important;
+
+    min-width:
+      30px !important;
+
+    padding:
+      0 !important;
+
+    justify-content:
+      center !important;
+  }
+
+
+  .topbarUtility
+    [data-campaign-hq-launcher="floating"],
+  .topbarUtility
+    button[aria-label^="Activity Center"] {
+    width:
+      30px !important;
+
+    min-width:
+      30px !important;
+  }
+
+
+  .utilityDivider {
+    height:
+      20px;
+  }
+
+}

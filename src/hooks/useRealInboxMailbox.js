@@ -401,6 +401,51 @@ function externalParticipant({
   );
 }
 
+function normalizeMessageAttachment({
+  message,
+  attachment,
+}) {
+  return {
+    id:
+      `nylas-attachment-${
+        attachment.id
+      }`,
+
+    providerAttachmentId:
+      attachment.id,
+
+    providerMessageId:
+      message.id,
+
+    name:
+      clean(
+        attachment.filename,
+      ) ||
+      "Attachment",
+
+    size:
+      Number(
+        attachment.size ||
+        0,
+      ),
+
+    contentType:
+      clean(
+        attachment.content_type,
+      ),
+
+    contentId:
+      clean(
+        attachment.content_id,
+      ),
+
+    isInline:
+      attachment.is_inline ===
+      true,
+  };
+}
+
+
 function messageAttachments(
   message,
 ) {
@@ -418,36 +463,42 @@ function messageAttachments(
         attachment &&
         !attachment.is_inline,
     )
-    .map((attachment) => ({
-      id:
-        `nylas-attachment-${
-          attachment.id
-        }`,
-
-      providerAttachmentId:
-        attachment.id,
-
-      providerMessageId:
-        message.id,
-
-      name:
-        clean(
-          attachment.filename,
-        ) ||
-        "Attachment",
-
-      size:
-        Number(
-          attachment.size ||
-          0,
-        ),
-
-      contentType:
-        clean(
-          attachment.content_type,
-        ),
-    }));
+    .map(
+      (attachment) =>
+        normalizeMessageAttachment({
+          message,
+          attachment,
+        }),
+    );
 }
+
+
+function messageInlineAttachments(
+  message,
+) {
+  if (
+    !Array.isArray(
+      message?.attachments,
+    )
+  ) {
+    return [];
+  }
+
+  return message.attachments
+    .filter(
+      (attachment) =>
+        attachment &&
+        attachment.is_inline,
+    )
+    .map(
+      (attachment) =>
+        normalizeMessageAttachment({
+          message,
+          attachment,
+        }),
+    );
+}
+
 
 function transformMessage({
   message,
@@ -525,6 +576,16 @@ function transformMessage({
       stripHtml(
         message.body ||
         message.snippet,
+      ),
+
+    htmlBody:
+      clean(
+        message.body,
+      ),
+
+    inlineAttachments:
+      messageInlineAttachments(
+        message,
       ),
 
     subject:

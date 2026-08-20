@@ -385,6 +385,20 @@ export function CampaignWorkspaceShell({
     [],
   );
 
+  const shortDateLabel = useMemo(
+    () =>
+      new Intl.DateTimeFormat(
+        "en-US",
+        {
+          month: "short",
+          day: "numeric",
+          timeZone:
+            "America/New_York",
+        },
+      ).format(new Date()),
+    [],
+  );
+
   const timeLabel = useMemo(
     () =>
       new Intl.DateTimeFormat(
@@ -702,35 +716,50 @@ export function CampaignWorkspaceShell({
           className={styles.topbar}
           data-shared-workspace-topbar="true"
         >
-          {/* SYSTEM RESPONSIVE MENU BUTTON */}
-          <button
-            className={styles.sharedMenuButton}
-            type="button"
-            aria-label="Open campaign navigation"
-            aria-expanded={sharedSidebarOpen}
-            onClick={() =>
-              setSharedSidebarOpen(true)
-            }
-          >
-            <Menu
-              size={20}
-              strokeWidth={2}
-            />
-          </button>
-
           <div
             className={
-              styles.workspaceIdentity
+              styles.topbarLead
             }
           >
-            <span>{workspaceEyebrow}</span>
+            <button
+              className={
+                styles.sharedMenuButton
+              }
+              type="button"
+              aria-label="Open campaign navigation"
+              aria-expanded={
+                sharedSidebarOpen
+              }
+              onClick={() =>
+                setSharedSidebarOpen(
+                  true,
+                )
+              }
+            >
+              <Menu
+                size={20}
+                strokeWidth={2}
+              />
+            </button>
 
-            <strong>{workspaceTitle}</strong>
+            <div
+              className={
+                styles.workspaceIdentity
+              }
+            >
+              <span>
+                {workspaceEyebrow}
+              </span>
+
+              <strong>
+                {workspaceTitle}
+              </strong>
+            </div>
           </div>
 
           <div
             className={
-              styles.topbarActions
+              styles.topbarUtility
             }
           >
             <button
@@ -744,20 +773,58 @@ export function CampaignWorkspaceShell({
                 )
               }
             >
-              <CalendarDays size={17} />
+              <CalendarDays
+                className={
+                  styles.utilityCalendarIcon
+                }
+                size={17}
+              />
 
-              <span>{dateLabel}</span>
+              <span
+                className={
+                  styles.fullDateLabel
+                }
+              >
+                {dateLabel}
+              </span>
+
+              <span
+                className={
+                  styles.shortDateLabel
+                }
+              >
+                {shortDateLabel}
+              </span>
 
               <i />
 
-              <Clock3 size={17} />
+              <Clock3
+                className={
+                  styles.utilityClockIcon
+                }
+                size={17}
+              />
 
               <strong>
                 {timeLabel}
               </strong>
             </button>
 
+            <div
+              className={
+                styles.utilityDivider
+              }
+              aria-hidden="true"
+            />
+
             <CampaignSearch />
+
+            <div
+              className={
+                styles.utilityDivider
+              }
+              aria-hidden="true"
+            />
 
             <ActivityCenter />
           </div>

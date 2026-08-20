@@ -6235,3 +6235,4261 @@
     flex-direction: column;
   }
 }
+
+/* ============================================================
+   CAMPAIGN SEAT — SAFE RICH EMAIL READER
+   ============================================================ */
+
+.richEmail {
+  min-width: 0;
+  margin-top: 8px;
+}
+
+.remoteImageProtection {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  padding: 8px 10px;
+  border: 1px solid #d5e1e9;
+  border-radius: 8px;
+  color: #607b90;
+  background: #f5f9fb;
+  font-size: 0.49rem;
+}
+
+.remoteImageProtection button {
+  flex: 0 0 auto;
+  min-height: 29px;
+  padding: 0 9px;
+  border: 1px solid #c5d6e1;
+  border-radius: 7px;
+  color: #2d648c;
+  background: #ffffff;
+  font: inherit;
+  font-size: 0.48rem;
+  font-weight: 780;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.inlineImageLoading {
+  display: flex;
+  gap: 7px;
+  align-items: center;
+  margin-bottom: 7px;
+  color: #7b8f9f;
+  font-size: 0.49rem;
+}
+
+.richEmailFrame {
+  display: block;
+  width: 100%;
+  min-height: 120px;
+  max-height: 900px;
+  border: 0;
+  background: #ffffff;
+}
+
+.richEmailLongNotice {
+  display: block;
+  margin-top: 5px;
+  color: #8395a4;
+  font-size: 0.47rem;
+}
+
+.inboundMessage > div,
+.outboundMessage > div {
+  min-width: 0;
+}
+
+@media (max-width: 760px) {
+  .remoteImageProtection {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .remoteImageProtection button {
+    width: 100%;
+  }
+}
+
+/* ============================================================
+   CAMPAIGN SEAT — LARGE EMAIL READING EXPERIENCE
+   ============================================================ */
+
+/*
+ * Give the email-reading pane more of the desktop workspace.
+ * Filters and conversation list remain usable, but the opened
+ * email is the visual priority.
+ */
+@media (min-width: 1200px) {
+  .inboxWorkspace {
+    grid-template-columns:
+      minmax(155px, 0.46fr)
+      minmax(290px, 0.78fr)
+      minmax(640px, 2.55fr)
+      !important;
+  }
+}
+
+
+/*
+ * Normal short messages retain their compact conversation
+ * appearance. Rich HTML email gets nearly the entire right pane.
+ */
+.richMessage {
+  width: 96%;
+  max-width: 96% !important;
+}
+
+.richMessage > div {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+
+/* ============================================================
+   EXPANDED MESSAGE VIEW
+   ============================================================ */
+
+.threadExpandScrim {
+  position: fixed;
+  z-index: 2147483400;
+  inset: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background:
+    rgba(
+      7,
+      24,
+      40,
+      0.64
+    );
+  backdrop-filter:
+    blur(2px);
+  -webkit-backdrop-filter:
+    blur(2px);
+  cursor: default;
+}
+
+.threadPanelExpanded {
+  position: fixed !important;
+  z-index: 2147483450 !important;
+
+  inset: 18px !important;
+
+  display: flex !important;
+  width: auto !important;
+  height:
+    calc(
+      100dvh - 36px
+    ) !important;
+
+  min-height: 0 !important;
+  max-height: none !important;
+
+  flex-direction: column;
+
+  overflow: hidden !important;
+
+  border-radius: 16px !important;
+
+  background: #ffffff !important;
+
+  box-shadow:
+    0 34px 110px
+    rgba(
+      3,
+      17,
+      30,
+      0.42
+    ) !important;
+}
+
+.threadPanelExpanded
+  .threadHeader {
+  flex: 0 0 auto;
+  padding:
+    12px
+    18px;
+}
+
+.threadPanelExpanded
+  .threadTabs {
+  flex: 0 0 auto;
+  padding:
+    0
+    18px;
+}
+
+.threadPanelExpanded
+  .threadBody {
+  height: auto !important;
+  min-height: 0 !important;
+  max-height: none !important;
+  flex: 1 1 auto !important;
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+  padding: 18px !important;
+}
+
+.threadPanelExpanded
+  .richMessage {
+  width:
+    min(
+      100%,
+      1320px
+    );
+
+  max-width:
+    1320px !important;
+
+  margin-right: auto;
+  margin-left: auto;
+}
+
+.threadPanelExpanded
+  .richEmailFrame {
+  width: 100%;
+}
+
+.threadPanelExpanded
+  .replyComposer {
+  max-height: 330px;
+  flex: 0 0 auto;
+  overflow-x: hidden;
+  overflow-y: auto;
+  padding:
+    12px
+    18px
+    15px;
+  border-top:
+    1px solid #dce5eb;
+  background:
+    #ffffff;
+}
+
+
+/*
+ * Expanded mode becomes edge-to-edge on smaller displays.
+ */
+@media (max-width: 760px) {
+  .threadPanelExpanded {
+    inset: 8px !important;
+
+    height:
+      calc(
+        100dvh - 16px
+      ) !important;
+
+    border-radius:
+      12px !important;
+  }
+
+  .threadPanelExpanded
+    .threadBody {
+    padding:
+      11px !important;
+  }
+
+  .richMessage {
+    width: 100%;
+    max-width: 100% !important;
+  }
+}
+
+/* ============================================================
+   CAMPAIGN SEAT — INBOX WORKSPACE REORGANIZATION
+   Metrics
+   Channels
+   Filters / Tags
+   Inbox List + Reading Pane
+   ============================================================ */
+
+.inboxControlDeck {
+  display: grid;
+  gap: 0;
+  margin-bottom: 12px;
+  overflow: hidden;
+  border: 1px solid #d8e3eb;
+  border-radius: 12px;
+  background: #ffffff;
+}
+
+.inboxControlRow {
+  display: grid;
+  grid-template-columns:
+    145px minmax(0, 1fr);
+  gap: 14px;
+  align-items: center;
+  padding: 11px 13px;
+}
+
+.inboxControlRow +
+.inboxControlRow {
+  border-top:
+    1px solid #e4ebf0;
+}
+
+.inboxControlHeading strong,
+.inboxControlHeading small {
+  display: block;
+}
+
+.inboxControlHeading strong {
+  color: #244b6b;
+  font-size: 0.66rem;
+}
+
+.inboxControlHeading small {
+  margin-top: 3px;
+  color: #8496a5;
+  font-size: 0.48rem;
+  line-height: 1.35;
+}
+
+
+/* ---------------- CHANNELS ---------------- */
+
+.channelControlList {
+  display: flex;
+  min-width: 0;
+  gap: 7px;
+  align-items: center;
+  overflow-x: auto;
+  padding: 1px 0 3px;
+  scrollbar-width: thin;
+}
+
+.channelControlButton {
+  display: inline-flex;
+  min-height: 36px;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 7px;
+  padding: 0 10px;
+  border: 1px solid #d9e3ea;
+  border-radius: 9px;
+  color: #557187;
+  background: #ffffff;
+  font-size: 0.53rem;
+  font-weight: 720;
+  white-space: nowrap;
+}
+
+.channelControlButton strong {
+  display: inline-flex;
+  min-width: 22px;
+  min-height: 21px;
+  align-items: center;
+  justify-content: center;
+  padding: 0 5px;
+  border-radius: 999px;
+  color: #73899b;
+  background: #eef3f6;
+  font-size: 0.46rem;
+}
+
+.activeChannelControl {
+  border-color:
+    rgba(
+      239,
+      51,
+      64,
+      0.32
+    );
+  color: #ca2633;
+  background: #fff3f4;
+}
+
+.activeChannelControl strong {
+  color: #ffffff;
+  background: #ef3340;
+}
+
+.unavailableChannelControl {
+  opacity: 0.48;
+  cursor: not-allowed;
+}
+
+
+/* ---------------- FILTERS + TAGS ---------------- */
+
+.filterControlGroups {
+  display: flex;
+  min-width: 0;
+  gap: 12px;
+  align-items: center;
+}
+
+.filterControlList,
+.tagControlList {
+  display: flex;
+  min-width: 0;
+  gap: 6px;
+  align-items: center;
+  overflow-x: auto;
+  padding-bottom: 2px;
+  scrollbar-width: thin;
+}
+
+.filterControlList {
+  flex: 0 1 auto;
+}
+
+.tagControlList {
+  flex: 1 1 auto;
+  padding-left: 12px;
+  border-left:
+    1px solid #e2e9ee;
+}
+
+.filterControlButton,
+.tagControlButton {
+  display: inline-flex;
+  min-height: 33px;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 0 9px;
+  border: 1px solid #dbe4ea;
+  border-radius: 8px;
+  color: #627c90;
+  background: #ffffff;
+  font-size: 0.5rem;
+  font-weight: 720;
+  white-space: nowrap;
+}
+
+.filterControlButton strong {
+  color: #8598a7;
+  font-size: 0.45rem;
+}
+
+.activeFilterControl,
+.activeTagControl {
+  border-color: #9eb8ca;
+  color: #244f70;
+  background: #edf5fa;
+}
+
+
+/* ============================================================
+   TWO-COLUMN INBOX
+   ============================================================ */
+
+.inboxWorkspace {
+  display: grid !important;
+
+  grid-template-columns:
+    minmax(315px, 0.72fr)
+    minmax(680px, 2.28fr)
+    !important;
+
+  gap: 12px !important;
+
+  min-height: 0 !important;
+}
+
+
+/*
+ * Both working columns align vertically.
+ */
+.conversationPanel,
+.threadPanel {
+  height: 760px !important;
+  min-height: 0 !important;
+  max-height: 760px !important;
+}
+
+
+/* ---------------- MESSAGE LIST ---------------- */
+
+.conversationPanel {
+  display: flex;
+  flex-direction: column;
+}
+
+.listHeader {
+  flex: 0 0 auto;
+}
+
+.listHeaderTitle {
+  min-width: 0;
+}
+
+.listHeaderTitle strong,
+.listHeaderTitle small {
+  display: block;
+}
+
+.listHeaderTitle strong {
+  color: #244b6b;
+  font-size: 0.68rem;
+}
+
+.listHeaderTitle small {
+  margin-top: 3px;
+  color: #8496a5;
+  font-size: 0.47rem;
+}
+
+.conversationList {
+  min-height: 0;
+  flex: 1 1 auto;
+  overflow-y: auto;
+}
+
+
+/* ---------------- READING PANE ---------------- */
+
+.threadPanel:not(.threadPanelExpanded) {
+  display: flex !important;
+  flex-direction: column;
+}
+
+.threadPanel:not(.threadPanelExpanded)
+  .threadHeader,
+.threadPanel:not(.threadPanelExpanded)
+  .threadTabs {
+  flex: 0 0 auto;
+}
+
+.threadPanel:not(.threadPanelExpanded)
+  .threadBody {
+  height: auto !important;
+  min-height: 0 !important;
+  max-height: none !important;
+
+  flex: 1 1 auto !important;
+
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+
+  padding:
+    16px
+    18px !important;
+}
+
+.threadPanel:not(.threadPanelExpanded)
+  .replyComposer {
+  max-height: 250px;
+
+  flex: 0 0 auto;
+
+  overflow-x: hidden;
+  overflow-y: auto;
+
+  border-top:
+    1px solid #dce5eb;
+}
+
+
+/*
+ * A rich HTML email gets plenty of room, but its actual body
+ * does NOT stretch unnaturally across the entire reader.
+ */
+.richMessage {
+  width: 100% !important;
+  max-width: 100% !important;
+}
+
+.inboundMessage.richMessage
+  > div {
+  box-sizing: border-box;
+
+  width:
+    min(
+      100%,
+      980px
+    ) !important;
+
+  max-width:
+    980px !important;
+
+  margin-right: auto;
+}
+
+.outboundMessage.richMessage
+  > div {
+  box-sizing: border-box;
+
+  width:
+    min(
+      100%,
+      980px
+    ) !important;
+
+  max-width:
+    980px !important;
+
+  margin-left: auto;
+}
+
+
+/*
+ * Full-screen reader can be wider, while still remaining
+ * comfortable to read.
+ */
+.threadPanelExpanded
+  .richMessage {
+  width:
+    min(
+      100%,
+      1180px
+    ) !important;
+
+  max-width:
+    1180px !important;
+
+  margin-right: auto;
+  margin-left: auto;
+}
+
+.threadPanelExpanded
+  .richMessage
+  > div {
+  width: 100% !important;
+  max-width:
+    1100px !important;
+
+  margin-right: auto;
+  margin-left: auto;
+}
+
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+
+@media (max-width: 1100px) {
+  .inboxControlRow {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .filterControlGroups {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .tagControlList {
+    padding-top: 7px;
+    padding-left: 0;
+    border-top:
+      1px solid #e2e9ee;
+    border-left: 0;
+  }
+
+  .inboxWorkspace {
+    grid-template-columns:
+      minmax(280px, 0.8fr)
+      minmax(520px, 1.8fr)
+      !important;
+  }
+}
+
+
+@media (max-width: 820px) {
+  .inboxWorkspace {
+    grid-template-columns:
+      1fr
+      !important;
+  }
+
+  .conversationPanel,
+  .threadPanel {
+    height: auto !important;
+    min-height: 620px !important;
+    max-height: none !important;
+  }
+
+  .channelControlList,
+  .filterControlList,
+  .tagControlList {
+    padding-bottom: 5px;
+  }
+}
+
+/* ============================================================
+   CAMPAIGN SEAT — FINAL INBOX SCROLL MODEL
+   Message thread scrolls independently.
+   Compose / Reply scrolls independently.
+   Send controls stay visible.
+   ============================================================ */
+
+
+/* ------------------------------------------------------------
+   READING AREA
+   ------------------------------------------------------------ */
+
+.threadPanel:not(.threadPanelExpanded)
+  .threadBody {
+  min-height: 0 !important;
+  flex: 1 1 auto !important;
+
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+
+  overscroll-behavior:
+    contain;
+
+  scrollbar-gutter:
+    stable;
+}
+
+
+/* ------------------------------------------------------------
+   REPLY / WRITE AREA
+   ------------------------------------------------------------ */
+
+.threadPanel:not(.threadPanelExpanded)
+  .replyComposer {
+  display: flex !important;
+
+  min-height: 0 !important;
+  max-height: 315px !important;
+
+  flex: 0 0 auto !important;
+  flex-direction: column;
+
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+
+  overscroll-behavior:
+    contain;
+
+  scrollbar-gutter:
+    stable;
+
+  background:
+    #ffffff;
+}
+
+
+/*
+ * The actual typed message gets its own scroll when it grows.
+ */
+.replyComposer textarea {
+  box-sizing: border-box;
+
+  min-height: 112px !important;
+  max-height: 190px !important;
+
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+
+  resize: vertical;
+
+  scrollbar-gutter:
+    stable;
+}
+
+
+/*
+ * Reply All / channels / Send button remain reachable
+ * even when attachments or the signature make the
+ * composer taller.
+ */
+.replyComposer
+  .composerFooter {
+  position: sticky !important;
+
+  z-index: 8;
+
+  bottom: 0;
+
+  flex: 0 0 auto;
+
+  margin-top: 10px;
+
+  padding-top: 10px;
+
+  border-top:
+    1px solid #e0e7ec;
+
+  background:
+    #ffffff;
+}
+
+
+/*
+ * Signature can be long without swallowing the reply area.
+ */
+.replyComposer
+  .composerSignature {
+  max-height: 150px;
+
+  overflow-x: hidden;
+  overflow-y: auto;
+
+  flex: 0 0 auto;
+}
+
+
+/*
+ * Attachment queue scrolls instead of making the
+ * whole right-side panel endlessly tall.
+ */
+.replyComposer
+  .attachmentQueue {
+  max-height: 132px;
+
+  overflow-x: hidden;
+  overflow-y: auto;
+
+  flex: 0 0 auto;
+
+  scrollbar-gutter:
+    stable;
+}
+
+
+/* ------------------------------------------------------------
+   NEW MESSAGE
+   ------------------------------------------------------------ */
+
+.newMessageModal
+  .replyComposer {
+  max-height:
+    min(
+      520px,
+      calc(
+        100dvh - 245px
+      )
+    ) !important;
+
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+}
+
+.newMessageModal
+  .replyComposer
+  textarea {
+  min-height:
+    150px !important;
+
+  max-height:
+    280px !important;
+
+  overflow-y:
+    auto !important;
+}
+
+
+/* ------------------------------------------------------------
+   EXPANDED READER
+   ------------------------------------------------------------ */
+
+.threadPanelExpanded
+  .replyComposer {
+  min-height: 0 !important;
+
+  max-height: 360px !important;
+
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+
+  scrollbar-gutter:
+    stable;
+}
+
+.threadPanelExpanded
+  .threadBody {
+  scrollbar-gutter:
+    stable;
+}
+
+
+/* ------------------------------------------------------------
+   TAG ROW AFTER STATUS-FILTER CLEANUP
+   ------------------------------------------------------------ */
+
+.inboxControlRow
+  > .tagControlList {
+  padding-left: 0;
+  border-left: 0;
+}
+
+
+/* ------------------------------------------------------------
+   MOBILE
+   ------------------------------------------------------------ */
+
+@media (max-width: 820px) {
+  .threadPanel:not(.threadPanelExpanded)
+    .replyComposer {
+    max-height:
+      360px !important;
+  }
+
+  .replyComposer textarea {
+    max-height:
+      220px !important;
+  }
+}
+
+/* ============================================================
+   CAMPAIGN SEAT — FINAL MESSAGE / REPLY LAYOUT
+   The email is the primary reading surface.
+   Reply controls stay anchored at the bottom.
+   ============================================================ */
+
+
+/* ------------------------------------------------------------
+   MORE VERTICAL ROOM FOR THE INBOX + OPEN MESSAGE
+   ------------------------------------------------------------ */
+
+.conversationPanel,
+.threadPanel {
+  height:
+    min(
+      840px,
+      calc(100dvh - 110px)
+    ) !important;
+
+  max-height:
+    none !important;
+
+  min-height:
+    680px !important;
+}
+
+
+/* ------------------------------------------------------------
+   RIGHT PANEL IS ONE FIXED FLEX LAYOUT
+   ------------------------------------------------------------ */
+
+.threadPanel:not(.newMessageModal) {
+  display: flex !important;
+
+  min-height: 0 !important;
+
+  flex-direction: column !important;
+
+  overflow: hidden !important;
+}
+
+.threadPanel:not(.newMessageModal)
+  .threadHeader,
+.threadPanel:not(.newMessageModal)
+  .threadTabs {
+  flex: 0 0 auto !important;
+}
+
+
+/* ------------------------------------------------------------
+   MESSAGE READER GETS ALL REMAINING HEIGHT
+   ------------------------------------------------------------ */
+
+.threadPanel:not(.newMessageModal)
+  .threadBody {
+  height: auto !important;
+
+  min-height: 0 !important;
+
+  max-height: none !important;
+
+  flex: 1 1 auto !important;
+
+  overflow-x: hidden !important;
+
+  overflow-y: auto !important;
+
+  padding:
+    18px
+    20px !important;
+
+  scrollbar-gutter:
+    stable;
+
+  overscroll-behavior:
+    contain;
+}
+
+
+/*
+ * Give rich emails a noticeably larger visible surface.
+ */
+.richEmailFrame {
+  min-height:
+    420px !important;
+
+  max-height:
+    1200px !important;
+}
+
+
+/*
+ * The email body itself remains readable and centered,
+ * rather than stretching edge-to-edge.
+ */
+.inboundMessage.richMessage,
+.outboundMessage.richMessage {
+  width: 100% !important;
+
+  max-width: 100% !important;
+}
+
+.inboundMessage.richMessage
+  > div,
+.outboundMessage.richMessage
+  > div {
+  box-sizing: border-box;
+
+  width:
+    min(
+      100%,
+      1080px
+    ) !important;
+
+  max-width:
+    1080px !important;
+}
+
+.inboundMessage.richMessage
+  > div {
+  margin-right: auto;
+}
+
+.outboundMessage.richMessage
+  > div {
+  margin-left: auto;
+}
+
+
+/* ------------------------------------------------------------
+   REPLY COMPOSER STAYS AT THE BOTTOM
+   ------------------------------------------------------------ */
+
+.threadPanel:not(.newMessageModal)
+  .replyComposer {
+  display: flex !important;
+
+  min-height: 0 !important;
+
+  max-height: none !important;
+
+  flex: 0 0 auto !important;
+
+  flex-direction: column !important;
+
+  overflow: visible !important;
+
+  padding:
+    11px
+    14px
+    12px !important;
+
+  border-top:
+    1px solid #dce5eb !important;
+
+  background:
+    #ffffff !important;
+}
+
+
+/*
+ * The overall composer does NOT scroll.
+ * Only the typed message itself scrolls if necessary.
+ */
+.threadPanel:not(.newMessageModal)
+  .replyComposer
+  textarea {
+  box-sizing: border-box;
+
+  height: 108px !important;
+
+  min-height: 108px !important;
+
+  max-height: 108px !important;
+
+  overflow-x: hidden !important;
+
+  overflow-y: auto !important;
+
+  resize: none !important;
+
+  scrollbar-gutter:
+    stable;
+}
+
+
+/*
+ * Signature preview stays compact so it cannot consume
+ * the reading area.
+ */
+.threadPanel:not(.newMessageModal)
+  .composerSignature {
+  max-height:
+    92px !important;
+
+  flex: 0 0 auto !important;
+
+  overflow-x: hidden !important;
+
+  overflow-y: auto !important;
+
+  margin-top:
+    8px !important;
+}
+
+
+/*
+ * Selected attachments get their own compact scroll region
+ * only when there are many of them.
+ */
+.threadPanel:not(.newMessageModal)
+  .attachmentQueue {
+  max-height:
+    88px !important;
+
+  flex: 0 0 auto !important;
+
+  overflow-x: hidden !important;
+
+  overflow-y: auto !important;
+}
+
+
+/*
+ * Attach control remains compact.
+ */
+.threadPanel:not(.newMessageModal)
+  .attachmentToolbar {
+  flex: 0 0 auto !important;
+
+  margin:
+    6px
+    0 !important;
+}
+
+
+/*
+ * This row is always the bottom-most element.
+ * No need for sticky behavior because the composer itself
+ * never scrolls.
+ */
+.threadPanel:not(.newMessageModal)
+  .composerFooter {
+  position: static !important;
+
+  z-index: auto !important;
+
+  bottom: auto !important;
+
+  flex: 0 0 auto !important;
+
+  margin-top:
+    8px !important;
+
+  padding-top:
+    8px !important;
+
+  border-top:
+    1px solid #e1e8ed !important;
+
+  background:
+    #ffffff !important;
+}
+
+
+/* ------------------------------------------------------------
+   EXPANDED VIEW
+   ------------------------------------------------------------ */
+
+.threadPanelExpanded {
+  height:
+    calc(
+      100dvh - 36px
+    ) !important;
+
+  min-height:
+    0 !important;
+}
+
+.threadPanelExpanded
+  .threadBody {
+  flex: 1 1 auto !important;
+
+  min-height: 0 !important;
+
+  overflow-y: auto !important;
+}
+
+.threadPanelExpanded
+  .replyComposer {
+  max-height: none !important;
+
+  flex: 0 0 auto !important;
+
+  overflow: visible !important;
+}
+
+.threadPanelExpanded
+  .replyComposer
+  textarea {
+  height:
+    110px !important;
+
+  min-height:
+    110px !important;
+
+  max-height:
+    110px !important;
+
+  overflow-y:
+    auto !important;
+}
+
+
+/* ------------------------------------------------------------
+   NEW MESSAGE REMAINS ITS OWN COMPOSER EXPERIENCE
+   ------------------------------------------------------------ */
+
+.newMessageModal
+  .replyComposer {
+  overflow-y:
+    auto !important;
+}
+
+
+/* ------------------------------------------------------------
+   RESPONSIVE
+   ------------------------------------------------------------ */
+
+@media (max-width: 820px) {
+  .conversationPanel,
+  .threadPanel {
+    height:
+      auto !important;
+
+    min-height:
+      660px !important;
+  }
+
+  .threadPanel:not(.newMessageModal)
+    .replyComposer
+    textarea {
+    height:
+      120px !important;
+
+    min-height:
+      120px !important;
+
+    max-height:
+      120px !important;
+  }
+
+  .richEmailFrame {
+    min-height:
+      360px !important;
+  }
+}
+
+/* ============================================================
+   CAMPAIGN SEAT — FINAL RIGHT-PANE PROPORTIONS
+
+   PRIMARY:
+   BIG message reader
+
+   SECONDARY:
+   Compact reply controls parked at bottom
+
+   The reply composer itself NEVER scrolls.
+   ============================================================ */
+
+
+/* ------------------------------------------------------------
+   MAKE THE ENTIRE WORKING AREA TALLER
+   ------------------------------------------------------------ */
+
+.conversationPanel,
+.threadPanel {
+  height:
+    min(
+      880px,
+      calc(100dvh - 92px)
+    ) !important;
+
+  min-height:
+    720px !important;
+
+  max-height:
+    none !important;
+}
+
+
+/* ------------------------------------------------------------
+   RIGHT PANE
+   ------------------------------------------------------------ */
+
+.threadPanel:not(.newMessageModal) {
+  display: flex !important;
+  flex-direction: column !important;
+
+  min-height: 0 !important;
+
+  overflow: hidden !important;
+}
+
+.threadPanel:not(.newMessageModal)
+  .threadHeader,
+.threadPanel:not(.newMessageModal)
+  .threadTabs {
+  flex:
+    0 0 auto !important;
+}
+
+
+/* ------------------------------------------------------------
+   THIS IS THE MAIN AREA.
+   IT RECEIVES ALL AVAILABLE SPACE.
+   ------------------------------------------------------------ */
+
+.threadPanel:not(.newMessageModal)
+  .threadBody {
+  height: auto !important;
+
+  min-height: 0 !important;
+  max-height: none !important;
+
+  flex:
+    1 1 0 !important;
+
+  overflow-x:
+    hidden !important;
+
+  overflow-y:
+    auto !important;
+
+  padding:
+    12px 16px !important;
+
+  scrollbar-gutter:
+    stable;
+
+  overscroll-behavior:
+    contain;
+
+  background:
+    #fbfcfd;
+}
+
+
+/*
+ * Make the actual displayed email visually substantial.
+ * Long messages continue downward inside the reader.
+ */
+.richEmailFrame {
+  min-height:
+    560px !important;
+
+  max-height:
+    1200px !important;
+}
+
+
+/*
+ * Rich HTML email gets the available width,
+ * but keeps a readable inner width.
+ */
+.inboundMessage.richMessage,
+.outboundMessage.richMessage {
+  width:
+    100% !important;
+
+  max-width:
+    100% !important;
+}
+
+.inboundMessage.richMessage
+  > div,
+.outboundMessage.richMessage
+  > div {
+  box-sizing:
+    border-box;
+
+  width:
+    min(
+      100%,
+      1100px
+    ) !important;
+
+  max-width:
+    1100px !important;
+}
+
+
+/* ------------------------------------------------------------
+   REPLY AREA:
+   SMALL, FIXED, NO OUTER SCROLL
+   ------------------------------------------------------------ */
+
+.threadPanel:not(.newMessageModal)
+  .replyComposer {
+  display: flex !important;
+
+  height: auto !important;
+
+  min-height:
+    0 !important;
+
+  max-height:
+    none !important;
+
+  flex:
+    0 0 auto !important;
+
+  flex-direction:
+    column !important;
+
+  overflow:
+    visible !important;
+
+  padding:
+    8px
+    12px
+    9px !important;
+
+  border-top:
+    1px solid #dce5eb !important;
+
+  background:
+    #ffffff !important;
+}
+
+
+/* Connected mailbox status */
+
+.threadPanel:not(.newMessageModal)
+  .previewNotice {
+  min-height:
+    31px !important;
+
+  margin-bottom:
+    5px !important;
+
+  padding:
+    5px
+    8px !important;
+
+  flex:
+    0 0 auto !important;
+}
+
+
+/* Attach files row */
+
+.threadPanel:not(.newMessageModal)
+  .attachmentToolbar {
+  min-height:
+    31px !important;
+
+  margin:
+    3px
+    0
+    5px !important;
+
+  flex:
+    0 0 auto !important;
+}
+
+
+/*
+ * Reply typing box is deliberately compact.
+ * If someone writes a long reply, THIS box scrolls,
+ * not the whole reply section.
+ */
+.threadPanel:not(.newMessageModal)
+  .replyComposer
+  textarea {
+  box-sizing:
+    border-box;
+
+  height:
+    82px !important;
+
+  min-height:
+    82px !important;
+
+  max-height:
+    82px !important;
+
+  margin:
+    0 !important;
+
+  overflow-x:
+    hidden !important;
+
+  overflow-y:
+    auto !important;
+
+  resize:
+    none !important;
+
+  flex:
+    0 0 82px !important;
+}
+
+
+/* Signature stays compact */
+
+.threadPanel:not(.newMessageModal)
+  .composerSignature {
+  min-height:
+    38px !important;
+
+  max-height:
+    72px !important;
+
+  margin-top:
+    5px !important;
+
+  padding:
+    7px
+    9px !important;
+
+  overflow:
+    hidden !important;
+
+  flex:
+    0 0 auto !important;
+}
+
+.threadPanel:not(.newMessageModal)
+  .composerSignature
+  > div {
+  max-height:
+    42px;
+
+  overflow:
+    hidden;
+}
+
+
+/*
+ * Multiple selected attachments may scroll in their
+ * own tiny queue, but NEVER make the composer itself scroll.
+ */
+.threadPanel:not(.newMessageModal)
+  .attachmentQueue {
+  max-height:
+    62px !important;
+
+  overflow-x:
+    hidden !important;
+
+  overflow-y:
+    auto !important;
+
+  flex:
+    0 0 auto !important;
+}
+
+
+/* ------------------------------------------------------------
+   BOTTOM ACTION BAR IS ALWAYS THERE
+   ------------------------------------------------------------ */
+
+.threadPanel:not(.newMessageModal)
+  .composerFooter {
+  position:
+    static !important;
+
+  display:
+    flex !important;
+
+  min-height:
+    45px !important;
+
+  flex:
+    0 0 45px !important;
+
+  align-items:
+    center !important;
+
+  margin-top:
+    5px !important;
+
+  padding-top:
+    5px !important;
+
+  border-top:
+    1px solid #e1e8ed !important;
+
+  background:
+    #ffffff !important;
+}
+
+
+/* ------------------------------------------------------------
+   EXPANDED VIEW:
+   SAME MODEL — EVEN BIGGER MESSAGE
+   ------------------------------------------------------------ */
+
+.threadPanelExpanded
+  .threadBody {
+  flex:
+    1 1 0 !important;
+
+  min-height:
+    0 !important;
+
+  max-height:
+    none !important;
+
+  overflow-y:
+    auto !important;
+}
+
+.threadPanelExpanded
+  .replyComposer {
+  flex:
+    0 0 auto !important;
+
+  max-height:
+    none !important;
+
+  overflow:
+    visible !important;
+}
+
+.threadPanelExpanded
+  .richEmailFrame {
+  min-height:
+    650px !important;
+}
+
+
+/* ------------------------------------------------------------
+   SMALLER SCREENS
+   ------------------------------------------------------------ */
+
+@media (max-width: 820px) {
+  .conversationPanel,
+  .threadPanel {
+    min-height:
+      680px !important;
+  }
+
+  .richEmailFrame {
+    min-height:
+      460px !important;
+  }
+
+  .threadPanel:not(.newMessageModal)
+    .replyComposer
+    textarea {
+    height:
+      92px !important;
+
+    min-height:
+      92px !important;
+
+    max-height:
+      92px !important;
+
+    flex-basis:
+      92px !important;
+  }
+}
+
+/* ============================================================
+   CAMPAIGN SEAT — EMAIL-FIRST RIGHT PANE
+   75–80% reading space, compact reply controls underneath.
+   ============================================================ */
+
+
+/* ------------------------------------------------------------
+   TALLER WORKING SURFACE
+   ------------------------------------------------------------ */
+
+.conversationPanel,
+.threadPanel {
+  height:
+    min(
+      920px,
+      calc(100dvh - 28px)
+    ) !important;
+
+  min-height:
+    720px !important;
+
+  max-height:
+    none !important;
+}
+
+
+/* ------------------------------------------------------------
+   EMAIL READER OWNS THE AVAILABLE SPACE
+   ------------------------------------------------------------ */
+
+.threadPanel:not(.newMessageModal) {
+  display: flex !important;
+
+  min-height: 0 !important;
+
+  flex-direction: column !important;
+
+  overflow: hidden !important;
+}
+
+.threadPanel:not(.newMessageModal)
+  .threadHeader,
+.threadPanel:not(.newMessageModal)
+  .threadTabs {
+  flex: 0 0 auto !important;
+}
+
+.threadPanel:not(.newMessageModal)
+  .threadBody {
+  height: auto !important;
+
+  min-height: 0 !important;
+  max-height: none !important;
+
+  flex: 1 1 0 !important;
+
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+
+  padding:
+    14px
+    18px !important;
+
+  scrollbar-gutter:
+    stable;
+
+  overscroll-behavior:
+    contain;
+}
+
+
+/*
+ * Rich email may be long, but the OUTER message reader
+ * controls the scrolling.
+ */
+.richEmailFrame {
+  min-height:
+    620px !important;
+
+  max-height:
+    1200px !important;
+}
+
+
+/* ------------------------------------------------------------
+   REPLY COMPOSER — COMPACT, FIXED, NO OUTER SCROLL
+   ------------------------------------------------------------ */
+
+.threadPanel:not(.newMessageModal)
+  .replyComposer {
+  display: flex !important;
+
+  height: auto !important;
+
+  min-height: 0 !important;
+
+  max-height: none !important;
+
+  flex: 0 0 auto !important;
+
+  flex-direction: column !important;
+
+  overflow: visible !important;
+
+  padding:
+    7px
+    11px
+    8px !important;
+
+  border-top:
+    1px solid #dce5eb !important;
+
+  background:
+    #ffffff !important;
+}
+
+
+/*
+ * Old reply-only blocks are not part of the visible reply stack.
+ */
+.threadPanel:not(.newMessageModal)
+  .previewNotice,
+.threadPanel:not(.newMessageModal)
+  .attachmentToolbar,
+.threadPanel:not(.newMessageModal)
+  .composerSignature {
+  display: none !important;
+}
+
+
+/*
+ * Draft box stays intentionally small.
+ */
+.threadPanel:not(.newMessageModal)
+  .replyComposer
+  textarea {
+  box-sizing: border-box;
+
+  height:
+    74px !important;
+
+  min-height:
+    74px !important;
+
+  max-height:
+    74px !important;
+
+  flex:
+    0 0 74px !important;
+
+  margin:
+    0 !important;
+
+  overflow-x:
+    hidden !important;
+
+  overflow-y:
+    auto !important;
+
+  resize:
+    none !important;
+
+  scrollbar-gutter:
+    stable;
+}
+
+
+/*
+ * If attachments are selected, they get a small internal queue.
+ */
+.threadPanel:not(.newMessageModal)
+  .attachmentQueue {
+  max-height:
+    54px !important;
+
+  margin:
+    0
+    0
+    5px !important;
+
+  overflow-x:
+    hidden !important;
+
+  overflow-y:
+    auto !important;
+
+  flex:
+    0 0 auto !important;
+}
+
+
+/* ------------------------------------------------------------
+   ONE COMPACT ACTION ROW AT THE VERY BOTTOM
+   ------------------------------------------------------------ */
+
+.threadPanel:not(.newMessageModal)
+  .composerFooter {
+  position: static !important;
+
+  display: flex !important;
+
+  min-height:
+    45px !important;
+
+  flex:
+    0 0 45px !important;
+
+  align-items:
+    center !important;
+
+  justify-content:
+    space-between !important;
+
+  gap:
+    9px !important;
+
+  margin-top:
+    5px !important;
+
+  padding-top:
+    5px !important;
+
+  border-top:
+    1px solid #e1e8ed !important;
+
+  background:
+    #ffffff !important;
+}
+
+.replyOptions {
+  display: flex !important;
+
+  min-width: 0;
+
+  align-items: center !important;
+
+  gap: 6px !important;
+
+  flex-wrap: nowrap !important;
+}
+
+
+/* Attach now lives in bottom row. */
+
+.compactAttachButton {
+  display: inline-flex !important;
+
+  min-height:
+    33px !important;
+
+  width: auto !important;
+
+  align-items:
+    center;
+
+  justify-content:
+    center;
+
+  gap:
+    6px;
+
+  padding:
+    0
+    9px !important;
+
+  border:
+    1px solid #d3dfe8 !important;
+
+  border-radius:
+    8px;
+
+  color:
+    #496a83;
+
+  background:
+    #ffffff;
+
+  font-size:
+    0.51rem;
+
+  font-weight:
+    760;
+
+  white-space:
+    nowrap;
+}
+
+
+/* Signature is now a compact checkbox. */
+
+.compactSignatureToggle {
+  display: inline-flex;
+
+  min-height:
+    33px;
+
+  align-items:
+    center;
+
+  gap:
+    6px;
+
+  padding:
+    0
+    9px;
+
+  border:
+    1px solid #d3dfe8;
+
+  border-radius:
+    8px;
+
+  color:
+    #496a83;
+
+  background:
+    #ffffff;
+
+  font-size:
+    0.51rem;
+
+  font-weight:
+    760;
+
+  white-space:
+    nowrap;
+}
+
+.compactSignatureToggle
+  input {
+  margin: 0;
+}
+
+
+/*
+ * Existing Reply All stays compact.
+ */
+.replyOptions
+  > button {
+  min-height:
+    33px !important;
+
+  min-width:
+    0 !important;
+
+  padding:
+    0
+    9px !important;
+}
+
+
+/*
+ * Channels remain in the same bottom bar.
+ */
+.replyChannels {
+  flex:
+    0 1 auto;
+
+  min-width:
+    0;
+
+  overflow-x:
+    auto;
+
+  white-space:
+    nowrap;
+
+  scrollbar-width:
+    none;
+}
+
+.replyChannels::-webkit-scrollbar {
+  display: none;
+}
+
+.replyChannels
+  button {
+  min-height:
+    33px !important;
+}
+
+
+/*
+ * Send is always visible on right edge.
+ */
+.sendButton {
+  flex:
+    0 0 auto !important;
+
+  min-height:
+    37px !important;
+
+  white-space:
+    nowrap;
+}
+
+
+/* ------------------------------------------------------------
+   EXPANDED VIEW
+   ------------------------------------------------------------ */
+
+.threadPanelExpanded
+  .threadBody {
+  flex:
+    1 1 0 !important;
+
+  min-height:
+    0 !important;
+
+  overflow-y:
+    auto !important;
+}
+
+.threadPanelExpanded
+  .richEmailFrame {
+  min-height:
+    720px !important;
+}
+
+
+/* ------------------------------------------------------------
+   MOBILE
+   ------------------------------------------------------------ */
+
+@media (max-width: 820px) {
+  .richEmailFrame {
+    min-height:
+      480px !important;
+  }
+
+  .threadPanel:not(.newMessageModal)
+    .replyComposer
+    textarea {
+    height:
+      86px !important;
+
+    min-height:
+      86px !important;
+
+    max-height:
+      86px !important;
+
+    flex-basis:
+      86px !important;
+  }
+
+  .composerFooter {
+    flex-wrap:
+      wrap !important;
+
+    height:
+      auto !important;
+
+    min-height:
+      45px !important;
+
+    flex-basis:
+      auto !important;
+  }
+}
+
+/* ============================================================
+   CAMPAIGN SEAT — FINAL EMAIL / REPLY BALANCE
+   Compact rendered email.
+   More comfortable reply area.
+   Signature preview restored.
+   ============================================================ */
+
+
+/* ------------------------------------------------------------
+   ACTUAL EMAIL
+   ------------------------------------------------------------ */
+
+/*
+ * The right-side reading area stays dominant, but a giant
+ * marketing email no longer takes over the entire screen.
+ */
+.threadPanel:not(.newMessageModal)
+  .richEmailFrame {
+  min-height:
+    440px !important;
+
+  max-height:
+    720px !important;
+
+  overflow:
+    auto !important;
+}
+
+
+/*
+ * Keep the rendered email centered and readable.
+ */
+.threadPanel:not(.newMessageModal)
+  .richMessage
+  > div {
+  width:
+    min(
+      100%,
+      980px
+    ) !important;
+
+  max-width:
+    980px !important;
+}
+
+
+/* ------------------------------------------------------------
+   REPLY COMPOSER
+   ------------------------------------------------------------ */
+
+.threadPanel:not(.newMessageModal)
+  .replyComposer {
+  display:
+    flex !important;
+
+  height:
+    auto !important;
+
+  min-height:
+    0 !important;
+
+  max-height:
+    none !important;
+
+  flex:
+    0 0 auto !important;
+
+  flex-direction:
+    column !important;
+
+  overflow:
+    visible !important;
+
+  padding:
+    9px
+    12px
+    9px !important;
+
+  background:
+    #ffffff !important;
+}
+
+
+/*
+ * More comfortable writing space than the previous
+ * ultra-compact version.
+ */
+.threadPanel:not(.newMessageModal)
+  .replyComposer
+  textarea {
+  box-sizing:
+    border-box;
+
+  height:
+    118px !important;
+
+  min-height:
+    118px !important;
+
+  max-height:
+    118px !important;
+
+  flex:
+    0 0 118px !important;
+
+  margin:
+    0 !important;
+
+  overflow-x:
+    hidden !important;
+
+  overflow-y:
+    auto !important;
+
+  resize:
+    none !important;
+}
+
+
+/* ------------------------------------------------------------
+   REAL SIGNATURE PREVIEW IS BACK
+   ------------------------------------------------------------ */
+
+.threadPanel:not(.newMessageModal)
+  .composerSignature {
+  display:
+    block !important;
+
+  min-height:
+    42px !important;
+
+  max-height:
+    105px !important;
+
+  margin-top:
+    7px !important;
+
+  padding:
+    8px
+    10px !important;
+
+  overflow-x:
+    hidden !important;
+
+  overflow-y:
+    auto !important;
+
+  flex:
+    0 0 auto !important;
+}
+
+.threadPanel:not(.newMessageModal)
+  .composerSignature
+  > div {
+  display:
+    block !important;
+
+  max-height:
+    62px !important;
+
+  overflow-x:
+    hidden !important;
+
+  overflow-y:
+    auto !important;
+}
+
+
+/*
+ * We don't need the second Signature checkbox in the bottom
+ * bar now that the proper signature panel is visible again.
+ */
+.compactSignatureToggle {
+  display:
+    none !important;
+}
+
+
+/* ------------------------------------------------------------
+   ATTACHMENTS
+   ------------------------------------------------------------ */
+
+.threadPanel:not(.newMessageModal)
+  .attachmentQueue {
+  max-height:
+    72px !important;
+
+  margin-bottom:
+    6px !important;
+
+  overflow-y:
+    auto !important;
+}
+
+
+/* ------------------------------------------------------------
+   BOTTOM CONTROLS
+   ------------------------------------------------------------ */
+
+.threadPanel:not(.newMessageModal)
+  .composerFooter {
+  min-height:
+    45px !important;
+
+  flex:
+    0 0 45px !important;
+
+  margin-top:
+    7px !important;
+
+  padding-top:
+    7px !important;
+
+  background:
+    #ffffff !important;
+}
+
+
+/* ------------------------------------------------------------
+   EXPANDED EMAIL
+   ------------------------------------------------------------ */
+
+.threadPanelExpanded
+  .richEmailFrame {
+  min-height:
+    560px !important;
+
+  max-height:
+    900px !important;
+}
+
+
+/* ------------------------------------------------------------
+   MOBILE
+   ------------------------------------------------------------ */
+
+@media (max-width: 820px) {
+  .threadPanel:not(.newMessageModal)
+    .richEmailFrame {
+    min-height:
+      380px !important;
+
+    max-height:
+      620px !important;
+  }
+
+  .threadPanel:not(.newMessageModal)
+    .replyComposer
+    textarea {
+    height:
+      130px !important;
+
+    min-height:
+      130px !important;
+
+    max-height:
+      130px !important;
+
+    flex-basis:
+      130px !important;
+  }
+}
+
+/* ============================================================
+   CAMPAIGN SEAT — FINAL PROPORTION MODEL
+
+   NORMAL INBOX
+   - Taller overall thread
+   - Compact actual HTML email
+   - Outer thread scroll is primary
+   - Comfortable reply area
+
+   EXPANDED
+   - Full-size email rendering
+   - Larger reading surface
+   ============================================================ */
+
+
+/* ------------------------------------------------------------
+   ENTIRE INBOX / THREAD
+   ------------------------------------------------------------ */
+
+@media (min-width: 821px) {
+  .conversationPanel,
+  .threadPanel {
+    height:
+      1010px !important;
+
+    min-height:
+      1010px !important;
+
+    max-height:
+      1010px !important;
+  }
+}
+
+
+/* ------------------------------------------------------------
+   NORMAL MESSAGE READER
+   ------------------------------------------------------------ */
+
+.threadPanel:not(.newMessageModal):not(.threadPanelExpanded)
+  .threadBody {
+  height:
+    auto !important;
+
+  min-height:
+    0 !important;
+
+  max-height:
+    none !important;
+
+  flex:
+    1 1 0 !important;
+
+  overflow-x:
+    hidden !important;
+
+  overflow-y:
+    auto !important;
+
+  padding:
+    15px
+    18px !important;
+
+  scrollbar-gutter:
+    stable;
+
+  overscroll-behavior:
+    contain;
+}
+
+
+/*
+ * Do NOT artificially cap normal email at 720px anymore.
+ * The iframe can grow with the email; the surrounding
+ * Campaign Seat message reader handles the scrolling.
+ */
+.threadPanel:not(.newMessageModal):not(.threadPanelExpanded)
+  .richEmailFrame {
+  min-height:
+    520px !important;
+
+  max-height:
+    none !important;
+}
+
+
+/*
+ * The rendered marketing/email design is compact inside
+ * the much larger thread.
+ */
+.threadPanel:not(.newMessageModal):not(.threadPanelExpanded)
+  .richMessage
+  > div {
+  box-sizing:
+    border-box;
+
+  width:
+    min(
+      100%,
+      900px
+    ) !important;
+
+  max-width:
+    900px !important;
+}
+
+
+/* ------------------------------------------------------------
+   REPLY AREA
+   ------------------------------------------------------------ */
+
+.threadPanel:not(.newMessageModal):not(.threadPanelExpanded)
+  .replyComposer {
+  display:
+    flex !important;
+
+  min-height:
+    0 !important;
+
+  max-height:
+    none !important;
+
+  flex:
+    0 0 auto !important;
+
+  flex-direction:
+    column !important;
+
+  overflow:
+    visible !important;
+
+  padding:
+    10px
+    13px
+    10px !important;
+
+  border-top:
+    1px solid #dce5eb !important;
+
+  background:
+    #ffffff !important;
+}
+
+
+/*
+ * Give the user actual room to reply.
+ */
+.threadPanel:not(.newMessageModal):not(.threadPanelExpanded)
+  .replyComposer
+  textarea {
+  box-sizing:
+    border-box;
+
+  height:
+    155px !important;
+
+  min-height:
+    155px !important;
+
+  max-height:
+    155px !important;
+
+  flex:
+    0 0 155px !important;
+
+  margin:
+    0 !important;
+
+  overflow-x:
+    hidden !important;
+
+  overflow-y:
+    auto !important;
+
+  resize:
+    none !important;
+}
+
+
+/*
+ * Signature gets enough room to actually see it.
+ */
+.threadPanel:not(.newMessageModal):not(.threadPanelExpanded)
+  .composerSignature {
+  display:
+    block !important;
+
+  min-height:
+    48px !important;
+
+  max-height:
+    125px !important;
+
+  flex:
+    0 0 auto !important;
+
+  margin-top:
+    7px !important;
+
+  padding:
+    9px
+    10px !important;
+
+  overflow-x:
+    hidden !important;
+
+  overflow-y:
+    auto !important;
+}
+
+.threadPanel:not(.newMessageModal):not(.threadPanelExpanded)
+  .composerSignature
+  > div {
+  max-height:
+    78px !important;
+
+  overflow-y:
+    auto !important;
+}
+
+
+/*
+ * Attachments can show without destroying the layout.
+ */
+.threadPanel:not(.newMessageModal):not(.threadPanelExpanded)
+  .attachmentQueue {
+  max-height:
+    90px !important;
+
+  overflow-y:
+    auto !important;
+
+  flex:
+    0 0 auto !important;
+}
+
+
+/* Bottom controls remain fixed in normal document flow. */
+
+.threadPanel:not(.newMessageModal):not(.threadPanelExpanded)
+  .composerFooter {
+  position:
+    static !important;
+
+  min-height:
+    48px !important;
+
+  flex:
+    0 0 48px !important;
+
+  margin-top:
+    8px !important;
+
+  padding-top:
+    7px !important;
+
+  background:
+    #ffffff !important;
+}
+
+
+/* ------------------------------------------------------------
+   EXPANDED MODE = LARGER VERSION OF THE EMAIL
+   ------------------------------------------------------------ */
+
+.threadPanelExpanded {
+  inset:
+    12px !important;
+
+  height:
+    calc(
+      100dvh - 24px
+    ) !important;
+
+  max-height:
+    none !important;
+}
+
+.threadPanelExpanded
+  .threadBody {
+  flex:
+    1 1 0 !important;
+
+  min-height:
+    0 !important;
+
+  max-height:
+    none !important;
+
+  overflow-y:
+    auto !important;
+
+  padding:
+    22px
+    26px !important;
+}
+
+.threadPanelExpanded
+  .richMessage {
+  width:
+    100% !important;
+
+  max-width:
+    100% !important;
+}
+
+.threadPanelExpanded
+  .richMessage
+  > div {
+  box-sizing:
+    border-box;
+
+  width:
+    min(
+      100%,
+      1280px
+    ) !important;
+
+  max-width:
+    1280px !important;
+
+  margin-right:
+    auto !important;
+
+  margin-left:
+    auto !important;
+}
+
+.threadPanelExpanded
+  .richEmailFrame {
+  min-height:
+    620px !important;
+
+  max-height:
+    none !important;
+}
+
+
+/*
+ * Expanded mode still has a usable reply box.
+ */
+.threadPanelExpanded
+  .replyComposer
+  textarea {
+  height:
+    150px !important;
+
+  min-height:
+    150px !important;
+
+  max-height:
+    150px !important;
+
+  flex:
+    0 0 150px !important;
+
+  overflow-y:
+    auto !important;
+}
+
+
+/* ------------------------------------------------------------
+   MOBILE / SHORTER DISPLAYS
+   ------------------------------------------------------------ */
+
+@media (max-width: 820px) {
+  .conversationPanel,
+  .threadPanel {
+    height:
+      auto !important;
+
+    min-height:
+      720px !important;
+
+    max-height:
+      none !important;
+  }
+
+  .threadPanel:not(.newMessageModal)
+    .richEmailFrame {
+    min-height:
+      420px !important;
+  }
+
+  .threadPanel:not(.newMessageModal)
+    .replyComposer
+    textarea {
+    height:
+      140px !important;
+
+    min-height:
+      140px !important;
+
+    max-height:
+      140px !important;
+
+    flex-basis:
+      140px !important;
+  }
+}
+
+/* ============================================================
+   CAMPAIGN SEAT — FINAL REPLY BAR ALIGNMENT
+   ============================================================ */
+
+/*
+ * Normal email is intentionally more compact.
+ * Expanded mode remains full-size through the renderer.
+ */
+.threadPanel:not(.newMessageModal):not(.threadPanelExpanded)
+  .richMessage
+  > div {
+  width:
+    min(
+      100%,
+      840px
+    ) !important;
+
+  max-width:
+    840px !important;
+
+  margin-right:
+    auto !important;
+
+  margin-left:
+    auto !important;
+}
+
+
+/* ------------------------------------------------------------
+   BOTTOM BAR
+   ------------------------------------------------------------ */
+
+.threadPanel:not(.newMessageModal)
+  .composerFooter {
+  display:
+    grid !important;
+
+  grid-template-columns:
+    auto minmax(0, 1fr) auto;
+
+  gap:
+    14px !important;
+
+  align-items:
+    center !important;
+
+  min-height:
+    52px !important;
+
+  height:
+    auto !important;
+
+  flex:
+    0 0 auto !important;
+
+  padding:
+    7px
+    0
+    0 !important;
+}
+
+
+/*
+ * Attach and Reply All are separate controls.
+ */
+.replyOptions {
+  display:
+    flex !important;
+
+  width:
+    auto !important;
+
+  min-width:
+    max-content !important;
+
+  align-items:
+    center !important;
+
+  gap:
+    8px !important;
+
+  flex-wrap:
+    nowrap !important;
+}
+
+
+.compactAttachButton,
+.replyAllButton {
+  display:
+    inline-flex !important;
+
+  width:
+    auto !important;
+
+  min-width:
+    0 !important;
+
+  min-height:
+    36px !important;
+
+  align-items:
+    center !important;
+
+  justify-content:
+    center !important;
+
+  gap:
+    6px !important;
+
+  margin:
+    0 !important;
+
+  padding:
+    0
+    11px !important;
+
+  border:
+    1px solid #d3dfe8 !important;
+
+  border-radius:
+    8px !important;
+
+  color:
+    #506f87 !important;
+
+  background:
+    #ffffff !important;
+
+  font-size:
+    0.54rem !important;
+
+  font-weight:
+    760 !important;
+
+  line-height:
+    1 !important;
+
+  white-space:
+    nowrap !important;
+}
+
+.replyAllButton:hover,
+.compactAttachButton:hover {
+  border-color:
+    #afc3d1 !important;
+
+  background:
+    #f7fafc !important;
+}
+
+.replyAllActive {
+  border-color:
+    #ef3340 !important;
+
+  color:
+    #cf2633 !important;
+
+  background:
+    #fff3f4 !important;
+}
+
+
+/*
+ * Communication channels live cleanly in the middle.
+ */
+.replyChannels {
+  display:
+    flex !important;
+
+  min-width:
+    0 !important;
+
+  align-items:
+    center !important;
+
+  justify-content:
+    flex-start !important;
+
+  gap:
+    7px !important;
+
+  overflow-x:
+    auto !important;
+
+  padding:
+    0 !important;
+}
+
+.replyChannels
+  button {
+  flex:
+    0 0 auto !important;
+
+  min-height:
+    36px !important;
+
+  margin:
+    0 !important;
+}
+
+
+/*
+ * Send stays locked on the right.
+ */
+.sendButton {
+  min-height:
+    40px !important;
+
+  margin:
+    0 !important;
+
+  justify-self:
+    end !important;
+}
+
+
+/* ------------------------------------------------------------
+   REPLY SPACE
+   ------------------------------------------------------------ */
+
+.threadPanel:not(.newMessageModal):not(.threadPanelExpanded)
+  .replyComposer
+  textarea {
+  height:
+    165px !important;
+
+  min-height:
+    165px !important;
+
+  max-height:
+    165px !important;
+
+  flex:
+    0 0 165px !important;
+}
+
+
+/*
+ * Keep the signature readable when enabled.
+ */
+.threadPanel:not(.newMessageModal)
+  .composerSignature {
+  max-height:
+    135px !important;
+}
+
+
+/* ------------------------------------------------------------
+   EXPANDED VIEW
+   ------------------------------------------------------------ */
+
+.threadPanelExpanded
+  .richMessage
+  > div {
+  width:
+    min(
+      100%,
+      1280px
+    ) !important;
+
+  max-width:
+    1280px !important;
+}
+
+
+/* ------------------------------------------------------------
+   MOBILE
+   ------------------------------------------------------------ */
+
+@media (max-width: 820px) {
+  .threadPanel:not(.newMessageModal)
+    .composerFooter {
+    grid-template-columns:
+      1fr !important;
+  }
+
+  .replyOptions,
+  .replyChannels {
+    width:
+      100% !important;
+  }
+
+  .sendButton {
+    width:
+      100% !important;
+
+    justify-self:
+      stretch !important;
+  }
+}
+
+/* ============================================================
+   CAMPAIGN SEAT — RESPONSIVE INBOX FINAL PASS
+   Desktop / Laptop / Tablet / Mobile
+   ============================================================ */
+
+
+/* ------------------------------------------------------------
+   GLOBAL CUSHION / OVERFLOW PROTECTION
+   ------------------------------------------------------------ */
+
+.page {
+  box-sizing: border-box;
+
+  width: 100%;
+
+  min-width: 0;
+
+  overflow-x: hidden;
+
+  padding-bottom:
+    clamp(
+      34px,
+      5vh,
+      64px
+    ) !important;
+}
+
+
+.inboxControlDeck,
+.inboxWorkspace {
+  width: 100%;
+
+  min-width: 0;
+
+  box-sizing: border-box;
+}
+
+
+.inboxWorkspace {
+  margin-bottom:
+    28px !important;
+}
+
+
+/*
+ * Give the bottom reply row visible breathing room
+ * from the panel edge.
+ */
+.threadPanel:not(.newMessageModal)
+  .replyComposer {
+  padding-bottom:
+    15px !important;
+}
+
+
+.threadPanel:not(.newMessageModal)
+  .composerFooter {
+  margin-bottom:
+    4px !important;
+}
+
+
+/* ------------------------------------------------------------
+   LARGE DESKTOP
+   ------------------------------------------------------------ */
+
+@media (min-width: 1500px) {
+
+  .inboxWorkspace {
+    grid-template-columns:
+      minmax(330px, 0.72fr)
+      minmax(0, 2.28fr)
+      !important;
+  }
+
+
+  .conversationPanel,
+  .threadPanel {
+    height:
+      min(
+        980px,
+        calc(100dvh - 42px)
+      ) !important;
+
+    min-height:
+      760px !important;
+
+    max-height:
+      none !important;
+  }
+
+
+  .threadPanel:not(.threadPanelExpanded)
+    .richMessage
+    > div {
+    max-width:
+      880px !important;
+  }
+
+}
+
+
+/* ------------------------------------------------------------
+   STANDARD LAPTOP
+   13–15 inch displays
+   ------------------------------------------------------------ */
+
+@media
+  (min-width: 1101px)
+  and
+  (max-width: 1499px) {
+
+  .page {
+    padding:
+      16px
+      18px
+      46px !important;
+  }
+
+
+  .pageHeader {
+    gap:
+      14px;
+  }
+
+
+  .globalSearch {
+    width:
+      min(
+        285px,
+        30vw
+      );
+  }
+
+
+  .metricCard {
+    min-height:
+      86px;
+  }
+
+
+  .inboxControlRow {
+    grid-template-columns:
+      125px
+      minmax(0, 1fr);
+
+    gap:
+      11px;
+  }
+
+
+  .inboxWorkspace {
+    grid-template-columns:
+      minmax(300px, 0.76fr)
+      minmax(0, 2.24fr)
+      !important;
+
+    gap:
+      10px !important;
+  }
+
+
+  .conversationPanel,
+  .threadPanel {
+    height:
+      min(
+        900px,
+        calc(100dvh - 34px)
+      ) !important;
+
+    min-height:
+      700px !important;
+
+    max-height:
+      none !important;
+  }
+
+
+  .threadPanel:not(.threadPanelExpanded)
+    .threadBody {
+    padding:
+      13px
+      15px !important;
+  }
+
+
+  .threadPanel:not(.threadPanelExpanded)
+    .richMessage
+    > div {
+    max-width:
+      800px !important;
+  }
+
+
+  .threadPanel:not(.newMessageModal)
+    .replyComposer
+    textarea {
+    height:
+      145px !important;
+
+    min-height:
+      145px !important;
+
+    max-height:
+      145px !important;
+
+    flex-basis:
+      145px !important;
+  }
+
+}
+
+
+/* ------------------------------------------------------------
+   TABLET LANDSCAPE / SMALL LAPTOP
+   ------------------------------------------------------------ */
+
+@media
+  (min-width: 821px)
+  and
+  (max-width: 1100px) {
+
+  .page {
+    padding:
+      14px
+      14px
+      44px !important;
+  }
+
+
+  .pageHeader {
+    align-items:
+      stretch;
+
+    flex-direction:
+      column;
+  }
+
+
+  .pageActions {
+    width:
+      100%;
+  }
+
+
+  .globalSearch {
+    width:
+      auto;
+
+    flex:
+      1 1 auto;
+  }
+
+
+  .metricsGrid {
+    grid-template-columns:
+      repeat(
+        3,
+        minmax(0, 1fr)
+      ) !important;
+  }
+
+
+  .inboxControlRow {
+    grid-template-columns:
+      1fr !important;
+
+    gap:
+      8px !important;
+  }
+
+
+  .channelControlList,
+  .tagControlList {
+    width:
+      100%;
+
+    overflow-x:
+      auto;
+
+    overflow-y:
+      hidden;
+
+    padding-bottom:
+      5px;
+  }
+
+
+  .inboxWorkspace {
+    grid-template-columns:
+      minmax(285px, 0.82fr)
+      minmax(0, 1.8fr)
+      !important;
+
+    gap:
+      9px !important;
+  }
+
+
+  .conversationPanel,
+  .threadPanel {
+    height:
+      820px !important;
+
+    min-height:
+      680px !important;
+
+    max-height:
+      none !important;
+  }
+
+
+  .threadPanel:not(.threadPanelExpanded)
+    .richMessage
+    > div {
+    width:
+      100% !important;
+
+    max-width:
+      720px !important;
+  }
+
+
+  .threadPanel:not(.newMessageModal)
+    .replyComposer
+    textarea {
+    height:
+      135px !important;
+
+    min-height:
+      135px !important;
+
+    max-height:
+      135px !important;
+
+    flex-basis:
+      135px !important;
+  }
+
+
+  .composerFooter {
+    grid-template-columns:
+      auto
+      minmax(0, 1fr)
+      auto !important;
+
+    gap:
+      8px !important;
+  }
+
+
+  .replyOptions {
+    gap:
+      5px !important;
+  }
+
+
+  .replyChannels {
+    gap:
+      5px !important;
+  }
+
+
+  .replyChannels button,
+  .compactAttachButton,
+  .replyAllButton {
+    min-height:
+      38px !important;
+  }
+
+}
+
+
+/* ------------------------------------------------------------
+   TABLET PORTRAIT + LARGE MOBILE
+   Stack list above message.
+   ------------------------------------------------------------ */
+
+@media (max-width: 820px) {
+
+  .page {
+    padding:
+      10px
+      10px
+      42px !important;
+  }
+
+
+  .pageHeader {
+    align-items:
+      stretch;
+
+    flex-direction:
+      column;
+
+    gap:
+      11px;
+  }
+
+
+  .pageHeader h1 {
+    font-size:
+      1.6rem;
+  }
+
+
+  .pageActions {
+    display:
+      grid;
+
+    width:
+      100%;
+
+    grid-template-columns:
+      minmax(0, 1fr)
+      auto
+      auto;
+
+    gap:
+      7px;
+  }
+
+
+  .globalSearch {
+    width:
+      100%;
+  }
+
+
+  .quickTaskButton,
+  .newMessageButton {
+    min-height:
+      42px;
+  }
+
+
+  /*
+   * Cards stay useful without becoming a giant vertical list.
+   */
+  .metricsGrid {
+    display:
+      grid !important;
+
+    grid-template-columns:
+      repeat(
+        3,
+        minmax(155px, 1fr)
+      ) !important;
+
+    overflow-x:
+      auto;
+
+    padding-bottom:
+      5px;
+  }
+
+
+  .metricCard {
+    min-height:
+      82px;
+  }
+
+
+  .inboxControlDeck {
+    border-radius:
+      10px;
+  }
+
+
+  .inboxControlRow {
+    grid-template-columns:
+      1fr !important;
+
+    gap:
+      7px !important;
+
+    padding:
+      10px !important;
+  }
+
+
+  .channelControlList,
+  .tagControlList {
+    display:
+      flex;
+
+    width:
+      100%;
+
+    overflow-x:
+      auto;
+
+    overflow-y:
+      hidden;
+
+    flex-wrap:
+      nowrap;
+
+    padding-bottom:
+      6px;
+
+    -webkit-overflow-scrolling:
+      touch;
+  }
+
+
+  .channelControlButton,
+  .tagControlButton {
+    min-height:
+      39px;
+
+    flex:
+      0 0 auto;
+  }
+
+
+  /*
+   * List first, opened message underneath.
+   */
+  .inboxWorkspace {
+    grid-template-columns:
+      1fr !important;
+
+    gap:
+      10px !important;
+  }
+
+
+  .conversationPanel {
+    height:
+      390px !important;
+
+    min-height:
+      390px !important;
+
+    max-height:
+      390px !important;
+  }
+
+
+  .threadPanel {
+    height:
+      780px !important;
+
+    min-height:
+      720px !important;
+
+    max-height:
+      none !important;
+  }
+
+
+  .threadPanel:not(.threadPanelExpanded)
+    .threadBody {
+    padding:
+      11px !important;
+  }
+
+
+  .threadPanel:not(.threadPanelExpanded)
+    .richMessage
+    > div {
+    width:
+      100% !important;
+
+    max-width:
+      100% !important;
+  }
+
+
+  .threadPanel:not(.newMessageModal)
+    .replyComposer {
+    padding:
+      9px
+      10px
+      14px !important;
+  }
+
+
+  .threadPanel:not(.newMessageModal)
+    .replyComposer
+    textarea {
+    height:
+      140px !important;
+
+    min-height:
+      140px !important;
+
+    max-height:
+      140px !important;
+
+    flex-basis:
+      140px !important;
+  }
+
+
+  /*
+   * Bottom controls wrap into sensible rows.
+   */
+  .threadPanel:not(.newMessageModal)
+    .composerFooter {
+    display:
+      grid !important;
+
+    grid-template-columns:
+      1fr !important;
+
+    gap:
+      8px !important;
+
+    min-height:
+      0 !important;
+
+    height:
+      auto !important;
+
+    flex-basis:
+      auto !important;
+  }
+
+
+  .replyOptions,
+  .replyChannels {
+    display:
+      flex !important;
+
+    width:
+      100% !important;
+
+    overflow-x:
+      auto;
+
+    gap:
+      6px !important;
+
+    padding-bottom:
+      2px;
+
+    -webkit-overflow-scrolling:
+      touch;
+  }
+
+
+  .compactAttachButton,
+  .replyAllButton,
+  .replyChannels button {
+    min-height:
+      42px !important;
+
+    flex:
+      0 0 auto !important;
+  }
+
+
+  .sendButton {
+    width:
+      100% !important;
+
+    min-height:
+      45px !important;
+
+    justify-self:
+      stretch !important;
+  }
+
+
+  .composerSignature {
+    max-height:
+      118px !important;
+  }
+
+
+  /*
+   * Full-screen email still works beautifully on tablet/mobile.
+   */
+  .threadPanelExpanded {
+    inset:
+      6px !important;
+
+    width:
+      auto !important;
+
+    height:
+      calc(
+        100dvh - 12px
+      ) !important;
+
+    border-radius:
+      10px !important;
+  }
+
+}
+
+
+/* ------------------------------------------------------------
+   PHONE
+   ------------------------------------------------------------ */
+
+@media (max-width: 600px) {
+
+  .page {
+    padding:
+      8px
+      8px
+      38px !important;
+  }
+
+
+  .pageActions {
+    grid-template-columns:
+      1fr
+      1fr !important;
+  }
+
+
+  .globalSearch {
+    grid-column:
+      1 / -1;
+  }
+
+
+  .quickTaskButton,
+  .newMessageButton {
+    width:
+      100%;
+
+    justify-content:
+      center;
+  }
+
+
+  .metricsGrid {
+    grid-template-columns:
+      repeat(
+        3,
+        145px
+      ) !important;
+  }
+
+
+  .conversationPanel {
+    height:
+      350px !important;
+
+    min-height:
+      350px !important;
+
+    max-height:
+      350px !important;
+  }
+
+
+  .threadPanel {
+    min-height:
+      690px !important;
+  }
+
+
+  .threadHeader {
+    padding:
+      9px
+      10px !important;
+  }
+
+
+  .threadTabs {
+    gap:
+      18px;
+
+    overflow-x:
+      auto;
+
+    padding:
+      0
+      10px !important;
+  }
+
+
+  .threadTabs button {
+    flex:
+      0 0 auto;
+
+    min-height:
+      42px;
+  }
+
+
+  .threadPanel:not(.newMessageModal)
+    .replyComposer
+    textarea {
+    height:
+      130px !important;
+
+    min-height:
+      130px !important;
+
+    max-height:
+      130px !important;
+
+    flex-basis:
+      130px !important;
+  }
+
+
+  .composerSignature {
+    max-height:
+      105px !important;
+  }
+
+
+  .attachmentQueue {
+    max-height:
+      85px !important;
+  }
+
+
+  /*
+   * Avoid any horizontal viewport escape.
+   */
+  .threadPanel,
+  .conversationPanel,
+  .inboxControlDeck,
+  .pageHeader,
+  .pageActions,
+  .composerFooter {
+    max-width:
+      100%;
+
+    min-width:
+      0;
+  }
+
+}
+
+
+/* ------------------------------------------------------------
+   VERY SMALL PHONE
+   ------------------------------------------------------------ */
+
+@media (max-width: 390px) {
+
+  .page {
+    padding-right:
+      6px !important;
+
+    padding-left:
+      6px !important;
+  }
+
+
+  .pageHeader h1 {
+    font-size:
+      1.45rem;
+  }
+
+
+  .metricsGrid {
+    grid-template-columns:
+      repeat(
+        3,
+        132px
+      ) !important;
+  }
+
+
+  .channelControlButton,
+  .tagControlButton {
+    min-height:
+      41px;
+  }
+
+
+  .conversationPanel {
+    height:
+      325px !important;
+
+    min-height:
+      325px !important;
+
+    max-height:
+      325px !important;
+  }
+
+
+  .threadPanel {
+    min-height:
+      660px !important;
+  }
+
+
+  .replyChannels button,
+  .compactAttachButton,
+  .replyAllButton {
+    min-height:
+      44px !important;
+  }
+
+}
+
+/* ============================================================
+   CAMPAIGN SEAT — FINAL RESPONSIVE COLUMN ORDER
+   ============================================================ */
+
+
+/* ------------------------------------------------------------
+   TABLET LANDSCAPE / SMALL LAPTOP
+   Always:
+   Inbox list LEFT
+   Message RIGHT
+   ------------------------------------------------------------ */
+
+@media
+  (min-width: 821px)
+  and
+  (max-width: 1100px) {
+
+  .inboxWorkspace {
+    display: grid !important;
+
+    grid-template-columns:
+      minmax(280px, 0.78fr)
+      minmax(0, 1.72fr)
+      !important;
+
+    grid-template-areas:
+      "inbox-list message"
+      !important;
+
+    align-items: stretch;
+  }
+
+
+  .conversationPanel {
+    grid-area:
+      inbox-list !important;
+
+    grid-column:
+      1 !important;
+
+    grid-row:
+      1 !important;
+
+    min-width:
+      0 !important;
+  }
+
+
+  .threadPanel {
+    grid-area:
+      message !important;
+
+    grid-column:
+      2 !important;
+
+    grid-row:
+      1 !important;
+
+    min-width:
+      0 !important;
+  }
+
+
+  .conversationList {
+    overflow-y:
+      auto !important;
+  }
+
+
+  .threadPanel:not(.threadPanelExpanded)
+    .threadBody {
+    overflow-y:
+      auto !important;
+  }
+
+}
+
+
+/* ------------------------------------------------------------
+   TABLET PORTRAIT / MOBILE
+   Always:
+   Inbox list FIRST
+   Message SECOND
+   ------------------------------------------------------------ */
+
+@media (max-width: 820px) {
+
+  .inboxWorkspace {
+    display:
+      flex !important;
+
+    flex-direction:
+      column !important;
+
+    gap:
+      12px !important;
+  }
+
+
+  .conversationPanel {
+    order:
+      1 !important;
+
+    width:
+      100% !important;
+
+    min-width:
+      0 !important;
+  }
+
+
+  .threadPanel {
+    order:
+      2 !important;
+
+    width:
+      100% !important;
+
+    min-width:
+      0 !important;
+  }
+
+
+  /*
+   * Give the list enough room to browse without
+   * forcing an enormous page section.
+   */
+  .conversationPanel {
+    height:
+      390px !important;
+
+    min-height:
+      390px !important;
+
+    max-height:
+      390px !important;
+  }
+
+
+  /*
+   * Opened email receives the larger mobile section.
+   */
+  .threadPanel:not(.threadPanelExpanded) {
+    height:
+      780px !important;
+
+    min-height:
+      780px !important;
+
+    max-height:
+      780px !important;
+  }
+
+
+  .threadPanel:not(.threadPanelExpanded)
+    .threadBody {
+    min-height:
+      0 !important;
+
+    flex:
+      1 1 0 !important;
+
+    overflow-y:
+      auto !important;
+  }
+
+
+  .page {
+    padding-bottom:
+      58px !important;
+  }
+
+
+  .inboxWorkspace {
+    margin-bottom:
+      34px !important;
+  }
+
+}
+
+
+/* ------------------------------------------------------------
+   PHONE
+   ------------------------------------------------------------ */
+
+@media (max-width: 600px) {
+
+  .conversationPanel {
+    height:
+      340px !important;
+
+    min-height:
+      340px !important;
+
+    max-height:
+      340px !important;
+  }
+
+
+  .threadPanel:not(.threadPanelExpanded) {
+    height:
+      720px !important;
+
+    min-height:
+      720px !important;
+
+    max-height:
+      720px !important;
+  }
+
+
+  .page {
+    padding-bottom:
+      64px !important;
+  }
+
+
+  /*
+   * Keep mobile channel/tag controls swipeable rather
+   * than compressing the labels.
+   */
+  .channelControlList,
+  .tagControlList {
+    flex-wrap:
+      nowrap !important;
+
+    overflow-x:
+      auto !important;
+
+    overflow-y:
+      hidden !important;
+  }
+
+
+  .channelControlButton,
+  .tagControlButton {
+    flex:
+      0 0 auto !important;
+  }
+
+}
+
+
+/* ------------------------------------------------------------
+   VERY SMALL PHONE
+   ------------------------------------------------------------ */
+
+@media (max-width: 390px) {
+
+  .conversationPanel {
+    height:
+      315px !important;
+
+    min-height:
+      315px !important;
+
+    max-height:
+      315px !important;
+  }
+
+
+  .threadPanel:not(.threadPanelExpanded) {
+    height:
+      690px !important;
+
+    min-height:
+      690px !important;
+
+    max-height:
+      690px !important;
+  }
+
+
+  .page {
+    padding-bottom:
+      70px !important;
+  }
+
+}

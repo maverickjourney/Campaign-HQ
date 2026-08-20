@@ -19,6 +19,8 @@ import {
   Inbox,
   Image,
   Mail,
+  Maximize2,
+  Minimize2,
   Paperclip,
   MessageCircle,
   MessageSquare,
@@ -835,6 +837,820 @@ function humanFileSize(
 }
 
 
+function normalizeContentId(
+  value,
+) {
+  let text =
+    String(
+      value || "",
+    ).trim();
+
+  try {
+    text =
+      decodeURIComponent(
+        text,
+      );
+  } catch {
+    // Keep the original
+    // content ID.
+  }
+
+  return text
+    .replace(
+      /^cid:/i,
+      "",
+    )
+    .replace(
+      /^<|>$/g,
+      "",
+    )
+    .trim()
+    .toLowerCase();
+}
+
+
+function blobToDataUrl(
+  blob,
+) {
+  return new Promise(
+    (
+      resolve,
+      reject,
+    ) => {
+      const reader =
+        new FileReader();
+
+      reader.onload = () => {
+        resolve(
+          String(
+            reader.result ||
+            "",
+          ),
+        );
+      };
+
+      reader.onerror = () => {
+        reject(
+          new Error(
+            "Campaign Seat could not prepare the embedded image.",
+          ),
+        );
+      };
+
+      reader.readAsDataURL(
+        blob,
+      );
+    },
+  );
+}
+
+
+function emailHasRemoteImages(
+  html,
+) {
+  if (
+    !html ||
+    typeof window ===
+      "undefined"
+  ) {
+    return false;
+  }
+
+  const documentValue =
+    new DOMParser()
+      .parseFromString(
+        html,
+        "text/html",
+      );
+
+  return Array.from(
+    documentValue
+      .querySelectorAll(
+        "img",
+      ),
+  ).some(
+    (image) => {
+      const src =
+        String(
+          image.getAttribute(
+            "src",
+          ) || "",
+        )
+          .trim()
+          .toLowerCase();
+
+      const srcset =
+        String(
+          image.getAttribute(
+            "srcset",
+          ) || "",
+        )
+          .trim()
+          .toLowerCase();
+
+      return (
+        /^https?:\/\//i.test(
+          src,
+        ) ||
+        /https?:\/\//i.test(
+          srcset,
+        )
+      );
+    },
+  );
+}
+
+
+function buildSafeEmailDocument({
+  html,
+  inlineSources,
+  allowRemoteImages,
+  contentScale,
+}) {
+  const documentValue =
+    new DOMParser()
+      .parseFromString(
+        html ||
+        "",
+        "text/html",
+      );
+
+  documentValue
+    .querySelectorAll(
+      [
+        "script",
+        "iframe",
+        "frame",
+        "frameset",
+        "object",
+        "embed",
+        "applet",
+        "form",
+        "input",
+        "button",
+        "textarea",
+        "select",
+        "option",
+        "base",
+        "link",
+        "svg",
+        "math",
+      ].join(","),
+    )
+    .forEach(
+      (element) =>
+        element.remove(),
+    );
+
+  documentValue
+    .querySelectorAll(
+      "*",
+    )
+    .forEach(
+      (element) => {
+        Array.from(
+          element.attributes ||
+          [],
+        ).forEach(
+          (attribute) => {
+            const name =
+              attribute.name
+                .toLowerCase();
+
+            const value =
+              String(
+                attribute.value ||
+                "",
+              )
+                .trim();
+
+            if (
+              name.startsWith(
+                "on",
+              ) ||
+              name ===
+                "srcdoc" ||
+              name ===
+                "nonce"
+            ) {
+              element
+                .removeAttribute(
+                  attribute.name,
+                );
+
+              return;
+            }
+
+            if (
+              name ===
+                "style" &&
+              (
+                /javascript:/i
+                  .test(
+                    value,
+                  ) ||
+                /expression\s*\(/i
+                  .test(
+                    value,
+                  )
+              )
+            ) {
+              element
+                .removeAttribute(
+                  "style",
+                );
+            }
+          },
+        );
+
+        if (
+          element.tagName ===
+          "A"
+        ) {
+          const href =
+            String(
+              element.getAttribute(
+                "href",
+              ) || "",
+            )
+              .trim();
+
+          if (
+            !(
+              /^https?:\/\//i
+                .test(
+                  href,
+                ) ||
+              /^mailto:/i
+                .test(
+                  href,
+                ) ||
+              /^tel:/i
+                .test(
+                  href,
+                )
+            )
+          ) {
+            element.removeAttribute(
+              "href",
+            );
+          } else {
+            element.setAttribute(
+              "target",
+              "_blank",
+            );
+
+            element.setAttribute(
+              "rel",
+              "noopener noreferrer",
+            );
+          }
+        }
+
+        if (
+          element.tagName ===
+          "IMG"
+        ) {
+          element.removeAttribute(
+            "srcset",
+          );
+
+          element.removeAttribute(
+            "crossorigin",
+          );
+
+          const originalSource =
+            String(
+              element.getAttribute(
+                "src",
+              ) || "",
+            )
+              .trim();
+
+          if (
+            /^cid:/i.test(
+              originalSource,
+            )
+          ) {
+            const cid =
+              normalizeContentId(
+                originalSource,
+              );
+
+            const source =
+              inlineSources[
+                cid
+              ];
+
+            if (
+              source
+            ) {
+              element.setAttribute(
+                "src",
+                source,
+              );
+
+              element.setAttribute(
+                "data-campaign-seat-inline",
+                "true",
+              );
+            } else {
+              element.setAttribute(
+                "src",
+                "data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=",
+              );
+
+              element.setAttribute(
+                "data-campaign-seat-blocked",
+                "inline",
+              );
+
+              element.setAttribute(
+                "title",
+                "Embedded image is loading",
+              );
+            }
+
+            return;
+          }
+
+          if (
+            /^https?:\/\//i.test(
+              originalSource,
+            )
+          ) {
+            if (
+              allowRemoteImages
+            ) {
+              element.setAttribute(
+                "data-campaign-seat-remote",
+                "shown",
+              );
+            } else {
+              element.setAttribute(
+                "data-campaign-seat-remote-src",
+                originalSource,
+              );
+
+              element.setAttribute(
+                "src",
+                "data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=",
+              );
+
+              element.setAttribute(
+                "data-campaign-seat-blocked",
+                "remote",
+              );
+
+              element.setAttribute(
+                "title",
+                "External image protected by Campaign Seat",
+              );
+            }
+
+            return;
+          }
+
+          if (
+            /^data:image\//i.test(
+              originalSource,
+            )
+          ) {
+            return;
+          }
+
+          if (
+            originalSource
+          ) {
+            element.removeAttribute(
+              "src",
+            );
+          }
+        }
+      },
+    );
+
+  const csp =
+    documentValue
+      .createElement(
+        "meta",
+      );
+
+  csp.setAttribute(
+    "http-equiv",
+    "Content-Security-Policy",
+  );
+
+  csp.setAttribute(
+    "content",
+    allowRemoteImages
+      ? "default-src 'none'; img-src data: https: http:; style-src 'unsafe-inline'; font-src data:; media-src 'none'; object-src 'none'; frame-src 'none'; connect-src 'none'; form-action 'none'; base-uri 'none'"
+      : "default-src 'none'; img-src data:; style-src 'unsafe-inline'; font-src data:; media-src 'none'; object-src 'none'; frame-src 'none'; connect-src 'none'; form-action 'none'; base-uri 'none'",
+  );
+
+  documentValue.head
+    .prepend(
+      csp,
+    );
+
+  const campaignSeatStyle =
+    documentValue
+      .createElement(
+        "style",
+      );
+
+  campaignSeatStyle
+    .textContent = `
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+        background: #ffffff;
+        color: #334f67;
+        font-family:
+          -apple-system,
+          BlinkMacSystemFont,
+          "Segoe UI",
+          Arial,
+          sans-serif;
+        font-size: 14px;
+        line-height: 1.55;
+        overflow-wrap: anywhere;
+      }
+
+      body {
+        padding: 2px 3px 14px;
+        zoom: ${contentScale};
+      }
+
+      img {
+        max-width: 100% !important;
+        height: auto;
+      }
+
+      img[data-campaign-seat-blocked] {
+        min-width: 1px;
+        min-height: 1px;
+        opacity: 0.28;
+      }
+
+      table {
+        max-width: 100% !important;
+      }
+
+      pre {
+        max-width: 100%;
+        overflow-x: auto;
+        white-space: pre-wrap;
+      }
+
+      a {
+        color: #216999;
+        text-decoration: underline;
+      }
+    `;
+
+  documentValue.head
+    .appendChild(
+      campaignSeatStyle,
+    );
+
+  return (
+    "<!doctype html>\n" +
+    documentValue
+      .documentElement
+      .outerHTML
+  );
+}
+
+
+function SafeEmailBody({
+  message,
+  getAttachmentBlob,
+  expanded,
+}) {
+  const [
+    inlineSources,
+    setInlineSources,
+  ] = useState({});
+
+  const [
+    inlineLoading,
+    setInlineLoading,
+  ] = useState(false);
+
+  const [
+    allowRemoteImages,
+    setAllowRemoteImages,
+  ] = useState(false);
+
+  const [
+    frameHeight,
+    setFrameHeight,
+  ] = useState(220);
+
+  const contentScale =
+    expanded
+      ? 1
+      : 0.68;
+
+  const maxFrameHeight =
+    expanded
+      ? 2200
+      : 1800;
+
+
+  const html =
+    String(
+      message?.htmlBody ||
+      "",
+    ).trim();
+
+  const inlineAttachments =
+    Array.isArray(
+      message?.inlineAttachments,
+    )
+      ? message.inlineAttachments
+      : [];
+
+  const remoteImages =
+    useMemo(
+      () =>
+        emailHasRemoteImages(
+          html,
+        ),
+      [
+        html,
+      ],
+    );
+
+
+  useEffect(() => {
+    let cancelled =
+      false;
+
+    async function loadInlineImages() {
+      const imageAttachments =
+        inlineAttachments
+          .filter(
+            (attachment) =>
+              String(
+                attachment
+                  ?.contentType ||
+                "",
+              )
+                .toLowerCase()
+                .startsWith(
+                  "image/",
+                ) &&
+              attachment
+                ?.contentId &&
+              attachment
+                ?.providerAttachmentId &&
+              attachment
+                ?.providerMessageId,
+          );
+
+      if (
+        !imageAttachments
+          .length
+      ) {
+        setInlineSources(
+          {},
+        );
+
+        return;
+      }
+
+      setInlineLoading(
+        true,
+      );
+
+      const entries =
+        await Promise.all(
+          imageAttachments.map(
+            async (
+              attachment,
+            ) => {
+              try {
+                const blob =
+                  await getAttachmentBlob(
+                    attachment,
+                  );
+
+                const dataUrl =
+                  await blobToDataUrl(
+                    blob,
+                  );
+
+                return [
+                  normalizeContentId(
+                    attachment
+                      .contentId,
+                  ),
+                  dataUrl,
+                ];
+              } catch {
+                return null;
+              }
+            },
+          ),
+        );
+
+      if (
+        cancelled
+      ) {
+        return;
+      }
+
+      setInlineSources(
+        Object.fromEntries(
+          entries.filter(
+            Boolean,
+          ),
+        ),
+      );
+
+      setInlineLoading(
+        false,
+      );
+    }
+
+    void loadInlineImages();
+
+    return () => {
+      cancelled =
+        true;
+    };
+  }, [
+    getAttachmentBlob,
+    message?.providerMessageId,
+  ]);
+
+
+  useEffect(() => {
+    setAllowRemoteImages(
+      false,
+    );
+  }, [
+    message?.providerMessageId,
+  ]);
+
+
+  const safeDocument =
+    useMemo(
+      () => {
+        if (!html) {
+          return "";
+        }
+
+        return buildSafeEmailDocument({
+          html,
+          inlineSources,
+          allowRemoteImages,
+          contentScale,
+        });
+      },
+      [
+        allowRemoteImages,
+        contentScale,
+        html,
+        inlineSources,
+      ],
+    );
+
+
+  if (
+    !html ||
+    !/<[a-z][\s\S]*>/i.test(
+      html,
+    )
+  ) {
+    return (
+      <p>
+        {message?.body || ""}
+      </p>
+    );
+  }
+
+
+  return (
+    <section
+      className={
+        styles.richEmail
+      }
+    >
+      {remoteImages ? (
+        <div
+          className={
+            styles.remoteImageProtection
+          }
+        >
+          <span>
+            {allowRemoteImages
+              ? "External images are displayed."
+              : "External images are protected to reduce email tracking."}
+          </span>
+
+          <button
+            type="button"
+            onClick={() =>
+              setAllowRemoteImages(
+                (current) =>
+                  !current,
+              )
+            }
+          >
+            {allowRemoteImages
+              ? "Hide external images"
+              : "Show external images"}
+          </button>
+        </div>
+      ) : null}
+
+      {inlineLoading ? (
+        <div
+          className={
+            styles.inlineImageLoading
+          }
+        >
+          <LoaderCircle
+            size={14}
+            className={
+              styles.attachmentPreviewSpinner
+            }
+          />
+
+          Loading embedded email images…
+        </div>
+      ) : null}
+
+      <iframe
+        className={
+          styles.richEmailFrame
+        }
+        title={
+          message?.subject ||
+          "Email message"
+        }
+        sandbox="allow-same-origin allow-popups allow-popups-to-escape-sandbox"
+        srcDoc={
+          safeDocument
+        }
+        style={{
+          height:
+            `${frameHeight}px`,
+        }}
+        onLoad={(
+          event,
+        ) => {
+          try {
+            const height =
+              event.currentTarget
+                .contentDocument
+                ?.documentElement
+                ?.scrollHeight ||
+              event.currentTarget
+                .contentDocument
+                ?.body
+                ?.scrollHeight ||
+              220;
+
+            setFrameHeight(
+              Math.min(
+                Math.max(
+                  height + 12,
+                  expanded
+                    ? 620
+                    : 520,
+                ),
+                maxFrameHeight,
+              ),
+            );
+          } catch {
+            setFrameHeight(
+              360,
+            );
+          }
+        }}
+      />
+
+      {frameHeight >=
+      maxFrameHeight ? (
+        <small
+          className={
+            styles.richEmailLongNotice
+          }
+        >
+          This email is long. Scroll inside
+          the message to continue reading.
+        </small>
+      ) : null}
+    </section>
+  );
+}
+
+
 function getChannelLabel(channel) {
   return (
     CHANNELS.find((item) => item.id === channel)
@@ -949,9 +1765,6 @@ export default function InboxReferencePreview() {
 
   const [activeTag, setActiveTag] = useState("");
 
-  const [mobileFiltersOpen, setMobileFiltersOpen] =
-    useState(false);
-
   const [query, setQuery] = useState("");
 
   const [sortDirection, setSortDirection] =
@@ -1052,6 +1865,11 @@ export default function InboxReferencePreview() {
   const threadBodyRef =
     useRef(null);
 
+  const [
+    threadExpanded,
+    setThreadExpanded,
+  ] = useState(false);
+
   useEffect(() => {
     return () => {
       if (
@@ -1066,6 +1884,41 @@ export default function InboxReferencePreview() {
     };
   }, [
     attachmentPreview,
+  ]);
+
+
+  useEffect(() => {
+    if (
+      !threadExpanded
+    ) {
+      return undefined;
+    }
+
+    const handleKeyDown =
+      (event) => {
+        if (
+          event.key ===
+          "Escape"
+        ) {
+          setThreadExpanded(
+            false,
+          );
+        }
+      };
+
+    document.addEventListener(
+      "keydown",
+      handleKeyDown,
+    );
+
+    return () => {
+      document.removeEventListener(
+        "keydown",
+        handleKeyDown,
+      );
+    };
+  }, [
+    threadExpanded,
   ]);
 
 
@@ -1631,6 +2484,7 @@ export default function InboxReferencePreview() {
     };
 
   const openNewMessage = () => {
+    setThreadExpanded(false);
     setNewMessageMode(true);
     setReplyText("");
     setIncludeSignature(
@@ -2732,93 +3586,94 @@ export default function InboxReferencePreview() {
         </section>
 
 
-        {/* CAMPAIGN SEAT MOBILE INBOX FILTER TOGGLE — START */}
-        <button
-          className={styles.mobileFilterToggle}
-          type="button"
-          aria-controls="inbox-mobile-filters"
-          aria-expanded={mobileFiltersOpen}
-          onClick={() =>
-            setMobileFiltersOpen(
-              (current) => !current,
-            )
+
+
+        <section
+          className={
+            styles.inboxControlDeck
           }
         >
-          <span className={styles.mobileFilterToggleLabel}>
-            <Filter size={17} />
-            <strong>Filter messages</strong>
-          </span>
-
-          <span className={styles.mobileFilterToggleMeta}>
-            <small>
-              {
-                activeChannel !== "all" ||
-                activeFilter ||
-                activeTag
-                  ? "Active"
-                  : "All"
-              }
-            </small>
-
-            <ChevronDown
-              size={17}
-              className={
-                mobileFiltersOpen
-                  ? styles.mobileFilterChevronOpen
-                  : ""
-              }
-            />
-          </span>
-        </button>
-        {/* CAMPAIGN SEAT MOBILE INBOX FILTER TOGGLE — END */}
-
-        <section className={styles.inboxWorkspace}>
-          <aside
-            id="inbox-mobile-filters"
-            className={`${styles.utilityPanel} ${
-              mobileFiltersOpen
-                ? styles.mobileFiltersOpen
-                : ""
-            }`}
+          <div
+            className={
+              styles.inboxControlRow
+            }
           >
-            <section>
-              <header>
-                <strong>Channels</strong>
+            <div
+              className={
+                styles.inboxControlHeading
+              }
+            >
+              <strong>
+                Channels
+              </strong>
 
-              </header>
+              <small>
+                Choose which conversations
+                appear in the Inbox
+              </small>
+            </div>
 
-              <div className={styles.utilityList}>
-                {CHANNELS.map((channel) => {
-                  const Icon = channel.icon;
+            <div
+              className={
+                styles.channelControlList
+              }
+            >
+              {CHANNELS.map(
+                (channel) => {
+                  const Icon =
+                    channel.icon;
 
                   const unavailable =
                     liveMailboxEnabled &&
-                    !LIVE_CONNECTED_CHANNELS.has(
-                      channel.id,
-                    );
+                    !LIVE_CONNECTED_CHANNELS
+                      .has(
+                        channel.id,
+                      );
 
                   return (
                     <button
-                      key={channel.id}
+                      key={
+                        channel.id
+                      }
                       className={[
-                        activeChannel === channel.id
-                          ? styles.activeUtility
+                        styles.channelControlButton,
+
+                        activeChannel ===
+                          channel.id
+                          ? styles.activeChannelControl
                           : "",
+
                         unavailable
-                          ? styles.unavailableUtility
+                          ? styles.unavailableChannelControl
                           : "",
                       ]
-                        .filter(Boolean)
+                        .filter(
+                          Boolean,
+                        )
                         .join(" ")}
                       type="button"
-                      disabled={unavailable}
+                      disabled={
+                        unavailable
+                      }
                       onClick={() => {
-                        setActiveChannel(channel.id);
-                        setActiveFilter("");
+                        setActiveChannel(
+                          channel.id,
+                        );
+
+                        setActiveFilter(
+                          "",
+                        );
                       }}
                     >
-                      <Icon size={16} />
-                      <span>{channel.label}</span>
+                      <Icon
+                        size={16}
+                      />
+
+                      <span>
+                        {
+                          channel.label
+                        }
+                      </span>
 
                       <strong>
                         {unavailable
@@ -2829,80 +3684,92 @@ export default function InboxReferencePreview() {
                       </strong>
                     </button>
                   );
-                })}
-              </div>
-            </section>
+                },
+              )}
+            </div>
+          </div>
 
-            <section>
-              <header>
-                <strong>Filters</strong>
+          <div
+            className={
+              styles.inboxControlRow
+            }
+          >
+            <div
+              className={
+                styles.inboxControlHeading
+              }
+            >
+              <strong>
+                Tags
+              </strong>
 
-              </header>
+              <small>
+                Organize and narrow
+                campaign conversations
+              </small>
+            </div>
 
-              <div className={styles.utilityList}>
-                {FILTERS.map((filter) => {
-                  const Icon = filter.icon;
-
-                  return (
-                    <button
-                      key={filter.id}
-                      className={
-                        activeFilter === filter.id
-                          ? styles.activeUtility
-                          : ""
-                      }
-                      type="button"
-                      onClick={() =>
-                        setActiveFilter(
-                          activeFilter === filter.id
-                            ? ""
-                            : filter.id,
-                        )
-                      }
-                    >
-                      <Icon size={16} />
-                      <span>{filter.label}</span>
-
-                      <strong>
-                        {getFilterCount(filter.id)}
-                      </strong>
-                    </button>
-                  );
-                })}
-              </div>
-            </section>
-
-            <section>
-              <header>
-                <strong>Tags</strong>
-
-              </header>
-
-              <div className={styles.tags}>
-                {TAGS.map((tag) => (
+            <div
+              className={
+                styles.tagControlList
+              }
+            >
+              {TAGS.map(
+                (tag) => (
                   <button
                     key={tag}
-                    className={
-                      activeTag === tag
-                        ? styles.activeTag
-                        : ""
-                    }
+                    className={[
+                      styles.tagControlButton,
+
+                      activeTag ===
+                        tag
+                        ? styles.activeTagControl
+                        : "",
+                    ]
+                      .filter(
+                        Boolean,
+                      )
+                      .join(" ")}
                     type="button"
                     onClick={() =>
                       setActiveTag(
-                        activeTag === tag ? "" : tag,
+                        activeTag ===
+                          tag
+                          ? ""
+                          : tag,
                       )
                     }
                   >
                     {tag}
                   </button>
-                ))}
-              </div>
-            </section>
-          </aside>
+                ),
+              )}
+            </div>
+          </div>
+        </section>
 
+        <section className={styles.inboxWorkspace}>
           <section className={styles.conversationPanel}>
             <header className={styles.listHeader}>
+              <div
+                className={
+                  styles.listHeaderTitle
+                }
+              >
+                <strong>
+                  Inbox
+                </strong>
+
+                <small>
+                  {
+                    filteredConversations
+                      .length
+                  }
+                  {" "}
+                  conversations loaded
+                </small>
+              </div>
+
               <label>
                 Sort by:
 
@@ -3045,11 +3912,32 @@ export default function InboxReferencePreview() {
             />
           ) : null}
 
+          {threadExpanded &&
+          !newMessageMode ? (
+            <button
+              className={
+                styles.threadExpandScrim
+              }
+              type="button"
+              tabIndex={-1}
+              aria-label="Close expanded email"
+              onClick={() =>
+                setThreadExpanded(
+                  false,
+                )
+              }
+            />
+          ) : null}
+
           <article
             className={[
               styles.threadPanel,
               newMessageMode
                 ? styles.newMessageModal
+                : "",
+              threadExpanded &&
+              !newMessageMode
+                ? styles.threadPanelExpanded
                 : "",
             ]
               .filter(Boolean)
@@ -3153,6 +4041,36 @@ export default function InboxReferencePreview() {
                 </div>
 
                 <div>
+                  <button
+                    type="button"
+                    aria-label={
+                      threadExpanded
+                        ? "Exit expanded email view"
+                        : "Open email in larger view"
+                    }
+                    title={
+                      threadExpanded
+                        ? "Exit larger view"
+                        : "Open message larger"
+                    }
+                    onClick={() =>
+                      setThreadExpanded(
+                        (current) =>
+                          !current,
+                      )
+                    }
+                  >
+                    {threadExpanded ? (
+                      <Minimize2
+                        size={17}
+                      />
+                    ) : (
+                      <Maximize2
+                        size={17}
+                      />
+                    )}
+                  </button>
+
                   <button
                     type="button"
                     aria-label={
@@ -3625,12 +4543,17 @@ export default function InboxReferencePreview() {
                   (message) => (
                     <div
                       key={message.id}
-                      className={
+                      className={[
                         message.direction ===
                         "outbound"
                           ? styles.outboundMessage
-                          : styles.inboundMessage
-                      }
+                          : styles.inboundMessage,
+                        message.htmlBody
+                          ? styles.richMessage
+                          : "",
+                      ]
+                        .filter(Boolean)
+                        .join(" ")}
                     >
                       <span className={styles.avatar}>
                         {message.initials}
@@ -3651,7 +4574,17 @@ export default function InboxReferencePreview() {
                           {message.channel}
                         </small>
 
-                        <p>{message.body}</p>
+                        <SafeEmailBody
+                          message={
+                            message
+                          }
+                          getAttachmentBlob={
+                            getMailboxAttachmentBlob
+                          }
+                          expanded={
+                            threadExpanded
+                          }
+                        />
 
                         {message.attachments
                           ?.length ? (
@@ -3979,13 +4912,21 @@ export default function InboxReferencePreview() {
             newMessageMode ? (
               <footer className={styles.replyComposer}>
 
-                <div className={styles.previewNotice}>
-                  <CheckCircle2 size={16} />
+                {newMessageMode ? (
+                  <div
+                    className={
+                      styles.previewNotice
+                    }
+                  >
+                    <CheckCircle2
+                      size={16}
+                    />
 
-                  <span>
-                    {composerNotice}
-                  </span>
-                </div>
+                    <span>
+                      {composerNotice}
+                    </span>
+                  </div>
+                ) : null}
 
                 {replyChannel ===
                   "email" &&
@@ -4005,6 +4946,7 @@ export default function InboxReferencePreview() {
                       }
                     />
 
+                    {newMessageMode ? (
                     <div
                       className={
                         styles.attachmentToolbar
@@ -4028,6 +4970,7 @@ export default function InboxReferencePreview() {
                         Up to 10 files · 20 MB total
                       </small>
                     </div>
+                    ) : null}
 
                     {pendingAttachments
                       .length ? (
@@ -4203,15 +5146,69 @@ export default function InboxReferencePreview() {
                   <div className={styles.replyOptions}>
                     {!newMessageMode &&
                     replyChannel === "email" &&
+                    liveMailboxEnabled ? (
+                      <button
+                        type="button"
+                        className={
+                          styles.compactAttachButton
+                        }
+                        onClick={() =>
+                          attachmentInputRef
+                            .current
+                            ?.click()
+                        }
+                      >
+                        <Paperclip
+                          size={15}
+                        />
+                        Attach
+                      </button>
+                    ) : null}
+
+                    {!newMessageMode &&
+                    replyChannel === "email" &&
+                    liveMailboxEnabled &&
+                    signatureEnabled ? (
+                      <label
+                        className={
+                          styles.compactSignatureToggle
+                        }
+                      >
+                        <input
+                          type="checkbox"
+                          checked={
+                            includeSignature
+                          }
+                          onChange={(
+                            event,
+                          ) =>
+                            setIncludeSignature(
+                              event.target
+                                .checked,
+                            )
+                          }
+                        />
+
+                        <span>
+                          Signature
+                        </span>
+                      </label>
+                    ) : null}
+
+                    {!newMessageMode &&
+                    replyChannel === "email" &&
                     liveMailboxEnabled &&
                     selectedConversation
                       ?.providerThreadId ? (
                       <button
-                        className={
+                        className={[
+                          styles.replyAllButton,
                           replyAllEnabled
                             ? styles.replyAllActive
-                            : ""
-                        }
+                            : "",
+                        ]
+                          .filter(Boolean)
+                          .join(" ")}
                         type="button"
                         onClick={() =>
                           setReplyAllThreadId(
