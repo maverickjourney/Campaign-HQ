@@ -3,15 +3,22 @@ import {
   useNavigate,
 } from "react-router-dom";
 import {
+  BarChart3,
   CalendarDays,
   ClipboardCheck,
   ContactRound,
+  CreditCard,
+  CircleDollarSign,
   FileCheck2,
+  Files,
   FolderKanban,
   LayoutDashboard,
+  LifeBuoy,
+  Link2,
   LogOut,
   MapPin,
   MessageSquareText,
+  PackageOpen,
   Settings,
   UserCog,
   UsersRound,
@@ -33,71 +40,93 @@ import {
 import {
   useActiveTaskCount,
 } from "../../hooks/useActiveTaskCount";
+
+import {
+  ACTIVE_SEAT_PRODUCT,
+  getSeatCoreModules,
+  getSeatPlatformModules,
+  getSeatProductModules,
+} from "../../config/seatPlatform";
+
 import "./CampaignSidebarTheme.css";
 
-// CAMPAIGN SEAT UNIFIED OPERATIONAL NAVIGATION
-const CAMPAIGN_NAVIGATION = [
-  {
-    label: "HQ",
-    icon: LayoutDashboard,
-    route: "/dashboard",
-  },
-  {
-    label: "Inbox",
-    icon: Inbox,
-    route: "/inbox",
-  },
-  {
-    label: "Calendar",
-    icon: CalendarDays,
-    route: "/calendar",
-  },
-  {
-    label: "Tasks",
-    icon: ClipboardCheck,
-    route: "/tasks",
-  },
-  {
-    label: "Commitments",
-    icon: Target,
-    route: "/commitments",
-  },
-  {
-    label: "Waiting On",
-    icon: Clock3,
-    route: "/approvals",
-  },
-  {
-    label: "Contacts",
-    icon: ContactRound,
-    route: "/contacts",
-  },
-  {
-    label: "Files",
-    icon: FolderKanban,
-    route: "/files",
-  },
-  {
-    label: "Approvals",
-    icon: FileCheck2,
-    route: "/approvals",
-  },
-  {
-    label: "Team",
-    icon: UsersRound,
-    route: "/team",
-  },
-  {
-    label: "Field operations",
-    icon: MapPin,
-    route: "/field-operations",
-  },
-  {
-    label: "Communications",
-    icon: MessageSquareText,
-    route: "/communications",
-  },
-];
+// CAMPAIGN SEAT — SHARED SEAT CORE NAVIGATION
+//
+// The Dashboard previously used an older hard-coded sidebar.
+// It now reads the same Seat Core manifest as the newer
+// CampaignWorkspaceShell so HQ exposes the current product.
+
+const MODULE_ICONS = {
+  dashboard: LayoutDashboard,
+  inbox: Inbox,
+  calendar: CalendarDays,
+  tasks: ClipboardCheck,
+  commitments: Target,
+  waiting_on: Clock3,
+  contacts: ContactRound,
+  documents: Files,
+  approvals: FileCheck2,
+  team: UserCog,
+  inventory: PackageOpen,
+
+  candidate: Vote,
+  volunteers: UsersRound,
+  fundraising: CircleDollarSign,
+  events: CalendarDays,
+  social_media: MessageSquareText,
+  media_center: FolderKanban,
+  reports_analytics: BarChart3,
+
+  integrations: Link2,
+  plan_usage: CreditCard,
+  settings: Settings,
+  support: LifeBuoy,
+};
+
+function createSeatNavigation(
+  modules,
+) {
+  return modules.map(
+    (module) => ({
+      key: module.key,
+      label: module.label,
+      route: module.route,
+      icon:
+        MODULE_ICONS[
+          module.key
+        ] ||
+        LayoutDashboard,
+    }),
+  );
+}
+
+const CORE_NAVIGATION =
+  createSeatNavigation(
+    getSeatCoreModules(),
+  );
+
+const CAMPAIGN_TOOL_NAVIGATION =
+  createSeatNavigation(
+    getSeatProductModules(
+      ACTIVE_SEAT_PRODUCT,
+    ),
+  );
+
+const PLATFORM_NAVIGATION =
+  createSeatNavigation(
+    getSeatPlatformModules()
+      .filter(
+        (module) =>
+          [
+            "integrations",
+            "plan_usage",
+            "settings",
+            "support",
+          ].includes(
+            module.key,
+          ),
+      ),
+  );
 
 const VOLUNTEER_NAVIGATION = [
   {
@@ -179,7 +208,11 @@ export function CampaignSidebar({
     campaignExperience.key ===
     "volunteer"
       ? VOLUNTEER_NAVIGATION
-      : CAMPAIGN_NAVIGATION;
+      : CORE_NAVIGATION;
+
+  const showSeatCoreGroups =
+    campaignExperience.key !==
+    "volunteer";
 
   const partyValue =
     String(
@@ -428,7 +461,131 @@ export function CampaignSidebar({
             },
           )}
 
-          {showLeadership && (
+          {showSeatCoreGroups && (
+            <>
+              <span
+                className={
+                  styles.navigationLabel
+                }
+                data-sidebar-section="true"
+              >
+                Campaign tools
+              </span>
+
+              {CAMPAIGN_TOOL_NAVIGATION.map(
+                (item) => {
+                  const Icon =
+                    item.icon;
+
+                  const active =
+                    item.route ===
+                      location.pathname ||
+                    item.label ===
+                      activePage;
+
+                  return (
+                    <button
+                      key={
+                        item.key ||
+                        item.label
+                      }
+                      className={
+                        active
+                          ? styles.activeNavigation
+                          : ""
+                      }
+                      type="button"
+                      aria-current={
+                        active
+                          ? "page"
+                          : undefined
+                      }
+                      title={
+                        item.label
+                      }
+                      onClick={() =>
+                        handleNavigation(
+                          item,
+                        )
+                      }
+                    >
+                      <Icon
+                        size={18}
+                        strokeWidth={1.8}
+                      />
+
+                      <span>
+                        {item.label}
+                      </span>
+                    </button>
+                  );
+                },
+              )}
+
+              <span
+                className={
+                  styles.navigationLabel
+                }
+                data-sidebar-section="true"
+              >
+                Platform
+              </span>
+
+              {PLATFORM_NAVIGATION.map(
+                (item) => {
+                  const Icon =
+                    item.icon;
+
+                  const active =
+                    item.route ===
+                      location.pathname ||
+                    item.label ===
+                      activePage;
+
+                  return (
+                    <button
+                      key={
+                        item.key ||
+                        item.label
+                      }
+                      className={
+                        active
+                          ? styles.activeNavigation
+                          : ""
+                      }
+                      type="button"
+                      aria-current={
+                        active
+                          ? "page"
+                          : undefined
+                      }
+                      title={
+                        item.label
+                      }
+                      onClick={() =>
+                        handleNavigation(
+                          item,
+                        )
+                      }
+                    >
+                      <Icon
+                        size={18}
+                        strokeWidth={1.8}
+                      />
+
+                      <span>
+                        {item.label}
+                      </span>
+                    </button>
+                  );
+                },
+              )}
+            </>
+          )}
+
+          {campaignExperience.key ===
+            "volunteer" &&
+            showLeadership && (
             <>
               <span
                 className={
