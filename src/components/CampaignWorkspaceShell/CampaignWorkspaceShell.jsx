@@ -23,6 +23,7 @@ import {
   Inbox,
   LayoutDashboard,
   LifeBuoy,
+  Link2,
   Mail,
   MessageSquare,
   Plus,
@@ -77,6 +78,7 @@ const MODULE_ICONS = {
   approvals: FileCheck2,
   team: UserCog,
   inventory: PackageOpen,
+  integrations: Link2,
   plan_usage: CreditCard,
   settings: Settings,
   support: LifeBuoy,
@@ -137,6 +139,7 @@ const PLATFORM_TOOLS =
       .filter(
         (module) =>
           [
+            "integrations",
             "plan_usage",
             "settings",
             "support",
