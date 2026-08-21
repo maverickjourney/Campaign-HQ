@@ -7,12 +7,16 @@ import {
 
 import {
   AlertTriangle,
+  Archive,
   ArrowDownToLine,
   BookmarkPlus,
   Boxes,
   CircleDollarSign,
+  ImagePlus,
   PackageOpen,
+  Pencil,
   Plus,
+  RefreshCw,
   RotateCcw,
   Search,
   Send,
@@ -29,10 +33,15 @@ import {
 } from "../../components/SeatPage/SeatPage";
 
 import {
+  useFilesCommandCenter,
+} from "../../hooks/useFilesCommandCenter";
+
+import {
   supabase,
 } from "../../lib/supabase";
 
 import {
+  getCurrentUser,
   getCurrentWorkspace,
 } from "../../utils/campaignSession";
 
@@ -65,6 +74,36 @@ const MOVEMENT_LABELS = {
   damaged: "Damaged",
   adjustment: "Adjusted",
 };
+
+
+const PURCHASE_ORDER_STATUSES = [
+  ["not_ordered", "Not ordered"],
+  ["ordered", "Ordered"],
+  ["in_production", "In production"],
+  ["shipped", "Shipped"],
+  ["received", "Received"],
+  ["cancelled", "Cancelled"],
+];
+
+function purchaseOrderFor(item) {
+  return (
+    item?.metadata
+      ?.purchase_order ||
+    {}
+  );
+}
+
+function purchaseOrderStatusLabel(
+  value,
+) {
+  return (
+    PURCHASE_ORDER_STATUSES.find(
+      ([key]) =>
+        key === value,
+    )?.[1] ||
+    "Not ordered"
+  );
+}
 
 const ACTIONS = [
   {
@@ -144,6 +183,7 @@ function formatDateTime(value) {
 function emptyItemForm() {
   return {
     item_name: "",
+    sku: "",
     category: "yard_signs",
     quantity_on_hand: "0",
     quantity_reserved: "0",
@@ -151,21 +191,44 @@ function emptyItemForm() {
     unit_cost: "",
     storage_location: "",
     vendor_name: "",
+    purchase_order_number: "",
+    purchase_order_status:
+      "not_ordered",
+    purchase_order_date: "",
+    expected_delivery_date: "",
     description: "",
   };
 }
 
 export default function Inventory() {
+  const user =
+    getCurrentUser();
+
   const workspace =
     getCurrentWorkspace();
 
   const workspaceId =
     workspace?.id || "";
 
+  const {
+    uploadFiles,
+    isSaving:
+      isSavingAsset,
+  } = useFilesCommandCenter({
+    workspaceId,
+    userId:
+      user?.id || "",
+  });
+
   const [
     items,
     setItems,
   ] = useState([]);
+
+  const [
+    imageUrls,
+    setImageUrls,
+  ] = useState({});
 
   const [
     movements,
@@ -193,8 +256,33 @@ export default function Inventory() {
   ] = useState("all");
 
   const [
+    statusFilter,
+    setStatusFilter,
+  ] = useState("active");
+
+  const [
     addOpen,
     setAddOpen,
+  ] = useState(false);
+
+  const [
+    editingItem,
+    setEditingItem,
+  ] = useState(null);
+
+  const [
+    itemImageFile,
+    setItemImageFile,
+  ] = useState(null);
+
+  const [
+    itemImagePreview,
+    setItemImagePreview,
+  ] = useState("");
+
+  const [
+    removeItemImage,
+    setRemoveItemImage,
   ] = useState(false);
 
   const [
@@ -256,10 +344,6 @@ export default function Inventory() {
               "workspace_id",
               workspaceId,
             )
-            .eq(
-              "status",
-              "active",
-            )
             .order(
               "item_name",
               {
@@ -304,8 +388,117 @@ export default function Inventory() {
           throw movementResult.error;
         }
 
+        const itemRows =
+          itemResult.data || [];
+
+        const imageFileIds = [
+          ...new Set(
+            itemRows
+              .map(
+                (item) =>
+                  item.image_file_id,
+              )
+              .filter(Boolean),
+          ),
+        ];
+
+        const signedUrlsByFileId =
+          {};
+
+        if (imageFileIds.length) {
+          const {
+            data:
+              imageFiles,
+            error:
+              imageFilesError,
+          } = await supabase
+            .from(
+              "campaign_files",
+            )
+            .select(
+              "id, storage_path, mime_type",
+            )
+            .in(
+              "id",
+              imageFileIds,
+            );
+
+          if (imageFilesError) {
+            throw imageFilesError;
+          }
+
+          await Promise.all(
+            (
+              imageFiles || []
+            ).map(
+              async (file) => {
+                if (
+                  !String(
+                    file.mime_type ||
+                      "",
+                  ).startsWith(
+                    "image/",
+                  )
+                ) {
+                  return;
+                }
+
+                const {
+                  data:
+                    signedData,
+                  error:
+                    signedError,
+                } =
+                  await supabase.storage
+                    .from(
+                      "campaign-files",
+                    )
+                    .createSignedUrl(
+                      file.storage_path,
+                      3600,
+                    );
+
+                if (
+                  !signedError &&
+                  signedData
+                    ?.signedUrl
+                ) {
+                  signedUrlsByFileId[
+                    file.id
+                  ] =
+                    signedData
+                      .signedUrl;
+                }
+              },
+            ),
+          );
+        }
+
+        const nextImageUrls =
+          {};
+
+        itemRows.forEach(
+          (item) => {
+            const signedUrl =
+              signedUrlsByFileId[
+                item.image_file_id
+              ];
+
+            if (signedUrl) {
+              nextImageUrls[
+                item.id
+              ] =
+                signedUrl;
+            }
+          },
+        );
+
+        setImageUrls(
+          nextImageUrls,
+        );
+
         setItems(
-          itemResult.data || [],
+          itemRows,
         );
 
         setMovements(
@@ -352,7 +545,16 @@ export default function Inventory() {
             item.category ===
               category;
 
-          if (!categoryMatches) {
+          const statusMatches =
+            statusFilter ===
+              "all" ||
+            item.status ===
+              statusFilter;
+
+          if (
+            !categoryMatches ||
+            !statusMatches
+          ) {
             return false;
           }
 
@@ -366,6 +568,9 @@ export default function Inventory() {
             item.storage_location,
             item.description,
             item.sku,
+            purchaseOrderFor(
+              item,
+            ).number,
           ]
             .filter(Boolean)
             .some((value) =>
@@ -381,12 +586,24 @@ export default function Inventory() {
       items,
       searchTerm,
       category,
+      statusFilter,
     ]);
+
+  const activeItems =
+    useMemo(
+      () =>
+        items.filter(
+          (item) =>
+            item.status ===
+            "active",
+        ),
+      [items],
+    );
 
   const metrics =
     useMemo(() => {
       const totalUnits =
-        items.reduce(
+        activeItems.reduce(
           (
             sum,
             item,
@@ -400,7 +617,7 @@ export default function Inventory() {
         );
 
       const lowStock =
-        items.filter(
+        activeItems.filter(
           (item) =>
             Number(
               item.quantity_available ||
@@ -413,7 +630,7 @@ export default function Inventory() {
         ).length;
 
       const value =
-        items.reduce(
+        activeItems.reduce(
           (
             sum,
             item,
@@ -434,12 +651,12 @@ export default function Inventory() {
 
       return {
         itemCount:
-          items.length,
+          activeItems.length,
         totalUnits,
         lowStock,
         value,
       };
-    }, [items]);
+    }, [activeItems]);
 
   const itemById =
     useMemo(
@@ -455,15 +672,226 @@ export default function Inventory() {
       [items],
     );
 
+  const resetItemEditor =
+    () => {
+      setAddOpen(false);
+      setEditingItem(null);
+
+      setItemForm(
+        emptyItemForm(),
+      );
+
+      setItemImageFile(
+        null,
+      );
+
+      setItemImagePreview(
+        "",
+      );
+
+      setRemoveItemImage(
+        false,
+      );
+    };
+
+  const openAdd =
+    () => {
+      setEditingItem(null);
+
+      setItemForm(
+        emptyItemForm(),
+      );
+
+      setItemImageFile(
+        null,
+      );
+
+      setItemImagePreview(
+        "",
+      );
+
+      setRemoveItemImage(
+        false,
+      );
+
+      setAddOpen(true);
+    };
+
+  const openEdit =
+    (item) => {
+      const purchaseOrder =
+        purchaseOrderFor(
+          item,
+        );
+
+      setEditingItem(item);
+
+      setItemForm({
+        item_name:
+          item.item_name || "",
+
+        sku:
+          item.sku || "",
+
+        category:
+          item.category ||
+          "other",
+
+        quantity_on_hand:
+          String(
+            item.quantity_on_hand ||
+              0,
+          ),
+
+        quantity_reserved:
+          String(
+            item.quantity_reserved ||
+              0,
+          ),
+
+        reorder_point:
+          String(
+            item.reorder_point ||
+              0,
+          ),
+
+        unit_cost:
+          item.unit_cost ==
+          null
+            ? ""
+            : String(
+                item.unit_cost,
+              ),
+
+        storage_location:
+          item.storage_location ||
+          "",
+
+        vendor_name:
+          item.vendor_name ||
+          "",
+
+        purchase_order_number:
+          purchaseOrder.number ||
+          "",
+
+        purchase_order_status:
+          purchaseOrder.status ||
+          "not_ordered",
+
+        purchase_order_date:
+          purchaseOrder
+            .order_date ||
+          "",
+
+        expected_delivery_date:
+          purchaseOrder
+            .expected_delivery_date ||
+          "",
+
+        description:
+          item.description ||
+          "",
+      });
+
+      setItemImageFile(
+        null,
+      );
+
+      setItemImagePreview(
+        imageUrls[item.id] ||
+          "",
+      );
+
+      setRemoveItemImage(
+        false,
+      );
+
+      setAddOpen(true);
+    };
+
   const closeAdd =
     () => {
-      if (savingItem) {
+      if (
+        savingItem ||
+        isSavingAsset
+      ) {
         return;
       }
 
-      setAddOpen(false);
-      setItemForm(
-        emptyItemForm(),
+      resetItemEditor();
+    };
+
+  const handleImageSelection =
+    (event) => {
+      const file =
+        event.target
+          .files?.[0];
+
+      event.target.value =
+        "";
+
+      if (!file) {
+        return;
+      }
+
+      if (
+        !String(
+          file.type || "",
+        ).startsWith(
+          "image/",
+        )
+      ) {
+        setError(
+          "Inventory photos must be image files.",
+        );
+        return;
+      }
+
+      if (
+        file.size >
+        10 * 1024 * 1024
+      ) {
+        setError(
+          "Inventory photos must be 10 MB or smaller.",
+        );
+        return;
+      }
+
+      setError("");
+
+      setItemImageFile(
+        file,
+      );
+
+      setRemoveItemImage(
+        false,
+      );
+
+      const reader =
+        new FileReader();
+
+      reader.onload = () => {
+        setItemImagePreview(
+          String(
+            reader.result ||
+              "",
+          ),
+        );
+      };
+
+      reader.readAsDataURL(
+        file,
+      );
+    };
+
+  const removeImage =
+    () => {
+      setItemImageFile(null);
+      setItemImagePreview("");
+
+      setRemoveItemImage(
+        true,
       );
     };
 
@@ -473,7 +901,9 @@ export default function Inventory() {
 
       if (
         !workspaceId ||
-        !itemForm.item_name.trim()
+        !itemForm
+          .item_name
+          .trim()
       ) {
         return;
       }
@@ -482,59 +912,181 @@ export default function Inventory() {
       setError("");
 
       try {
-        const {
-          error: insertError,
-        } = await supabase
-          .from(
-            "workspace_inventory_items",
-          )
-          .insert({
-            workspace_id:
-              workspaceId,
-            item_name:
-              itemForm.item_name.trim(),
-            category:
-              itemForm.category,
-            quantity_on_hand:
-              Number(
-                itemForm.quantity_on_hand ||
-                  0,
-              ),
-            quantity_reserved:
-              Number(
-                itemForm.quantity_reserved ||
-                  0,
-              ),
-            reorder_point:
-              Number(
-                itemForm.reorder_point ||
-                  0,
-              ),
-            unit_cost:
-              itemForm.unit_cost === ""
-                ? null
-                : Number(
-                    itemForm.unit_cost,
-                  ),
-            storage_location:
-              itemForm.storage_location
-                .trim() ||
-              null,
-            vendor_name:
-              itemForm.vendor_name
-                .trim() ||
-              null,
-            description:
-              itemForm.description
-                .trim() ||
-              null,
-          });
+        let imageFileId =
+          editingItem
+            ?.image_file_id ||
+          null;
 
-        if (insertError) {
-          throw insertError;
+        if (removeItemImage) {
+          imageFileId =
+            null;
         }
 
-        closeAdd();
+        if (itemImageFile) {
+          const uploaded =
+            await uploadFiles(
+              [itemImageFile],
+              "Campaign Materials",
+            );
+
+          imageFileId =
+            uploaded?.[0]?.id ||
+            null;
+
+          if (!imageFileId) {
+            throw new Error(
+              "The inventory image uploaded but could not be attached.",
+            );
+          }
+        }
+
+        const purchaseOrder = {
+          number:
+            itemForm
+              .purchase_order_number
+              .trim() ||
+            null,
+
+          status:
+            itemForm
+              .purchase_order_status ||
+            "not_ordered",
+
+          order_date:
+            itemForm
+              .purchase_order_date ||
+            null,
+
+          expected_delivery_date:
+            itemForm
+              .expected_delivery_date ||
+            null,
+        };
+
+        const payload = {
+          item_name:
+            itemForm
+              .item_name
+              .trim(),
+
+          sku:
+            itemForm.sku
+              .trim() ||
+            null,
+
+          category:
+            itemForm.category,
+
+          reorder_point:
+            Number(
+              itemForm.reorder_point ||
+                0,
+            ),
+
+          unit_cost:
+            itemForm.unit_cost ===
+            ""
+              ? null
+              : Number(
+                  itemForm.unit_cost,
+                ),
+
+          storage_location:
+            itemForm
+              .storage_location
+              .trim() ||
+            null,
+
+          vendor_name:
+            itemForm
+              .vendor_name
+              .trim() ||
+            null,
+
+          description:
+            itemForm
+              .description
+              .trim() ||
+            null,
+
+          image_file_id:
+            imageFileId,
+
+          metadata: {
+            ...(
+              editingItem
+                ?.metadata ||
+              {}
+            ),
+
+            purchase_order:
+              purchaseOrder,
+          },
+
+          updated_at:
+            new Date()
+              .toISOString(),
+        };
+
+        if (editingItem) {
+          const {
+            error:
+              updateError,
+          } = await supabase
+            .from(
+              "workspace_inventory_items",
+            )
+            .update(
+              payload,
+            )
+            .eq(
+              "id",
+              editingItem.id,
+            )
+            .eq(
+              "workspace_id",
+              workspaceId,
+            );
+
+          if (updateError) {
+            throw updateError;
+          }
+        } else {
+          const {
+            error:
+              insertError,
+          } = await supabase
+            .from(
+              "workspace_inventory_items",
+            )
+            .insert({
+              ...payload,
+
+              workspace_id:
+                workspaceId,
+
+              quantity_on_hand:
+                Number(
+                  itemForm
+                    .quantity_on_hand ||
+                    0,
+                ),
+
+              quantity_reserved:
+                Number(
+                  itemForm
+                    .quantity_reserved ||
+                    0,
+                ),
+            });
+
+          if (insertError) {
+            throw insertError;
+          }
+        }
+
+        resetItemEditor();
+
         await loadInventory();
       } catch (saveError) {
         setError(
@@ -543,6 +1095,64 @@ export default function Inventory() {
         );
       } finally {
         setSavingItem(false);
+      }
+    };
+
+  const setItemStatus =
+    async (
+      item,
+      nextStatus,
+    ) => {
+      if (
+        nextStatus ===
+          "archived" &&
+        !window.confirm(
+          `Archive ${item.item_name}? It can be restored later.`,
+        )
+      ) {
+        return;
+      }
+
+      setError("");
+
+      try {
+        const {
+          error:
+            statusError,
+        } = await supabase
+          .from(
+            "workspace_inventory_items",
+          )
+          .update({
+            status:
+              nextStatus,
+
+            updated_at:
+              new Date()
+                .toISOString(),
+          })
+          .eq(
+            "id",
+            item.id,
+          )
+          .eq(
+            "workspace_id",
+            workspaceId,
+          );
+
+        if (statusError) {
+          throw statusError;
+        }
+
+        await loadInventory();
+      } catch (
+        statusSaveError
+      ) {
+        setError(
+          statusSaveError
+            ?.message ||
+            "Inventory status could not be updated.",
+        );
       }
     };
 
@@ -707,9 +1317,7 @@ export default function Inventory() {
               styles.primaryButton
             }
             type="button"
-            onClick={() =>
-              setAddOpen(true)
-            }
+            onClick={openAdd}
           >
             <Plus size={17} />
             Add inventory
@@ -839,6 +1447,36 @@ export default function Inventory() {
                 ),
               )}
             </select>
+
+            <select
+              className={
+                styles.categorySelect
+              }
+              value={
+                statusFilter
+              }
+              onChange={(
+                event,
+              ) =>
+                setStatusFilter(
+                  event.target
+                    .value,
+                )
+              }
+              aria-label="Inventory status"
+            >
+              <option value="active">
+                Active
+              </option>
+
+              <option value="archived">
+                Archived
+              </option>
+
+              <option value="all">
+                All statuses
+              </option>
+            </select>
           </div>
 
           {filteredItems.length ? (
@@ -892,18 +1530,82 @@ export default function Inventory() {
                             }
                           >
                             <td>
-                              <strong>
-                                {
-                                  item.item_name
+                              <div
+                                className={
+                                  styles.itemIdentity
                                 }
-                              </strong>
-                              {item.vendor_name ? (
-                                <small>
-                                  {
-                                    item.vendor_name
+                              >
+                                <span
+                                  className={
+                                    styles.itemThumb
                                   }
-                                </small>
-                              ) : null}
+                                >
+                                  {imageUrls[
+                                    item.id
+                                  ] ? (
+                                    <img
+                                      src={
+                                        imageUrls[
+                                          item.id
+                                        ]
+                                      }
+                                      alt=""
+                                    />
+                                  ) : (
+                                    <PackageOpen
+                                      size={18}
+                                    />
+                                  )}
+                                </span>
+
+                                <span
+                                  className={
+                                    styles.itemCopy
+                                  }
+                                >
+                                  <strong>
+                                    {
+                                      item.item_name
+                                    }
+                                  </strong>
+
+                                  {item.sku ? (
+                                    <small>
+                                      SKU{" "}
+                                      {
+                                        item.sku
+                                      }
+                                    </small>
+                                  ) : null}
+
+                                  {item.vendor_name ? (
+                                    <small>
+                                      {
+                                        item.vendor_name
+                                      }
+                                    </small>
+                                  ) : null}
+
+                                  {purchaseOrderFor(
+                                    item,
+                                  ).number ? (
+                                    <small>
+                                      PO{" "}
+                                      {
+                                        purchaseOrderFor(
+                                          item,
+                                        ).number
+                                      }{" "}
+                                      ·{" "}
+                                      {purchaseOrderStatusLabel(
+                                        purchaseOrderFor(
+                                          item,
+                                        ).status,
+                                      )}
+                                    </small>
+                                  ) : null}
+                                </span>
+                              </div>
                             </td>
 
                             <td>
@@ -958,42 +1660,96 @@ export default function Inventory() {
                                   styles.rowActions
                                 }
                               >
-                                {ACTIONS.slice(
-                                  0,
-                                  4,
-                                ).map(
-                                  (
-                                    action,
-                                  ) => {
-                                    const Icon =
-                                      action.icon;
+                                <button
+                                  type="button"
+                                  title="Edit item"
+                                  aria-label={`Edit ${item.item_name}`}
+                                  onClick={() =>
+                                    openEdit(
+                                      item,
+                                    )
+                                  }
+                                >
+                                  <Pencil
+                                    size={15}
+                                  />
+                                </button>
 
-                                    return (
-                                      <button
-                                        key={
-                                          action.key
-                                        }
-                                        type="button"
-                                        title={
-                                          action.label
-                                        }
-                                        aria-label={`${action.label} ${item.item_name}`}
-                                        onClick={() =>
-                                          openAdjustment(
-                                            item,
-                                            action.key,
-                                          )
-                                        }
-                                      >
-                                        <Icon
-                                          size={
-                                            15
-                                          }
-                                        />
-                                      </button>
-                                    );
-                                  },
-                                )}
+                                {item.status ===
+                                "active"
+                                  ? ACTIONS.slice(
+                                      0,
+                                      4,
+                                    ).map(
+                                      (
+                                        action,
+                                      ) => {
+                                        const Icon =
+                                          action.icon;
+
+                                        return (
+                                          <button
+                                            key={
+                                              action.key
+                                            }
+                                            type="button"
+                                            title={
+                                              action.label
+                                            }
+                                            aria-label={`${action.label} ${item.item_name}`}
+                                            onClick={() =>
+                                              openAdjustment(
+                                                item,
+                                                action.key,
+                                              )
+                                            }
+                                          >
+                                            <Icon
+                                              size={
+                                                15
+                                              }
+                                            />
+                                          </button>
+                                        );
+                                      },
+                                    )
+                                  : null}
+
+                                <button
+                                  type="button"
+                                  title={
+                                    item.status ===
+                                    "archived"
+                                      ? "Restore item"
+                                      : "Archive item"
+                                  }
+                                  aria-label={
+                                    item.status ===
+                                    "archived"
+                                      ? `Restore ${item.item_name}`
+                                      : `Archive ${item.item_name}`
+                                  }
+                                  onClick={() =>
+                                    void setItemStatus(
+                                      item,
+                                      item.status ===
+                                      "archived"
+                                        ? "active"
+                                        : "archived",
+                                    )
+                                  }
+                                >
+                                  {item.status ===
+                                  "archived" ? (
+                                    <RefreshCw
+                                      size={15}
+                                    />
+                                  ) : (
+                                    <Archive
+                                      size={15}
+                                    />
+                                  )}
+                                </button>
                               </div>
                             </td>
                           </tr>
@@ -1034,20 +1790,87 @@ export default function Inventory() {
                         }
                       >
                         <header>
-                          <div>
-                            <strong>
-                              {
-                                item.item_name
+                          <div
+                            className={
+                              styles.mobileIdentity
+                            }
+                          >
+                            <span
+                              className={
+                                styles.itemThumb
                               }
-                            </strong>
-                            <span>
-                              {categoryLabel(
-                                item.category,
+                            >
+                              {imageUrls[
+                                item.id
+                              ] ? (
+                                <img
+                                  src={
+                                    imageUrls[
+                                      item.id
+                                    ]
+                                  }
+                                  alt=""
+                                />
+                              ) : (
+                                <PackageOpen
+                                  size={18}
+                                />
                               )}
+                            </span>
+
+                            <span
+                              className={
+                                styles.itemCopy
+                              }
+                            >
+                              <strong>
+                                {
+                                  item.item_name
+                                }
+                              </strong>
+
+                              <span>
+                                {categoryLabel(
+                                  item.category,
+                                )}
+                              </span>
+
+                              {item.sku ? (
+                                <small>
+                                  SKU{" "}
+                                  {
+                                    item.sku
+                                  }
+                                </small>
+                              ) : null}
+
+                              {purchaseOrderFor(
+                                item,
+                              ).number ? (
+                                <small>
+                                  PO{" "}
+                                  {
+                                    purchaseOrderFor(
+                                      item,
+                                    ).number
+                                  }{" "}
+                                  ·{" "}
+                                  {purchaseOrderStatusLabel(
+                                    purchaseOrderFor(
+                                      item,
+                                    ).status,
+                                  )}
+                                </small>
+                              ) : null}
                             </span>
                           </div>
 
-                          {low ? (
+                          {item.status ===
+                          "archived" ? (
+                            <em>
+                              Archived
+                            </em>
+                          ) : low ? (
                             <em>
                               Low stock
                             </em>
@@ -1113,38 +1936,84 @@ export default function Inventory() {
                             styles.mobileActions
                           }
                         >
-                          {ACTIONS.map(
-                            (
-                              action,
-                            ) => {
-                              const Icon =
-                                action.icon;
+                          <button
+                            type="button"
+                            onClick={() =>
+                              openEdit(
+                                item,
+                              )
+                            }
+                          >
+                            <Pencil
+                              size={16}
+                            />
+                            Edit
+                          </button>
 
-                              return (
-                                <button
-                                  key={
-                                    action.key
-                                  }
-                                  type="button"
-                                  onClick={() =>
-                                    openAdjustment(
-                                      item,
-                                      action.key,
-                                    )
-                                  }
-                                >
-                                  <Icon
-                                    size={
-                                      16
-                                    }
-                                  />
-                                  {
-                                    action.label
-                                  }
-                                </button>
-                              );
-                            },
-                          )}
+                          {item.status ===
+                          "active"
+                            ? ACTIONS.map(
+                                (
+                                  action,
+                                ) => {
+                                  const Icon =
+                                    action.icon;
+
+                                  return (
+                                    <button
+                                      key={
+                                        action.key
+                                      }
+                                      type="button"
+                                      onClick={() =>
+                                        openAdjustment(
+                                          item,
+                                          action.key,
+                                        )
+                                      }
+                                    >
+                                      <Icon
+                                        size={
+                                          16
+                                        }
+                                      />
+                                      {
+                                        action.label
+                                      }
+                                    </button>
+                                  );
+                                },
+                              )
+                            : null}
+
+                          <button
+                            type="button"
+                            onClick={() =>
+                              void setItemStatus(
+                                item,
+                                item.status ===
+                                "archived"
+                                  ? "active"
+                                  : "archived",
+                              )
+                            }
+                          >
+                            {item.status ===
+                            "archived" ? (
+                              <RefreshCw
+                                size={16}
+                              />
+                            ) : (
+                              <Archive
+                                size={16}
+                              />
+                            )}
+
+                            {item.status ===
+                            "archived"
+                              ? "Restore"
+                              : "Archive"}
+                          </button>
                         </div>
                       </article>
                     );
@@ -1173,9 +2042,7 @@ export default function Inventory() {
                   styles.primaryButton
                 }
                 type="button"
-                onClick={() =>
-                  setAddOpen(true)
-                }
+                onClick={openAdd}
               >
                 <Plus size={17} />
                 Add first item
@@ -1312,10 +2179,13 @@ export default function Inventory() {
             <header>
               <div>
                 <span>
-                  Inventory
+                  Inventory item
                 </span>
+
                 <h2>
-                  Add inventory item
+                  {editingItem
+                    ? "Edit inventory item"
+                    : "Add inventory item"}
                 </h2>
               </div>
 
@@ -1364,6 +2234,110 @@ export default function Inventory() {
                     )
                   }
                   placeholder="Accomando 18×24 Yard Sign"
+                />
+              </label>
+
+              <div
+                className={[
+                  styles.imageEditor,
+                  styles.fullField,
+                ].join(" ")}
+              >
+                <span
+                  className={
+                    styles.imagePreview
+                  }
+                >
+                  {itemImagePreview ? (
+                    <img
+                      src={
+                        itemImagePreview
+                      }
+                      alt="Inventory item preview"
+                    />
+                  ) : (
+                    <ImagePlus
+                      size={28}
+                    />
+                  )}
+                </span>
+
+                <div>
+                  <strong>
+                    Item photo / asset
+                  </strong>
+
+                  <p>
+                    Add a product photo, yard-sign proof, shirt image or other visual. The image is also kept securely in Campaign Seat Files.
+                  </p>
+
+                  <div
+                    className={
+                      styles.imageEditorActions
+                    }
+                  >
+                    <label
+                      className={
+                        styles.imageUploadButton
+                      }
+                    >
+                      <ImagePlus
+                        size={16}
+                      />
+
+                      {itemImagePreview
+                        ? "Replace image"
+                        : "Add image"}
+
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={
+                          handleImageSelection
+                        }
+                      />
+                    </label>
+
+                    {itemImagePreview ? (
+                      <button
+                        type="button"
+                        onClick={
+                          removeImage
+                        }
+                      >
+                        Remove image
+                      </button>
+                    ) : null}
+                  </div>
+                </div>
+              </div>
+
+              <label>
+                <span>
+                  SKU / internal code
+                </span>
+
+                <input
+                  value={
+                    itemForm.sku
+                  }
+                  onChange={(
+                    event,
+                  ) =>
+                    setItemForm(
+                      (
+                        current,
+                      ) => ({
+                        ...current,
+
+                        sku:
+                          event
+                            .target
+                            .value,
+                      }),
+                    )
+                  }
+                  placeholder="SIGN-18X24-001"
                 />
               </label>
 
@@ -1418,6 +2392,11 @@ export default function Inventory() {
                 <input
                   type="number"
                   min="0"
+                  disabled={
+                    Boolean(
+                      editingItem,
+                    )
+                  }
                   value={
                     itemForm.quantity_on_hand
                   }
@@ -1446,6 +2425,11 @@ export default function Inventory() {
                 <input
                   type="number"
                   min="0"
+                  disabled={
+                    Boolean(
+                      editingItem,
+                    )
+                  }
                   value={
                     itemForm.quantity_reserved
                   }
@@ -1579,6 +2563,139 @@ export default function Inventory() {
                 />
               </label>
 
+              <label>
+                <span>
+                  Purchase order #
+                </span>
+
+                <input
+                  value={
+                    itemForm
+                      .purchase_order_number
+                  }
+                  onChange={(
+                    event,
+                  ) =>
+                    setItemForm(
+                      (
+                        current,
+                      ) => ({
+                        ...current,
+
+                        purchase_order_number:
+                          event
+                            .target
+                            .value,
+                      }),
+                    )
+                  }
+                  placeholder="PO-2026-1042"
+                />
+              </label>
+
+              <label>
+                <span>
+                  PO status
+                </span>
+
+                <select
+                  value={
+                    itemForm
+                      .purchase_order_status
+                  }
+                  onChange={(
+                    event,
+                  ) =>
+                    setItemForm(
+                      (
+                        current,
+                      ) => ({
+                        ...current,
+
+                        purchase_order_status:
+                          event
+                            .target
+                            .value,
+                      }),
+                    )
+                  }
+                >
+                  {PURCHASE_ORDER_STATUSES.map(
+                    ([
+                      key,
+                      label,
+                    ]) => (
+                      <option
+                        key={key}
+                        value={key}
+                      >
+                        {label}
+                      </option>
+                    ),
+                  )}
+                </select>
+              </label>
+
+              <label>
+                <span>
+                  Order date
+                </span>
+
+                <input
+                  type="date"
+                  value={
+                    itemForm
+                      .purchase_order_date
+                  }
+                  onChange={(
+                    event,
+                  ) =>
+                    setItemForm(
+                      (
+                        current,
+                      ) => ({
+                        ...current,
+
+                        purchase_order_date:
+                          event
+                            .target
+                            .value,
+                      }),
+                    )
+                  }
+                />
+              </label>
+
+              <label>
+                <span>
+                  Expected delivery
+                </span>
+
+                <input
+                  type="date"
+                  value={
+                    itemForm
+                      .expected_delivery_date
+                  }
+                  onChange={(
+                    event,
+                  ) =>
+                    setItemForm(
+                      (
+                        current,
+                      ) => ({
+                        ...current,
+
+                        expected_delivery_date:
+                          event
+                            .target
+                            .value,
+                      }),
+                    )
+                  }
+                />
+              </label>
+
               <label
                 className={
                   styles.fullField
@@ -1627,12 +2744,17 @@ export default function Inventory() {
                   }
                   type="submit"
                   disabled={
-                    savingItem
+                    savingItem ||
+                    isSavingAsset
                   }
                 >
-                  {savingItem
-                    ? "Saving…"
-                    : "Add inventory"}
+                  {isSavingAsset
+                    ? "Uploading…"
+                    : savingItem
+                      ? "Saving…"
+                      : editingItem
+                        ? "Save changes"
+                        : "Add inventory"}
                 </button>
               </footer>
             </form>
