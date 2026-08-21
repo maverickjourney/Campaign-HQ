@@ -24,6 +24,7 @@ const ALLOWED_OPENAI_MODELS =
 const MAX_QUESTION_LENGTH = 4000;
 const MAX_RETRIEVAL_QUERY_LENGTH = 1200;
 const MAX_SOURCE_COUNT = 18;
+const MAX_PROVIDER_SOURCE_COUNT = 8;
 
 function corsHeaders(
   request: Request,
@@ -190,6 +191,105 @@ function safeSource(
         260,
       ),
   };
+}
+
+
+function selectProviderSources<
+  T extends Record<
+    string,
+    unknown
+  >,
+>(
+  sources: T[],
+) {
+  /*
+   * Preserve the ranking produced by search_campaign_hq.
+   * Limit external exposure while always retaining the
+   * canonical workspace record when one was retrieved.
+   */
+  const selected =
+    sources.slice(
+      0,
+      MAX_PROVIDER_SOURCE_COUNT,
+    );
+
+  const workspaceSource =
+    sources.find(
+      (source) =>
+        clean(
+          source.type,
+        ).toLowerCase() ===
+          "workspace",
+    );
+
+  if (!workspaceSource) {
+    return selected;
+  }
+
+  const workspaceKey =
+    clean(
+      workspaceSource.source_key,
+    );
+
+  const alreadyIncluded =
+    selected.some(
+      (source) =>
+        clean(
+          source.source_key,
+        ) === workspaceKey,
+    );
+
+  if (alreadyIncluded) {
+    return selected;
+  }
+
+  if (
+    selected.length <
+    MAX_PROVIDER_SOURCE_COUNT
+  ) {
+    return [
+      ...selected,
+      workspaceSource,
+    ];
+  }
+
+  return [
+    ...selected.slice(
+      0,
+      MAX_PROVIDER_SOURCE_COUNT - 1,
+    ),
+    workspaceSource,
+  ];
+}
+
+function extractCitedSourceKeys(
+  answer: string,
+) {
+  const keys =
+    new Set<string>();
+
+  for (
+    const match
+    of answer.matchAll(
+      /\[S(\d+)\]/gi,
+    )
+  ) {
+    const number =
+      Number(
+        match[1],
+      );
+
+    if (
+      Number.isFinite(number) &&
+      number > 0
+    ) {
+      keys.add(
+        `S${number}`,
+      );
+    }
+  }
+
+  return keys;
 }
 
 function extractResponseText(
@@ -741,6 +841,11 @@ Deno.serve(
             ),
         );
 
+    const providerSources =
+      selectProviderSources(
+        sources,
+      );
+
     const brain =
       (
         brainResult.data &&
@@ -854,7 +959,8 @@ Deno.serve(
             {}
           : {},
 
-      sources,
+      sources:
+        providerSources,
     };
 
     const instructions = [
@@ -1000,6 +1106,77 @@ Deno.serve(
       );
     }
 
+    const citedSourceKeys =
+      extractCitedSourceKeys(
+        answer,
+      );
+
+    const providerSourceKeys =
+      new Set(
+        providerSources.map(
+          (source) =>
+            clean(
+              source.source_key,
+            ),
+        ),
+      );
+
+    const invalidCitations =
+      [
+        ...citedSourceKeys,
+      ].filter(
+        (sourceKey) =>
+          !providerSourceKeys.has(
+            sourceKey,
+          ),
+      );
+
+    if (
+      invalidCitations.length
+    ) {
+      return jsonResponse(
+        request,
+        502,
+        {
+          error:
+            "The AI provider returned unsupported Campaign Seat source citations.",
+
+          code:
+            "invalid_source_citation",
+        },
+      );
+    }
+
+    const citedSources =
+      providerSources.filter(
+        (source) =>
+          citedSourceKeys.has(
+            clean(
+              source.source_key,
+            ),
+          ),
+      );
+
+    if (
+      settings
+        .require_source_citations !==
+          false &&
+      providerSources.length > 0 &&
+      citedSources.length === 0
+    ) {
+      return jsonResponse(
+        request,
+        502,
+        {
+          error:
+            "The AI provider returned an answer without required Campaign Seat citations.",
+
+          code:
+            "required_source_citation_missing",
+        },
+      );
+    }
+
     const inputTokens =
       usageNumber(
         providerPayload.usage,
@@ -1040,8 +1217,14 @@ Deno.serve(
       provider_request_id:
         providerRequestId,
 
-      source_count:
+      retrieved_source_count:
         sources.length,
+
+      provider_source_count:
+        providerSources.length,
+
+      cited_source_count:
+        citedSources.length,
     };
 
     const usageRows:
@@ -1160,7 +1343,8 @@ Deno.serve(
 
         model,
 
-        sources,
+        sources:
+          citedSources,
 
         usage: {
           inputTokens,
