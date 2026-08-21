@@ -292,6 +292,230 @@ function extractCitedSourceKeys(
   return keys;
 }
 
+const CITATION_SUPPORT_STOP_WORDS =
+  new Set([
+    "about",
+    "after",
+    "again",
+    "also",
+    "and",
+    "answer",
+    "are",
+    "because",
+    "been",
+    "before",
+    "being",
+    "campaign",
+    "campaigns",
+    "could",
+    "does",
+    "from",
+    "have",
+    "into",
+    "just",
+    "more",
+    "only",
+    "record",
+    "records",
+    "seat",
+    "should",
+    "that",
+    "their",
+    "there",
+    "these",
+    "they",
+    "this",
+    "those",
+    "through",
+    "using",
+    "what",
+    "when",
+    "where",
+    "which",
+    "with",
+    "would",
+    "your",
+  ]);
+
+function citationSupportTerms(
+  value: unknown,
+) {
+  return new Set(
+    clean(
+      value,
+    )
+      .toLowerCase()
+      .replace(
+        /\[s\d+\]/g,
+        " ",
+      )
+      .replace(
+        /[^a-z0-9]+/g,
+        " ",
+      )
+      .split(
+        /\s+/,
+      )
+      .filter(
+        (term) =>
+          term.length >= 3 &&
+          !CITATION_SUPPORT_STOP_WORDS
+            .has(
+              term,
+            ),
+      ),
+  );
+}
+
+function sourceSupportScore(
+  answer: string,
+  source: Record<
+    string,
+    unknown
+  >,
+) {
+  const answerTerms =
+    citationSupportTerms(
+      answer,
+    );
+
+  const sourceTerms =
+    citationSupportTerms(
+      [
+        source.type,
+        source.title,
+        source.subtitle,
+        source.detail,
+        source.status,
+      ]
+        .map(
+          (value) =>
+            clean(
+              value,
+            ),
+        )
+        .filter(
+          Boolean,
+        )
+        .join(
+          " ",
+        ),
+    );
+
+  if (
+    answerTerms.size === 0 ||
+    sourceTerms.size === 0
+  ) {
+    return 0;
+  }
+
+  let overlap = 0;
+
+  for (
+    const term
+    of answerTerms
+  ) {
+    if (
+      sourceTerms.has(
+        term,
+      )
+    ) {
+      overlap += 1;
+    }
+  }
+
+  return (
+    overlap /
+    answerTerms.size
+  );
+}
+
+function citationSupportAudit(
+  answer: string,
+  sources: Record<
+    string,
+    unknown
+  >[],
+  citedSourceKeys:
+    Set<string>,
+) {
+  const scoredSources =
+    sources.map(
+      (source) => ({
+        sourceKey:
+          clean(
+            source.source_key,
+          ),
+
+        score:
+          sourceSupportScore(
+            answer,
+            source,
+          ),
+      }),
+    );
+
+  const bestScore =
+    scoredSources.reduce(
+      (
+        best,
+        entry,
+      ) =>
+        Math.max(
+          best,
+          entry.score,
+        ),
+      0,
+    );
+
+  const citedScores =
+    scoredSources.filter(
+      (entry) =>
+        citedSourceKeys.has(
+          entry.sourceKey,
+        ),
+    );
+
+  const weakKeys =
+    citedScores
+      .filter(
+        (entry) => {
+          /*
+           * Only apply semantic rejection when another
+           * supplied record has clearly stronger lexical
+           * support. This avoids rejecting reasonable
+           * paraphrases merely because word overlap is low.
+           */
+          if (
+            bestScore < 0.35
+          ) {
+            return false;
+          }
+
+          const minimumScore =
+            Math.max(
+              0.25,
+              bestScore * 0.55,
+            );
+
+          return (
+            entry.score <
+            minimumScore
+          );
+        },
+      )
+      .map(
+        (entry) =>
+          entry.sourceKey,
+      );
+
+  return {
+    bestScore,
+    weakKeys,
+  };
+}
+
+
 function extractResponseText(
   payload: Record<
     string,
@@ -972,7 +1196,7 @@ Deno.serve(
 
       "If supplied Campaign Seat records do not support a factual answer, say what information is missing instead of guessing.",
 
-      "Cite every factual claim derived from Campaign Seat records inline using only supplied source keys such as [S1] and [S2].",
+      "Cite every factual claim derived from Campaign Seat records inline using the exact source key shown on the specific record that directly supports the claim.",
 
       "If Campaign Seat records do not contain the requested information, clearly say that the information is not available in the supplied records rather than guessing. Cite the closest relevant record only when it materially supports that explanation.",
 
@@ -1216,18 +1440,30 @@ Deno.serve(
         );
       };
 
-    const citationRequiredForAnswer =
+    const initialCitationSupport =
+      citationSupportAudit(
+        answer,
+        providerSources,
+        citedSourceKeys,
+      );
+
+    const citationRepairRequired =
       settings
         .require_source_citations !==
         false &&
       providerSources.length > 0 &&
-      citedSourceKeys.size === 0 &&
       !allowsSourceFreeAnswer(
         answer,
+      ) &&
+      (
+        citedSourceKeys.size ===
+          0 ||
+        initialCitationSupport
+          .weakKeys.length > 0
       );
 
     if (
-      citationRequiredForAnswer
+      citationRepairRequired
     ) {
       citationRepairAttempted =
         true;
@@ -1244,9 +1480,13 @@ Deno.serve(
 
           "Answer the user's question again using the same supplied Campaign Seat records.",
 
-          "Every factual claim derived from Campaign Seat records must include at least one valid inline source key such as [S1].",
+          "Every factual claim derived from Campaign Seat records must include the exact inline source key of the specific supplied record that directly supports that claim.",
 
-          "Use only source keys actually supplied in the Campaign Seat context. Never invent a citation.",
+          "Use only source keys actually supplied in the Campaign Seat context. Never invent a citation, never cite the first source by default, and never cite a record merely because it mentions the candidate or workspace name.",
+
+          "Before choosing a citation, compare the claim against each supplied record's title, subtitle and detail.",
+
+          "Cite the record whose actual text directly supports the specific factual claim. Do not choose a source merely because it appears first or mentions the same person's name.",
 
           "If the supplied records do not support the requested fact, say that the information is not available rather than guessing.",
         ].join("\n");
@@ -1423,6 +1663,30 @@ Deno.serve(
         );
       }
 
+      const repairedCitationSupport =
+        citationSupportAudit(
+          repairedAnswer,
+          providerSources,
+          repairedCitedSourceKeys,
+        );
+
+      if (
+        repairedCitationSupport
+          .weakKeys.length > 0
+      ) {
+        return jsonResponse(
+          request,
+          502,
+          {
+            error:
+              "The AI provider cited a Campaign Seat record that does not sufficiently support the factual answer.",
+
+            code:
+              "weak_source_citation",
+          },
+        );
+      }
+
       providerPayload =
         repairPayload;
 
@@ -1529,6 +1793,13 @@ Deno.serve(
         citationRepairAttempted
           ? citedSources.length > 0
           : false,
+
+      citation_support_best_score:
+        citationSupportAudit(
+          answer,
+          providerSources,
+          citedSourceKeys,
+        ).bestScore,
     };
 
     const usageRows:
