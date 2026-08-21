@@ -36,6 +36,10 @@ import {
   useCampaignSearch,
 } from "../../hooks/useCampaignSearch";
 
+import {
+  useCampaignAi,
+} from "../../hooks/useCampaignAi";
+
 import styles from "./CampaignSearch.module.css";
 
 const QUICK_QUESTIONS = [
@@ -235,8 +239,36 @@ function formatDate(value) {
     return "";
   }
 
+  const cleanValue =
+    String(value).trim();
+
+  /*
+   * YYYY-MM-DD values represent calendar dates, not moments
+   * in time. Parse them in local calendar time so an election
+   * date such as 2026-08-18 never displays as Aug 17 in a
+   * negative UTC offset.
+   */
+  const dateOnlyMatch =
+    cleanValue.match(
+      /^(\d{4})-(\d{2})-(\d{2})$/,
+    );
+
   const date =
-    new Date(value);
+    dateOnlyMatch
+      ? new Date(
+          Number(
+            dateOnlyMatch[1],
+          ),
+          Number(
+            dateOnlyMatch[2],
+          ) - 1,
+          Number(
+            dateOnlyMatch[3],
+          ),
+        )
+      : new Date(
+          cleanValue,
+        );
 
   if (
     Number.isNaN(
@@ -259,6 +291,58 @@ function formatDate(value) {
           : undefined,
     },
   ).format(date);
+}
+
+function renderAnswer(
+  value,
+) {
+  const parts =
+    String(
+      value || "",
+    )
+      .split(
+        /(\*\*[^*]+\*\*|\[S\d+\])/g,
+      )
+      .filter(Boolean);
+
+  return parts.map(
+    (
+      part,
+      index,
+    ) => {
+      if (
+        part.startsWith("**") &&
+        part.endsWith("**")
+      ) {
+        return (
+          <strong
+            key={`bold-${index}`}
+          >
+            {part.slice(2, -2)}
+          </strong>
+        );
+      }
+
+      if (
+        /^\[S\d+\]$/i.test(
+          part,
+        )
+      ) {
+        return (
+          <span
+            className={
+              styles.citationToken
+            }
+            key={`citation-${index}`}
+          >
+            {part}
+          </span>
+        );
+      }
+
+      return part;
+    },
+  );
 }
 
 function normalizeQuestion(
@@ -691,6 +775,34 @@ export function CampaignSearch() {
     setHasSearched,
   ] = useState(false);
 
+  const [
+    answerMode,
+    setAnswerMode,
+  ] = useState("");
+
+  const [
+    answerProvider,
+    setAnswerProvider,
+  ] = useState("");
+
+  const [
+    isRunning,
+    setIsRunning,
+  ] = useState(false);
+
+  const [
+    requestPhase,
+    setRequestPhase,
+  ] = useState("");
+
+  const {
+    askCampaignAi,
+  } =
+    useCampaignAi({
+      workspaceId:
+        workspace.id,
+    });
+
   const {
     isSearching,
     error,
@@ -776,41 +888,152 @@ export function CampaignSearch() {
       setQuestion(
         trimmed,
       );
+
       setHasSearched(true);
       setAnswer("");
       setResults([]);
+      setAnswerMode("");
+      setAnswerProvider("");
       clearError();
 
-      try {
-        const rows =
-          await searchCampaign({
-            query:
-              intent.searchText,
-            limit: 100,
-          });
+      setIsRunning(true);
+      setRequestPhase("ai");
 
-        const filtered =
-          filterResults(
-            rows,
-            intent,
-            user.id,
+      try {
+        try {
+          const aiResponse =
+            await askCampaignAi({
+              question:
+                trimmed,
+
+              retrievalQuery:
+                intent.searchText ||
+                trimmed,
+            });
+
+          const citedSources =
+            Array.isArray(
+              aiResponse.sources,
+            )
+              ? aiResponse.sources
+              : [];
+
+          setAnswer(
+            String(
+              aiResponse.answer ||
+              "",
+            ).trim(),
           );
 
-        setResults(
-          filtered.slice(
-            0,
-            60,
-          ),
-        );
+          setResults(
+            citedSources.map(
+              (
+                source,
+                index,
+              ) => ({
+                result_type:
+                  source.type ||
+                  "workspace",
 
-        setAnswer(
-          buildAnswer(
-            filtered,
-            intent,
-          ),
-        );
-      } catch {
-        setAnswer("");
+                result_id:
+                  source.source_key ||
+                  `source-${index}`,
+
+                source_key:
+                  source.source_key ||
+                  "",
+
+                title:
+                  source.title ||
+                  "Campaign Seat source",
+
+                subtitle:
+                  source.subtitle ||
+                  "",
+
+                detail:
+                  source.detail ||
+                  "",
+
+                status:
+                  source.status ||
+                  "",
+
+                result_date:
+                  source.date ||
+                  "",
+
+                route:
+                  source.route ||
+                  "",
+              }),
+            ),
+          );
+
+          setAnswerMode("ai");
+
+          setAnswerProvider(
+            aiResponse.provider ===
+              "openai"
+              ? "OpenAI"
+              : "Campaign AI",
+          );
+
+          return;
+        } catch {
+          /*
+           * Live AI unavailable or disabled:
+           * preserve the existing deterministic workspace
+           * search as the automatic fallback.
+           */
+          setRequestPhase(
+            "search",
+          );
+        }
+
+        try {
+          const rows =
+            await searchCampaign({
+              query:
+                intent.searchText,
+
+              limit: 100,
+            });
+
+          const filtered =
+            filterResults(
+              rows,
+              intent,
+              user.id,
+            );
+
+          setResults(
+            filtered.slice(
+              0,
+              60,
+            ),
+          );
+
+          setAnswer(
+            buildAnswer(
+              filtered,
+              intent,
+            ),
+          );
+
+          setAnswerMode(
+            "search",
+          );
+
+          setAnswerProvider("");
+        } catch {
+          setAnswer("");
+          setAnswerMode("");
+          setAnswerProvider("");
+        }
+      } finally {
+        setIsRunning(false);
+        setRequestPhase("");
       }
     };
 
@@ -977,18 +1200,23 @@ export function CampaignSearch() {
                       .value,
                   )
                 }
-                placeholder="Ask about files, contacts, tasks, events, approvals or campaign activity…"
+                placeholder="Ask about your campaign, people, tasks, events, approvals or activity…"
               />
 
               <button
                 type="submit"
                 disabled={
+                  isRunning ||
                   isSearching ||
                   !question.trim()
                 }
               >
-                {isSearching
-                  ? "Searching…"
+                {isRunning ||
+                isSearching
+                  ? requestPhase ===
+                    "search"
+                    ? "Searching…"
+                    : "Thinking…"
                   : "Ask"}
               </button>
             </form>
@@ -1009,16 +1237,17 @@ export function CampaignSearch() {
                   />
 
                   <h3>
-                    Search the whole
+                    Ask across your
                     campaign
                   </h3>
 
                   <p>
-                    Campaign HQ searches
-                    the records your
-                    account is allowed to
-                    view and returns
-                    clickable results.
+                    Campaign HQ answers
+                    from workspace
+                    records your account
+                    can view and links
+                    the Campaign Seat
+                    sources it used.
                   </p>
                 </div>
 
@@ -1062,7 +1291,7 @@ export function CampaignSearch() {
               </div>
             )}
 
-            {isSearching && (
+            {(isRunning || isSearching) && (
               <div
                 className={
                   styles.loadingState
@@ -1076,19 +1305,23 @@ export function CampaignSearch() {
                 />
 
                 <strong>
-                  Searching Campaign
-                  HQ…
+                  {requestPhase ===
+                  "search"
+                    ? "Searching Campaign HQ…"
+                    : "Campaign HQ is reviewing your workspace…"}
                 </strong>
 
                 <span>
-                  Checking campaign
-                  records and
-                  permissions
+                  {requestPhase ===
+                  "search"
+                    ? "Using Campaign Search as the workspace fallback"
+                    : "Reviewing only campaign context your account can access"}
                 </span>
               </div>
             )}
 
-            {!isSearching &&
+            {!isRunning &&
+              !isSearching &&
               error && (
                 <div
                   className={
@@ -1113,7 +1346,8 @@ export function CampaignSearch() {
                 </div>
               )}
 
-            {!isSearching &&
+            {!isRunning &&
+              !isSearching &&
               !error &&
               hasSearched && (
                 <>
@@ -1129,13 +1363,40 @@ export function CampaignSearch() {
                     </div>
 
                     <div>
-                      <span>
-                        Campaign HQ
-                        summary
-                      </span>
+                      <div
+                        className={
+                          styles.answerHeading
+                        }
+                      >
+                        <span>
+                          {answerMode ===
+                          "ai"
+                            ? "Campaign Seat AI"
+                            : "Campaign Search"}
+                        </span>
+
+                        {answerMode ===
+                          "ai" && (
+                          <small
+                            className={
+                              styles.answerTrust
+                            }
+                          >
+                            {answerProvider ||
+                              "AI"}{" "}
+                            · sourced from
+                            your workspace
+                          </small>
+                        )}
+                      </div>
 
                       <p>
-                        {answer}
+                        {answerMode ===
+                        "ai"
+                          ? renderAnswer(
+                              answer,
+                            )
+                          : answer}
                       </p>
                     </div>
                   </section>
@@ -1148,16 +1409,23 @@ export function CampaignSearch() {
                     <strong>
                       {results.length}
                       {" "}
-                      {results.length ===
-                      1
-                        ? "result"
-                        : "results"}
+                      {answerMode ===
+                      "ai"
+                        ? results.length ===
+                          1
+                          ? "cited source"
+                          : "cited sources"
+                        : results.length ===
+                          1
+                          ? "result"
+                          : "results"}
                     </strong>
 
                     <span>
-                      Open a result to
-                      continue in its
-                      module
+                      {answerMode ===
+                      "ai"
+                        ? "Open a cited source to view its Campaign Seat record"
+                        : "Open a result to continue in its module"}
                     </span>
                   </div>
 
@@ -1217,6 +1485,20 @@ export function CampaignSearch() {
                                       .result_type}
                                 </span>
 
+                                {answerMode ===
+                                  "ai" &&
+                                  result.source_key && (
+                                    <em
+                                      className={
+                                        styles.sourceKey
+                                      }
+                                    >
+                                      {
+                                        result.source_key
+                                      }
+                                    </em>
+                                  )}
+
                                 {result.status && (
                                   <em>
                                     {
@@ -1273,29 +1555,58 @@ export function CampaignSearch() {
                       },
                     )}
 
-                    {!results.length && (
-                      <div
-                        className={
-                          styles.emptyState
-                        }
-                      >
-                        <Search
-                          size={31}
-                        />
+                    {!results.length &&
+                      answerMode ===
+                        "ai" && (
+                        <div
+                          className={
+                            styles.aiNoSources
+                          }
+                        >
+                          <Sparkles
+                            size={27}
+                          />
 
-                        <h3>
-                          No matching
-                          records
-                        </h3>
+                          <strong>
+                            No cited record
+                            needed
+                          </strong>
 
-                        <p>
-                          Try fewer words,
-                          a person’s name
-                          or a broader
-                          campaign topic.
-                        </p>
-                      </div>
-                    )}
+                          <span>
+                            This answer did
+                            not rely on a
+                            specific
+                            Campaign Seat
+                            record.
+                          </span>
+                        </div>
+                      )}
+
+                    {!results.length &&
+                      answerMode !==
+                        "ai" && (
+                        <div
+                          className={
+                            styles.emptyState
+                          }
+                        >
+                          <Search
+                            size={31}
+                          />
+
+                          <h3>
+                            No matching
+                            records
+                          </h3>
+
+                          <p>
+                            Try fewer words,
+                            a person’s name
+                            or a broader
+                            campaign topic.
+                          </p>
+                        </div>
+                      )}
                   </div>
                 </>
               )}
@@ -1306,14 +1617,14 @@ export function CampaignSearch() {
               }
             >
               <span>
-                Searches the active
-                workspace only
+                Answers stay within the
+                active workspace
               </span>
 
               <span>
-                File names and metadata
-                are searchable; file
-                contents come later
+                Cited Campaign Seat
+                records open in their
+                existing modules
               </span>
             </footer>
           </section>
