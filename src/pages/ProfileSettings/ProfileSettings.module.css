@@ -1478,3 +1478,352 @@
 }
 
 /* CAMPAIGN SEAT SETTINGS PHONE TAB STRIP — END */
+
+/* TWILIO PLATFORM SMS NOTIFICATIONS UI — V1 */
+
+.smsSettingsCard {
+  grid-column: 1 / -1;
+  overflow: hidden;
+}
+
+.smsSettingsBody {
+  display: grid;
+  gap: 16px;
+  padding: 18px 20px 20px;
+  border-top: 1px solid #e2eaf0;
+}
+
+.smsStatusStrip {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  padding: 14px 16px;
+  border: 1px solid #d7e3ec;
+  border-radius: 12px;
+  background: #f8fbfd;
+}
+
+.smsStatusStrip > div {
+  display: grid;
+  min-width: 0;
+  gap: 4px;
+}
+
+.smsStatusStrip strong {
+  color: #173b59;
+  font-size: 12.5px;
+  font-weight: 850;
+}
+
+.smsStatusStrip small {
+  color: #70899d;
+  font-size: 10.5px;
+  line-height: 1.45;
+}
+
+.smsStatusBadge {
+  flex: 0 0 auto;
+  padding: 6px 10px;
+  border-radius: 999px;
+  color: #6b8293;
+  background: #edf2f6;
+  font-size: 10px;
+  font-weight: 850;
+}
+
+.smsStatusBadgeActive {
+  color: #157454;
+  background: #e8f7f0;
+}
+
+.smsMeta {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.smsMeta > span {
+  display: grid;
+  min-width: 0;
+  gap: 6px;
+  padding: 15px 16px;
+  border: 1px solid #dce6ed;
+  border-radius: 11px;
+  background: #ffffff;
+}
+
+.smsMeta strong {
+  color: #315b79;
+  font-size: 10.5px;
+  font-weight: 850;
+}
+
+.smsMeta small {
+  color: #173b59;
+  font-size: 12px;
+  overflow-wrap: anywhere;
+}
+
+.smsConsent {
+  display: grid;
+  grid-template-columns: 18px minmax(0, 1fr);
+  align-items: start;
+  gap: 11px;
+  padding: 15px 16px;
+  border: 1px solid #d7e2ea;
+  border-radius: 11px;
+  background: #fbfcfd;
+  cursor: pointer;
+}
+
+.smsConsent input {
+  width: 16px;
+  height: 16px;
+  margin: 2px 0 0;
+  accent-color: #e62436;
+}
+
+.smsConsent span {
+  color: #526f84;
+  font-size: 10.5px;
+  line-height: 1.6;
+}
+
+.smsLegalLinks {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin: -3px 0 0 29px;
+  color: #8194a4;
+  font-size: 10.5px;
+}
+
+.smsLegalLinks a {
+  color: #245d86;
+  font-weight: 850;
+  text-decoration: none;
+}
+
+.smsLegalLinks a:hover {
+  text-decoration: underline;
+}
+
+.smsActions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
+
+.smsPrimaryButton,
+.smsSecondaryButton {
+  display: inline-flex;
+  min-height: 40px;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  padding: 0 14px;
+  border-radius: 9px;
+  cursor: pointer;
+  font: inherit;
+  font-size: 11px;
+  font-weight: 850;
+}
+
+.smsPrimaryButton {
+  border: 1px solid #d41f32;
+  color: #ffffff;
+  background: #e62436;
+}
+
+.smsSecondaryButton {
+  border: 1px solid #cbd9e4;
+  color: #315b79;
+  background: #ffffff;
+}
+
+.smsPrimaryButton:disabled,
+.smsSecondaryButton:disabled {
+  cursor: not-allowed;
+  opacity: 0.52;
+}
+
+.smsError,
+.smsSuccess {
+  margin: 0;
+  padding: 12px 14px;
+  border-radius: 10px;
+  font-size: 10.5px;
+  font-weight: 750;
+  line-height: 1.45;
+}
+
+.smsError {
+  border: 1px solid #f1c6cc;
+  color: #a32634;
+  background: #fff3f4;
+}
+
+.smsSuccess {
+  border: 1px solid #c9e3d8;
+  color: #137355;
+  background: #eef9f4;
+}
+
+.smsChangeNumberNote {
+  margin: -4px 0 0;
+  color: #7890a2;
+  font-size: 10.5px;
+  line-height: 1.45;
+}
+
+.smsComplianceNote {
+  display: grid;
+  grid-template-columns: 22px minmax(0, 1fr);
+  align-items: start;
+  gap: 10px;
+  padding: 13px 14px;
+  border: 1px solid #dce6ed;
+  border-radius: 10px;
+  color: #617c90;
+  background: #f8fafc;
+  font-size: 10.5px;
+  line-height: 1.5;
+}
+
+.smsComplianceNote svg {
+  margin-top: 1px;
+  color: #537994;
+}
+
+.smsSettingsBody .field {
+  max-width: none;
+}
+
+.smsSettingsBody .input {
+  min-height: 45px;
+}
+
+@media (max-width: 760px) {
+  .smsSettingsBody {
+    padding: 14px;
+  }
+
+  .smsStatusStrip {
+    align-items: flex-start;
+  }
+
+  .smsMeta {
+    grid-template-columns: 1fr;
+  }
+
+  .smsActions {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .smsPrimaryButton,
+  .smsSecondaryButton {
+    width: 100%;
+  }
+
+  .smsLegalLinks {
+    margin-left: 0;
+  }
+}
+
+/* TWILIO PLATFORM SMS NOTIFICATIONS UI — V1 END */
+
+/* DELIVERY READINESS ROW LAYOUT — V1.7 */
+
+.settingsGrid {
+  align-items: start;
+}
+
+.channelGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 10px;
+  padding: 16px;
+}
+
+.channelGrid article {
+  display: grid;
+  grid-template-columns: 38px minmax(0, 1fr) auto;
+  grid-template-areas:
+    "icon title badge"
+    "icon detail badge";
+  align-items: center;
+  column-gap: 12px;
+  row-gap: 3px;
+  min-width: 0;
+  min-height: 70px;
+  padding: 13px 14px;
+  border: 1px solid #d5e1ea;
+  border-radius: 12px;
+  background: #fbfdff;
+}
+
+.channelGrid article > svg {
+  grid-area: icon;
+  align-self: center;
+  color: #2475b8;
+}
+
+.channelGrid article > strong {
+  grid-area: title;
+  min-width: 0;
+  color: #173b59;
+  font-size: 12px;
+  font-weight: 850;
+  line-height: 1.25;
+}
+
+.channelGrid article > small {
+  grid-area: detail;
+  min-width: 0;
+  color: #71899c;
+  font-size: 10.5px;
+  line-height: 1.4;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+.channelGrid article > span {
+  grid-area: badge;
+  align-self: center;
+  justify-self: end;
+  max-width: 140px;
+  padding: 5px 9px;
+  border-radius: 999px;
+  color: #26704f;
+  background: #eaf7f0;
+  font-size: 9.5px;
+  font-weight: 850;
+  line-height: 1.2;
+  text-align: center;
+  white-space: normal;
+}
+
+@media (max-width: 760px) {
+  .channelGrid {
+    padding: 12px;
+  }
+
+  .channelGrid article {
+    grid-template-columns: 34px minmax(0, 1fr);
+    grid-template-areas:
+      "icon title"
+      "icon detail"
+      "icon badge";
+  }
+
+  .channelGrid article > span {
+    justify-self: start;
+    margin-top: 4px;
+  }
+}
+
+/* DELIVERY READINESS ROW LAYOUT — V1.7 END */

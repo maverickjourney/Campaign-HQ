@@ -1,4 +1,5 @@
 import {
+  useEffect,
   useState,
 } from "react";
 
@@ -57,6 +58,14 @@ import SecurityOnboardingGate from "../../components/security/SecurityOnboarding
 import {
   useProfileSettings,
 } from "../../hooks/useProfileSettings";
+
+import {
+  usePlatformSmsPreferences,
+} from "../../hooks/usePlatformSmsPreferences";
+
+import {
+  usePlatformNotificationPreferences,
+} from "../../hooks/usePlatformNotificationPreferences";
 
 import {
   getCurrentUser,
@@ -169,6 +178,48 @@ function loadLocalSettings({
     return defaults;
   }
 }
+
+function normalizePlatformSmsPhone(
+  value,
+) {
+  const raw =
+    String(
+      value || "",
+    ).trim();
+
+  if (
+    /^\+[1-9][0-9]{7,14}$/
+      .test(
+        raw,
+      )
+  ) {
+    return raw;
+  }
+
+  const digits =
+    raw.replace(
+      /[^0-9]/g,
+      "",
+    );
+
+  if (
+    digits.length === 10
+  ) {
+    return `+1${digits}`;
+  }
+
+  if (
+    digits.length === 11 &&
+    digits.startsWith(
+      "1",
+    )
+  ) {
+    return `+${digits}`;
+  }
+
+  return "";
+}
+
 
 function PreferenceToggle({
   checked,
@@ -333,6 +384,103 @@ export default function ProfileSettings() {
       user.email,
   });
 
+  const {
+    subscription:
+      smsSubscription,
+    isLoading:
+      smsIsLoading,
+    error:
+      smsLoadError,
+    setPreference:
+      setSmsPreference,
+    sendTestMessage:
+      sendSmsTestMessage,
+  } =
+    usePlatformSmsPreferences({
+      userId:
+        user.id,
+    });
+
+  const {
+    preferences:
+      platformNotificationPreferences,
+    isLoading:
+      notificationPreferencesLoading,
+    isSaving:
+      notificationPreferencesSaving,
+    error:
+      notificationPreferencesError,
+    updatePreference:
+      updatePlatformNotificationPreference,
+  } =
+    usePlatformNotificationPreferences({
+      userId:
+        user.id,
+    });
+
+  const [
+    smsPhone,
+    setSmsPhone,
+  ] =
+    useState(
+      "",
+    );
+
+  const [
+    smsConsentChecked,
+    setSmsConsentChecked,
+  ] =
+    useState(
+      false,
+    );
+
+  const [
+    smsIsSaving,
+    setSmsIsSaving,
+  ] =
+    useState(
+      false,
+    );
+
+  const [
+    smsFeedback,
+    setSmsFeedback,
+  ] =
+    useState(
+      "",
+    );
+
+  const [
+    smsActionError,
+    setSmsActionError,
+  ] =
+    useState(
+      "",
+    );
+
+  useEffect(
+    () => {
+      if (
+        smsSubscription
+          ?.phone_e164
+      ) {
+        setSmsPhone(
+          smsSubscription
+            .phone_e164,
+        );
+      }
+
+      setSmsConsentChecked(
+        smsSubscription
+          ?.status ===
+          "active",
+      );
+    },
+    [
+      smsSubscription,
+    ],
+  );
+
   const persistLocal =
     (next) => {
       setLocalSettings(next);
@@ -362,15 +510,168 @@ export default function ProfileSettings() {
     };
 
   const updateNotification =
-    (field, value) => {
-      persistLocal({
-        ...localSettings,
-        notifications: {
-          ...localSettings.notifications,
-          [field]: value,
-        },
-      });
+    async (
+      field,
+      value,
+    ) => {
+      setFormError(
+        "",
+      );
+
+      try {
+        await updatePlatformNotificationPreference(
+          field,
+          value,
+        );
+
+        persistLocal({
+          ...localSettings,
+          notifications: {
+            ...localSettings.notifications,
+            [field]: value,
+          },
+        });
+
+        setLocalMessage(
+          "Notification preferences saved to your Campaign Seat account.",
+        );
+      } catch (
+        notificationError
+      ) {
+        setFormError(
+          notificationError
+            ?.message ||
+            "Campaign Seat could not save the notification preference.",
+        );
+      }
     };
+
+  const enablePlatformSms =
+    async () => {
+      const normalizedPhone =
+        normalizePlatformSmsPhone(
+          smsPhone,
+        );
+
+      if (
+        !normalizedPhone
+      ) {
+        setSmsActionError(
+          "Enter a valid U.S. mobile number, for example (555) 555-5555.",
+        );
+        setSmsFeedback(
+          "",
+        );
+        return;
+      }
+
+      if (
+        !smsConsentChecked
+      ) {
+        setSmsActionError(
+          "Check the optional SMS consent box before enabling text notifications.",
+        );
+        setSmsFeedback(
+          "",
+        );
+        return;
+      }
+
+      setSmsIsSaving(true);
+      setSmsActionError("");
+      setSmsFeedback("");
+
+      try {
+        await setSmsPreference({
+          phoneE164:
+            normalizedPhone,
+          consented:
+            true,
+          source:
+            "campaign_seat_settings",
+        });
+
+        setSmsPhone(
+          normalizedPhone,
+        );
+
+        setSmsFeedback(
+          "Text notifications are enabled for your Campaign Seat account.",
+        );
+      } catch (
+        preferenceError
+      ) {
+        setSmsActionError(
+          preferenceError
+            ?.message ||
+            "Campaign Seat could not enable text notifications.",
+        );
+      } finally {
+        setSmsIsSaving(false);
+      }
+    };
+
+
+  const disablePlatformSms =
+    async () => {
+      setSmsIsSaving(true);
+      setSmsActionError("");
+      setSmsFeedback("");
+
+      try {
+        await setSmsPreference({
+          phoneE164:
+            "",
+          consented:
+            false,
+          source:
+            "campaign_seat_settings",
+        });
+
+        setSmsConsentChecked(false);
+
+        setSmsFeedback(
+          "Text notifications are turned off for your Campaign Seat account.",
+        );
+      } catch (
+        preferenceError
+      ) {
+        setSmsActionError(
+          preferenceError
+            ?.message ||
+            "Campaign Seat could not turn off text notifications.",
+        );
+      } finally {
+        setSmsIsSaving(false);
+      }
+    };
+
+
+  const sendPlatformSmsTest =
+    async () => {
+      setSmsIsSaving(true);
+      setSmsActionError("");
+      setSmsFeedback("");
+
+      try {
+        await sendSmsTestMessage(
+          "Campaign Seat: Your text notifications are connected. Message frequency varies. Msg & data rates may apply. Reply HELP for help or STOP to cancel.",
+        );
+
+        setSmsFeedback(
+          "Campaign Seat submitted the test text to the messaging provider.",
+        );
+      } catch (
+        testError
+      ) {
+        setSmsActionError(
+          "Campaign Seat could not send the test text yet. If the toll-free sender is still under carrier review, try again after approval.",
+        );
+      } finally {
+        setSmsIsSaving(false);
+      }
+    };
+
 
   const handleAvatar =
     (event) => {
@@ -1415,9 +1716,12 @@ export default function ProfileSettings() {
                 >
                   <PreferenceToggle
                     checked={
-                      localSettings
-                        .notifications
+                      platformNotificationPreferences
                         .campaignUpdates
+                    }
+                    disabled={
+                      notificationPreferencesLoading ||
+                      notificationPreferencesSaving
                     }
                     label="Campaign updates"
                     description="Important campaign announcements and changes."
@@ -1433,8 +1737,7 @@ export default function ProfileSettings() {
 
                   <PreferenceToggle
                     checked={
-                      localSettings
-                        .notifications
+                      platformNotificationPreferences
                         .taskReminders
                     }
                     label="Task & reminder emails"
@@ -1451,8 +1754,7 @@ export default function ProfileSettings() {
 
                   <PreferenceToggle
                     checked={
-                      localSettings
-                        .notifications
+                      platformNotificationPreferences
                         .weeklySummary
                     }
                     label="Weekly summary"
@@ -1809,6 +2111,29 @@ export default function ProfileSettings() {
           </section>
         ) : null}
 
+        {notificationPreferencesError &&
+        activeTab ===
+          "notifications" ? (
+          <div
+            className={[
+              styles.banner,
+              styles.errorBanner,
+            ]
+              .filter(Boolean)
+              .join(" ")}
+          >
+            <AlertTriangle
+              size={18}
+            />
+
+            <p>
+              {
+                notificationPreferencesError
+              }
+            </p>
+          </div>
+        ) : null}
+
         {activeTab ===
         "notifications" ? (
           <section
@@ -1883,6 +2208,10 @@ export default function ProfileSettings() {
                         .notifications
                         .taskReminders
                     }
+                    disabled={
+                      notificationPreferencesLoading ||
+                      notificationPreferencesSaving
+                    }
                     label="Tasks and reminders"
                     description="Due dates, assignments and waiting-on activity."
                     onChange={(
@@ -1897,9 +2226,12 @@ export default function ProfileSettings() {
 
                   <PreferenceToggle
                     checked={
-                      localSettings
-                        .notifications
+                      platformNotificationPreferences
                         .approvals
+                    }
+                    disabled={
+                      notificationPreferencesLoading ||
+                      notificationPreferencesSaving
                     }
                     label="Approval requests"
                     description="Items requiring review or campaign authorization."
@@ -1915,9 +2247,12 @@ export default function ProfileSettings() {
 
                   <PreferenceToggle
                     checked={
-                      localSettings
-                        .notifications
+                      platformNotificationPreferences
                         .fieldAlerts
+                    }
+                    disabled={
+                      notificationPreferencesLoading ||
+                      notificationPreferencesSaving
                     }
                     label="Field-operation alerts"
                     description="Route issues, volunteer reports and urgent field updates."
@@ -1936,6 +2271,10 @@ export default function ProfileSettings() {
                       localSettings
                         .notifications
                         .weeklySummary
+                    }
+                    disabled={
+                      notificationPreferencesLoading ||
+                      notificationPreferencesSaving
                     }
                     label="Weekly campaign summary"
                     description="A campaign-wide recap of activity and outstanding work."
@@ -2039,14 +2378,398 @@ export default function ProfileSettings() {
                     </strong>
 
                     <small>
-                      Campaign SMS delivery
-                      is not connected yet.
+                      {smsIsLoading
+                        ? "Checking text notification status..."
+                        : smsSubscription
+                              ?.status ===
+                            "active"
+                          ? smsSubscription
+                              .phone_e164
+                          : "Optional Campaign Seat text notifications are off."}
                     </small>
 
                     <span>
-                      Planned
+                      {smsSubscription
+                        ?.status ===
+                      "active"
+                        ? "Connected"
+                        : "Optional"}
                     </span>
                   </article>
+                </div>
+              </section>
+
+              <section
+                className={[
+                  styles.settingsCard,
+                  styles.smsSettingsCard,
+                ]
+                  .filter(Boolean)
+                  .join(" ")}
+              >
+                <header
+                  className={
+                    styles.cardHeader
+                  }
+                >
+                  <span
+                    className={
+                      styles.cardIcon
+                    }
+                  >
+                    <MessageSquare
+                      size={20}
+                    />
+                  </span>
+
+                  <div>
+                    <h2>
+                      Text notifications
+                    </h2>
+
+                    <p>
+                      Optional Campaign Seat account notifications,
+                      onboarding updates and customer-support texts.
+                    </p>
+                  </div>
+                </header>
+
+                <div
+                  className={
+                    styles.smsSettingsBody
+                  }
+                >
+                  <div
+                    className={
+                      styles.smsStatusStrip
+                    }
+                  >
+                    <div>
+                      <strong>
+                        {smsIsLoading
+                          ? "Checking SMS status"
+                          : smsSubscription
+                                ?.status ===
+                              "active"
+                            ? "Text notifications enabled"
+                            : smsSubscription
+                                  ?.status ===
+                                "opted_out"
+                              ? "Text notifications turned off"
+                              : "Text notifications not enabled"}
+                      </strong>
+
+                      <small>
+                        {smsSubscription
+                          ?.status ===
+                        "active"
+                          ? `Campaign Seat may text ${smsSubscription.phone_e164} for the platform messages you opted into.`
+                          : "SMS is optional and is not required to use Campaign Seat."}
+                      </small>
+                    </div>
+
+                    <span
+                      className={[
+                        styles.smsStatusBadge,
+                        smsSubscription
+                              ?.status ===
+                            "active"
+                          ? styles.smsStatusBadgeActive
+                          : "",
+                      ]
+                        .filter(Boolean)
+                        .join(" ")}
+                    >
+                      {smsSubscription
+                        ?.status ===
+                      "active"
+                        ? "Active"
+                        : "Off"}
+                    </span>
+                  </div>
+
+                  {smsSubscription
+                    ?.status ===
+                  "active" ? (
+                    <>
+                      <div
+                        className={
+                          styles.smsMeta
+                        }
+                      >
+                        <span>
+                          <strong>
+                            Mobile number
+                          </strong>
+                          <small>
+                            {
+                              smsSubscription
+                                .phone_e164
+                            }
+                          </small>
+                        </span>
+
+                        <span>
+                          <strong>
+                            Consent recorded
+                          </strong>
+                          <small>
+                            {smsSubscription
+                              .consented_at
+                              ? new Date(
+                                  smsSubscription
+                                    .consented_at,
+                                )
+                                  .toLocaleString()
+                              : "Recorded"}
+                          </small>
+                        </span>
+                      </div>
+
+                      <div
+                        className={
+                          styles.smsActions
+                        }
+                      >
+                        <button
+                          className={
+                            styles.smsPrimaryButton
+                          }
+                          type="button"
+                          disabled={
+                            smsIsSaving ||
+                            smsIsLoading
+                          }
+                          onClick={
+                            sendPlatformSmsTest
+                          }
+                        >
+                          <MessageSquare
+                            size={16}
+                          />
+                          {smsIsSaving
+                            ? "Working..."
+                            : "Send test text"}
+                        </button>
+
+                        <button
+                          className={
+                            styles.smsSecondaryButton
+                          }
+                          type="button"
+                          disabled={
+                            smsIsSaving ||
+                            smsIsLoading
+                          }
+                          onClick={
+                            disablePlatformSms
+                          }
+                        >
+                          Turn off SMS
+                        </button>
+                      </div>
+
+                      <p
+                        className={
+                          styles.smsChangeNumberNote
+                        }
+                      >
+                        To use a different mobile number, turn off SMS and
+                        enroll the new number with fresh consent.
+                      </p>
+                    </>
+                  ) : (
+                    <>
+                      <label
+                        className={
+                          styles.field
+                        }
+                      >
+                        <span>
+                          Mobile phone number
+                        </span>
+
+                        <div
+                          className={
+                            styles.input
+                          }
+                        >
+                          <Phone
+                            size={17}
+                          />
+
+                          <input
+                            type="tel"
+                            inputMode="tel"
+                            autoComplete="tel"
+                            placeholder="(555) 555-5555"
+                            value={
+                              smsPhone
+                            }
+                            disabled={
+                              smsIsSaving ||
+                              smsIsLoading
+                            }
+                            onChange={(
+                              event,
+                            ) => {
+                              setSmsPhone(
+                                event
+                                  .currentTarget
+                                  .value,
+                              );
+                              setSmsActionError("");
+                              setSmsFeedback("");
+                            }}
+                          />
+                        </div>
+
+                        <small
+                          className={
+                            styles.helperText
+                          }
+                        >
+                          U.S. numbers are normalized to +1 format when saved.
+                        </small>
+                      </label>
+
+                      <label
+                        className={
+                          styles.smsConsent
+                        }
+                      >
+                        <input
+                          type="checkbox"
+                          checked={
+                            smsConsentChecked
+                          }
+                          disabled={
+                            smsIsSaving ||
+                            smsIsLoading
+                          }
+                          onChange={(
+                            event,
+                          ) => {
+                            setSmsConsentChecked(
+                              event
+                                .currentTarget
+                                .checked,
+                            );
+                            setSmsActionError("");
+                            setSmsFeedback("");
+                          }}
+                        />
+
+                        <span>
+                          I agree to receive recurring SMS text messages from Campaign Seat,
+                          operated by CC Innovation Group LLC, at the mobile number provided
+                          for account notifications, onboarding communications and customer
+                          support. Message frequency varies. Message and data rates may apply.
+                          Reply HELP for help or STOP to cancel. Consent is optional and is not
+                          a condition of creating or using a Campaign Seat account.
+                        </span>
+                      </label>
+
+                      <p
+                        className={
+                          styles.smsLegalLinks
+                        }
+                      >
+                        <a
+                          href="/terms/"
+                          target="_blank"
+                          rel="noreferrer"
+                        >
+                          Terms and Conditions
+                        </a>
+
+                        <span>·</span>
+
+                        <a
+                          href="/privacy/"
+                          target="_blank"
+                          rel="noreferrer"
+                        >
+                          Privacy Policy
+                        </a>
+                      </p>
+
+                      <div
+                        className={
+                          styles.smsActions
+                        }
+                      >
+                        <button
+                          className={
+                            styles.smsPrimaryButton
+                          }
+                          type="button"
+                          disabled={
+                            smsIsSaving ||
+                            smsIsLoading ||
+                            !smsPhone.trim() ||
+                            !smsConsentChecked
+                          }
+                          onClick={
+                            enablePlatformSms
+                          }
+                        >
+                          <Check
+                            size={16}
+                          />
+                          {smsIsSaving
+                            ? "Saving..."
+                            : "Enable text notifications"}
+                        </button>
+                      </div>
+                    </>
+                  )}
+
+                  {smsLoadError ? (
+                    <p
+                      className={
+                        styles.smsError
+                      }
+                    >
+                      {smsLoadError}
+                    </p>
+                  ) : null}
+
+                  {smsActionError ? (
+                    <p
+                      className={
+                        styles.smsError
+                      }
+                    >
+                      {smsActionError}
+                    </p>
+                  ) : null}
+
+                  {smsFeedback ? (
+                    <p
+                      className={
+                        styles.smsSuccess
+                      }
+                    >
+                      {smsFeedback}
+                    </p>
+                  ) : null}
+
+                  <div
+                    className={
+                      styles.smsComplianceNote
+                    }
+                  >
+                    <ShieldCheck
+                      size={17}
+                    />
+
+                    <span>
+                      Campaign Seat platform SMS is separate from campaign
+                      voter/contact outreach. This setting controls only your
+                      own Campaign Seat account notifications.
+                    </span>
+                  </div>
                 </div>
               </section>
             </div>
