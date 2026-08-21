@@ -12,6 +12,7 @@ import {
   CheckCircle2,
   ChevronDown,
   CircleDollarSign,
+  CreditCard,
   Clock3,
   FileCheck2,
   FileText,
@@ -21,10 +22,12 @@ import {
   Inbox,
   LayoutDashboard,
   LifeBuoy,
+  Link2,
   Mail,
   MapPin,
   Menu,
   MessageSquare,
+  PackageOpen,
   Plus,
   PhoneCall,
   Search,
@@ -36,6 +39,7 @@ import {
   TrendingUp,
   UserCog,
   Users,
+  Vote,
   X,
   Zap,
 } from "lucide-react";
@@ -48,100 +52,100 @@ import {
   getUserInitials,
 } from "../../utils/campaignSession";
 import { useCampaignDashboard } from "../../hooks/useCampaignDashboard";
+
+import {
+  ACTIVE_SEAT_PRODUCT,
+  getSeatCoreModules,
+  getSeatPlatformModules,
+  getSeatProductModules,
+} from "../../config/seatPlatform";
 import { ActivityCenter } from "../../components/ActivityCenter/ActivityCenter";
 import { CampaignSearch } from "../../components/CampaignSearch/CampaignSearch";
 import elizabethPhoto from "../../assets/images/dashboard/elizabeth.jpg";
 import styles from "./DashboardReferencePreview.module.css";
 
-const PRIMARY_NAVIGATION = [
-  {
-    label: "HQ",
-    icon: LayoutDashboard,
-    route: "/dashboard",
-  },
-  {
-    label: "Inbox",
-    icon: Inbox,
-    route: "/inbox",
-  },
-  {
-    label: "Calendar",
-    icon: CalendarDays,
-    route: "/calendar",
-  },
-  {
-    label: "Tasks",
-    icon: CheckCircle2,
-    route: "/tasks",
-    countKey: "tasks",
-  },
-  {
-    label: "Commitments",
-    icon: Target,
-    route: "/commitments",
-  },
-  {
-    label: "Waiting On",
-    icon: Clock3,
-    route: "/waiting-on",
-    countKey: "waiting",
-  },
-  {
-    label: "Contacts",
-    icon: Users,
-    route: "/contacts",
-  },
-  {
-    label: "Documents",
-    icon: Files,
-    route: "/files",
-  },
-  {
-    label: "Approvals",
-    icon: FileCheck2,
-    route: "/approvals",
-    countKey: "approvals",
-  },
-  {
-    label: "Team",
-    icon: UserCog,
-    route: "/team",
-  },
-];
+const MODULE_ICONS = {
+  dashboard: LayoutDashboard,
+  inbox: Inbox,
+  calendar: CalendarDays,
+  tasks: CheckCircle2,
+  commitments: Target,
+  waiting_on: Clock3,
+  contacts: Users,
+  documents: Files,
+  approvals: FileCheck2,
+  team: UserCog,
+  inventory: PackageOpen,
 
-const CAMPAIGN_TOOLS = [
-  {
-    label: "Volunteers",
-    icon: Users,
-    route: "/volunteers",
-  },
-  {
-    label: "Fundraising",
-    icon: CircleDollarSign,
-    route: "/fundraising",
-  },
-  {
-    label: "Events",
-    icon: CalendarDays,
-    route: "/events",
-  },
-  {
-    label: "Social Media",
-    icon: MessageSquare,
-    route: "/social-media",
-  },
-  {
-    label: "Media Center",
-    icon: FolderKanban,
-    route: "/media-center",
-  },
-  {
-    label: "Reports & Analytics",
-    icon: BarChart3,
-    route: "/reports-analytics",
-  },
-];
+  candidate: Vote,
+  volunteers: Users,
+  fundraising: CircleDollarSign,
+  events: CalendarDays,
+  social_media: MessageSquare,
+  media_center: FolderKanban,
+  reports_analytics: BarChart3,
 
+  integrations: Link2,
+  plan_usage: CreditCard,
+  settings: Settings,
+  support: LifeBuoy,
+};
+
+const MODULE_COUNT_KEYS = {
+  tasks: "tasks",
+  waiting_on: "waiting",
+  approvals: "approvals",
+};
+
+function createSeatNavigation(
+  modules,
+) {
+  return modules.map(
+    (module) => ({
+      ...module,
+
+      icon:
+        MODULE_ICONS[
+          module.key
+        ] ||
+        LayoutDashboard,
+
+      countKey:
+        MODULE_COUNT_KEYS[
+          module.key
+        ] ||
+        "",
+    }),
+  );
+}
+
+const PRIMARY_NAVIGATION =
+  createSeatNavigation(
+    getSeatCoreModules(),
+  );
+
+const CAMPAIGN_TOOLS =
+  createSeatNavigation(
+    getSeatProductModules(
+      ACTIVE_SEAT_PRODUCT,
+    ),
+  );
+
+const PLATFORM_TOOLS =
+  createSeatNavigation(
+    getSeatPlatformModules()
+      .filter(
+        (module) =>
+          [
+            "integrations",
+            "plan_usage",
+            "settings",
+            "support",
+          ].includes(
+            module.key,
+          ),
+      ),
+  );
 
 // PRESENTATION PRIORITIES — START
 const PRESENTATION_PRIORITIES = [
@@ -1575,6 +1579,34 @@ const [
         })}
 
         <span className={styles.navigationLabel}>
+          Platform
+        </span>
+
+        {PLATFORM_TOOLS.map((item) => {
+          const Icon = item.icon;
+
+          return (
+            <button
+              key={item.key || item.label}
+              type="button"
+              onClick={() => {
+                navigate(item.route);
+                setSidebarOpen(false);
+              }}
+            >
+              <Icon
+                size={17}
+                strokeWidth={1.9}
+              />
+
+              <span>
+                {item.label}
+              </span>
+            </button>
+          );
+        })}
+
+        <span className={styles.navigationLabel}>
           Connected apps
         </span>
 
@@ -1582,7 +1614,7 @@ const [
           <button
             type="button"
             onClick={() =>
-              navigate("/workspace/settings")
+              navigate("/workspace/integrations")
             }
             aria-label="Email integration"
           >
@@ -1592,7 +1624,7 @@ const [
           <button
             type="button"
             onClick={() =>
-              navigate("/workspace/settings")
+              navigate("/workspace/integrations")
             }
             aria-label="Calendar integration"
           >
@@ -1602,7 +1634,7 @@ const [
           <button
             type="button"
             onClick={() =>
-              navigate("/workspace/settings")
+              navigate("/workspace/integrations")
             }
             aria-label="File storage integration"
           >
@@ -1612,7 +1644,7 @@ const [
           <button
             type="button"
             onClick={() =>
-              navigate("/workspace/settings")
+              navigate("/workspace/integrations")
             }
             aria-label="Messaging integration"
           >
@@ -1622,7 +1654,7 @@ const [
           <button
             type="button"
             onClick={() =>
-              navigate("/workspace/settings")
+              navigate("/workspace/integrations")
             }
             aria-label="Add integration"
           >
