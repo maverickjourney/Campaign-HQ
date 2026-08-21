@@ -205,3 +205,24 @@
 }
 
 /* HIDE SUPPORT DURING INBOX MODALS — END */
+
+/* HIDE SUPPORT DURING INVENTORY MODALS — START */
+
+:global(
+  body:has(
+    [aria-label="Add inventory item"]
+  )
+)
+.launcher,
+:global(
+  body:has(
+    [aria-label="Adjust inventory"]
+  )
+)
+.launcher {
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+
+/* HIDE SUPPORT DURING INVENTORY MODALS — END */
