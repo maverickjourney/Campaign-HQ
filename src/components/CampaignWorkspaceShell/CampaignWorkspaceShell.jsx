@@ -1,6 +1,7 @@
 import {
   useEffect,
   useMemo,
+  useRef,
   useState,
 } from "react";
 import {
@@ -15,14 +16,17 @@ import {
   ChevronDown,
   CircleDollarSign,
   Clock3,
+  CreditCard,
   FileCheck2,
   Files,
   FolderKanban,
   Inbox,
   LayoutDashboard,
+  LifeBuoy,
   Mail,
   MessageSquare,
   Plus,
+  Settings,
   PackageOpen,
   Target,
   UserCog,
@@ -42,6 +46,7 @@ import {
 import {
   ACTIVE_SEAT_PRODUCT,
   getSeatCoreModules,
+  getSeatPlatformModules,
   getSeatProductModules,
 } from "../../config/seatPlatform";
 
@@ -72,6 +77,9 @@ const MODULE_ICONS = {
   approvals: FileCheck2,
   team: UserCog,
   inventory: PackageOpen,
+  plan_usage: CreditCard,
+  settings: Settings,
+  support: LifeBuoy,
   candidate: Vote,
   volunteers: Users,
   fundraising: CircleDollarSign,
@@ -87,6 +95,9 @@ const MODULE_COUNTS = {
   waiting_on: 3,
   approvals: 3,
 };
+
+const SIDEBAR_SCROLL_STORAGE_KEY =
+  "campaign-seat:workspace-sidebar-scroll";
 
 function createNavigation(
   modules,
@@ -119,12 +130,31 @@ const CAMPAIGN_TOOLS =
     ),
   );
 
+
+const PLATFORM_TOOLS =
+  createNavigation(
+    getSeatPlatformModules()
+      .filter(
+        (module) =>
+          [
+            "plan_usage",
+            "settings",
+            "support",
+          ].includes(
+            module.key,
+          ),
+      ),
+  );
+
 export function CampaignWorkspaceShell({
   activeItem,
   children,
 }) {
   const navigate = useNavigate();
   const location = useLocation();
+
+  const sidebarNavigationRef =
+    useRef(null);
 
   // SYSTEM RESPONSIVE DRAWER STATE — START
   const [
@@ -387,7 +417,85 @@ export function CampaignWorkspaceShell({
     [],
   );
 
+  useEffect(() => {
+    const frameId =
+      window.requestAnimationFrame(
+        () => {
+          const navigation =
+            sidebarNavigationRef.current;
+
+          if (!navigation) {
+            return;
+          }
+
+          try {
+            const stored =
+              window.sessionStorage.getItem(
+                SIDEBAR_SCROLL_STORAGE_KEY,
+              );
+
+            const scrollTop =
+              Number(stored);
+
+            if (
+              Number.isFinite(scrollTop) &&
+              scrollTop >= 0
+            ) {
+              navigation.scrollTop =
+                scrollTop;
+            }
+          } catch {
+            // Sidebar persistence is optional.
+          }
+        },
+      );
+
+    return () =>
+      window.cancelAnimationFrame(
+        frameId,
+      );
+  }, []);
+
+  const rememberSidebarScroll =
+    () => {
+      const navigation =
+        sidebarNavigationRef.current;
+
+      if (!navigation) {
+        return;
+      }
+
+      try {
+        window.sessionStorage.setItem(
+          SIDEBAR_SCROLL_STORAGE_KEY,
+          String(
+            navigation.scrollTop,
+          ),
+        );
+      } catch {
+        // Navigation remains available without session storage.
+      }
+    };
+
   const openRoute = (route) => {
+    rememberSidebarScroll();
+
+    if (route === "/support") {
+      const currentLocation = [
+        location.pathname,
+        location.search,
+        location.hash,
+      ].join("");
+
+      navigate(
+        `/support?from=${encodeURIComponent(
+          currentLocation,
+        )}`,
+      );
+
+      return;
+    }
+
     navigate(route);
   };
 
@@ -533,8 +641,12 @@ export function CampaignWorkspaceShell({
         {/* LOCKED WORKSPACE SWITCHER — END */}
 
         <nav
+          ref={sidebarNavigationRef}
           className={
             dashboardStyles.sidebarNavigation
+          }
+          onScroll={
+            rememberSidebarScroll
           }
         >
           {renderNavigation(
@@ -551,6 +663,18 @@ export function CampaignWorkspaceShell({
 
           {renderNavigation(
             CAMPAIGN_TOOLS,
+          )}
+
+          <span
+            className={
+              dashboardStyles.navigationLabel
+            }
+          >
+            Platform
+          </span>
+
+          {renderNavigation(
+            PLATFORM_TOOLS,
           )}
 
           <span

@@ -110,11 +110,23 @@ function getSafeReturnPath(search) {
 
 function getReturnLabel(returnPath) {
   if (returnPath === "/") {
-    return "Back to sign in";
+    return "Back to login";
   }
 
   if (returnPath.startsWith("/workspaces")) {
     return "Back to workspaces";
+  }
+
+  if (returnPath.startsWith("/workspace/usage")) {
+    return "Back to Plan & Usage";
+  }
+
+  if (returnPath.startsWith("/workspace/settings")) {
+    return "Back to Settings";
+  }
+
+  if (returnPath.startsWith("/inventory")) {
+    return "Back to Inventory";
   }
 
   return "Back to Campaign HQ";

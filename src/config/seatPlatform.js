@@ -215,6 +215,10 @@ export function getSeatCoreModules() {
   return [...SEAT_CORE_MODULES];
 }
 
+export function getSeatPlatformModules() {
+  return [...SEAT_PLATFORM_MODULES];
+}
+
 export function getSeatProductModules(
   product = ACTIVE_SEAT_PRODUCT,
 ) {

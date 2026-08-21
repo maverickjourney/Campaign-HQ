@@ -1,0 +1,370 @@
+.notice {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 15px 17px;
+  border: 1px solid rgba(25, 72, 120, 0.14);
+  border-radius: 16px;
+  background: rgba(244, 248, 252, 0.92);
+  color: #17314d;
+}
+
+.notice > svg {
+  flex: 0 0 auto;
+  margin-top: 2px;
+}
+
+.notice div {
+  display: grid;
+  gap: 3px;
+}
+
+.notice strong {
+  font-size: 0.88rem;
+  font-weight: 850;
+}
+
+.notice span {
+  color: #607289;
+  font-size: 0.8rem;
+  line-height: 1.5;
+}
+
+.refreshButton {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 0 15px;
+  border: 1px solid #d5dde7;
+  border-radius: 12px;
+  background: #fff;
+  color: #18324e;
+  font: inherit;
+  font-size: 0.84rem;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.refreshButton:hover {
+  border-color: #aebbc9;
+  background: #f8fafc;
+}
+
+.refreshButton:disabled {
+  cursor: wait;
+  opacity: 0.65;
+}
+
+.spinning {
+  animation: spin 0.9s linear infinite;
+}
+
+.overviewGrid {
+  display: grid;
+  grid-template-columns:
+    repeat(4, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.overviewCard {
+  position: relative;
+  display: flex;
+  min-width: 0;
+  min-height: 142px;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+  padding: 18px;
+  border: 1px solid #e1e7ee;
+  border-radius: 16px;
+  background: #fff;
+  box-shadow:
+    0 8px 28px rgba(21, 43, 66, 0.035);
+}
+
+.overviewCard > svg {
+  margin-bottom: 5px;
+  color: #315b86;
+}
+
+.overviewCard > span {
+  color: #78899c;
+  font-size: 0.75rem;
+  font-weight: 750;
+}
+
+.overviewCard > strong {
+  max-width: 100%;
+  overflow: hidden;
+  color: #142b43;
+  font-size: 1.08rem;
+  font-weight: 900;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.overviewCard small {
+  color: #718195;
+  font-size: 0.72rem;
+  line-height: 1.4;
+}
+
+.overviewCard em {
+  display: inline-flex;
+  min-height: 24px;
+  align-items: center;
+  margin-top: 2px;
+  padding: 0 9px;
+  border-radius: 999px;
+  background: #eef2f6;
+  color: #53657a;
+  font-size: 0.69rem;
+  font-style: normal;
+  font-weight: 850;
+}
+
+.overviewCard em[data-tone="good"] {
+  background: #eaf7ef;
+  color: #267347;
+}
+
+.overviewCard em[data-tone="warning"] {
+  background: #fff2dd;
+  color: #936111;
+}
+
+.usageGrid {
+  display: grid;
+  grid-template-columns:
+    repeat(4, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.usageCard {
+  display: flex;
+  min-width: 0;
+  min-height: 170px;
+  flex-direction: column;
+  padding: 17px;
+  border: 1px solid #e2e7ed;
+  border-radius: 15px;
+  background: #fff;
+}
+
+.usageCardHeader {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  color: #5b6f85;
+  font-size: 0.77rem;
+  font-weight: 800;
+}
+
+.usageIcon {
+  display: inline-flex;
+  width: 34px;
+  height: 34px;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  background: #f0f4f8;
+  color: #315c88;
+}
+
+.usageValues {
+  display: grid;
+  gap: 2px;
+  margin-top: 17px;
+}
+
+.usageValues strong {
+  color: #142b43;
+  font-size: 1.25rem;
+  font-weight: 900;
+}
+
+.usageValues span {
+  color: #8a98a8;
+  font-size: 0.72rem;
+}
+
+.meterTrack {
+  height: 7px;
+  margin-top: 15px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: #edf1f5;
+}
+
+.meterTrack span {
+  display: block;
+  height: 100%;
+  min-width: 0;
+  border-radius: inherit;
+  background:
+    linear-gradient(
+      90deg,
+      #183e67,
+      #4f7ead
+    );
+}
+
+.usageCard small {
+  margin-top: auto;
+  padding-top: 11px;
+  color: #8492a3;
+  font-size: 0.67rem;
+  line-height: 1.4;
+}
+
+.detailGrid {
+  display: grid;
+  grid-template-columns:
+    minmax(0, 0.85fr)
+    minmax(0, 1.15fr);
+  gap: 16px;
+}
+
+.statList {
+  display: grid;
+  grid-template-columns:
+    repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.statList > div,
+.subscriptionDetails > div {
+  display: grid;
+  min-width: 0;
+  gap: 4px;
+  padding: 14px;
+  border: 1px solid #e5e9ee;
+  border-radius: 12px;
+  background: #fafbfd;
+}
+
+.statList span,
+.subscriptionDetails span {
+  color: #8290a0;
+  font-size: 0.69rem;
+  font-weight: 750;
+}
+
+.statList strong,
+.subscriptionDetails strong {
+  overflow: hidden;
+  color: #1a3149;
+  font-size: 0.9rem;
+  font-weight: 850;
+  text-overflow: ellipsis;
+}
+
+.subscriptionDetails {
+  display: grid;
+  grid-template-columns:
+    repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.pricingNote {
+  grid-column: 1 / -1;
+  margin: 2px 0 0;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: #fff7e8;
+  color: #795927;
+  font-size: 0.73rem;
+  line-height: 1.5;
+}
+
+.restricted {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 18px;
+  border: 1px dashed #ccd5df;
+  border-radius: 14px;
+  background: #fafbfd;
+  color: #40566d;
+}
+
+.restricted > svg {
+  flex: 0 0 auto;
+  color: #607b98;
+}
+
+.restricted div {
+  display: grid;
+  gap: 5px;
+}
+
+.restricted strong {
+  color: #243b52;
+  font-size: 0.85rem;
+}
+
+.restricted span {
+  color: #728396;
+  font-size: 0.76rem;
+  line-height: 1.5;
+}
+
+.updated {
+  margin: -4px 0 0;
+  color: #8b98a7;
+  font-size: 0.69rem;
+  text-align: right;
+}
+
+@media (max-width: 1180px) {
+  .overviewGrid,
+  .usageGrid {
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 900px) {
+  .detailGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 620px) {
+  .notice {
+    padding: 14px;
+    border-radius: 14px;
+  }
+
+  .overviewGrid,
+  .usageGrid,
+  .statList,
+  .subscriptionDetails {
+    grid-template-columns: 1fr;
+  }
+
+  .overviewCard {
+    min-height: 126px;
+  }
+
+  .usageCard {
+    min-height: 158px;
+  }
+
+  .refreshButton {
+    width: 100%;
+  }
+
+  .updated {
+    text-align: left;
+  }
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

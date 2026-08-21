@@ -226,3 +226,20 @@
 }
 
 /* HIDE SUPPORT DURING INVENTORY MODALS — END */
+
+/* HIDE FLOATING SUPPORT INSIDE WORKSPACE SHELL — START */
+
+/*
+ * Seat workspace pages expose Support in Platform navigation.
+ * Keep the floating launcher for non-workspace surfaces only.
+ */
+:global(
+  body:has(
+    [data-shared-workspace-region="true"]
+  )
+)
+.launcher {
+  display: none !important;
+}
+
+/* HIDE FLOATING SUPPORT INSIDE WORKSPACE SHELL — END */
