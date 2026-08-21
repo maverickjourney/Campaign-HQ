@@ -262,7 +262,16 @@ using (
   status = 'active'
 );
 
--- Demo entitlements only. These are not final commercial prices.
+-- Campaign Seat entitlement profiles.
+--
+-- founding_pilot matches the existing live subscription
+-- foundation and remains the default/current workspace plan.
+--
+-- beta_demo is retained as an optional internal/demo plan.
+--
+-- Commercial pricing and final limits are intentionally
+-- not finalized by this migration.
+
 insert into public.campaign_seat_plan_catalog (
   plan_key,
   display_name,
@@ -280,32 +289,59 @@ insert into public.campaign_seat_plan_catalog (
   inventory_item_limit,
   metadata
 )
-values (
-  'beta_demo',
-  'Campaign Seat Demo',
-  'active',
-  null,
-  null,
-  10000,
-  5000000,
-  1000000,
-  5000,
-  1000,
-  10000,
-  10737418240,
-  20,
-  1000,
-  jsonb_build_object(
-    'commercial_pricing_finalized',
-    false,
-    'purpose',
-    'Patrick demo and beta entitlement foundation'
+values
+  (
+    'founding_pilot',
+    'Founding Pilot',
+    'active',
+    null,
+    null,
+    10000,
+    5000000,
+    1000000,
+    5000,
+    1000,
+    10000,
+    10737418240,
+    20,
+    1000,
+    jsonb_build_object(
+      'commercial_pricing_finalized',
+      false,
+      'purpose',
+      'Founding pilot entitlement foundation'
+    )
+  ),
+  (
+    'beta_demo',
+    'Campaign Seat Demo',
+    'active',
+    null,
+    null,
+    10000,
+    5000000,
+    1000000,
+    5000,
+    1000,
+    10000,
+    10737418240,
+    20,
+    1000,
+    jsonb_build_object(
+      'commercial_pricing_finalized',
+      false,
+      'purpose',
+      'Internal beta and product demonstration'
+    )
   )
-)
 on conflict (plan_key)
 do update set
-  display_name = excluded.display_name,
-  ai_credit_limit = excluded.ai_credit_limit,
+  display_name =
+    excluded.display_name,
+  status =
+    excluded.status,
+  ai_credit_limit =
+    excluded.ai_credit_limit,
   ai_input_token_soft_limit =
     excluded.ai_input_token_soft_limit,
   ai_output_token_soft_limit =
@@ -322,11 +358,26 @@ do update set
     excluded.member_seat_limit,
   inventory_item_limit =
     excluded.inventory_item_limit,
-  metadata = excluded.metadata,
-  updated_at = now();
+  metadata =
+    excluded.metadata,
+  updated_at =
+    now();
 
 -- ============================================================
 -- WORKSPACE SUBSCRIPTION
+--
+-- IMPORTANT:
+-- workspace_subscriptions already exists in production and is
+-- authoritative for seat/account limits and billing state.
+--
+-- Existing canonical states:
+--   trial
+--   active
+--   past_due
+--   suspended
+--   cancelled
+--
+-- Existing workspaces and plan assignments are preserved.
 -- ============================================================
 
 create table if not exists
@@ -336,26 +387,23 @@ public.workspace_subscriptions (
     on delete cascade,
 
   plan_key text not null
-    references public.campaign_seat_plan_catalog(plan_key),
+    default 'founding_pilot',
 
   status text not null
-    default 'demo',
+    default 'active',
 
-  billing_period_start timestamptz,
+  command_seat_limit integer,
 
-  billing_period_end timestamptz,
+  staff_seat_limit integer,
 
-  trial_ends_at timestamptz,
+  volunteer_account_limit integer,
 
-  external_customer_id text,
+  reviewer_account_limit integer,
 
-  external_subscription_id text,
+  starts_at timestamptz not null
+    default now(),
 
-  entitlement_overrides jsonb not null
-    default '{}'::jsonb,
-
-  metadata jsonb not null
-    default '{}'::jsonb,
+  renews_at timestamptz,
 
   created_at timestamptz not null
     default now(),
@@ -363,54 +411,138 @@ public.workspace_subscriptions (
   updated_at timestamptz not null
     default now(),
 
-  constraint workspace_subscriptions_status_check
+  constraint
+    workspace_subscriptions_command_seat_limit_check
+  check (
+    command_seat_limit is null
+    or command_seat_limit >= 1
+  ),
+
+  constraint
+    workspace_subscriptions_staff_seat_limit_check
+  check (
+    staff_seat_limit is null
+    or staff_seat_limit >= 0
+  ),
+
+  constraint
+    workspace_subscriptions_volunteer_account_limit_check
+  check (
+    volunteer_account_limit is null
+    or volunteer_account_limit >= 0
+  ),
+
+  constraint
+    workspace_subscriptions_reviewer_account_limit_check
+  check (
+    reviewer_account_limit is null
+    or reviewer_account_limit >= 0
+  ),
+
+  constraint
+    workspace_subscriptions_status_check
   check (
     status in (
-      'demo',
-      'trialing',
+      'trial',
       'active',
       'past_due',
-      'paused',
-      'canceled',
-      'incomplete'
+      'suspended',
+      'cancelled'
     )
-  ),
-
-  constraint workspace_subscriptions_override_object_check
-  check (
-    jsonb_typeof(entitlement_overrides) = 'object'
-  ),
-
-  constraint workspace_subscriptions_metadata_object_check
-  check (
-    jsonb_typeof(metadata) = 'object'
   )
 );
 
+-- Extend the existing subscription model without replacing
+-- or rewriting existing subscription records.
+
 alter table public.workspace_subscriptions
+add column if not exists
+  trial_ends_at timestamptz;
+
+alter table public.workspace_subscriptions
+add column if not exists
+  external_customer_id text;
+
+alter table public.workspace_subscriptions
+add column if not exists
+  external_subscription_id text;
+
+alter table public.workspace_subscriptions
+add column if not exists
+  entitlement_overrides jsonb
+  not null
+  default '{}'::jsonb;
+
+alter table public.workspace_subscriptions
+add column if not exists
+  metadata jsonb
+  not null
+  default '{}'::jsonb;
+
+alter table public.workspace_subscriptions
+drop constraint if exists
+  workspace_subscriptions_override_object_check;
+
+alter table public.workspace_subscriptions
+add constraint
+  workspace_subscriptions_override_object_check
+check (
+  jsonb_typeof(
+    entitlement_overrides
+  ) = 'object'
+);
+
+alter table public.workspace_subscriptions
+drop constraint if exists
+  workspace_subscriptions_metadata_object_check;
+
+alter table public.workspace_subscriptions
+add constraint
+  workspace_subscriptions_metadata_object_check
+check (
+  jsonb_typeof(metadata) = 'object'
+);
+
+alter table
+public.workspace_subscriptions
 enable row level security;
 
 revoke all
-on table public.workspace_subscriptions
+on table
+public.workspace_subscriptions
 from public, anon;
 
 grant select
-on table public.workspace_subscriptions
+on table
+public.workspace_subscriptions
 to authenticated;
+
+-- Never broaden subscription visibility to every workspace
+-- member. Preserve the existing Campaign Seat billing boundary.
 
 drop policy if exists
   "Workspace members can view subscription"
 on public.workspace_subscriptions;
 
+drop policy if exists
+  "Authorized users can view workspace subscriptions"
+on public.workspace_subscriptions;
+
 create policy
-  "Workspace members can view subscription"
+  "Authorized users can view workspace subscriptions"
 on public.workspace_subscriptions
 for select
 to authenticated
 using (
-  public.campaign_seat_workspace_member(
-    workspace_id
+  public.has_campaign_permission(
+    workspace_id,
+    'workspace.manage_billing'
   )
+  or public.has_campaign_permission(
+    workspace_id,
+    'workspace.manage_members'
+  )
+  or public.is_platform_staff()
 );
 
 -- ============================================================
@@ -1125,9 +1257,9 @@ begin
             'plan_key', subscription.plan_key,
             'status', subscription.status,
             'billing_period_start',
-              subscription.billing_period_start,
+              subscription.starts_at,
             'billing_period_end',
-              subscription.billing_period_end
+              subscription.renews_at
           )
           from public.workspace_subscriptions subscription
           where
@@ -1210,11 +1342,11 @@ begin
 
   select
     coalesce(
-      subscription.billing_period_start,
+      subscription.starts_at,
       date_trunc('month', now())
     ),
     coalesce(
-      subscription.billing_period_end,
+      subscription.renews_at,
       date_trunc('month', now()) +
       interval '1 month'
     )
@@ -1308,14 +1440,10 @@ set search_path = public, private, pg_temp
 as $campaign_seat$
 begin
   insert into public.workspace_subscriptions (
-    workspace_id,
-    plan_key,
-    status
+    workspace_id
   )
   values (
-    new.id,
-    'beta_demo',
-    'demo'
+    new.id
   )
   on conflict (workspace_id)
   do nothing;
@@ -1350,14 +1478,10 @@ execute function
   private.seed_campaign_intelligence_foundation();
 
 insert into public.workspace_subscriptions (
-  workspace_id,
-  plan_key,
-  status
+  workspace_id
 )
 select
-  workspace_record.id,
-  'beta_demo',
-  'demo'
+  workspace_record.id
 from public.workspaces workspace_record
 on conflict (workspace_id)
 do nothing;
