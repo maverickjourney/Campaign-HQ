@@ -23,6 +23,7 @@ import {
   Mail,
   MessageSquare,
   Plus,
+  PackageOpen,
   Target,
   UserCog,
   Users,
@@ -39,6 +40,12 @@ import {
 } from "../CampaignSearch/CampaignSearch";
 
 import {
+  ACTIVE_SEAT_PRODUCT,
+  getSeatCoreModules,
+  getSeatProductModules,
+} from "../../config/seatPlatform";
+
+import {
   supabase,
 } from "../../lib/supabase";
 
@@ -53,100 +60,64 @@ import dashboardStyles from "../../pages/DashboardReferencePreview/DashboardRefe
 
 import styles from "./CampaignWorkspaceShell.module.css";
 
-const PRIMARY_NAVIGATION = [
-  {
-    label: "HQ",
-    icon: LayoutDashboard,
-    route: "/dashboard",
-  },
-  {
-    label: "Inbox",
-    icon: Inbox,
-    route: "/inbox",
-    count: 8,
-  },
-  {
-    label: "Calendar",
-    icon: CalendarDays,
-    route: "/calendar",
-  },
-  {
-    label: "Tasks",
-    icon: CheckCircle2,
-    route: "/tasks",
-    count: 3,
-  },
-  {
-    label: "Commitments",
-    icon: Target,
-    route: "/commitments",
-  },
-  {
-    label: "Waiting On",
-    icon: Clock3,
-    route: "/waiting-on",
-    count: 3,
-  },
-  {
-    label: "Contacts",
-    icon: Users,
-    route: "/contacts",
-  },
-  {
-    label: "Documents",
-    icon: Files,
-    route: "/files",
-  },
-  {
-    label: "Approvals",
-    icon: FileCheck2,
-    route: "/approvals",
-    count: 3,
-  },
-  {
-    label: "Team",
-    icon: UserCog,
-    route: "/team",
-  },
-  {
-    label: "Candidate",
-    icon: Vote,
-    route: "/workspace/candidate-profile",
-  },
-];
+const MODULE_ICONS = {
+  dashboard: LayoutDashboard,
+  inbox: Inbox,
+  calendar: CalendarDays,
+  tasks: CheckCircle2,
+  commitments: Target,
+  waiting_on: Clock3,
+  contacts: Users,
+  documents: Files,
+  approvals: FileCheck2,
+  team: UserCog,
+  inventory: PackageOpen,
+  candidate: Vote,
+  volunteers: Users,
+  fundraising: CircleDollarSign,
+  events: CalendarDays,
+  social_media: MessageSquare,
+  media_center: FolderKanban,
+  reports_analytics: BarChart3,
+};
 
-const CAMPAIGN_TOOLS = [
-  {
-    label: "Volunteers",
-    icon: Users,
-    route: "/volunteers",
-  },
-  {
-    label: "Fundraising",
-    icon: CircleDollarSign,
-    route: "/fundraising",
-  },
-  {
-    label: "Events",
-    icon: CalendarDays,
-    route: "/events",
-  },
-  {
-    label: "Social Media",
-    icon: MessageSquare,
-    route: "/social-media",
-  },
-  {
-    label: "Media Center",
-    icon: FolderKanban,
-    route: "/media-center",
-  },
-  {
-    label: "Reports & Analytics",
-    icon: BarChart3,
-    route: "/reports-analytics",
-  },
-];
+const MODULE_COUNTS = {
+  inbox: 8,
+  tasks: 3,
+  waiting_on: 3,
+  approvals: 3,
+};
+
+function createNavigation(
+  modules,
+) {
+  return modules.map(
+    (module) => ({
+      ...module,
+      icon:
+        MODULE_ICONS[
+          module.key
+        ] ||
+        LayoutDashboard,
+      count:
+        MODULE_COUNTS[
+          module.key
+        ],
+    }),
+  );
+}
+
+const PRIMARY_NAVIGATION =
+  createNavigation(
+    getSeatCoreModules(),
+  );
+
+const CAMPAIGN_TOOLS =
+  createNavigation(
+    getSeatProductModules(
+      ACTIVE_SEAT_PRODUCT,
+    ),
+  );
 
 export function CampaignWorkspaceShell({
   activeItem,
@@ -162,7 +133,9 @@ export function CampaignWorkspaceShell({
   ] = useState(false);
 
   useEffect(() => {
-    setSharedSidebarOpen(false);
+    queueMicrotask(() => {
+      setSharedSidebarOpen(false);
+    });
   }, [location.pathname]);
 
   useEffect(() => {
@@ -573,7 +546,7 @@ export function CampaignWorkspaceShell({
               dashboardStyles.navigationLabel
             }
           >
-            Campaign tools
+            {ACTIVE_SEAT_PRODUCT.toolGroupLabel}
           </span>
 
           {renderNavigation(

@@ -14,6 +14,7 @@ import CampaignToolComingSoon from "./pages/CampaignToolComingSoon/CampaignToolC
 import InboxReferencePreview from "./pages/InboxReferencePreview/InboxReferencePreview";
 import ContactsReferencePreview from "./pages/ContactsReferencePreview/ContactsReferencePreview";
 import DocumentsReferencePreview from "./pages/DocumentsReferencePreview/DocumentsReferencePreview";
+import Inventory from "./pages/Inventory/Inventory";
 import VolunteerFieldAssignment from "./pages/VolunteerFieldAssignment/VolunteerFieldAssignment";
 import FieldOperations from "./pages/FieldOperations/FieldOperations";
 import Login from "./pages/Login/Login";
@@ -282,6 +283,15 @@ export default function Router() {
           element={
             <ProtectedRoute allowedExperiences={LEADERSHIP_EXPERIENCES}>
               <DocumentsReferencePreview />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/inventory"
+          element={
+            <ProtectedRoute allowedExperiences={LEADERSHIP_EXPERIENCES}>
+              <Inventory />
             </ProtectedRoute>
           }
         />
