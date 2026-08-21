@@ -1510,3 +1510,31 @@
     right: 10px !important;
   }
 }
+
+/* =========================================================
+   CAMPAIGN SEAT — LOGIN HERO HEADER COLLISION FIX
+   Keeps the platform label inside the brand header and
+   prevents the hero eyebrow from sliding underneath it.
+   Desktop only; tablet/mobile layouts remain untouched.
+   ========================================================= */
+
+@media (min-width: 1181px) {
+  .header {
+    min-height: 100px;
+  }
+
+  .content {
+    margin-top:
+      clamp(16px, 2.2vh, 28px);
+  }
+}
+
+@media (min-width: 1181px) and (max-height: 820px) {
+  .header {
+    min-height: 76px !important;
+  }
+
+  .content {
+    margin-top: 14px !important;
+  }
+}
