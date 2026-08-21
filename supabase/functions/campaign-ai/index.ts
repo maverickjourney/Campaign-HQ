@@ -1091,7 +1091,7 @@ Deno.serve(
       );
     }
 
-    const answer =
+    let answer =
       extractResponseText(
         providerPayload,
       );
@@ -1110,10 +1110,328 @@ Deno.serve(
       );
     }
 
-    const citedSourceKeys =
+    /*
+     * Meter the total provider work for this logical
+     * Campaign AI request. A citation repair, when needed,
+     * is a second provider call but remains one user request.
+     */
+    let inputTokens =
+      usageNumber(
+        providerPayload.usage,
+        "input_tokens",
+      );
+
+    let outputTokens =
+      usageNumber(
+        providerPayload.usage,
+        "output_tokens",
+      );
+
+    const providerRequestIds:
+      string[] = [];
+
+    const initialProviderRequestId =
+      clean(
+        providerPayload.id,
+      );
+
+    if (
+      initialProviderRequestId
+    ) {
+      providerRequestIds.push(
+        initialProviderRequestId,
+      );
+    }
+
+    let providerCallCount = 1;
+
+    let citationRepairAttempted =
+      false;
+
+    let citedSourceKeys =
       extractCitedSourceKeys(
         answer,
       );
+
+    /*
+     * Some correct answers legitimately need no campaign
+     * citation: explicit unsupported-information answers
+     * and truthful capability/write-action safety answers.
+     *
+     * Keep these exceptions deliberately narrow so ordinary
+     * workspace facts still fail closed if citation repair
+     * cannot produce a valid source.
+     */
+    const allowsSourceFreeAnswer =
+      (
+        value: string,
+      ) => {
+        const normalized =
+          clean(
+            value,
+          ).toLowerCase();
+
+        if (!normalized) {
+          return false;
+        }
+
+        const missingInformation =
+          (
+            normalized.includes(
+              "campaign seat",
+            ) ||
+            normalized.includes(
+              "supplied records",
+            ) ||
+            normalized.includes(
+              "available records",
+            )
+          ) &&
+          (
+            /\bnot (?:available|present|provided|included|found|listed|recorded)\b/.test(
+              normalized,
+            ) ||
+            /\bno (?:information|record|records|data)\b/.test(
+              normalized,
+            ) ||
+            /\b(?:does not|doesn't|do not|don't) (?:contain|include|provide|show|list)\b/.test(
+              normalized,
+            )
+          );
+
+        const capabilitySafety =
+          /\bi (?:did not|didn't|have not|haven't|cannot|can't) (?:send|modify|update|delete|create|schedule|approve|perform|execute|authorize|claim)\b/.test(
+            normalized,
+          ) ||
+          /\bno .*\b(?:was|were) (?:sent|modified|updated|deleted|created|scheduled|approved|performed|executed)\b/.test(
+            normalized,
+          ) ||
+          /\bwrite actions? (?:are|remain|is) (?:disabled|off|not enabled)\b/.test(
+            normalized,
+          );
+
+        return (
+          missingInformation ||
+          capabilitySafety
+        );
+      };
+
+    const citationRequiredForAnswer =
+      settings
+        .require_source_citations !==
+        false &&
+      providerSources.length > 0 &&
+      citedSourceKeys.size === 0 &&
+      !allowsSourceFreeAnswer(
+        answer,
+      );
+
+    if (
+      citationRequiredForAnswer
+    ) {
+      citationRepairAttempted =
+        true;
+
+      const repairInstructions =
+        [
+          instructions,
+
+          "",
+
+          "CITATION REPAIR — REQUIRED:",
+
+          "The previous draft omitted a required Campaign Seat source citation.",
+
+          "Answer the user's question again using the same supplied Campaign Seat records.",
+
+          "Every factual claim derived from Campaign Seat records must include at least one valid inline source key such as [S1].",
+
+          "Use only source keys actually supplied in the Campaign Seat context. Never invent a citation.",
+
+          "If the supplied records do not support the requested fact, say that the information is not available rather than guessing.",
+        ].join("\n");
+
+      let repairResponse:
+        Response;
+
+      try {
+        repairResponse =
+          await fetch(
+            "https://api.openai.com/v1/responses",
+            {
+              method:
+                "POST",
+
+              headers: {
+                "Authorization":
+                  `Bearer ${openaiApiKey}`,
+
+                "Content-Type":
+                  "application/json",
+              },
+
+              body:
+                JSON.stringify({
+                  model,
+
+                  instructions:
+                    repairInstructions,
+
+                  input:
+                    providerInput,
+
+                  store:
+                    false,
+
+                  max_output_tokens:
+                    clampInteger(
+                      body.maxOutputTokens,
+                      900,
+                      200,
+                      1800,
+                    ),
+                }),
+            },
+          );
+      } catch {
+        return jsonResponse(
+          request,
+          502,
+          {
+            error:
+              "Campaign HQ could not complete citation repair.",
+
+            code:
+              "citation_repair_provider_unreachable",
+
+            provider:
+              "openai",
+          },
+        );
+      }
+
+      let repairPayload:
+        Record<
+          string,
+          unknown
+        > = {};
+
+      try {
+        repairPayload =
+          await repairResponse
+            .json();
+      } catch {
+        // Repair failure handled below.
+      }
+
+      if (
+        !repairResponse.ok
+      ) {
+        return jsonResponse(
+          request,
+          502,
+          {
+            error:
+              "The AI provider rejected Campaign HQ citation repair.",
+
+            code:
+              "citation_repair_provider_rejected",
+
+            provider:
+              "openai",
+
+            providerStatus:
+              repairResponse.status,
+          },
+        );
+      }
+
+      const repairedAnswer =
+        extractResponseText(
+          repairPayload,
+        );
+
+      if (!repairedAnswer) {
+        return jsonResponse(
+          request,
+          502,
+          {
+            error:
+              "The AI provider returned no usable citation-repaired answer.",
+
+            code:
+              "citation_repair_empty_answer",
+
+            provider:
+              "openai",
+          },
+        );
+      }
+
+      providerCallCount += 1;
+
+      const repairProviderRequestId =
+        clean(
+          repairPayload.id,
+        );
+
+      if (
+        repairProviderRequestId
+      ) {
+        providerRequestIds.push(
+          repairProviderRequestId,
+        );
+      }
+
+      inputTokens +=
+        usageNumber(
+          repairPayload.usage,
+          "input_tokens",
+        );
+
+      outputTokens +=
+        usageNumber(
+          repairPayload.usage,
+          "output_tokens",
+        );
+
+      const repairedCitedSourceKeys =
+        extractCitedSourceKeys(
+          repairedAnswer,
+        );
+
+      /*
+       * This path was entered because the initial answer
+       * appeared record-grounded. The repair must therefore
+       * produce an actual citation; otherwise fail closed and
+       * let the frontend deterministic search fallback handle it.
+       */
+      if (
+        repairedCitedSourceKeys
+          .size === 0
+      ) {
+        return jsonResponse(
+          request,
+          502,
+          {
+            error:
+              "The AI provider returned a factual Campaign Seat answer without a required source citation after repair.",
+
+            code:
+              "required_source_citation_missing",
+          },
+        );
+      }
+
+      providerPayload =
+        repairPayload;
+
+      answer =
+        repairedAnswer;
+
+      citedSourceKeys =
+        repairedCitedSourceKeys;
+    }
 
     const providerSourceKeys =
       new Set(
@@ -1161,18 +1479,6 @@ Deno.serve(
           ),
       );
 
-    const inputTokens =
-      usageNumber(
-        providerPayload.usage,
-        "input_tokens",
-      );
-
-    const outputTokens =
-      usageNumber(
-        providerPayload.usage,
-        "output_tokens",
-      );
-
     const adminClient =
       createClient(
         supabaseUrl,
@@ -1209,6 +1515,20 @@ Deno.serve(
 
       cited_source_count:
         citedSources.length,
+
+      provider_call_count:
+        providerCallCount,
+
+      provider_request_ids:
+        providerRequestIds,
+
+      citation_repair_attempted:
+        citationRepairAttempted,
+
+      citation_repair_succeeded:
+        citationRepairAttempted
+          ? citedSources.length > 0
+          : false,
     };
 
     const usageRows:
