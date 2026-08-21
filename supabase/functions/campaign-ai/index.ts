@@ -972,7 +972,11 @@ Deno.serve(
 
       "If supplied Campaign Seat records do not support a factual answer, say what information is missing instead of guessing.",
 
-      "Cite record-based claims inline using only supplied source keys such as [S1] and [S2].",
+      "Cite every factual claim derived from Campaign Seat records inline using only supplied source keys such as [S1] and [S2].",
+
+      "If Campaign Seat records do not contain the requested information, clearly say that the information is not available in the supplied records rather than guessing. Cite the closest relevant record only when it materially supports that explanation.",
+
+      "Questions about your own capabilities, safety rules, or whether you performed an action do not require an artificial Campaign Seat citation. Answer those truthfully without inventing a source.",
 
       "Never claim that you sent a message, modified a record, scheduled an event, approved something, or performed another write action.",
 
@@ -1156,26 +1160,6 @@ Deno.serve(
             ),
           ),
       );
-
-    if (
-      settings
-        .require_source_citations !==
-          false &&
-      providerSources.length > 0 &&
-      citedSources.length === 0
-    ) {
-      return jsonResponse(
-        request,
-        502,
-        {
-          error:
-            "The AI provider returned an answer without required Campaign Seat citations.",
-
-          code:
-            "required_source_citation_missing",
-        },
-      );
-    }
 
     const inputTokens =
       usageNumber(
