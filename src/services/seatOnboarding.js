@@ -249,6 +249,7 @@ export async function loadMySeatOnboarding() {
 
 export async function resendSeatVerificationEmail(
   email,
+  captchaToken,
 ) {
   const normalizedEmail =
     normalizeEmail(
@@ -273,6 +274,8 @@ export async function resendSeatVerificationEmail(
           normalizedEmail,
 
         options: {
+          captchaToken,
+
           emailRedirectTo:
             `${window.location.origin}/onboarding/continue`,
         },

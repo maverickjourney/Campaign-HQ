@@ -213,6 +213,18 @@ export default function SeatOnboardingSignIn() {
         return;
       }
 
+      if (!captchaToken) {
+        setResendState(
+          "error",
+        );
+
+        setResendMessage(
+          "Wait for the browser security check to finish before resending.",
+        );
+
+        return;
+      }
+
       setResendState(
         "sending",
       );
@@ -224,7 +236,13 @@ export default function SeatOnboardingSignIn() {
       try {
         await resendSeatVerificationEmail(
           normalized,
+          captchaToken,
         );
+
+        setCaptchaToken("");
+
+        turnstileRef
+          .current?.reset();
 
         setResendState(
           "sent",
@@ -243,6 +261,11 @@ export default function SeatOnboardingSignIn() {
           60000,
         );
       } catch (resendError) {
+        setCaptchaToken("");
+
+        turnstileRef
+          .current?.reset();
+
         setResendState(
           "error",
         );

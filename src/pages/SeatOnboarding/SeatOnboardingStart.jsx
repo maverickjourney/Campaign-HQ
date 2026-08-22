@@ -319,6 +319,18 @@ export default function SeatOnboardingStart() {
         return;
       }
 
+      if (!captchaToken) {
+        setResendState(
+          "error",
+        );
+
+        setResendMessage(
+          "Wait for the browser security check to finish before resending.",
+        );
+
+        return;
+      }
+
       setResendState(
         "sending",
       );
@@ -330,7 +342,13 @@ export default function SeatOnboardingStart() {
       try {
         await resendSeatVerificationEmail(
           invitation.email,
+          captchaToken,
         );
+
+        setCaptchaToken("");
+
+        turnstileRef
+          .current?.reset();
 
         setResendState(
           "sent",
@@ -349,6 +367,11 @@ export default function SeatOnboardingStart() {
           60000,
         );
       } catch (resendError) {
+        setCaptchaToken("");
+
+        turnstileRef
+          .current?.reset();
+
         setResendState(
           "error",
         );
@@ -462,6 +485,14 @@ export default function SeatOnboardingStart() {
             </strong>
             . Open the verification email and follow the secure link to continue onboarding.
           </p>
+
+          <TurnstileChallenge
+            ref={turnstileRef}
+            action="campaign_auth"
+            onTokenChange={
+              setCaptchaToken
+            }
+          />
 
           <button
             className={styles.resendButton}
