@@ -180,3 +180,336 @@
   font-weight: 800;
   color: #65758b;
 }
+
+/* ============================================================
+   SEAT PLATFORM ADMIN — BUSINESS WORKSPACE
+   ============================================================ */
+
+.primaryAction {
+  min-height: 42px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 0 15px;
+  border: 0;
+  border-radius: 10px;
+  background: #102d52;
+  color: #fff;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 800;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.primaryAction:disabled {
+  opacity: .55;
+  cursor: not-allowed;
+}
+
+.metricGrid {
+  max-width: 1240px;
+  margin: 0 auto 20px;
+  display: grid;
+  grid-template-columns:
+    repeat(4, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.metricGrid article {
+  min-height: 125px;
+  display: grid;
+  align-content: space-between;
+  padding: 18px;
+  border: 1px solid #dce3ec;
+  border-radius: 14px;
+  background: #fff;
+}
+
+.metricGrid strong {
+  margin-top: 12px;
+  font-size: 30px;
+}
+
+.metricGrid span {
+  color: #65758b;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.adminPanel {
+  max-width: 1240px;
+  margin: 0 auto 16px;
+  padding: 22px;
+  border: 1px solid #dce3ec;
+  border-radius: 15px;
+  background: #fff;
+}
+
+.adminPanel h2 {
+  margin: 0 0 17px;
+  font-size: 19px;
+}
+
+.productGrid {
+  display: grid;
+  grid-template-columns:
+    repeat(auto-fit, minmax(200px, 1fr));
+  gap: 10px;
+}
+
+.productGrid article {
+  display: grid;
+  gap: 5px;
+  padding: 15px;
+  border: 1px solid #e1e6ed;
+  border-radius: 10px;
+  background: #f8fafc;
+}
+
+.productGrid span {
+  color: #65758b;
+  font-size: 13px;
+}
+
+.productGrid small {
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.adminError {
+  max-width: 1240px;
+  margin: 0 auto 14px;
+  padding: 12px 14px;
+  border: 1px solid #f0c3c3;
+  border-radius: 10px;
+  background: #fff3f3;
+  color: #a61b1b;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.customerToolbar {
+  display: flex;
+  justify-content: space-between;
+  gap: 15px;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.searchBox {
+  width: min(480px, 100%);
+  min-height: 42px;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 0 12px;
+  border: 1px solid #ccd6e2;
+  border-radius: 9px;
+}
+
+.searchBox input {
+  width: 100%;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  font: inherit;
+}
+
+.customerToolbar > span {
+  color: #65758b;
+  font-size: 13px;
+}
+
+.customerList {
+  display: grid;
+  gap: 9px;
+}
+
+.customerCard {
+  display: grid;
+  grid-template-columns:
+    1.3fr 1.2fr .8fr 1fr;
+  gap: 14px;
+  padding: 15px;
+  border: 1px solid #e1e6ed;
+  border-radius: 10px;
+}
+
+.customerCard > div {
+  min-width: 0;
+  display: grid;
+  gap: 4px;
+}
+
+.customerCard strong,
+.customerCard span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.customerCard strong {
+  font-size: 13px;
+}
+
+.customerCard span {
+  color: #65758b;
+  font-size: 12px;
+}
+
+.adminEmpty {
+  min-height: 220px;
+  display: grid;
+  place-items: center;
+  align-content: center;
+  gap: 8px;
+  color: #65758b;
+  text-align: center;
+  font-size: 13px;
+}
+
+.adminEmpty strong {
+  color: #10233f;
+  font-size: 16px;
+}
+
+.clientSetup {
+  max-width: 1000px;
+  margin: 0 auto;
+  display: grid;
+  gap: 14px;
+}
+
+.formGrid {
+  display: grid;
+  grid-template-columns:
+    repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.formGrid label {
+  display: grid;
+  gap: 7px;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.formGrid input,
+.formGrid select,
+.notes {
+  width: 100%;
+  min-height: 43px;
+  box-sizing: border-box;
+  padding: 0 11px;
+  border: 1px solid #cdd7e3;
+  border-radius: 9px;
+  background: #fff;
+  color: #10233f;
+  font: inherit;
+}
+
+.wide {
+  grid-column: 1 / -1;
+}
+
+.checkboxGrid {
+  display: grid;
+  grid-template-columns:
+    repeat(auto-fit, minmax(200px, 1fr));
+  gap: 9px;
+}
+
+.checkboxCard {
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+  padding: 13px;
+  border: 1px solid #dce3ec;
+  border-radius: 9px;
+  background: #fafbfd;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.checkboxCard input {
+  margin-top: 2px;
+}
+
+.notes {
+  min-height: 115px;
+  padding: 11px;
+  resize: vertical;
+}
+
+.saveBar {
+  position: sticky;
+  bottom: 12px;
+  display: flex;
+  justify-content: space-between;
+  gap: 18px;
+  align-items: center;
+  padding: 16px 18px;
+  border: 1px solid #ccd6e2;
+  border-radius: 12px;
+  background: rgba(255,255,255,.97);
+  box-shadow: 0 12px 30px rgba(16,35,63,.12);
+}
+
+.saveBar > div {
+  display: grid;
+  gap: 3px;
+}
+
+.saveBar strong {
+  font-size: 13px;
+}
+
+.saveBar span {
+  color: #65758b;
+  font-size: 12px;
+}
+
+.adminSuccess {
+  max-width: 650px;
+  margin: 50px auto;
+  display: grid;
+  justify-items: center;
+  gap: 10px;
+  padding: 38px;
+  border: 1px solid #dce3ec;
+  border-radius: 16px;
+  background: #fff;
+  text-align: center;
+}
+
+.adminSuccess svg {
+  color: #21875a;
+}
+
+.adminSuccess p {
+  color: #65758b;
+}
+
+@media (max-width: 850px) {
+  .metricGrid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .customerCard,
+  .formGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .wide {
+    grid-column: auto;
+  }
+
+  .saveBar {
+    position: static;
+    flex-direction: column;
+    align-items: stretch;
+  }
+}

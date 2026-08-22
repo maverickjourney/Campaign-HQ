@@ -43,6 +43,9 @@ import SupportLauncher from "./components/SupportLauncher/SupportLauncher";
 import PlatformAdminGuard from "./components/auth/PlatformAdminGuard/PlatformAdminGuard";
 import PlatformAdminLogin from "./pages/PlatformAdmin/PlatformAdminLogin";
 import PlatformAdminHome from "./pages/PlatformAdmin/PlatformAdminHome";
+import PlatformAdminCustomers from "./pages/PlatformAdmin/PlatformAdminCustomers";
+import PlatformAdminNewClient from "./pages/PlatformAdmin/PlatformAdminNewClient";
+
 
 
 const LEADERSHIP_EXPERIENCES = [
@@ -70,6 +73,24 @@ export default function Router() {
           element={
             <PlatformAdminGuard>
               <PlatformAdminHome />
+            </PlatformAdminGuard>
+          }
+        />
+
+        <Route
+          path="/admin/customers"
+          element={
+            <PlatformAdminGuard>
+              <PlatformAdminCustomers />
+            </PlatformAdminGuard>
+          }
+        />
+
+        <Route
+          path="/admin/customers/new"
+          element={
+            <PlatformAdminGuard>
+              <PlatformAdminNewClient />
             </PlatformAdminGuard>
           }
         />
