@@ -41,6 +41,91 @@ function money(
   );
 }
 
+
+function partitionProposalItems(
+  items = [],
+) {
+  return {
+    modules:
+      items.filter(
+        (item) =>
+          item.item_type ===
+          "module",
+      ),
+
+    integrations:
+      items.filter(
+        (item) =>
+          item.item_type ===
+          "integration",
+      ),
+
+    services:
+      items.filter(
+        (item) =>
+          [
+            "addon",
+            "migration",
+            "custom",
+          ].includes(
+            item.item_type,
+          ) ||
+          (
+            item.item_type ===
+              "service" &&
+            item.item_key !==
+              "onboarding_setup"
+          ),
+      ),
+
+    includedUsers:
+      items.find(
+        (item) =>
+          item.item_key ===
+          "included_users",
+      ) || null,
+  };
+}
+
+
+function proposalTermLabel(
+  proposal,
+) {
+  return proposal
+    ?.contract_term_months
+    ? `${proposal.contract_term_months} months`
+    : "Flexible";
+}
+
+
+function proposalValidityLabel(
+  proposal,
+) {
+  if (proposal?.valid_until) {
+    return new Intl.DateTimeFormat(
+      "en-US",
+      {
+        month: "short",
+        day: "numeric",
+        year: "numeric",
+      },
+    ).format(
+      new Date(
+        proposal.valid_until,
+      ),
+    );
+  }
+
+  const days =
+    proposal
+      ?.metadata
+      ?.proposal_valid_days ||
+    7;
+
+  return `${days} days after sending`;
+}
+
+
 export default function PlatformAdminProposalPreview() {
   const {
     proposalId,
@@ -183,6 +268,29 @@ export default function PlatformAdminProposalPreview() {
     );
   }
 
+  const groupedItems =
+    partitionProposalItems(
+      proposal.items,
+    );
+
+  const includedUsers =
+    proposal.metadata
+      ?.included_user_seats ??
+    groupedItems
+      .includedUsers
+      ?.quantity ??
+    "—";
+
+  const termLabel =
+    proposalTermLabel(
+      proposal,
+    );
+
+  const validityLabel =
+    proposalValidityLabel(
+      proposal,
+    );
+
   return (
     <PlatformAdminShell
       title="Proposal Preview"
@@ -253,9 +361,7 @@ export default function PlatformAdminProposalPreview() {
             </span>
 
             <strong>
-              {proposal.metadata
-                ?.included_user_seats ??
-                "—"}
+              {includedUsers}
             </strong>
           </div>
         </div>
@@ -265,43 +371,164 @@ export default function PlatformAdminProposalPreview() {
             ?.summary}
         </p>
 
-        <div className={styles.proposalItemList}>
-          {proposal.items.map(
-            (item) => (
-              <article
-                key={item.id}
-              >
-                <Check size={16} />
+        <div className={styles.proposalMetaGrid}>
+          <div>
+            <span>
+              Proposal
+            </span>
 
-                <div>
-                  <strong>
-                    {item.display_name}
-                  </strong>
+            <strong>
+              {proposal.proposal_code}
+            </strong>
+          </div>
 
-                  {item.description && (
-                    <span>
-                      {item.description}
-                    </span>
-                  )}
-                </div>
+          <div>
+            <span>
+              Term
+            </span>
 
-                {!item.included &&
-                  item.unit_amount_cents >
-                    0 && (
-                    <small>
-                      {money(
-                        item.unit_amount_cents,
-                      )}
-                      {item.billing_cadence ===
-                      "monthly"
-                        ? "/mo"
-                        : ""}
-                    </small>
-                  )}
-              </article>
-            ),
-          )}
+            <strong>
+              {termLabel}
+            </strong>
+          </div>
+
+          <div>
+            <span>
+              Valid
+            </span>
+
+            <strong>
+              {validityLabel}
+            </strong>
+          </div>
+
+          <div>
+            <span>
+              Billing
+            </span>
+
+            <strong>
+              After onboarding
+            </strong>
+          </div>
         </div>
+
+        {groupedItems.modules.length > 0 && (
+          <section className={styles.proposalContentSection}>
+            <div className={styles.proposalSectionHeading}>
+              <div>
+                <span>
+                  Platform access
+                </span>
+
+                <h3>
+                  Included modules
+                </h3>
+              </div>
+
+              <strong>
+                {groupedItems.modules.length}
+              </strong>
+            </div>
+
+            <div className={styles.proposalCompactGrid}>
+              {groupedItems.modules.map(
+                (item) => (
+                  <div
+                    className={styles.proposalCompactItem}
+                    key={item.id}
+                  >
+                    <Check size={15} />
+
+                    <span>
+                      {item.display_name}
+                    </span>
+                  </div>
+                ),
+              )}
+            </div>
+          </section>
+        )}
+
+        {groupedItems.integrations.length > 0 && (
+          <section className={styles.proposalContentSection}>
+            <div className={styles.proposalSectionHeading}>
+              <div>
+                <span>
+                  Onboarding
+                </span>
+
+                <h3>
+                  Connected during onboarding
+                </h3>
+              </div>
+            </div>
+
+            <div className={styles.proposalIntegrationGrid}>
+              {groupedItems.integrations.map(
+                (item) => (
+                  <article
+                    className={styles.proposalIntegrationCard}
+                    key={item.id}
+                  >
+                    <Check size={17} />
+
+                    <div>
+                      <strong>
+                        {item.display_name}
+                      </strong>
+
+                      <span>
+                        Securely connected during onboarding.
+                      </span>
+                    </div>
+                  </article>
+                ),
+              )}
+            </div>
+          </section>
+        )}
+
+        {groupedItems.services.length > 0 && (
+          <section className={styles.proposalContentSection}>
+            <div className={styles.proposalSectionHeading}>
+              <div>
+                <span>
+                  Implementation
+                </span>
+
+                <h3>
+                  Additional services
+                </h3>
+              </div>
+            </div>
+
+            <div className={styles.proposalServiceGrid}>
+              {groupedItems.services.map(
+                (item) => (
+                  <article
+                    className={styles.proposalServiceCard}
+                    key={item.id}
+                  >
+                    <Check size={16} />
+
+                    <div>
+                      <strong>
+                        {item.display_name}
+                      </strong>
+
+                      {item.description && (
+                        <span>
+                          {item.description}
+                        </span>
+                      )}
+                    </div>
+                  </article>
+                ),
+              )}
+            </div>
+          </section>
+        )}
 
         <div className={styles.proposalTermsBox}>
           <strong>

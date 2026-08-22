@@ -244,3 +244,144 @@
     flex-direction: column;
   }
 }
+
+
+/* ============================================================
+   SEAT CLIENT PROPOSAL — COMPACT PACKAGE SUMMARY
+   ============================================================ */
+
+.details {
+  display: grid;
+  grid-template-columns:
+    repeat(4, minmax(0, 1fr));
+  overflow: hidden;
+  border: 1px solid #dce3ec;
+  border-radius: 14px;
+  background: #ffffff;
+}
+
+.details > div {
+  display: grid;
+  gap: 5px;
+  padding: 17px 20px;
+}
+
+.details > div + div {
+  border-left: 1px solid #e0e6ee;
+}
+
+.details span {
+  color: #65758b;
+  font-size: 12px;
+}
+
+.details strong {
+  font-size: 13px;
+}
+
+.includedGroup + .includedGroup {
+  margin-top: 26px;
+}
+
+.groupHeading {
+  display: grid;
+  gap: 3px;
+  margin-bottom: 12px;
+}
+
+.groupHeading > span {
+  color: #65758b;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+.groupHeading h3 {
+  margin: 0;
+  font-size: 18px;
+}
+
+.moduleGrid {
+  display: grid;
+  grid-template-columns:
+    repeat(4, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.moduleChip {
+  min-height: 42px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 11px;
+  border: 1px solid #e0e6ee;
+  border-radius: 9px;
+  background: #f8fafc;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.moduleChip svg,
+.integrationCard > svg {
+  flex: 0 0 auto;
+  color: #21875a;
+}
+
+.integrationGrid {
+  display: grid;
+  grid-template-columns:
+    repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.integrationCard {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 15px;
+  border: 1px solid #e0e6ee;
+  border-radius: 10px;
+  background: #f8fafc;
+}
+
+.integrationCard div {
+  display: grid;
+  gap: 4px;
+}
+
+.integrationCard span {
+  color: #65758b;
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+@media (max-width: 800px) {
+  .details,
+  .moduleGrid {
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+  }
+
+  .details > div:nth-child(3) {
+    border-left: 0;
+    border-top: 1px solid #e0e6ee;
+  }
+
+  .details > div:nth-child(4) {
+    border-top: 1px solid #e0e6ee;
+  }
+}
+
+@media (max-width: 560px) {
+  .details,
+  .moduleGrid,
+  .integrationGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .details > div + div {
+    border-left: 0;
+    border-top: 1px solid #e0e6ee;
+  }
+}

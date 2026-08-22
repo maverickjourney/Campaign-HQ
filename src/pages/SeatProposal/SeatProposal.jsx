@@ -38,6 +38,75 @@ function money(
   );
 }
 
+
+function partitionProposalItems(
+  items = [],
+) {
+  return {
+    modules:
+      items.filter(
+        (item) =>
+          item.item_type ===
+          "module",
+      ),
+
+    integrations:
+      items.filter(
+        (item) =>
+          item.item_type ===
+          "integration",
+      ),
+
+    services:
+      items.filter(
+        (item) =>
+          [
+            "addon",
+            "migration",
+            "custom",
+          ].includes(
+            item.item_type,
+          ) ||
+          (
+            item.item_type ===
+              "service" &&
+            item.item_key !==
+              "onboarding_setup"
+          ),
+      ),
+
+    includedUsers:
+      items.find(
+        (item) =>
+          item.item_key ===
+          "included_users",
+      ) || null,
+  };
+}
+
+
+function proposalValidityLabel(
+  proposal,
+) {
+  if (!proposal?.valid_until) {
+    return "Private proposal";
+  }
+
+  return new Intl.DateTimeFormat(
+    "en-US",
+    {
+      month: "short",
+      day: "numeric",
+      year: "numeric",
+    },
+  ).format(
+    new Date(
+      proposal.valid_until,
+    ),
+  );
+}
+
+
 export default function SeatProposal() {
   const {
     token,
@@ -196,6 +265,22 @@ export default function SeatProposal() {
     );
   }
 
+  const groupedItems =
+    partitionProposalItems(
+      proposal.items,
+    );
+
+  const includedUsers =
+    groupedItems
+      .includedUsers
+      ?.quantity ??
+    "—";
+
+  const validityLabel =
+    proposalValidityLabel(
+      proposal,
+    );
+
   return (
     <main className={styles.page}>
       <header className={styles.topbar}>
@@ -277,6 +362,48 @@ export default function SeatProposal() {
           </div>
         </div>
 
+        <div className={styles.details}>
+          <div>
+            <span>
+              Proposal
+            </span>
+
+            <strong>
+              {proposal.proposal_code}
+            </strong>
+          </div>
+
+          <div>
+            <span>
+              Included users
+            </span>
+
+            <strong>
+              {includedUsers}
+            </strong>
+          </div>
+
+          <div>
+            <span>
+              Valid until
+            </span>
+
+            <strong>
+              {validityLabel}
+            </strong>
+          </div>
+
+          <div>
+            <span>
+              Billing
+            </span>
+
+            <strong>
+              After onboarding
+            </strong>
+          </div>
+        </div>
+
         <section className={styles.section}>
           <h2>
             What you're getting
@@ -287,43 +414,110 @@ export default function SeatProposal() {
               ?.summary}
           </p>
 
-          <div className={styles.items}>
-            {(proposal.items || []).map(
-              (item, index) => (
-                <article
-                  key={`${item.item_key}-${index}`}
-                >
-                  <Check size={17} />
+          <div className={styles.includedGroup}>
+            <div className={styles.groupHeading}>
+              <span>
+                Platform access
+              </span>
 
-                  <div>
-                    <strong>
+              <h3>
+                Included modules
+              </h3>
+            </div>
+
+            <div className={styles.moduleGrid}>
+              {groupedItems.modules.map(
+                (item, index) => (
+                  <div
+                    className={styles.moduleChip}
+                    key={`${item.item_key}-${index}`}
+                  >
+                    <Check size={15} />
+
+                    <span>
                       {item.display_name}
-                    </strong>
-
-                    {item.description && (
-                      <span>
-                        {item.description}
-                      </span>
-                    )}
+                    </span>
                   </div>
-
-                  {!item.included &&
-                    item.unit_amount_cents >
-                      0 && (
-                    <small>
-                      {money(
-                        item.unit_amount_cents,
-                      )}
-                      {item.billing_cadence ===
-                      "monthly"
-                        ? "/mo"
-                        : ""}
-                    </small>
-                  )}
-                </article>
-              ),
-            )}
+                ),
+              )}
+            </div>
           </div>
+
+          {groupedItems.integrations.length > 0 && (
+            <div className={styles.includedGroup}>
+              <div className={styles.groupHeading}>
+                <span>
+                  Onboarding
+                </span>
+
+                <h3>
+                  Connected during onboarding
+                </h3>
+              </div>
+
+              <div className={styles.integrationGrid}>
+                {groupedItems.integrations.map(
+                  (item, index) => (
+                    <article
+                      className={styles.integrationCard}
+                      key={`${item.item_key}-${index}`}
+                    >
+                      <Check size={17} />
+
+                      <div>
+                        <strong>
+                          {item.display_name}
+                        </strong>
+
+                        <span>
+                          Securely connected during setup.
+                        </span>
+                      </div>
+                    </article>
+                  ),
+                )}
+              </div>
+            </div>
+          )}
+
+          {groupedItems.services.length > 0 && (
+            <div className={styles.includedGroup}>
+              <div className={styles.groupHeading}>
+                <span>
+                  Implementation
+                </span>
+
+                <h3>
+                  Additional services
+                </h3>
+              </div>
+
+              <div className={styles.integrationGrid}>
+                {groupedItems.services.map(
+                  (item, index) => (
+                    <article
+                      className={styles.integrationCard}
+                      key={`${item.item_key}-${index}`}
+                    >
+                      <Check size={17} />
+
+                      <div>
+                        <strong>
+                          {item.display_name}
+                        </strong>
+
+                        {item.description && (
+                          <span>
+                            {item.description}
+                          </span>
+                        )}
+                      </div>
+                    </article>
+                  ),
+                )}
+              </div>
+            </div>
+          )}
         </section>
 
         <section className={styles.section}>

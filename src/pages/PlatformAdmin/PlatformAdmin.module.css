@@ -1045,3 +1045,171 @@
     flex-direction: column;
   }
 }
+
+
+/* ============================================================
+   SEAT PLATFORM — COMPACT PROPOSAL PRESENTATION
+   ============================================================ */
+
+.proposalMetaGrid {
+  display: grid;
+  grid-template-columns:
+    repeat(4, minmax(0, 1fr));
+  overflow: hidden;
+  border: 1px solid #dce3ec;
+  border-radius: 13px;
+  background: #ffffff;
+}
+
+.proposalMetaGrid > div {
+  display: grid;
+  gap: 5px;
+  padding: 16px 18px;
+}
+
+.proposalMetaGrid > div + div {
+  border-left: 1px solid #e4e9ef;
+}
+
+.proposalMetaGrid span {
+  color: #65758b;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.proposalMetaGrid strong {
+  font-size: 13px;
+}
+
+.proposalContentSection {
+  padding: 20px;
+  border: 1px solid #dce3ec;
+  border-radius: 14px;
+  background: #ffffff;
+}
+
+.proposalSectionHeading {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 14px;
+}
+
+.proposalSectionHeading > div {
+  display: grid;
+  gap: 3px;
+}
+
+.proposalSectionHeading span {
+  color: #65758b;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: .09em;
+  text-transform: uppercase;
+}
+
+.proposalSectionHeading h3 {
+  margin: 0;
+  font-size: 17px;
+}
+
+.proposalSectionHeading > strong {
+  color: #65758b;
+  font-size: 12px;
+}
+
+.proposalCompactGrid {
+  display: grid;
+  grid-template-columns:
+    repeat(4, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.proposalCompactItem {
+  min-height: 40px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 11px;
+  border: 1px solid #e2e7ed;
+  border-radius: 9px;
+  background: #f8fafc;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.proposalCompactItem svg,
+.proposalIntegrationCard > svg,
+.proposalServiceCard > svg {
+  flex: 0 0 auto;
+  color: #21875a;
+}
+
+.proposalIntegrationGrid,
+.proposalServiceGrid {
+  display: grid;
+  grid-template-columns:
+    repeat(2, minmax(0, 1fr));
+  gap: 9px;
+}
+
+.proposalIntegrationCard,
+.proposalServiceCard {
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+  padding: 13px;
+  border: 1px solid #e2e7ed;
+  border-radius: 10px;
+  background: #f8fafc;
+}
+
+.proposalIntegrationCard div,
+.proposalServiceCard div {
+  display: grid;
+  gap: 3px;
+}
+
+.proposalIntegrationCard strong,
+.proposalServiceCard strong {
+  font-size: 13px;
+}
+
+.proposalIntegrationCard span,
+.proposalServiceCard span {
+  color: #65758b;
+  font-size: 11px;
+  line-height: 1.4;
+}
+
+@media (max-width: 900px) {
+  .proposalMetaGrid,
+  .proposalCompactGrid {
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+  }
+
+  .proposalMetaGrid > div:nth-child(3) {
+    border-left: 0;
+    border-top: 1px solid #e4e9ef;
+  }
+
+  .proposalMetaGrid > div:nth-child(4) {
+    border-top: 1px solid #e4e9ef;
+  }
+}
+
+@media (max-width: 600px) {
+  .proposalMetaGrid,
+  .proposalCompactGrid,
+  .proposalIntegrationGrid,
+  .proposalServiceGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .proposalMetaGrid > div + div {
+    border-left: 0;
+    border-top: 1px solid #e4e9ef;
+  }
+}
