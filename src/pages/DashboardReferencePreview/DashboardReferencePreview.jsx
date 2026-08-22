@@ -499,6 +499,54 @@ function getDaysUntilElection(value) {
   );
 }
 
+function getEasternDateKey(value) {
+  const date =
+    value instanceof Date
+      ? value
+      : new Date(value);
+
+  if (
+    Number.isNaN(
+      date.getTime(),
+    )
+  ) {
+    return "";
+  }
+
+  const parts =
+    new Intl.DateTimeFormat(
+      "en-US",
+      {
+        timeZone:
+          "America/New_York",
+        year:
+          "numeric",
+        month:
+          "2-digit",
+        day:
+          "2-digit",
+      },
+    ).formatToParts(
+      date,
+    );
+
+  const values =
+    Object.fromEntries(
+      parts.map(
+        (part) => [
+          part.type,
+          part.value,
+        ],
+      ),
+    );
+
+  return [
+    values.year,
+    values.month,
+    values.day,
+  ].join("-");
+}
+
 function formatTime(value) {
   if (!value) {
     return "No time";
@@ -718,23 +766,105 @@ const [
     ),
   );
 
-  const upcomingEvents = data.events.slice(0, 6);
+  const todayScheduleDateKey =
+    getEasternDateKey(
+      headerNow,
+    );
+
+  const todayScheduleEvents =
+    (() => {
+      const seenScheduleKeys =
+        new Set();
+
+      return data.events
+        .filter(
+          (event) =>
+            getEasternDateKey(
+              event.starts_at,
+            ) ===
+            todayScheduleDateKey,
+        )
+        .filter((event) => {
+          const normalizedTitle =
+            String(
+              event.title || "",
+            )
+              .trim()
+              .replace(/\s+/g, " ")
+              .toLowerCase();
+
+          const normalizedLocation =
+            String(
+              event.location || "",
+            )
+              .trim()
+              .replace(/\s+/g, " ")
+              .toLowerCase();
+
+          const rawStart =
+            String(
+              event.starts_at || "",
+            ).trim();
+
+          const normalizedDisplayedTime =
+            rawStart
+              ? String(
+                  formatTime(
+                    rawStart,
+                  ),
+                )
+                  .trim()
+                  .toLowerCase()
+              : "";
+
+          const scheduleKey = [
+            normalizedTitle,
+            normalizedDisplayedTime,
+            normalizedLocation,
+          ].join("|");
+
+          if (
+            seenScheduleKeys.has(
+              scheduleKey,
+            )
+          ) {
+            return false;
+          }
+
+          seenScheduleKeys.add(
+            scheduleKey,
+          );
+
+          return true;
+        })
+        .slice(0, 6);
+    })();
 
   const isPresentationWorkspace =
     workspace.id ===
       "11111111-1111-1111-1111-111111111111" ||
     workspace.name === "Elizabeth Accomando";
 
+  const presentationScheduleToday =
+    PRESENTATION_SCHEDULE.filter(
+      (event) =>
+        getEasternDateKey(
+          event.starts_at,
+        ) ===
+        todayScheduleDateKey,
+    );
+
   const isUsingPresentationSchedule =
     isPresentationWorkspace &&
-    upcomingEvents.length === 0 &&
+    data.events.length === 0 &&
+    presentationScheduleToday.length > 0 &&
     !isLoading;
 
   const displayedScheduleEvents =
-    upcomingEvents.length > 0
-      ? upcomingEvents
+    todayScheduleEvents.length > 0
+      ? todayScheduleEvents
       : isUsingPresentationSchedule
-        ? PRESENTATION_SCHEDULE
+        ? presentationScheduleToday
         : [];
 
   const hasScheduleConflict =
@@ -744,10 +874,42 @@ const [
 
   const lowerEvents = data.events.slice(0, 3);
 
-  const displayedPriorities =
-    isPresentationWorkspace
-      ? PRESENTATION_PRIORITIES
-      : priorities;
+  const prioritySeverityRank = {
+    urgent: 0,
+    critical: 0,
+    high: 1,
+    medium: 2,
+    low: 3,
+  };
+
+  const displayedPriorities = [
+    ...(
+      isPresentationWorkspace
+        ? PRESENTATION_PRIORITIES
+        : priorities
+    ),
+  ].sort(
+    (left, right) => {
+      const leftRank =
+        prioritySeverityRank[
+          String(
+            left.priority || "",
+          ).toLowerCase()
+        ] ?? 4;
+
+      const rightRank =
+        prioritySeverityRank[
+          String(
+            right.priority || "",
+          ).toLowerCase()
+        ] ?? 4;
+
+      return (
+        leftRank -
+        rightRank
+      );
+    },
+  );
   const recentActivity = data.activity.slice(0, 4);
 
   const latestMetric =
@@ -1561,189 +1723,267 @@ const [
               </div>
             </article>
             <div className={styles.centerHeroStack}>
-              <article className={styles.heroCard}>
-                            <div className={styles.heroCopy}>
-                              <span className={styles.sectionEyebrow}>
-                                Campaign spotlight
-                              </span>
+              <article
+                className={`${styles.heroCard} ${styles.simpleSpotlight}`}
+              >
+                <div className={styles.simpleSpotlightCopy}>
+                  <div className={styles.simpleSpotlightMessage}>
+                    <h2>
+                      Building momentum for
+                      <strong>
+                        {workspace.description ||
+                          workspace.name ||
+                          "your campaign"}
+                      </strong>
+                    </h2>
 
-                              <h2>
-                                Building momentum for
-                                <br />
-                                <strong>
-                                  {workspace.description
-                                    ?.split(",")
-                                    .pop()
-                                    ?.trim() || "the campaign"}.
-                                </strong>
-                              </h2>
+                    <p>
+                      {workspace.location ||
+                        "Campaign workspace"}
+                    </p>
+                  </div>
+
+                  <div className={styles.simpleSpotlightInfoStack}>
+                    <div className={styles.simpleSpotlightInfoCard}>
+                      <span
+                        className={
+                          styles.simpleSpotlightInfoIcon
+                        }
+                      >
+                        <CalendarDays size={18} />
+                      </span>
+
+                      <div
+                        className={
+                          styles.simpleSpotlightInfoBody
+                        }
+                      >
+                        <small>
+                          {workspace.electionLabel ||
+                            "Election day"}
+                        </small>
+
+                        <strong>
+                          {workspace.electionDate ||
+                            "Date pending"}
+                        </strong>
+                      </div>
+                    </div>
+
+                    <div className={styles.simpleSpotlightInfoCard}>
+                      <span
+                        className={
+                          styles.simpleSpotlightInfoIcon
+                        }
+                      >
+                        <Clock3 size={18} />
+                      </span>
+
+                      <div
+                        className={
+                          styles.simpleSpotlightInfoBody
+                        }
+                      >
+                        <small>
+                          Countdown
+                        </small>
+
+                        <strong>
+                          {daysUntilElection}{" "}
+                          {daysUntilElection === 1
+                            ? "day remaining"
+                            : "days remaining"}
+                        </strong>
+                      </div>
+                    </div>
 
 
-                              <div className={styles.heroTags}>
-                                <span>Community</span>
-                                <span>Leadership</span>
-                                <span>
-                                  {workspace.location
-                                    ?.split(",")
-                                    .slice(0, 1)
-                                    .join(",") || "Campaign"}
-                                </span>
-                              </div>
+                  </div>
 
-                              <div className={styles.heroStats}>
-                                <div>
-                                  <small>Election day</small>
-                                  <strong>{daysUntilElection}</strong>
-                                  <span>
-                                    days to {workspace.electionDate}
-                                  </span>
-                                </div>
+                  <div className={styles.simpleSpotlightCustomize}>
+                    <div
+                      className={
+                        styles.simpleSpotlightCustomizeCopy
+                      }
+                    >
+                      <small>
+                        Customize your HQ
+                      </small>
 
-                              </div>
-                              <div className={styles.heroShortcutArea}>
-                                <button
-                                  className={styles.editShortcutsButton}
-                                  type="button"
-                                  aria-expanded={
-                                    isEditingSpotlightShortcuts
-                                  }
-                                  onClick={() =>
-                                    setIsEditingSpotlightShortcuts(
-                                      (current) => !current,
-                                    )
-                                  }
-                                >
-                                  <Settings size={13} />
-                                  Edit shortcuts
-                                </button>
+                      <span>
+                        Choose up to 6 cards below to shape
+                        the information you see first.
+                      </span>
+                    </div>
 
-                                {isEditingSpotlightShortcuts && (
-                                  <div
-                                    className={styles.shortcutEditor}
-                                    role="dialog"
-                                    aria-label="Edit Dashboard HQ shortcuts"
-                                  >
-                                    <div
-                                      className={
-                                        styles.shortcutEditorHeader
-                                      }
-                                    >
-                                      <div>
-                                        <strong>
-                                          Your HQ shortcuts
-                                        </strong>
+                    <div className={styles.heroShortcutArea}>
+                      <button
+                        className={
+                          styles.editShortcutsButton
+                        }
+                        type="button"
+                        aria-expanded={
+                          isEditingSpotlightShortcuts
+                        }
+                        onClick={() =>
+                          setIsEditingSpotlightShortcuts(
+                            (current) => !current,
+                          )
+                        }
+                      >
+                        <Settings size={13} />
+                        Customize HQ
+                      </button>
 
-                                        <small>
-                                          Choose up to 6 items to appear on your HQ.
-                                        </small>
-                                      </div>
+                      {isEditingSpotlightShortcuts && (
+                        <div
+                          className={styles.shortcutEditor}
+                          role="dialog"
+                          aria-modal="true"
+                          aria-label="Edit Dashboard HQ shortcuts"
+                        >
+                          <div
+                            className={
+                              styles.shortcutEditorHeader
+                            }
+                          >
+                            <div>
+                              <strong>
+                                Your HQ cards
+                              </strong>
 
-                                      <button
-                                        type="button"
-                                        aria-label="Close shortcut editor"
-                                        onClick={() =>
-                                          setIsEditingSpotlightShortcuts(
-                                            false,
-                                          )
-                                        }
-                                      >
-                                        <X size={16} />
-                                      </button>
-                                    </div>
+                              <small>
+                                Choose up to 6 items to
+                                appear on your main HQ.
+                              </small>
+                            </div>
 
-                                    <div
-                                      className={styles.shortcutOptions}
-                                    >
-                                      {SPOTLIGHT_SHORTCUT_OPTIONS.map(
-                                        (option) => {
-                                          const Icon = option.icon;
+                            <button
+                              type="button"
+                              aria-label="Close shortcut editor"
+                              onClick={() =>
+                                setIsEditingSpotlightShortcuts(
+                                  false,
+                                )
+                              }
+                            >
+                              <X size={16} />
+                            </button>
+                          </div>
 
-                                          const isSelected =
-                                            activeSpotlightShortcutKeys.includes(
-                                              option.key,
-                                            );
+                          <div
+                            className={
+                              styles.shortcutOptions
+                            }
+                          >
+                            {SPOTLIGHT_SHORTCUT_OPTIONS.map(
+                              (option) => {
+                                const Icon =
+                                  option.icon;
 
-                                          return (
-                                            <button
-                                              key={option.key}
-                                              type="button"
-                                              aria-pressed={isSelected}
+                                const isSelected =
+                                  activeSpotlightShortcutKeys.includes(
+                                    option.key,
+                                  );
 
-                                              disabled={
-
-                                                !isSelected &&
-
-                                                activeSpotlightShortcutKeys.length >=
-
-                                                  HQ_SHORTCUT_LIMIT
-
-                                              }
-
-                                              className={
-                                                isSelected
-                                                  ? styles.selectedShortcut
-                                                  : ""
-                                              }
-                                              onClick={() =>
-                                                toggleSpotlightShortcut(
-                                                  option.key,
-                                                )
-                                              }
-                                            >
-                                              <Icon size={15} />
-
-                                              <span>
-                                                {option.label}
-                                              </span>
-
-                                              {isSelected && (
-                                                <CheckCircle2 size={14} />
-                                              )}
-                                            </button>
-                                          );
-                                        },
-                                      )}
-                                    </div>
-
-                                    <div
-                                      className={
-                                        styles.shortcutEditorFooter
-                                      }
-                                    >
-                                      <span>
-                                        {
-                                          activeSpotlightShortcutKeys.length
-                                        }
-                                        /{HQ_SHORTCUT_LIMIT} selected
-                                        {" · "}
-                                        {activeSpotlightShortcutKeys.length >=
+                                return (
+                                  <button
+                                    key={option.key}
+                                    type="button"
+                                    aria-pressed={
+                                      isSelected
+                                    }
+                                    disabled={
+                                      !isSelected &&
+                                      activeSpotlightShortcutKeys.length >=
                                         HQ_SHORTCUT_LIMIT
-                                          ? "Remove one to choose another"
-                                          : "Choose your HQ widgets"}
-                                      </span>
+                                    }
+                                    className={
+                                      isSelected
+                                        ? styles.selectedShortcut
+                                        : ""
+                                    }
+                                    onClick={() =>
+                                      toggleSpotlightShortcut(
+                                        option.key,
+                                      )
+                                    }
+                                  >
+                                    <Icon size={15} />
 
-                                      <button
-                                        type="button"
-                                        onClick={
-                                          resetSpotlightShortcuts
-                                        }
-                                      >
-                                        Reset recommended
-                                      </button>
-                                    </div>
-                                  </div>
-                                )}
-                              </div>
-                            </div>
+                                    <span>
+                                      {option.label}
+                                    </span>
 
-                            <div className={styles.heroPortraitWrap}>
-                              <img
-                                src={elizabethPhoto}
-                                alt={workspace.name}
-                                className={styles.heroPortrait}
-                              />
-                            </div>
-                          </article>
+                                    {isSelected && (
+                                      <CheckCircle2
+                                        size={14}
+                                      />
+                                    )}
+                                  </button>
+                                );
+                              },
+                            )}
+                          </div>
+
+                          <div
+                            className={
+                              styles.shortcutEditorFooter
+                            }
+                          >
+                            <span>
+                              {
+                                activeSpotlightShortcutKeys.length
+                              }
+                              /{HQ_SHORTCUT_LIMIT} selected
+                              {" · "}
+                              {activeSpotlightShortcutKeys.length >=
+                              HQ_SHORTCUT_LIMIT
+                                ? "Remove one to choose another"
+                                : "Choose your HQ cards"}
+                            </span>
+
+                            <button
+                              type="button"
+                              onClick={
+                                resetSpotlightShortcuts
+                              }
+                            >
+                              Reset recommended
+                            </button>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                <div className={styles.simpleSpotlightMedia}>
+                  <img
+                    className={
+                      styles.simpleSpotlightBackdrop
+                    }
+                    src={elizabethPhoto}
+                    alt=""
+                    aria-hidden="true"
+                  />
+
+                  <div
+                    className={
+                      styles.simpleSpotlightMediaShade
+                    }
+                    aria-hidden="true"
+                  />
+
+                  <img
+                    className={
+                      styles.simpleSpotlightPortrait
+                    }
+                    src={elizabethPhoto}
+                    alt={workspace.name}
+                  />
+                </div>
+              </article>
 
               <section
                 className={styles.campaignAiPanel}
@@ -1761,7 +2001,7 @@ const [
         Live campaign intelligence
       </span>
 
-                  <strong>Ask Campaign HQ</strong>
+                  <strong>Insights, answers &amp; next steps</strong>
 
                 </div>
 
@@ -1922,7 +2162,7 @@ const [
                         : "No upcoming events"}
                     </strong>
                     <p>
-                      New campaign events will appear here.
+                      No events scheduled for today.
                     </p>
                   </div>
                 )}
@@ -1945,7 +2185,7 @@ const [
                           ? "event"
                           : "events"
                       }`
-                    : "Campaign schedule is clear"}
+                    : "No events today"}
 
                 {hasScheduleConflict && (
                   <button

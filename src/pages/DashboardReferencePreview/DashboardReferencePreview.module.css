@@ -17907,3 +17907,785 @@
 }
 
 /* EXPANDED DASHBOARD HQ WIDGET CATALOG — END */
+
+/* SPOTLIGHT COMPACT DYNAMIC V9 — START */
+
+.centerHeroStack .simpleSpotlight {
+  box-sizing: border-box;
+  display: grid;
+  width: 100%;
+  min-width: 0;
+
+  height: 292px;
+  min-height: 292px;
+  max-height: 292px;
+
+  grid-template-columns:
+    minmax(0, 59%)
+    minmax(0, 41%);
+
+  align-items: stretch;
+  overflow: hidden;
+
+  border: 0;
+  border-radius: 18px;
+
+  color: #ffffff;
+
+  background:
+    linear-gradient(
+      135deg,
+      #173f6e 0%,
+      #10355f 100%
+    );
+}
+
+.simpleSpotlight::before {
+  display: none !important;
+}
+
+/* BLUE CONTENT */
+
+.simpleSpotlightCopy {
+  box-sizing: border-box;
+  display: flex;
+
+  width: 100%;
+  min-width: 0;
+
+  height: 292px;
+  min-height: 292px;
+  max-height: 292px;
+
+  flex-direction: column;
+
+  padding: 17px 20px 14px;
+
+  overflow: hidden;
+}
+
+/* WORKSPACE-DRIVEN HEADLINE */
+
+.simpleSpotlightMessage {
+  min-width: 0;
+}
+
+.simpleSpotlightMessage h2 {
+  width: 100%;
+  max-width: 455px;
+
+  margin: 0;
+
+  color: #ffffff;
+
+  font-size:
+    clamp(
+      1.16rem,
+      1.32vw,
+      1.42rem
+    );
+
+  font-weight: 850;
+
+  line-height: 1.04;
+
+  letter-spacing:
+    -0.022em;
+}
+
+.simpleSpotlightMessage h2 strong {
+  display: block;
+
+  width: 100%;
+  max-width: 455px;
+
+  margin-top: 4px;
+
+  color: #ff5260;
+
+  font-size:
+    clamp(
+      1.12rem,
+      1.3vw,
+      1.4rem
+    );
+
+  font-weight: 850;
+
+  line-height: 1.05;
+
+  letter-spacing:
+    -0.018em;
+}
+
+.simpleSpotlightMessage p {
+  display: none;
+}
+
+/* GENERAL ELECTION + COUNTDOWN */
+
+.simpleSpotlightInfoStack {
+  display: grid;
+
+  width: 100%;
+  min-width: 0;
+
+  gap: 6px;
+
+  margin-top: 13px;
+}
+
+.simpleSpotlightInfoCard {
+  box-sizing: border-box;
+
+  display: grid;
+
+  width: 100%;
+  min-width: 0;
+
+  min-height: 54px;
+
+  grid-template-columns:
+    36px
+    minmax(0, 1fr);
+
+  align-items: center;
+
+  gap: 9px;
+
+  padding: 6px 9px;
+
+  overflow: hidden;
+
+  border:
+    1px solid
+    rgba(
+      255,
+      255,
+      255,
+      0.1
+    );
+
+  border-radius: 10px;
+
+  background:
+    rgba(
+      255,
+      255,
+      255,
+      0.055
+    );
+}
+
+.simpleSpotlightInfoIcon {
+  display: grid;
+
+  width: 36px;
+  height: 36px;
+
+  place-items: center;
+
+  border-radius: 9px;
+
+  color: #ffffff;
+
+  background:
+    rgba(
+      255,
+      255,
+      255,
+      0.075
+    );
+}
+
+.simpleSpotlightInfoIcon svg {
+  width: 17px;
+  height: 17px;
+}
+
+.simpleSpotlightInfoBody {
+  width: 100%;
+  min-width: 0;
+
+  overflow: hidden;
+}
+
+.simpleSpotlightInfoBody small,
+.simpleSpotlightInfoBody strong {
+  display: block;
+
+  width: 100%;
+  min-width: 0;
+}
+
+.simpleSpotlightInfoBody small {
+  color:
+    rgba(
+      255,
+      255,
+      255,
+      0.45
+    );
+
+  font-size: 0.82rem;
+
+  font-weight: 900;
+
+  letter-spacing:
+    0.08em;
+
+  line-height: 1;
+
+  text-transform: uppercase;
+}
+
+.simpleSpotlightInfoBody strong {
+  margin-top: 3px;
+
+  overflow: hidden;
+
+  color: #ffffff;
+
+  font-size: 0.6rem;
+
+  font-weight: 820;
+
+  line-height: 1.15;
+
+  text-overflow: ellipsis;
+
+  white-space: nowrap;
+}
+
+/* CUSTOMIZE HQ */
+
+.simpleSpotlightCustomize {
+  box-sizing: border-box;
+
+  display: grid !important;
+
+  position: relative !important;
+
+  inset: auto !important;
+
+  width: 100% !important;
+  min-width: 0 !important;
+
+  grid-template-columns:
+    minmax(0, 1fr)
+    auto !important;
+
+  align-items: center !important;
+
+  gap: 12px !important;
+
+  margin: auto 0 0 !important;
+
+  padding: 9px 0 0 !important;
+
+  border-top:
+    1px solid
+    rgba(
+      255,
+      255,
+      255,
+      0.09
+    );
+
+  transform: none !important;
+}
+
+.simpleSpotlightCustomizeCopy {
+  width: 100%;
+  min-width: 0;
+  font-size: 13px;
+  line-height: 1.4;
+
+}
+
+.simpleSpotlightCustomizeCopy small {
+  display: block;
+
+  margin: 0;
+
+  color:
+    rgba(
+      255,
+      255,
+      255,
+      0.9
+    );
+
+  font-size: 0.72rem;
+
+  font-weight: 850;
+
+  line-height: 1.1;
+}
+
+.simpleSpotlightCustomizeCopy span {
+  display: block;
+
+  max-width: 270px;
+
+  margin-top: 2px;
+
+  color:
+    rgba(
+      255,
+      255,
+      255,
+      0.49
+    );
+
+  font-size: 0.64rem;
+
+  font-weight: 620;
+
+  line-height: 1.2;
+}
+
+.simpleSpotlightCustomize
+  .heroShortcutArea {
+  position: relative !important;
+  inset: auto !important;
+
+  display: flex !important;
+
+  width: auto !important;
+  min-width: max-content !important;
+
+  height: auto !important;
+
+  margin: 0 !important;
+  padding: 0 !important;
+
+  align-items: center !important;
+  justify-content: flex-end !important;
+
+  transform: none !important;
+}
+
+.simpleSpotlightCustomize
+  .editShortcutsButton {
+  position: relative !important;
+  inset: auto !important;
+
+  display: inline-flex !important;
+
+  width: auto !important;
+  min-width: max-content !important;
+
+  min-height: 28px !important;
+
+  margin: 0 !important;
+
+  padding: 0 9px !important;
+
+  align-items: center !important;
+  justify-content: center !important;
+
+  gap: 5px !important;
+
+  border:
+    1px solid
+    rgba(
+      255,
+      255,
+      255,
+      0.15
+    );
+
+  border-radius: 8px;
+
+  color: #ffffff;
+
+  background:
+    rgba(
+      255,
+      255,
+      255,
+      0.07
+    );
+
+  box-shadow: none !important;
+
+  font-size: 0.7rem;
+
+  font-weight: 800;
+
+  white-space: nowrap;
+
+  transform: none !important;
+}
+
+/* PHOTO — EXACT SAME HEIGHT */
+
+.simpleSpotlightMedia {
+  box-sizing: border-box;
+
+  position: relative;
+
+  width: 100%;
+  min-width: 0;
+
+  height: 292px;
+  min-height: 292px;
+  max-height: 292px;
+
+  align-self: stretch;
+
+  overflow: hidden;
+
+  background: #0f2d50;
+}
+
+.simpleSpotlightBackdrop {
+  position: absolute;
+  z-index: 0;
+
+  inset: -18px;
+
+  display: block;
+
+  width: calc(100% + 36px);
+  height: calc(100% + 36px);
+
+  object-fit: cover;
+
+  object-position:
+    var(--campaign-photo-x, 50%)
+    var(--campaign-photo-y, 35%);
+
+  filter:
+    blur(20px)
+    brightness(0.58)
+    saturate(0.9);
+
+  transform: scale(1.05);
+
+  opacity: 0.33;
+}
+
+.simpleSpotlightMediaShade {
+  position: absolute;
+  z-index: 1;
+
+  inset: 0;
+
+  background:
+    linear-gradient(
+      90deg,
+      #143a65 0%,
+      rgba(
+        20,
+        58,
+        101,
+        0.16
+      )
+      20%,
+      transparent
+      46%
+    );
+
+  pointer-events: none;
+}
+
+.simpleSpotlightPortrait {
+  position: absolute;
+  z-index: 2;
+
+  inset: 0;
+
+  display: block;
+
+  width: 100%;
+
+  height: 292px;
+  min-height: 292px;
+  max-height: 292px;
+
+  object-fit: cover;
+
+  object-position:
+    var(--campaign-photo-x, 50%)
+    var(--campaign-photo-y, 35%);
+}
+
+/* CUSTOMIZATION MODAL */
+
+.simpleSpotlightCustomize
+  .shortcutEditor {
+  position: fixed !important;
+
+  z-index: 1000 !important;
+
+  top: 50% !important;
+  left: 50% !important;
+
+  width:
+    min(
+      760px,
+      calc(
+        100vw - 32px
+      )
+    )
+    !important;
+
+  min-width: 0 !important;
+
+  height: auto !important;
+
+  max-height:
+    min(
+      78vh,
+      720px
+    )
+    !important;
+
+  margin: 0 !important;
+
+  transform:
+    translate(
+      -50%,
+      -50%
+    )
+    !important;
+}
+
+/* ASK CAMPAIGN HQ */
+
+.centerHeroStack .campaignAiPanel {
+  position: relative !important;
+
+  z-index: 10;
+
+  margin-top: 10px !important;
+
+  transform: none !important;
+}
+
+/* RESPONSIVE */
+
+@media (max-width: 820px) {
+  .centerHeroStack .simpleSpotlight {
+    height: auto;
+    min-height: 0;
+    max-height: none;
+
+    grid-template-columns: 1fr;
+  }
+
+  .simpleSpotlightCopy {
+    height: auto;
+    min-height: 292px;
+    max-height: none;
+  }
+
+  .simpleSpotlightMedia,
+  .simpleSpotlightPortrait {
+    height: 270px;
+    min-height: 270px;
+    max-height: 270px;
+  }
+}
+
+@media (max-width: 560px) {
+  .simpleSpotlightCustomize {
+    grid-template-columns: 1fr !important;
+
+    align-items: flex-start !important;
+
+    gap: 7px !important;
+  }
+
+  .simpleSpotlightCustomizeCopy span {
+    max-width: 100%;
+  }
+
+  .simpleSpotlightCustomize
+    .heroShortcutArea {
+    justify-content: flex-start !important;
+  }
+
+  .simpleSpotlightMedia,
+  .simpleSpotlightPortrait {
+    height: 245px;
+    min-height: 245px;
+    max-height: 245px;
+  }
+}
+
+/* SPOTLIGHT COMPACT DYNAMIC V9 — END */
+
+
+/* ============================================================
+   CAMPAIGN SEAT READABLE TYPOGRAPHY FLOOR
+
+   User-facing helper/supporting copy should remain readable.
+   Do not intentionally reduce meaningful dashboard copy below
+   approximately 12px on desktop.
+   ============================================================ */
+
+/* SPOTLIGHT INFO HIERARCHY V10 — START */
+
+/*
+ * Supporting labels stay quiet.
+ * The actual election date and countdown become the visual focus.
+ */
+
+.centerHeroStack
+  .simpleSpotlightInfoBody
+  small {
+  margin: 0 !important;
+
+  color:
+    rgba(
+      255,
+      255,
+      255,
+      0.52
+    ) !important;
+
+  font-size:
+    0.48rem !important;
+
+  font-weight:
+    850 !important;
+
+  letter-spacing:
+    0.1em !important;
+
+  line-height:
+    1 !important;
+
+  text-transform:
+    uppercase !important;
+}
+
+.centerHeroStack
+  .simpleSpotlightInfoBody
+  strong {
+  margin-top:
+    5px !important;
+
+  color:
+    #ffffff !important;
+
+  font-size:
+    clamp(
+      0.88rem,
+      1vw,
+      1.02rem
+    ) !important;
+
+  font-weight:
+    850 !important;
+
+  letter-spacing:
+    -0.01em !important;
+
+  line-height:
+    1.08 !important;
+}
+
+/* Slightly larger icons without overpowering the values. */
+
+.centerHeroStack
+  .simpleSpotlightInfoIcon
+  svg {
+  width:
+    16px !important;
+
+  height:
+    16px !important;
+}
+
+/* SPOTLIGHT INFO HIERARCHY V10 — END */
+
+/* SIDEBAR SCROLL FINISH V12 — START */
+
+/*
+ * Navigation remains independently scrollable while the
+ * signed-in profile stays visibly anchored underneath it.
+ */
+
+.sidebarNavigation {
+  min-height: 0 !important;
+
+  padding-bottom: 32px !important;
+
+  overscroll-behavior-y: contain !important;
+
+  scrollbar-gutter: stable !important;
+
+  scroll-padding-bottom: 32px !important;
+}
+
+/*
+ * Give the final navigation item real breathing room.
+ * This makes the end of the navigation feel intentional
+ * instead of trapped behind the signed-in footer.
+ */
+
+.sidebarNavigation::after {
+  content: "";
+
+  display: block;
+
+  width: 100%;
+  height: 16px;
+
+  flex: 0 0 16px;
+}
+
+.sidebarProfile {
+  position: relative !important;
+
+  z-index: 4 !important;
+
+  min-height: 72px !important;
+
+  flex:
+    0
+    0
+    72px !important;
+
+  background:
+    linear-gradient(
+      180deg,
+      rgba(99, 4, 16, 0.98),
+      rgba(73, 2, 10, 0.99)
+    ) !important;
+
+  box-shadow:
+    0
+    -10px
+    24px
+    rgba(48, 0, 7, 0.16) !important;
+}
+
+@media (max-width: 760px) {
+  .sidebarNavigation {
+    padding-bottom: 18px !important;
+
+    scrollbar-gutter: auto !important;
+  }
+
+  .sidebarNavigation::after {
+    height: 8px;
+
+    flex-basis: 8px;
+  }
+
+  .sidebarProfile {
+    min-height: 69px !important;
+
+    flex:
+      0
+      0
+      auto !important;
+  }
+}
+
+/* SIDEBAR SCROLL FINISH V12 — END */

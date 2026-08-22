@@ -33,14 +33,31 @@ const campaignMemoryStore = {
   },
 };
 
+export const CAMPAIGN_ELECTION_SCHEDULE = [
+  {
+    key: "primary",
+    label: "Primary election",
+    electionDateRaw: "2026-08-18",
+  },
+  {
+    key: "general",
+    label: "General election",
+    electionDateRaw: "2026-11-03",
+  },
+];
+
 export const CAMPAIGN_WORKSPACE = {
   id: "11111111-1111-1111-1111-111111111111",
   name: "Elizabeth Accomando",
   description:
     "Palm Beach County Commission, District 6",
   location: "Palm Beach County, Florida",
-  electionDate: "August 18, 2026",
-  electionDateRaw: "2026-08-18",
+
+  // Current fallback points to the next remaining election.
+  electionDate: "November 3, 2026",
+  electionDateRaw: "2026-11-03",
+  electionLabel: "General election",
+
   politicalParty: "republican",
   status: "active",
 };
@@ -54,6 +71,113 @@ function readSessionValue(key, fallback = null) {
     campaignMemoryStore.removeItem(key);
     return fallback;
   }
+}
+
+function getEasternCalendarDateKey(
+  value = new Date(),
+) {
+  const parts =
+    new Intl.DateTimeFormat(
+      "en-US",
+      {
+        timeZone:
+          "America/New_York",
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+      },
+    ).formatToParts(value);
+
+  const values =
+    Object.fromEntries(
+      parts.map(
+        (part) => [
+          part.type,
+          part.value,
+        ],
+      ),
+    );
+
+  return [
+    values.year,
+    values.month,
+    values.day,
+  ].join("-");
+}
+
+function resolveCurrentElection(
+  workspace = {},
+) {
+  const workspaceId =
+    workspace.id ||
+    CAMPAIGN_WORKSPACE.id;
+
+  const configuredRaw =
+    workspace.election_date ||
+    workspace.electionDateRaw ||
+    "";
+
+  const configuredLabel =
+    workspace.election_label ||
+    workspace.electionLabel ||
+    "Election day";
+
+  const schedule =
+    workspaceId ===
+    CAMPAIGN_WORKSPACE.id
+      ? [
+          ...CAMPAIGN_ELECTION_SCHEDULE,
+        ]
+      : [];
+
+  if (
+    configuredRaw &&
+    !schedule.some(
+      (item) =>
+        item.electionDateRaw ===
+        configuredRaw,
+    )
+  ) {
+    schedule.push({
+      key: "configured",
+      label: configuredLabel,
+      electionDateRaw:
+        configuredRaw,
+    });
+  }
+
+  if (!schedule.length) {
+    return {
+      key: "configured",
+      label: configuredLabel,
+      electionDateRaw:
+        configuredRaw ||
+        CAMPAIGN_WORKSPACE
+          .electionDateRaw,
+    };
+  }
+
+  schedule.sort(
+    (left, right) =>
+      left.electionDateRaw
+        .localeCompare(
+          right.electionDateRaw,
+        ),
+  );
+
+  const today =
+    getEasternCalendarDateKey();
+
+  return (
+    schedule.find(
+      (item) =>
+        item.electionDateRaw >=
+        today,
+    ) ||
+    schedule[
+      schedule.length - 1
+    ]
+  );
 }
 
 function formatElectionDate(value) {
@@ -77,10 +201,14 @@ function formatElectionDate(value) {
 }
 
 function normalizeWorkspace(workspace = {}) {
+  const activeElection =
+    resolveCurrentElection(
+      workspace,
+    );
+
   const electionDateRaw =
-    workspace.election_date ||
-    workspace.electionDateRaw ||
-    CAMPAIGN_WORKSPACE.electionDateRaw;
+    activeElection
+      .electionDateRaw;
 
   return {
     id: workspace.id || CAMPAIGN_WORKSPACE.id,
@@ -94,9 +222,20 @@ function normalizeWorkspace(workspace = {}) {
       workspace.location ||
       CAMPAIGN_WORKSPACE.location,
     electionDate:
-      workspace.electionDate ||
-      formatElectionDate(electionDateRaw),
+      formatElectionDate(
+        electionDateRaw,
+      ),
+
     electionDateRaw,
+
+    electionLabel:
+      activeElection.label ||
+      "Election day",
+
+    electionKey:
+      activeElection.key ||
+      "configured",
+
     politicalParty:
       workspace.politicalParty ||
       workspace.political_party ||

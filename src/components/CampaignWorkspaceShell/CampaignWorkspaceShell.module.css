@@ -4040,3 +4040,102 @@ button[aria-label^="Activity Center"] {
   }
 
 }
+
+/* TOPBAR WORKSPACE LOCATION — START */
+
+.workspaceIdentity
+  .workspaceLocation {
+  display: block;
+  max-width: 420px;
+  margin-top: 3px;
+  overflow: hidden;
+  color: #7b91a5;
+  font-size: 0.56rem;
+  font-weight: 650;
+  line-height: 1.15;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+@media (max-width: 760px) {
+  .workspaceIdentity
+    .workspaceLocation {
+    max-width: 260px;
+  }
+}
+
+/* TOPBAR WORKSPACE LOCATION — END */
+
+/* FINAL WORKSPACE IDENTITY POLISH V12 — START */
+
+/*
+ * Keep the workspace identity compact and intentional:
+ *
+ * Elizabeth Accomando
+ * Palm Beach County Commission
+ * District 6
+ */
+
+.workspaceBrandCopy > strong {
+  font-size: 14px !important;
+  line-height: 1.08 !important;
+}
+
+.workspaceDistrict {
+  width: 100% !important;
+
+  margin-top: 1px !important;
+
+  overflow: hidden !important;
+
+  font-size: 10px !important;
+  font-weight: 560 !important;
+
+  line-height: 1.16 !important;
+
+  text-overflow: ellipsis !important;
+
+  white-space: nowrap !important;
+}
+
+/*
+ * The location now has a useful secondary hierarchy
+ * instead of disappearing under the workspace title.
+ */
+
+.workspaceIdentity
+  .workspaceLocation {
+  display: block !important;
+
+  max-width: 430px !important;
+
+  margin-top: 4px !important;
+
+  overflow: hidden !important;
+
+  color: #71879d !important;
+
+  font-size: 0.65rem !important;
+  font-weight: 680 !important;
+
+  letter-spacing: 0 !important;
+  line-height: 1.15 !important;
+
+  text-overflow: ellipsis !important;
+  text-transform: none !important;
+
+  white-space: nowrap !important;
+}
+
+@media (max-width: 760px) {
+  .workspaceIdentity
+    .workspaceLocation {
+    max-width: 260px !important;
+
+    font-size: 0.62rem !important;
+  }
+}
+
+/* FINAL WORKSPACE IDENTITY POLISH V12 — END */

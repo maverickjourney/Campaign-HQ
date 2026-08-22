@@ -197,23 +197,59 @@ export default function Hero() {
       [],
     );
 
-  const primaryDays =
+  const upcomingElections =
     useMemo(
-      () =>
-        daysUntil(
-          ELECTION_DATES.primary,
-          now,
-        ),
-      [now],
-    );
+      () => {
+        const today =
+          new Date(
+            now.getFullYear(),
+            now.getMonth(),
+            now.getDate(),
+          );
 
-  const generalDays =
-    useMemo(
-      () =>
-        daysUntil(
-          ELECTION_DATES.general,
-          now,
-        ),
+        const elections = [
+          {
+            key: "primary",
+            label:
+              "Primary election",
+            date:
+              ELECTION_DATES.primary,
+          },
+          {
+            key: "general",
+            label:
+              "General election",
+            date:
+              ELECTION_DATES.general,
+          },
+        ];
+
+        const future =
+          elections.filter(
+            (election) =>
+              election.date >= today,
+          );
+
+        return (
+          future.length
+            ? future
+            : [
+                elections[
+                  elections.length - 1
+                ],
+              ]
+        ).map(
+          (election) => ({
+            ...election,
+
+            days:
+              daysUntil(
+                election.date,
+                now,
+              ),
+          }),
+        );
+      },
       [now],
     );
 
@@ -271,47 +307,41 @@ export default function Hero() {
           </div>
 
           <div className={styles.headerElections}>
-            <article>
-              <div className={styles.dateIcon}>
-                <CalendarDays size={18} />
-              </div>
+            {upcomingElections.map(
+              (election) => (
+                <article
+                  key={election.key}
+                >
+                  <div className={styles.dateIcon}>
+                    <CalendarDays size={18} />
+                  </div>
 
-              <div className={styles.headerElectionCopy}>
-                <span>Primary election</span>
+                  <div
+                    className={
+                      styles.headerElectionCopy
+                    }
+                  >
+                    <span>
+                      {election.label}
+                    </span>
 
-                <strong>
-                  {formatDate(
-                    ELECTION_DATES.primary,
-                  )}
-                </strong>
-              </div>
+                    <strong>
+                      {formatDate(
+                        election.date,
+                      )}
+                    </strong>
+                  </div>
 
-              <div className={styles.countdown}>
-                <strong>{primaryDays}</strong>
-                <span>days</span>
-              </div>
-            </article>
+                  <div className={styles.countdown}>
+                    <strong>
+                      {election.days}
+                    </strong>
 
-            <article>
-              <div className={styles.dateIcon}>
-                <CalendarDays size={18} />
-              </div>
-
-              <div className={styles.headerElectionCopy}>
-                <span>General election</span>
-
-                <strong>
-                  {formatDate(
-                    ELECTION_DATES.general,
-                  )}
-                </strong>
-              </div>
-
-              <div className={styles.countdown}>
-                <strong>{generalDays}</strong>
-                <span>days</span>
-              </div>
-            </article>
+                    <span>days</span>
+                  </div>
+                </article>
+              ),
+            )}
           </div>
         </div>
       </header>

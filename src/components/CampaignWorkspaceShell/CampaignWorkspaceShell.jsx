@@ -373,8 +373,43 @@ export function CampaignWorkspaceShell({
     ? "Current workspace"
     : "Campaign workspace";
 
+  const workspaceTitleDetail =
+    String(
+      workspace.description ||
+        "",
+    )
+      .split(",")
+      .map(
+        (part) =>
+          part.trim(),
+      )
+      .filter(Boolean)
+      .at(-1) ||
+    "";
+
+  const workspaceOfficeTitle =
+    String(
+      workspace.description ||
+        "",
+    )
+      .split(",")
+      .map(
+        (part) =>
+          part.trim(),
+      )
+      .filter(Boolean)
+      .slice(0, -1)
+      .join(", ") ||
+    workspace.description ||
+    workspace.name;
+
   const workspaceTitle =
-    `${workspace.name} · District 6`;
+    [
+      workspace.name,
+      workspaceTitleDetail,
+    ]
+      .filter(Boolean)
+      .join(" · ");
   const dateLabel = useMemo(
     () =>
       new Intl.DateTimeFormat(
@@ -582,12 +617,19 @@ export function CampaignWorkspaceShell({
             <span className={styles.workspaceBrandCopy}>
               <small>Campaign Workspace</small>
 
-              <strong>Elizabeth Accomando</strong>
+              <strong>
+                {workspace.name}
+              </strong>
 
               <span className={styles.workspaceDistrict}>
-                Palm Beach County Commission
-                <br />
-                District 6
+                {workspaceOfficeTitle}
+
+                {workspaceTitleDetail ? (
+                  <>
+                    <br />
+                    {workspaceTitleDetail}
+                  </>
+                ) : null}
               </span>
             </span>
 
@@ -611,10 +653,15 @@ export function CampaignWorkspaceShell({
               </span>
 
               <span>
-                <strong>Elizabeth Accomando</strong>
+                <strong>
+                  {workspace.name}
+                </strong>
 
                 <small>
-                  Palm Beach County · District 6
+                  {workspaceOfficeTitle}
+                  {workspaceTitleDetail
+                    ? ` · ${workspaceTitleDetail}`
+                    : ""}
                 </small>
               </span>
 
@@ -854,6 +901,15 @@ export function CampaignWorkspaceShell({
               <strong>
                 {workspaceTitle}
               </strong>
+
+              <small
+                className={
+                  styles.workspaceLocation
+                }
+              >
+                {workspace.location ||
+                  "Campaign location"}
+              </small>
             </div>
           </div>
 
