@@ -131,6 +131,7 @@ export async function createSeatOnboardingAccount({
   invitation,
   fullName,
   password,
+  captchaToken,
 }) {
   const currentUser =
     await getCurrentSeatUser();
@@ -180,6 +181,8 @@ export async function createSeatOnboardingAccount({
         password,
 
         options: {
+          captchaToken,
+
           emailRedirectTo:
             `${window.location.origin}/onboarding/continue`,
 

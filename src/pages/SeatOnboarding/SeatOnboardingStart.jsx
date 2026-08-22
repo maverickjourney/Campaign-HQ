@@ -1,5 +1,6 @@
 import {
   useEffect,
+  useRef,
   useState,
 } from "react";
 
@@ -18,6 +19,9 @@ import {
 
 import SeatBrand
   from "../../components/brand/SeatBrand/SeatBrand";
+
+import TurnstileChallenge
+  from "../../components/security/TurnstileChallenge/TurnstileChallenge";
 
 import {
   createSeatOnboardingAccount,
@@ -62,6 +66,9 @@ function validatePassword(
 
 
 export default function SeatOnboardingStart() {
+  const turnstileRef =
+    useRef(null);
+
   const {
     token,
   } = useParams();
@@ -118,6 +125,12 @@ export default function SeatOnboardingStart() {
     confirmationRequired,
     setConfirmationRequired,
   ] = useState(false);
+
+
+  const [
+    captchaToken,
+    setCaptchaToken,
+  ] = useState("");
 
 
   useEffect(() => {
@@ -208,6 +221,14 @@ export default function SeatOnboardingStart() {
         return;
       }
 
+      if (!captchaToken) {
+        setError(
+          "Wait for the browser security check to finish, then try again.",
+        );
+
+        return;
+      }
+
       setSaving(true);
 
       try {
@@ -217,7 +238,13 @@ export default function SeatOnboardingStart() {
             invitation,
             fullName,
             password,
+            captchaToken,
           });
+
+        setCaptchaToken("");
+
+        turnstileRef
+          .current?.reset();
 
         if (
           result.status ===
@@ -248,10 +275,22 @@ export default function SeatOnboardingStart() {
           },
         );
       } catch (saveError) {
-        setError(
+        setCaptchaToken("");
+
+        turnstileRef
+          .current?.reset();
+
+        const message =
           saveError instanceof Error
             ? saveError.message
-            : "Account setup could not be completed.",
+            : "Account setup could not be completed.";
+
+        setError(
+          /captcha|challenge/i.test(
+            message,
+          )
+            ? "The browser security check expired. Complete it again and retry."
+            : message,
         );
       } finally {
         setSaving(false);
@@ -513,6 +552,14 @@ export default function SeatOnboardingStart() {
             <small className={styles.passwordHelp}>
               Minimum 12 characters with uppercase, lowercase, a number and a symbol.
             </small>
+
+            <TurnstileChallenge
+              ref={turnstileRef}
+              action="campaign_auth"
+              onTokenChange={
+                setCaptchaToken
+              }
+            />
 
             {error && (
               <div
