@@ -318,82 +318,162 @@ const PRESENTATION_SCHEDULE = [
   },
 ];
 
-// SPOTLIGHT SHORTCUT OPTIONS — START
+// DASHBOARD HQ SHORTCUT OPTIONS — START
+const HQ_SHORTCUT_LIMIT = 6;
+
 const SPOTLIGHT_SHORTCUT_OPTIONS = [
   {
-    key: "manage-users",
-    label: "Manage users",
-    icon: UserCog,
-    route: "/team/access",
+    key: "messages",
+    label: "Messages for you",
+    icon: Mail,
+    kind: "operational",
   },
   {
-    key: "review-approvals",
-    label: "Review approvals",
+    key: "decisions",
+    label: "Decisions for you",
     icon: FileCheck2,
-    route: "/approvals",
+    kind: "operational",
   },
   {
-    key: "add-event",
-    label: "Add event",
-    icon: CalendarDays,
-    route: "/calendar",
+    key: "contacts",
+    label: "People to contact",
+    icon: PhoneCall,
+    kind: "operational",
   },
   {
-    key: "upload-file",
-    label: "Upload file",
-    icon: Files,
-    route: "/files",
+    key: "commitments",
+    label: "Commitments & follow-ups",
+    icon: Target,
+    kind: "operational",
   },
   {
-    key: "open-tasks",
-    label: "Open tasks",
+    key: "team-brief",
+    label: "Team brief",
+    icon: Zap,
+    kind: "operational",
+  },
+  {
+    key: "risk",
+    label: "Risk & compliance",
+    icon: ShieldCheck,
+    kind: "operational",
+  },
+
+  {
+    key: "tasks",
+    label: "Tasks",
     icon: CheckCircle2,
+    kind: "module",
     route: "/tasks",
+    description: "Open tasks, deadlines and campaign priorities.",
+  },
+  {
+    key: "calendar",
+    label: "Calendar",
+    icon: CalendarDays,
+    kind: "module",
+    route: "/calendar",
+    description: "Upcoming campaign events and schedule.",
   },
   {
     key: "volunteers",
     label: "Volunteers",
     icon: Users,
-    route: "/team",
+    kind: "module",
+    route: "/volunteers",
+    description: "Volunteer activity and field coordination.",
   },
   {
-    key: "communications",
-    label: "Communications",
-    icon: Mail,
-    route: "/communications",
+    key: "fundraising",
+    label: "Fundraising",
+    icon: CircleDollarSign,
+    kind: "module",
+    route: "/fundraising",
+    description: "Fundraising workspace and finance activity.",
   },
   {
-    key: "contacts",
+    key: "contact-directory",
     label: "Contacts",
     icon: Users,
+    kind: "module",
     route: "/contacts",
+    description: "Campaign contacts, supporters and relationships.",
   },
   {
-    key: "field-operations",
-    label: "Field operations",
-    icon: MapPin,
-    route: "/field-operations",
-  },
-  {
-    key: "full-calendar",
-    label: "Full calendar",
-    icon: CalendarDays,
-    route: "/calendar",
-  },
-  {
-    key: "campaign-files",
-    label: "Campaign files",
+    key: "documents",
+    label: "Documents",
     icon: Files,
+    kind: "module",
     route: "/files",
+    description: "Files, documents and shared campaign materials.",
   },
   {
-    key: "workspace-settings",
-    label: "Workspace settings",
-    icon: Settings,
-    route: "/workspace/settings",
+    key: "approvals",
+    label: "Approvals",
+    icon: FileCheck2,
+    kind: "module",
+    route: "/approvals",
+    description: "Campaign items awaiting review and approval.",
+  },
+  {
+    key: "inventory",
+    label: "Inventory",
+    icon: PackageOpen,
+    kind: "module",
+    route: "/inventory",
+    description: "Signs, materials, merchandise and campaign stock.",
+  },
+  {
+    key: "candidate",
+    label: "Candidate",
+    icon: Vote,
+    kind: "module",
+    route: "/workspace/candidate-profile",
+    description: "Candidate profile, identity and campaign details.",
+  },
+  {
+    key: "events",
+    label: "Events",
+    icon: CalendarDays,
+    kind: "module",
+    route: "/events",
+    description: "Campaign events and event operations.",
+  },
+  {
+    key: "social-media",
+    label: "Social media",
+    icon: MessageSquare,
+    kind: "module",
+    route: "/social-media",
+    description: "Social content and publishing workspace.",
+  },
+  {
+    key: "media-center",
+    label: "Media center",
+    icon: FolderKanban,
+    kind: "module",
+    route: "/media-center",
+    description: "Campaign media assets and content library.",
+  },
+  {
+    key: "reports-analytics",
+    label: "Reports & analytics",
+    icon: BarChart3,
+    kind: "module",
+    route: "/reports-analytics",
+    description: "Campaign reporting and performance analytics.",
+  },
+  {
+    key: "waiting-on",
+    label: "Waiting On",
+    icon: Clock3,
+    kind: "module",
+    route: "/waiting-on",
+    description: "Work blocked on people, vendors or approvals.",
   },
 ];
-// SPOTLIGHT SHORTCUT OPTIONS — END
+
+// DASHBOARD HQ SHORTCUT OPTIONS — END
 
 function getGreeting() {
   const hour = new Date().getHours();
@@ -804,46 +884,15 @@ const [
     quickActionsByExperience[effectiveExperienceKey] ||
     quickActionsByExperience.volunteer;
 
-  // EDITABLE SPOTLIGHT SHORTCUTS — START
-  const recommendedShortcutKeysByRole = {
-    owner: [
-      "manage-users",
-      "review-approvals",
-      "add-event",
-      "upload-file",
-    ],
-    manager: [
-      "field-operations",
-      "full-calendar",
-      "communications",
-      "volunteers",
-    ],
-    candidate: [
-      "review-approvals",
-      "full-calendar",
-      "campaign-files",
-      "communications",
-    ],
-    volunteer: [
-      "open-tasks",
-      "full-calendar",
-      "campaign-files",
-      "communications",
-    ],
-  };
-
-  const recommendedSpotlightShortcutKeys =
-    isPresentationWorkspace
-      ? [
-          "manage-users",
-          "review-approvals",
-          "add-event",
-          "upload-file",
-        ]
-      : recommendedShortcutKeysByRole[
-          effectiveExperienceKey
-        ] ||
-        recommendedShortcutKeysByRole.volunteer;
+  // EDITABLE DASHBOARD HQ SHORTCUTS — START
+  const recommendedSpotlightShortcutKeys = [
+    "messages",
+    "decisions",
+    "contacts",
+    "commitments",
+    "team-brief",
+    "risk",
+  ];
 
   const activeSpotlightShortcutKeys =
     customSpotlightShortcutKeys.length > 0
@@ -1331,15 +1380,6 @@ const [
   }, []);
   // SAFE LIVE SCHEDULE SYNC — END
 
-  const spotlightActions =
-    activeSpotlightShortcutKeys
-      .map((key) =>
-        SPOTLIGHT_SHORTCUT_OPTIONS.find(
-          (option) => option.key === key,
-        ),
-      )
-      .filter(Boolean);
-
   const toggleSpotlightShortcut = (key) => {
     setCustomSpotlightShortcutKeys((current) => {
       const selection =
@@ -1357,7 +1397,7 @@ const [
         );
       }
 
-      if (selection.length >= 4) {
+      if (selection.length >= HQ_SHORTCUT_LIMIT) {
         return selection;
       }
 
@@ -1368,7 +1408,7 @@ const [
   const resetSpotlightShortcuts = () => {
     setCustomSpotlightShortcutKeys([]);
   };
-  // EDITABLE SPOTLIGHT SHORTCUTS — END
+  // EDITABLE DASHBOARD HQ SHORTCUTS — END
 
   // PRESENTATION SPOTLIGHT ACTIONS — START
   // PRESENTATION SPOTLIGHT ACTIONS — END
@@ -1538,11 +1578,6 @@ const [
                                 </strong>
                               </h2>
 
-                              <p>
-                                One campaign hub for events, volunteer
-                                activity, approvals, files and team
-                                communication.
-                              </p>
 
                               <div className={styles.heroTags}>
                                 <span>Community</span>
@@ -1565,27 +1600,7 @@ const [
                                 </div>
 
                               </div>
-
                               <div className={styles.heroShortcutArea}>
-                                <div className={styles.heroActions}>
-                                  {spotlightActions.map((action) => {
-                                    const Icon = action.icon;
-
-                                    return (
-                                      <button
-                                        key={action.key}
-                                        type="button"
-                                        onClick={() =>
-                                          navigate(action.route)
-                                        }
-                                      >
-                                        <Icon size={15} />
-                                        <span>{action.label}</span>
-                                      </button>
-                                    );
-                                  })}
-                                </div>
-
                                 <button
                                   className={styles.editShortcutsButton}
                                   type="button"
@@ -1606,7 +1621,7 @@ const [
                                   <div
                                     className={styles.shortcutEditor}
                                     role="dialog"
-                                    aria-label="Edit campaign shortcuts"
+                                    aria-label="Edit Dashboard HQ shortcuts"
                                   >
                                     <div
                                       className={
@@ -1615,12 +1630,11 @@ const [
                                     >
                                       <div>
                                         <strong>
-                                          Campaign shortcuts
+                                          Your HQ shortcuts
                                         </strong>
 
                                         <small>
-                                          Choose up to four items to keep
-                                          in this spotlight.
+                                          Choose up to 6 items to appear on your HQ.
                                         </small>
                                       </div>
 
@@ -1654,6 +1668,17 @@ const [
                                               key={option.key}
                                               type="button"
                                               aria-pressed={isSelected}
+
+                                              disabled={
+
+                                                !isSelected &&
+
+                                                activeSpotlightShortcutKeys.length >=
+
+                                                  HQ_SHORTCUT_LIMIT
+
+                                              }
+
                                               className={
                                                 isSelected
                                                   ? styles.selectedShortcut
@@ -1666,7 +1691,10 @@ const [
                                               }
                                             >
                                               <Icon size={15} />
-                                              <span>{option.label}</span>
+
+                                              <span>
+                                                {option.label}
+                                              </span>
 
                                               {isSelected && (
                                                 <CheckCircle2 size={14} />
@@ -1686,7 +1714,12 @@ const [
                                         {
                                           activeSpotlightShortcutKeys.length
                                         }
-                                        /4 selected
+                                        /{HQ_SHORTCUT_LIMIT} selected
+                                        {" · "}
+                                        {activeSpotlightShortcutKeys.length >=
+                                        HQ_SHORTCUT_LIMIT
+                                          ? "Remove one to choose another"
+                                          : "Choose your HQ widgets"}
                                       </span>
 
                                       <button
@@ -1729,10 +1762,7 @@ const [
       </span>
 
                   <strong>Ask Campaign HQ</strong>
-                  <small>
-                    Get a quick briefing, find campaign
-                    work or ask what needs attention.
-                  </small>
+
                 </div>
 
                 <div className={styles.campaignAiAction}>
@@ -1933,6 +1963,7 @@ const [
 
                                         {/* CAMPAIGN SEAT DECISION GRID — START */}
           <section className={styles.decisionGrid}>
+            {activeSpotlightShortcutKeys.includes("messages") && (
             <article
               className={`${styles.compactCard} ${styles.candidateMessagesCard}`}
               aria-label="Messages requiring the candidate's attention"
@@ -2011,7 +2042,9 @@ const [
                 <ArrowRight size={14} />
               </button>
             </article>
+            )}
 
+            {activeSpotlightShortcutKeys.includes("decisions") && (
             <article
               className={`${styles.compactCard} ${styles.candidateDecisionsCard}`}
               aria-label="Decisions requiring the candidate's approval"
@@ -2106,7 +2139,9 @@ const [
                 </button>
               )}
             </article>
+            )}
 
+            {activeSpotlightShortcutKeys.includes("contacts") && (
             <article
               className={`${styles.compactCard} ${styles.candidateContactsCard}`}
               aria-label="People the candidate should contact"
@@ -2234,7 +2269,9 @@ const [
                 );
               })()}
             </article>
+            )}
 
+            {activeSpotlightShortcutKeys.includes("commitments") && (
             <article
               className={`${styles.compactCard} ${styles.candidateCommitmentsCard}`}
               aria-label="Candidate commitments and follow-ups"
@@ -2410,7 +2447,9 @@ const [
                 );
               })()}
             </article>
+            )}
 
+            {activeSpotlightShortcutKeys.includes("team-brief") && (
             <article
               className={`${styles.compactCard} ${styles.candidateTeamBriefCard}`}
               aria-label="Candidate team brief"
@@ -2503,7 +2542,9 @@ const [
                 </button>
               )}
             </article>
+            )}
 
+            {activeSpotlightShortcutKeys.includes("risk") && (
             <article
               className={`${styles.compactCard} ${styles.candidateRiskCard}`}
               aria-label="Candidate risk and compliance overview"
@@ -2725,6 +2766,82 @@ const [
                 );
               })()}
             </article>
+            )}
+            {SPOTLIGHT_SHORTCUT_OPTIONS
+              .filter(
+                (option) =>
+                  option.kind === "module" &&
+                  activeSpotlightShortcutKeys.includes(
+                    option.key,
+                  ),
+              )
+              .map((option) => {
+                const Icon = option.icon;
+
+                return (
+                  <article
+                    key={`hq-module-${option.key}`}
+                    className={`${styles.compactCard} ${styles.hqModuleShortcutCard}`}
+                    aria-label={`${option.label} HQ widget`}
+                  >
+                    <div className={styles.cardHeading}>
+                      <span>
+                        <Icon size={15} />
+                        {option.label}
+                      </span>
+
+                      <button
+                        type="button"
+                        onClick={() =>
+                          navigate(option.route)
+                        }
+                      >
+                        Open
+                      </button>
+                    </div>
+
+                    <div
+                      className={
+                        styles.hqModuleShortcutBody
+                      }
+                    >
+                      <span
+                        className={
+                          styles.hqModuleShortcutIcon
+                        }
+                      >
+                        <Icon size={24} />
+                      </span>
+
+                      <div>
+                        <strong>
+                          {option.label}
+                        </strong>
+
+                        <p>
+                          {option.description}
+                        </p>
+                      </div>
+                    </div>
+
+                    <button
+                      className={
+                        styles.hqModuleShortcutAction
+                      }
+                      type="button"
+                      onClick={() =>
+                        navigate(option.route)
+                      }
+                    >
+                      <span>
+                        Open {option.label}
+                      </span>
+
+                      <ArrowRight size={14} />
+                    </button>
+                  </article>
+                );
+              })}
           </section>
           {/* CAMPAIGN SEAT DECISION GRID — END */}
 

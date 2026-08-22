@@ -17748,3 +17748,162 @@
 }
 
 /* CAMPAIGN SEAT CANONICAL MOBILE SPOTLIGHT — END */
+
+
+/* DASHBOARD HQ SINGLE SHORTCUT CONTROL — START */
+
+.centerHeroStack .heroCopy {
+  display: flex;
+  flex-direction: column;
+}
+
+.centerHeroStack .heroShortcutArea {
+  position: relative !important;
+  z-index: 25 !important;
+  display: flex !important;
+  width: 100% !important;
+  align-items: flex-start !important;
+  justify-content: flex-start !important;
+  margin-top: 13px !important;
+  padding-top: 0 !important;
+}
+
+.centerHeroStack .editShortcutsButton {
+  position: static !important;
+  display: inline-flex !important;
+  width: auto !important;
+  min-width: 0 !important;
+  min-height: 30px !important;
+  align-items: center !important;
+  align-self: flex-start !important;
+  justify-content: center !important;
+  gap: 6px !important;
+  padding: 0 12px !important;
+  border: 1px solid rgba(255, 255, 255, 0.22) !important;
+  border-radius: 9px !important;
+  color: rgba(255, 255, 255, 0.9) !important;
+  background: rgba(255, 255, 255, 0.08) !important;
+  font-size: 11px !important;
+  font-weight: 800 !important;
+  line-height: 1 !important;
+  white-space: nowrap !important;
+}
+
+.centerHeroStack .editShortcutsButton:hover,
+.centerHeroStack .editShortcutsButton[aria-expanded="true"] {
+  color: #ffffff !important;
+  background: rgba(255, 255, 255, 0.15) !important;
+}
+
+.centerHeroStack .editShortcutsButton svg {
+  width: 12px !important;
+  height: 12px !important;
+  min-width: 12px !important;
+}
+
+.centerHeroStack .shortcutEditor {
+  width: min(440px, calc(100vw - 48px));
+}
+
+@media (max-width: 560px) {
+  .centerHeroStack .editShortcutsButton {
+    width: 100% !important;
+  }
+}
+
+/* DASHBOARD HQ SINGLE SHORTCUT CONTROL — END */
+
+/* EXPANDED DASHBOARD HQ WIDGET CATALOG — START */
+
+.shortcutOptions {
+  max-height: min(50vh, 430px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.shortcutOptions > button:disabled:not(.selectedShortcut) {
+  opacity: 0.4;
+  cursor: not-allowed;
+  filter: grayscale(0.15);
+}
+
+.hqModuleShortcutCard {
+  display: flex;
+  min-height: 230px;
+  flex-direction: column;
+}
+
+.hqModuleShortcutBody {
+  display: flex;
+  min-height: 0;
+  flex: 1;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 22px 16px 18px;
+}
+
+.hqModuleShortcutIcon {
+  display: grid;
+  width: 46px;
+  height: 46px;
+  flex: 0 0 46px;
+  place-items: center;
+  border-radius: 13px;
+  color: #155a91;
+  background: #edf6fd;
+}
+
+.hqModuleShortcutBody > div {
+  min-width: 0;
+}
+
+.hqModuleShortcutBody strong {
+  display: block;
+  color: #173b60;
+  font-size: 0.9rem;
+  font-weight: 850;
+}
+
+.hqModuleShortcutBody p {
+  max-width: 34ch;
+  margin: 7px 0 0;
+  color: #71879b;
+  font-size: 0.69rem;
+  font-weight: 600;
+  line-height: 1.55;
+}
+
+.hqModuleShortcutAction {
+  display: flex;
+  width: calc(100% - 28px);
+  min-height: 38px;
+  align-items: center;
+  justify-content: space-between;
+  margin: 0 14px 14px;
+  padding: 0;
+  border: 0;
+  border-top: 1px solid #e2eaf1;
+  color: #155a91;
+  background: transparent;
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.68rem;
+  font-weight: 820;
+  text-align: left;
+}
+
+.hqModuleShortcutAction:hover {
+  color: #0d4370;
+}
+
+@media (max-width: 760px) {
+  .shortcutOptions {
+    max-height: 54vh;
+  }
+
+  .hqModuleShortcutCard {
+    min-height: 205px;
+  }
+}
+
+/* EXPANDED DASHBOARD HQ WIDGET CATALOG — END */
