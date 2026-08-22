@@ -130,3 +130,59 @@
     padding: 20px;
   }
 }
+
+/* ============================================================
+   SEAT PLATFORM ADMIN — SCROLL OWNERSHIP
+
+   Desktop Admin uses a fixed viewport shell with independently
+   scrollable navigation and main content. This prevents long
+   forms from becoming trapped below the viewport.
+   ============================================================ */
+
+@media (min-width: 801px) {
+  .shell {
+    height: 100vh;
+    height: 100dvh;
+    min-height: 0;
+    overflow: hidden;
+  }
+
+  .sidebar {
+    height: 100vh;
+    height: 100dvh;
+    min-height: 0;
+    overflow-x: hidden;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+
+  .content {
+    height: 100vh;
+    height: 100dvh;
+    min-height: 0;
+    overflow-x: hidden;
+    overflow-y: auto;
+    overscroll-behavior-y: contain;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 48px;
+  }
+}
+
+@media (max-width: 800px) {
+  .shell {
+    height: auto;
+    min-height: 100vh;
+    overflow: visible;
+  }
+
+  .sidebar {
+    height: auto;
+    overflow: visible;
+  }
+
+  .content {
+    height: auto;
+    overflow: visible;
+    padding-bottom: 32px;
+  }
+}

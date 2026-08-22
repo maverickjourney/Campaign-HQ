@@ -85,6 +85,7 @@ export default function PlatformAdminShell({
           </NavLink>
 
           <NavLink
+            end
             to="/admin/customers"
             className={({ isActive }) =>
               isActive

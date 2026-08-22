@@ -513,3 +513,251 @@
     align-items: stretch;
   }
 }
+
+/* ============================================================
+   NEW CLIENT SETUP — LONG FORM USABILITY
+   ============================================================ */
+
+.clientSetup {
+  padding-bottom: 32px;
+}
+
+.saveBar {
+  position: static;
+  bottom: auto;
+  margin-top: 4px;
+  margin-bottom: 24px;
+}
+
+/*
+ * Long Admin forms must never be hidden behind fixed/sticky
+ * action controls. The user should always be able to scroll
+ * naturally to every field and then reach the save action.
+ */
+
+
+/* ============================================================
+   SEAT PLATFORM ADMIN — NEW CLIENT DESKTOP WORKSPACE
+
+   Long client setup should use the available Admin workspace,
+   not collapse into a narrow centered mobile-style column.
+   ============================================================ */
+
+.clientSetup {
+  width: 100%;
+  max-width: 1240px;
+  grid-template-columns:
+    repeat(12, minmax(0, 1fr));
+  gap: 18px;
+  align-items: start;
+}
+
+/*
+ * Prevent Admin cards from shrink-wrapping inside the form grid.
+ */
+.clientSetup > .adminPanel {
+  width: 100%;
+  max-width: none;
+  margin: 0;
+  min-width: 0;
+}
+
+/* 1. Customer */
+.clientSetup > .adminPanel:nth-of-type(1) {
+  grid-column: span 6;
+}
+
+/* 2. Primary contact */
+.clientSetup > .adminPanel:nth-of-type(2) {
+  grid-column: span 6;
+}
+
+/* 3. Commercial terms */
+.clientSetup > .adminPanel:nth-of-type(3) {
+  grid-column: 1 / -1;
+}
+
+/* 4. Modules */
+.clientSetup > .adminPanel:nth-of-type(4) {
+  grid-column: 1 / -1;
+}
+
+/* 5. Integrations + add-ons */
+.clientSetup > .adminPanel:nth-of-type(5) {
+  grid-column: span 6;
+}
+
+/* 6. Starting HQ */
+.clientSetup > .adminPanel:nth-of-type(6) {
+  grid-column: span 6;
+}
+
+/* 7. Internal sales notes */
+.clientSetup > .adminPanel:nth-of-type(7) {
+  grid-column: 1 / -1;
+}
+
+.clientSetup > .adminError,
+.clientSetup > .saveBar {
+  grid-column: 1 / -1;
+}
+
+
+/* ------------------------------------------------------------
+   Commercial terms
+   ------------------------------------------------------------ */
+
+.clientSetup
+  > .adminPanel:nth-of-type(3)
+  .formGrid {
+  grid-template-columns:
+    repeat(4, minmax(0, 1fr));
+}
+
+.clientSetup
+  > .adminPanel:nth-of-type(3)
+  .wide {
+  grid-column: 1 / -1;
+}
+
+
+/* ------------------------------------------------------------
+   Module / option grids
+   ------------------------------------------------------------ */
+
+.clientSetup
+  > .adminPanel:nth-of-type(4)
+  .checkboxGrid {
+  grid-template-columns:
+    repeat(4, minmax(0, 1fr));
+}
+
+.clientSetup
+  > .adminPanel:nth-of-type(5)
+  .checkboxGrid,
+.clientSetup
+  > .adminPanel:nth-of-type(6)
+  .checkboxGrid {
+  grid-template-columns:
+    repeat(2, minmax(0, 1fr));
+}
+
+
+/* ------------------------------------------------------------
+   General card / field proportions
+   ------------------------------------------------------------ */
+
+.clientSetup .adminPanel {
+  padding: 24px;
+}
+
+.clientSetup .adminPanel h2 {
+  margin-bottom: 20px;
+  font-size: 20px;
+}
+
+.clientSetup .formGrid {
+  gap: 16px;
+}
+
+.clientSetup .checkboxGrid {
+  gap: 11px;
+}
+
+.clientSetup .checkboxCard {
+  min-height: 52px;
+  align-items: center;
+  padding: 13px 14px;
+}
+
+.clientSetup .checkboxCard input {
+  flex: 0 0 auto;
+  margin: 0;
+}
+
+.clientSetup .checkboxCard span {
+  min-width: 0;
+  line-height: 1.35;
+}
+
+.clientSetup .notes {
+  width: 100%;
+  min-height: 150px;
+}
+
+
+/* ------------------------------------------------------------
+   Save action
+   ------------------------------------------------------------ */
+
+.clientSetup .saveBar {
+  width: 100%;
+  margin: 2px 0 28px;
+}
+
+
+/* ------------------------------------------------------------
+   Medium screens
+   ------------------------------------------------------------ */
+
+@media (max-width: 1180px) {
+  .clientSetup {
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+  }
+
+  .clientSetup > .adminPanel:nth-of-type(1),
+  .clientSetup > .adminPanel:nth-of-type(2),
+  .clientSetup > .adminPanel:nth-of-type(5),
+  .clientSetup > .adminPanel:nth-of-type(6) {
+    grid-column: span 1;
+  }
+
+  .clientSetup > .adminPanel:nth-of-type(3),
+  .clientSetup > .adminPanel:nth-of-type(4),
+  .clientSetup > .adminPanel:nth-of-type(7),
+  .clientSetup > .adminError,
+  .clientSetup > .saveBar {
+    grid-column: 1 / -1;
+  }
+
+  .clientSetup
+    > .adminPanel:nth-of-type(4)
+    .checkboxGrid {
+    grid-template-columns:
+      repeat(3, minmax(0, 1fr));
+  }
+}
+
+
+/* ------------------------------------------------------------
+   Tablet / mobile
+   ------------------------------------------------------------ */
+
+@media (max-width: 850px) {
+  .clientSetup {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .clientSetup > .adminPanel:nth-of-type(n),
+  .clientSetup > .adminError,
+  .clientSetup > .saveBar {
+    grid-column: 1;
+  }
+
+  .clientSetup
+    > .adminPanel:nth-of-type(3)
+    .formGrid,
+  .clientSetup
+    > .adminPanel:nth-of-type(4)
+    .checkboxGrid,
+  .clientSetup
+    > .adminPanel:nth-of-type(5)
+    .checkboxGrid,
+  .clientSetup
+    > .adminPanel:nth-of-type(6)
+    .checkboxGrid {
+    grid-template-columns: 1fr;
+  }
+}
