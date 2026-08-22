@@ -233,7 +233,16 @@ export default function PlatformAdminCustomers() {
                   </div>
 
                   <div>
-                    {customer.currentDeal?.deal_code ? (
+                    {customer.currentProposal?.id ? (
+                      <Link
+                        className={styles.tableAction}
+                        to={`/admin/proposals/${customer.currentProposal.id}`}
+                      >
+                        {customer.currentProposal.status === "approved"
+                          ? "Continue onboarding"
+                          : "View proposal"}
+                      </Link>
+                    ) : customer.currentDeal?.deal_code ? (
                       <Link
                         className={styles.tableAction}
                         to={`/admin/deals/${customer.currentDeal.deal_code}/proposal`}

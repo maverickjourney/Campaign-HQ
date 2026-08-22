@@ -109,6 +109,14 @@ export async function loadPlatformCustomers() {
           expected_monthly_cents,
           expected_setup_cents,
           updated_at
+        ),
+        seat_proposals (
+          id,
+          proposal_code,
+          status,
+          version,
+          approved_at,
+          updated_at
         )
       `,
     )
@@ -130,6 +138,9 @@ export async function loadPlatformCustomers() {
     const deals =
       customer.seat_deals || [];
 
+    const proposals =
+      customer.seat_proposals || [];
+
     const primaryContact =
       contacts.find(
         (contact) =>
@@ -146,10 +157,20 @@ export async function loadPlatformCustomers() {
           new Date(a.updated_at || 0),
       )[0] || null;
 
+    const currentProposal =
+      [...proposals].sort(
+        (a, b) =>
+          Number(b.version || 0) -
+            Number(a.version || 0) ||
+          new Date(b.updated_at || 0) -
+            new Date(a.updated_at || 0),
+      )[0] || null;
+
     return {
       ...customer,
       primaryContact,
       currentDeal,
+      currentProposal,
     };
   });
 }
