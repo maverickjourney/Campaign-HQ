@@ -40,6 +40,10 @@ import CampaignSetupWizard from "./pages/CampaignSetupWizard/CampaignSetupWizard
 import WorkspaceSelector from "./pages/WorkspaceSelector/WorkspaceSelector";
 import Support from "./pages/Support/Support";
 import SupportLauncher from "./components/SupportLauncher/SupportLauncher";
+import PlatformAdminGuard from "./components/auth/PlatformAdminGuard/PlatformAdminGuard";
+import PlatformAdminLogin from "./pages/PlatformAdmin/PlatformAdminLogin";
+import PlatformAdminHome from "./pages/PlatformAdmin/PlatformAdminHome";
+
 
 const LEADERSHIP_EXPERIENCES = [
   "owner",
@@ -56,6 +60,20 @@ export default function Router() {
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<Login />} />
+        <Route
+          path="/admin/login"
+          element={<PlatformAdminLogin />}
+        />
+
+        <Route
+          path="/admin"
+          element={
+            <PlatformAdminGuard>
+              <PlatformAdminHome />
+            </PlatformAdminGuard>
+          }
+        />
+
 
         <Route
           path="/support"
