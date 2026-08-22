@@ -374,6 +374,46 @@ export default function SeatOnboardingStart() {
 
 
   if (
+    !invitation?.found &&
+    invitation?.used
+  ) {
+    return (
+      <main className={styles.page}>
+        <section className={styles.messageCard}>
+          <SeatBrand
+            variant="wordmark"
+            color="black"
+            className={styles.messageLogo}
+          />
+
+          <ShieldCheck size={38} />
+
+          <h1>
+            Your Seat account is ready
+          </h1>
+
+          <p>
+            This one-time onboarding invitation has already been used. Sign in with the account you created to continue onboarding.
+          </p>
+
+          <button
+            className={styles.primary}
+            type="button"
+            onClick={() =>
+              navigate(
+                "/onboarding/sign-in",
+              )
+            }
+          >
+            Continue to Sign In
+          </button>
+        </section>
+      </main>
+    );
+  }
+
+
+  if (
     !invitation?.found
   ) {
     return (

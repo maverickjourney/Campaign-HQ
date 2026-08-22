@@ -613,6 +613,33 @@ export default function PlatformAdminProposalPreview() {
                     The approved customer can sign in and continue onboarding.
                   </span>
                 </div>
+
+                <button
+                  className={styles.secondaryAction}
+                  type="button"
+                  onClick={() =>
+                    navigator.clipboard.writeText(
+                      `${window.location.origin}/onboarding/sign-in?email=${encodeURIComponent(
+                        proposal.client_email,
+                      )}`,
+                    )
+                  }
+                >
+                  <Copy size={16} />
+                  Copy client sign-in link
+                </button>
+
+                <a
+                  className={styles.primaryAction}
+                  href={`${window.location.origin}/onboarding/sign-in?email=${encodeURIComponent(
+                    proposal.client_email,
+                  )}`}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  <ExternalLink size={16} />
+                  Open client sign-in
+                </a>
               </>
             ) : (
               <>

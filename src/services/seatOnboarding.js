@@ -307,3 +307,115 @@ export async function resendSeatVerificationEmail(
     ok: true,
   };
 }
+
+
+export async function signInSeatOnboarding({
+  email,
+  password,
+  captchaToken,
+}) {
+  const normalizedEmail =
+    normalizeEmail(
+      email,
+    );
+
+  if (
+    !normalizedEmail ||
+    !password
+  ) {
+    throw new Error(
+      "Enter your email and password.",
+    );
+  }
+
+  if (!captchaToken) {
+    throw new Error(
+      "Wait for the browser security check to finish.",
+    );
+  }
+
+  const {
+    data,
+    error,
+  } =
+    await supabase.auth
+      .signInWithPassword({
+        email:
+          normalizedEmail,
+
+        password,
+
+        options: {
+          captchaToken,
+        },
+      });
+
+  if (error) {
+    console.error(error);
+
+    const message =
+      String(
+        error.message ||
+        "",
+      );
+
+    if (
+      /email.*confirm|confirm.*email/i.test(
+        message,
+      )
+    ) {
+      return {
+        status:
+          "confirmation_required",
+
+        email:
+          normalizedEmail,
+      };
+    }
+
+    if (
+      /invalid login credentials/i.test(
+        message,
+      )
+    ) {
+      throw new Error(
+        "The email or password is incorrect.",
+      );
+    }
+
+    if (
+      /captcha|challenge/i.test(
+        message,
+      )
+    ) {
+      throw new Error(
+        "The browser security check expired. Complete it again and retry.",
+      );
+    }
+
+    throw new Error(
+      message ||
+        "Seat onboarding sign-in could not be completed.",
+    );
+  }
+
+  if (
+    !data.user ||
+    !data.session
+  ) {
+    throw new Error(
+      "A secure onboarding session could not be opened.",
+    );
+  }
+
+  return {
+    status:
+      "ready",
+
+    user:
+      data.user,
+
+    session:
+      data.session,
+  };
+}
