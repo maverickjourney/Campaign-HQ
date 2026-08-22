@@ -20,6 +20,9 @@ import {
   respondToClientProposal,
 } from "../../services/platformAdminData";
 
+import SeatBrand
+  from "../../components/brand/SeatBrand/SeatBrand";
+
 import styles
   from "./SeatProposal.module.css";
 
@@ -284,10 +287,12 @@ export default function SeatProposal() {
   return (
     <main className={styles.page}>
       <header className={styles.topbar}>
-        <div>
-          <strong>
-            Seat Platform
-          </strong>
+        <div className={styles.clientBrand}>
+          <SeatBrand
+            variant="wordmark"
+            color="white"
+            className={styles.clientBrandLogo}
+          />
 
           <span>
             Secure Client Proposal

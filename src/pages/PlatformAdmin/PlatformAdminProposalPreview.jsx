@@ -18,6 +18,9 @@ import {
 import PlatformAdminShell
   from "../../components/admin/PlatformAdminShell/PlatformAdminShell";
 
+import SeatBrand
+  from "../../components/brand/SeatBrand/SeatBrand";
+
 import {
   loadAdminProposal,
   sendPlatformProposal,
@@ -304,6 +307,13 @@ export default function PlatformAdminProposalPreview() {
 
       <section className={styles.proposalPreview}>
         <div className={styles.proposalPreviewHeader}>
+          <div className={styles.proposalBrand}>
+            <SeatBrand
+              variant="wordmark"
+              color="black"
+              className={styles.proposalBrandLogo}
+            />
+          </div>
           <span>
             {proposal.product
               ?.product_name}

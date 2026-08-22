@@ -1,0 +1,15 @@
+.logo {
+  display: block;
+  max-width: 100%;
+  object-fit: contain;
+  user-select: none;
+}
+
+.mark {
+  aspect-ratio: 1;
+}
+
+.wordmark {
+  width: auto;
+  height: auto;
+}

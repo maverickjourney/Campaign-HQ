@@ -1213,3 +1213,26 @@
     border-top: 1px solid #e4e9ef;
   }
 }
+
+/* CAMPAIGN SEAT OFFICIAL ADMIN BRAND */
+.adminBrand {
+  margin-bottom: 22px;
+}
+
+.adminBrandLogo {
+  width: min(100%, 320px);
+  max-height: 92px;
+  object-fit: contain;
+  object-position: left center;
+}
+
+.proposalBrand {
+  margin-bottom: 22px;
+}
+
+.proposalBrandLogo {
+  width: min(100%, 290px);
+  max-height: 80px;
+  object-fit: contain;
+  object-position: left center;
+}

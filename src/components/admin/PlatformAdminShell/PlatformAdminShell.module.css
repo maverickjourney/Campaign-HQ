@@ -186,3 +186,11 @@
     padding-bottom: 32px;
   }
 }
+
+/* CAMPAIGN SEAT OFFICIAL SIDEBAR BRAND */
+.brandMark {
+  width: 44px;
+  height: 44px;
+  flex: 0 0 44px;
+  object-fit: contain;
+}

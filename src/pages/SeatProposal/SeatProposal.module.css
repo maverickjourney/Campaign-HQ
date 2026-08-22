@@ -427,3 +427,33 @@
     padding-bottom: 32px;
   }
 }
+
+/* CAMPAIGN SEAT OFFICIAL CLIENT BRAND */
+.clientBrand {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
+.clientBrandLogo {
+  width: 230px;
+  max-height: 58px;
+  object-fit: contain;
+  object-position: left center;
+}
+
+.clientBrand > span {
+  padding-left: 18px;
+  border-left: 1px solid rgba(255, 255, 255, 0.18);
+}
+
+@media (max-width: 700px) {
+  .clientBrandLogo {
+    width: 170px;
+    max-height: 46px;
+  }
+
+  .clientBrand > span {
+    display: none;
+  }
+}

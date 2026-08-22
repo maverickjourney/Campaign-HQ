@@ -18,6 +18,9 @@ import {
 import TurnstileChallenge
   from "../../components/security/TurnstileChallenge/TurnstileChallenge";
 
+import SeatBrand
+  from "../../components/brand/SeatBrand/SeatBrand";
+
 import {
   signInToPlatformAdmin,
 } from "../../services/platformAdminAuth";
@@ -140,6 +143,14 @@ export default function PlatformAdminLogin() {
   return (
     <main className={styles.loginPage}>
       <section className={styles.loginCard}>
+        <div className={styles.adminBrand}>
+          <SeatBrand
+            variant="wordmark"
+            color="black"
+            className={styles.adminBrandLogo}
+          />
+        </div>
+
         <div className={styles.adminBadge}>
           <ShieldCheck size={20} />
           Seat Platform Admin

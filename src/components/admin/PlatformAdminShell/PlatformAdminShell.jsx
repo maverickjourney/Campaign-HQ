@@ -15,6 +15,9 @@ import {
   signOutPlatformAdmin,
 } from "../../../services/platformAdminAuth";
 
+import SeatBrand
+  from "../../brand/SeatBrand/SeatBrand";
+
 import styles
   from "./PlatformAdminShell.module.css";
 
@@ -41,9 +44,11 @@ export default function PlatformAdminShell({
     <div className={styles.shell}>
       <aside className={styles.sidebar}>
         <div className={styles.brand}>
-          <div className={styles.mark}>
-            S
-          </div>
+          <SeatBrand
+            variant="mark"
+            color="white"
+            className={styles.brandMark}
+          />
 
           <div>
             <strong>
