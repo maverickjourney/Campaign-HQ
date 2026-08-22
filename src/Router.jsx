@@ -48,6 +48,9 @@ import PlatformAdminNewClient from "./pages/PlatformAdmin/PlatformAdminNewClient
 import PlatformAdminProposalBuilder from "./pages/PlatformAdmin/PlatformAdminProposalBuilder";
 import PlatformAdminProposalPreview from "./pages/PlatformAdmin/PlatformAdminProposalPreview";
 import SeatProposal from "./pages/SeatProposal/SeatProposal";
+import SeatOnboardingStart from "./pages/SeatOnboarding/SeatOnboardingStart";
+import SeatOnboardingContinue from "./pages/SeatOnboarding/SeatOnboardingContinue";
+
 
 
 
@@ -120,6 +123,16 @@ export default function Router() {
         <Route
           path="/proposal/:token"
           element={<SeatProposal />}
+        />
+
+        <Route
+          path="/onboarding/:token"
+          element={<SeatOnboardingStart />}
+        />
+
+        <Route
+          path="/onboarding/continue"
+          element={<SeatOnboardingContinue />}
         />
 
 

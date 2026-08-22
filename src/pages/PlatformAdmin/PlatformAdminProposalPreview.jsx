@@ -26,6 +26,10 @@ import {
   sendPlatformProposal,
 } from "../../services/platformAdminData";
 
+import {
+  provisionApprovedSeatProposal,
+} from "../../services/seatOnboarding";
+
 import styles
   from "./PlatformAdmin.module.css";
 
@@ -164,6 +168,22 @@ export default function PlatformAdminProposalPreview() {
     setCopied,
   ] = useState(false);
 
+
+  const [
+    onboardingRole,
+    setOnboardingRole,
+  ] = useState("candidate");
+
+  const [
+    provisioning,
+    setProvisioning,
+  ] = useState(false);
+
+  const [
+    onboardingResult,
+    setOnboardingResult,
+  ] = useState(null);
+
   useEffect(() => {
     let active = true;
 
@@ -237,6 +257,33 @@ export default function PlatformAdminProposalPreview() {
         setSending(false);
       }
     };
+
+  const provisionOnboarding =
+    async () => {
+      setProvisioning(true);
+      setError("");
+
+      try {
+        const result =
+          await provisionApprovedSeatProposal(
+            proposalId,
+            onboardingRole,
+          );
+
+        setOnboardingResult(
+          result,
+        );
+      } catch (provisionError) {
+        setError(
+          provisionError instanceof Error
+            ? provisionError.message
+            : "Client onboarding could not be provisioned.",
+        );
+      } finally {
+        setProvisioning(false);
+      }
+    };
+
 
   const copyLink =
     async () => {
@@ -553,7 +600,110 @@ export default function PlatformAdminProposalPreview() {
       </section>
 
       <section className={styles.proposalSendPanel}>
-        {!clientLink ? (
+        {proposal.status === "approved" ? (
+          onboardingResult ? (
+            onboardingResult.existing_user ? (
+              <>
+                <div>
+                  <strong>
+                    Existing Seat account linked.
+                  </strong>
+
+                  <span>
+                    The approved customer can sign in and continue onboarding.
+                  </span>
+                </div>
+              </>
+            ) : (
+              <>
+                <div className={styles.clientLinkBox}>
+                  <strong>
+                    Private onboarding link
+                  </strong>
+
+                  <span>
+                    {`${window.location.origin}/onboarding/${onboardingResult.invitation_token}`}
+                  </span>
+                </div>
+
+                <button
+                  className={styles.secondaryAction}
+                  type="button"
+                  onClick={() =>
+                    navigator.clipboard.writeText(
+                      `${window.location.origin}/onboarding/${onboardingResult.invitation_token}`,
+                    )
+                  }
+                >
+                  <Copy size={16} />
+                  Copy onboarding link
+                </button>
+
+                <a
+                  className={styles.primaryAction}
+                  href={`${window.location.origin}/onboarding/${onboardingResult.invitation_token}`}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  <ExternalLink size={16} />
+                  Open onboarding
+                </a>
+              </>
+            )
+          ) : (
+            <>
+              <div>
+                <strong>
+                  Proposal approved.
+                </strong>
+
+                <span>
+                  Provision the product account, pending billing record and private onboarding invitation.
+                </span>
+              </div>
+
+              <label className={styles.onboardingRoleField}>
+                Initial role
+
+                <select
+                  value={onboardingRole}
+                  onChange={(event) =>
+                    setOnboardingRole(
+                      event.target.value,
+                    )
+                  }
+                >
+                  <option value="candidate">
+                    Candidate
+                  </option>
+
+                  <option value="campaign_manager">
+                    Campaign Manager
+                  </option>
+
+                  <option value="campaign_consultant">
+                    Campaign Consultant
+                  </option>
+
+                  <option value="campaign_administrator">
+                    Campaign Administrator
+                  </option>
+                </select>
+              </label>
+
+              <button
+                className={styles.primaryAction}
+                type="button"
+                onClick={provisionOnboarding}
+                disabled={provisioning}
+              >
+                {provisioning
+                  ? "Provisioning…"
+                  : "Start Client Onboarding"}
+              </button>
+            </>
+          )
+        ) : !clientLink ? (
           <>
             <div>
               <strong>

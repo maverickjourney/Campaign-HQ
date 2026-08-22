@@ -1236,3 +1236,23 @@
   object-fit: contain;
   object-position: left center;
 }
+
+/* SEAT PLATFORM — APPROVED PROPOSAL ONBOARDING */
+.onboardingRoleField {
+  display: grid;
+  gap: 5px;
+  color: #53657a;
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.onboardingRoleField select {
+  min-height: 38px;
+  padding: 0 10px;
+  border: 1px solid #ccd6e2;
+  border-radius: 9px;
+  background: #ffffff;
+  color: #10233f;
+  font: inherit;
+  font-size: 12px;
+}
