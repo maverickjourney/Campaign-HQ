@@ -356,3 +356,386 @@ export async function createPlatformClientDraft(
 
   return data?.[0] || null;
 }
+
+
+export async function loadProposalBuilder(
+  dealCode,
+) {
+  const normalized =
+    String(dealCode || "")
+      .trim()
+      .toUpperCase();
+
+  const {
+    data: deal,
+    error: dealError,
+  } =
+    await supabase
+      .from("seat_deals")
+      .select(
+        `
+          id,
+          deal_code,
+          customer_id,
+          product_id,
+          currency,
+          expected_monthly_cents,
+          expected_setup_cents,
+          contract_term_months,
+          notes,
+          metadata
+        `,
+      )
+      .eq(
+        "deal_code",
+        normalized,
+      )
+      .single();
+
+  if (dealError || !deal) {
+    throw new Error(
+      "Deal could not be loaded.",
+    );
+  }
+
+  const [
+    customerResult,
+    productResult,
+  ] =
+    await Promise.all([
+      supabase
+        .from("seat_customers")
+        .select(
+          `
+            id,
+            display_name,
+            customer_type,
+            billing_email,
+            seat_customer_contacts (
+              id,
+              full_name,
+              email,
+              phone,
+              is_primary,
+              status
+            )
+          `,
+        )
+        .eq(
+          "id",
+          deal.customer_id,
+        )
+        .single(),
+
+      supabase
+        .from("seat_products")
+        .select(
+          "id, product_name, hq_label",
+        )
+        .eq(
+          "id",
+          deal.product_id,
+        )
+        .single(),
+    ]);
+
+  if (
+    customerResult.error ||
+    productResult.error
+  ) {
+    throw new Error(
+      "Proposal customer information could not be loaded.",
+    );
+  }
+
+  const contacts =
+    customerResult
+      .data
+      ?.seat_customer_contacts ||
+    [];
+
+  const primaryContact =
+    contacts.find(
+      (contact) =>
+        contact.is_primary &&
+        contact.status === "active",
+    ) ||
+    contacts[0] ||
+    null;
+
+  return {
+    deal,
+
+    customer:
+      customerResult.data,
+
+    product:
+      productResult.data,
+
+    primaryContact,
+  };
+}
+
+
+export async function createPlatformProposalDraft(
+  values,
+) {
+  const {
+    data,
+    error,
+  } =
+    await supabase.rpc(
+      "create_seat_proposal_draft",
+      {
+        target_deal_code:
+          values.dealCode,
+
+        target_customer_display_name:
+          values.customerName,
+
+        target_client_name:
+          values.clientName,
+
+        target_client_email:
+          values.clientEmail,
+
+        target_monthly_cents:
+          values.monthlyCents,
+
+        target_setup_cents:
+          values.setupCents,
+
+        target_contract_term_months:
+          values.contractMonths,
+
+        target_valid_days:
+          values.validDays,
+
+        target_terms_summary:
+          values.termsSummary,
+      },
+    );
+
+  if (error) {
+    console.error(error);
+
+    throw new Error(
+      error.message ||
+        "Proposal draft could not be created.",
+    );
+  }
+
+  return data?.[0] || null;
+}
+
+
+export async function loadAdminProposal(
+  proposalId,
+) {
+  const {
+    data: proposal,
+    error,
+  } =
+    await supabase
+      .from("seat_proposals")
+      .select(
+        `
+          id,
+          proposal_code,
+          deal_id,
+          customer_id,
+          product_id,
+          client_name,
+          client_email,
+          status,
+          version,
+          currency,
+          monthly_total_cents,
+          annual_total_cents,
+          setup_total_cents,
+          contract_term_months,
+          valid_until,
+          terms_summary,
+          dashboard_config,
+          onboarding_config,
+          metadata,
+          seat_proposal_items (
+            id,
+            item_type,
+            item_key,
+            display_name,
+            description,
+            quantity,
+            unit_amount_cents,
+            billing_cadence,
+            included,
+            sort_order
+          )
+        `,
+      )
+      .eq(
+        "id",
+        proposalId,
+      )
+      .single();
+
+  if (error || !proposal) {
+    throw new Error(
+      "Proposal could not be loaded.",
+    );
+  }
+
+  const [
+    customer,
+    product,
+  ] =
+    await Promise.all([
+      supabase
+        .from("seat_customers")
+        .select(
+          "id, display_name",
+        )
+        .eq(
+          "id",
+          proposal.customer_id,
+        )
+        .single(),
+
+      supabase
+        .from("seat_products")
+        .select(
+          "id, product_name, hq_label",
+        )
+        .eq(
+          "id",
+          proposal.product_id,
+        )
+        .single(),
+    ]);
+
+  if (
+    customer.error ||
+    product.error
+  ) {
+    throw new Error(
+      "Proposal details could not be loaded.",
+    );
+  }
+
+  return {
+    ...proposal,
+
+    customer:
+      customer.data,
+
+    product:
+      product.data,
+
+    items:
+      [
+        ...(
+          proposal.seat_proposal_items ||
+          []
+        ),
+      ].sort(
+        (a, b) =>
+          (a.sort_order || 0) -
+          (b.sort_order || 0),
+      ),
+  };
+}
+
+
+export async function sendPlatformProposal(
+  proposalId,
+  validDays,
+) {
+  const {
+    data,
+    error,
+  } =
+    await supabase.rpc(
+      "send_seat_proposal",
+      {
+        target_proposal_id:
+          proposalId,
+
+        target_valid_days:
+          validDays || null,
+      },
+    );
+
+  if (error) {
+    console.error(error);
+
+    throw new Error(
+      error.message ||
+        "Secure proposal link could not be generated.",
+    );
+  }
+
+  return data?.[0] || null;
+}
+
+
+export async function loadClientProposal(
+  token,
+) {
+  const {
+    data,
+    error,
+  } =
+    await supabase.rpc(
+      "get_seat_proposal_by_token",
+      {
+        target_token:
+          token,
+      },
+    );
+
+  if (error) {
+    console.error(error);
+
+    throw new Error(
+      "Proposal could not be opened.",
+    );
+  }
+
+  return data;
+}
+
+
+export async function respondToClientProposal(
+  token,
+  action,
+  note = "",
+) {
+  const {
+    data,
+    error,
+  } =
+    await supabase.rpc(
+      "respond_to_seat_proposal",
+      {
+        target_token:
+          token,
+
+        target_action:
+          action,
+
+        target_note:
+          note || null,
+      },
+    );
+
+  if (error) {
+    console.error(error);
+
+    throw new Error(
+      error.message ||
+        "Proposal response could not be saved.",
+    );
+  }
+
+  return data;
+}

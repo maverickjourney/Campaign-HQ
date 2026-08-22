@@ -45,6 +45,10 @@ import PlatformAdminLogin from "./pages/PlatformAdmin/PlatformAdminLogin";
 import PlatformAdminHome from "./pages/PlatformAdmin/PlatformAdminHome";
 import PlatformAdminCustomers from "./pages/PlatformAdmin/PlatformAdminCustomers";
 import PlatformAdminNewClient from "./pages/PlatformAdmin/PlatformAdminNewClient";
+import PlatformAdminProposalBuilder from "./pages/PlatformAdmin/PlatformAdminProposalBuilder";
+import PlatformAdminProposalPreview from "./pages/PlatformAdmin/PlatformAdminProposalPreview";
+import SeatProposal from "./pages/SeatProposal/SeatProposal";
+
 
 
 
@@ -93,6 +97,29 @@ export default function Router() {
               <PlatformAdminNewClient />
             </PlatformAdminGuard>
           }
+        />
+
+        <Route
+          path="/admin/deals/:dealCode/proposal"
+          element={
+            <PlatformAdminGuard>
+              <PlatformAdminProposalBuilder />
+            </PlatformAdminGuard>
+          }
+        />
+
+        <Route
+          path="/admin/proposals/:proposalId"
+          element={
+            <PlatformAdminGuard>
+              <PlatformAdminProposalPreview />
+            </PlatformAdminGuard>
+          }
+        />
+
+        <Route
+          path="/proposal/:token"
+          element={<SeatProposal />}
         />
 
 

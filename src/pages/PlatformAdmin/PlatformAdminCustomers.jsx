@@ -231,6 +231,19 @@ export default function PlatformAdminCustomers() {
                       setup
                     </span>
                   </div>
+
+                  <div>
+                    {customer.currentDeal?.deal_code ? (
+                      <Link
+                        className={styles.tableAction}
+                        to={`/admin/deals/${customer.currentDeal.deal_code}/proposal`}
+                      >
+                        Build proposal
+                      </Link>
+                    ) : (
+                      <span>—</span>
+                    )}
+                  </div>
                 </article>
               ),
             )}

@@ -761,3 +761,287 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* ============================================================
+   SEAT PLATFORM ADMIN — PROPOSALS
+   ============================================================ */
+
+.secondaryAction,
+.tableAction {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  border: 1px solid #ccd6e2;
+  border-radius: 9px;
+  background: #fff;
+  color: #16365c;
+  font-size: 13px;
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.secondaryAction {
+  min-height: 42px;
+  padding: 0 14px;
+}
+
+.tableAction {
+  min-height: 34px;
+  padding: 0 10px;
+}
+
+.customerCard {
+  grid-template-columns:
+    1.2fr 1.15fr .75fr .9fr auto;
+}
+
+.proposalBuilder {
+  width: 100%;
+  max-width: 1100px;
+  margin: 0 auto;
+  display: grid;
+  gap: 16px;
+  padding-bottom: 30px;
+}
+
+.proposalBuilder > .adminPanel {
+  width: 100%;
+  max-width: none;
+  margin: 0;
+}
+
+.proposalTermsGrid {
+  display: grid;
+  grid-template-columns:
+    repeat(4, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.proposalTermsGrid label,
+.proposalMessageGrid label {
+  display: grid;
+  gap: 7px;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.proposalTermsGrid input,
+.proposalMessageGrid input,
+.proposalMessageGrid textarea {
+  width: 100%;
+  box-sizing: border-box;
+  min-height: 43px;
+  padding: 10px 11px;
+  border: 1px solid #cdd7e3;
+  border-radius: 9px;
+  background: #fff;
+  color: #10233f;
+  font: inherit;
+}
+
+.proposalMessageGrid {
+  display: grid;
+  gap: 14px;
+}
+
+.proposalConfigSummary {
+  display: grid;
+  grid-template-columns:
+    repeat(4, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.proposalConfigSummary > div {
+  display: grid;
+  gap: 5px;
+  padding: 15px;
+  border: 1px solid #e0e6ee;
+  border-radius: 10px;
+  background: #f8fafc;
+}
+
+.proposalConfigSummary span {
+  color: #65758b;
+  font-size: 13px;
+}
+
+.proposalActionBar,
+.proposalSendPanel {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 14px;
+  padding: 16px 18px;
+  border: 1px solid #dce3ec;
+  border-radius: 12px;
+  background: #fff;
+}
+
+.proposalActionBar > div,
+.proposalSendPanel > div {
+  display: grid;
+  gap: 4px;
+}
+
+.proposalActionBar span,
+.proposalSendPanel span {
+  color: #65758b;
+  font-size: 12px;
+}
+
+.proposalPreview {
+  width: min(100%, 900px);
+  margin: 0 auto 18px;
+  display: grid;
+  gap: 14px;
+}
+
+.proposalPreviewHeader,
+.proposalPricing,
+.proposalItemList,
+.proposalTermsBox {
+  border: 1px solid #dce3ec;
+  border-radius: 14px;
+  background: #fff;
+}
+
+.proposalPreviewHeader {
+  padding: 30px;
+}
+
+.proposalPreviewHeader > span {
+  color: #65758b;
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.proposalPreviewHeader h2 {
+  margin: 7px 0;
+  font-size: 34px;
+}
+
+.proposalPreviewHeader p,
+.proposalPreviewHeader small,
+.proposalSummary {
+  color: #65758b;
+}
+
+.proposalPricing {
+  display: grid;
+  grid-template-columns:
+    repeat(3, 1fr);
+  overflow: hidden;
+}
+
+.proposalPricing > div {
+  display: grid;
+  gap: 5px;
+  padding: 20px;
+}
+
+.proposalPricing > div + div {
+  border-left: 1px solid #e0e6ee;
+}
+
+.proposalPricing span {
+  color: #65758b;
+  font-size: 12px;
+}
+
+.proposalPricing strong {
+  font-size: 25px;
+}
+
+.proposalSummary {
+  margin: 0;
+  padding: 2px 5px;
+  line-height: 1.6;
+}
+
+.proposalItemList {
+  display: grid;
+  grid-template-columns:
+    repeat(2, minmax(0, 1fr));
+  gap: 9px;
+  padding: 18px;
+}
+
+.proposalItemList article {
+  display: grid;
+  grid-template-columns:
+    auto minmax(0, 1fr) auto;
+  gap: 9px;
+  padding: 12px;
+  border: 1px solid #e5e9ef;
+  border-radius: 9px;
+}
+
+.proposalItemList article > svg {
+  color: #21875a;
+}
+
+.proposalItemList article div {
+  display: grid;
+  gap: 3px;
+}
+
+.proposalItemList article span {
+  color: #65758b;
+  font-size: 11px;
+}
+
+.proposalTermsBox {
+  padding: 18px;
+}
+
+.proposalTermsBox p {
+  margin-bottom: 0;
+  color: #65758b;
+}
+
+.proposalSendPanel {
+  width: min(100%, 900px);
+  box-sizing: border-box;
+  margin: 0 auto 30px;
+}
+
+.clientLinkBox {
+  min-width: 0;
+  flex: 1;
+}
+
+.clientLinkBox span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@media (max-width: 900px) {
+  .proposalTermsGrid,
+  .proposalConfigSummary,
+  .proposalPricing,
+  .proposalItemList {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .customerCard {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 650px) {
+  .proposalTermsGrid,
+  .proposalConfigSummary,
+  .proposalPricing,
+  .proposalItemList {
+    grid-template-columns: 1fr;
+  }
+
+  .proposalSendPanel,
+  .proposalActionBar {
+    align-items: stretch;
+    flex-direction: column;
+  }
+}
