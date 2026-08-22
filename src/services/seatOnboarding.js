@@ -245,3 +245,65 @@ export async function loadMySeatOnboarding() {
 
   return data;
 }
+
+
+export async function resendSeatVerificationEmail(
+  email,
+) {
+  const normalizedEmail =
+    normalizeEmail(
+      email,
+    );
+
+  if (!normalizedEmail) {
+    throw new Error(
+      "Verification email is missing.",
+    );
+  }
+
+  const {
+    error,
+  } =
+    await supabase.auth
+      .resend({
+        type:
+          "signup",
+
+        email:
+          normalizedEmail,
+
+        options: {
+          emailRedirectTo:
+            `${window.location.origin}/onboarding/continue`,
+        },
+      });
+
+  if (error) {
+    console.error(error);
+
+    const message =
+      String(
+        error.message ||
+        "",
+      );
+
+    if (
+      /rate limit/i.test(
+        message,
+      )
+    ) {
+      throw new Error(
+        "A verification email was requested recently. Wait a minute before trying again.",
+      );
+    }
+
+    throw new Error(
+      message ||
+        "The verification email could not be resent.",
+    );
+  }
+
+  return {
+    ok: true,
+  };
+}

@@ -484,3 +484,51 @@
     padding-bottom: 40px;
   }
 }
+
+
+/* ============================================================
+   SEAT ONBOARDING — EMAIL VERIFICATION RESEND
+   ============================================================ */
+
+.resendButton {
+  min-height: 46px;
+  padding: 0 18px;
+  border: 0;
+  border-radius: 10px;
+  background: #102d52;
+  color: #ffffff;
+  font: inherit;
+  font-weight: 800;
+}
+
+.resendButton:disabled {
+  opacity: 0.58;
+  cursor: not-allowed;
+}
+
+.resendSuccess,
+.resendError {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 10px 12px;
+  border-radius: 9px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.resendSuccess {
+  border: 1px solid #cde6d9;
+  background: #f1faf5;
+  color: #18794e;
+}
+
+.resendError {
+  border: 1px solid #f0c5c5;
+  background: #fff3f3;
+  color: #a61b1b;
+}
+
+.resendHelp {
+  color: #65758b;
+  line-height: 1.45;
+}

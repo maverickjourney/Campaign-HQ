@@ -27,6 +27,7 @@ import {
   createSeatOnboardingAccount,
   getCurrentSeatUser,
   loadSeatOnboardingInvitation,
+  resendSeatVerificationEmail,
 } from "../../services/seatOnboarding";
 
 import styles
@@ -125,6 +126,17 @@ export default function SeatOnboardingStart() {
     confirmationRequired,
     setConfirmationRequired,
   ] = useState(false);
+
+
+  const [
+    resendState,
+    setResendState,
+  ] = useState("idle");
+
+  const [
+    resendMessage,
+    setResendMessage,
+  ] = useState("");
 
 
   const [
@@ -298,6 +310,58 @@ export default function SeatOnboardingStart() {
     };
 
 
+  const resendVerification =
+    async () => {
+      if (
+        resendState ===
+        "sending"
+      ) {
+        return;
+      }
+
+      setResendState(
+        "sending",
+      );
+
+      setResendMessage(
+        "",
+      );
+
+      try {
+        await resendSeatVerificationEmail(
+          invitation.email,
+        );
+
+        setResendState(
+          "sent",
+        );
+
+        setResendMessage(
+          "Verification email sent. Check Inbox, Junk and Other.",
+        );
+
+        window.setTimeout(
+          () => {
+            setResendState(
+              "idle",
+            );
+          },
+          60000,
+        );
+      } catch (resendError) {
+        setResendState(
+          "error",
+        );
+
+        setResendMessage(
+          resendError instanceof Error
+            ? resendError.message
+            : "Verification email could not be resent.",
+        );
+      }
+    };
+
+
   if (loading) {
     return (
       <main className={styles.page}>
@@ -358,6 +422,43 @@ export default function SeatOnboardingStart() {
             </strong>
             . Open the verification email and follow the secure link to continue onboarding.
           </p>
+
+          <button
+            className={styles.resendButton}
+            type="button"
+            onClick={resendVerification}
+            disabled={
+              resendState ===
+                "sending" ||
+              resendState ===
+                "sent"
+            }
+          >
+            {resendState ===
+            "sending"
+              ? "Sending…"
+              : resendState ===
+                "sent"
+              ? "Email sent"
+              : "Resend verification email"}
+          </button>
+
+          {resendMessage && (
+            <div
+              className={
+                resendState ===
+                "error"
+                  ? styles.resendError
+                  : styles.resendSuccess
+              }
+            >
+              {resendMessage}
+            </div>
+          )}
+
+          <small className={styles.resendHelp}>
+            Delivery can take a moment. Also check Junk Email and Other.
+          </small>
         </section>
       </main>
     );
