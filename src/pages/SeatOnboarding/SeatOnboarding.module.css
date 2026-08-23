@@ -3013,3 +3013,130 @@
     flex-direction: column;
   }
 }
+
+
+/* ============================================================
+   CAMPAIGN SEAT — REVIEW TEXT FIT / WRAPPING
+   Never split important client data awkwardly
+   ============================================================ */
+
+.reviewGrid,
+.reviewSection,
+.reviewDetails,
+.reviewDetails > div,
+.reviewConnections,
+.reviewConnections > div,
+.reviewPrimaryMember,
+.reviewTeamList,
+.reviewTeamList > div {
+  min-width: 0;
+}
+
+.reviewDetails dd {
+  max-width: 100%;
+  overflow-wrap: break-word;
+  word-break: normal;
+  hyphens: none;
+}
+
+/*
+ * Email needs more horizontal room than the other small
+ * two-column review facts. Let it use the full Billing card.
+ */
+.reviewEmailDetail {
+  grid-column: 1 / -1;
+}
+
+.reviewEmailDetail dd {
+  white-space: normal;
+  overflow-wrap: normal;
+  word-break: normal;
+  font-size: 13px;
+}
+
+/*
+ * Long addresses should wrap only where natural spaces exist.
+ */
+.reviewDetailWide dd {
+  overflow-wrap: break-word;
+  word-break: normal;
+  line-height: 1.5;
+}
+
+/*
+ * Do not let integration/team identity text collide with
+ * status pills on narrower desktop widths.
+ */
+.reviewConnections > div > div:first-child,
+.reviewTeamList > div > div,
+.reviewPrimaryMember > div {
+  min-width: 0;
+}
+
+.reviewConnections strong,
+.reviewConnections span,
+.reviewTeamList strong,
+.reviewTeamList span,
+.reviewPrimaryMember strong,
+.reviewPrimaryMember span {
+  max-width: 100%;
+  overflow-wrap: break-word;
+  word-break: normal;
+}
+
+/*
+ * Status pills retain their complete wording.
+ */
+.reviewStatusGood,
+.reviewStatusPending,
+.reviewPrimaryMember b,
+.reviewTeamList b {
+  flex: 0 0 auto;
+  white-space: nowrap;
+}
+
+/*
+ * Give the two main Review columns slightly more breathing room.
+ */
+.reviewGrid {
+  gap: 20px;
+}
+
+.reviewSection {
+  overflow: hidden;
+}
+
+@media (max-width: 1050px) {
+  .reviewGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .reviewEmailDetail {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 560px) {
+  .reviewDetails {
+    grid-template-columns: 1fr;
+  }
+
+  .reviewEmailDetail,
+  .reviewDetailWide {
+    grid-column: auto;
+  }
+
+  .reviewConnections > div,
+  .reviewPrimaryMember,
+  .reviewTeamList > div {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .reviewStatusGood,
+  .reviewStatusPending,
+  .reviewPrimaryMember b,
+  .reviewTeamList b {
+    white-space: normal;
+  }
+}

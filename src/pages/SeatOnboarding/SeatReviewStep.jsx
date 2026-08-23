@@ -616,7 +616,11 @@ export default function SeatReviewStep() {
               </dd>
             </div>
 
-            <div>
+            <div
+              className={
+                styles.reviewEmailDetail
+              }
+            >
               <dt>
                 Billing email
               </dt>
