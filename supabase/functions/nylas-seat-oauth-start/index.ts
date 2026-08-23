@@ -186,10 +186,23 @@ Deno.serve(
         "NYLAS_API_URI",
       ) || "";
 
-    const nylasRedirectUri =
+    const configuredRedirectUri =
       Deno.env.get(
         "NYLAS_REDIRECT_URI",
       ) || "";
+
+
+    const localDevelopmentOrigin =
+      origin ===
+        "http://127.0.0.1:5180" ||
+      origin ===
+        "http://localhost:5180";
+
+
+    const redirectUri =
+      localDevelopmentOrigin
+        ? `${origin}/oauth/nylas/callback`
+        : configuredRedirectUri;
 
 
     if (
@@ -197,7 +210,7 @@ Deno.serve(
       !anonKey ||
       !nylasClientId ||
       !nylasApiUri ||
-      !nylasRedirectUri
+      !configuredRedirectUri
     ) {
       return jsonResponse(
         request,
@@ -297,7 +310,7 @@ Deno.serve(
             integrationKey,
 
           target_redirect_uri:
-            nylasRedirectUri,
+            redirectUri,
         },
       );
 
@@ -378,7 +391,7 @@ Deno.serve(
       .searchParams
       .set(
         "redirect_uri",
-        nylasRedirectUri,
+        redirectUri,
       );
 
     authorizationUrl
