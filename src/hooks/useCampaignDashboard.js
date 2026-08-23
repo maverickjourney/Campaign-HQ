@@ -59,6 +59,7 @@ export function useCampaignDashboard(workspaceId) {
                 category,
                 priority,
                 status,
+                tags,
                 due_at,
                 assigned_to,
                 created_by,
