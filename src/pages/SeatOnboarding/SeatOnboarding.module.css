@@ -1218,3 +1218,263 @@
     padding: 18px;
   }
 }
+
+
+/* ============================================================
+   CAMPAIGN SEAT — TEAM & ACCESS ONBOARDING
+   ============================================================ */
+
+.teamCard {
+  width: 100%;
+  box-sizing: border-box;
+  display: grid;
+  gap: 20px;
+  padding: 26px;
+  border: 1px solid #dce3ec;
+  border-radius: 18px;
+  background: #ffffff;
+}
+
+.teamHeader {
+  display: flex;
+  justify-content: space-between;
+  gap: 24px;
+  align-items: flex-start;
+}
+
+.teamHeader h2 {
+  margin: 6px 0 8px;
+  color: #102847;
+  font-size: 28px;
+  letter-spacing: -0.03em;
+}
+
+.teamHeader p {
+  max-width: 760px;
+  margin: 0;
+  color: #66778f;
+  line-height: 1.55;
+}
+
+.teamNotice {
+  display: flex;
+  gap: 12px;
+  padding: 15px 16px;
+  border: 1px solid #c9e1f2;
+  border-radius: 12px;
+  background: #f4f9fd;
+}
+
+.teamNotice > svg {
+  flex: 0 0 auto;
+  color: #1d6eb7;
+}
+
+.teamNotice > div {
+  display: grid;
+  gap: 4px;
+}
+
+.teamNotice strong {
+  color: #102847;
+}
+
+.teamNotice span {
+  color: #5f7188;
+  font-size: 13px;
+}
+
+.primaryTeamMember {
+  display: grid;
+  grid-template-columns:
+    auto
+    minmax(0, 1fr)
+    auto;
+  align-items: center;
+  gap: 14px;
+  padding: 17px;
+  border: 1px solid #bfe1cf;
+  border-radius: 13px;
+  background: #f1faf5;
+}
+
+.teamMemberIcon {
+  width: 42px;
+  height: 42px;
+  border-radius: 11px;
+  display: grid;
+  place-items: center;
+  background: #ffffff;
+  color: #177f52;
+}
+
+.primaryTeamMember > div:nth-child(2) {
+  display: grid;
+  gap: 3px;
+}
+
+.primaryTeamMember span,
+.teamMemberHeading span {
+  color: #718198;
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.primaryTeamMember strong {
+  color: #102847;
+  font-size: 16px;
+}
+
+.primaryTeamMember small {
+  color: #60728a;
+}
+
+.ownerRole {
+  padding: 7px 10px;
+  border-radius: 999px;
+  background: #ffffff;
+  color: #177f52;
+  font-size: 11px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.teamCapacity {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 14px 16px;
+  border: 1px solid #dde4ed;
+  border-radius: 12px;
+  background: #fbfcfe;
+}
+
+.teamCapacity > div {
+  display: grid;
+  gap: 3px;
+}
+
+.teamCapacity span {
+  color: #708097;
+  font-size: 12px;
+}
+
+.teamCapacity > strong {
+  color: #1d5f9d;
+}
+
+.plannedTeamList {
+  display: grid;
+  gap: 14px;
+}
+
+.plannedTeamMember {
+  display: grid;
+  gap: 16px;
+  padding: 18px;
+  border: 1px solid #dce3ec;
+  border-radius: 13px;
+  background: #fbfcfe;
+}
+
+.teamMemberHeading {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 15px;
+}
+
+.teamMemberHeading > div {
+  display: grid;
+  gap: 4px;
+}
+
+.teamMemberHeading strong {
+  color: #102847;
+}
+
+.teamMemberHeading button {
+  width: 36px;
+  height: 36px;
+  display: grid;
+  place-items: center;
+  border: 1px solid #ecd1d1;
+  border-radius: 9px;
+  background: #fff7f7;
+  color: #b04444;
+  cursor: pointer;
+}
+
+.teamEmailField {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 46px;
+  padding: 0 11px;
+  border: 1px solid #cfd9e6;
+  border-radius: 9px;
+  background: #ffffff;
+}
+
+.teamEmailField input {
+  min-height: 42px !important;
+  padding: 0 !important;
+  border: 0 !important;
+  outline: 0;
+  background: transparent !important;
+}
+
+.roleExplanation {
+  padding: 10px 12px;
+  border-radius: 9px;
+  background: #f1f5fa;
+  color: #65778f;
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.addTeamMember {
+  min-height: 46px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border: 1px dashed #9db7d4;
+  border-radius: 11px;
+  background: #f7fbff;
+  color: #165c9c;
+  font: inherit;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.teamEmpty {
+  padding: 14px;
+  border-radius: 11px;
+  background: #f7f9fc;
+  color: #66788f;
+  font-size: 13px;
+  text-align: center;
+}
+
+@media (max-width: 760px) {
+  .teamCard {
+    padding: 18px;
+  }
+
+  .primaryTeamMember {
+    grid-template-columns:
+      auto 1fr;
+  }
+
+  .ownerRole {
+    grid-column: 1 / -1;
+    justify-self: start;
+  }
+
+  .teamCapacity {
+    flex-direction: column;
+  }
+}

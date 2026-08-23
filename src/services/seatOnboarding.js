@@ -569,3 +569,52 @@ export async function saveMySeatIntegrationSetup(
 
   return data;
 }
+
+
+export async function loadMySeatTeamSetup() {
+  const {
+    data,
+    error,
+  } =
+    await supabase.rpc(
+      "get_my_seat_team_setup",
+    );
+
+  if (error) {
+    console.error(error);
+
+    throw new Error(
+      "Team setup could not be loaded.",
+    );
+  }
+
+  return data;
+}
+
+
+export async function saveMySeatTeamSetup(
+  teamMembers,
+) {
+  const {
+    data,
+    error,
+  } =
+    await supabase.rpc(
+      "save_my_seat_team_setup",
+      {
+        team_members:
+          teamMembers,
+      },
+    );
+
+  if (error) {
+    console.error(error);
+
+    throw new Error(
+      error.message ||
+        "Team setup could not be saved.",
+    );
+  }
+
+  return data;
+}
