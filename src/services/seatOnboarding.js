@@ -422,3 +422,30 @@ export async function signInSeatOnboarding({
       data.session,
   };
 }
+
+
+export async function saveMySeatCampaignProfile(
+  profile,
+) {
+  const {
+    data,
+    error,
+  } =
+    await supabase.rpc(
+      "save_my_seat_campaign_profile",
+      {
+        profile,
+      },
+    );
+
+  if (error) {
+    console.error(error);
+
+    throw new Error(
+      error.message ||
+        "Campaign Profile could not be saved.",
+    );
+  }
+
+  return data;
+}

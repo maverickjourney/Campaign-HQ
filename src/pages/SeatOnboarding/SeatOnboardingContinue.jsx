@@ -1,5 +1,6 @@
 import {
   useEffect,
+  useMemo,
   useState,
 } from "react";
 
@@ -15,6 +16,9 @@ import SeatBrand
 import {
   loadMySeatOnboarding,
 } from "../../services/seatOnboarding";
+
+import SeatCampaignProfileStep
+  from "./SeatCampaignProfileStep";
 
 import styles
   from "./SeatOnboarding.module.css";
@@ -74,6 +78,21 @@ export default function SeatOnboardingContinue() {
   }, []);
 
 
+  const currentStep =
+    useMemo(
+      () =>
+        (onboarding?.steps || [])
+          .find(
+            (step) =>
+              step.step_key ===
+              onboarding?.current_step_key,
+          ) || null,
+      [
+        onboarding,
+      ],
+    );
+
+
   if (loading) {
     return (
       <main className={styles.page}>
@@ -100,7 +119,7 @@ export default function SeatOnboardingContinue() {
 
           <p>
             {error ||
-              "Finish email verification, then return to your Seat onboarding link."}
+              "Finish email verification, then return to your Seat onboarding sign-in."}
           </p>
         </section>
       </main>
@@ -153,7 +172,9 @@ export default function SeatOnboardingContinue() {
               </span>
 
               <h2>
-                Next: Campaign profile
+                Next:{" "}
+                {currentStep?.display_name ||
+                  "Onboarding"}
               </h2>
             </div>
 
@@ -165,9 +186,7 @@ export default function SeatOnboardingContinue() {
               .map(
                 (step) => (
                   <article
-                    key={
-                      step.step_key
-                    }
+                    key={step.step_key}
                     data-status={
                       step.status
                     }
@@ -197,11 +216,22 @@ export default function SeatOnboardingContinue() {
                 ),
               )}
           </div>
-
-          <div className={styles.nextNotice}>
-            The Campaign Profile step is ready for the next onboarding build.
-          </div>
         </section>
+
+
+        {onboarding.current_step_key ===
+        "product_profile" ? (
+          <SeatCampaignProfileStep
+            onboarding={onboarding}
+          />
+        ) : (
+          <div className={styles.nextNotice}>
+            The{" "}
+            {currentStep?.display_name ||
+              "next onboarding"}{" "}
+            step is ready for the next build.
+          </div>
+        )}
       </section>
     </main>
   );
