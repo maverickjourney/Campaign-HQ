@@ -471,3 +471,52 @@ export async function completeMySeatSecurityStep() {
 
   return data;
 }
+
+
+export async function loadMySeatBillingSetup() {
+  const {
+    data,
+    error,
+  } =
+    await supabase.rpc(
+      "get_my_seat_billing_setup",
+    );
+
+  if (error) {
+    console.error(error);
+
+    throw new Error(
+      "Billing setup could not be loaded.",
+    );
+  }
+
+  return data;
+}
+
+
+export async function saveMySeatBillingSetup(
+  billingData,
+) {
+  const {
+    data,
+    error,
+  } =
+    await supabase.rpc(
+      "save_my_seat_billing_setup",
+      {
+        billing_data:
+          billingData,
+      },
+    );
+
+  if (error) {
+    console.error(error);
+
+    throw new Error(
+      error.message ||
+        "Billing setup could not be saved.",
+    );
+  }
+
+  return data;
+}

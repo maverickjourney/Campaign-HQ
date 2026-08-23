@@ -878,3 +878,154 @@
     padding: 18px;
   }
 }
+
+
+/* ============================================================
+   CAMPAIGN SEAT — BILLING ONBOARDING
+   ============================================================ */
+
+.billingCard {
+  width: 100%;
+  box-sizing: border-box;
+  display: grid;
+  gap: 20px;
+  padding: 26px;
+  border: 1px solid #dce3ec;
+  border-radius: 18px;
+  background: #ffffff;
+}
+
+.billingHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 24px;
+}
+
+.billingHeader h2 {
+  margin: 6px 0 8px;
+  color: #102847;
+  font-size: 28px;
+  letter-spacing: -0.03em;
+}
+
+.billingHeader p {
+  max-width: 720px;
+  margin: 0;
+  color: #66778f;
+  line-height: 1.55;
+}
+
+.billingSummary {
+  display: grid;
+  grid-template-columns:
+    repeat(
+      4,
+      minmax(0, 1fr)
+    );
+  border: 1px solid #dce3ec;
+  border-radius: 14px;
+  overflow: hidden;
+}
+
+.billingSummary article {
+  display: grid;
+  gap: 7px;
+  padding: 18px;
+  border-right: 1px solid #dce3ec;
+}
+
+.billingSummary article:last-child {
+  border-right: 0;
+}
+
+.billingSummary span {
+  color: #718198;
+  font-size: 12px;
+}
+
+.billingSummary strong {
+  color: #102847;
+  font-size: 21px;
+}
+
+.billingNotice {
+  display: flex;
+  gap: 12px;
+  padding: 15px 16px;
+  border: 1px solid #c9e1f2;
+  border-radius: 12px;
+  background: #f4f9fd;
+  color: #315873;
+}
+
+.billingNotice > svg {
+  flex: 0 0 auto;
+}
+
+.billingNotice > div {
+  display: grid;
+  gap: 4px;
+}
+
+.billingNotice strong {
+  color: #102847;
+}
+
+.billingNotice span {
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.billingConfirmation {
+  display: flex !important;
+  align-items: flex-start;
+  gap: 12px !important;
+  padding: 16px;
+  border: 1px solid #dce3ec;
+  border-radius: 12px;
+  background: #fbfcfe;
+}
+
+.billingConfirmation input {
+  width: 18px !important;
+  min-height: 18px !important;
+  height: 18px;
+  margin-top: 2px;
+  padding: 0 !important;
+  flex: 0 0 auto;
+}
+
+.billingConfirmation > div {
+  display: grid;
+  gap: 4px;
+}
+
+.billingConfirmation span {
+  color: #6f7f94;
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.45;
+}
+
+@media (max-width: 760px) {
+  .billingCard {
+    padding: 18px;
+  }
+
+  .billingSummary {
+    grid-template-columns:
+      repeat(
+        2,
+        minmax(0, 1fr)
+      );
+  }
+
+  .billingSummary article:nth-child(2) {
+    border-right: 0;
+  }
+
+  .billingSummary article:nth-child(-n + 2) {
+    border-bottom: 1px solid #dce3ec;
+  }
+}

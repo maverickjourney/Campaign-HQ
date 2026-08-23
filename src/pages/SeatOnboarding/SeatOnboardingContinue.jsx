@@ -24,6 +24,10 @@ import SeatCampaignProfileStep
 import SeatSecurityStep
   from "./SeatSecurityStep";
 
+
+import SeatBillingStep
+  from "./SeatBillingStep";
+
 import styles
   from "./SeatOnboarding.module.css";
 
@@ -231,6 +235,9 @@ export default function SeatOnboardingContinue() {
         ) : onboarding.current_step_key ===
           "security" ? (
           <SeatSecurityStep />
+        ) : onboarding.current_step_key ===
+          "billing" ? (
+          <SeatBillingStep />
         ) : (
           <div className={styles.nextNotice}>
             The{" "}
