@@ -81,6 +81,14 @@ export default function NylasOAuthCallback() {
       return;
     }
 
+    const seatOnboardingConnection =
+      Boolean(
+        state?.startsWith(
+          "seat.",
+        ),
+      );
+
+
     if (
       !code ||
       !state
@@ -122,7 +130,9 @@ export default function NylasOAuthCallback() {
           await supabase
             .functions
             .invoke(
-              "nylas-oauth-exchange",
+              seatOnboardingConnection
+                ? "nylas-seat-oauth-exchange"
+                : "nylas-oauth-exchange",
               {
                 body: {
                   code,
@@ -178,6 +188,28 @@ export default function NylasOAuthCallback() {
         setStatus(
           "success",
         );
+
+        if (
+          seatOnboardingConnection
+        ) {
+          setMessage(
+            `Connected ${data.email}. Returning to Campaign Seat Activation…`,
+          );
+
+          window.setTimeout(
+            () => {
+              window.location.replace(
+                `/onboarding/continue?provider-connection=success&provider=${encodeURIComponent(
+                  data.provider ||
+                    "",
+                )}`,
+              );
+            },
+            750,
+          );
+
+          return;
+        }
 
         setMessage(
           reauthorized
@@ -253,7 +285,9 @@ export default function NylasOAuthCallback() {
             type="button"
             onClick={() =>
               window.location.replace(
-                "/workspace/settings?tab=integrations&onboarding=communications",
+                seatOnboardingConnection
+                  ? "/onboarding/continue"
+                  : "/workspace/settings?tab=integrations&onboarding=communications",
               )
             }
           >

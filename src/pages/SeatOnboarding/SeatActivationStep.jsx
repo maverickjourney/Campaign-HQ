@@ -21,6 +21,7 @@ import {
 import {
   activateMyCampaignSeat,
   loadMyCampaignSeatActivationStatus,
+  startSeatProviderConnection,
 } from "../../services/seatOnboarding";
 
 import styles
@@ -108,6 +109,13 @@ export default function SeatActivationStep() {
     useState(null);
 
 
+  const [
+    connectingIntegrationKey,
+    setConnectingIntegrationKey,
+  ] =
+    useState("");
+
+
   const load =
     async ({
       refresh = false,
@@ -141,6 +149,47 @@ export default function SeatActivationStep() {
   useEffect(() => {
     void load();
   }, []);
+
+
+  const connectProvider =
+    async (
+      integrationKey,
+    ) => {
+      if (
+        connectingIntegrationKey ||
+        activating
+      ) {
+        return;
+      }
+
+      setError("");
+      setConnectingIntegrationKey(
+        integrationKey,
+      );
+
+      try {
+        const result =
+          await startSeatProviderConnection(
+            integrationKey,
+          );
+
+        window.location.assign(
+          result.authorizationUrl,
+        );
+      } catch (
+        connectionError
+      ) {
+        setError(
+          connectionError instanceof Error
+            ? connectionError.message
+            : "The provider connection could not be started.",
+        );
+
+        setConnectingIntegrationKey(
+          "",
+        );
+      }
+    };
 
 
   const activate =
@@ -510,11 +559,40 @@ export default function SeatActivationStep() {
                   </span>
                 </section>
 
-                <b>
-                  {connected
-                    ? "Connected"
-                    : "Pending"}
-                </b>
+                <aside
+                  className={
+                    styles.activationProviderAction
+                  }
+                >
+                  <b>
+                    {connected
+                      ? "Connected"
+                      : "Pending"}
+                  </b>
+
+                  {!connected && (
+                    <button
+                      type="button"
+                      disabled={
+                        Boolean(
+                          connectingIntegrationKey,
+                        ) ||
+                        activating
+                      }
+                      onClick={() =>
+                        connectProvider(
+                          integration
+                            .integration_key,
+                        )
+                      }
+                    >
+                      {connectingIntegrationKey ===
+                      integration.integration_key
+                        ? "Opening…"
+                        : "Connect"}
+                    </button>
+                  )}
+                </aside>
               </article>
             );
           },

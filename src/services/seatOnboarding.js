@@ -825,3 +825,68 @@ export async function activateMyCampaignSeat() {
       invitationDelivery,
   };
 }
+
+
+async function getSeatOAuthFunctionError(
+  error,
+  fallback,
+) {
+  if (
+    error?.context instanceof
+      Response
+  ) {
+    try {
+      const payload =
+        await error.context.json();
+
+      return (
+        payload?.error ||
+        payload?.message ||
+        error.message ||
+        fallback
+      );
+    } catch {
+      // Fall through.
+    }
+  }
+
+  return (
+    error?.message ||
+    fallback
+  );
+}
+
+
+export async function startSeatProviderConnection(
+  integrationKey,
+) {
+  const {
+    data,
+    error,
+  } =
+    await supabase
+      .functions
+      .invoke(
+        "nylas-seat-oauth-start",
+        {
+          body: {
+            integrationKey,
+          },
+        },
+      );
+
+  if (
+    error ||
+    !data?.authorizationUrl
+  ) {
+    throw new Error(
+      await getSeatOAuthFunctionError(
+        error,
+        data?.error ||
+          "Campaign Seat could not begin the provider connection.",
+      ),
+    );
+  }
+
+  return data;
+}

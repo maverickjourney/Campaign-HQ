@@ -422,13 +422,7 @@ export default function Router() {
         <Route
           path="/oauth/nylas/callback"
           element={
-            <ProtectedRoute
-              allowedExperiences={
-                LEADERSHIP_EXPERIENCES
-              }
-            >
-              <NylasOAuthCallback />
-            </ProtectedRoute>
+            <NylasOAuthCallback />
           }
         />
 
