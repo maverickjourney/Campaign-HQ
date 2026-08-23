@@ -368,9 +368,10 @@ export default function SeatBillingStep() {
         </div>
 
         <div
-          className={
-            styles.profileGrid
-          }
+          className={[
+            styles.profileGrid,
+            styles.billingFormGrid,
+          ].join(" ")}
         >
           <label>
             Billing contact name

@@ -18,47 +18,254 @@ import {
   saveMySeatCampaignProfile,
 } from "../../services/seatOnboarding";
 
+import SeatDateField
+  from "./SeatDateField";
+
+import SeatOnboardingSelect
+  from "./SeatOnboardingSelect";
+
 import styles
   from "./SeatOnboarding.module.css";
 
 
+const CAMPAIGN_TYPES = [
+  {
+    value:
+      "candidate_campaign",
+    label:
+      "Candidate campaign",
+    description:
+      "Campaign for an individual candidate.",
+  },
+  {
+    value:
+      "ballot_measure",
+    label:
+      "Ballot measure",
+    description:
+      "Issue, referendum or ballot initiative.",
+  },
+  {
+    value: "pac",
+    label: "PAC",
+    description:
+      "Political action committee.",
+  },
+  {
+    value:
+      "party_organization",
+    label:
+      "Party organization",
+  },
+  {
+    value:
+      "elected_official",
+    label:
+      "Elected official",
+  },
+  {
+    value:
+      "advocacy_organization",
+    label:
+      "Advocacy organization",
+  },
+  {
+    value: "other",
+    label: "Other",
+  },
+];
+
+
 const OFFICE_LEVELS = [
-  ["", "Select office level"],
-  ["federal", "Federal"],
-  ["state", "State"],
-  ["county", "County"],
-  ["municipal", "Municipal"],
-  ["school_board", "School Board"],
-  ["special_district", "Special District"],
-  ["other", "Other"],
-  ["not_applicable", "Not applicable"],
+  {
+    value: "",
+    label:
+      "Select office level",
+  },
+  {
+    value: "federal",
+    label: "Federal",
+  },
+  {
+    value: "state",
+    label: "State",
+  },
+  {
+    value: "county",
+    label: "County",
+  },
+  {
+    value: "municipal",
+    label: "Municipal",
+  },
+  {
+    value:
+      "school_board",
+    label:
+      "School Board",
+  },
+  {
+    value:
+      "special_district",
+    label:
+      "Special District",
+  },
+  {
+    value: "other",
+    label: "Other",
+  },
+  {
+    value:
+      "not_applicable",
+    label:
+      "Not applicable",
+  },
 ];
 
 
 const JURISDICTION_TYPES = [
-  ["", "Select jurisdiction type"],
-  ["federal", "Federal"],
-  ["state", "State"],
-  ["county", "County"],
-  ["city", "City"],
-  ["town", "Town"],
-  ["village", "Village"],
-  ["district", "District"],
-  ["school_district", "School District"],
-  ["special_district", "Special District"],
-  ["other", "Other"],
+  {
+    value: "",
+    label:
+      "Select jurisdiction type",
+  },
+  {
+    value: "federal",
+    label: "Federal",
+  },
+  {
+    value: "state",
+    label: "State",
+  },
+  {
+    value: "county",
+    label: "County",
+  },
+  {
+    value: "city",
+    label: "City",
+  },
+  {
+    value: "town",
+    label: "Town",
+  },
+  {
+    value: "village",
+    label: "Village",
+  },
+  {
+    value: "district",
+    label: "District",
+  },
+  {
+    value:
+      "school_district",
+    label:
+      "School District",
+  },
+  {
+    value:
+      "special_district",
+    label:
+      "Special District",
+  },
+  {
+    value: "other",
+    label: "Other",
+  },
 ];
 
 
 const PARTIES = [
-  ["", "Select political party"],
-  ["republican", "Republican"],
-  ["democratic", "Democratic"],
-  ["independent", "Independent"],
-  ["libertarian", "Libertarian"],
-  ["green", "Green"],
-  ["nonpartisan", "Nonpartisan"],
-  ["other", "Other"],
+  {
+    value: "",
+    label:
+      "Select political party",
+  },
+  {
+    value: "republican",
+    label: "Republican",
+  },
+  {
+    value: "democratic",
+    label: "Democratic",
+  },
+  {
+    value: "independent",
+    label: "Independent",
+  },
+  {
+    value: "libertarian",
+    label: "Libertarian",
+  },
+  {
+    value: "green",
+    label: "Green",
+  },
+  {
+    value: "nonpartisan",
+    label: "Nonpartisan",
+  },
+  {
+    value: "other",
+    label: "Other",
+  },
+];
+
+
+const TIMEZONES = [
+  {
+    value:
+      "America/New_York",
+    label:
+      "Eastern Time",
+    description:
+      "ET · New York",
+  },
+  {
+    value:
+      "America/Chicago",
+    label:
+      "Central Time",
+    description:
+      "CT · Chicago",
+  },
+  {
+    value:
+      "America/Denver",
+    label:
+      "Mountain Time",
+    description:
+      "MT · Denver",
+  },
+  {
+    value:
+      "America/Phoenix",
+    label:
+      "Arizona Time",
+    description:
+      "Phoenix",
+  },
+  {
+    value:
+      "America/Los_Angeles",
+    label:
+      "Pacific Time",
+    description:
+      "PT · Los Angeles",
+  },
+  {
+    value:
+      "America/Anchorage",
+    label:
+      "Alaska Time",
+  },
+  {
+    value:
+      "Pacific/Honolulu",
+    label:
+      "Hawaii Time",
+  },
 ];
 
 
@@ -79,97 +286,177 @@ function browserTimezone() {
 export default function SeatCampaignProfileStep({
   onboarding,
 }) {
-  const defaultTimezone =
+  const savedProfile =
     useMemo(
-      browserTimezone,
-      [],
+      () =>
+        (
+          onboarding?.steps ||
+          []
+        ).find(
+          (step) =>
+            step.step_key ===
+            "product_profile",
+        )?.step_data ||
+        {},
+      [
+        onboarding,
+      ],
     );
+
+
+  const savedAddress =
+    savedProfile
+      .campaign_address ||
+    {};
+
+
+  const defaultTimezone =
+    savedProfile.timezone ||
+    browserTimezone();
+
 
   const [
     form,
     setForm,
-  ] = useState({
-    campaign_type:
-      "candidate_campaign",
+  ] =
+    useState({
+      campaign_type:
+        savedProfile
+          .campaign_type ||
+        "candidate_campaign",
 
-    campaign_name:
-      onboarding?.account_name ||
-      "",
+      campaign_name:
+        savedProfile
+          .campaign_name ||
+        onboarding
+          ?.account_name ||
+        "",
 
-    candidate_name:
-      onboarding?.full_name ||
-      "",
+      candidate_name:
+        savedProfile
+          .candidate_name ||
+        onboarding
+          ?.full_name ||
+        "",
 
-    legal_committee_name:
-      "",
+      legal_committee_name:
+        savedProfile
+          .legal_committee_name ||
+        "",
 
-    office_sought:
-      "",
+      office_sought:
+        savedProfile
+          .office_sought ||
+        "",
 
-    office_level:
-      "",
+      office_level:
+        savedProfile
+          .office_level ||
+        "",
 
-    district_label:
-      "",
+      district_label:
+        savedProfile
+          .district_label ||
+        "",
 
-    jurisdiction_name:
-      "",
+      jurisdiction_name:
+        savedProfile
+          .jurisdiction_name ||
+        "",
 
-    jurisdiction_type:
-      "",
+      jurisdiction_type:
+        savedProfile
+          .jurisdiction_type ||
+        "",
 
-    political_party:
-      "",
+      political_party:
+        savedProfile
+          .political_party ||
+        "",
 
-    next_election_date:
-      "",
+      next_election_date:
+        savedProfile
+          .next_election_date ||
+        "",
 
-    primary_election_date:
-      "",
+      primary_election_date:
+        savedProfile
+          .primary_election_date ||
+        "",
 
-    general_election_date:
-      "",
+      general_election_date:
+        savedProfile
+          .general_election_date ||
+        "",
 
-    timezone:
-      defaultTimezone,
+      timezone:
+        defaultTimezone,
 
-    campaign_email:
-      onboarding?.email ||
-      "",
+      campaign_email:
+        savedProfile
+          .campaign_email ||
+        onboarding?.email ||
+        "",
 
-    campaign_phone:
-      "",
+      campaign_phone:
+        savedProfile
+          .campaign_phone ||
+        "",
 
-    website_url:
-      "",
+      website_url:
+        savedProfile
+          .website_url ||
+        "",
 
-    address_line1:
-      "",
+      address_line1:
+        savedAddress.line1 ||
+        "",
 
-    address_line2:
-      "",
+      address_line2:
+        savedAddress.line2 ||
+        "",
 
-    address_city:
-      "",
+      address_city:
+        savedAddress.city ||
+        "",
 
-    state_region:
-      "",
+      state_region:
+        savedProfile
+          .state_region ||
+        savedAddress
+          .state_region ||
+        "",
 
-    county_name:
-      "",
+      county_name:
+        savedProfile
+          .county_name ||
+        "",
 
-    municipality_name:
-      "",
+      municipality_name:
+        savedProfile
+          .municipality_name ||
+        "",
 
-    postal_code:
-      "",
+      postal_code:
+        savedProfile
+          .postal_code ||
+        savedAddress
+          .postal_code ||
+        "",
 
-    country_code:
-      "US",
+      country_code:
+        savedProfile
+          .country_code ||
+        savedAddress
+          .country_code ||
+        "US",
 
-    disclaimer_text:
-      "",
-  });
+      disclaimer_text:
+        savedProfile
+          .disclaimer_text ||
+        "",
+    });
+
 
   const [
     saving,
@@ -184,17 +471,32 @@ export default function SeatCampaignProfileStep({
     useState("");
 
 
+  const isCandidate =
+    form.campaign_type ===
+    "candidate_campaign";
+
+
+  const setValue =
+    (
+      field,
+      value,
+    ) => {
+      setForm(
+        (current) => ({
+          ...current,
+          [field]: value,
+        }),
+      );
+    };
+
+
   const update =
     (field) =>
-      (event) => {
-        setForm(
-          (current) => ({
-            ...current,
-            [field]:
-              event.target.value,
-          }),
+      (event) =>
+        setValue(
+          field,
+          event.target.value,
         );
-      };
 
 
   const submit =
@@ -228,12 +530,22 @@ export default function SeatCampaignProfileStep({
 
   return (
     <form
-      className={styles.profileCard}
+      className={
+        styles.profileCard
+      }
       onSubmit={submit}
     >
-      <div className={styles.profileHeading}>
+      <div
+        className={
+          styles.profileHeading
+        }
+      >
         <div>
-          <span className={styles.eyebrow}>
+          <span
+            className={
+              styles.eyebrow
+            }
+          >
             Campaign profile
           </span>
 
@@ -242,17 +554,25 @@ export default function SeatCampaignProfileStep({
           </h2>
 
           <p>
-            These details will become the foundation of the Campaign Seat workspace when onboarding is activated.
+            These details become the foundation of your Campaign Seat workspace when onboarding is activated.
           </p>
         </div>
 
-        <Landmark size={26} />
+        <Landmark size={27} />
       </div>
 
 
-      <section className={styles.profileSection}>
-        <div className={styles.profileSectionTitle}>
-          <Building2 size={19} />
+      <section
+        className={
+          styles.profileSection
+        }
+      >
+        <div
+          className={
+            styles.profileSectionTitle
+          }
+        >
+          <Building2 size={20} />
 
           <div>
             <strong>
@@ -265,12 +585,23 @@ export default function SeatCampaignProfileStep({
           </div>
         </div>
 
-        <div className={styles.profileGrid}>
-          <label className={styles.profileWide}>
+        <div
+          className={[
+            styles.profileGrid,
+            styles.polishedFormGrid,
+          ].join(" ")}
+        >
+          <label
+            className={
+              styles.profileWide
+            }
+          >
             Campaign / workspace name
 
             <input
-              value={form.campaign_name}
+              value={
+                form.campaign_name
+              }
               onChange={update(
                 "campaign_name",
               )}
@@ -278,66 +609,50 @@ export default function SeatCampaignProfileStep({
             />
           </label>
 
-          <label>
-            Campaign type
-
-            <select
-              value={form.campaign_type}
-              onChange={update(
+          <SeatOnboardingSelect
+            label="Campaign type"
+            value={
+              form.campaign_type
+            }
+            options={
+              CAMPAIGN_TYPES
+            }
+            onChange={(value) =>
+              setValue(
                 "campaign_type",
-              )}
-            >
-              <option value="candidate_campaign">
-                Candidate campaign
-              </option>
-
-              <option value="ballot_measure">
-                Ballot measure
-              </option>
-
-              <option value="pac">
-                PAC
-              </option>
-
-              <option value="party_organization">
-                Party organization
-              </option>
-
-              <option value="elected_official">
-                Elected official
-              </option>
-
-              <option value="advocacy_organization">
-                Advocacy organization
-              </option>
-
-              <option value="other">
-                Other
-              </option>
-            </select>
-          </label>
+                value,
+              )
+            }
+            required
+          />
 
           <label>
             Candidate name
 
             <input
-              value={form.candidate_name}
+              value={
+                form.candidate_name
+              }
               onChange={update(
                 "candidate_name",
               )}
               required={
-                form.campaign_type ===
-                "candidate_campaign"
+                isCandidate
               }
             />
           </label>
 
-          <label className={styles.profileWide}>
+          <label
+            className={
+              styles.profileWide
+            }
+          >
             Legal committee name
 
             <input
               value={
-                form.legal_committee_name
+                form
+                  .legal_committee_name
               }
               onChange={update(
                 "legal_committee_name",
@@ -349,9 +664,17 @@ export default function SeatCampaignProfileStep({
       </section>
 
 
-      <section className={styles.profileSection}>
-        <div className={styles.profileSectionTitle}>
-          <MapPin size={19} />
+      <section
+        className={
+          styles.profileSection
+        }
+      >
+        <div
+          className={
+            styles.profileSectionTitle
+          }
+        >
+          <MapPin size={20} />
 
           <div>
             <strong>
@@ -364,54 +687,55 @@ export default function SeatCampaignProfileStep({
           </div>
         </div>
 
-        <div className={styles.profileGrid}>
+        <div
+          className={[
+            styles.profileGrid,
+            styles.polishedFormGrid,
+          ].join(" ")}
+        >
           <label>
             Office sought
 
             <input
-              value={form.office_sought}
+              value={
+                form.office_sought
+              }
               onChange={update(
                 "office_sought",
               )}
               placeholder="County Commissioner"
               required={
-                form.campaign_type ===
-                "candidate_campaign"
+                isCandidate
               }
             />
           </label>
 
-          <label>
-            Office level
-
-            <select
-              value={form.office_level}
-              onChange={update(
+          <SeatOnboardingSelect
+            label="Office level"
+            value={
+              form.office_level
+            }
+            options={
+              OFFICE_LEVELS
+            }
+            onChange={(value) =>
+              setValue(
                 "office_level",
-              )}
-              required={
-                form.campaign_type ===
-                "candidate_campaign"
-              }
-            >
-              {OFFICE_LEVELS.map(
-                ([value, label]) => (
-                  <option
-                    value={value}
-                    key={value}
-                  >
-                    {label}
-                  </option>
-                ),
-              )}
-            </select>
-          </label>
+                value,
+              )
+            }
+            required={
+              isCandidate
+            }
+          />
 
           <label>
             District / seat
 
             <input
-              value={form.district_label}
+              value={
+                form.district_label
+              }
               onChange={update(
                 "district_label",
               )}
@@ -419,44 +743,41 @@ export default function SeatCampaignProfileStep({
             />
           </label>
 
-          <label>
-            Jurisdiction type
-
-            <select
-              value={
-                form.jurisdiction_type
-              }
-              onChange={update(
+          <SeatOnboardingSelect
+            label="Jurisdiction type"
+            value={
+              form
+                .jurisdiction_type
+            }
+            options={
+              JURISDICTION_TYPES
+            }
+            onChange={(value) =>
+              setValue(
                 "jurisdiction_type",
-              )}
-            >
-              {JURISDICTION_TYPES.map(
-                ([value, label]) => (
-                  <option
-                    value={value}
-                    key={value}
-                  >
-                    {label}
-                  </option>
-                ),
-              )}
-            </select>
-          </label>
+                value,
+              )
+            }
+          />
 
-          <label className={styles.profileWide}>
+          <label
+            className={
+              styles.profileWide
+            }
+          >
             Jurisdiction name
 
             <input
               value={
-                form.jurisdiction_name
+                form
+                  .jurisdiction_name
               }
               onChange={update(
                 "jurisdiction_name",
               )}
               placeholder="Palm Beach County"
               required={
-                form.campaign_type ===
-                "candidate_campaign"
+                isCandidate
               }
             />
           </label>
@@ -465,7 +786,9 @@ export default function SeatCampaignProfileStep({
             State / region
 
             <input
-              value={form.state_region}
+              value={
+                form.state_region
+              }
               onChange={update(
                 "state_region",
               )}
@@ -477,7 +800,9 @@ export default function SeatCampaignProfileStep({
             County
 
             <input
-              value={form.county_name}
+              value={
+                form.county_name
+              }
               onChange={update(
                 "county_name",
               )}
@@ -489,7 +814,8 @@ export default function SeatCampaignProfileStep({
 
             <input
               value={
-                form.municipality_name
+                form
+                  .municipality_name
               }
               onChange={update(
                 "municipality_name",
@@ -497,40 +823,40 @@ export default function SeatCampaignProfileStep({
             />
           </label>
 
-          <label>
-            Political party
-
-            <select
-              value={
-                form.political_party
-              }
-              onChange={update(
+          <SeatOnboardingSelect
+            label="Political party"
+            value={
+              form.political_party
+            }
+            options={PARTIES}
+            onChange={(value) =>
+              setValue(
                 "political_party",
-              )}
-              required={
-                form.campaign_type ===
-                "candidate_campaign"
-              }
-            >
-              {PARTIES.map(
-                ([value, label]) => (
-                  <option
-                    value={value}
-                    key={value}
-                  >
-                    {label}
-                  </option>
-                ),
-              )}
-            </select>
-          </label>
+                value,
+              )
+            }
+            required={
+              isCandidate
+            }
+          />
         </div>
       </section>
 
 
-      <section className={styles.profileSection}>
-        <div className={styles.profileSectionTitle}>
-          <CalendarDays size={19} />
+      <section
+        className={[
+          styles.profileSection,
+          styles.electionSection,
+        ].join(" ")}
+      >
+        <div
+          className={
+            styles.profileSectionTitle
+          }
+        >
+          <CalendarDays
+            size={20}
+          />
 
           <div>
             <strong>
@@ -543,71 +869,87 @@ export default function SeatCampaignProfileStep({
           </div>
         </div>
 
-        <div className={styles.profileGrid}>
-          <label>
-            Next election date
-
-            <input
-              type="date"
-              value={
-                form.next_election_date
-              }
-              onChange={update(
+        <div
+          className={[
+            styles.profileGrid,
+            styles.polishedFormGrid,
+            styles.electionGrid,
+          ].join(" ")}
+        >
+          <SeatDateField
+            label="Next election date"
+            value={
+              form
+                .next_election_date
+            }
+            onChange={(value) =>
+              setValue(
                 "next_election_date",
-              )}
-              required={
-                form.campaign_type ===
-                "candidate_campaign"
-              }
-            />
-          </label>
+                value,
+              )
+            }
+            required={
+              isCandidate
+            }
+          />
 
-          <label>
-            Primary election
-
-            <input
-              type="date"
-              value={
-                form.primary_election_date
-              }
-              onChange={update(
+          <SeatDateField
+            label="Primary election"
+            value={
+              form
+                .primary_election_date
+            }
+            onChange={(value) =>
+              setValue(
                 "primary_election_date",
-              )}
-            />
-          </label>
+                value,
+              )
+            }
+          />
 
-          <label>
-            General election
-
-            <input
-              type="date"
-              value={
-                form.general_election_date
-              }
-              onChange={update(
+          <SeatDateField
+            label="General election"
+            value={
+              form
+                .general_election_date
+            }
+            onChange={(value) =>
+              setValue(
                 "general_election_date",
-              )}
-            />
-          </label>
+                value,
+              )
+            }
+          />
 
-          <label>
-            Timezone
-
-            <input
-              value={form.timezone}
-              onChange={update(
+          <SeatOnboardingSelect
+            label="Timezone"
+            value={
+              form.timezone
+            }
+            options={TIMEZONES}
+            onChange={(value) =>
+              setValue(
                 "timezone",
-              )}
-              required
-            />
-          </label>
+                value,
+              )
+            }
+            required
+          />
         </div>
       </section>
 
 
-      <section className={styles.profileSection}>
-        <div className={styles.profileSectionTitle}>
-          <Globe2 size={19} />
+      <section
+        className={
+          styles.profileSection
+        }
+      >
+        <div
+          className={
+            styles.profileSectionTitle
+          }
+        >
+          <Globe2 size={20} />
 
           <div>
             <strong>
@@ -620,7 +962,12 @@ export default function SeatCampaignProfileStep({
           </div>
         </div>
 
-        <div className={styles.profileGrid}>
+        <div
+          className={[
+            styles.profileGrid,
+            styles.polishedFormGrid,
+          ].join(" ")}
+        >
           <label>
             Campaign email
 
@@ -649,12 +996,18 @@ export default function SeatCampaignProfileStep({
             />
           </label>
 
-          <label className={styles.profileWide}>
+          <label
+            className={
+              styles.profileWide
+            }
+          >
             Website
 
             <input
               type="url"
-              value={form.website_url}
+              value={
+                form.website_url
+              }
               onChange={update(
                 "website_url",
               )}
@@ -662,22 +1015,34 @@ export default function SeatCampaignProfileStep({
             />
           </label>
 
-          <label className={styles.profileWide}>
+          <label
+            className={
+              styles.profileWide
+            }
+          >
             Address line 1
 
             <input
-              value={form.address_line1}
+              value={
+                form.address_line1
+              }
               onChange={update(
                 "address_line1",
               )}
             />
           </label>
 
-          <label className={styles.profileWide}>
+          <label
+            className={
+              styles.profileWide
+            }
+          >
             Address line 2
 
             <input
-              value={form.address_line2}
+              value={
+                form.address_line2
+              }
               onChange={update(
                 "address_line2",
               )}
@@ -688,7 +1053,9 @@ export default function SeatCampaignProfileStep({
             City
 
             <input
-              value={form.address_city}
+              value={
+                form.address_city
+              }
               onChange={update(
                 "address_city",
               )}
@@ -699,7 +1066,9 @@ export default function SeatCampaignProfileStep({
             Postal code
 
             <input
-              value={form.postal_code}
+              value={
+                form.postal_code
+              }
               onChange={update(
                 "postal_code",
               )}
@@ -711,7 +1080,9 @@ export default function SeatCampaignProfileStep({
 
             <input
               maxLength={2}
-              value={form.country_code}
+              value={
+                form.country_code
+              }
               onChange={update(
                 "country_code",
               )}
@@ -721,9 +1092,17 @@ export default function SeatCampaignProfileStep({
       </section>
 
 
-      <section className={styles.profileSection}>
-        <div className={styles.profileSectionTitle}>
-          <Phone size={19} />
+      <section
+        className={
+          styles.profileSection
+        }
+      >
+        <div
+          className={
+            styles.profileSectionTitle
+          }
+        >
+          <Phone size={20} />
 
           <div>
             <strong>
@@ -755,7 +1134,9 @@ export default function SeatCampaignProfileStep({
 
       {error && (
         <div
-          className={styles.error}
+          className={
+            styles.error
+          }
           role="alert"
         >
           {error}
@@ -763,19 +1144,25 @@ export default function SeatCampaignProfileStep({
       )}
 
 
-      <div className={styles.profileActions}>
+      <div
+        className={
+          styles.profileActions
+        }
+      >
         <div>
           <strong>
-            Next: Security
+            Save campaign profile
           </strong>
 
           <span>
-            No workspace will be activated yet.
+            Your saved information remains editable until Activation.
           </span>
         </div>
 
         <button
-          className={styles.primary}
+          className={
+            styles.primary
+          }
           type="submit"
           disabled={saving}
         >
@@ -787,7 +1174,9 @@ export default function SeatCampaignProfileStep({
           ) : (
             <>
               Save & Continue
-              <ArrowRight size={18} />
+              <ArrowRight
+                size={18}
+              />
             </>
           )}
         </button>

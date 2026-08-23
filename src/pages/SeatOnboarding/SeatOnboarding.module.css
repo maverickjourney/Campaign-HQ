@@ -1979,3 +1979,560 @@
     display: none;
   }
 }
+
+
+/* ============================================================
+   CAMPAIGN SEAT — ONBOARDING FORM POLISH
+   Profile + dates + selects + billing + team
+   ============================================================ */
+
+.profileCard,
+.billingCard,
+.teamCard {
+  max-width: 1140px;
+  margin-inline: auto;
+}
+
+.profileCard {
+  padding: 30px;
+  gap: 24px;
+}
+
+.profileSection {
+  padding: 24px;
+  gap: 20px;
+  border-radius: 16px;
+  background:
+    linear-gradient(
+      180deg,
+      #ffffff 0%,
+      #fbfcfe 100%
+    );
+}
+
+.profileSectionTitle {
+  gap: 12px;
+}
+
+.profileSectionTitle > svg {
+  margin-top: 1px;
+  color: #174f84;
+}
+
+.profileSectionTitle strong {
+  color: #102847;
+  font-size: 18px;
+  line-height: 1.25;
+}
+
+.profileSectionTitle span {
+  margin-top: 2px;
+  color: #73839a;
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+
+/* ------------------------------
+   UNIVERSAL FORM FIELD
+   ------------------------------ */
+
+.polishedFormGrid {
+  grid-template-columns:
+    repeat(
+      2,
+      minmax(0, 1fr)
+    );
+  gap: 20px 22px;
+  align-items: start;
+}
+
+.profileCard label,
+.billingCard label,
+.formField {
+  min-width: 0;
+  display: grid;
+  gap: 8px;
+  color: #162d4c;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.fieldLabel {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  color: #162d4c;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.requiredMark {
+  color: #df2e38;
+}
+
+.fieldHelper {
+  color: #76869b;
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 1.4;
+}
+
+.profileCard input,
+.profileCard textarea,
+.billingCard input {
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+  border: 1px solid #cbd7e5;
+  border-radius: 11px;
+  background: #ffffff;
+  color: #102847;
+  font: inherit;
+  font-size: 15px;
+  font-weight: 600;
+  transition:
+    border-color 140ms ease,
+    box-shadow 140ms ease,
+    background 140ms ease;
+}
+
+.profileCard input,
+.billingCard input {
+  height: 50px;
+  min-height: 50px;
+  padding: 0 14px;
+}
+
+.profileCard textarea {
+  min-height: 105px;
+  padding: 13px 14px;
+  resize: vertical;
+}
+
+.profileCard input::placeholder,
+.profileCard textarea::placeholder,
+.billingCard input::placeholder {
+  color: #9ba8b8;
+  font-weight: 500;
+}
+
+.profileCard input:hover,
+.profileCard textarea:hover,
+.billingCard input:hover {
+  border-color: #adbed2;
+}
+
+.profileCard input:focus,
+.profileCard textarea:focus,
+.billingCard input:focus {
+  outline: none;
+  border-color: #377fc2;
+  box-shadow:
+    0 0 0 3px
+    rgba(55, 127, 194, 0.13);
+}
+
+.profileWide {
+  grid-column: 1 / -1;
+}
+
+
+/* ------------------------------
+   CUSTOM DROPDOWN
+   ------------------------------ */
+
+.onboardingSelect {
+  position: relative;
+  width: 100%;
+}
+
+.onboardingSelectTrigger {
+  width: 100%;
+  min-height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 8px 13px 8px 14px;
+  border: 1px solid #cbd7e5;
+  border-radius: 11px;
+  background: #ffffff;
+  color: #102847;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition:
+    border-color 140ms ease,
+    box-shadow 140ms ease,
+    background 140ms ease;
+}
+
+.onboardingSelectTrigger:hover {
+  border-color: #aebfd2;
+  background: #fcfdff;
+}
+
+.onboardingSelectTrigger[aria-expanded="true"] {
+  border-color: #377fc2;
+  box-shadow:
+    0 0 0 3px
+    rgba(55, 127, 194, 0.13);
+}
+
+.onboardingSelectTrigger > div {
+  min-width: 0;
+  display: grid;
+  gap: 2px;
+}
+
+.onboardingSelectTrigger strong {
+  overflow: hidden;
+  color: #102847;
+  font-size: 14px;
+  font-weight: 800;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.onboardingSelectTrigger strong[data-placeholder="true"] {
+  color: #8b99aa;
+  font-weight: 600;
+}
+
+.onboardingSelectTrigger span {
+  color: #74859a;
+  font-size: 11px;
+  font-weight: 500;
+}
+
+.onboardingSelectTrigger > svg {
+  flex: 0 0 auto;
+  color: #60758e;
+  transition:
+    transform 140ms ease;
+}
+
+.onboardingSelectTrigger[aria-expanded="true"] > svg {
+  transform: rotate(180deg);
+}
+
+.onboardingSelectMenu {
+  position: absolute;
+  z-index: 80;
+  top: calc(100% + 7px);
+  left: 0;
+  width: 100%;
+  max-height: 350px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 7px;
+  border: 1px solid #c9d6e5;
+  border-radius: 13px;
+  background: #ffffff;
+  box-shadow:
+    0 20px 48px
+    rgba(16, 40, 71, 0.17);
+}
+
+.onboardingSelectOption {
+  width: 100%;
+  display: grid;
+  grid-template-columns:
+    minmax(0, 1fr)
+    auto;
+  align-items: center;
+  gap: 12px;
+  padding: 11px 12px;
+  border: 0;
+  border-radius: 9px;
+  background: transparent;
+  color: #102847;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.onboardingSelectOption:hover {
+  background: #f3f7fb;
+}
+
+.onboardingSelectOption[data-selected="true"] {
+  background: #eaf4fd;
+}
+
+.onboardingSelectOption > div {
+  min-width: 0;
+  display: grid;
+  gap: 3px;
+}
+
+.onboardingSelectOption strong {
+  font-size: 14px;
+  font-weight: 800;
+}
+
+.onboardingSelectOption span {
+  color: #697c92;
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 1.4;
+}
+
+.onboardingSelectOption > svg {
+  color: #1b70b8;
+}
+
+
+/* ------------------------------
+   CLEAN DATE PICKER
+   ------------------------------ */
+
+.electionSection {
+  overflow: visible;
+}
+
+.electionGrid {
+  overflow: visible;
+}
+
+.onboardingDate {
+  position: relative;
+  width: 100%;
+}
+
+.onboardingDateDisplay {
+  width: 100%;
+  min-height: 50px;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding: 0 14px;
+  border: 1px solid #cbd7e5;
+  border-radius: 11px;
+  background: #ffffff;
+  color: #102847;
+  cursor: pointer;
+  transition:
+    border-color 140ms ease,
+    box-shadow 140ms ease,
+    background 140ms ease;
+}
+
+.onboardingDateDisplay:hover {
+  border-color: #aebfd2;
+  background: #fcfdff;
+}
+
+.onboardingDateDisplay > svg {
+  flex: 0 0 auto;
+  color: #2b6fae;
+}
+
+.onboardingDateDisplay span {
+  color: #102847;
+  font-size: 14px;
+  font-weight: 800;
+}
+
+.onboardingDateDisplay span[data-empty="true"] {
+  color: #8d9bad;
+  font-weight: 600;
+}
+
+.onboardingDate > input[type="date"] {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  width: 100%;
+  height: 100%;
+  opacity: 0.001;
+  cursor: pointer;
+}
+
+.onboardingDate:focus-within
+.onboardingDateDisplay {
+  border-color: #377fc2;
+  box-shadow:
+    0 0 0 3px
+    rgba(55, 127, 194, 0.13);
+}
+
+
+/* ------------------------------
+   BILLING — FIX RAW INLINE FORM
+   ------------------------------ */
+
+.billingCard {
+  padding: 30px;
+  gap: 24px;
+}
+
+.billingCard .profileSection {
+  padding: 26px;
+}
+
+.billingFormGrid {
+  display: grid !important;
+  grid-template-columns:
+    repeat(
+      12,
+      minmax(0, 1fr)
+    ) !important;
+  gap: 20px 22px !important;
+  align-items: start;
+}
+
+.billingFormGrid > label {
+  grid-column: span 6;
+}
+
+.billingFormGrid > label:nth-child(3) {
+  grid-column: span 6;
+}
+
+.billingFormGrid > label:nth-child(4),
+.billingFormGrid > label:nth-child(5) {
+  grid-column: 1 / -1;
+}
+
+.billingFormGrid > label:nth-child(6),
+.billingFormGrid > label:nth-child(7) {
+  grid-column: span 6;
+}
+
+.billingFormGrid > label:nth-child(8) {
+  grid-column: span 4;
+}
+
+.billingFormGrid > label:nth-child(9) {
+  grid-column: span 4;
+}
+
+.billingSummary {
+  border-radius: 15px;
+  background: #ffffff;
+}
+
+.billingSummary article {
+  min-height: 78px;
+  justify-content: center;
+  padding: 18px 20px;
+}
+
+.billingNotice {
+  padding: 17px 18px;
+  border-radius: 13px;
+}
+
+.billingConfirmation {
+  padding: 18px;
+  border-radius: 13px;
+}
+
+
+/* ------------------------------
+   TEAM PICKER FINAL POLISH
+   ------------------------------ */
+
+.teamFormGrid {
+  gap: 20px 22px;
+}
+
+.rolePickerButton {
+  min-height: 52px;
+}
+
+.rolePickerMenu {
+  max-height: 390px;
+  overscroll-behavior: contain;
+}
+
+.rolePickerOption {
+  min-height: 57px;
+}
+
+.rolePickerOption span {
+  line-height: 1.45;
+}
+
+.plannedTeamMember {
+  overflow: visible;
+}
+
+
+/* ------------------------------
+   ACTION ROWS
+   ------------------------------ */
+
+.profileActions {
+  min-height: 66px;
+  padding-top: 5px;
+}
+
+.profileActions .primary {
+  min-height: 50px;
+  border-radius: 11px;
+  padding-inline: 21px;
+}
+
+
+/* ------------------------------
+   RESPONSIVE
+   ------------------------------ */
+
+@media (max-width: 860px) {
+  .polishedFormGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .polishedFormGrid
+  .profileWide {
+    grid-column: auto;
+  }
+
+  .billingFormGrid {
+    grid-template-columns:
+      repeat(
+        2,
+        minmax(0, 1fr)
+      ) !important;
+  }
+
+  .billingFormGrid > label {
+    grid-column: span 1 !important;
+  }
+
+  .billingFormGrid > label:nth-child(4),
+  .billingFormGrid > label:nth-child(5) {
+    grid-column: 1 / -1 !important;
+  }
+}
+
+@media (max-width: 600px) {
+  .profileCard,
+  .billingCard,
+  .teamCard {
+    padding: 18px;
+  }
+
+  .profileSection,
+  .billingCard .profileSection {
+    padding: 18px;
+  }
+
+  .billingFormGrid {
+    grid-template-columns:
+      1fr !important;
+  }
+
+  .billingFormGrid > label {
+    grid-column:
+      1 / -1 !important;
+  }
+
+  .onboardingSelectMenu {
+    max-height: 300px;
+  }
+}
