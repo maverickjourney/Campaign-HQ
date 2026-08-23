@@ -291,7 +291,9 @@ export default function NylasOAuthCallback() {
               )
             }
           >
-            Return to Email &amp; Contacts
+            {seatOnboardingConnection
+              ? "Return to Activation"
+              : "Return to Email & Contacts"}
           </button>
         )}
       </section>
