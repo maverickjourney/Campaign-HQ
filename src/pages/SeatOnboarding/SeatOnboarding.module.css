@@ -2536,3 +2536,480 @@
     max-height: 300px;
   }
 }
+
+
+/* ============================================================
+   CAMPAIGN SEAT — ONBOARDING REVIEW
+   ============================================================ */
+
+.reviewCard {
+  width: 100%;
+  max-width: 1140px;
+  box-sizing: border-box;
+  display: grid;
+  gap: 24px;
+  margin-inline: auto;
+  padding: 30px;
+  border: 1px solid #dce3ec;
+  border-radius: 18px;
+  background: #ffffff;
+}
+
+.reviewHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 24px;
+}
+
+.reviewHeader h2 {
+  margin: 6px 0 8px;
+  color: #102847;
+  font-size: 32px;
+  line-height: 1.08;
+  letter-spacing: -0.035em;
+}
+
+.reviewHeader p {
+  max-width: 760px;
+  margin: 0;
+  color: #687a91;
+  font-size: 15px;
+  line-height: 1.6;
+}
+
+.reviewReadyBanner,
+.reviewPendingBanner {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 17px 18px;
+  border-radius: 13px;
+}
+
+.reviewReadyBanner {
+  border: 1px solid #bfe2cf;
+  background: #effaf4;
+  color: #15774b;
+}
+
+.reviewPendingBanner {
+  border: 1px solid #ecd89f;
+  background: #fffaf0;
+  color: #806418;
+}
+
+.reviewReadyBanner > svg,
+.reviewPendingBanner > svg {
+  flex: 0 0 auto;
+  margin-top: 1px;
+}
+
+.reviewReadyBanner > div,
+.reviewPendingBanner > div {
+  display: grid;
+  gap: 4px;
+}
+
+.reviewReadyBanner strong,
+.reviewPendingBanner strong {
+  color: #102847;
+}
+
+.reviewReadyBanner span,
+.reviewPendingBanner span {
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.reviewGrid {
+  display: grid;
+  grid-template-columns:
+    repeat(
+      2,
+      minmax(0, 1fr)
+    );
+  gap: 18px;
+}
+
+.reviewSection,
+.activationReadiness {
+  display: grid;
+  align-content: start;
+  gap: 18px;
+  padding: 21px;
+  border: 1px solid #dce3ec;
+  border-radius: 15px;
+  background:
+    linear-gradient(
+      180deg,
+      #ffffff 0%,
+      #fbfcfe 100%
+    );
+}
+
+.reviewSectionHeading {
+  display: flex;
+  gap: 11px;
+  align-items: flex-start;
+}
+
+.reviewSectionHeading > svg {
+  flex: 0 0 auto;
+  margin-top: 1px;
+  color: #1d609e;
+}
+
+.reviewSectionHeading > div {
+  display: grid;
+  gap: 3px;
+}
+
+.reviewSectionHeading strong {
+  color: #102847;
+  font-size: 17px;
+}
+
+.reviewSectionHeading span {
+  color: #73839a;
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.reviewDetails {
+  display: grid;
+  grid-template-columns:
+    repeat(
+      2,
+      minmax(0, 1fr)
+    );
+  gap: 13px;
+  margin: 0;
+}
+
+.reviewDetails > div {
+  display: grid;
+  gap: 4px;
+  padding: 11px 12px;
+  border-radius: 10px;
+  background: #f5f8fb;
+}
+
+.reviewDetails dt {
+  color: #74859b;
+  font-size: 10px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+}
+
+.reviewDetails dd {
+  overflow-wrap: anywhere;
+  margin: 0;
+  color: #102847;
+  font-size: 13px;
+  font-weight: 800;
+  line-height: 1.4;
+}
+
+.reviewDetailWide {
+  grid-column: 1 / -1;
+}
+
+.reviewMiniSection {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  padding: 11px 12px;
+  border: 1px solid #e0e6ee;
+  border-radius: 10px;
+}
+
+.reviewMiniSection > svg {
+  color: #377fc2;
+}
+
+.reviewMiniSection > div {
+  display: grid;
+  gap: 2px;
+}
+
+.reviewMiniSection span {
+  color: #718198;
+  font-size: 10px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.reviewMiniSection strong {
+  color: #102847;
+  font-size: 13px;
+}
+
+.reviewCommercial {
+  display: grid;
+  grid-template-columns:
+    repeat(
+      3,
+      minmax(0, 1fr)
+    );
+  overflow: hidden;
+  border: 1px solid #dde4ed;
+  border-radius: 11px;
+}
+
+.reviewCommercial > div {
+  display: grid;
+  gap: 5px;
+  padding: 13px;
+  border-right: 1px solid #dde4ed;
+}
+
+.reviewCommercial > div:last-child {
+  border-right: 0;
+}
+
+.reviewCommercial span {
+  color: #74859a;
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.reviewCommercial strong {
+  color: #102847;
+  font-size: 18px;
+}
+
+.reviewStatusGood,
+.reviewStatusPending {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  justify-self: start;
+  padding: 7px 9px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.reviewStatusGood {
+  background: #edf9f3;
+  color: #167d50;
+}
+
+.reviewStatusPending {
+  background: #fff6e4;
+  color: #8a6510;
+}
+
+.reviewStatusGood > span,
+.reviewStatusPending > span {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.reviewConnections {
+  display: grid;
+  gap: 10px;
+}
+
+.reviewConnections > div,
+.reviewTeamList > div {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 15px;
+  padding: 12px;
+  border: 1px solid #e0e6ee;
+  border-radius: 10px;
+  background: #ffffff;
+}
+
+.reviewConnections > div > div:first-child,
+.reviewTeamList > div > div {
+  min-width: 0;
+  display: grid;
+  gap: 3px;
+}
+
+.reviewConnections strong,
+.reviewTeamList strong {
+  color: #102847;
+  font-size: 13px;
+}
+
+.reviewConnections span,
+.reviewTeamList span {
+  color: #74859a;
+  font-size: 11px;
+}
+
+.reviewPrimaryMember {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 15px;
+  padding: 14px;
+  border: 1px solid #bfe1cf;
+  border-radius: 11px;
+  background: #f0faf5;
+}
+
+.reviewPrimaryMember > div {
+  display: grid;
+  gap: 3px;
+}
+
+.reviewPrimaryMember strong {
+  color: #102847;
+}
+
+.reviewPrimaryMember span {
+  color: #66798f;
+  font-size: 12px;
+}
+
+.reviewPrimaryMember b,
+.reviewTeamList b {
+  color: #177d50;
+  font-size: 11px;
+}
+
+.reviewTeamList {
+  display: grid;
+  gap: 9px;
+}
+
+.reviewEmptyTeam {
+  padding: 13px;
+  border-radius: 10px;
+  background: #f5f8fb;
+  color: #66798f;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.activationReadiness {
+  gap: 17px;
+}
+
+.readinessList {
+  display: grid;
+  grid-template-columns:
+    repeat(
+      2,
+      minmax(0, 1fr)
+    );
+  gap: 10px;
+}
+
+.readinessList > div {
+  min-height: 45px;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  box-sizing: border-box;
+  padding: 10px 12px;
+  border-radius: 10px;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.readinessList > div[data-ready="true"] {
+  background: #eff9f4;
+  color: #16794d;
+}
+
+.readinessList > div[data-ready="false"] {
+  background: #fff6e6;
+  color: #86620f;
+}
+
+.reviewConfirmation {
+  display: flex !important;
+  align-items: flex-start;
+  gap: 12px !important;
+  padding: 17px 18px;
+  border: 1px solid #cbd8e7;
+  border-radius: 13px;
+  background: #f8fbfe;
+}
+
+.reviewConfirmation input {
+  width: 19px !important;
+  min-width: 19px;
+  height: 19px !important;
+  min-height: 19px !important;
+  margin: 1px 0 0;
+  padding: 0 !important;
+  flex: 0 0 auto;
+}
+
+.reviewConfirmation > div {
+  display: grid;
+  gap: 4px;
+}
+
+.reviewConfirmation strong {
+  color: #102847;
+  font-size: 14px;
+}
+
+.reviewConfirmation span {
+  color: #6c7d93;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.45;
+}
+
+@media (max-width: 900px) {
+  .reviewGrid {
+    grid-template-columns:
+      1fr;
+  }
+}
+
+@media (max-width: 650px) {
+  .reviewCard {
+    padding: 18px;
+  }
+
+  .reviewHeader h2 {
+    font-size: 27px;
+  }
+
+  .reviewDetails,
+  .readinessList {
+    grid-template-columns:
+      1fr;
+  }
+
+  .reviewDetailWide {
+    grid-column: auto;
+  }
+
+  .reviewCommercial {
+    grid-template-columns:
+      1fr;
+  }
+
+  .reviewCommercial > div {
+    border-right: 0;
+    border-bottom:
+      1px solid #dde4ed;
+  }
+
+  .reviewCommercial > div:last-child {
+    border-bottom: 0;
+  }
+
+  .reviewPrimaryMember,
+  .reviewConnections > div,
+  .reviewTeamList > div {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}

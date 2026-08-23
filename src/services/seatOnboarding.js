@@ -646,3 +646,50 @@ export async function reopenMySeatOnboardingStep(
 
   return data;
 }
+
+
+export async function loadMySeatOnboardingReview() {
+  const {
+    data,
+    error,
+  } =
+    await supabase.rpc(
+      "get_my_seat_onboarding_review",
+    );
+
+  if (error) {
+    console.error(error);
+
+    throw new Error(
+      "Your onboarding review could not be loaded.",
+    );
+  }
+
+  return data;
+}
+
+
+export async function completeMySeatOnboardingReview() {
+  const {
+    data,
+    error,
+  } =
+    await supabase.rpc(
+      "complete_my_seat_onboarding_review",
+      {
+        details_confirmed:
+          true,
+      },
+    );
+
+  if (error) {
+    console.error(error);
+
+    throw new Error(
+      error.message ||
+        "Your onboarding review could not be confirmed.",
+    );
+  }
+
+  return data;
+}

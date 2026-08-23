@@ -37,6 +37,10 @@ import SeatIntegrationsStep
 import SeatTeamAccessStep
   from "./SeatTeamAccessStep";
 
+
+import SeatReviewStep
+  from "./SeatReviewStep";
+
 import styles
   from "./SeatOnboarding.module.css";
 
@@ -379,6 +383,9 @@ export default function SeatOnboardingContinue() {
         ) : onboarding.current_step_key ===
           "team" ? (
           <SeatTeamAccessStep />
+        ) : onboarding.current_step_key ===
+          "review" ? (
+          <SeatReviewStep />
         ) : (
           <div className={styles.nextNotice}>
             The{" "}
