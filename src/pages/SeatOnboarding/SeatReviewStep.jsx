@@ -266,6 +266,29 @@ export default function SeatReviewStep() {
   }
 
 
+  if (error) {
+    return (
+      <section
+        className={
+          styles.reviewCard
+        }
+      >
+        <TriangleAlert
+          size={28}
+        />
+
+        <strong>
+          Your onboarding review could not be loaded.
+        </strong>
+
+        <span>
+          {error}
+        </span>
+      </section>
+    );
+  }
+
+
   if (
     !review?.found
   ) {
@@ -282,6 +305,10 @@ export default function SeatReviewStep() {
         <strong>
           Your onboarding review could not be found.
         </strong>
+
+        <span>
+          Your saved onboarding account is still preserved.
+        </span>
       </section>
     );
   }

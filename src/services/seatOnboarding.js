@@ -661,7 +661,8 @@ export async function loadMySeatOnboardingReview() {
     console.error(error);
 
     throw new Error(
-      "Your onboarding review could not be loaded.",
+      error.message ||
+        "Your onboarding review could not be loaded.",
     );
   }
 
