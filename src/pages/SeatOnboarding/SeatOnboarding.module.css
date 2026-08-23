@@ -3648,3 +3648,155 @@ b {
 button:disabled {
   transform: none;
 }
+
+
+/* ============================================================
+   CAMPAIGN SEAT — PROVIDER DATA AAL2 REAUTH
+   ============================================================ */
+
+.providerMfaPrompt {
+  display: grid;
+  gap: 16px;
+  padding: 20px;
+  border: 1px solid #bcd7ec;
+  border-radius: 14px;
+  background: #f6faff;
+}
+
+.providerMfaPromptHeader {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.providerMfaIcon {
+  width: 40px;
+  height: 40px;
+  flex: 0 0 auto;
+  display: grid;
+  place-items: center;
+  border-radius: 11px;
+  background: #e9f4fd;
+  color: #176ca9;
+}
+
+.providerMfaPromptHeader > div:last-child {
+  display: grid;
+  gap: 4px;
+}
+
+.providerMfaPromptHeader strong {
+  color: #102847;
+  font-size: 15px;
+}
+
+.providerMfaPromptHeader span {
+  max-width: 720px;
+  color: #667b93;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.providerMfaForm {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.providerMfaForm label {
+  width: min(280px, 100%);
+  display: grid;
+  gap: 7px;
+}
+
+.providerMfaForm label > span {
+  color: #183654;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.providerMfaForm input {
+  width: 100%;
+  min-height: 48px;
+  box-sizing: border-box;
+  padding: 0 15px;
+  border: 1px solid #c6d5e5;
+  border-radius: 10px;
+  outline: none;
+  background: #ffffff;
+  color: #102847;
+  font: inherit;
+  font-size: 18px;
+  font-weight: 800;
+  letter-spacing: 0.18em;
+}
+
+.providerMfaForm input:focus {
+  border-color: #438ac5;
+  box-shadow:
+    0 0 0 3px
+    rgba(67, 138, 197, 0.12);
+}
+
+.providerMfaActions {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+
+.providerMfaActions button {
+  min-height: 44px;
+  padding: 0 15px;
+  border-radius: 10px;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.providerMfaCancel {
+  border: 1px solid #ccd8e4;
+  background: #ffffff;
+  color: #334f6b;
+}
+
+.providerMfaConfirm {
+  border: 1px solid #12375f;
+  background: #12375f;
+  color: #ffffff;
+}
+
+.providerMfaActions button:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.providerMfaError {
+  padding: 11px 13px;
+  border: 1px solid #efc3c3;
+  border-radius: 9px;
+  background: #fff4f4;
+  color: #b12222;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+@media (max-width: 680px) {
+  .providerMfaForm {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .providerMfaForm label {
+    width: 100%;
+  }
+
+  .providerMfaActions {
+    width: 100%;
+  }
+
+  .providerMfaActions button {
+    flex: 1;
+  }
+}

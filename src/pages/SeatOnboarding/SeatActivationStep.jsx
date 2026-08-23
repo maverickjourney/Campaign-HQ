@@ -25,6 +25,12 @@ import {
   startSeatProviderConnection,
 } from "../../services/seatOnboarding";
 
+
+import {
+  getMfaState,
+  verifyTotpFactor,
+} from "../../services/mfa";
+
 import styles
   from "./SeatOnboarding.module.css";
 
@@ -130,6 +136,31 @@ export default function SeatActivationStep() {
     useState({});
 
 
+  const [
+    providerMfaPrompt,
+    setProviderMfaPrompt,
+  ] =
+    useState(null);
+
+  const [
+    providerMfaCode,
+    setProviderMfaCode,
+  ] =
+    useState("");
+
+  const [
+    providerMfaBusy,
+    setProviderMfaBusy,
+  ] =
+    useState(false);
+
+  const [
+    providerMfaError,
+    setProviderMfaError,
+  ] =
+    useState("");
+
+
   const load =
     async ({
       refresh = false,
@@ -206,18 +237,10 @@ export default function SeatActivationStep() {
     };
 
 
-  const verifyProviderData =
+  const runProviderProbe =
     async (
       integrationKey,
     ) => {
-      if (
-        probingIntegrationKey ||
-        connectingIntegrationKey ||
-        activating
-      ) {
-        return;
-      }
-
       setError("");
       setProbingIntegrationKey(
         integrationKey,
@@ -237,6 +260,8 @@ export default function SeatActivationStep() {
               result,
           }),
         );
+
+        return true;
       } catch (
         probeError
       ) {
@@ -245,11 +270,195 @@ export default function SeatActivationStep() {
             ? probeError.message
             : "Provider data access could not be verified.",
         );
+
+        return false;
       } finally {
         setProbingIntegrationKey(
           "",
         );
       }
+    };
+
+
+  const verifyProviderData =
+    async (
+      integrationKey,
+    ) => {
+      if (
+        probingIntegrationKey ||
+        connectingIntegrationKey ||
+        providerMfaBusy ||
+        activating
+      ) {
+        return;
+      }
+
+      setError("");
+      setProviderMfaError("");
+
+      try {
+        const mfaState =
+          await getMfaState();
+
+        if (
+          mfaState.isAal2
+        ) {
+          await runProviderProbe(
+            integrationKey,
+          );
+
+          return;
+        }
+
+        const authenticatorFactor =
+          mfaState
+            .verifiedTotpFactors
+            ?.[0];
+
+        if (
+          !authenticatorFactor
+            ?.id
+        ) {
+          throw new Error(
+            "A verified authenticator method is required before Campaign Seat can inspect connected provider data.",
+          );
+        }
+
+        setProviderMfaCode(
+          "",
+        );
+
+        setProviderMfaPrompt({
+          integrationKey,
+
+          factorId:
+            authenticatorFactor.id,
+
+          friendlyName:
+            authenticatorFactor
+              .friendly_name ||
+            "Campaign Seat Authenticator",
+        });
+      } catch (
+        mfaStateError
+      ) {
+        setError(
+          mfaStateError instanceof Error
+            ? mfaStateError.message
+            : "Campaign Seat could not verify the current session security level.",
+        );
+      }
+    };
+
+
+  const confirmProviderMfa =
+    async () => {
+      const prompt =
+        providerMfaPrompt;
+
+      if (
+        !prompt ||
+        providerMfaBusy
+      ) {
+        return;
+      }
+
+      const normalizedCode =
+        String(
+          providerMfaCode ||
+          "",
+        )
+          .replace(
+            /\D/g,
+            "",
+          )
+          .slice(
+            0,
+            6,
+          );
+
+      if (
+        !/^\d{6}$/.test(
+          normalizedCode,
+        )
+      ) {
+        setProviderMfaError(
+          "Enter the complete six-digit code from Campaign Seat Authenticator.",
+        );
+
+        return;
+      }
+
+      setProviderMfaBusy(
+        true,
+      );
+
+      setProviderMfaError(
+        "",
+      );
+
+      setError(
+        "",
+      );
+
+      try {
+        await verifyTotpFactor({
+          factorId:
+            prompt.factorId,
+
+          code:
+            normalizedCode,
+        });
+
+        const integrationKey =
+          prompt.integrationKey;
+
+        setProviderMfaPrompt(
+          null,
+        );
+
+        setProviderMfaCode(
+          "",
+        );
+
+        await runProviderProbe(
+          integrationKey,
+        );
+      } catch (
+        mfaError
+      ) {
+        setProviderMfaError(
+          mfaError instanceof Error
+            ? mfaError.message
+            : "Campaign Seat could not verify the security code.",
+        );
+      } finally {
+        setProviderMfaBusy(
+          false,
+        );
+      }
+    };
+
+
+  const cancelProviderMfa =
+    () => {
+      if (
+        providerMfaBusy
+      ) {
+        return;
+      }
+
+      setProviderMfaPrompt(
+        null,
+      );
+
+      setProviderMfaCode(
+        "",
+      );
+
+      setProviderMfaError(
+        "",
+      );
     };
 
 
@@ -725,6 +934,149 @@ export default function SeatActivationStep() {
           </b>
         </article>
       </div>
+
+
+      {providerMfaPrompt && (
+        <section
+          className={
+            styles.providerMfaPrompt
+          }
+        >
+          <div
+            className={
+              styles.providerMfaPromptHeader
+            }
+          >
+            <div
+              className={
+                styles.providerMfaIcon
+              }
+            >
+              <ShieldCheck
+                size={21}
+              />
+            </div>
+
+            <div>
+              <strong>
+                Confirm it’s you
+              </strong>
+
+              <span>
+                Connected campaign data is protected. Enter the current six-digit code from your Campaign Seat Authenticator to continue.
+              </span>
+            </div>
+          </div>
+
+          <div
+            className={
+              styles.providerMfaForm
+            }
+          >
+            <label>
+              <span>
+                Authenticator code
+              </span>
+
+              <input
+                autoFocus
+                type="text"
+                inputMode="numeric"
+                autoComplete="one-time-code"
+                maxLength={6}
+                placeholder="000000"
+                value={
+                  providerMfaCode
+                }
+                disabled={
+                  providerMfaBusy
+                }
+                onChange={(event) =>
+                  setProviderMfaCode(
+                    event.target.value
+                      .replace(
+                        /\D/g,
+                        "",
+                      )
+                      .slice(
+                        0,
+                        6,
+                      ),
+                  )
+                }
+                onKeyDown={(event) => {
+                  if (
+                    event.key ===
+                    "Enter"
+                  ) {
+                    event.preventDefault();
+
+                    void confirmProviderMfa();
+                  }
+                }}
+              />
+            </label>
+
+            <div
+              className={
+                styles.providerMfaActions
+              }
+            >
+              <button
+                type="button"
+                className={
+                  styles.providerMfaCancel
+                }
+                disabled={
+                  providerMfaBusy
+                }
+                onClick={
+                  cancelProviderMfa
+                }
+              >
+                Cancel
+              </button>
+
+              <button
+                type="button"
+                className={
+                  styles.providerMfaConfirm
+                }
+                disabled={
+                  providerMfaBusy ||
+                  providerMfaCode
+                    .replace(
+                      /\D/g,
+                      "",
+                    )
+                    .length !==
+                    6
+                }
+                onClick={() =>
+                  void confirmProviderMfa()
+                }
+              >
+                {providerMfaBusy
+                  ? "Verifying…"
+                  : "Verify & Continue"}
+              </button>
+            </div>
+          </div>
+
+          {providerMfaError && (
+            <div
+              className={
+                styles.providerMfaError
+              }
+              role="alert"
+            >
+              {
+                providerMfaError
+              }
+            </div>
+          )}
+        </section>
+      )}
 
 
       {!status.ready && (
