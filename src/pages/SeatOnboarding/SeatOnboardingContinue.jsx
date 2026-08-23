@@ -15,6 +15,7 @@ import SeatBrand
 
 import {
   loadMySeatOnboarding,
+  reopenMySeatOnboardingStep,
 } from "../../services/seatOnboarding";
 
 import SeatCampaignProfileStep
@@ -54,6 +55,17 @@ export default function SeatOnboardingContinue() {
   const [
     error,
     setError,
+  ] = useState("");
+
+
+  const [
+    reopeningStepKey,
+    setReopeningStepKey,
+  ] = useState("");
+
+  const [
+    navigationError,
+    setNavigationError,
   ] = useState("");
 
 
@@ -107,6 +119,35 @@ export default function SeatOnboardingContinue() {
         onboarding,
       ],
     );
+
+
+  const reopenStep =
+    async (stepKey) => {
+      if (reopeningStepKey) {
+        return;
+      }
+
+      setNavigationError("");
+      setReopeningStepKey(
+        stepKey,
+      );
+
+      try {
+        await reopenMySeatOnboardingStep(
+          stepKey,
+        );
+
+        window.location.reload();
+      } catch (reopenError) {
+        setNavigationError(
+          reopenError instanceof Error
+            ? reopenError.message
+            : "That onboarding step could not be reopened.",
+        );
+
+        setReopeningStepKey("");
+      }
+    };
 
 
   if (loading) {
@@ -200,38 +241,124 @@ export default function SeatOnboardingContinue() {
           <div className={styles.steps}>
             {(onboarding.steps || [])
               .map(
-                (step) => (
-                  <article
-                    key={step.step_key}
-                    data-status={
-                      step.status
-                    }
-                  >
-                    <div className={styles.stepIcon}>
-                      {step.status ===
-                      "complete" ? (
-                        <Check size={16} />
-                      ) : (
-                        <Circle size={15} />
-                      )}
-                    </div>
+                (step) => {
+                  const canReopen =
+                    step.status ===
+                      "complete" &&
+                    [
+                      "product_profile",
+                      "security",
+                      "billing",
+                      "integrations",
+                      "team",
+                    ].includes(
+                      step.step_key,
+                    );
 
-                    <div>
-                      <strong>
-                        {step.display_name}
-                      </strong>
-
-                      <span>
-                        {step.status.replace(
-                          "_",
-                          " ",
+                  const content = (
+                    <>
+                      <div
+                        className={
+                          styles.stepIcon
+                        }
+                      >
+                        {step.status ===
+                        "complete" ? (
+                          <Check
+                            size={16}
+                          />
+                        ) : (
+                          <Circle
+                            size={15}
+                          />
                         )}
-                      </span>
-                    </div>
-                  </article>
-                ),
+                      </div>
+
+                      <div
+                        className={
+                          styles.stepCopy
+                        }
+                      >
+                        <strong>
+                          {
+                            step.display_name
+                          }
+                        </strong>
+
+                        <span>
+                          {step.status.replace(
+                            "_",
+                            " ",
+                          )}
+                        </span>
+                      </div>
+
+                      {canReopen && (
+                        <span
+                          className={
+                            styles.stepEditHint
+                          }
+                        >
+                          {reopeningStepKey ===
+                          step.step_key
+                            ? "Opening…"
+                            : "Edit"}
+                        </span>
+                      )}
+                    </>
+                  );
+
+                  return canReopen ? (
+                    <button
+                      className={
+                        styles.progressStepButton
+                      }
+                      key={
+                        step.step_key
+                      }
+                      data-status={
+                        step.status
+                      }
+                      type="button"
+                      disabled={
+                        Boolean(
+                          reopeningStepKey,
+                        )
+                      }
+                      onClick={() =>
+                        reopenStep(
+                          step.step_key,
+                        )
+                      }
+                    >
+                      {content}
+                    </button>
+                  ) : (
+                    <article
+                      key={
+                        step.step_key
+                      }
+                      data-status={
+                        step.status
+                      }
+                    >
+                      {content}
+                    </article>
+                  );
+                },
               )}
           </div>
+
+          {navigationError && (
+            <div
+              className={
+                styles.progressNavigationError
+              }
+              role="alert"
+            >
+              {navigationError}
+            </div>
+          )}
         </section>
 
 

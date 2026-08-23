@@ -1880,3 +1880,102 @@
     font-size: 26px;
   }
 }
+
+
+/* ============================================================
+   CAMPAIGN SEAT — ONBOARDING STEP NAVIGATION
+   ============================================================ */
+
+.progressStepButton {
+  width: 100%;
+  min-width: 0;
+  min-height: 78px;
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  padding: 16px;
+  border: 1px solid #cde5d8;
+  border-radius: 12px;
+  background: #effaf4;
+  color: #102847;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition:
+    border-color 140ms ease,
+    background 140ms ease,
+    transform 140ms ease,
+    box-shadow 140ms ease;
+}
+
+.progressStepButton:hover {
+  border-color: #8fc8ab;
+  background: #e7f8ef;
+  transform: translateY(-1px);
+  box-shadow:
+    0 7px 18px
+    rgba(22, 115, 76, 0.08);
+}
+
+.progressStepButton:focus-visible {
+  outline: none;
+  border-color: #3a83c4;
+  box-shadow:
+    0 0 0 3px
+    rgba(58, 131, 196, 0.15);
+}
+
+.progressStepButton:disabled {
+  cursor: wait;
+  opacity: 0.72;
+  transform: none;
+}
+
+.stepCopy {
+  min-width: 0;
+  display: grid;
+  gap: 4px;
+  flex: 1;
+}
+
+.stepCopy strong {
+  color: #102847;
+  font-size: 14px;
+}
+
+.stepCopy span {
+  color: #6e8096;
+  font-size: 12px;
+  text-transform: capitalize;
+}
+
+.stepEditHint {
+  flex: 0 0 auto;
+  padding: 6px 9px;
+  border-radius: 999px;
+  background: #ffffff;
+  color: #17784d !important;
+  font-size: 11px !important;
+  font-weight: 800;
+}
+
+.progressNavigationError {
+  margin-top: 12px;
+  padding: 11px 13px;
+  border: 1px solid #eccaca;
+  border-radius: 10px;
+  background: #fff5f5;
+  color: #a32626;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+@media (max-width: 600px) {
+  .progressStepButton {
+    min-height: 72px;
+  }
+
+  .stepEditHint {
+    display: none;
+  }
+}

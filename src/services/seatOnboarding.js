@@ -618,3 +618,31 @@ export async function saveMySeatTeamSetup(
 
   return data;
 }
+
+
+export async function reopenMySeatOnboardingStep(
+  stepKey,
+) {
+  const {
+    data,
+    error,
+  } =
+    await supabase.rpc(
+      "reopen_my_seat_onboarding_step",
+      {
+        requested_step_key:
+          stepKey,
+      },
+    );
+
+  if (error) {
+    console.error(error);
+
+    throw new Error(
+      error.message ||
+        "That onboarding step could not be reopened.",
+    );
+  }
+
+  return data;
+}
