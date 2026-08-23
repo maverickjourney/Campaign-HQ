@@ -694,3 +694,134 @@ export async function completeMySeatOnboardingReview() {
 
   return data;
 }
+
+
+export async function loadMyCampaignSeatActivationStatus() {
+  const {
+    data,
+    error,
+  } =
+    await supabase.rpc(
+      "get_my_campaign_seat_activation_status",
+    );
+
+  if (error) {
+    console.error(error);
+
+    throw new Error(
+      error.message ||
+        "Campaign Seat Activation status could not be loaded.",
+    );
+  }
+
+  return data;
+}
+
+
+export async function activateMyCampaignSeat() {
+  const {
+    data,
+    error,
+  } =
+    await supabase.rpc(
+      "activate_my_campaign_seat",
+    );
+
+  if (error) {
+    console.error(error);
+
+    throw new Error(
+      error.message ||
+        "Campaign Seat could not be activated.",
+    );
+  }
+
+
+  const invitationDelivery = [];
+
+
+  for (
+    const invitation of
+      data?.team_invitations ||
+      []
+  ) {
+    try {
+      const {
+        data: emailData,
+        error: emailError,
+      } =
+        await supabase
+          .functions
+          .invoke(
+            "send-workspace-invitation",
+            {
+              body: {
+                invitationId:
+                  invitation.invitation_id,
+
+                invitationToken:
+                  invitation.invitation_token,
+              },
+            },
+          );
+
+      if (emailError) {
+        throw emailError;
+      }
+
+      if (
+        emailData?.success !==
+        true
+      ) {
+        throw new Error(
+          emailData?.error ||
+            "Invitation email delivery was not confirmed.",
+        );
+      }
+
+      invitationDelivery.push({
+        email:
+          invitation.email,
+
+        sent:
+          true,
+
+        emailId:
+          emailData.emailId ||
+          null,
+
+        error:
+          "",
+      });
+    } catch (
+      emailFailure
+    ) {
+      console.error(
+        "Launch invitation delivery failed:",
+        emailFailure,
+      );
+
+      invitationDelivery.push({
+        email:
+          invitation.email,
+
+        sent:
+          false,
+
+        emailId:
+          null,
+
+        error:
+          "The workspace was activated, but this team invitation email was not automatically delivered.",
+      });
+    }
+  }
+
+
+  return {
+    ...data,
+
+    invitation_delivery:
+      invitationDelivery,
+  };
+}

@@ -3140,3 +3140,438 @@
     white-space: normal;
   }
 }
+
+
+/* ============================================================
+   CAMPAIGN SEAT — FINAL ACTIVATION
+   ============================================================ */
+
+.activationCard {
+  width: 100%;
+  max-width: 1140px;
+  box-sizing: border-box;
+  display: grid;
+  gap: 24px;
+  margin-inline: auto;
+  padding: 30px;
+  border: 1px solid #dce3ec;
+  border-radius: 18px;
+  background: #ffffff;
+}
+
+.activationHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 24px;
+}
+
+.activationHeader h2 {
+  margin: 6px 0 8px;
+  color: #102847;
+  font-size: 34px;
+  line-height: 1.06;
+  letter-spacing: -0.04em;
+}
+
+.activationHeader p {
+  max-width: 770px;
+  margin: 0;
+  color: #687b92;
+  font-size: 15px;
+  line-height: 1.6;
+}
+
+.activationHeader > svg {
+  color: #174f84;
+}
+
+.activationReadyBanner,
+.activationLockedBanner {
+  display: flex;
+  align-items: flex-start;
+  gap: 13px;
+  padding: 18px;
+  border-radius: 14px;
+}
+
+.activationReadyBanner {
+  border: 1px solid #bde1ce;
+  background: #effaf4;
+  color: #14794c;
+}
+
+.activationLockedBanner {
+  border: 1px solid #ecd69a;
+  background: #fff9ec;
+  color: #84600f;
+}
+
+.activationReadyBanner > svg,
+.activationLockedBanner > svg {
+  flex: 0 0 auto;
+  margin-top: 1px;
+}
+
+.activationReadyBanner > div,
+.activationLockedBanner > div {
+  display: grid;
+  gap: 4px;
+}
+
+.activationReadyBanner strong,
+.activationLockedBanner strong {
+  color: #102847;
+  font-size: 15px;
+}
+
+.activationReadyBanner span,
+.activationLockedBanner span {
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.activationRequirementGrid {
+  display: grid;
+  grid-template-columns:
+    repeat(
+      2,
+      minmax(0, 1fr)
+    );
+  gap: 13px;
+}
+
+.activationRequirementGrid > article {
+  min-width: 0;
+  display: grid;
+  grid-template-columns:
+    auto
+    minmax(0, 1fr)
+    auto;
+  align-items: center;
+  gap: 13px;
+  padding: 16px;
+  border: 1px solid #dce3ec;
+  border-radius: 13px;
+}
+
+.activationRequirementGrid
+> article[data-ready="true"] {
+  border-color: #cce6d8;
+  background: #f3fbf7;
+}
+
+.activationRequirementGrid
+> article[data-ready="false"] {
+  border-color: #eadcb4;
+  background: #fffaf0;
+}
+
+.activationRequirementGrid
+> article
+> div {
+  width: 36px;
+  height: 36px;
+  display: grid;
+  place-items: center;
+  border-radius: 10px;
+  background: #ffffff;
+}
+
+.activationRequirementGrid
+> article[data-ready="true"]
+> div {
+  color: #168052;
+}
+
+.activationRequirementGrid
+> article[data-ready="false"]
+> div {
+  color: #8c6815;
+}
+
+.activationRequirementGrid section {
+  min-width: 0;
+  display: grid;
+  gap: 3px;
+}
+
+.activationRequirementGrid section strong {
+  color: #102847;
+  font-size: 14px;
+}
+
+.activationRequirementGrid section span {
+  overflow-wrap: break-word;
+  color: #718198;
+  font-size: 11px;
+  line-height: 1.4;
+}
+
+.activationRequirementGrid b {
+  padding: 6px 9px;
+  border-radius: 999px;
+  font-size: 10px;
+  white-space: nowrap;
+}
+
+.activationRequirementGrid
+> article[data-ready="true"]
+b {
+  background: #ffffff;
+  color: #16794d;
+}
+
+.activationRequirementGrid
+> article[data-ready="false"]
+b {
+  background: #ffffff;
+  color: #87630f;
+}
+
+.activationBlockers {
+  display: grid;
+  gap: 14px;
+  padding: 20px;
+  border: 1px solid #ead8a8;
+  border-radius: 14px;
+  background: #fffdf7;
+}
+
+.activationBlockerHeading {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.activationBlockerHeading > svg {
+  flex: 0 0 auto;
+  color: #9b7216;
+}
+
+.activationBlockerHeading > div {
+  display: grid;
+  gap: 3px;
+}
+
+.activationBlockerHeading strong {
+  color: #102847;
+}
+
+.activationBlockerHeading span {
+  color: #7d6a3a;
+  font-size: 12px;
+}
+
+.activationBlockerList {
+  display: grid;
+  gap: 9px;
+}
+
+.activationBlockerList article {
+  display: grid;
+  grid-template-columns:
+    auto
+    1fr;
+  gap: 11px;
+  padding: 12px 13px;
+  border-radius: 10px;
+  background: #ffffff;
+}
+
+.activationBlockerList article > div {
+  width: 8px;
+  height: 8px;
+  margin-top: 5px;
+  border-radius: 50%;
+  background: #d39a21;
+}
+
+.activationBlockerList section {
+  display: grid;
+  gap: 3px;
+}
+
+.activationBlockerList strong {
+  color: #102847;
+  font-size: 13px;
+}
+
+.activationBlockerList span {
+  color: #748198;
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.activationConfirmation {
+  display: flex !important;
+  align-items: flex-start;
+  gap: 12px !important;
+  padding: 18px;
+  border: 1px solid #bad8ef;
+  border-radius: 14px;
+  background: #f5faff;
+}
+
+.activationConfirmation input {
+  width: 19px !important;
+  min-width: 19px;
+  height: 19px !important;
+  min-height: 19px !important;
+  margin: 1px 0 0;
+  padding: 0 !important;
+  flex: 0 0 auto;
+}
+
+.activationConfirmation > div {
+  display: grid;
+  gap: 4px;
+}
+
+.activationConfirmation strong {
+  color: #102847;
+  font-size: 14px;
+}
+
+.activationConfirmation span {
+  color: #65788f;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.45;
+}
+
+.activationActions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 14px;
+  padding-top: 2px;
+}
+
+.activationRefreshButton,
+.activationLaunchButton {
+  min-height: 50px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  padding: 0 19px;
+  border-radius: 11px;
+  font: inherit;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.activationRefreshButton {
+  border: 1px solid #cad7e5;
+  background: #ffffff;
+  color: #183759;
+}
+
+.activationLaunchButton {
+  border: 1px solid #12375f;
+  background: #12375f;
+  color: #ffffff;
+}
+
+.activationRefreshButton:hover:not(:disabled) {
+  background: #f5f8fb;
+}
+
+.activationLaunchButton:hover:not(:disabled) {
+  background: #0e2e51;
+}
+
+.activationRefreshButton:disabled,
+.activationLaunchButton:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.activationSuccess {
+  justify-items: center;
+  padding-block: 55px;
+  text-align: center;
+}
+
+.activationSuccessIcon {
+  width: 64px;
+  height: 64px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: #edf9f3;
+  color: #168052;
+}
+
+.activationSuccess h2 {
+  margin: 0;
+  color: #102847;
+  font-size: 34px;
+  letter-spacing: -0.04em;
+}
+
+.activationSuccess p {
+  max-width: 620px;
+  margin: 0;
+  color: #687a91;
+  font-size: 15px;
+  line-height: 1.6;
+}
+
+.activationSuccess
+.activationLaunchButton {
+  margin-top: 6px;
+}
+
+.activationWarning {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 12px 14px;
+  border: 1px solid #ecd69c;
+  border-radius: 10px;
+  background: #fff9eb;
+  color: #815f11;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+@media (max-width: 850px) {
+  .activationRequirementGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 620px) {
+  .activationCard {
+    padding: 18px;
+  }
+
+  .activationHeader h2,
+  .activationSuccess h2 {
+    font-size: 28px;
+  }
+
+  .activationActions {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .activationRefreshButton,
+  .activationLaunchButton {
+    width: 100%;
+  }
+
+  .activationRequirementGrid
+  > article {
+    grid-template-columns:
+      auto
+      minmax(0, 1fr);
+  }
+
+  .activationRequirementGrid b {
+    grid-column: 2;
+    justify-self: start;
+  }
+}
