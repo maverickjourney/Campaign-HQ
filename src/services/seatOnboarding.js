@@ -520,3 +520,52 @@ export async function saveMySeatBillingSetup(
 
   return data;
 }
+
+
+export async function loadMySeatIntegrationSetup() {
+  const {
+    data,
+    error,
+  } =
+    await supabase.rpc(
+      "get_my_seat_integration_setup",
+    );
+
+  if (error) {
+    console.error(error);
+
+    throw new Error(
+      "Integration setup could not be loaded.",
+    );
+  }
+
+  return data;
+}
+
+
+export async function saveMySeatIntegrationSetup(
+  selectedIntegrationKeys,
+) {
+  const {
+    data,
+    error,
+  } =
+    await supabase.rpc(
+      "save_my_seat_integration_setup",
+      {
+        selected_integration_keys:
+          selectedIntegrationKeys,
+      },
+    );
+
+  if (error) {
+    console.error(error);
+
+    throw new Error(
+      error.message ||
+        "Integration setup could not be saved.",
+    );
+  }
+
+  return data;
+}

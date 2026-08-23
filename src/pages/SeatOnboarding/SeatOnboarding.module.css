@@ -1029,3 +1029,192 @@
     border-bottom: 1px solid #dce3ec;
   }
 }
+
+
+/* ============================================================
+   CAMPAIGN SEAT — INTEGRATIONS ONBOARDING
+   ============================================================ */
+
+.integrationCard {
+  width: 100%;
+  box-sizing: border-box;
+  display: grid;
+  gap: 20px;
+  padding: 26px;
+  border: 1px solid #dce3ec;
+  border-radius: 18px;
+  background: #ffffff;
+}
+
+.integrationHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 24px;
+}
+
+.integrationHeader h2 {
+  margin: 6px 0 8px;
+  color: #102847;
+  font-size: 28px;
+  letter-spacing: -0.03em;
+}
+
+.integrationHeader p {
+  max-width: 760px;
+  margin: 0;
+  color: #66778f;
+  line-height: 1.55;
+}
+
+.integrationNotice {
+  display: flex;
+  gap: 12px;
+  padding: 15px 16px;
+  border: 1px solid #efd8a1;
+  border-radius: 12px;
+  background: #fffaf0;
+  color: #735a18;
+}
+
+.integrationNotice > svg {
+  flex: 0 0 auto;
+}
+
+.integrationNotice > div {
+  display: grid;
+  gap: 4px;
+}
+
+.integrationNotice strong {
+  color: #102847;
+}
+
+.integrationNotice span {
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.integrationList {
+  display: grid;
+  gap: 14px;
+}
+
+.integrationItem {
+  display: grid;
+  grid-template-columns:
+    minmax(260px, 1fr)
+    minmax(320px, 1.4fr)
+    auto;
+  align-items: center;
+  gap: 18px;
+  padding: 18px;
+  border: 1px solid #dce3ec;
+  border-radius: 13px;
+  background: #fbfcfe;
+}
+
+.integrationItem[data-selected="true"] {
+  border-color: #b9d1ef;
+  background: #f6faff;
+}
+
+.integrationSelect {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  border: 0;
+  padding: 0;
+  background: transparent;
+  color: #102847;
+  text-align: left;
+  cursor: pointer;
+}
+
+.integrationSelect > div {
+  display: grid;
+  gap: 4px;
+}
+
+.integrationSelect strong {
+  font-size: 16px;
+}
+
+.integrationSelect span {
+  color: #708097;
+  font-size: 12px;
+}
+
+.integrationCheck {
+  width: 25px;
+  height: 25px;
+  border: 1px solid #bac8da;
+  border-radius: 7px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff !important;
+  background: #ffffff;
+  flex: 0 0 auto;
+}
+
+.integrationItem[data-selected="true"]
+.integrationCheck {
+  border-color: #1d6eb7;
+  background: #1d6eb7;
+}
+
+.integrationCapabilities {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+}
+
+.integrationCapabilities span {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 8px;
+  border: 1px solid #dde4ed;
+  border-radius: 999px;
+  background: #ffffff;
+  color: #506279;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.integrationConnected,
+.integrationPending {
+  white-space: nowrap;
+  padding: 7px 9px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.integrationConnected {
+  background: #edf9f3;
+  color: #168051;
+}
+
+.integrationPending {
+  background: #f2f5f9;
+  color: #697b91;
+}
+
+@media (max-width: 900px) {
+  .integrationItem {
+    grid-template-columns: 1fr;
+  }
+
+  .integrationConnected,
+  .integrationPending {
+    justify-self: start;
+  }
+}
+
+@media (max-width: 760px) {
+  .integrationCard {
+    padding: 18px;
+  }
+}

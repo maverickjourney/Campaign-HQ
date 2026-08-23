@@ -28,6 +28,10 @@ import SeatSecurityStep
 import SeatBillingStep
   from "./SeatBillingStep";
 
+
+import SeatIntegrationsStep
+  from "./SeatIntegrationsStep";
+
 import styles
   from "./SeatOnboarding.module.css";
 
@@ -238,6 +242,9 @@ export default function SeatOnboardingContinue() {
         ) : onboarding.current_step_key ===
           "billing" ? (
           <SeatBillingStep />
+        ) : onboarding.current_step_key ===
+          "integrations" ? (
+          <SeatIntegrationsStep />
         ) : (
           <div className={styles.nextNotice}>
             The{" "}
