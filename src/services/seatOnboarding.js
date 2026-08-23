@@ -449,3 +449,25 @@ export async function saveMySeatCampaignProfile(
 
   return data;
 }
+
+
+export async function completeMySeatSecurityStep() {
+  const {
+    data,
+    error,
+  } =
+    await supabase.rpc(
+      "complete_my_seat_security_step",
+    );
+
+  if (error) {
+    console.error(error);
+
+    throw new Error(
+      error.message ||
+        "Security onboarding could not be completed.",
+    );
+  }
+
+  return data;
+}

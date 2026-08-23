@@ -791,3 +791,90 @@
     width: 100%;
   }
 }
+
+
+/* ============================================================
+   CAMPAIGN SEAT — SECURITY ONBOARDING
+   ============================================================ */
+
+.securityOnboarding {
+  width: 100%;
+  box-sizing: border-box;
+  display: grid;
+  gap: 20px;
+  padding: 26px;
+  border: 1px solid #dce3ec;
+  border-radius: 18px;
+  background: #ffffff;
+}
+
+.securityOnboardingHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 24px;
+}
+
+.securityOnboardingHeader h2 {
+  margin: 6px 0 8px;
+  color: #102847;
+  font-size: 28px;
+  letter-spacing: -0.03em;
+}
+
+.securityOnboardingHeader p {
+  max-width: 720px;
+  margin: 0;
+  color: #66778f;
+  line-height: 1.55;
+}
+
+.securityReady,
+.securityWaiting {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  padding: 15px 16px;
+  border-radius: 12px;
+}
+
+.securityReady {
+  border: 1px solid #c8e7d7;
+  background: #f0faf5;
+  color: #16774b;
+}
+
+.securityWaiting {
+  border: 1px solid #d9e1ec;
+  background: #f7f9fc;
+  color: #52647b;
+}
+
+.securityReady > svg,
+.securityWaiting > svg {
+  flex: 0 0 auto;
+  margin-top: 1px;
+}
+
+.securityReady > div,
+.securityWaiting > div {
+  display: grid;
+  gap: 4px;
+}
+
+.securityReady strong,
+.securityWaiting strong {
+  color: #102847;
+}
+
+.securityReady span,
+.securityWaiting span {
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+@media (max-width: 760px) {
+  .securityOnboarding {
+    padding: 18px;
+  }
+}
