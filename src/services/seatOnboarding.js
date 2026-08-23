@@ -890,3 +890,67 @@ export async function startSeatProviderConnection(
 
   return data;
 }
+
+
+export async function probeSeatProviderData(
+  integrationKey,
+) {
+  const {
+    data,
+    error,
+  } =
+    await supabase
+      .functions
+      .invoke(
+        "nylas-seat-data-probe",
+        {
+          body: {
+            integrationKey,
+          },
+        },
+      );
+
+
+  if (error) {
+    let message =
+      error.message ||
+      "Campaign Seat could not verify provider data access.";
+
+
+    if (
+      error.context instanceof
+        Response
+    ) {
+      try {
+        const payload =
+          await error.context.json();
+
+        message =
+          payload?.error ||
+          payload?.message ||
+          message;
+      } catch {
+        // Preserve fallback.
+      }
+    }
+
+
+    throw new Error(
+      message,
+    );
+  }
+
+
+  if (
+    data?.success !==
+    true
+  ) {
+    throw new Error(
+      data?.error ||
+        "Campaign Seat could not verify provider data access.",
+    );
+  }
+
+
+  return data;
+}

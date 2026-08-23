@@ -3626,3 +3626,25 @@ b {
     flex-wrap: wrap;
   }
 }
+
+
+/* ============================================================
+   CAMPAIGN SEAT — PROVIDER DATA VERIFICATION
+   ============================================================ */
+
+.providerProbeVerified {
+  display: inline-flex;
+  align-items: center;
+  width: fit-content;
+  margin-top: 3px;
+  color: #15794c;
+  font-size: 10px;
+  font-style: normal;
+  font-weight: 800;
+  line-height: 1.35;
+}
+
+.activationProviderAction
+button:disabled {
+  transform: none;
+}

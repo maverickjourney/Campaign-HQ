@@ -21,6 +21,7 @@ import {
 import {
   activateMyCampaignSeat,
   loadMyCampaignSeatActivationStatus,
+  probeSeatProviderData,
   startSeatProviderConnection,
 } from "../../services/seatOnboarding";
 
@@ -116,6 +117,19 @@ export default function SeatActivationStep() {
     useState("");
 
 
+  const [
+    probingIntegrationKey,
+    setProbingIntegrationKey,
+  ] =
+    useState("");
+
+  const [
+    providerProbeResults,
+    setProviderProbeResults,
+  ] =
+    useState({});
+
+
   const load =
     async ({
       refresh = false,
@@ -186,6 +200,53 @@ export default function SeatActivationStep() {
         );
 
         setConnectingIntegrationKey(
+          "",
+        );
+      }
+    };
+
+
+  const verifyProviderData =
+    async (
+      integrationKey,
+    ) => {
+      if (
+        probingIntegrationKey ||
+        connectingIntegrationKey ||
+        activating
+      ) {
+        return;
+      }
+
+      setError("");
+      setProbingIntegrationKey(
+        integrationKey,
+      );
+
+      try {
+        const result =
+          await probeSeatProviderData(
+            integrationKey,
+          );
+
+        setProviderProbeResults(
+          (current) => ({
+            ...current,
+
+            [integrationKey]:
+              result,
+          }),
+        );
+      } catch (
+        probeError
+      ) {
+        setError(
+          probeError instanceof Error
+            ? probeError.message
+            : "Provider data access could not be verified.",
+        );
+      } finally {
+        setProbingIntegrationKey(
           "",
         );
       }
@@ -557,6 +618,18 @@ export default function SeatActivationStep() {
                         "Secure provider authorization complete"
                       : "Secure OAuth authorization required"}
                   </span>
+
+                  {providerProbeResults[
+                    integration.integration_key
+                  ]?.success && (
+                    <em
+                      className={
+                        styles.providerProbeVerified
+                      }
+                    >
+                      Email · Calendar · Contacts verified
+                    </em>
+                  )}
                 </section>
 
                 <aside
@@ -570,12 +643,15 @@ export default function SeatActivationStep() {
                       : "Pending"}
                   </b>
 
-                  {!connected && (
+                  {!connected ? (
                     <button
                       type="button"
                       disabled={
                         Boolean(
                           connectingIntegrationKey,
+                        ) ||
+                        Boolean(
+                          probingIntegrationKey,
                         ) ||
                         activating
                       }
@@ -590,6 +666,34 @@ export default function SeatActivationStep() {
                       integration.integration_key
                         ? "Opening…"
                         : "Connect"}
+                    </button>
+                  ) : (
+                    <button
+                      type="button"
+                      disabled={
+                        Boolean(
+                          probingIntegrationKey,
+                        ) ||
+                        Boolean(
+                          connectingIntegrationKey,
+                        ) ||
+                        activating
+                      }
+                      onClick={() =>
+                        verifyProviderData(
+                          integration
+                            .integration_key,
+                        )
+                      }
+                    >
+                      {probingIntegrationKey ===
+                      integration.integration_key
+                        ? "Checking…"
+                        : providerProbeResults[
+                            integration.integration_key
+                          ]?.success
+                          ? "Verified"
+                          : "Verify data"}
                     </button>
                   )}
                 </aside>
