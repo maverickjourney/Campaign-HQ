@@ -6,6 +6,8 @@ import {
 
 import {
   ArrowRight,
+  Check,
+  ChevronDown,
   Crown,
   LoaderCircle,
   Mail,
@@ -65,6 +67,13 @@ export default function SeatTeamAccessStep() {
     setError,
   ] =
     useState("");
+
+
+  const [
+    openRoleIndex,
+    setOpenRoleIndex,
+  ] =
+    useState(null);
 
 
   useEffect(() => {
@@ -174,6 +183,8 @@ export default function SeatTeamAccessStep() {
 
   const removeMember =
     (index) => {
+      setOpenRoleIndex(null);
+
       setMembers(
         (current) =>
           current.filter(
@@ -407,9 +418,12 @@ export default function SeatTeamAccessStep() {
 
 
               <div
-                className={
-                  styles.profileGrid
-                }
+                className={[
+                  styles.profileGrid,
+                  styles.teamFormGrid,
+                ]
+                  .filter(Boolean)
+                  .join(" ")}
               >
                 <label>
                   Full name
@@ -467,39 +481,134 @@ export default function SeatTeamAccessStep() {
                 <label>
                   Campaign role
 
-                  <select
-                    value={
-                      member.role_key
-                    }
-                    onChange={(
-                      event,
-                    ) =>
-                      updateMember(
-                        index,
-                        "role_key",
-                        event.target
-                          .value,
-                      )
+                  <div
+                    className={
+                      styles.rolePicker
                     }
                   >
-                    {(
-                      setup?.roles ||
-                      []
-                    ).map(
-                      (role) => (
-                        <option
-                          key={
-                            role.role_key
-                          }
-                          value={
-                            role.role_key
-                          }
-                        >
-                          {role.name}
-                        </option>
-                      ),
+                    <button
+                      className={
+                        styles.rolePickerButton
+                      }
+                      type="button"
+                      aria-haspopup="listbox"
+                      aria-expanded={
+                        openRoleIndex ===
+                        index
+                      }
+                      onClick={() =>
+                        setOpenRoleIndex(
+                          (current) =>
+                            current ===
+                            index
+                              ? null
+                              : index,
+                        )
+                      }
+                    >
+                      <div>
+                        <strong>
+                          {(
+                            setup?.roles ||
+                            []
+                          ).find(
+                            (role) =>
+                              role.role_key ===
+                              member.role_key,
+                          )?.name ||
+                            "Choose a role"}
+                        </strong>
+
+                        <span>
+                          {(
+                            setup?.roles ||
+                            []
+                          ).find(
+                            (role) =>
+                              role.role_key ===
+                              member.role_key,
+                          )?.seat_type ||
+                            "Campaign access"}
+                        </span>
+                      </div>
+
+                      <ChevronDown
+                        size={18}
+                        aria-hidden="true"
+                      />
+                    </button>
+
+                    {openRoleIndex ===
+                      index && (
+                      <div
+                        className={
+                          styles.rolePickerMenu
+                        }
+                        role="listbox"
+                      >
+                        {(
+                          setup?.roles ||
+                          []
+                        ).map(
+                          (role) => {
+                            const selected =
+                              role.role_key ===
+                              member.role_key;
+
+                            return (
+                              <button
+                                className={
+                                  styles.rolePickerOption
+                                }
+                                data-selected={
+                                  selected
+                                    ? "true"
+                                    : "false"
+                                }
+                                type="button"
+                                role="option"
+                                aria-selected={
+                                  selected
+                                }
+                                key={
+                                  role.role_key
+                                }
+                                onClick={() => {
+                                  updateMember(
+                                    index,
+                                    "role_key",
+                                    role.role_key,
+                                  );
+
+                                  setOpenRoleIndex(
+                                    null,
+                                  );
+                                }}
+                              >
+                                <div>
+                                  <strong>
+                                    {role.name}
+                                  </strong>
+
+                                  <span>
+                                    {
+                                      role.description
+                                    }
+                                  </span>
+                                </div>
+
+                                {selected && (
+                                  <Check
+                                    size={17}
+                                  />
+                                )}
+                              </button>
+                            );
+                          },
+                        )}
+                      </div>
                     )}
-                  </select>
+                  </div>
                 </label>
 
                 <label>
