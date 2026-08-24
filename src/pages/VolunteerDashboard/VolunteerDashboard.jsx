@@ -15,6 +15,7 @@ import {
   Sparkles,
 } from "lucide-react";
 import {
+  useEffect,
   useMemo,
   useState,
 } from "react";
@@ -31,17 +32,18 @@ import {
 import {
   getCurrentUser,
   getCurrentWorkspace,
+  getUserInitials,
 } from "../../utils/campaignSession";
 import {
   useVolunteerTasks,
 } from "../../hooks/useVolunteerTasks";
-import elizabethPhoto from "../../assets/images/dashboard/elizabeth.jpg";
+
+import {
+  supabase,
+} from "../../lib/supabase";
 
 import shellStyles from "../Tasks/Tasks.module.css";
 import styles from "./VolunteerDashboard.module.css";
-
-const ELECTION_DATE =
-  new Date("2026-08-18T00:00:00-04:00");
 
 function getGreeting() {
   const hour =
@@ -58,13 +60,29 @@ function getGreeting() {
   return "Good evening";
 }
 
-function getElectionCountdown() {
-  const today =
-    new Date();
+function getElectionCountdown(
+  electionDateRaw,
+) {
+  if (!electionDateRaw) {
+    return null;
+  }
+
+  const electionDate =
+    new Date(
+      `${electionDateRaw}T00:00:00`,
+    );
+
+  if (
+    Number.isNaN(
+      electionDate.getTime(),
+    )
+  ) {
+    return null;
+  }
 
   const milliseconds =
-    ELECTION_DATE.getTime() -
-    today.getTime();
+    electionDate.getTime() -
+    Date.now();
 
   return Math.max(
     0,
@@ -125,6 +143,92 @@ export default function VolunteerDashboard() {
 
   const workspace =
     getCurrentWorkspace();
+
+  const candidateName =
+    workspace.candidateName ||
+    workspace.name ||
+    "the campaign";
+
+  const districtLabel =
+    workspace.districtLabel ||
+    workspace.officeSought ||
+    workspace.description ||
+    "your community";
+
+  const jurisdictionLabel =
+    workspace.jurisdictionName ||
+    workspace.location ||
+    "the community";
+
+  const candidateInitials =
+    getUserInitials(
+      candidateName,
+    );
+
+  const [
+    candidatePhotoUrl,
+    setCandidatePhotoUrl,
+  ] = useState("");
+
+  useEffect(() => {
+    let cancelled = false;
+
+    const loadPhoto =
+      async () => {
+        const storagePath =
+          workspace.candidatePhotoPath;
+
+        if (!storagePath) {
+          setCandidatePhotoUrl(
+            "",
+          );
+          return;
+        }
+
+        try {
+          const {
+            data,
+            error:
+              signedUrlError,
+          } =
+            await supabase.storage
+              .from(
+                "campaign-files",
+              )
+              .createSignedUrl(
+                storagePath,
+                21600,
+              );
+
+          if (
+            signedUrlError
+          ) {
+            throw signedUrlError;
+          }
+
+          if (!cancelled) {
+            setCandidatePhotoUrl(
+              data?.signedUrl ||
+              "",
+            );
+          }
+        } catch {
+          if (!cancelled) {
+            setCandidatePhotoUrl(
+              "",
+            );
+          }
+        }
+      };
+
+    void loadPhoto();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [
+    workspace.candidatePhotoPath,
+  ]);
 
   const [
     sidebarOpen,
@@ -194,7 +298,9 @@ export default function VolunteerDashboard() {
     "Volunteer";
 
   const countdown =
-    getElectionCountdown();
+    getElectionCountdown(
+      workspace.electionDateRaw,
+    );
 
   return (
     <div className={styles.app}>
@@ -315,23 +421,22 @@ export default function VolunteerDashboard() {
               <h2>
                 Building momentum for
                 <strong>
-                  District 6.
+                  {districtLabel}.
                 </strong>
               </h2>
 
               <p>
                 Every volunteer shift,
                 conversation and completed
-                assignment helps move
-                Elizabeth’s campaign
-                forward.
+                assignment helps move{" "}
+                {candidateName} forward.
               </p>
 
               <div className={styles.heroTags}>
                 <span>Community</span>
                 <span>Field team</span>
                 <span>
-                  Palm Beach County
+                  {jurisdictionLabel}
                 </span>
               </div>
 
@@ -342,12 +447,13 @@ export default function VolunteerDashboard() {
                   </span>
 
                   <strong>
-                    {countdown}
+                    {countdown ?? "—"}
                   </strong>
 
                   <small>
-                    days to August 18,
-                    2026
+                    {countdown === null
+                      ? "Election date not set"
+                      : `days to ${workspace.electionDate}`}
                   </small>
                 </div>
 
@@ -387,12 +493,29 @@ export default function VolunteerDashboard() {
             <div className={styles.heroPortrait}>
               <div className={styles.flagGlow} />
 
-              <img
-                src={
-                  elizabethPhoto
-                }
-                alt="Elizabeth Accomando campaign portrait"
-              />
+              {candidatePhotoUrl ? (
+                <img
+                  src={
+                    candidatePhotoUrl
+                  }
+                  alt={`${candidateName} campaign portrait`}
+                />
+              ) : (
+                <div
+                  className={
+                    styles.portraitFallback
+                  }
+                  aria-label="Candidate photo not uploaded"
+                >
+                  <strong>
+                    {candidateInitials}
+                  </strong>
+
+                  <span>
+                    Candidate photo
+                  </span>
+                </div>
+              )}
 
               <div className={styles.portraitCaption}>
                 <span>
@@ -400,8 +523,9 @@ export default function VolunteerDashboard() {
                 </span>
 
                 <strong>
-                  Help protect what makes
-                  District 6 special.
+                  Help strengthen{" "}
+                  {districtLabel} in{" "}
+                  {jurisdictionLabel}.
                 </strong>
               </div>
             </div>

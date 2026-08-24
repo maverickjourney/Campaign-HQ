@@ -102,7 +102,15 @@ async function buildMembershipAccess(
           location,
           election_date,
           political_party,
-          status
+          status,
+          candidate_name,
+          candidate_photo_path,
+          office_sought,
+          district_label,
+          jurisdiction_name,
+          primary_election_date,
+          general_election_date,
+          timezone
         `,
       )
       .in("id", workspaceIds),

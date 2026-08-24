@@ -796,7 +796,9 @@ export default function SeatActivationStep() {
           onClick={() => {
             if (workspaceId) {
               window.location.href =
-                "/dashboard";
+                `/workspaces?open=${encodeURIComponent(
+                  workspaceId,
+                )}`;
             }
           }}
         >

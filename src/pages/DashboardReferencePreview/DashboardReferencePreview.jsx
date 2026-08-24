@@ -70,7 +70,6 @@ import { CampaignSearch } from "../../components/CampaignSearch/CampaignSearch";
 import {
   CampaignWorkspaceShell,
 } from "../../components/CampaignWorkspaceShell/CampaignWorkspaceShell";
-import elizabethPhoto from "../../assets/images/dashboard/elizabeth.jpg";
 import {
   useCandidateProfileManagement,
 } from "../../hooks/useCandidateProfileManagement";
@@ -1283,6 +1282,10 @@ const [
   const {
     profile:
       dashboardCandidateProfile,
+
+    photoPreviewUrl:
+      dashboardCandidatePhotoUrl,
+
     isLoading:
       dashboardCandidateLoading,
   } = useCandidateProfileManagement({
@@ -8579,14 +8582,37 @@ const [
                 </div>
 
                 <div className={styles.simpleSpotlightMedia}>
-                  <img
-                    className={
-                      styles.simpleSpotlightBackdrop
-                    }
-                    src={elizabethPhoto}
-                    alt=""
-                    aria-hidden="true"
-                  />
+                  {dashboardCandidatePhotoUrl ? (
+                    <img
+                      className={
+                        styles.simpleSpotlightBackdrop
+                      }
+                      src={
+                        dashboardCandidatePhotoUrl
+                      }
+                      alt=""
+                      aria-hidden="true"
+                    />
+                  ) : (
+                    <div
+                      className={
+                        styles.simpleSpotlightPhotoFallback
+                      }
+                      aria-label="Candidate photo not uploaded"
+                    >
+                      <strong>
+                        {getUserInitials(
+                          dashboardCandidateProfile
+                            ?.candidateName ||
+                          workspace.name,
+                        )}
+                      </strong>
+
+                      <span>
+                        Upload candidate photo
+                      </span>
+                    </div>
+                  )}
 
                   <div
                     className={
@@ -8595,13 +8621,21 @@ const [
                     aria-hidden="true"
                   />
 
-                  <img
-                    className={
-                      styles.simpleSpotlightPortrait
-                    }
-                    src={elizabethPhoto}
-                    alt={workspace.name}
-                  />
+                  {dashboardCandidatePhotoUrl ? (
+                    <img
+                      className={
+                        styles.simpleSpotlightPortrait
+                      }
+                      src={
+                        dashboardCandidatePhotoUrl
+                      }
+                      alt={
+                        dashboardCandidateProfile
+                          ?.candidateName ||
+                        workspace.name
+                      }
+                    />
+                  ) : null}
                 </div>
               </article>
 

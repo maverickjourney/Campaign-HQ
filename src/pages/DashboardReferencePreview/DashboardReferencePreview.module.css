@@ -23083,3 +23083,46 @@
 }
 
 /* WAITING ON BLOCKER RADAR V1 — END */
+
+/* WORKSPACE CANDIDATE PHOTO FALLBACK — START */
+.simpleSpotlightPhotoFallback {
+  position: absolute;
+  z-index: 0;
+  inset: 0;
+  display: grid;
+  place-content: center;
+  gap: 8px;
+  color: #ffffff;
+  text-align: center;
+  background:
+    radial-gradient(
+      circle at 50% 38%,
+      rgba(255, 255, 255, 0.1),
+      transparent 28%
+    ),
+    linear-gradient(
+      145deg,
+      #164f87,
+      #071f3c
+    );
+}
+
+.simpleSpotlightPhotoFallback strong {
+  font-size: clamp(
+    52px,
+    7vw,
+    94px
+  );
+  line-height: 1;
+  letter-spacing: -0.06em;
+}
+
+.simpleSpotlightPhotoFallback span {
+  color:
+    rgba(255, 255, 255, 0.72);
+  font-size: 10px;
+  font-weight: 850;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+/* WORKSPACE CANDIDATE PHOTO FALLBACK — END */

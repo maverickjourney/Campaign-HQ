@@ -1,6 +1,7 @@
 import {
   useEffect,
   useMemo,
+  useRef,
   useState,
 } from "react";
 import { useNavigate } from "react-router-dom";
@@ -217,6 +218,9 @@ function getDaysUntilElection(dateValue) {
 export default function WorkspaceSelector() {
   const navigate = useNavigate();
 
+  const autoOpenRef =
+    useRef(false);
+
   const [searchTerm, setSearchTerm] =
     useState("");
 
@@ -362,6 +366,59 @@ export default function WorkspaceSelector() {
       },
     );
   };
+
+  useEffect(() => {
+    if (
+      autoOpenRef.current
+    ) {
+      return;
+    }
+
+    const requestedWorkspaceId =
+      new URLSearchParams(
+        window.location.search,
+      ).get(
+        "open",
+      );
+
+    if (
+      !requestedWorkspaceId
+    ) {
+      return;
+    }
+
+    const requestedMembership =
+      memberships.find(
+        (membership) =>
+          (
+            membership.workspaceId ||
+            membership.workspace?.id
+          ) ===
+          requestedWorkspaceId,
+      );
+
+    if (
+      !requestedMembership
+    ) {
+      return;
+    }
+
+    autoOpenRef.current =
+      true;
+
+    window.history.replaceState(
+      {},
+      document.title,
+      "/workspaces",
+    );
+
+    handleSelectWorkspace(
+      requestedMembership,
+    );
+  }, [
+    memberships,
+  ]);
+
 
   const handleLogout = async () => {
     await clearCampaignSession();
@@ -653,8 +710,8 @@ export default function WorkspaceSelector() {
                         }
                       >
                         <p>
-                          Palm Beach County,
-                          Florida
+                          {workspace.location ||
+                            "Campaign location"}
                         </p>
 
                         <h2>

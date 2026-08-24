@@ -649,7 +649,9 @@ export function CampaignWorkspaceShell({
               }
             >
               <span className={styles.workspaceSwitcherAvatar}>
-                EA
+                {getUserInitials(
+                  workspace.name,
+                )}
               </span>
 
               <span>

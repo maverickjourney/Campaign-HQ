@@ -33,33 +33,29 @@ const campaignMemoryStore = {
   },
 };
 
-export const CAMPAIGN_ELECTION_SCHEDULE = [
-  {
-    key: "primary",
-    label: "Primary election",
-    electionDateRaw: "2026-08-18",
-  },
-  {
-    key: "general",
-    label: "General election",
-    electionDateRaw: "2026-11-03",
-  },
-];
+export const CAMPAIGN_ELECTION_SCHEDULE = [];
 
 export const CAMPAIGN_WORKSPACE = {
-  id: "11111111-1111-1111-1111-111111111111",
-  name: "Elizabeth Accomando",
-  description:
-    "Palm Beach County Commission, District 6",
-  location: "Palm Beach County, Florida",
-
-  // Current fallback points to the next remaining election.
-  electionDate: "November 3, 2026",
-  electionDateRaw: "2026-11-03",
-  electionLabel: "General election",
-
-  politicalParty: "republican",
-  status: "active",
+  id: "",
+  name: "Campaign Workspace",
+  description: "",
+  location: "",
+  electionDate:
+    "Election date not set",
+  electionDateRaw: "",
+  electionLabel: "Election day",
+  politicalParty:
+    "nonpartisan",
+  status: "",
+  candidateName: "",
+  candidatePhotoPath: "",
+  officeSought: "",
+  districtLabel: "",
+  jurisdictionName: "",
+  primaryElectionDate: "",
+  generalElectionDate: "",
+  timezone:
+    "America/New_York",
 };
 
 function readSessionValue(key, fallback = null) {
@@ -235,6 +231,45 @@ function normalizeWorkspace(workspace = {}) {
     electionKey:
       activeElection.key ||
       "configured",
+
+    candidateName:
+      workspace.candidateName ||
+      workspace.candidate_name ||
+      "",
+
+    candidatePhotoPath:
+      workspace.candidatePhotoPath ||
+      workspace.candidate_photo_path ||
+      "",
+
+    officeSought:
+      workspace.officeSought ||
+      workspace.office_sought ||
+      "",
+
+    districtLabel:
+      workspace.districtLabel ||
+      workspace.district_label ||
+      "",
+
+    jurisdictionName:
+      workspace.jurisdictionName ||
+      workspace.jurisdiction_name ||
+      "",
+
+    primaryElectionDate:
+      workspace.primaryElectionDate ||
+      workspace.primary_election_date ||
+      "",
+
+    generalElectionDate:
+      workspace.generalElectionDate ||
+      workspace.general_election_date ||
+      "",
+
+    timezone:
+      workspace.timezone ||
+      "America/New_York",
 
     politicalParty:
       workspace.politicalParty ||

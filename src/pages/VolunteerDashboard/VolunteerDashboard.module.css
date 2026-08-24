@@ -1457,3 +1457,45 @@
     display: grid !important;
   }
 }
+
+/* WORKSPACE CANDIDATE PHOTO FALLBACK — START */
+.portraitFallback {
+  position: absolute;
+  z-index: 1;
+  inset: 0;
+  display: grid;
+  place-content: center;
+  gap: 8px;
+  text-align: center;
+  background:
+    radial-gradient(
+      circle at 50% 36%,
+      rgba(255, 255, 255, 0.12),
+      transparent 27%
+    ),
+    linear-gradient(
+      145deg,
+      rgba(9, 37, 70, 0.2),
+      rgba(9, 29, 54, 0.86)
+    );
+}
+
+.portraitFallback strong {
+  font-size: clamp(
+    54px,
+    8vw,
+    96px
+  );
+  line-height: 1;
+  letter-spacing: -0.06em;
+}
+
+.portraitFallback span {
+  color:
+    rgba(255, 255, 255, 0.7);
+  font-size: 11px;
+  font-weight: 850;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+}
+/* WORKSPACE CANDIDATE PHOTO FALLBACK — END */
