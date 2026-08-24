@@ -69,6 +69,14 @@ import {
   getWorkspaceThemeStyle,
 } from "../../utils/workspacePresentation";
 
+import {
+  useWorkspaceCommandCounts,
+} from "../../hooks/useWorkspaceCommandCounts";
+
+import {
+  useWorkspaceProviderFreshness,
+} from "../../hooks/useWorkspaceProviderFreshness";
+
 
 import styles from "./CampaignWorkspaceShell.module.css";
 
@@ -97,13 +105,6 @@ const MODULE_ICONS = {
   reports_analytics: BarChart3,
 };
 
-const MODULE_COUNTS = {
-  inbox: 8,
-  tasks: 3,
-  waiting_on: 3,
-  approvals: 3,
-};
-
 const SIDEBAR_SCROLL_STORAGE_KEY =
   "campaign-seat:workspace-sidebar-scroll";
 
@@ -118,10 +119,6 @@ function createNavigation(
           module.key
         ] ||
         LayoutDashboard,
-      count:
-        MODULE_COUNTS[
-          module.key
-        ],
     }),
   );
 }
@@ -225,6 +222,24 @@ export function CampaignWorkspaceShell({
     getWorkspaceThemeStyle(
       workspace,
     );
+
+  const {
+    counts:
+      workspaceCommandCounts,
+  } =
+    useWorkspaceCommandCounts(
+      workspace?.id,
+    );
+
+  useWorkspaceProviderFreshness({
+    workspaceId:
+      workspace?.id,
+
+    enabled:
+      Boolean(
+        workspace?.id,
+      ),
+  });
 
   const [
     candidateAvatarUrl,
@@ -558,6 +573,15 @@ export function CampaignWorkspaceShell({
   ) =>
     navigationItems.map((item) => {
       const Icon = item.icon;
+
+      const liveCount =
+        Number(
+          workspaceCommandCounts[
+            item.key
+          ] ||
+          0,
+        );
+
       const isComingSoon = Boolean(item.comingSoon);
 
       const isActive =
@@ -603,8 +627,12 @@ export function CampaignWorkspaceShell({
 
           <span>{item.label}</span>
 
-          {item.count ? (
-            <small>{item.count}</small>
+          {liveCount > 0 ? (
+            <small>
+              {liveCount > 99
+                ? "99+"
+                : liveCount}
+            </small>
           ) : null}
 
         </button>

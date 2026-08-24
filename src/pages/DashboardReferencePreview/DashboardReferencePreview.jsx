@@ -160,173 +160,6 @@ const PLATFORM_TOOLS =
       ),
   );
 
-// PRESENTATION PRIORITIES — START
-const PRESENTATION_PRIORITIES = [
-  {
-    id: "presentation-reporter-response",
-    title: "Respond to Palm Beach Post reporter",
-    detail: "Waiting for 14 hours",
-    priority: "urgent",
-    icon: Star,
-  },
-  {
-    id: "presentation-yard-sign",
-    title: "Approve yard sign design",
-    detail: "Vendor awaiting approval",
-    priority: "high",
-    icon: FileText,
-  },
-  {
-    id: "presentation-budget-update",
-    title: "Treasurer budget update",
-    detail: "Requested 2 days ago",
-    priority: "medium",
-    icon: CircleDollarSign,
-  },
-  {
-    id: "presentation-donor-notes",
-    title: "Prepare donor call notes",
-    detail: "Call with John Smith at 2:00 PM",
-    priority: "medium",
-    icon: PhoneCall,
-  },
-  {
-    id: "presentation-volunteer-schedule",
-    title: "Review volunteer schedule",
-    detail: "Saturday canvass needs 3 more",
-    priority: "low",
-    icon: Users,
-  },
-  {
-    id: "presentation-canvass-routes",
-    title: "Confirm weekend canvass routes",
-    detail: "North and west teams need final turf",
-    priority: "high",
-    icon: MapPin,
-  },
-  {
-    id: "presentation-social-calendar",
-    title: "Approve weekend social calendar",
-    detail: "Six posts are awaiting review",
-    priority: "high",
-    icon: MessageSquare,
-  },
-  {
-    id: "presentation-community-leaders",
-    title: "Follow up with community leaders",
-    detail: "Three introductions remain open",
-    priority: "medium",
-    icon: Users,
-  },
-  {
-    id: "presentation-volunteer-briefing",
-    title: "Finalize volunteer captain briefing",
-    detail: "Send the briefing before 5:30 PM",
-    priority: "medium",
-    icon: FileCheck2,
-  },
-  {
-    id: "presentation-mail-plan",
-    title: "Review vote-by-mail outreach plan",
-    detail: "Mail deadline checklist due today",
-    priority: "high",
-    icon: Mail,
-  },
-  {
-    id: "presentation-polling-handout",
-    title: "Confirm polling-location handout",
-    detail: "Final addresses require verification",
-    priority: "low",
-    icon: MapPin,
-  },
-];
-// PRESENTATION PRIORITIES — END
-
-const PRESENTATION_SCHEDULE = [
-  {
-    id: "presentation-standup",
-    title: "Campaign Team Standup",
-    location: "HQ Office",
-    starts_at: "2026-07-24T09:00:00-04:00",
-    attendeeLabels: ["EA", "CH", "TM"],
-    attendeeOverflow: 4,
-  },
-  {
-    id: "presentation-communications",
-    title: "Communications Brief",
-    location: "Zoom Meeting",
-    starts_at: "2026-07-24T10:30:00-04:00",
-    attendeeLabels: ["EA", "CH", "JS"],
-    attendeeOverflow: 3,
-  },
-  {
-    id: "presentation-lunch",
-    title: "Lunch with Supporter",
-    location: "150 Aero Club Dr, Wellington, FL",
-    starts_at: "2026-07-24T12:00:00-04:00",
-    attendeeLabels: [],
-    attendeeOverflow: 0,
-  },
-  {
-    id: "presentation-donor-call",
-    title: "Donor Call: John Smith",
-    location: "Phone Call",
-    starts_at: "2026-07-24T14:00:00-04:00",
-    attendeeLabels: [],
-    attendeeOverflow: 0,
-    phone: true,
-    conflict: true,
-  },
-  {
-    id: "presentation-media-review",
-    title: "Media Strategy Review",
-    location: "HQ Office",
-    starts_at: "2026-07-24T16:00:00-04:00",
-    attendeeLabels: ["EA", "CH", "TM"],
-    attendeeOverflow: 2,
-  },
-  {
-    id: "presentation-fundraiser",
-    title: "Fundraiser Event",
-    location: "Wellington Community Center",
-    starts_at: "2026-07-24T18:00:00-04:00",
-    attendeeLabels: [],
-    attendeeOverflow: 0,
-  },
-  {
-    id: "presentation-captain-check-in",
-    title: "Volunteer Captain Check-In",
-    location: "Zoom Meeting",
-    starts_at: "2026-07-24T19:15:00-04:00",
-    attendeeLabels: ["TM", "JS", "PB"],
-    attendeeOverflow: 5,
-  },
-  {
-    id: "presentation-digital-review",
-    title: "Digital Advertising Review",
-    location: "Campaign HQ",
-    starts_at: "2026-07-24T20:00:00-04:00",
-    attendeeLabels: ["EA", "CH"],
-    attendeeOverflow: 2,
-  },
-  {
-    id: "presentation-canvass-briefing",
-    title: "Weekend Canvass Briefing",
-    location: "Field Office",
-    starts_at: "2026-07-24T20:45:00-04:00",
-    attendeeLabels: ["TM", "JS"],
-    attendeeOverflow: 7,
-  },
-  {
-    id: "presentation-war-room",
-    title: "End-of-Day War Room",
-    location: "HQ Office",
-    starts_at: "2026-07-24T21:30:00-04:00",
-    attendeeLabels: ["EA", "CH", "TM"],
-    attendeeOverflow: 4,
-  },
-];
-
 // DASHBOARD HQ SHORTCUT OPTIONS — START
 const HQ_SHORTCUT_LIMIT = 6;
 
@@ -1773,32 +1606,8 @@ const [
         .slice(0, 6);
     })();
 
-  const isPresentationWorkspace =
-    workspace.id ===
-      "11111111-1111-1111-1111-111111111111" ||
-    workspace.name === "Elizabeth Accomando";
-
-  const presentationScheduleToday =
-    PRESENTATION_SCHEDULE.filter(
-      (event) =>
-        getEasternDateKey(
-          event.starts_at,
-        ) ===
-        todayScheduleDateKey,
-    );
-
-  const isUsingPresentationSchedule =
-    isPresentationWorkspace &&
-    data.events.length === 0 &&
-    presentationScheduleToday.length > 0 &&
-    !isLoading;
-
   const displayedScheduleEvents =
-    todayScheduleEvents.length > 0
-      ? todayScheduleEvents
-      : isUsingPresentationSchedule
-        ? presentationScheduleToday
-        : [];
+    todayScheduleEvents;
 
   const hasScheduleConflict =
     displayedScheduleEvents.some(
@@ -1816,11 +1625,7 @@ const [
   };
 
   const displayedPriorities = [
-    ...(
-      isPresentationWorkspace
-        ? PRESENTATION_PRIORITIES
-        : priorities
-    ),
+    ...priorities,
   ].sort(
     (left, right) => {
       const leftRank =
