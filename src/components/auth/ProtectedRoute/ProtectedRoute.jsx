@@ -18,6 +18,8 @@ import {
 
 import {
   getCampaignExperience,
+  getCampaignMemberships,
+  getCurrentMembership,
 } from "../../../utils/campaignSession";
 
 import styles from "./ProtectedRoute.module.css";
@@ -82,6 +84,44 @@ export default function ProtectedRoute({
           return;
         }
 
+        /*
+         * A protected Campaign workspace screen must never
+         * render against the neutral fallback workspace.
+         *
+         * One workspace is automatically selected by
+         * saveAuthenticatedSession().
+         *
+         * If no workspace is selected here, the user must
+         * choose one from the Workspace selector.
+         */
+        const campaignMemberships =
+          getCampaignMemberships();
+
+
+        const selectedMembership =
+          getCurrentMembership();
+
+
+        const workspaceSelectionRequired =
+          campaignMemberships.length > 0 &&
+          !selectedMembership &&
+          location.pathname !==
+            "/workspaces" &&
+          location.pathname !==
+            "/profile/settings";
+
+
+        if (
+          workspaceSelectionRequired
+        ) {
+          setStatus(
+            "workspace-required",
+          );
+
+          return;
+        }
+
+
         const allowed =
           allowedKey
             ? allowedKey.split(
@@ -115,6 +155,7 @@ export default function ProtectedRoute({
     };
   }, [
     allowedKey,
+    location.pathname,
   ]);
 
   const returnDestination =
@@ -200,6 +241,19 @@ export default function ProtectedRoute({
       />
     );
   }
+
+  if (
+    status ===
+    "workspace-required"
+  ) {
+    return (
+      <Navigate
+        to="/workspaces"
+        replace
+      />
+    );
+  }
+
 
   if (
     status ===

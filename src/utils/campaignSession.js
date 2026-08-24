@@ -395,9 +395,35 @@ export function saveAuthenticatedSession({
           previousMembership?.workspaceId,
     );
 
-  if (preservedMembership) {
+
+  /*
+   * CAMPAIGN SEAT WORKSPACE SELECTION
+   *
+   * One campaign:
+   *   Open it automatically.
+   *
+   * Multiple campaigns:
+   *   Keep the campaign unselected until the
+   *   user chooses from /workspaces.
+   *
+   * This prevents a fresh browser session from
+   * falling into the generic Volunteer fallback.
+   */
+  const automaticMembership =
+    normalizedMemberships.length ===
+      1
+      ? normalizedMemberships[0]
+      : null;
+
+
+  const selectedMembership =
+    preservedMembership ||
+    automaticMembership;
+
+
+  if (selectedMembership) {
     selectCampaignWorkspace(
-      preservedMembership,
+      selectedMembership,
     );
   } else {
     clearSelectedCampaign();
