@@ -931,6 +931,35 @@ Deno.serve(
         );
       }
 
+      const {
+        error:
+          beginDeliveryError,
+      } =
+        await supabase.rpc(
+          "begin_workspace_invitation_delivery",
+          {
+            target_invitation_id:
+              invitation.id,
+          },
+        );
+
+
+      if (beginDeliveryError) {
+        console.error(
+          "Invitation delivery state could not be started",
+          beginDeliveryError,
+        );
+
+        return jsonResponse(
+          {
+            error:
+              "Campaign Seat could not start secure invitation delivery.",
+          },
+          500,
+        );
+      }
+
+
       const [
         workspaceResult,
         roleResult,
@@ -1018,7 +1047,7 @@ Deno.serve(
                 "Campaign-Seat-Edge-Function/1.0",
 
               "Idempotency-Key":
-                `workspace-invitation-${invitation.id}`,
+                `workspace-invitation-${invitation.id}-${suppliedHash.slice(0, 16)}`,
             },
 
             body:
@@ -1087,6 +1116,43 @@ Deno.serve(
           },
         );
 
+        const {
+          error:
+            finishFailureError,
+        } =
+          await supabase.rpc(
+            "finish_workspace_invitation_delivery",
+            {
+              target_invitation_id:
+                invitation.id,
+
+              target_success:
+                false,
+
+              target_provider_message_id:
+                null,
+
+              target_provider_status_code:
+                resendResponse.status,
+
+              target_error:
+                clean(
+                  resendPayload?.message ||
+                  resendPayload?.error ||
+                  "Resend did not accept the invitation email.",
+                ),
+            },
+          );
+
+
+        if (finishFailureError) {
+          console.error(
+            "Invitation delivery failure state could not be recorded",
+            finishFailureError,
+          );
+        }
+
+
         return jsonResponse(
           {
             error:
@@ -1096,6 +1162,47 @@ Deno.serve(
         );
       }
 
+      const providerMessageId =
+        clean(
+          resendPayload
+            ?.id,
+        ) ||
+        null;
+
+
+      const {
+        error:
+          finishSuccessError,
+      } =
+        await supabase.rpc(
+          "finish_workspace_invitation_delivery",
+          {
+            target_invitation_id:
+              invitation.id,
+
+            target_success:
+              true,
+
+            target_provider_message_id:
+              providerMessageId,
+
+            target_provider_status_code:
+              resendResponse.status,
+
+            target_error:
+              null,
+          },
+        );
+
+
+      if (finishSuccessError) {
+        console.error(
+          "Invitation delivery success state could not be recorded",
+          finishSuccessError,
+        );
+      }
+
+
       return jsonResponse(
         {
           success: true,
@@ -1104,9 +1211,7 @@ Deno.serve(
             invitation.id,
 
           emailId:
-            resendPayload
-              ?.id ||
-            null,
+            providerMessageId,
 
           recipient:
             invitation

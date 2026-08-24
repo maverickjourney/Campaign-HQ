@@ -1245,3 +1245,147 @@ export async function retryWorkspaceProviderSync(
 
   return data;
 }
+
+
+// ============================================================
+// CAMPAIGN SEAT — WORKSPACE INVITATION DELIVERY
+// ============================================================
+
+export async function getWorkspaceInvitationDeliveryStatus(
+  workspaceId,
+) {
+  const {
+    data,
+    error,
+  } =
+    await supabase.rpc(
+      "get_workspace_invitation_delivery_status",
+      {
+        target_workspace_id:
+          workspaceId,
+      },
+    );
+
+
+  if (error) {
+    console.error(error);
+
+    throw new Error(
+      error.message ||
+        "Campaign Seat invitation delivery status could not be loaded.",
+    );
+  }
+
+
+  return data;
+}
+
+
+export async function retryWorkspaceInvitationDelivery(
+  invitationId,
+) {
+  const {
+    data:
+      rotatedRows,
+    error:
+      rotateError,
+  } =
+    await supabase.rpc(
+      "rotate_workspace_invitation_for_retry",
+      {
+        target_invitation_id:
+          invitationId,
+      },
+    );
+
+
+  if (rotateError) {
+    console.error(
+      rotateError,
+    );
+
+    throw new Error(
+      rotateError.message ||
+        "Campaign Seat could not prepare a secure invitation retry.",
+    );
+  }
+
+
+  const rotated =
+    Array.isArray(
+      rotatedRows,
+    )
+      ? rotatedRows[0]
+      : rotatedRows;
+
+
+  if (
+    !rotated
+      ?.invitation_id ||
+    !rotated
+      ?.invitation_token
+  ) {
+    throw new Error(
+      "Campaign Seat did not return a secure retry token.",
+    );
+  }
+
+
+  /*
+   * The plaintext retry token exists only in this function call.
+   * Supabase stores only the replacement SHA-256 hash.
+   */
+  const {
+    data:
+      deliveryData,
+    error:
+      deliveryError,
+  } =
+    await supabase
+      .functions
+      .invoke(
+        "send-workspace-invitation",
+        {
+          body: {
+            invitationId:
+              rotated
+                .invitation_id,
+
+            invitationToken:
+              rotated
+                .invitation_token,
+          },
+        },
+      );
+
+
+  if (
+    deliveryError ||
+    deliveryData
+      ?.success !==
+      true
+  ) {
+    console.error(
+      deliveryError ||
+      deliveryData,
+    );
+
+    throw new Error(
+      deliveryData?.error ||
+        deliveryError?.message ||
+        "Campaign Seat prepared a new invitation link, but email delivery still requires attention.",
+    );
+  }
+
+
+  return {
+    ...deliveryData,
+
+    expiresAt:
+      rotated
+        .invitation_expires_at ||
+      deliveryData
+        ?.expiresAt ||
+      null,
+  };
+}
