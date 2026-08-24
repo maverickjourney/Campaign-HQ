@@ -353,16 +353,81 @@ Deno.serve(
     }
 
 
-    const {
-      error:
-        aalError,
-    } =
-      await userClient.rpc(
-        "require_aal2",
+    /*
+     * getUser() above has already asked Supabase Auth to
+     * validate the bearer token.
+     *
+     * Read the AAL claim from that same validated JWT instead
+     * of creating a second PostgREST authorization context.
+     */
+    const bearerToken =
+      authorization.replace(
+        /^Bearer\\s+/i,
+        "",
       );
 
 
-    if (aalError) {
+    let jwtPayload:
+      Record<
+        string,
+        unknown
+      > = {};
+
+
+    try {
+      const payloadPart =
+        bearerToken
+          .split(".")[1] ||
+        "";
+
+      const normalized =
+        payloadPart
+          .replace(
+            /-/g,
+            "+",
+          )
+          .replace(
+            /_/g,
+            "/",
+          );
+
+      const padded =
+        normalized.padEnd(
+          Math.ceil(
+            normalized.length /
+            4,
+          ) * 4,
+          "=",
+        );
+
+      jwtPayload =
+        JSON.parse(
+          atob(
+            padded,
+          ),
+        );
+    } catch {
+      return jsonResponse(
+        request,
+        401,
+        {
+          error:
+            "The Campaign Seat security token could not be read.",
+        },
+      );
+    }
+
+
+    if (
+      String(
+        jwtPayload.sub ||
+        "",
+      ) !== actorUser.id ||
+      String(
+        jwtPayload.aal ||
+        "",
+      ) !== "aal2"
+    ) {
       return jsonResponse(
         request,
         403,

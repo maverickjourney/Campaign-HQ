@@ -1,5 +1,6 @@
 import {
   useEffect,
+  useRef,
   useState,
 } from "react";
 
@@ -148,6 +149,10 @@ export default function SeatActivationStep() {
   ] =
     useState("");
 
+
+  const providerMfaInputRef =
+    useRef(null);
+
   const [
     providerMfaBusy,
     setProviderMfaBusy,
@@ -237,6 +242,51 @@ export default function SeatActivationStep() {
     };
 
 
+  const openProviderMfaPrompt =
+    async (
+      integrationKey,
+    ) => {
+      const mfaState =
+        await getMfaState();
+
+      const authenticatorFactor =
+        mfaState
+          .verifiedTotpFactors
+          ?.[0];
+
+
+      if (
+        !authenticatorFactor
+          ?.id
+      ) {
+        throw new Error(
+          "A verified Campaign Seat Authenticator is required before connected provider data can be inspected.",
+        );
+      }
+
+
+      setProviderMfaCode(
+        "",
+      );
+
+      setProviderMfaError(
+        "",
+      );
+
+      setProviderMfaPrompt({
+        integrationKey,
+
+        factorId:
+          authenticatorFactor.id,
+
+        friendlyName:
+          authenticatorFactor
+            .friendly_name ||
+          "Campaign Seat Authenticator",
+      });
+    };
+
+
   const runProviderProbe =
     async (
       integrationKey,
@@ -265,10 +315,39 @@ export default function SeatActivationStep() {
       } catch (
         probeError
       ) {
-        setError(
+        const message =
           probeError instanceof Error
             ? probeError.message
-            : "Provider data access could not be verified.",
+            : "Provider data access could not be verified.";
+
+
+        if (
+          /two-step verification|aal2/i.test(
+            message,
+          )
+        ) {
+          setError("");
+
+          try {
+            await openProviderMfaPrompt(
+              integrationKey,
+            );
+          } catch (
+            promptError
+          ) {
+            setError(
+              promptError instanceof Error
+                ? promptError.message
+                : "Campaign Seat could not reopen two-step verification.",
+            );
+          }
+
+          return false;
+        }
+
+
+        setError(
+          message,
         );
 
         return false;
@@ -300,45 +379,21 @@ export default function SeatActivationStep() {
         const mfaState =
           await getMfaState();
 
+
         if (
-          mfaState.isAal2
+          !mfaState.isAal2
         ) {
-          await runProviderProbe(
+          await openProviderMfaPrompt(
             integrationKey,
           );
 
           return;
         }
 
-        const authenticatorFactor =
-          mfaState
-            .verifiedTotpFactors
-            ?.[0];
 
-        if (
-          !authenticatorFactor
-            ?.id
-        ) {
-          throw new Error(
-            "A verified authenticator method is required before Campaign Seat can inspect connected provider data.",
-          );
-        }
-
-        setProviderMfaCode(
-          "",
-        );
-
-        setProviderMfaPrompt({
+        await runProviderProbe(
           integrationKey,
-
-          factorId:
-            authenticatorFactor.id,
-
-          friendlyName:
-            authenticatorFactor
-              .friendly_name ||
-            "Campaign Seat Authenticator",
-        });
+        );
       } catch (
         mfaStateError
       ) {
@@ -365,6 +420,9 @@ export default function SeatActivationStep() {
 
       const normalizedCode =
         String(
+          providerMfaInputRef
+            .current
+            ?.value ||
           providerMfaCode ||
           "",
         )
@@ -376,6 +434,7 @@ export default function SeatActivationStep() {
             0,
             6,
           );
+
 
       if (
         !/^\d{6}$/.test(
@@ -389,6 +448,7 @@ export default function SeatActivationStep() {
         return;
       }
 
+
       setProviderMfaBusy(
         true,
       );
@@ -401,6 +461,7 @@ export default function SeatActivationStep() {
         "",
       );
 
+
       try {
         await verifyTotpFactor({
           factorId:
@@ -410,8 +471,20 @@ export default function SeatActivationStep() {
             normalizedCode,
         });
 
+
+        /*
+         * Supabase challengeAndVerify replaces the current
+         * browser session with an AAL2 session.
+         *
+         * Give the auth client one microtask before retrieving
+         * the new access token inside probeSeatProviderData.
+         */
+        await Promise.resolve();
+
+
         const integrationKey =
           prompt.integrationKey;
+
 
         setProviderMfaPrompt(
           null,
@@ -420,6 +493,7 @@ export default function SeatActivationStep() {
         setProviderMfaCode(
           "",
         );
+
 
         await runProviderProbe(
           integrationKey,
@@ -457,6 +531,10 @@ export default function SeatActivationStep() {
       );
 
       setProviderMfaError(
+        "",
+      );
+
+      setError(
         "",
       );
     };
@@ -979,6 +1057,9 @@ export default function SeatActivationStep() {
               </span>
 
               <input
+                ref={
+                  providerMfaInputRef
+                }
                 autoFocus
                 type="text"
                 inputMode="numeric"
@@ -994,6 +1075,19 @@ export default function SeatActivationStep() {
                 onChange={(event) =>
                   setProviderMfaCode(
                     event.target.value
+                      .replace(
+                        /\D/g,
+                        "",
+                      )
+                      .slice(
+                        0,
+                        6,
+                      ),
+                  )
+                }
+                onInput={(event) =>
+                  setProviderMfaCode(
+                    event.currentTarget.value
                       .replace(
                         /\D/g,
                         "",
@@ -1043,14 +1137,7 @@ export default function SeatActivationStep() {
                   styles.providerMfaConfirm
                 }
                 disabled={
-                  providerMfaBusy ||
-                  providerMfaCode
-                    .replace(
-                      /\D/g,
-                      "",
-                    )
-                    .length !==
-                    6
+                  providerMfaBusy
                 }
                 onClick={() =>
                   void confirmProviderMfa()

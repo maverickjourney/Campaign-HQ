@@ -896,6 +896,85 @@ export async function probeSeatProviderData(
   integrationKey,
 ) {
   const {
+    data:
+      sessionData,
+    error:
+      sessionError,
+  } =
+    await supabase.auth
+      .getSession();
+
+
+  if (
+    sessionError ||
+    !sessionData
+      ?.session
+      ?.access_token
+  ) {
+    throw new Error(
+      "Your secure Campaign Seat session could not be verified.",
+    );
+  }
+
+
+  const accessToken =
+    sessionData
+      .session
+      .access_token;
+
+
+  let tokenPayload = {};
+
+
+  try {
+    const payloadPart =
+      accessToken
+        .split(".")[1] ||
+      "";
+
+    const normalized =
+      payloadPart
+        .replace(
+          /-/g,
+          "+",
+        )
+        .replace(
+          /_/g,
+          "/",
+        );
+
+    const padded =
+      normalized.padEnd(
+        Math.ceil(
+          normalized.length /
+          4,
+        ) * 4,
+        "=",
+      );
+
+    tokenPayload =
+      JSON.parse(
+        atob(
+          padded,
+        ),
+      );
+  } catch {
+    tokenPayload =
+      {};
+  }
+
+
+  if (
+    tokenPayload?.aal !==
+      "aal2"
+  ) {
+    throw new Error(
+      "Two-step verification is required to verify connected provider data.",
+    );
+  }
+
+
+  const {
     data,
     error,
   } =
@@ -906,6 +985,11 @@ export async function probeSeatProviderData(
         {
           body: {
             integrationKey,
+          },
+
+          headers: {
+            Authorization:
+              `Bearer ${accessToken}`,
           },
         },
       );
