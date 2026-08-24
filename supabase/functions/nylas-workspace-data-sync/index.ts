@@ -770,6 +770,29 @@ Deno.serve(
 
     const {
       data:
+        initialSyncJob,
+      error:
+        initialSyncJobError,
+    } =
+      await adminClient.rpc(
+        "begin_seat_workspace_initial_sync",
+        {
+          target_workspace_id:
+            workspaceId,
+        },
+      );
+
+
+    if (initialSyncJobError) {
+      console.warn(
+        "Campaign Seat initial sync job could not be started",
+        initialSyncJobError,
+      );
+    }
+
+
+    const {
+      data:
         calendarRuntimes,
       error:
         calendarRuntimeError,
@@ -1727,14 +1750,132 @@ Deno.serve(
     }
 
 
+    const calendarFailures =
+      calendarResults.filter(
+        (item) =>
+          Boolean(
+            item.error,
+          ),
+      );
+
+
+    const contactFailures =
+      contactResults.filter(
+        (item) =>
+          Boolean(
+            item.error,
+          ),
+      );
+
+
+    const totalResultCount =
+      calendarResults.length +
+      contactResults.length;
+
+
+    const totalFailureCount =
+      calendarFailures.length +
+      contactFailures.length;
+
+
+    const jobStatus =
+      totalResultCount === 0
+        ? "failed"
+        : totalFailureCount === 0
+          ? "complete"
+          : totalFailureCount <
+              totalResultCount
+            ? "partial"
+            : "failed";
+
+
+    const firstFailure =
+      String(
+        calendarFailures[0]
+          ?.error ||
+        contactFailures[0]
+          ?.error ||
+        "",
+      );
+
+
+    const syncResult = {
+      workspaceId,
+
+      calendars:
+        calendarResults,
+
+      contacts:
+        contactResults,
+
+      calendarResultCount:
+        calendarResults.length,
+
+      contactsResultCount:
+        contactResults.length,
+
+      failureCount:
+        totalFailureCount,
+
+      completedAt:
+        new Date()
+          .toISOString(),
+    };
+
+
+    if (
+      initialSyncJob
+        ?.found ===
+      true
+    ) {
+      const {
+        error:
+          finishJobError,
+      } =
+        await adminClient.rpc(
+          "finish_seat_workspace_initial_sync",
+          {
+            target_workspace_id:
+              workspaceId,
+
+            target_status:
+              jobStatus,
+
+            target_result:
+              syncResult,
+
+            target_error:
+              firstFailure,
+          },
+        );
+
+
+      if (finishJobError) {
+        console.error(
+          "Campaign Seat initial sync job could not be finalized",
+          finishJobError,
+        );
+      }
+    }
+
+
     return jsonResponse(
       request,
       200,
       {
         success:
-          true,
+          jobStatus !==
+          "failed",
 
         workspaceId,
+
+        syncJobId:
+          initialSyncJob
+            ?.job_id ||
+          null,
+
+        syncStatus:
+          jobStatus,
 
         calendars:
           calendarResults,

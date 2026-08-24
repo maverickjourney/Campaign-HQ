@@ -737,6 +737,143 @@ export async function activateMyCampaignSeat() {
   }
 
 
+  let providerSync = {
+    attempted:
+      false,
+
+    success:
+      false,
+
+    status:
+      "not_started",
+
+    calendars:
+      [],
+
+    contacts:
+      [],
+
+    error:
+      "",
+  };
+
+
+  const activatedWorkspaceId =
+    data?.workspace_id ||
+    null;
+
+
+  if (activatedWorkspaceId) {
+    providerSync = {
+      ...providerSync,
+
+      attempted:
+        true,
+
+      status:
+        "running",
+    };
+
+
+    try {
+      const {
+        data:
+          syncData,
+        error:
+          syncError,
+      } =
+        await supabase
+          .functions
+          .invoke(
+            "nylas-workspace-data-sync",
+            {
+              body: {
+                workspaceId:
+                  activatedWorkspaceId,
+              },
+            },
+          );
+
+
+      if (syncError) {
+        throw syncError;
+      }
+
+
+      providerSync = {
+        attempted:
+          true,
+
+        success:
+          syncData?.success ===
+          true,
+
+        status:
+          syncData
+            ?.syncStatus ||
+          (
+            syncData?.success
+              ? "complete"
+              : "failed"
+          ),
+
+        jobId:
+          syncData
+            ?.syncJobId ||
+          null,
+
+        calendars:
+          syncData
+            ?.calendars ||
+          [],
+
+        contacts:
+          syncData
+            ?.contacts ||
+          [],
+
+        error:
+          syncData?.success ===
+          true
+            ? ""
+            : "The Campaign workspace was activated, but one or more provider data sources require a sync retry.",
+      };
+
+    } catch (
+      syncFailure
+    ) {
+      console.error(
+        "Initial Campaign Seat provider synchronization failed:",
+        syncFailure,
+      );
+
+
+      providerSync = {
+        attempted:
+          true,
+
+        success:
+          false,
+
+        status:
+          "retry_required",
+
+        jobId:
+          null,
+
+        calendars:
+          [],
+
+        contacts:
+          [],
+
+        error:
+          "The Campaign workspace is active, but its first provider Calendar/Contacts sync needs to be retried.",
+      };
+    }
+  }
+
+
   const invitationDelivery = [];
 
 
@@ -823,6 +960,9 @@ export async function activateMyCampaignSeat() {
 
     invitation_delivery:
       invitationDelivery,
+
+    provider_sync:
+      providerSync,
   };
 }
 
