@@ -35,6 +35,16 @@ import {
   selectCampaignWorkspace,
 } from "../../utils/campaignSession";
 
+import {
+  getWorkspaceLocationLabel,
+  getWorkspaceThemeStyle,
+} from "../../utils/workspacePresentation";
+
+import {
+  resolveWorkspaceLocationPhoto,
+} from "../../utils/workspaceLocationMedia";
+
+
 import styles from "./WorkspaceSelector.module.css";
 
 const lastOpenedWorkspaceMemory =
@@ -222,6 +232,12 @@ export default function WorkspaceSelector() {
   const [activeSlide, setActiveSlide] =
     useState(0);
 
+  const [
+    locationMediaByWorkspace,
+    setLocationMediaByWorkspace,
+  ] =
+    useState({});
+
   const user = getCurrentUser();
 
   const memberships =
@@ -314,6 +330,110 @@ export default function WorkspaceSelector() {
       filteredMemberships,
       lastOpenedByWorkspace,
     ]);
+
+  const visibleWorkspaceMediaKey =
+    visibleMemberships
+      .map(
+        (membership) => {
+          const workspace =
+            membership.workspace ||
+            {};
+
+          return [
+            workspace.id,
+            workspace.jurisdictionType,
+            workspace.jurisdictionName,
+            workspace.countyName,
+            workspace.municipalityName,
+            workspace.stateRegion,
+          ]
+            .filter(Boolean)
+            .join(":");
+        },
+      )
+      .join("|");
+
+
+  useEffect(() => {
+    let cancelled =
+      false;
+
+
+    const loadLocationMedia =
+      async () => {
+        const results =
+          await Promise.all(
+            visibleMemberships.map(
+              async (
+                membership,
+              ) => {
+                const workspace =
+                  membership.workspace;
+
+                if (!workspace?.id) {
+                  return null;
+                }
+
+
+                const media =
+                  await resolveWorkspaceLocationPhoto(
+                    workspace,
+                  );
+
+
+                return {
+                  workspaceId:
+                    workspace.id,
+
+                  media,
+                };
+              },
+            ),
+          );
+
+
+        if (cancelled) {
+          return;
+        }
+
+
+        const next =
+          {};
+
+
+        results.forEach(
+          (result) => {
+            if (
+              result
+                ?.workspaceId
+            ) {
+              next[
+                result.workspaceId
+              ] =
+                result.media ||
+                null;
+            }
+          },
+        );
+
+
+        setLocationMediaByWorkspace(
+          next,
+        );
+      };
+
+
+    void loadLocationMedia();
+
+
+    return () => {
+      cancelled =
+        true;
+    };
+  }, [
+    visibleWorkspaceMediaKey,
+  ]);
+
 
   const electionCountdown =
     getDaysUntilElection(
@@ -587,14 +707,37 @@ export default function WorkspaceSelector() {
                   const workspace =
                     membership.workspace;
 
+                  const locationMedia =
+                    locationMediaByWorkspace[
+                      workspace.id
+                    ] ||
+                    null;
+
                   const campaignImages =
-                    getCampaignImages();
+                    locationMedia
+                      ?.imageUrl
+                      ? [
+                          locationMedia
+                            .imageUrl,
+                          ...getCampaignImages(),
+                        ]
+                      : getCampaignImages();
 
                   const currentImage =
                     campaignImages[
                       activeSlide %
                         campaignImages.length
                     ];
+
+                  const locationLabel =
+                    getWorkspaceLocationLabel(
+                      workspace,
+                    );
+
+                  const workspaceThemeStyle =
+                    getWorkspaceThemeStyle(
+                      workspace,
+                    );
 
                   return (
                     <article
@@ -605,6 +748,8 @@ export default function WorkspaceSelector() {
                         styles.campaignCard
                       }
                       style={{
+                        ...workspaceThemeStyle,
+
                         backgroundImage: `
                           linear-gradient(
                             90deg,
@@ -696,8 +841,7 @@ export default function WorkspaceSelector() {
                         }
                       >
                         <p>
-                          {workspace.location ||
-                            "Campaign location"}
+                          {locationLabel}
                         </p>
 
                         <h2>
@@ -998,7 +1142,11 @@ export default function WorkspaceSelector() {
                 {
                   primaryMembership
                     ?.workspace
-                    ?.location
+                    ? getWorkspaceLocationLabel(
+                        primaryMembership
+                          .workspace,
+                      )
+                    : "Campaign location"
                 }
               </strong>
             </div>

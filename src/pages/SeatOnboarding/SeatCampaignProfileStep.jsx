@@ -10,8 +10,10 @@ import {
   Globe2,
   Landmark,
   MapPin,
+  Palette,
   Phone,
   Save,
+  Sparkles,
 } from "lucide-react";
 
 import {
@@ -23,6 +25,12 @@ import SeatDateField
 
 import SeatOnboardingSelect
   from "./SeatOnboardingSelect";
+
+import {
+  WORKSPACE_THEME_OPTIONS,
+  getRecommendedWorkspaceTheme,
+} from "../../utils/workspacePresentation";
+
 
 import styles
   from "./SeatOnboarding.module.css";
@@ -374,6 +382,27 @@ export default function SeatCampaignProfileStep({
           .political_party ||
         "",
 
+      recommended_theme:
+        savedProfile
+          .recommended_theme ||
+        getRecommendedWorkspaceTheme(
+          savedProfile
+            .political_party,
+        ),
+
+      active_theme:
+        savedProfile
+          .active_theme ||
+        getRecommendedWorkspaceTheme(
+          savedProfile
+            .political_party,
+        ),
+
+      theme_source:
+        savedProfile
+          .theme_source ||
+        "recommended",
+
       next_election_date:
         savedProfile
           .next_election_date ||
@@ -497,6 +526,118 @@ export default function SeatCampaignProfileStep({
           field,
           event.target.value,
         );
+
+
+  const selectPoliticalParty =
+    (
+      politicalParty,
+    ) => {
+      const recommendedTheme =
+        getRecommendedWorkspaceTheme(
+          politicalParty,
+        );
+
+
+      setForm(
+        (current) => ({
+          ...current,
+
+          political_party:
+            politicalParty,
+
+          recommended_theme:
+            recommendedTheme,
+
+          active_theme:
+            current.theme_source ===
+              "campaign_branding"
+              ? current.active_theme
+              : recommendedTheme,
+
+          theme_source:
+            current.theme_source ===
+              "campaign_branding"
+              ? "campaign_branding"
+              : "recommended",
+        }),
+      );
+    };
+
+
+  const selectWorkspaceTheme =
+    (
+      activeTheme,
+    ) => {
+      setForm(
+        (current) => ({
+          ...current,
+
+          active_theme:
+            activeTheme,
+
+          recommended_theme:
+            getRecommendedWorkspaceTheme(
+              current
+                .political_party,
+            ),
+
+          theme_source:
+            "campaign_branding",
+        }),
+      );
+    };
+
+
+  const locationPreview =
+    (() => {
+      const type =
+        String(
+          form
+            .jurisdiction_type ||
+          "",
+        ).toLowerCase();
+
+      let primary =
+        form
+          .jurisdiction_name;
+
+
+      if (
+        type ===
+          "county"
+      ) {
+        primary =
+          form.county_name;
+      } else if (
+        [
+          "city",
+          "town",
+          "village",
+        ].includes(type)
+      ) {
+        primary =
+          form
+            .municipality_name;
+      } else if (
+        type ===
+          "state"
+      ) {
+        primary =
+          form.state_region;
+      }
+
+
+      return [
+        primary,
+        form.state_region &&
+        form.state_region !==
+          primary
+          ? form.state_region
+          : "",
+      ]
+        .filter(Boolean)
+        .join(", ");
+    })();
 
 
   const submit =
@@ -775,9 +916,28 @@ export default function SeatCampaignProfileStep({
               onChange={update(
                 "jurisdiction_name",
               )}
-              placeholder="Palm Beach County"
+              placeholder={
+                [
+                  "district",
+                  "school_district",
+                  "special_district",
+                  "other",
+                ].includes(
+                  form.jurisdiction_type,
+                )
+                  ? "District or jurisdiction name"
+                  : "Derived from the structured location below"
+              }
               required={
-                isCandidate
+                isCandidate &&
+                [
+                  "district",
+                  "school_district",
+                  "special_district",
+                  "other",
+                ].includes(
+                  form.jurisdiction_type,
+                )
               }
             />
           </label>
@@ -806,6 +966,11 @@ export default function SeatCampaignProfileStep({
               onChange={update(
                 "county_name",
               )}
+              placeholder="Palm Beach County"
+              required={
+                form.jurisdiction_type ===
+                "county"
+              }
             />
           </label>
 
@@ -820,6 +985,16 @@ export default function SeatCampaignProfileStep({
               onChange={update(
                 "municipality_name",
               )}
+              placeholder="City, town or village"
+              required={
+                [
+                  "city",
+                  "town",
+                  "village",
+                ].includes(
+                  form.jurisdiction_type,
+                )
+              }
             />
           </label>
 
@@ -829,17 +1004,165 @@ export default function SeatCampaignProfileStep({
               form.political_party
             }
             options={PARTIES}
-            onChange={(value) =>
-              setValue(
-                "political_party",
-                value,
-              )
+            onChange={
+              selectPoliticalParty
             }
             required={
               isCandidate
             }
           />
         </div>
+      </section>
+
+
+        <div
+          className={
+            styles.locationTruthPreview
+          }
+        >
+          <MapPin size={18} />
+
+          <div>
+            <strong>
+              Campaign Seat location
+            </strong>
+
+            <span>
+              {locationPreview ||
+                "Complete the structured jurisdiction fields above."}
+            </span>
+
+            <small>
+              This location drives the Workspace screen, regional imagery and campaign geography.
+            </small>
+          </div>
+        </div>
+
+
+      <section
+        className={[
+          styles.profileSection,
+          styles.brandingSection,
+        ].join(" ")}
+      >
+        <div
+          className={
+            styles.profileSectionTitle
+          }
+        >
+          <Palette size={20} />
+
+          <div>
+            <strong>
+              Workspace appearance
+            </strong>
+
+            <span>
+              Choose the color system this campaign will use across Campaign HQ.
+            </span>
+          </div>
+        </div>
+
+
+        <div
+          className={
+            styles.themeRecommendation
+          }
+        >
+          <Sparkles size={17} />
+
+          <span>
+            Campaign Seat recommends{" "}
+            <strong>
+              {getRecommendedWorkspaceTheme(
+                form.political_party,
+              ) === "red"
+                ? "Red"
+                : getRecommendedWorkspaceTheme(
+                      form.political_party,
+                    ) === "blue"
+                  ? "Blue"
+                  : "Campaign Navy"}
+            </strong>
+            {" "}for the selected political affiliation. You can choose another palette.
+          </span>
+        </div>
+
+
+        <div
+          className={
+            styles.secureThemeGrid
+          }
+        >
+          {WORKSPACE_THEME_OPTIONS.map(
+            (themeOption) => {
+              const selected =
+                form.active_theme ===
+                themeOption.value;
+
+
+              return (
+                <button
+                  key={
+                    themeOption.value
+                  }
+                  type="button"
+                  className={[
+                    styles.secureThemeCard,
+                    selected
+                      ? styles.secureThemeCardSelected
+                      : "",
+                  ]
+                    .filter(Boolean)
+                    .join(" ")}
+                  data-theme={
+                    themeOption.value
+                  }
+                  onClick={() =>
+                    selectWorkspaceTheme(
+                      themeOption.value,
+                    )
+                  }
+                >
+                  <span
+                    className={
+                      styles.secureThemeSwatch
+                    }
+                  />
+
+                  <span>
+                    <strong>
+                      {themeOption.label}
+                    </strong>
+
+                    <small>
+                      {themeOption.description}
+                    </small>
+                  </span>
+
+                  {selected ? (
+                    <span
+                      className={
+                        styles.secureThemeSelected
+                      }
+                    >
+                      Selected
+                    </span>
+                  ) : null}
+                </button>
+              );
+            },
+          )}
+        </div>
+
+
+        <p
+          className={
+            styles.themePersistenceNote
+          }
+        >
+          This choice belongs to the campaign workspace. Campaign leadership can change it later without affecting other Campaign Seat workspaces.
+        </p>
       </section>
 
 

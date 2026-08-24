@@ -1274,3 +1274,73 @@
 }
 
 /* CAMPAIGN SEAT CLEAN MAIN WORKSPACE — END */
+
+/* LIVE WORKSPACE BRANDING — START */
+
+.campaignCard .cardContent > p {
+  color:
+    var(
+      --workspace-highlight,
+      #ff7180
+    );
+}
+
+.campaignCard .campaignDetails svg {
+  color:
+    var(
+      --workspace-highlight,
+      #ff6776
+    );
+}
+
+.campaignCard .slideDots
+  button.activeDot {
+  background:
+    var(
+      --workspace-highlight,
+      #ff5367
+    );
+}
+
+.campaignCard .enterButton {
+  background:
+    linear-gradient(
+      90deg,
+      var(
+        --workspace-primary,
+        #dc1f2c
+      ),
+      var(
+        --workspace-accent,
+        #f13a48
+      )
+    );
+
+  box-shadow:
+    0 11px 25px
+    color-mix(
+      in srgb,
+      var(
+        --workspace-accent,
+        #f13a48
+      )
+      28%,
+      transparent
+    );
+}
+
+.campaignCard .enterButton:hover {
+  box-shadow:
+    0 14px 30px
+    color-mix(
+      in srgb,
+      var(
+        --workspace-accent,
+        #f13a48
+      )
+      36%,
+      transparent
+    );
+}
+
+/* LIVE WORKSPACE BRANDING — END */

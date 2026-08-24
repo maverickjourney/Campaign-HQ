@@ -23126,3 +23126,79 @@
   text-transform: uppercase;
 }
 /* WORKSPACE CANDIDATE PHOTO FALLBACK — END */
+
+/* LIVE CAMPAIGN WORKSPACE THEME — START */
+
+.sidebar {
+  background:
+    radial-gradient(
+      circle at 100% 0%,
+      rgba(
+        255,
+        255,
+        255,
+        0.12
+      ),
+      transparent 28%
+    ),
+    linear-gradient(
+      180deg,
+      var(
+        --workspace-primary,
+        #b81523
+      )
+      0%,
+      var(
+        --workspace-secondary,
+        #7f0914
+      )
+      52%,
+      var(
+        --workspace-deep,
+        #57070e
+      )
+      100%
+    );
+}
+
+.greeting h1 span,
+.heroCopy h2 strong {
+  color:
+    var(
+      --workspace-accent,
+      #ef3340
+    );
+}
+
+.progressTrack span {
+  background:
+    linear-gradient(
+      90deg,
+      var(
+        --workspace-accent,
+        #ef3340
+      ),
+      var(
+        --workspace-highlight,
+        #ff7380
+      )
+    );
+}
+
+.activeNavigation {
+  box-shadow:
+    inset 3px 0
+      var(
+        --workspace-highlight,
+        #65b7ff
+      ),
+    0 8px 20px
+      rgba(
+        5,
+        24,
+        46,
+        0.18
+      );
+}
+
+/* LIVE CAMPAIGN WORKSPACE THEME — END */

@@ -3817,3 +3817,213 @@ button:disabled {
   font-weight: 800;
   line-height: 1.35;
 }
+
+/* SECURE WORKSPACE BRANDING + GEOGRAPHY — START */
+
+.locationTruthPreview {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin-top: 18px;
+  padding: 15px 16px;
+  border: 1px solid #cfe0ef;
+  border-radius: 14px;
+  color: #173b61;
+  background: #f4f9fd;
+}
+
+.locationTruthPreview > svg {
+  flex: 0 0 auto;
+  margin-top: 2px;
+  color: #2770ad;
+}
+
+.locationTruthPreview > div {
+  display: grid;
+  gap: 4px;
+}
+
+.locationTruthPreview strong {
+  font-size: 13px;
+}
+
+.locationTruthPreview span {
+  color: #294f76;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.locationTruthPreview small {
+  color: #73859a;
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+
+.brandingSection {
+  overflow: hidden;
+}
+
+.themeRecommendation {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin-bottom: 15px;
+  padding: 12px 14px;
+  border: 1px solid #d7e2ed;
+  border-radius: 12px;
+  color: #395b7c;
+  background: #f7f9fc;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.themeRecommendation svg {
+  flex: 0 0 auto;
+  color: #245f99;
+}
+
+.secureThemeGrid {
+  display: grid;
+  grid-template-columns:
+    repeat(
+      4,
+      minmax(0, 1fr)
+    );
+  gap: 11px;
+}
+
+.secureThemeCard {
+  --theme-card-primary:
+    #123a64;
+  --theme-card-accent:
+    #2d6ca7;
+
+  display: grid;
+  min-height: 150px;
+  grid-template-rows:
+    auto 1fr auto;
+  gap: 11px;
+  padding: 14px;
+  border: 1px solid #d5e0ea;
+  border-radius: 15px;
+  color: #193754;
+  background: #ffffff;
+  text-align: left;
+  cursor: pointer;
+  transition:
+    transform 0.18s ease,
+    border-color 0.18s ease,
+    box-shadow 0.18s ease;
+}
+
+.secureThemeCard[data-theme="red"] {
+  --theme-card-primary:
+    #991927;
+  --theme-card-accent:
+    #ef3340;
+}
+
+.secureThemeCard[data-theme="blue"] {
+  --theme-card-primary:
+    #0d477f;
+  --theme-card-accent:
+    #3686cc;
+}
+
+.secureThemeCard[data-theme="purple"] {
+  --theme-card-primary:
+    #4c2d72;
+  --theme-card-accent:
+    #9066bd;
+}
+
+.secureThemeCard:hover {
+  transform: translateY(-1px);
+  border-color:
+    var(--theme-card-accent);
+}
+
+.secureThemeCardSelected {
+  border-color:
+    var(--theme-card-accent);
+  box-shadow:
+    0 0 0 3px
+      color-mix(
+        in srgb,
+        var(--theme-card-accent)
+          13%,
+        transparent
+      );
+}
+
+.secureThemeSwatch {
+  width: 100%;
+  height: 37px;
+  border-radius: 9px;
+  background:
+    linear-gradient(
+      115deg,
+      var(--theme-card-primary),
+      var(--theme-card-accent)
+    );
+}
+
+.secureThemeCard > span:nth-child(2) {
+  display: grid;
+  align-content: start;
+  gap: 4px;
+}
+
+.secureThemeCard strong {
+  font-size: 13px;
+}
+
+.secureThemeCard small {
+  color: #7a899b;
+  font-size: 10px;
+  line-height: 1.45;
+}
+
+.secureThemeSelected {
+  justify-self: start;
+  padding: 5px 8px;
+  border-radius: 999px;
+  color:
+    var(--theme-card-primary);
+  background:
+    color-mix(
+      in srgb,
+      var(--theme-card-accent)
+        12%,
+      white
+    );
+  font-size: 9px;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.themePersistenceNote {
+  margin: 13px 0 0;
+  color: #77879a;
+  font-size: 11px;
+  line-height: 1.55;
+}
+
+@media (max-width: 900px) {
+  .secureThemeGrid {
+    grid-template-columns:
+      repeat(
+        2,
+        minmax(0, 1fr)
+      );
+  }
+}
+
+@media (max-width: 560px) {
+  .secureThemeGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* SECURE WORKSPACE BRANDING + GEOGRAPHY — END */

@@ -110,7 +110,18 @@ async function buildMembershipAccess(
           jurisdiction_name,
           primary_election_date,
           general_election_date,
-          timezone
+          timezone,
+          country_code,
+          state_region,
+          county_name,
+          municipality_name,
+          postal_code,
+          location_context,
+          recommended_theme,
+          active_theme,
+          theme_source,
+          theme_primary_color,
+          theme_accent_color
         `,
       )
       .in("id", workspaceIds),

@@ -271,6 +271,63 @@ function normalizeWorkspace(workspace = {}) {
       workspace.timezone ||
       "America/New_York",
 
+    countryCode:
+      workspace.countryCode ||
+      workspace.country_code ||
+      "",
+
+    stateRegion:
+      workspace.stateRegion ||
+      workspace.state_region ||
+      "",
+
+    countyName:
+      workspace.countyName ||
+      workspace.county_name ||
+      "",
+
+    municipalityName:
+      workspace.municipalityName ||
+      workspace.municipality_name ||
+      "",
+
+    postalCode:
+      workspace.postalCode ||
+      workspace.postal_code ||
+      "",
+
+    locationContext:
+      workspace.locationContext ||
+      workspace.location_context ||
+      {},
+
+    recommendedTheme:
+      workspace.recommendedTheme ||
+      workspace.recommended_theme ||
+      "neutral",
+
+    activeTheme:
+      workspace.activeTheme ||
+      workspace.active_theme ||
+      workspace.recommendedTheme ||
+      workspace.recommended_theme ||
+      "neutral",
+
+    themeSource:
+      workspace.themeSource ||
+      workspace.theme_source ||
+      "campaign_branding",
+
+    themePrimaryColor:
+      workspace.themePrimaryColor ||
+      workspace.theme_primary_color ||
+      "",
+
+    themeAccentColor:
+      workspace.themeAccentColor ||
+      workspace.theme_accent_color ||
+      "",
+
     politicalParty:
       workspace.politicalParty ||
       workspace.political_party ||

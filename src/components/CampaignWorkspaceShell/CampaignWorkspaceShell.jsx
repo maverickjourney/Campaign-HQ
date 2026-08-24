@@ -64,6 +64,12 @@ import {
 
 import dashboardStyles from "../../pages/DashboardReferencePreview/DashboardReferencePreview.module.css";
 
+import {
+  getWorkspaceThemePalette,
+  getWorkspaceThemeStyle,
+} from "../../utils/workspacePresentation";
+
+
 import styles from "./CampaignWorkspaceShell.module.css";
 
 const MODULE_ICONS = {
@@ -209,6 +215,16 @@ export function CampaignWorkspaceShell({
   const workspace = getCurrentWorkspace();
   const roleLabel = getRoleLabel();
   const initials = getUserInitials(user.name);
+
+  const workspaceTheme =
+    getWorkspaceThemePalette(
+      workspace,
+    );
+
+  const workspaceThemeStyle =
+    getWorkspaceThemeStyle(
+      workspace,
+    );
 
   const [
     candidateAvatarUrl,
@@ -596,7 +612,15 @@ export function CampaignWorkspaceShell({
     });
 
   return (
-    <div className={styles.app}>
+    <div
+      className={styles.app}
+      data-workspace-theme={
+        workspaceTheme.theme
+      }
+      style={
+        workspaceThemeStyle
+      }
+    >
       <aside
         className={dashboardStyles.sidebar}
         data-shared-workspace-sidebar="true"
