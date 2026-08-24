@@ -23,6 +23,7 @@ import {
   activateMyCampaignSeat,
   loadMyCampaignSeatActivationStatus,
   probeSeatProviderData,
+  startMyCampaignSeatFreeTrial,
   startSeatProviderConnection,
 } from "../../services/seatOnboarding";
 
@@ -95,6 +96,12 @@ export default function SeatActivationStep() {
   const [
     activating,
     setActivating,
+  ] =
+    useState(false);
+
+  const [
+    startingTrial,
+    setStartingTrial,
   ] =
     useState(false);
 
@@ -245,6 +252,7 @@ export default function SeatActivationStep() {
   const openProviderMfaPrompt =
     async (
       integrationKey,
+      action = "provider_probe",
     ) => {
       const mfaState =
         await getMfaState();
@@ -275,6 +283,8 @@ export default function SeatActivationStep() {
 
       setProviderMfaPrompt({
         integrationKey,
+
+        action,
 
         factorId:
           authenticatorFactor.id,
@@ -406,6 +416,101 @@ export default function SeatActivationStep() {
     };
 
 
+  const runFreeTrialStart =
+    async () => {
+      if (
+        startingTrial ||
+        activating
+      ) {
+        return false;
+      }
+
+
+      setStartingTrial(
+        true,
+      );
+
+      setError(
+        "",
+      );
+
+
+      try {
+        await startMyCampaignSeatFreeTrial();
+
+
+        await load({
+          refresh:
+            true,
+        });
+
+
+        return true;
+      } catch (
+        trialError
+      ) {
+        setError(
+          trialError instanceof Error
+            ? trialError.message
+            : "Campaign Seat could not start the 30-day free trial.",
+        );
+
+
+        return false;
+      } finally {
+        setStartingTrial(
+          false,
+        );
+      }
+    };
+
+
+  const startFreeTrial =
+    async () => {
+      if (
+        startingTrial ||
+        activating
+      ) {
+        return;
+      }
+
+
+      setError(
+        "",
+      );
+
+
+      try {
+        const mfaState =
+          await getMfaState();
+
+
+        if (
+          !mfaState.isAal2
+        ) {
+          await openProviderMfaPrompt(
+            "",
+            "start_trial",
+          );
+
+
+          return;
+        }
+
+
+        await runFreeTrialStart();
+      } catch (
+        trialSecurityError
+      ) {
+        setError(
+          trialSecurityError instanceof Error
+            ? trialSecurityError.message
+            : "Campaign Seat could not verify the security level required to start the trial.",
+        );
+      }
+    };
+
+
   const confirmProviderMfa =
     async () => {
       const prompt =
@@ -486,6 +591,11 @@ export default function SeatActivationStep() {
           prompt.integrationKey;
 
 
+        const promptAction =
+          prompt.action ||
+          "provider_probe";
+
+
         setProviderMfaPrompt(
           null,
         );
@@ -495,9 +605,16 @@ export default function SeatActivationStep() {
         );
 
 
-        await runProviderProbe(
-          integrationKey,
-        );
+        if (
+          promptAction ===
+          "start_trial"
+        ) {
+          await runFreeTrialStart();
+        } else {
+          await runProviderProbe(
+            integrationKey,
+          );
+        }
       } catch (
         mfaError
       ) {
@@ -544,6 +661,7 @@ export default function SeatActivationStep() {
     async () => {
       if (
         activating ||
+        startingTrial ||
         !confirmed ||
         !status?.ready
       ) {
@@ -839,24 +957,67 @@ export default function SeatActivationStep() {
             </strong>
 
             <span>
-              {money(
-                status.billing
-                  ?.monthly_amount_cents,
-                status.billing
-                  ?.currency,
-              )}/month ·{" "}
-              {readableStatus(
-                status.billing
-                  ?.status,
-              )}
+              {status.billing
+                ?.status ===
+              "trial"
+                ? "30-day free trial · $0 today · no card required"
+                : (
+                  <>
+                    {money(
+                      status.billing
+                        ?.monthly_amount_cents,
+                      status.billing
+                        ?.currency,
+                    )}/month ·{" "}
+                    {readableStatus(
+                      status.billing
+                        ?.status,
+                    )}
+                  </>
+                )}
             </span>
           </section>
 
-          <b>
-            {status.billing?.ready
-              ? "Ready"
-              : "Pending"}
-          </b>
+          <aside
+            className={
+              styles.activationProviderAction
+            }
+          >
+            <b>
+              {status.billing?.ready
+                ? "Ready"
+                : "Pending"}
+            </b>
+
+            {!status.billing?.ready &&
+              status.billing
+                ?.provider ===
+                "pending" &&
+              status.billing
+                ?.status ===
+                "pending_billing" && (
+                <button
+                  type="button"
+                  disabled={
+                    startingTrial ||
+                    activating ||
+                    Boolean(
+                      connectingIntegrationKey,
+                    ) ||
+                    Boolean(
+                      probingIntegrationKey,
+                    )
+                  }
+                  onClick={() =>
+                    void startFreeTrial()
+                  }
+                >
+                  {startingTrial
+                    ? "Starting trial…"
+                    : "Start 30-day free trial"}
+                </button>
+              )}
+          </aside>
         </article>
 
 
@@ -1085,7 +1246,10 @@ export default function SeatActivationStep() {
               </strong>
 
               <span>
-                Connected campaign data is protected. Enter the current six-digit code from your Campaign Seat Authenticator to continue.
+                {providerMfaPrompt.action ===
+                "start_trial"
+                  ? "Starting the free trial changes the Campaign Seat billing lifecycle. Enter the current six-digit code from your Campaign Seat Authenticator to confirm."
+                  : "Connected campaign data is protected. Enter the current six-digit code from your Campaign Seat Authenticator to continue."}
               </span>
             </div>
           </div>
@@ -1326,7 +1490,8 @@ export default function SeatActivationStep() {
           type="button"
           disabled={
             refreshing ||
-            activating
+            activating ||
+            startingTrial
           }
           onClick={() =>
             load({
@@ -1351,7 +1516,8 @@ export default function SeatActivationStep() {
           disabled={
             !status.ready ||
             !confirmed ||
-            activating
+            activating ||
+            startingTrial
           }
           onClick={activate}
         >

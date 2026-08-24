@@ -1417,3 +1417,31 @@ export async function getCampaignSeatLaunchHealth() {
 
   return data;
 }
+
+
+// ============================================================
+// CAMPAIGN SEAT — ONE-TIME 30-DAY FREE TRIAL
+// ============================================================
+
+export async function startMyCampaignSeatFreeTrial() {
+  const {
+    data,
+    error,
+  } =
+    await supabase.rpc(
+      "start_my_campaign_seat_free_trial",
+    );
+
+
+  if (error) {
+    console.error(error);
+
+    throw new Error(
+      error.message ||
+        "Campaign Seat could not start the 30-day free trial.",
+    );
+  }
+
+
+  return data;
+}
