@@ -796,13 +796,11 @@ export default function SeatActivationStep() {
           onClick={() => {
             if (workspaceId) {
               window.location.href =
-                `/workspaces?open=${encodeURIComponent(
-                  workspaceId,
-                )}`;
+                "/workspaces";
             }
           }}
         >
-          Open Campaign HQ
+          View Campaign Workspaces
           <ArrowRight
             size={19}
           />
