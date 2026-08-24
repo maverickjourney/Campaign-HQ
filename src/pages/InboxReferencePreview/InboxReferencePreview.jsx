@@ -8,12 +8,14 @@ import {
   Archive,
   ArrowLeft,
   AtSign,
+  Bell,
   CheckCircle2,
   ListTodo,
   LoaderCircle,
   ChevronDown,
   Clock3,
   FileText,
+  Folder,
   Filter,
   Flag,
   Hash,
@@ -27,10 +29,16 @@ import {
   MessageSquare,
   Phone,
   Plus,
+  Reply,
+  ReplyAll,
+  Forward,
   Search,
+  RefreshCw,
   Send,
+  ShieldAlert,
   Sparkles,
   Star,
+  Trash2,
   UserPlus,
   X,
 } from "lucide-react";
@@ -1668,6 +1676,211 @@ function parseComposerRecipients(value) {
 }
 
 
+const STANDARD_MAILBOX_FOLDERS = [
+  {
+    kind: "inbox",
+    label: "Inbox",
+  },
+  {
+    kind: "drafts",
+    label: "Drafts",
+  },
+  {
+    kind: "sent",
+    label: "Sent",
+  },
+  {
+    kind: "archive",
+    label: "Archive",
+  },
+  {
+    kind: "trash",
+    label: "Trash",
+  },
+  {
+    kind: "junk",
+    label: "Junk",
+  },
+];
+
+function mailboxFolderKind(folder) {
+  const values = [
+    folder?.system_folder,
+    folder?.display_name,
+    folder?.name,
+    folder?.id,
+  ]
+    .map(
+      (value) =>
+        String(
+          value || "",
+        )
+          .trim()
+          .toLowerCase(),
+    )
+    .filter(Boolean);
+
+  const combined =
+    values.join(" ");
+
+  if (/(^|\W)inbox(\W|$)/.test(combined)) {
+    return "inbox";
+  }
+
+  if (/draft/.test(combined)) {
+    return "drafts";
+  }
+
+  if (
+    /(^|\W)sent(\W|$)|sent items|sent mail/.test(
+      combined,
+    )
+  ) {
+    return "sent";
+  }
+
+  if (/archive|all mail/.test(combined)) {
+    return "archive";
+  }
+
+  if (
+    /trash|deleted|deleted items|recycle bin/.test(
+      combined,
+    )
+  ) {
+    return "trash";
+  }
+
+  if (/spam|junk/.test(combined)) {
+    return "junk";
+  }
+
+  return "folder";
+}
+
+function mailboxFolderLabel(folder) {
+  const kind =
+    mailboxFolderKind(
+      folder,
+    );
+
+  const standard =
+    STANDARD_MAILBOX_FOLDERS.find(
+      (item) =>
+        item.kind === kind,
+    );
+
+  if (standard) {
+    return standard.label;
+  }
+
+  return (
+    String(
+      folder?.display_name ||
+        folder?.name ||
+        "",
+    ).trim() ||
+    "Folder"
+  );
+}
+
+function mailboxFolderCount(folder) {
+  const raw =
+    folder?.total_count ??
+    folder?.unread_count;
+
+  if (
+    raw === null ||
+    raw === undefined ||
+    raw === ""
+  ) {
+    return null;
+  }
+
+  const value =
+    Number(raw);
+
+  return Number.isFinite(value)
+    ? Math.max(
+        0,
+        Math.floor(value),
+      )
+    : null;
+}
+
+function mailboxFolderIcon(kind) {
+  switch (kind) {
+    case "inbox":
+      return Inbox;
+
+    case "drafts":
+      return FileText;
+
+    case "sent":
+      return Send;
+
+    case "archive":
+      return Archive;
+
+    case "trash":
+      return Trash2;
+
+    case "junk":
+      return ShieldAlert;
+
+    default:
+      return Folder;
+  }
+}
+
+function normalizeEmailAccountKey(
+  value,
+) {
+  return String(
+    value || "",
+  )
+    .trim()
+    .toLowerCase();
+}
+
+function emailAccountTone(
+  value,
+) {
+  const key =
+    normalizeEmailAccountKey(
+      value,
+    );
+
+  if (!key) {
+    return "1";
+  }
+
+  let hash =
+    0;
+
+  for (
+    let index = 0;
+    index < key.length;
+    index += 1
+  ) {
+    hash =
+      (
+        hash * 31 +
+        key.charCodeAt(
+          index,
+        )
+      ) >>> 0;
+  }
+
+  return String(
+    (
+      hash %
+      6
+    ) +
+      1,
+  );
+}
+
 function getChannelLabel(channel) {
   return (
     CHANNELS.find((item) => item.id === channel)
@@ -1695,6 +1908,7 @@ export default function InboxReferencePreview() {
     isSaving: taskSaving,
     error: taskError,
     createTask,
+    createTaskReminder,
   } = useTasksCommandCenter({
     workspaceId: workspace.id,
     userId: user.id,
@@ -1711,8 +1925,22 @@ export default function InboxReferencePreview() {
     setMobileConversationActive,
   ] = useState(false);
 
+  const [
+    selectedMailboxFolderId,
+    setSelectedMailboxFolderId,
+  ] = useState("");
+
+  /*
+   * LOCAL LIVE INBOX
+   *
+   * The Inbox development workspace on localhost uses the real
+   * connected campaign mailbox by default. The explicit query
+   * parameter remains supported for other development hosts.
+   */
   const liveMailboxEnabled =
     !import.meta.env.DEV ||
+    window.location.hostname === "127.0.0.1" ||
+    window.location.hostname === "localhost" ||
     new URLSearchParams(
       window.location.search,
     ).get("mailbox-live") === "enabled";
@@ -1721,6 +1949,7 @@ export default function InboxReferencePreview() {
     conversations: mailboxConversations,
     connectedEmail: mailboxConnectedEmail,
     accountProvider: mailboxAccountProvider,
+    folders: mailboxFolders,
     inboxTotalCount: mailboxInboxTotalCount,
     inboxUnreadCount: mailboxInboxUnreadCount,
     isLoading: mailboxLoading,
@@ -1736,6 +1965,8 @@ export default function InboxReferencePreview() {
     workspaceId: workspace.id,
     enabled: liveMailboxEnabled,
     selectedConversationId: selectedId,
+    selectedFolderId:
+      selectedMailboxFolderId,
   });
 
   const {
@@ -1803,10 +2034,413 @@ export default function InboxReferencePreview() {
   const [activeChannel, setActiveChannel] =
     useState("all");
 
+  const [
+    mailboxMenuOpen,
+    setMailboxMenuOpen,
+  ] = useState(false);
+
+  const [
+    emailAccountMenuOpen,
+    setEmailAccountMenuOpen,
+  ] = useState(false);
+
+  const [
+    selectedEmailAccountKeys,
+    setSelectedEmailAccountKeys,
+  ] = useState([]);
+
+  const [
+    sourceMenuOpen,
+    setSourceMenuOpen,
+  ] = useState(false);
+
+  const [
+    tagMenuOpen,
+    setTagMenuOpen,
+  ] = useState(false);
+
+  const sourceToolbarRef =
+    useRef(null);
+
+  useEffect(() => {
+    const handleSourceToolbarPointerDown =
+      (event) => {
+        if (
+          sourceToolbarRef.current &&
+          !sourceToolbarRef.current.contains(
+            event.target,
+          )
+        ) {
+          setMailboxMenuOpen(false);
+          setEmailAccountMenuOpen(false);
+          setSourceMenuOpen(false);
+          setTagMenuOpen(false);
+        }
+      };
+
+    document.addEventListener(
+      "pointerdown",
+      handleSourceToolbarPointerDown,
+    );
+
+    return () => {
+      document.removeEventListener(
+        "pointerdown",
+        handleSourceToolbarPointerDown,
+      );
+    };
+  }, []);
+
   const [activeFilter, setActiveFilter] =
     useState("");
 
   const [activeTag, setActiveTag] = useState("");
+
+  const mailboxMenuItems =
+    useMemo(
+      () => {
+        const providerItems =
+          (
+            Array.isArray(
+              mailboxFolders,
+            )
+              ? mailboxFolders
+              : []
+          ).map(
+            (folder) => ({
+              id:
+                String(
+                  folder?.id || "",
+                ).trim(),
+
+              kind:
+                mailboxFolderKind(
+                  folder,
+                ),
+
+              label:
+                mailboxFolderLabel(
+                  folder,
+                ),
+
+              count:
+                mailboxFolderCount(
+                  folder,
+                ),
+
+              folder,
+
+              available:
+                Boolean(
+                  folder?.id,
+                ),
+
+              synthetic:
+                false,
+            }),
+          );
+
+        const standardItems =
+          STANDARD_MAILBOX_FOLDERS.map(
+            (definition) => {
+              const match =
+                providerItems.find(
+                  (item) =>
+                    item.kind ===
+                    definition.kind,
+                );
+
+              if (match) {
+                return match;
+              }
+
+              return {
+                id:
+                  `missing:${definition.kind}`,
+
+                kind:
+                  definition.kind,
+
+                label:
+                  definition.label,
+
+                count:
+                  null,
+
+                folder:
+                  null,
+
+                available:
+                  !liveMailboxEnabled &&
+                  definition.kind ===
+                    "inbox",
+
+                synthetic:
+                  true,
+              };
+            },
+          );
+
+        const customItems =
+          providerItems.filter(
+            (item) =>
+              item.kind ===
+              "folder",
+          );
+
+        return [
+          ...standardItems,
+          ...customItems,
+        ];
+      },
+      [
+        liveMailboxEnabled,
+        mailboxFolders,
+      ],
+    );
+
+  const inboxMailboxItem =
+    mailboxMenuItems.find(
+      (item) =>
+        item.kind ===
+        "inbox",
+    ) ||
+    null;
+
+  const activeMailboxItem =
+    (
+      selectedMailboxFolderId
+        ? mailboxMenuItems.find(
+            (item) =>
+              item.id ===
+              selectedMailboxFolderId,
+          )
+        : null
+    ) ||
+    inboxMailboxItem ||
+    mailboxMenuItems[0] ||
+    {
+      id: "",
+      kind: "inbox",
+      label: "Inbox",
+      count: null,
+      available: true,
+      synthetic: true,
+    };
+
+  const activeMailboxKind =
+    activeMailboxItem.kind ||
+    "inbox";
+
+  const mailboxQuickKinds = [
+    "inbox",
+    "drafts",
+    "sent",
+    "trash",
+  ];
+
+  const mailboxQuickItems =
+    mailboxQuickKinds
+      .map(
+        (kind) =>
+          mailboxMenuItems.find(
+            (item) =>
+              item.kind === kind,
+          ),
+      )
+      .filter(Boolean);
+
+  const mailboxFolderMenuItems =
+    mailboxMenuItems.filter(
+      (item) =>
+        !mailboxQuickKinds.includes(
+          item.kind,
+        ),
+    );
+
+  const activeMailboxUsesFolderMenu =
+    !mailboxQuickKinds.includes(
+      activeMailboxKind,
+    );
+
+  const emailAccountOptions =
+    useMemo(
+      () => {
+        const accounts =
+          new Map();
+
+        const addAccount =
+          (
+            email,
+            provider = "",
+          ) => {
+            const key =
+              normalizeEmailAccountKey(
+                email,
+              );
+
+            if (!key) {
+              return;
+            }
+
+            const existing =
+              accounts.get(
+                key,
+              );
+
+            accounts.set(
+              key,
+              {
+                key,
+                email:
+                  String(
+                    email,
+                  ).trim(),
+                provider:
+                  String(
+                    provider ||
+                    existing?.provider ||
+                    "",
+                  ).trim(),
+                tone:
+                  emailAccountTone(
+                    key,
+                  ),
+              },
+            );
+          };
+
+        addAccount(
+          mailboxConnectedEmail,
+          mailboxAccountProvider,
+        );
+
+        conversations.forEach(
+          (conversation) => {
+            if (
+              conversation.channel !==
+              "email"
+            ) {
+              return;
+            }
+
+            addAccount(
+              conversation.mailboxEmail ||
+                mailboxConnectedEmail,
+
+              conversation
+                .mailboxAccountProvider ||
+                conversation
+                  .accountProvider ||
+                mailboxAccountProvider,
+            );
+          },
+        );
+
+        return Array.from(
+          accounts.values(),
+        ).sort(
+          (
+            left,
+            right,
+          ) =>
+            left.email.localeCompare(
+              right.email,
+            ),
+        );
+      },
+      [
+        conversations,
+        mailboxAccountProvider,
+        mailboxConnectedEmail,
+      ],
+    );
+
+  const selectedEmailAccountSet =
+    useMemo(
+      () =>
+        new Set(
+          selectedEmailAccountKeys,
+        ),
+      [
+        selectedEmailAccountKeys,
+      ],
+    );
+
+  const emailAccountFilterActive =
+    emailAccountOptions.length >
+      1 &&
+    selectedEmailAccountKeys.length >
+      0;
+
+  const conversationEmailAccountKey =
+    (conversation) => {
+      if (
+        conversation?.channel !==
+        "email"
+      ) {
+        return "";
+      }
+
+      return normalizeEmailAccountKey(
+        conversation.mailboxEmail ||
+          mailboxConnectedEmail,
+      );
+    };
+
+  const emailAccountScopedConversations =
+    useMemo(
+      () => {
+        if (
+          !selectedEmailAccountKeys.length
+        ) {
+          return conversations;
+        }
+
+        return conversations.filter(
+          (conversation) => {
+            if (
+              conversation.channel !==
+              "email"
+            ) {
+              return true;
+            }
+
+            return selectedEmailAccountSet
+              .has(
+                normalizeEmailAccountKey(
+                  conversation.mailboxEmail ||
+                    mailboxConnectedEmail,
+                ),
+              );
+          },
+        );
+      },
+      [
+        conversations,
+        mailboxConnectedEmail,
+        selectedEmailAccountKeys,
+        selectedEmailAccountSet,
+      ],
+    );
+
+  const emailAccountButtonLabel =
+    selectedEmailAccountKeys.length ===
+      0
+      ? "All Email Accounts"
+      : selectedEmailAccountKeys.length ===
+          1
+        ? (
+            emailAccountOptions.find(
+              (account) =>
+                account.key ===
+                selectedEmailAccountKeys[
+                  0
+                ],
+            )?.email ||
+            "Email Account"
+          )
+        : `${selectedEmailAccountKeys.length} Email Accounts`;
 
   const [query, setQuery] = useState("");
 
@@ -1820,6 +2454,19 @@ export default function InboxReferencePreview() {
     useState("email");
 
   const [replyText, setReplyText] = useState("");
+
+  const [
+    replyRichHtml,
+    setReplyRichHtml,
+  ] = useState("");
+
+  const richComposerRef =
+    useRef(null);
+
+  const [
+    replyComposerOpen,
+    setReplyComposerOpen,
+  ] = useState(false);
 
   const [
     includeSignature,
@@ -1887,6 +2534,11 @@ export default function InboxReferencePreview() {
 
   const [quickTaskOpen, setQuickTaskOpen] =
     useState(false);
+
+  const [
+    quickTaskMode,
+    setQuickTaskMode,
+  ] = useState("task");
 
   const [quickTaskForm, setQuickTaskForm] =
     useState(() =>
@@ -2294,52 +2946,136 @@ export default function InboxReferencePreview() {
       ? mailboxInboxUnreadCount
       : null;
 
-  const summaryMetrics = useMemo(
-    () =>
-      SUMMARY_METRICS.map((metric) => {
-        const value =
-          metric.id === "unread"
-            ? providerInboxUnreadCount !==
-                null
-              ? providerInboxUnreadCount +
-                internalConversations.filter(
-                  (conversation) =>
-                    conversation.unread,
-                ).length
-              : conversations.filter(
-                  (conversation) =>
-                    conversation.unread,
-                ).length
-            : metric.id === "needs-response"
-              ? conversations.filter(
-                  (conversation) =>
-                    conversation.needsResponse &&
-                    !conversation.archived,
-                ).length
-              : conversations.filter(
-                  (conversation) =>
-                    conversation.priority &&
-                    !conversation.archived,
-                ).length;
+    /*
+   * SOURCE-AWARE INBOX METRICS
+   *
+   * All Messages = combined communication health.
+   * A selected source = health for that source only.
+   */
+  const metricScopeConversations =
+    useMemo(
+      () =>
+        activeChannel ===
+          "all"
+          ? emailAccountScopedConversations
+          : emailAccountScopedConversations
+              .filter(
+                (conversation) =>
+                  conversation.channel ===
+                  activeChannel,
+              ),
+      [
+        activeChannel,
+        emailAccountScopedConversations,
+      ],
+    );
 
-        return {
-          ...metric,
-          value,
-        };
-      }),
-    [
-      conversations,
-      internalConversations,
-      providerInboxUnreadCount,
-    ],
-  );
+  const sourceNonEmailUnreadCount =
+    useMemo(
+      () =>
+        conversations.filter(
+          (conversation) =>
+            conversation.channel !==
+              "email" &&
+            conversation.unread,
+        ).length,
+      [
+        conversations,
+      ],
+    );
+
+  const summaryMetrics =
+    useMemo(
+      () =>
+        SUMMARY_METRICS.map(
+          (metric) => {
+            let value = 0;
+
+            if (
+              metric.id ===
+              "unread"
+            ) {
+              if (
+                activeChannel ===
+                  "email" &&
+                !selectedEmailAccountKeys.length &&
+                providerInboxUnreadCount !==
+                  null
+              ) {
+                value =
+                  providerInboxUnreadCount;
+              } else if (
+                activeChannel ===
+                  "all" &&
+                !selectedEmailAccountKeys.length &&
+                providerInboxUnreadCount !==
+                  null
+              ) {
+                value =
+                  providerInboxUnreadCount +
+                  sourceNonEmailUnreadCount;
+              } else {
+                value =
+                  metricScopeConversations
+                    .filter(
+                      (
+                        conversation,
+                      ) =>
+                        conversation.unread,
+                    )
+                    .length;
+              }
+            } else if (
+              metric.id ===
+              "needs-response"
+            ) {
+              value =
+                metricScopeConversations
+                  .filter(
+                    (
+                      conversation,
+                    ) =>
+                      conversation
+                        .needsResponse,
+                  )
+                  .length;
+            } else if (
+              metric.id ===
+              "priority"
+            ) {
+              value =
+                metricScopeConversations
+                  .filter(
+                    (
+                      conversation,
+                    ) =>
+                      conversation
+                        .priority,
+                  )
+                  .length;
+            }
+
+            return {
+              ...metric,
+              value,
+            };
+          },
+        ),
+      [
+        activeChannel,
+        metricScopeConversations,
+        providerInboxUnreadCount,
+        selectedEmailAccountKeys.length,
+        sourceNonEmailUnreadCount,
+      ],
+    );
 
   const filteredConversations = useMemo(() => {
     const normalizedQuery = query
       .trim()
       .toLowerCase();
 
-    const filtered = conversations.filter(
+    const filtered = emailAccountScopedConversations.filter(
       (conversation) => {
         if (
           activeChannel !== "all" &&
@@ -2423,16 +3159,83 @@ export default function InboxReferencePreview() {
     activeChannel,
     activeFilter,
     activeTag,
-    conversations,
+    emailAccountScopedConversations,
     query,
     sortDirection,
+  ]);
+
+  useEffect(() => {
+    const campaignSeatSourceSelectionSync =
+      window.requestAnimationFrame(
+        () => {
+          if (
+            newMessageMode ||
+            !filteredConversations.length
+          ) {
+            return;
+          }
+
+          const selectedStillVisible =
+            filteredConversations.some(
+              (conversation) =>
+                conversation.id ===
+                selectedId,
+            );
+
+          if (selectedStillVisible) {
+            return;
+          }
+
+          const nextConversation =
+            filteredConversations[0];
+
+          setSelectedId(
+            nextConversation.id,
+          );
+
+          setReplyComposerOpen(
+            false,
+          );
+
+          setReplyAllThreadId(
+            "",
+          );
+
+          setReplyText(
+            "",
+          );
+
+          setPendingAttachments(
+            [],
+          );
+
+          setAttachmentError(
+            "",
+          );
+
+          setActiveThreadTab(
+            "conversation",
+          );
+        },
+      );
+
+    return () => {
+      window.cancelAnimationFrame(
+        campaignSeatSourceSelectionSync,
+      );
+    };
+  }, [
+    filteredConversations,
+    newMessageMode,
+    selectedId,
   ]);
 
   const getChannelCount = (channelId) => {
     if (
       liveMailboxEnabled &&
       providerInboxTotalCount !==
-        null
+        null &&
+      !selectedEmailAccountKeys.length
     ) {
       if (
         channelId ===
@@ -2447,21 +3250,32 @@ export default function InboxReferencePreview() {
       ) {
         return (
           providerInboxTotalCount +
-          internalConversations.length
+          conversations.filter(
+            (conversation) =>
+              conversation.channel !==
+              "email",
+          ).length
         );
       }
     }
 
-    if (channelId === "all") {
-      return conversations.length;
+    if (
+      channelId ===
+      "all"
+    ) {
+      return emailAccountScopedConversations
+        .length;
     }
 
-    return conversations.filter(
-      (conversation) =>
-        conversation.channel ===
-        channelId,
-    ).length;
+    return emailAccountScopedConversations
+      .filter(
+        (conversation) =>
+          conversation.channel ===
+          channelId,
+      )
+      .length;
   };
+
 
   const getFilterCount = (filterId) => {
     if (filterId === "unread") {
@@ -2507,6 +3321,99 @@ export default function InboxReferencePreview() {
 
     return 0;
   };
+
+  const richComposerEnabled =
+    replyChannel ===
+      "email" ||
+    replyChannel ===
+      "dashboard";
+
+  const syncRichComposerState =
+    () => {
+      const editor =
+        richComposerRef.current;
+
+      if (!editor) {
+        return;
+      }
+
+      setReplyRichHtml(
+        editor.innerHTML,
+      );
+
+      setReplyText(
+        String(
+          editor.innerText ||
+          "",
+        )
+          .replace(
+            /\u00a0/g,
+            " ",
+          )
+          .trimEnd(),
+      );
+    };
+
+  const focusRichComposer =
+    () => {
+      richComposerRef
+        .current
+        ?.focus();
+    };
+
+  const applyComposerCommand =
+    (
+      command,
+      value = null,
+    ) => {
+      focusRichComposer();
+
+      document.execCommand(
+        command,
+        false,
+        value,
+      );
+
+      syncRichComposerState();
+    };
+
+  const addComposerLink =
+    () => {
+      focusRichComposer();
+
+      const rawUrl =
+        window.prompt(
+          "Enter the link URL",
+          "https://",
+        );
+
+      if (!rawUrl) {
+        return;
+      }
+
+      const trimmed =
+        rawUrl.trim();
+
+      if (
+        !/^https?:\/\//i.test(
+          trimmed,
+        )
+      ) {
+        setToast(
+          "Links must start with http:// or https://.",
+        );
+
+        return;
+      }
+
+      document.execCommand(
+        "createLink",
+        false,
+        trimmed,
+      );
+
+      syncRichComposerState();
+    };
 
   const handleAttachmentSelection =
     (event) => {
@@ -2661,6 +3568,7 @@ export default function InboxReferencePreview() {
     setThreadExpanded(false);
     setNewMessageMode(true);
     setReplyText("");
+    setReplyRichHtml("");
     setIncludeSignature(
       defaultSignatureOnNew,
     );
@@ -2762,6 +3670,9 @@ export default function InboxReferencePreview() {
   };
 
   const openQuickTask = () => {
+    setQuickTaskMode(
+      "task",
+    );
     setQuickTaskForm(
       defaultTaskForm(
         selectedConversation,
@@ -2771,6 +3682,45 @@ export default function InboxReferencePreview() {
     setQuickTaskError("");
     setQuickTaskOpen(true);
   };
+
+  const openQuickReminder = () => {
+    setQuickTaskMode(
+      "reminder",
+    );
+
+    const reminderForm =
+      defaultTaskForm(
+        selectedConversation,
+        user.id,
+      );
+
+    setQuickTaskForm({
+      ...reminderForm,
+
+      title:
+        selectedConversation?.sender
+          ? `Follow up with ${selectedConversation.sender}`
+          : "Reminder",
+
+      dueDate:
+        getEasternDateInput(1),
+
+      dueTime:
+        "09:00",
+
+      assignedTo:
+        user.id,
+    });
+
+    setQuickTaskError(
+      "",
+    );
+
+    setQuickTaskOpen(
+      true,
+    );
+  };
+
 
   const handleCreateQuickTask = async (event) => {
     event.preventDefault();
@@ -2789,7 +3739,8 @@ export default function InboxReferencePreview() {
     );
 
     try {
-      await createTask({
+      const createdTask =
+        await createTask({
         title: quickTaskForm.title.trim(),
         description: [
           quickTaskForm.description.trim(),
@@ -2819,6 +3770,48 @@ export default function InboxReferencePreview() {
           null,
       });
 
+      if (
+        quickTaskMode ===
+        "reminder"
+      ) {
+        if (
+          !createdTask?.id
+        ) {
+          throw new Error(
+            "The reminder task was created without a task ID.",
+          );
+        }
+
+        if (!dueAt) {
+          throw new Error(
+            "Choose a reminder date and time.",
+          );
+        }
+
+        await createTaskReminder(
+          createdTask.id,
+          {
+            schedule_type:
+              "exact",
+
+            exact_at:
+              dueAt,
+
+            recipient_scope:
+              "assignee",
+
+            message:
+              quickTaskForm
+                .title
+                .trim(),
+
+            is_enabled:
+              true,
+          },
+        );
+      }
+
+
       setQuickTaskOpen(false);
 
       addActivity(
@@ -2837,7 +3830,189 @@ export default function InboxReferencePreview() {
     }
   };
 
+  const startInlineReply =
+    ({
+      replyAll = false,
+    } = {}) => {
+      setNewMessageMode(false);
+
+      setActiveThreadTab(
+        "conversation",
+      );
+
+      const conversationChannel =
+        String(
+          selectedConversation
+            ?.channel ||
+            "email",
+        ).toLowerCase();
+
+      if (
+        conversationChannel ===
+        "email"
+      ) {
+        setReplyChannel(
+          "email",
+        );
+      }
+
+      const nextReplyChannel =
+        conversationChannel ===
+          "sms"
+          ? "text"
+          : conversationChannel ===
+              "dashboard"
+            ? "dashboard"
+            : conversationChannel ===
+                "whatsapp"
+              ? "whatsapp"
+              : "email";
+
+      setReplyChannel(
+        nextReplyChannel,
+      );
+
+      setReplyAllThreadId(
+        replyAll &&
+        selectedConversation
+          ?.providerThreadId
+          ? selectedConversation
+              .providerThreadId
+          : "",
+      );
+
+      setReplyComposerOpen(
+        true,
+      );
+
+      window.requestAnimationFrame(
+        () => {
+          document
+            .querySelector(
+              '[data-inline-reply="true"] textarea',
+            )
+            ?.focus();
+        },
+      );
+    };
+
+  const cancelInlineReply =
+    () => {
+      setReplyComposerOpen(
+        false,
+      );
+
+      setReplyAllThreadId(
+        "",
+      );
+
+      setReplyText(
+        "",
+      );
+
+      setPendingAttachments(
+        [],
+      );
+
+      setAttachmentError(
+        "",
+      );
+    };
+
+  const forwardSelectedMessage =
+    () => {
+      const messages =
+        Array.isArray(
+          selectedConversation
+            ?.messages,
+        )
+          ? selectedConversation
+              .messages
+          : [];
+
+      const latestMessage =
+        messages[
+          messages.length - 1
+        ] ||
+        null;
+
+      const subject =
+        String(
+          selectedConversation
+            ?.subject ||
+            "",
+        ).trim();
+
+      const forwardSubject =
+        /^fwd:/i.test(
+          subject,
+        )
+          ? subject
+          : `Fwd: ${
+              subject ||
+              "(No subject)"
+            }`;
+
+      const forwardBody = [
+        "",
+        "",
+        "---------- Forwarded message ----------",
+        `From: ${
+          latestMessage
+            ?.author ||
+          selectedConversation
+            ?.sender ||
+          "Campaign contact"
+        }`,
+        `Subject: ${
+          subject ||
+          "(No subject)"
+        }`,
+        "",
+        String(
+          latestMessage
+            ?.body ||
+          "",
+        ).trim(),
+      ]
+        .join("\n")
+        .trim();
+
+      openNewMessage();
+
+      setReplyChannel(
+        "email",
+      );
+
+      setNewSubject(
+        forwardSubject,
+      );
+
+      setReplyText(
+        forwardBody,
+      );
+    };
+
   const openConversation = (id) => {
+    setReplyComposerOpen(
+      false,
+    );
+
+    setReplyAllThreadId(
+      "",
+    );
+
+    setReplyText(
+      "",
+    );
+
+    setPendingAttachments(
+      [],
+    );
+
+    setAttachmentError(
+      "",
+    );
     setIncludeSignature(
       defaultSignatureOnReply,
     );
@@ -2851,6 +4026,7 @@ export default function InboxReferencePreview() {
     setSelectedId(id);
     setMobileConversationActive(true);
     setNewMessageMode(false);
+    setReplyRichHtml("");
     setActiveThreadTab(
       "conversation",
     );
@@ -4251,11 +5427,148 @@ export default function InboxReferencePreview() {
     <CampaignWorkspaceShell activeItem="Inbox">
       <main className={styles.page}>
         <header className={styles.pageHeader}>
-          <div>
+          <div
+            className={
+              styles.inboxHeaderSummary
+            }
+          >
             <h1>Inbox</h1>
-            <p>
-              All campaign messages in one place.
-            </p>
+
+            <div
+              className={
+                styles.headerMetrics
+              }
+              aria-label="Inbox status"
+            >
+              {summaryMetrics
+              .filter(
+                (metric) =>
+                  metric.id ===
+                  "unread",
+              )
+              .map(
+                (metric) => {
+                  const Icon =
+                    metric.icon;
+
+                  const compactLabel =
+                    metric.id ===
+                    "unread"
+                      ? "Unread"
+                      : metric.id ===
+                          "needs-response"
+                        ? "Needs Reply"
+                        : "High Priority";
+
+                  return (
+                    <button
+                      key={metric.id}
+                      className={[
+                        styles.headerMetricButton,
+
+                        activeFilter ===
+                          metric.id
+                          ? styles.headerMetricButtonActive
+                          : "",
+                      ]
+                        .filter(Boolean)
+                        .join(" ")}
+                      type="button"
+                      aria-pressed={
+                        activeFilter ===
+                        metric.id
+                      }
+                      onClick={() => {
+                        setActiveFilter(
+                          activeFilter ===
+                            metric.id
+                            ? ""
+                            : metric.id,
+                        );
+
+                        setActiveChannel(
+                          "all",
+                        );
+                      }}
+                    >
+                      <Icon
+                        size={14}
+                      />
+
+                      <strong>
+                        {metric.value}
+                      </strong>
+
+                      <span>
+                        {compactLabel}
+                      </span>
+                    </button>
+                  );
+                },
+              )}
+            </div>
+
+            {liveMailboxEnabled ? (
+              <button
+                className={[
+                  styles.topLiveMailboxButton,
+
+                  mailboxError
+                    ? styles.topLiveMailboxError
+                    : mailboxLoading
+                      ? styles.topLiveMailboxLoading
+                      : mailboxConnectedEmail
+                        ? styles.topLiveMailboxReady
+                        : styles.topLiveMailboxPending,
+                ]
+                  .filter(Boolean)
+                  .join(" ")}
+                type="button"
+                title={
+                  mailboxConnectedEmail
+                    ? `${mailboxConnectedEmail}${
+                        mailboxAccountProvider
+                          ? ` · ${mailboxAccountProvider}`
+                          : ""
+                      }`
+                    : "Connected campaign email"
+                }
+                disabled={
+                  mailboxLoading
+                }
+                onClick={() => {
+                  void refreshMailbox();
+                }}
+              >
+                {mailboxLoading ? (
+                  <LoaderCircle
+                    size={14}
+                    className={
+                      styles.mailboxStatusSpinner
+                    }
+                  />
+                ) : mailboxConnectedEmail &&
+                  !mailboxError ? (
+                  <RefreshCw
+                    size={14}
+                  />
+                ) : (
+                  <RefreshCw
+                    size={14}
+                  />
+                )}
+
+                <span>
+                  {mailboxError
+                    ? "Email Issue"
+                    : mailboxLoading
+                      ? "Checking Email"
+                      : mailboxConnectedEmail
+                        ? "Live Email"
+                        : "Email"}
+                </span>
+              </button>
+            ) : null}
           </div>
 
           <div className={styles.pageActions}>
@@ -4281,6 +5594,23 @@ export default function InboxReferencePreview() {
             >
               <ListTodo size={18} />
               Quick Task
+            </button>
+
+            <button
+              className={
+                styles.reminderButton
+              }
+              type="button"
+              onClick={
+                openQuickReminder
+              }
+              title="Create a timed reminder"
+            >
+              <Bell
+                size={18}
+              />
+
+              Reminder
             </button>
 
             <button
@@ -4378,216 +5708,855 @@ export default function InboxReferencePreview() {
           </section>
         ) : null}
 
-        <section className={styles.metricsGrid}>
-          {summaryMetrics.map((metric) => {
-            const Icon = metric.icon;
-
-            return (
-              <button
-                key={metric.id}
-                className={`${styles.metricCard} ${
-                  activeFilter === metric.id
-                    ? styles.activeMetricCard
-                    : ""
-                }`}
-                type="button"
-                aria-pressed={
-                  activeFilter === metric.id
-                }
-                onClick={() => {
-                  setActiveFilter(
-                    activeFilter === metric.id
-                      ? ""
-                      : metric.id,
-                  );
-                  setActiveChannel("all");
-                }}
-              >
-                <span
-                  className={`${styles.metricIcon} ${
-                    styles[
-                      `metricIcon${metric.tone}`
-                    ]
-                  }`}
-                >
-                  <Icon size={20} />
-                </span>
-
-                <span className={styles.metricCopy}>
-                  <small>{metric.label}</small>
-
-                  <span>
-                    <strong>{metric.value}</strong>
-                  </span>
-
-                  <small>{metric.detail}</small>
-                </span>
-              </button>
-            );
-          })}
-        </section>
-
-
-
-
         <section
           className={
-            styles.inboxControlDeck
+            styles.inboxSourceToolbar
           }
+          data-active-channel={
+            activeChannel
+          }
+          ref={sourceToolbarRef}
+          aria-label="Inbox message sources and tags"
         >
           <div
             className={
-              styles.inboxControlRow
+              styles.inboxMailboxQuickBar
             }
+            aria-label="Mailbox shortcuts"
           >
-            <div
-              className={
-                styles.inboxControlHeading
-              }
-            >
-              <strong>
-                Channels
-              </strong>
+            {mailboxQuickItems.map(
+              (item) => {
+                const ItemIcon =
+                  mailboxFolderIcon(
+                    item.kind,
+                  );
 
-              <small>
-                Choose which conversations
-                appear in the Inbox
-              </small>
-            </div>
+                const active =
+                  activeMailboxItem.id ===
+                    item.id ||
+                  (
+                    !selectedMailboxFolderId &&
+                    item.kind ===
+                      "inbox"
+                  );
 
-            <div
-              className={
-                styles.channelControlList
-              }
-            >
-              {CHANNELS.map(
-                (channel) => {
-                  const Icon =
-                    channel.icon;
+                return (
+                  <button
+                    key={
+                      item.kind
+                    }
+                    className={[
+                      styles.inboxMailboxQuickButton,
 
-                  const unavailable =
-                    liveMailboxEnabled &&
-                    !LIVE_CONNECTED_CHANNELS
-                      .has(
-                        channel.id,
+                      active
+                        ? styles.inboxMailboxQuickButtonActive
+                        : "",
+                    ]
+                      .filter(Boolean)
+                      .join(" ")}
+                    type="button"
+                    disabled={
+                      !item.available
+                    }
+                    onClick={() => {
+                      if (
+                        !item.available
+                      ) {
+                        return;
+                      }
+
+                      setSelectedMailboxFolderId(
+                        item.synthetic
+                          ? ""
+                          : item.id,
                       );
 
-                  return (
-                    <button
-                      key={
-                        channel.id
-                      }
-                      className={[
-                        styles.channelControlButton,
+                      setMailboxMenuOpen(
+                        false,
+                      );
 
-                        activeChannel ===
-                          channel.id
-                          ? styles.activeChannelControl
-                          : "",
+                      setSourceMenuOpen(
+                        false,
+                      );
 
-                        unavailable
-                          ? styles.unavailableChannelControl
-                          : "",
-                      ]
-                        .filter(
-                          Boolean,
-                        )
-                        .join(" ")}
-                      type="button"
-                      disabled={
-                        unavailable
-                      }
-                      onClick={() => {
+                      setTagMenuOpen(
+                        false,
+                      );
+
+                      setActiveFilter(
+                        "",
+                      );
+
+                      if (
+                        item.kind !==
+                        "inbox"
+                      ) {
                         setActiveChannel(
-                          channel.id,
+                          "email",
                         );
+                      }
+                    }}
+                  >
+                    <ItemIcon
+                      size={15}
+                    />
 
-                        setActiveFilter(
-                          "",
-                        );
-                      }}
-                    >
-                      <Icon
-                        size={16}
-                      />
+                    <span>
+                      {item.label}
+                    </span>
 
-                      <span>
-                        {
-                          channel.label
-                        }
-                      </span>
-
+                    {item.count !==
+                    null ? (
                       <strong>
-                        {unavailable
-                          ? "Soon"
-                          : getChannelCount(
-                              channel.id,
-                            )}
+                        {item.count}
                       </strong>
-                    </button>
-                  );
-                },
-              )}
-            </div>
+                    ) : null}
+                  </button>
+                );
+              },
+            )}
           </div>
 
           <div
             className={
-              styles.inboxControlRow
+              styles.inboxMailboxPicker
             }
           >
-            <div
-              className={
-                styles.inboxControlHeading
+            <button
+              className={[
+                styles.inboxMailboxTrigger,
+
+                activeMailboxUsesFolderMenu
+                  ? styles.inboxMailboxTriggerActive
+                  : "",
+              ]
+                .filter(Boolean)
+                .join(" ")}
+              type="button"
+              aria-expanded={
+                mailboxMenuOpen
               }
+              onClick={() => {
+                setMailboxMenuOpen(
+                  (current) =>
+                    !current,
+                );
+
+                setSourceMenuOpen(
+                  false,
+                );
+
+                setTagMenuOpen(
+                  false,
+                );
+              }}
             >
-              <strong>
-                Tags
-              </strong>
+              <Folder
+                size={15}
+              />
 
-              <small>
-                Organize and narrow
-                campaign conversations
-              </small>
-            </div>
+              <span>
+                {activeMailboxUsesFolderMenu
+                  ? activeMailboxItem.label
+                  : "Folders"}
+              </span>
 
-            <div
-              className={
-                styles.tagControlList
-              }
-            >
-              {TAGS.map(
-                (tag) => (
-                  <button
-                    key={tag}
-                    className={[
-                      styles.tagControlButton,
+              {activeMailboxUsesFolderMenu &&
+              activeMailboxItem.count !==
+                null ? (
+                <strong>
+                  {activeMailboxItem.count}
+                </strong>
+              ) : null}
 
-                      activeTag ===
-                        tag
-                        ? styles.activeTagControl
-                        : "",
-                    ]
-                      .filter(
-                        Boolean,
-                      )
-                      .join(" ")}
-                    type="button"
-                    onClick={() =>
-                      setActiveTag(
-                        activeTag ===
-                          tag
-                          ? ""
-                          : tag,
-                      )
-                    }
-                  >
-                    {tag}
-                  </button>
-                ),
-              )}
-            </div>
+              <ChevronDown
+                size={14}
+              />
+            </button>
+
+            {mailboxMenuOpen ? (
+              <div
+                className={
+                  styles.inboxMailboxMenu
+                }
+              >
+                <header>
+                  <strong>
+                    Folders
+                  </strong>
+                </header>
+
+                <div>
+                  {mailboxFolderMenuItems.length ? (
+                    mailboxFolderMenuItems.map(
+                      (item) => {
+                        const ItemIcon =
+                          mailboxFolderIcon(
+                            item.kind,
+                          );
+
+                        const active =
+                          activeMailboxItem.id ===
+                          item.id;
+
+                        return (
+                          <button
+                            key={
+                              item.id
+                            }
+                            className={[
+                              styles.inboxMailboxMenuItem,
+
+                              active
+                                ? styles.inboxMailboxMenuItemActive
+                                : "",
+
+                              !item.available
+                                ? styles.inboxMailboxMenuItemDisabled
+                                : "",
+                            ]
+                              .filter(Boolean)
+                              .join(" ")}
+                            type="button"
+                            disabled={
+                              !item.available
+                            }
+                            onClick={() => {
+                              if (
+                                !item.available
+                              ) {
+                                return;
+                              }
+
+                              setSelectedMailboxFolderId(
+                                item.synthetic
+                                  ? ""
+                                  : item.id,
+                              );
+
+                              setMailboxMenuOpen(
+                                false,
+                              );
+
+                              setSourceMenuOpen(
+                                false,
+                              );
+
+                              setTagMenuOpen(
+                                false,
+                              );
+
+                              setActiveFilter(
+                                "",
+                              );
+
+                              setActiveChannel(
+                                "email",
+                              );
+                            }}
+                          >
+                            <span
+                              className={
+                                styles.inboxMailboxMenuIcon
+                              }
+                            >
+                              <ItemIcon
+                                size={16}
+                              />
+                            </span>
+
+                            <strong>
+                              {item.label}
+                            </strong>
+
+                            {item.count !==
+                            null ? (
+                              <em>
+                                {item.count}
+                              </em>
+                            ) : null}
+                          </button>
+                        );
+                      },
+                    )
+                  ) : (
+                    <div
+                      className={
+                        styles.inboxMailboxMenuEmpty
+                      }
+                    >
+                      No additional folders
+                    </div>
+                  )}
+                </div>
+              </div>
+            ) : null}
           </div>
+
+          <div
+            className={
+              styles.inboxSourcePicker
+            }
+          >
+            <button
+              className={[
+                styles.inboxSourceTrigger,
+
+                activeChannel !== "all"
+                  ? styles.inboxSourceTriggerActive
+                  : "",
+              ]
+                .filter(Boolean)
+                .join(" ")}
+              type="button"
+              aria-expanded={
+                sourceMenuOpen
+              }
+              onClick={() => {
+                setSourceMenuOpen(
+                  (current) =>
+                    !current,
+                );
+
+                setMailboxMenuOpen(
+                  false,
+                );
+
+                setTagMenuOpen(
+                  false,
+                );
+              }}
+            >
+              {(() => {
+                const activeDefinition =
+                  CHANNELS.find(
+                    (channel) =>
+                      channel.id ===
+                      activeChannel,
+                  ) ||
+                  CHANNELS[0];
+
+                const ActiveIcon =
+                  activeDefinition.icon;
+
+                return (
+                  <>
+                    <ActiveIcon
+                      size={15}
+                    />
+
+                    <span>
+                      {
+                        activeDefinition.label
+                      }
+                    </span>
+
+                    <strong>
+                      {getChannelCount(
+                        activeDefinition.id,
+                      )}
+                    </strong>
+
+                    <ChevronDown
+                      size={14}
+                    />
+                  </>
+                );
+              })()}
+            </button>
+
+            {sourceMenuOpen ? (
+              <div
+                className={
+                  styles.inboxSourceMenu
+                }
+              >
+                <header>
+                  <strong>
+                    Message sources
+                  </strong>
+                </header>
+
+                <div>
+                  {CHANNELS.map(
+                    (channel) => {
+                      const Icon =
+                        channel.icon;
+
+                      const unavailable =
+                        liveMailboxEnabled &&
+                        !LIVE_CONNECTED_CHANNELS
+                          .has(
+                            channel.id,
+                          );
+
+                      const isEmail =
+                        channel.id ===
+                        "email";
+
+                      return (
+                        <button
+                          key={
+                            channel.id
+                          }
+                          className={[
+                            styles.inboxSourceMenuItem,
+
+                            activeChannel ===
+                              channel.id
+                              ? styles.inboxSourceMenuItemActive
+                              : "",
+                          ]
+                            .filter(Boolean)
+                            .join(" ")}
+                          type="button"
+                          disabled={
+                            unavailable
+                          }
+                          onClick={() => {
+                            setActiveChannel(
+                              channel.id,
+                            );
+
+                            if (
+                              channel.id !==
+                                "email" &&
+                              activeMailboxKind !==
+                                "inbox"
+                            ) {
+                              setSelectedMailboxFolderId(
+                                inboxMailboxItem &&
+                                inboxMailboxItem.available &&
+                                !inboxMailboxItem.synthetic
+                                  ? inboxMailboxItem.id
+                                  : "",
+                              );
+                            }
+
+                            setActiveFilter(
+                              "",
+                            );
+
+                            setSourceMenuOpen(
+                              false,
+                            );
+                          }}
+                        >
+                          <span
+                            className={
+                              styles.inboxSourceMenuIcon
+                            }
+                          >
+                            <Icon
+                              size={15}
+                            />
+                          </span>
+
+                          <span
+                            className={
+                              styles.inboxSourceMenuCopy
+                            }
+                          >
+                            <strong>
+                              {
+                                channel.label
+                              }
+                            </strong>
+                          </span>
+
+                          <em>
+                            {unavailable
+                              ? "Soon"
+                              : getChannelCount(
+                                  channel.id,
+                                )}
+                          </em>
+                        </button>
+                      );
+                    },
+                  )}
+                </div>
+              </div>
+            ) : null}
+          </div>
+
+          {(
+            activeChannel === "all" ||
+            activeChannel === "email"
+          ) &&
+          emailAccountOptions.length ? (
+            <div
+              className={
+                styles.inboxEmailAccountPicker
+              }
+            >
+              <button
+                className={[
+                  styles.inboxEmailAccountTrigger,
+
+                  selectedEmailAccountKeys.length
+                    ? styles.inboxEmailAccountTriggerActive
+                    : "",
+                ]
+                  .filter(Boolean)
+                  .join(" ")}
+                type="button"
+                aria-expanded={
+                  emailAccountMenuOpen
+                }
+                onClick={() => {
+                  setEmailAccountMenuOpen(
+                    (current) =>
+                      !current,
+                  );
+
+                  setSourceMenuOpen(
+                    false,
+                  );
+
+                  setTagMenuOpen(
+                    false,
+                  );
+                }}
+              >
+                <span
+                  className={
+                    styles.emailAccountStackIcon
+                  }
+                >
+                  <Mail size={14} />
+                </span>
+
+                <span
+                  className={
+                    styles.emailAccountTriggerLabel
+                  }
+                >
+                  {emailAccountButtonLabel}
+                </span>
+
+                <ChevronDown
+                  size={14}
+                />
+              </button>
+
+              {emailAccountMenuOpen ? (
+                <div
+                  className={
+                    styles.inboxEmailAccountMenu
+                  }
+                >
+                  <header>
+                    <strong>
+                      Email Accounts
+                    </strong>
+                  </header>
+
+                  <div>
+                    <button
+                      className={[
+                        styles.emailAccountMenuItem,
+
+                        !selectedEmailAccountKeys
+                          .length
+                          ? styles.emailAccountMenuItemActive
+                          : "",
+                      ]
+                        .filter(Boolean)
+                        .join(" ")}
+                      type="button"
+                      onClick={() => {
+                        setSelectedEmailAccountKeys(
+                          [],
+                        );
+
+                        setEmailAccountMenuOpen(
+                          false,
+                        );
+                      }}
+                    >
+                      <span
+                        className={
+                          styles.emailAccountAllIcon
+                        }
+                      >
+                        <Mail size={15} />
+                      </span>
+
+                      <span>
+                        <strong>
+                          All Email Accounts
+                        </strong>
+                      </span>
+
+                      {!selectedEmailAccountKeys
+                        .length ? (
+                        <CheckCircle2
+                          size={16}
+                        />
+                      ) : null}
+                    </button>
+
+                    {emailAccountOptions.map(
+                      (account) => {
+                        const selected =
+                          selectedEmailAccountSet
+                            .has(
+                              account.key,
+                            );
+
+                        return (
+                          <button
+                            key={
+                              account.key
+                            }
+                            className={[
+                              styles.emailAccountMenuItem,
+
+                              selected
+                                ? styles.emailAccountMenuItemActive
+                                : "",
+                            ]
+                              .filter(Boolean)
+                              .join(" ")}
+                            data-mailbox-tone={
+                              account.tone
+                            }
+                            type="button"
+                            onClick={() => {
+                              setSelectedEmailAccountKeys(
+                                (current) => {
+                                  if (
+                                    !current.length
+                                  ) {
+                                    return [
+                                      account.key,
+                                    ];
+                                  }
+
+                                  if (
+                                    current.includes(
+                                      account.key,
+                                    )
+                                  ) {
+                                    return current.filter(
+                                      (key) =>
+                                        key !==
+                                        account.key,
+                                    );
+                                  }
+
+                                  return [
+                                    ...current,
+                                    account.key,
+                                  ];
+                                },
+                              );
+                            }}
+                          >
+                            <span
+                              className={
+                                styles.emailAccountColorDot
+                              }
+                            />
+
+                            <span>
+                              <strong>
+                                {account.email}
+                              </strong>
+
+                              {account.provider ? (
+                                <small>
+                                  {account.provider}
+                                </small>
+                              ) : null}
+                            </span>
+
+                            {selected ? (
+                              <CheckCircle2
+                                size={16}
+                              />
+                            ) : null}
+                          </button>
+                        );
+                      },
+                    )}
+                  </div>
+
+                  <footer>
+                    <button
+                      type="button"
+                      onClick={() =>
+                        window.location.assign(
+                          "/workspace/settings?tab=integrations&onboarding=communications",
+                        )
+                      }
+                    >
+                      Manage email accounts
+                    </button>
+                  </footer>
+                </div>
+              ) : null}
+            </div>
+          ) : null}
+
+          <div
+            className={
+              styles.inboxTagPicker
+            }
+          >
+            <button
+              className={[
+                styles.inboxTagTrigger,
+
+                activeTag
+                  ? styles.inboxTagTriggerActive
+                  : "",
+              ]
+                .filter(Boolean)
+                .join(" ")}
+              type="button"
+              aria-expanded={
+                tagMenuOpen
+              }
+              onClick={() => {
+                setTagMenuOpen(
+                  (current) =>
+                    !current,
+                );
+
+                setMailboxMenuOpen(
+                  false,
+                );
+
+                setSourceMenuOpen(
+                  false,
+                );
+              }}
+            >
+              <Filter
+                size={14}
+              />
+
+              <span>
+                {activeTag ||
+                  "All Tags"}
+              </span>
+
+              <ChevronDown
+                size={14}
+              />
+            </button>
+
+            {tagMenuOpen ? (
+              <div
+                className={
+                  styles.inboxTagMenu
+                }
+              >
+                <button
+                  className={
+                    !activeTag
+                      ? styles.inboxTagMenuActive
+                      : ""
+                  }
+                  type="button"
+                  onClick={() => {
+                    setActiveTag("");
+                    setTagMenuOpen(false);
+                  }}
+                >
+                  All Tags
+                </button>
+
+                {TAGS.map(
+                  (tag) => (
+                    <button
+                      key={tag}
+                      className={
+                        activeTag ===
+                        tag
+                          ? styles.inboxTagMenuActive
+                          : ""
+                      }
+                      type="button"
+                      onClick={() => {
+                        setActiveTag(
+                          tag,
+                        );
+
+                        setTagMenuOpen(
+                          false,
+                        );
+                      }}
+                    >
+                      {tag}
+                    </button>
+                  ),
+                )}
+              </div>
+            ) : null}
+          </div>
+
+          {(
+            activeChannel !== "all" ||
+            activeTag
+          ) ? (
+            <button
+              className={
+                styles.inboxClearSourceFilters
+              }
+              type="button"
+              onClick={() => {
+                setActiveChannel(
+                  "all",
+                );
+
+                setActiveTag(
+                  "",
+                );
+
+                setActiveFilter(
+                  "",
+                );
+
+                setSourceMenuOpen(
+                  false,
+                );
+
+                setTagMenuOpen(
+                  false,
+                );
+              }}
+            >
+              <X
+                size={13}
+              />
+              Clear
+            </button>
+          ) : null}
+
+          <span
+            className={
+              styles.inboxSourceHint
+            }
+          >
+            {activeChannel ===
+              "email" &&
+            mailboxConnectedEmail
+              ? `Showing email from ${mailboxConnectedEmail}`
+              : activeChannel ===
+                  "all"
+                ? "All communication sources"
+                : `Showing ${
+                    CHANNELS.find(
+                      (channel) =>
+                        channel.id ===
+                        activeChannel,
+                    )?.label ||
+                    "selected source"
+                  }`}
+          </span>
         </section>
 
         <section
@@ -4655,13 +6624,34 @@ export default function InboxReferencePreview() {
                   (conversation) => (
                     <button
                       key={conversation.id}
+                      data-channel={
+                        conversation.channel
+                      }
                       className={
                         selectedConversation.id ===
                         conversation.id
                           ? styles.selectedConversation
                           : ""
                       }
-                      type="button"
+                                            data-mailbox-tone={
+                        conversation.channel ===
+                          "email"
+                          ? emailAccountTone(
+                              conversation.mailboxEmail ||
+                                mailboxConnectedEmail,
+                            )
+                          : undefined
+                      }
+                      data-mailbox-email={
+                        conversation.channel ===
+                          "email"
+                          ? normalizeEmailAccountKey(
+                              conversation.mailboxEmail ||
+                                mailboxConnectedEmail,
+                            )
+                          : undefined
+                      }
+type="button"
                       aria-label={`Open conversation with ${conversation.sender}`}
                       onClick={() =>
                         openConversation(
@@ -4702,10 +6692,26 @@ export default function InboxReferencePreview() {
                           {conversation.subject}
                         </span>
 
-                        <small>
+                        <small
+                          className={
+                            styles.conversationSource
+                          }
+                        >
                           {getChannelLabel(
                             conversation.channel,
                           )}
+
+                          {conversation.channel ===
+                            "email" &&
+                          (
+                            conversation.mailboxEmail ||
+                            mailboxConnectedEmail
+                          )
+                            ? ` · ${
+                                conversation.mailboxEmail ||
+                                mailboxConnectedEmail
+                              }`
+                            : ""}
                         </small>
                       </span>
 
@@ -4914,8 +6920,27 @@ export default function InboxReferencePreview() {
                       {selectedConversation.sender}
                     </strong>
 
-                    <small>
-                      {selectedConversation.email}
+                    <small
+                      className={
+                        styles.selectedConversationSource
+                      }
+                    >
+                      {selectedConversation.channel ===
+                        "email"
+                        ? [
+                            "Email",
+                            selectedConversation.mailboxEmail ||
+                              mailboxConnectedEmail,
+                          ]
+                            .filter(Boolean)
+                            .join(" · ")
+                        : getChannelLabel(
+                            selectedConversation.channel,
+                          )}
+
+                      {selectedConversation.email
+                        ? ` · ${selectedConversation.email}`
+                        : ""}
                     </small>
                   </span>
                 </div>
@@ -4953,37 +6978,50 @@ export default function InboxReferencePreview() {
 
                   <button
                     type="button"
-                    aria-label={
-                      selectedConversation.flagged
-                        ? "Remove conversation flag"
-                        : "Flag conversation"
-                    }
-                    title={
-                      selectedConversation.flagged
-                        ? "Remove flag"
-                        : "Flag conversation"
-                    }
+                    aria-label="Reply to conversation"
+                    title="Reply"
                     onClick={() =>
-                      toggleConversationField(
-                        "flagged",
-                      )
+                      startInlineReply()
                     }
                   >
-                    <Flag size={17} />
+                    <Reply
+                      size={17}
+                    />
                   </button>
+
+                  {selectedConversation
+                    ?.channel ===
+                      "email" &&
+                  selectedConversation
+                    ?.providerThreadId ? (
+                    <button
+                      type="button"
+                      aria-label="Reply all"
+                      title="Reply All"
+                      onClick={() =>
+                        startInlineReply({
+                          replyAll:
+                            true,
+                        })
+                      }
+                    >
+                      <ReplyAll
+                        size={17}
+                      />
+                    </button>
+                  ) : null}
 
                   <button
                     type="button"
-                    aria-label="Reply by email"
-                    title="Reply by email"
-                    onClick={() => {
-                      setReplyChannel("email");
-                      setActiveThreadTab(
-                        "conversation",
-                      );
-                    }}
+                    aria-label="Forward conversation"
+                    title="Forward"
+                    onClick={
+                      forwardSelectedMessage
+                    }
                   >
-                    <Mail size={17} />
+                    <Forward
+                      size={17}
+                    />
                   </button>
 
                 </div>
@@ -5634,6 +7672,62 @@ export default function InboxReferencePreview() {
                     </div>
                   ),
                 )}
+
+                {!replyComposerOpen &&
+                selectedConversation
+                  ?.messages
+                  ?.length ? (
+                  <div
+                    className={
+                      styles.messageReadActions
+                    }
+                  >
+                    <button
+                      type="button"
+                      onClick={() =>
+                        startInlineReply()
+                      }
+                    >
+                      <Mail
+                        size={16}
+                      />
+                      Reply
+                    </button>
+
+                    {selectedConversation
+                      ?.channel ===
+                        "email" &&
+                    selectedConversation
+                      ?.providerThreadId ? (
+                      <button
+                        type="button"
+                        onClick={() =>
+                          startInlineReply({
+                            replyAll:
+                              true,
+                          })
+                        }
+                      >
+                        <MessageCircle
+                          size={16}
+                        />
+                        Reply All
+                      </button>
+                    ) : null}
+
+                    <button
+                      type="button"
+                      onClick={
+                        forwardSelectedMessage
+                      }
+                    >
+                      <Send
+                        size={16}
+                      />
+                      Forward
+                    </button>
+                  </div>
+                ) : null}
               </div>
             ) : null}
 
@@ -5872,9 +7966,48 @@ export default function InboxReferencePreview() {
               </div>
             ) : null}
 
-            {activeThreadTab === "conversation" ||
-            newMessageMode ? (
-              <footer className={styles.replyComposer}>
+            {newMessageMode ||
+            (
+              activeThreadTab ===
+                "conversation" &&
+              replyComposerOpen
+            ) ? (
+              <footer
+                className={
+                  styles.replyComposer
+                }
+                data-inline-reply={
+                  !newMessageMode
+                    ? "true"
+                    : undefined
+                }
+              >
+
+                {!newMessageMode ? (
+                  <div
+                    className={
+                      styles.inlineReplyTopbar
+                    }
+                  >
+                    <strong>
+                      {replyAllEnabled
+                        ? "Reply All"
+                        : "Reply"}
+                    </strong>
+
+                    <button
+                      type="button"
+                      onClick={
+                        cancelInlineReply
+                      }
+                    >
+                      <X
+                        size={14}
+                      />
+                      Cancel
+                    </button>
+                  </div>
+                ) : null}
 
                 {newMessageMode ? (
                   <div
@@ -5890,6 +8023,73 @@ export default function InboxReferencePreview() {
                       {composerNotice}
                     </span>
                   </div>
+                ) : null}
+
+                {!newMessageMode &&
+                (
+                  replyChannel ===
+                    "email" ||
+                  replyChannel ===
+                    "dashboard"
+                ) ? (
+                  <section
+                    className={
+                      styles.replyAddressing
+                    }
+                  >
+                    <div>
+                      <span>
+                        To
+                      </span>
+
+                      <strong>
+                        {replyChannel ===
+                        "email"
+                          ? (
+                              selectedConversation
+                                ?.email ||
+                              selectedConversation
+                                ?.sender ||
+                              "Email recipient"
+                            )
+                          : (
+                              selectedConversation
+                                ?.sender ||
+                              "Campaign Seat"
+                            )}
+                      </strong>
+                    </div>
+
+                    <div>
+                      <span>
+                        Subject
+                      </span>
+
+                      <strong>
+                        {replyChannel ===
+                        "email"
+                          ? (
+                              /^re:/i.test(
+                                selectedConversation
+                                  ?.subject ||
+                                "",
+                              )
+                                ? selectedConversation
+                                    ?.subject
+                                : `Re: ${
+                                    selectedConversation
+                                      ?.subject ||
+                                    "(No subject)"
+                                  }`
+                            )
+                          : (
+                              selectedConversation
+                                ?.subject ||
+                              "Campaign Seat conversation"
+                            )}
+                      </strong>
+                    </div>
+                  </section>
                 ) : null}
 
                 {(
@@ -6004,20 +8204,334 @@ export default function InboxReferencePreview() {
                   </>
                 ) : null}
 
-                <textarea
-                  value={replyText}
-                  onChange={(event) =>
-                    setReplyText(
-                      event.target.value,
-                    )
-                  }
-                  rows={4}
-                  placeholder={
-                    newMessageMode
-                      ? "Write your message..."
-                      : "Type your reply..."
-                  }
-                />
+                {richComposerEnabled ? (
+                  <section
+                    className={
+                      styles.richComposerShell
+                    }
+                  >
+                    <div
+                      className={
+                        styles.richComposerToolbar
+                      }
+                      aria-label="Message formatting"
+                    >
+                      <button
+                        type="button"
+                        title="Undo"
+                        onMouseDown={(
+                          event,
+                        ) =>
+                          event.preventDefault()
+                        }
+                        onClick={() =>
+                          applyComposerCommand(
+                            "undo",
+                          )
+                        }
+                      >
+                        ↶
+                      </button>
+
+                      <button
+                        type="button"
+                        title="Redo"
+                        onMouseDown={(
+                          event,
+                        ) =>
+                          event.preventDefault()
+                        }
+                        onClick={() =>
+                          applyComposerCommand(
+                            "redo",
+                          )
+                        }
+                      >
+                        ↷
+                      </button>
+
+                      <span
+                        className={
+                          styles.richToolbarDivider
+                        }
+                      />
+
+                      <select
+                        aria-label="Font"
+                        defaultValue="Aptos"
+                        onChange={(
+                          event,
+                        ) =>
+                          applyComposerCommand(
+                            "fontName",
+                            event.target.value,
+                          )
+                        }
+                      >
+                        <option value="Aptos">
+                          Aptos
+                        </option>
+
+                        <option value="Arial">
+                          Arial
+                        </option>
+
+                        <option value="Georgia">
+                          Georgia
+                        </option>
+
+                        <option value="Times New Roman">
+                          Times New Roman
+                        </option>
+
+                        <option value="Courier New">
+                          Courier New
+                        </option>
+                      </select>
+
+                      <select
+                        aria-label="Font size"
+                        defaultValue="3"
+                        onChange={(
+                          event,
+                        ) =>
+                          applyComposerCommand(
+                            "fontSize",
+                            event.target.value,
+                          )
+                        }
+                      >
+                        <option value="2">
+                          12
+                        </option>
+
+                        <option value="3">
+                          14
+                        </option>
+
+                        <option value="4">
+                          18
+                        </option>
+
+                        <option value="5">
+                          24
+                        </option>
+
+                        <option value="6">
+                          32
+                        </option>
+                      </select>
+
+                      <span
+                        className={
+                          styles.richToolbarDivider
+                        }
+                      />
+
+                      <button
+                        type="button"
+                        className={
+                          styles.richToolbarBold
+                        }
+                        title="Bold"
+                        onMouseDown={(
+                          event,
+                        ) =>
+                          event.preventDefault()
+                        }
+                        onClick={() =>
+                          applyComposerCommand(
+                            "bold",
+                          )
+                        }
+                      >
+                        B
+                      </button>
+
+                      <button
+                        type="button"
+                        className={
+                          styles.richToolbarItalic
+                        }
+                        title="Italic"
+                        onMouseDown={(
+                          event,
+                        ) =>
+                          event.preventDefault()
+                        }
+                        onClick={() =>
+                          applyComposerCommand(
+                            "italic",
+                          )
+                        }
+                      >
+                        I
+                      </button>
+
+                      <button
+                        type="button"
+                        className={
+                          styles.richToolbarUnderline
+                        }
+                        title="Underline"
+                        onMouseDown={(
+                          event,
+                        ) =>
+                          event.preventDefault()
+                        }
+                        onClick={() =>
+                          applyComposerCommand(
+                            "underline",
+                          )
+                        }
+                      >
+                        U
+                      </button>
+
+                      <label
+                        className={
+                          styles.richColorControl
+                        }
+                        title="Text color"
+                      >
+                        <span>
+                          A
+                        </span>
+
+                        <input
+                          type="color"
+                          defaultValue="#173d62"
+                          onChange={(
+                            event,
+                          ) =>
+                            applyComposerCommand(
+                              "foreColor",
+                              event.target.value,
+                            )
+                          }
+                        />
+                      </label>
+
+                      <label
+                        className={
+                          styles.richHighlightControl
+                        }
+                        title="Highlight"
+                      >
+                        <span>
+                          ▰
+                        </span>
+
+                        <input
+                          type="color"
+                          defaultValue="#fff2a8"
+                          onChange={(
+                            event,
+                          ) =>
+                            applyComposerCommand(
+                              "hiliteColor",
+                              event.target.value,
+                            )
+                          }
+                        />
+                      </label>
+
+                      <span
+                        className={
+                          styles.richToolbarDivider
+                        }
+                      />
+
+                      <button
+                        type="button"
+                        title="Bulleted list"
+                        onMouseDown={(
+                          event,
+                        ) =>
+                          event.preventDefault()
+                        }
+                        onClick={() =>
+                          applyComposerCommand(
+                            "insertUnorderedList",
+                          )
+                        }
+                      >
+                        •≡
+                      </button>
+
+                      <button
+                        type="button"
+                        title="Numbered list"
+                        onMouseDown={(
+                          event,
+                        ) =>
+                          event.preventDefault()
+                        }
+                        onClick={() =>
+                          applyComposerCommand(
+                            "insertOrderedList",
+                          )
+                        }
+                      >
+                        1.
+                      </button>
+
+                      <button
+                        type="button"
+                        title="Add link"
+                        onMouseDown={(
+                          event,
+                        ) =>
+                          event.preventDefault()
+                        }
+                        onClick={
+                          addComposerLink
+                        }
+                      >
+                        🔗
+                      </button>
+                    </div>
+
+                    <div
+                      ref={
+                        richComposerRef
+                      }
+                      className={
+                        styles.richComposerEditor
+                      }
+                      contentEditable
+                      role="textbox"
+                      aria-multiline="true"
+                      data-placeholder={
+                        newMessageMode
+                          ? "Write your message..."
+                          : "Type your reply..."
+                      }
+                      suppressContentEditableWarning
+                      onInput={
+                        syncRichComposerState
+                      }
+                      onBlur={
+                        syncRichComposerState
+                      }
+                    />
+                  </section>
+                ) : (
+                  <textarea
+                    value={replyText}
+                    onChange={(event) =>
+                      setReplyText(
+                        event.target.value,
+                      )
+                    }
+                    rows={4}
+                    placeholder={
+                      newMessageMode
+                        ? "Write your message..."
+                        : "Type your reply..."
+                    }
+                  />
+                )}
 
                 {replyChannel ===
                   "email" &&
@@ -6178,34 +8692,108 @@ export default function InboxReferencePreview() {
                     ) : null}
                   </div>
 
-                  <div className={styles.replyChannels}>
-                    {REPLY_CHANNELS.map(
-                      (channel) => {
-                        const Icon = channel.icon;
+                  {newMessageMode ? (
+                    <div
+                      className={
+                        styles.replyChannels
+                      }
+                    >
+                      {REPLY_CHANNELS.map(
+                        (channel) => {
+                          const Icon =
+                            channel.icon;
 
-                        return (
-                          <button
-                            key={channel.id}
-                            className={
-                              replyChannel ===
-                              channel.id
-                                ? styles.activeReplyChannel
-                                : ""
-                            }
-                            type="button"
-                            onClick={() =>
-                              setReplyChannel(
-                                channel.id,
-                              )
-                            }
-                          >
-                            <Icon size={15} />
-                            {channel.label}
-                          </button>
-                        );
-                      },
-                    )}
-                  </div>
+                          return (
+                            <button
+                              key={
+                                channel.id
+                              }
+                              className={
+                                replyChannel ===
+                                channel.id
+                                  ? styles.activeReplyChannel
+                                  : ""
+                              }
+                              type="button"
+                              onClick={() =>
+                                setReplyChannel(
+                                  channel.id,
+                                )
+                              }
+                            >
+                              <Icon
+                                size={15}
+                              />
+                              {
+                                channel.label
+                              }
+                            </button>
+                          );
+                        },
+                      )}
+                    </div>
+                  ) : selectedConversation
+                      ?.channel ===
+                    "email" ? (
+                    <div
+                      className={
+                        styles.lockedReplyChannel
+                      }
+                      title="Replies to an email conversation are sent by email."
+                    >
+                      <Mail
+                        size={15}
+                      />
+
+                      <span>
+                        Email
+                      </span>
+
+                      <small>
+                        Reply channel
+                      </small>
+                    </div>
+                  ) : (
+                    <div
+                      className={
+                        styles.replyChannels
+                      }
+                    >
+                      {REPLY_CHANNELS.map(
+                        (channel) => {
+                          const Icon =
+                            channel.icon;
+
+                          return (
+                            <button
+                              key={
+                                channel.id
+                              }
+                              className={
+                                replyChannel ===
+                                channel.id
+                                  ? styles.activeReplyChannel
+                                  : ""
+                              }
+                              type="button"
+                              onClick={() =>
+                                setReplyChannel(
+                                  channel.id,
+                                )
+                              }
+                            >
+                              <Icon
+                                size={15}
+                              />
+                              {
+                                channel.label
+                              }
+                            </button>
+                          );
+                        },
+                      )}
+                    </div>
+                  )}
 
                   <button
                     className={styles.sendButton}
@@ -6628,10 +9216,17 @@ export default function InboxReferencePreview() {
 
                   <div>
                     <small>
-                      Inbox follow-up
+                      {quickTaskMode ===
+                      "reminder"
+                        ? "Timed follow-up"
+                        : "Inbox follow-up"}
                     </small>
+
                     <h2 id="quick-task-title">
-                      Create Quick Task
+                      {quickTaskMode ===
+                      "reminder"
+                        ? "Create Reminder"
+                        : "Create Quick Task"}
                     </h2>
                   </div>
                 </div>
@@ -6669,8 +9264,30 @@ export default function InboxReferencePreview() {
                 </span>
               </div>
 
+              {quickTaskMode ===
+              "reminder" ? (
+                <div
+                  className={
+                    styles.reminderModeNotice
+                  }
+                >
+                  <Bell
+                    size={16}
+                  />
+
+                  <span>
+                    This creates a task for you and
+                    schedules a Campaign Seat reminder
+                    at the date and time below.
+                  </span>
+                </div>
+              ) : null}
+
               <label>
-                Task title
+                {quickTaskMode ===
+                "reminder"
+                  ? "Remind me to"
+                  : "Task title"}
                 <input
                   value={quickTaskForm.title}
                   onChange={(event) =>

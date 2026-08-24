@@ -14180,3 +14180,4621 @@
   }
 
 }
+
+/* INBOX COMPACT WORKSPACE V1 — START */
+
+.inboxHeaderSummary {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 16px;
+}
+
+.headerMetrics {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 6px;
+}
+
+.headerMetricButton {
+  display: inline-flex;
+  min-height: 34px;
+  align-items: center;
+  gap: 6px;
+  padding: 0 9px;
+  border: 1px solid #d6e1e9;
+  border-radius: 9px;
+  color: #607a90;
+  background: #ffffff;
+  white-space: nowrap;
+}
+
+.headerMetricButton svg {
+  color: #718ca2;
+}
+
+.headerMetricButton strong {
+  color: #173f67;
+  font-size: 0.72rem;
+  font-weight: 860;
+}
+
+.headerMetricButton span {
+  color: #6d8397;
+  font-size: 0.56rem;
+  font-weight: 720;
+}
+
+.headerMetricButton:hover {
+  border-color: #b7cad8;
+  background: #f8fbfd;
+}
+
+.headerMetricButtonActive {
+  border-color: #ef7982;
+  color: #c82432;
+  background: #fff4f5;
+}
+
+.headerMetricButtonActive svg,
+.headerMetricButtonActive strong,
+.headerMetricButtonActive span {
+  color: #c82432;
+}
+
+
+/*
+ * Desktop Inbox should prioritize actual conversation content.
+ */
+@media (min-width: 1041px) {
+
+  .page {
+    padding:
+      12px
+      18px
+      20px !important;
+  }
+
+  .pageHeader {
+    min-height: 42px !important;
+    gap: 12px !important;
+    margin-bottom: 8px !important;
+  }
+
+  .pageHeader h1 {
+    font-size: 1.72rem !important;
+    line-height: 1 !important;
+  }
+
+  .pageHeader p {
+    display: none !important;
+  }
+
+  .inboxHeaderSummary {
+    flex:
+      0 1 auto !important;
+  }
+
+  .pageActions {
+    gap: 8px !important;
+  }
+
+  .globalSearch {
+    width:
+      min(
+        330px,
+        31vw
+      ) !important;
+
+    min-height:
+      38px !important;
+
+    height:
+      38px !important;
+
+    padding:
+      0
+      10px !important;
+  }
+
+  .quickTaskButton,
+  .newMessageButton {
+    min-height:
+      38px !important;
+
+    height:
+      38px !important;
+  }
+
+  /*
+   * Channels + Tags remain available, but they should behave
+   * like controls rather than large dashboard sections.
+   */
+  .inboxControlDeck {
+    margin-bottom:
+      8px !important;
+
+    border-radius:
+      10px !important;
+  }
+
+  .inboxControlRow {
+    min-height:
+      38px !important;
+
+    gap:
+      9px !important;
+
+    padding:
+      5px
+      9px !important;
+  }
+
+  .inboxControlHeading {
+    flex:
+      0 0
+      62px !important;
+
+    width:
+      62px !important;
+
+    min-width:
+      62px !important;
+  }
+
+  .inboxControlHeading strong {
+    font-size:
+      0.56rem !important;
+
+    line-height:
+      1 !important;
+  }
+
+  .inboxControlHeading small {
+    display:
+      none !important;
+  }
+
+  .channelControlList,
+  .tagControlList {
+    min-width:
+      0 !important;
+
+    gap:
+      5px !important;
+
+    flex-wrap:
+      nowrap !important;
+
+    overflow-x:
+      auto !important;
+
+    overflow-y:
+      hidden !important;
+
+    scrollbar-width:
+      none !important;
+  }
+
+  .channelControlList::-webkit-scrollbar,
+  .tagControlList::-webkit-scrollbar {
+    display:
+      none !important;
+  }
+
+  .channelControlButton {
+    min-height:
+      29px !important;
+
+    height:
+      29px !important;
+
+    flex:
+      0 0
+      auto !important;
+
+    gap:
+      5px !important;
+
+    padding:
+      0
+      8px !important;
+
+    border-radius:
+      8px !important;
+
+    font-size:
+      0.55rem !important;
+
+    white-space:
+      nowrap !important;
+  }
+
+  .channelControlButton svg {
+    width:
+      14px !important;
+
+    height:
+      14px !important;
+  }
+
+  .channelControlButton strong {
+    min-width:
+      18px !important;
+
+    height:
+      18px !important;
+
+    padding:
+      0
+      5px !important;
+
+    font-size:
+      0.46rem !important;
+  }
+
+  .tagControlButton {
+    min-height:
+      27px !important;
+
+    height:
+      27px !important;
+
+    flex:
+      0 0
+      auto !important;
+
+    padding:
+      0
+      9px !important;
+
+    font-size:
+      0.54rem !important;
+
+    white-space:
+      nowrap !important;
+  }
+
+  /*
+   * Reduce Inbox chrome so the selected message begins sooner.
+   */
+  .conversationPanel {
+    grid-template-rows:
+      42px
+      minmax(
+        0,
+        1fr
+      ) !important;
+  }
+
+  .listHeader {
+    min-height:
+      42px !important;
+
+    height:
+      42px !important;
+
+    padding:
+      0
+      10px !important;
+  }
+
+  .conversationList
+  > button {
+    min-height:
+      66px !important;
+
+    padding:
+      8px
+      10px !important;
+  }
+
+  .threadHeader {
+    min-height:
+      55px !important;
+
+    padding:
+      7px
+      12px !important;
+  }
+
+  .threadTabs {
+    gap:
+      22px !important;
+
+    padding:
+      0
+      12px !important;
+  }
+
+  .threadTabs button {
+    min-height:
+      38px !important;
+
+    height:
+      38px !important;
+  }
+
+  .threadBody {
+    padding:
+      11px
+      12px !important;
+  }
+}
+
+
+/*
+ * At intermediate widths keep the metrics beneath the title
+ * rather than forcing the toolbar off-screen.
+ */
+@media
+  (min-width: 701px)
+  and
+  (max-width: 1040px) {
+
+  .inboxHeaderSummary {
+    width: 100%;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .headerMetrics {
+    width: 100%;
+  }
+
+  .headerMetricButton {
+    flex:
+      1
+      1
+      0;
+
+    justify-content:
+      center;
+  }
+}
+
+
+/*
+ * Phone layout: three compact metrics remain available without
+ * rebuilding the old tall KPI cards.
+ */
+@media (max-width: 700px) {
+
+  .inboxHeaderSummary {
+    display: grid;
+    width: 100%;
+    gap: 8px;
+  }
+
+  .headerMetrics {
+    display: grid;
+    width: 100%;
+
+    grid-template-columns:
+      repeat(
+        3,
+        minmax(0, 1fr)
+      );
+
+    gap: 5px;
+  }
+
+  .headerMetricButton {
+    min-width: 0;
+    justify-content: center;
+    padding:
+      0
+      6px;
+  }
+
+  .headerMetricButton span {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
+
+/* INBOX COMPACT WORKSPACE V1 — END */
+
+/* INBOX SOURCE PICKER V2 — START */
+
+.inboxSourceToolbar {
+  position: relative;
+  z-index: 20;
+
+  display: flex;
+  min-width: 0;
+  min-height: 42px;
+
+  align-items: center;
+  gap: 7px;
+
+  margin-bottom: 8px;
+  padding: 4px 6px;
+
+  border: 1px solid #d6e2ea;
+  border-radius: 10px;
+
+  background: #ffffff;
+}
+
+.inboxSourcePicker,
+.inboxTagPicker {
+  position: relative;
+  flex: 0 0 auto;
+}
+
+.inboxSourceTrigger,
+.inboxTagTrigger {
+  display: inline-flex;
+  min-height: 32px;
+
+  align-items: center;
+  gap: 6px;
+
+  padding: 0 9px;
+
+  border: 1px solid #d4e0e8;
+  border-radius: 8px;
+
+  color: #496b86;
+  background: #ffffff;
+
+  font-size: 0.56rem;
+  font-weight: 760;
+}
+
+.inboxSourceTrigger:hover,
+.inboxTagTrigger:hover {
+  border-color: #b7cad8;
+  background: #f8fbfd;
+}
+
+.inboxSourceTrigger strong {
+  display: grid;
+
+  min-width: 19px;
+  height: 19px;
+
+  place-items: center;
+
+  padding: 0 5px;
+
+  border-radius: 999px;
+
+  color: #526f87;
+  background: #edf3f7;
+
+  font-size: 0.48rem;
+}
+
+.inboxSourceTriggerActive,
+.inboxTagTriggerActive {
+  border-color: #ef8b93;
+  color: #c72735;
+  background: #fff5f5;
+}
+
+.inboxSourceTriggerActive strong {
+  color: #ffffff;
+  background: #ef3340;
+}
+
+.inboxSourceMenu,
+.inboxTagMenu {
+  position: absolute;
+  z-index: 500;
+
+  top: calc(100% + 6px);
+  left: 0;
+
+  overflow: hidden;
+
+  border: 1px solid #d4e0e8;
+  border-radius: 11px;
+
+  background: #ffffff;
+
+  box-shadow:
+    0 18px 44px
+    rgba(15, 49, 78, 0.16);
+}
+
+.inboxSourceMenu {
+  width:
+    min(
+      360px,
+      calc(100vw - 48px)
+    );
+}
+
+.inboxSourceMenu > header {
+  padding: 10px 11px 8px;
+  border-bottom: 1px solid #e6edf2;
+}
+
+.inboxSourceMenu > header strong,
+.inboxSourceMenu > header small {
+  display: block;
+}
+
+.inboxSourceMenu > header strong {
+  color: #173d62;
+  font-size: 0.63rem;
+  font-weight: 850;
+}
+
+.inboxSourceMenu > header small {
+  margin-top: 3px;
+  color: #8094a5;
+  font-size: 0.5rem;
+}
+
+.inboxSourceMenu > div {
+  max-height: 340px;
+  overflow-y: auto;
+  padding: 5px;
+}
+
+.inboxSourceMenuItem {
+  display: grid;
+
+  width: 100%;
+  min-width: 0;
+  min-height: 48px;
+
+  grid-template-columns:
+    30px
+    minmax(0, 1fr)
+    auto;
+
+  align-items: center;
+  gap: 8px;
+
+  padding: 6px 8px;
+
+  border: 0;
+  border-radius: 8px;
+
+  color: #496a84;
+  background: transparent;
+
+  text-align: left;
+}
+
+.inboxSourceMenuItem:hover {
+  background: #f4f8fb;
+}
+
+.inboxSourceMenuItem:disabled {
+  cursor: default;
+  opacity: 0.5;
+}
+
+.inboxSourceMenuItemActive {
+  background: #fff2f3;
+}
+
+.inboxSourceMenuIcon {
+  display: grid;
+
+  width: 30px;
+  height: 30px;
+
+  place-items: center;
+
+  border-radius: 8px;
+
+  color: #456e8c;
+  background: #edf4f8;
+}
+
+.inboxSourceMenuItemActive
+  .inboxSourceMenuIcon {
+  color: #c72634;
+  background: #ffecee;
+}
+
+.inboxSourceMenuCopy {
+  min-width: 0;
+}
+
+.inboxSourceMenuCopy strong,
+.inboxSourceMenuCopy small {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.inboxSourceMenuCopy strong {
+  color: #234c6d;
+  font-size: 0.59rem;
+  font-weight: 820;
+}
+
+.inboxSourceMenuCopy small {
+  margin-top: 3px;
+  color: #8497a7;
+  font-size: 0.48rem;
+}
+
+.inboxSourceMenuItem em {
+  display: grid;
+
+  min-width: 22px;
+  height: 22px;
+
+  place-items: center;
+
+  padding: 0 6px;
+
+  border-radius: 999px;
+
+  color: #607b91;
+  background: #edf3f7;
+
+  font-size: 0.47rem;
+  font-style: normal;
+  font-weight: 820;
+}
+
+.inboxSourceMenu > footer {
+  display: flex;
+
+  align-items: center;
+  gap: 6px;
+
+  padding: 8px 10px;
+
+  border-top: 1px solid #e5edf2;
+
+  color: #6f8597;
+  background: #f8fafc;
+
+  font-size: 0.48rem;
+}
+
+.inboxSourceMenu > footer strong {
+  color: #315c7d;
+}
+
+.inboxTagMenu {
+  display: grid;
+
+  width: 170px;
+  gap: 2px;
+
+  padding: 5px;
+}
+
+.inboxTagMenu button {
+  min-height: 32px;
+
+  padding: 0 9px;
+
+  border: 0;
+  border-radius: 7px;
+
+  color: #526f87;
+  background: transparent;
+
+  text-align: left;
+
+  font-size: 0.54rem;
+  font-weight: 720;
+}
+
+.inboxTagMenu button:hover {
+  background: #f4f8fb;
+}
+
+.inboxTagMenu
+  .inboxTagMenuActive {
+  color: #c72735;
+  background: #fff1f2;
+}
+
+.inboxClearSourceFilters {
+  display: inline-flex;
+
+  min-height: 30px;
+
+  align-items: center;
+  gap: 5px;
+
+  padding: 0 8px;
+
+  border: 0;
+  border-radius: 7px;
+
+  color: #72889a;
+  background: transparent;
+
+  font-size: 0.51rem;
+  font-weight: 760;
+}
+
+.inboxClearSourceFilters:hover {
+  color: #c52634;
+  background: #fff3f4;
+}
+
+.inboxSourceHint {
+  min-width: 0;
+
+  margin-left: auto;
+
+  overflow: hidden;
+
+  color: #8395a4;
+
+  font-size: 0.5rem;
+  font-weight: 650;
+
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.conversationSource,
+.selectedConversationSource {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.selectedConversationSource {
+  max-width: 520px;
+}
+
+@media (max-width: 700px) {
+
+  .inboxSourceToolbar {
+    flex-wrap: wrap;
+  }
+
+  .inboxSourcePicker,
+  .inboxTagPicker {
+    flex: 1 1 0;
+  }
+
+  .inboxSourceTrigger,
+  .inboxTagTrigger {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .inboxSourceHint {
+    order: 5;
+
+    width: 100%;
+    margin-left: 0;
+
+    padding: 2px 3px;
+  }
+
+  .inboxSourceMenu {
+    width:
+      min(
+        360px,
+        calc(100vw - 34px)
+      );
+  }
+}
+
+/* INBOX SOURCE PICKER V2 — END */
+
+/* INBOX SOURCE MENU READABILITY V3 — START */
+
+.inboxSourceMenu {
+  width:
+    min(
+      300px,
+      calc(100vw - 44px)
+    ) !important;
+}
+
+.inboxSourceMenu > header {
+  padding:
+    11px
+    12px !important;
+}
+
+.inboxSourceMenu > header strong {
+  font-size:
+    0.78rem !important;
+
+  font-weight:
+    850 !important;
+}
+
+.inboxSourceMenu > header small,
+.inboxSourceMenu > footer,
+.inboxSourceMenuCopy small {
+  display:
+    none !important;
+}
+
+.inboxSourceMenu > div {
+  padding:
+    6px !important;
+}
+
+.inboxSourceMenuItem {
+  min-height:
+    48px !important;
+
+  grid-template-columns:
+    35px
+    minmax(0, 1fr)
+    auto !important;
+
+  gap:
+    10px !important;
+
+  padding:
+    6px
+    9px !important;
+}
+
+.inboxSourceMenuIcon {
+  width:
+    35px !important;
+
+  height:
+    35px !important;
+}
+
+.inboxSourceMenuIcon svg {
+  width:
+    17px !important;
+
+  height:
+    17px !important;
+}
+
+.inboxSourceMenuCopy {
+  display:
+    flex !important;
+
+  min-width:
+    0 !important;
+
+  align-items:
+    center !important;
+}
+
+.inboxSourceMenuCopy strong {
+  font-size:
+    0.72rem !important;
+
+  font-weight:
+    800 !important;
+
+  line-height:
+    1.1 !important;
+}
+
+.inboxSourceMenuItem em {
+  min-width:
+    26px !important;
+
+  height:
+    26px !important;
+
+  font-size:
+    0.6rem !important;
+}
+
+.inboxSourceTrigger,
+.inboxTagTrigger {
+  min-height:
+    37px !important;
+
+  padding:
+    0
+    11px !important;
+
+  font-size:
+    0.7rem !important;
+}
+
+.inboxSourceTrigger strong {
+  min-width:
+    22px !important;
+
+  height:
+    22px !important;
+
+  font-size:
+    0.58rem !important;
+}
+
+.inboxClearSourceFilters {
+  font-size:
+    0.66rem !important;
+}
+
+.inboxSourceHint {
+  font-size:
+    0.64rem !important;
+}
+
+/* INBOX SOURCE MENU READABILITY V3 — END */
+
+/* REAL MAILBOX NAVIGATOR V4 — START */
+
+.inboxMailboxPicker {
+  position: relative;
+  flex: 0 0 auto;
+}
+
+.inboxMailboxTrigger {
+  display: inline-flex;
+  min-height: 37px;
+
+  align-items: center;
+  gap: 7px;
+
+  padding: 0 11px;
+
+  border: 1px solid #d4e0e8;
+  border-radius: 8px;
+
+  color: #496b86;
+  background: #ffffff;
+
+  font-size: 0.7rem;
+  font-weight: 780;
+}
+
+.inboxMailboxTrigger:hover {
+  border-color: #b7cad8;
+  background: #f8fbfd;
+}
+
+.inboxMailboxTrigger strong {
+  display: grid;
+
+  min-width: 22px;
+  height: 22px;
+
+  place-items: center;
+
+  padding: 0 6px;
+
+  border-radius: 999px;
+
+  color: #526f87;
+  background: #edf3f7;
+
+  font-size: 0.58rem;
+}
+
+.inboxMailboxTriggerActive {
+  border-color: #86a9c4;
+  color: #245d88;
+  background: #f3f8fb;
+}
+
+.inboxMailboxMenu {
+  position: absolute;
+  z-index: 520;
+
+  top: calc(100% + 6px);
+  left: 0;
+
+  width:
+    min(
+      260px,
+      calc(100vw - 44px)
+    );
+
+  overflow: hidden;
+
+  border: 1px solid #d4e0e8;
+  border-radius: 11px;
+
+  background: #ffffff;
+
+  box-shadow:
+    0 18px 44px
+    rgba(15, 49, 78, 0.16);
+}
+
+.inboxMailboxMenu > header {
+  padding: 11px 12px;
+
+  border-bottom: 1px solid #e6edf2;
+}
+
+.inboxMailboxMenu > header strong {
+  color: #173d62;
+
+  font-size: 0.78rem;
+  font-weight: 850;
+}
+
+.inboxMailboxMenu > div {
+  display: grid;
+
+  gap: 2px;
+
+  max-height: 390px;
+  overflow-y: auto;
+
+  padding: 6px;
+}
+
+.inboxMailboxMenuItem {
+  display: grid;
+
+  width: 100%;
+  min-height: 46px;
+
+  grid-template-columns:
+    35px
+    minmax(0, 1fr)
+    auto;
+
+  align-items: center;
+  gap: 10px;
+
+  padding: 5px 9px;
+
+  border: 0;
+  border-radius: 8px;
+
+  color: #496b86;
+  background: transparent;
+
+  text-align: left;
+}
+
+.inboxMailboxMenuItem:hover {
+  background: #f4f8fb;
+}
+
+.inboxMailboxMenuIcon {
+  display: grid;
+
+  width: 35px;
+  height: 35px;
+
+  place-items: center;
+
+  border-radius: 8px;
+
+  color: #456e8c;
+  background: #edf4f8;
+}
+
+.inboxMailboxMenuItem > strong {
+  overflow: hidden;
+
+  color: #234c6d;
+
+  font-size: 0.72rem;
+  font-weight: 800;
+
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.inboxMailboxMenuItem > em {
+  display: grid;
+
+  min-width: 26px;
+  height: 26px;
+
+  place-items: center;
+
+  padding: 0 6px;
+
+  border-radius: 999px;
+
+  color: #607b91;
+  background: #edf3f7;
+
+  font-size: 0.6rem;
+  font-style: normal;
+  font-weight: 820;
+}
+
+.inboxMailboxMenuItemActive {
+  background: #edf6fc;
+}
+
+.inboxMailboxMenuItemActive
+  .inboxMailboxMenuIcon {
+  color: #245f8d;
+  background: #dceef9;
+}
+
+.inboxMailboxMenuItemDisabled {
+  cursor: default !important;
+  opacity: 0.4;
+}
+
+.inboxMailboxMenuItemDisabled:hover {
+  background: transparent;
+}
+
+.inboxSourceHint {
+  display: none !important;
+}
+
+@media (max-width: 700px) {
+
+  .inboxMailboxPicker {
+    flex: 1 1 100%;
+  }
+
+  .inboxMailboxTrigger {
+    width: 100%;
+
+    justify-content:
+      space-between;
+  }
+}
+
+/* REAL MAILBOX NAVIGATOR V4 — END */
+
+/* READ FIRST REPLY V10 — START */
+
+.messageReadActions {
+  display: flex;
+
+  align-items: center;
+  gap: 8px;
+
+  margin:
+    22px
+    0
+    5px;
+
+  padding:
+    15px
+    0
+    3px;
+
+  border-top:
+    1px solid
+    #dce6ed;
+}
+
+.messageReadActions button {
+  display: inline-flex;
+
+  min-height: 40px;
+
+  align-items: center;
+  justify-content: center;
+
+  gap: 7px;
+
+  padding:
+    0
+    14px;
+
+  border:
+    1px solid
+    #cbdbe6;
+
+  border-radius: 9px;
+
+  color: #315f80;
+  background: #ffffff;
+
+  font-size: 0.7rem;
+  font-weight: 780;
+}
+
+.messageReadActions button:hover {
+  border-color: #8eaec5;
+  background: #f5f9fc;
+}
+
+.inlineReplyTopbar {
+  display: flex;
+
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 12px;
+
+  margin-bottom: 10px;
+
+  padding-bottom: 10px;
+
+  border-bottom:
+    1px solid
+    #e1e8ee;
+}
+
+.inlineReplyTopbar strong {
+  color: #173d62;
+
+  font-size: 0.76rem;
+  font-weight: 850;
+}
+
+.inlineReplyTopbar button {
+  display: inline-flex;
+
+  min-height: 32px;
+
+  align-items: center;
+
+  gap: 5px;
+
+  padding:
+    0
+    9px;
+
+  border: 0;
+
+  border-radius: 7px;
+
+  color: #6c8294;
+  background: #f3f6f8;
+
+  font-size: 0.62rem;
+  font-weight: 740;
+}
+
+
+/*
+ * No .threadPanel, .threadBody, .richEmail,
+ * .richEmailFrame or reading-height changes in V10.
+ */
+
+@media (max-width: 700px) {
+
+  .messageReadActions {
+    display: grid;
+
+    grid-template-columns:
+      repeat(
+        3,
+        minmax(0, 1fr)
+      );
+  }
+
+  .messageReadActions button {
+    padding:
+      0
+      7px;
+  }
+}
+
+/* READ FIRST REPLY V10 — END */
+
+/* INBOX TOP COMMAND BAR V11 — START */
+
+/*
+ * The old full-width mailbox status consumes an entire row.
+ * Mailbox state now lives in the compact header control.
+ */
+.mailboxStatus {
+  display: none !important;
+}
+
+
+/*
+ * Compact Live Email control.
+ */
+.topLiveMailboxButton {
+  display: inline-flex;
+
+  min-height: 34px;
+
+  align-items: center;
+  justify-content: center;
+
+  gap: 6px;
+
+  flex:
+    0 0 auto;
+
+  padding:
+    0
+    10px;
+
+  border:
+    1px solid
+    #ccdce6;
+
+  border-radius: 9px;
+
+  color: #526f87;
+  background: #ffffff;
+
+  font-size: 0.68rem;
+  font-weight: 780;
+
+  white-space: nowrap;
+}
+
+.topLiveMailboxButton:hover:not(:disabled) {
+  border-color: #9fc6b5;
+  background: #f4fbf7;
+}
+
+.topLiveMailboxReady {
+  border-color: #a8d9c2;
+
+  color: #1f7655;
+  background: #f2fbf6;
+}
+
+.topLiveMailboxLoading {
+  color: #526f87;
+  background: #f8fafc;
+}
+
+.topLiveMailboxPending {
+  color: #526f87;
+  background: #f8fafc;
+}
+
+.topLiveMailboxError {
+  border-color: #efb1b6;
+
+  color: #b52b37;
+  background: #fff4f5;
+}
+
+
+/*
+ * Desktop command-bar density.
+ *
+ * IMPORTANT:
+ * This block deliberately does not touch the thread/message
+ * area that is now working correctly.
+ */
+@media (min-width: 1041px) {
+
+  .page {
+    padding-top:
+      10px !important;
+  }
+
+  .pageHeader {
+    min-height:
+      42px !important;
+
+    align-items:
+      center !important;
+
+    gap:
+      12px !important;
+
+    margin-bottom:
+      7px !important;
+  }
+
+  .inboxHeaderSummary {
+    display: flex !important;
+
+    min-width:
+      0 !important;
+
+    align-items:
+      center !important;
+
+    gap:
+      10px !important;
+
+    flex:
+      1 1 auto !important;
+  }
+
+  .pageHeader h1 {
+    margin:
+      0 !important;
+
+    font-size:
+      1.7rem !important;
+
+    line-height:
+      1 !important;
+  }
+
+  .headerMetrics {
+    display: flex !important;
+
+    align-items:
+      center !important;
+
+    gap:
+      5px !important;
+
+    flex-wrap:
+      nowrap !important;
+  }
+
+  .headerMetricButton {
+    min-height:
+      34px !important;
+
+    height:
+      34px !important;
+
+    gap:
+      6px !important;
+
+    padding:
+      0
+      9px !important;
+
+    font-size:
+      inherit !important;
+  }
+
+  .headerMetricButton strong {
+    font-size:
+      0.72rem !important;
+  }
+
+  .headerMetricButton span {
+    font-size:
+      0.6rem !important;
+  }
+
+  .pageActions {
+    display: flex !important;
+
+    flex:
+      0 0 auto !important;
+
+    align-items:
+      center !important;
+
+    gap:
+      7px !important;
+  }
+
+  .globalSearch {
+    width:
+      min(
+        350px,
+        29vw
+      ) !important;
+
+    height:
+      38px !important;
+
+    min-height:
+      38px !important;
+  }
+
+  .quickTaskButton,
+  .newMessageButton {
+    height:
+      38px !important;
+
+    min-height:
+      38px !important;
+  }
+
+
+  /*
+   * Second row = compact filters only.
+   */
+  .inboxSourceToolbar {
+    min-height:
+      42px !important;
+
+    height:
+      auto !important;
+
+    align-items:
+      center !important;
+
+    gap:
+      6px !important;
+
+    margin-bottom:
+      7px !important;
+
+    padding:
+      4px
+      6px !important;
+  }
+
+  .inboxMailboxTrigger,
+  .inboxSourceTrigger,
+  .inboxTagTrigger {
+    min-height:
+      34px !important;
+
+    height:
+      34px !important;
+
+    padding:
+      0
+      10px !important;
+
+    font-size:
+      0.67rem !important;
+  }
+
+  .inboxMailboxTrigger strong,
+  .inboxSourceTrigger strong {
+    min-width:
+      21px !important;
+
+    height:
+      21px !important;
+
+    font-size:
+      0.55rem !important;
+  }
+
+  .inboxClearSourceFilters {
+    min-height:
+      32px !important;
+
+    font-size:
+      0.63rem !important;
+  }
+}
+
+
+/*
+ * Smaller desktop widths may wrap the header if needed,
+ * without bringing the old giant green status row back.
+ */
+@media
+  (min-width: 701px)
+  and
+  (max-width: 1040px) {
+
+  .inboxHeaderSummary {
+    gap: 8px;
+  }
+
+  .topLiveMailboxButton {
+    min-height: 34px;
+  }
+}
+
+
+/*
+ * Mobile keeps the Live Email control compact.
+ */
+@media (max-width: 700px) {
+
+  .topLiveMailboxButton {
+    min-height: 34px;
+  }
+}
+
+/* INBOX TOP COMMAND BAR V11 — END */
+
+/* MAILBOX SHORTCUT BAR V12 — START */
+
+.inboxMailboxQuickBar {
+  display: flex;
+
+  min-width: 0;
+
+  align-items: center;
+  gap: 5px;
+}
+
+.inboxMailboxQuickButton {
+  display: inline-flex;
+
+  min-height: 34px;
+  height: 34px;
+
+  align-items: center;
+  gap: 6px;
+
+  padding:
+    0
+    9px;
+
+  border:
+    1px solid
+    #d4e0e8;
+
+  border-radius: 8px;
+
+  color: #496b86;
+  background: #ffffff;
+
+  font-size: 0.67rem;
+  font-weight: 760;
+
+  white-space: nowrap;
+}
+
+.inboxMailboxQuickButton:hover:not(:disabled) {
+  border-color: #b7cad8;
+  background: #f8fbfd;
+}
+
+.inboxMailboxQuickButton:disabled {
+  cursor: default;
+  opacity: 0.4;
+}
+
+.inboxMailboxQuickButton strong {
+  display: grid;
+
+  min-width: 21px;
+  height: 21px;
+
+  place-items: center;
+
+  padding:
+    0
+    5px;
+
+  border-radius: 999px;
+
+  color: #526f87;
+  background: #edf3f7;
+
+  font-size: 0.55rem;
+}
+
+.inboxMailboxQuickButtonActive {
+  border-color: #85aac6;
+
+  color: #245f8d;
+  background: #edf6fc;
+}
+
+.inboxMailboxQuickButtonActive strong {
+  color: #245f8d;
+  background: #dceef9;
+}
+
+.inboxMailboxMenuEmpty {
+  padding:
+    14px;
+
+  color: #74899a;
+
+  font-size: 0.67rem;
+  text-align: center;
+}
+
+
+/*
+ * Let this row use the available horizontal space.
+ */
+@media (min-width: 1041px) {
+
+  .inboxSourceToolbar {
+    display: flex !important;
+
+    min-width: 0 !important;
+
+    align-items: center !important;
+
+    flex-wrap: nowrap !important;
+
+    gap: 5px !important;
+  }
+
+  .inboxMailboxQuickBar {
+    flex:
+      0 1 auto;
+  }
+
+  .inboxMailboxQuickButton {
+    flex:
+      0 0 auto;
+  }
+
+  .inboxMailboxPicker,
+  .inboxSourcePicker,
+  .inboxTagPicker {
+    flex:
+      0 0 auto;
+  }
+}
+
+
+@media
+  (min-width: 701px)
+  and
+  (max-width: 1220px) {
+
+  .inboxMailboxQuickBar {
+    overflow-x: auto;
+
+    scrollbar-width: none;
+  }
+
+  .inboxMailboxQuickBar::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+
+@media (max-width: 700px) {
+
+  .inboxMailboxQuickBar {
+    width: 100%;
+
+    overflow-x: auto;
+
+    scrollbar-width: none;
+  }
+
+  .inboxMailboxQuickBar::-webkit-scrollbar {
+    display: none;
+  }
+
+  .inboxMailboxQuickButton {
+    flex:
+      0 0 auto;
+  }
+}
+
+/* MAILBOX SHORTCUT BAR V12 — END */
+
+/* EMAIL THREAD ACTIONS V13 — START */
+
+.lockedReplyChannel {
+  display: inline-flex;
+
+  min-height: 36px;
+
+  align-items: center;
+  gap: 6px;
+
+  padding:
+    0
+    10px;
+
+  border:
+    1px solid
+    #ef9ca3;
+
+  border-radius: 8px;
+
+  color: #c72735;
+  background: #fff4f5;
+
+  white-space: nowrap;
+}
+
+.lockedReplyChannel > span {
+  font-size: 0.68rem;
+  font-weight: 800;
+}
+
+.lockedReplyChannel > small {
+  color: #8c6c70;
+
+  font-size: 0.55rem;
+  font-weight: 650;
+}
+
+
+/*
+ * Existing working message pane is intentionally untouched.
+ */
+@media (max-width: 700px) {
+
+  .lockedReplyChannel {
+    justify-content: center;
+  }
+
+  .lockedReplyChannel > small {
+    display: none;
+  }
+}
+
+/* EMAIL THREAD ACTIONS V13 — END */
+
+/* SOURCE AWARE INBOX V14 — START */
+
+/*
+ * SOURCE COLOR LANGUAGE
+ *
+ * Email         = blue
+ * Campaign Seat = purple
+ * SMS / Text    = teal
+ * WhatsApp      = green
+ *
+ * Color is used as a navigation cue, not as decoration.
+ */
+
+.conversationList
+  > button[data-channel="email"]
+  .avatar {
+  color: #ffffff !important;
+  background: #3974a8 !important;
+}
+
+.conversationList
+  > button[data-channel="dashboard"]
+  .avatar {
+  color: #ffffff !important;
+  background: #7552b4 !important;
+}
+
+.conversationList
+  > button[data-channel="sms"]
+  .avatar {
+  color: #ffffff !important;
+  background: #277a83 !important;
+}
+
+.conversationList
+  > button[data-channel="whatsapp"]
+  .avatar {
+  color: #ffffff !important;
+  background: #347d5b !important;
+}
+
+
+/*
+ * Source label beneath each subject uses the same color.
+ */
+.conversationList
+  > button[data-channel="email"]
+  .conversationCopy
+  > small {
+  color: #3974a8 !important;
+}
+
+.conversationList
+  > button[data-channel="dashboard"]
+  .conversationCopy
+  > small {
+  color: #7552b4 !important;
+}
+
+.conversationList
+  > button[data-channel="sms"]
+  .conversationCopy
+  > small {
+  color: #277a83 !important;
+}
+
+.conversationList
+  > button[data-channel="whatsapp"]
+  .conversationCopy
+  > small {
+  color: #347d5b !important;
+}
+
+
+/*
+ * Source selector carries the current context color.
+ */
+.inboxSourceToolbar[data-active-channel="email"]
+  .inboxSourceTrigger {
+  border-color: #93b7d5 !important;
+  color: #28689b !important;
+  background: #f2f8fc !important;
+}
+
+.inboxSourceToolbar[data-active-channel="email"]
+  .inboxSourceTrigger strong {
+  color: #ffffff !important;
+  background: #3974a8 !important;
+}
+
+
+.inboxSourceToolbar[data-active-channel="dashboard"]
+  .inboxSourceTrigger {
+  border-color: #b5a2db !important;
+  color: #6845a5 !important;
+  background: #f7f4fc !important;
+}
+
+.inboxSourceToolbar[data-active-channel="dashboard"]
+  .inboxSourceTrigger strong {
+  color: #ffffff !important;
+  background: #7552b4 !important;
+}
+
+
+.inboxSourceToolbar[data-active-channel="sms"]
+  .inboxSourceTrigger {
+  border-color: #91bec3 !important;
+  color: #236d75 !important;
+  background: #f1f9f9 !important;
+}
+
+.inboxSourceToolbar[data-active-channel="sms"]
+  .inboxSourceTrigger strong {
+  color: #ffffff !important;
+  background: #277a83 !important;
+}
+
+
+.inboxSourceToolbar[data-active-channel="whatsapp"]
+  .inboxSourceTrigger {
+  border-color: #9bcab1 !important;
+  color: #2c7353 !important;
+  background: #f2faf5 !important;
+}
+
+.inboxSourceToolbar[data-active-channel="whatsapp"]
+  .inboxSourceTrigger strong {
+  color: #ffffff !important;
+  background: #347d5b !important;
+}
+
+
+/*
+ * All Messages stays neutral because it combines every source.
+ */
+.inboxSourceToolbar[data-active-channel="all"]
+  .inboxSourceTrigger {
+  border-color: #d4e0e8 !important;
+  color: #496b86 !important;
+  background: #ffffff !important;
+}
+
+
+/*
+ * Keep selected-row behavior intact.
+ */
+.conversationList
+  > button[data-channel] {
+  transition:
+    background-color 120ms ease,
+    border-color 120ms ease;
+}
+
+/* SOURCE AWARE INBOX V14 — END */
+
+/* STRONG SOURCE IDENTITY V15 — START */
+
+/*
+ * COMMUNICATION SOURCE LANGUAGE
+ *
+ * Email         = Blue
+ * Campaign Seat = Purple
+ * SMS / Text    = Teal
+ * WhatsApp      = Green
+ *
+ * We preserve the written labels so color is never
+ * the only way the source is communicated.
+ */
+
+
+/* ---------------------------------------------------------
+   EMAIL
+   --------------------------------------------------------- */
+
+.conversationList
+  > button[data-channel="email"] {
+  border-left:
+    4px solid
+    #3974a8 !important;
+}
+
+.conversationList
+  > button[data-channel="email"]:hover {
+  background:
+    #f2f7fc !important;
+}
+
+.conversationList
+  > button[data-channel="email"]
+  .avatar {
+  color:
+    #ffffff !important;
+
+  background:
+    #3974a8 !important;
+
+  box-shadow:
+    0 0 0 3px
+    #e4f0f9;
+}
+
+.conversationList
+  > button[data-channel="email"]
+  .conversationCopy
+  > small {
+  display:
+    inline-flex !important;
+
+  width:
+    fit-content;
+
+  margin-top:
+    5px !important;
+
+  padding:
+    3px
+    7px !important;
+
+  border-radius:
+    999px;
+
+  color:
+    #28689b !important;
+
+  background:
+    #eaf4fb !important;
+
+  font-weight:
+    780 !important;
+}
+
+
+/* ---------------------------------------------------------
+   CAMPAIGN SEAT
+   --------------------------------------------------------- */
+
+.conversationList
+  > button[data-channel="dashboard"] {
+  border-left:
+    4px solid
+    #7552b4 !important;
+}
+
+.conversationList
+  > button[data-channel="dashboard"]:hover {
+  background:
+    #f7f3fc !important;
+}
+
+.conversationList
+  > button[data-channel="dashboard"]
+  .avatar {
+  color:
+    #ffffff !important;
+
+  background:
+    #7552b4 !important;
+
+  box-shadow:
+    0 0 0 3px
+    #eee8f8;
+}
+
+.conversationList
+  > button[data-channel="dashboard"]
+  .conversationCopy
+  > small {
+  display:
+    inline-flex !important;
+
+  width:
+    fit-content;
+
+  margin-top:
+    5px !important;
+
+  padding:
+    3px
+    7px !important;
+
+  border-radius:
+    999px;
+
+  color:
+    #6745a4 !important;
+
+  background:
+    #eee8f8 !important;
+
+  font-weight:
+    780 !important;
+}
+
+
+/* ---------------------------------------------------------
+   SMS / TEXT
+   --------------------------------------------------------- */
+
+.conversationList
+  > button[data-channel="sms"] {
+  border-left:
+    4px solid
+    #277a83 !important;
+}
+
+.conversationList
+  > button[data-channel="sms"]:hover {
+  background:
+    #f0f9fa !important;
+}
+
+.conversationList
+  > button[data-channel="sms"]
+  .avatar {
+  color:
+    #ffffff !important;
+
+  background:
+    #277a83 !important;
+
+  box-shadow:
+    0 0 0 3px
+    #dff1f3;
+}
+
+.conversationList
+  > button[data-channel="sms"]
+  .conversationCopy
+  > small {
+  display:
+    inline-flex !important;
+
+  width:
+    fit-content;
+
+  margin-top:
+    5px !important;
+
+  padding:
+    3px
+    7px !important;
+
+  border-radius:
+    999px;
+
+  color:
+    #1f7079 !important;
+
+  background:
+    #dff1f3 !important;
+
+  font-weight:
+    780 !important;
+}
+
+
+/* ---------------------------------------------------------
+   WHATSAPP
+   --------------------------------------------------------- */
+
+.conversationList
+  > button[data-channel="whatsapp"] {
+  border-left:
+    4px solid
+    #347d5b !important;
+}
+
+.conversationList
+  > button[data-channel="whatsapp"]:hover {
+  background:
+    #f0f9f4 !important;
+}
+
+.conversationList
+  > button[data-channel="whatsapp"]
+  .avatar {
+  color:
+    #ffffff !important;
+
+  background:
+    #347d5b !important;
+
+  box-shadow:
+    0 0 0 3px
+    #e0f2e8;
+}
+
+.conversationList
+  > button[data-channel="whatsapp"]
+  .conversationCopy
+  > small {
+  display:
+    inline-flex !important;
+
+  width:
+    fit-content;
+
+  margin-top:
+    5px !important;
+
+  padding:
+    3px
+    7px !important;
+
+  border-radius:
+    999px;
+
+  color:
+    #2d7454 !important;
+
+  background:
+    #e0f2e8 !important;
+
+  font-weight:
+    780 !important;
+}
+
+
+/* ---------------------------------------------------------
+   SOURCE-AWARE SELECTED ROWS
+   --------------------------------------------------------- */
+
+/*
+ * Stop every selected conversation from becoming the same
+ * generic pink. The selected row retains its source identity.
+ */
+
+.conversationList
+  > button[data-channel="email"].selectedConversation {
+  background:
+    #eaf4fb !important;
+
+  box-shadow:
+    inset 0 0 0 1px
+    #b7d4e8;
+}
+
+.conversationList
+  > button[data-channel="dashboard"].selectedConversation {
+  background:
+    #f0ebf9 !important;
+
+  box-shadow:
+    inset 0 0 0 1px
+    #cbbce8;
+}
+
+.conversationList
+  > button[data-channel="sms"].selectedConversation {
+  background:
+    #e6f5f6 !important;
+
+  box-shadow:
+    inset 0 0 0 1px
+    #b6dadd;
+}
+
+.conversationList
+  > button[data-channel="whatsapp"].selectedConversation {
+  background:
+    #e9f6ee !important;
+
+  box-shadow:
+    inset 0 0 0 1px
+    #b7dcc8;
+}
+
+
+/*
+ * Keep sender + subject readable regardless of source.
+ */
+
+.conversationList
+  > button[data-channel]
+  .conversationTopline
+  strong {
+  color:
+    #173d62 !important;
+}
+
+.conversationList
+  > button[data-channel]
+  .conversationSubject {
+  color:
+    #526f87 !important;
+}
+
+
+/*
+ * Slightly more breathing room so the source badges read as
+ * intentional identifiers rather than another line of text.
+ */
+
+.conversationList
+  > button[data-channel] {
+  padding-left:
+    12px !important;
+}
+
+/* STRONG SOURCE IDENTITY V15 — END */
+
+/* EMAIL ACCOUNT SELECTOR V16 — START */
+
+.inboxEmailAccountPicker {
+  position: relative;
+  flex: 0 0 auto;
+}
+
+.inboxEmailAccountTrigger {
+  display: inline-flex;
+
+  min-height: 34px;
+  height: 34px;
+
+  max-width: 270px;
+
+  align-items: center;
+  gap: 7px;
+
+  padding:
+    0
+    10px;
+
+  border:
+    1px solid
+    #a9c5da;
+
+  border-radius: 8px;
+
+  color: #2f6997;
+  background: #f5faff;
+
+  font-size: 0.67rem;
+  font-weight: 780;
+}
+
+.inboxEmailAccountTrigger:hover {
+  border-color: #7fa8c8;
+  background: #edf6fc;
+}
+
+.inboxEmailAccountTriggerActive {
+  border-color: #6d9dc3;
+  background: #eaf4fb;
+}
+
+.emailAccountStackIcon {
+  display: grid;
+
+  width: 23px;
+  height: 23px;
+
+  place-items: center;
+
+  border-radius: 7px;
+
+  color: #ffffff;
+  background: #3974a8;
+}
+
+.emailAccountTriggerLabel {
+  min-width: 0;
+
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.inboxEmailAccountMenu {
+  position: absolute;
+
+  z-index: 580;
+
+  top:
+    calc(100% + 6px);
+
+  left: 0;
+
+  width:
+    min(
+      390px,
+      calc(100vw - 46px)
+    );
+
+  overflow: hidden;
+
+  border:
+    1px solid
+    #cad9e5;
+
+  border-radius: 11px;
+
+  background: #ffffff;
+
+  box-shadow:
+    0 18px 44px
+    rgba(18, 54, 83, 0.17);
+}
+
+.inboxEmailAccountMenu > header {
+  padding:
+    11px
+    12px;
+
+  border-bottom:
+    1px solid
+    #e4ebf1;
+}
+
+.inboxEmailAccountMenu > header strong {
+  color: #173d62;
+
+  font-size: 0.76rem;
+  font-weight: 850;
+}
+
+.inboxEmailAccountMenu > div {
+  display: grid;
+
+  gap: 3px;
+
+  max-height: 350px;
+  overflow-y: auto;
+
+  padding: 6px;
+}
+
+.emailAccountMenuItem {
+  display: grid;
+
+  width: 100%;
+  min-height: 48px;
+
+  grid-template-columns:
+    32px
+    minmax(0, 1fr)
+    18px;
+
+  align-items: center;
+  gap: 9px;
+
+  padding:
+    6px
+    8px;
+
+  border: 0;
+  border-radius: 8px;
+
+  color: #496b86;
+  background: transparent;
+
+  text-align: left;
+}
+
+.emailAccountMenuItem:hover {
+  background: #f5f8fb;
+}
+
+.emailAccountMenuItemActive {
+  background: #eef6fc;
+}
+
+.emailAccountMenuItem > span:nth-child(2) {
+  min-width: 0;
+}
+
+.emailAccountMenuItem strong,
+.emailAccountMenuItem small {
+  display: block;
+
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.emailAccountMenuItem strong {
+  color: #214d70;
+
+  font-size: 0.69rem;
+  font-weight: 800;
+}
+
+.emailAccountMenuItem small {
+  margin-top: 3px;
+
+  color: #788ea0;
+
+  font-size: 0.6rem;
+}
+
+.emailAccountAllIcon {
+  display: grid;
+
+  width: 32px;
+  height: 32px;
+
+  place-items: center;
+
+  border-radius: 8px;
+
+  color: #3974a8;
+  background: #eaf4fb;
+}
+
+.emailAccountColorDot {
+  display: block;
+
+  width: 17px;
+  height: 17px;
+
+  justify-self: center;
+
+  border: 3px solid #ffffff;
+  border-radius: 999px;
+
+  background: #3974a8;
+
+  box-shadow:
+    0 0 0 1px
+    #b8ccd9;
+}
+
+.inboxEmailAccountMenu > footer {
+  padding: 7px;
+
+  border-top:
+    1px solid
+    #e4ebf1;
+
+  background: #f8fafc;
+}
+
+.inboxEmailAccountMenu > footer button {
+  width: 100%;
+  min-height: 34px;
+
+  border: 0;
+  border-radius: 7px;
+
+  color: #2f6b99;
+  background: transparent;
+
+  font-size: 0.65rem;
+  font-weight: 790;
+
+  text-align: left;
+}
+
+.inboxEmailAccountMenu > footer button:hover {
+  background: #edf5fb;
+}
+
+
+/*
+ * Individual mailboxes remain within the Email blue family,
+ * but get visibly distinct shades.
+ */
+
+[data-mailbox-tone="1"]
+  .emailAccountColorDot,
+.conversationList
+  > button[data-channel="email"][data-mailbox-tone="1"]
+  .avatar {
+  background: #246aa5 !important;
+}
+
+[data-mailbox-tone="2"]
+  .emailAccountColorDot,
+.conversationList
+  > button[data-channel="email"][data-mailbox-tone="2"]
+  .avatar {
+  background: #4b7fc2 !important;
+}
+
+[data-mailbox-tone="3"]
+  .emailAccountColorDot,
+.conversationList
+  > button[data-channel="email"][data-mailbox-tone="3"]
+  .avatar {
+  background: #245984 !important;
+}
+
+[data-mailbox-tone="4"]
+  .emailAccountColorDot,
+.conversationList
+  > button[data-channel="email"][data-mailbox-tone="4"]
+  .avatar {
+  background: #616db3 !important;
+}
+
+[data-mailbox-tone="5"]
+  .emailAccountColorDot,
+.conversationList
+  > button[data-channel="email"][data-mailbox-tone="5"]
+  .avatar {
+  background: #2681a2 !important;
+}
+
+[data-mailbox-tone="6"]
+  .emailAccountColorDot,
+.conversationList
+  > button[data-channel="email"][data-mailbox-tone="6"]
+  .avatar {
+  background: #4b609e !important;
+}
+
+
+.conversationList
+  > button[data-channel="email"][data-mailbox-tone="1"] {
+  border-left-color: #246aa5 !important;
+}
+
+.conversationList
+  > button[data-channel="email"][data-mailbox-tone="2"] {
+  border-left-color: #4b7fc2 !important;
+}
+
+.conversationList
+  > button[data-channel="email"][data-mailbox-tone="3"] {
+  border-left-color: #245984 !important;
+}
+
+.conversationList
+  > button[data-channel="email"][data-mailbox-tone="4"] {
+  border-left-color: #616db3 !important;
+}
+
+.conversationList
+  > button[data-channel="email"][data-mailbox-tone="5"] {
+  border-left-color: #2681a2 !important;
+}
+
+.conversationList
+  > button[data-channel="email"][data-mailbox-tone="6"] {
+  border-left-color: #4b609e !important;
+}
+
+
+/*
+ * Mailbox color dot remains inside the visible Email badge.
+ */
+
+.conversationList
+  > button[data-channel="email"]
+  .conversationCopy
+  > small::before {
+  content: "";
+
+  display: inline-block;
+
+  width: 7px;
+  height: 7px;
+
+  margin-right: 5px;
+
+  border-radius: 999px;
+
+  background: currentColor;
+}
+
+
+@media (max-width: 1180px) {
+
+  .inboxEmailAccountTrigger {
+    max-width: 210px;
+  }
+}
+
+
+@media (max-width: 700px) {
+
+  .inboxEmailAccountPicker {
+    width: 100%;
+  }
+
+  .inboxEmailAccountTrigger {
+    width: 100%;
+    max-width: none;
+
+    justify-content: space-between;
+  }
+}
+
+/* EMAIL ACCOUNT SELECTOR V16 — END */
+
+/* QUICK REMINDER V17 — START */
+
+.reminderButton {
+  display: inline-flex;
+
+  min-height: 38px;
+
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+
+  padding:
+    0
+    13px;
+
+  border:
+    1px solid
+    #d3a64e;
+
+  border-radius: 9px;
+
+  color:
+    #8a641b;
+
+  background:
+    #fffaf0;
+
+  font-size:
+    0.72rem;
+
+  font-weight:
+    800;
+
+  white-space:
+    nowrap;
+}
+
+.reminderButton:hover {
+  border-color:
+    #bb8930;
+
+  color:
+    #704d0f;
+
+  background:
+    #fff4d9;
+}
+
+.reminderModeNotice {
+  display: flex;
+
+  align-items: flex-start;
+  gap: 8px;
+
+  padding:
+    10px
+    11px;
+
+  border:
+    1px solid
+    #ead6a8;
+
+  border-radius:
+    9px;
+
+  color:
+    #72551e;
+
+  background:
+    #fffbf2;
+
+  font-size:
+    0.67rem;
+
+  font-weight:
+    650;
+
+  line-height:
+    1.45;
+}
+
+.reminderModeNotice svg {
+  flex:
+    0 0 auto;
+
+  margin-top:
+    1px;
+
+  color:
+    #b0791d;
+}
+
+
+@media (max-width: 1180px) {
+
+  .reminderButton {
+    padding:
+      0
+      10px;
+  }
+}
+
+
+@media (max-width: 860px) {
+
+  .reminderButton {
+    min-width:
+      38px;
+
+    padding:
+      0
+      10px;
+
+    font-size:
+      0;
+  }
+
+  .reminderButton svg {
+    width:
+      18px;
+
+    height:
+      18px;
+  }
+}
+
+/* QUICK REMINDER V17 — END */
+
+/* INBOX HEADER RESPONSIVE V19 — START */
+
+/*
+ * Keep every major Inbox command visible:
+ *
+ * Inbox
+ * Unread / Needs Reply / High Priority
+ * Live Email
+ * Search
+ * Quick Task
+ * Reminder
+ * New Message
+ *
+ * No overlap and no hidden controls.
+ */
+
+.pageHeader {
+  width: 100% !important;
+
+  display: flex !important;
+
+  align-items: center !important;
+
+  gap: 12px !important;
+
+  min-width: 0 !important;
+}
+
+.inboxHeaderSummary {
+  display: flex !important;
+
+  align-items: center !important;
+
+  gap: 8px !important;
+
+  flex:
+    0 1 auto !important;
+
+  min-width: 0 !important;
+}
+
+.headerMetrics {
+  display: flex !important;
+
+  align-items: center !important;
+
+  gap: 6px !important;
+
+  flex-wrap: nowrap !important;
+}
+
+.pageActions {
+  display: flex !important;
+
+  align-items: center !important;
+
+  justify-content: flex-end !important;
+
+  gap: 8px !important;
+
+  flex:
+    1 1 auto !important;
+
+  min-width: 0 !important;
+}
+
+.globalSearch {
+  flex:
+    1 1 330px !important;
+
+  min-width: 220px !important;
+
+  max-width: 520px !important;
+}
+
+.quickTaskButton,
+.reminderButton,
+.newMessageButton {
+  flex:
+    0 0 auto !important;
+
+  white-space: nowrap !important;
+}
+
+
+/*
+ * Medium desktop:
+ *
+ * Give the command controls their own full row rather than
+ * allowing the Inbox metrics and actions to collide.
+ */
+@media
+  (min-width: 901px)
+  and
+  (max-width: 1460px) {
+
+  .pageHeader {
+    display: grid !important;
+
+    grid-template-columns:
+      minmax(0, 1fr) !important;
+
+    gap: 8px !important;
+  }
+
+  .inboxHeaderSummary {
+    width: 100% !important;
+
+    justify-content: flex-start !important;
+  }
+
+  .pageActions {
+    width: 100% !important;
+
+    justify-content: stretch !important;
+  }
+
+  .globalSearch {
+    flex:
+      1 1 auto !important;
+
+    width: auto !important;
+
+    max-width: none !important;
+  }
+}
+
+
+/*
+ * Smaller laptop / tablet:
+ *
+ * Search gets its own row.
+ * All three actions remain fully visible below it.
+ */
+@media
+  (min-width: 701px)
+  and
+  (max-width: 1050px) {
+
+  .pageActions {
+    display: grid !important;
+
+    grid-template-columns:
+      minmax(0, 1fr)
+      auto
+      auto
+      auto !important;
+
+    gap: 7px !important;
+  }
+
+  .globalSearch {
+    width: 100% !important;
+
+    min-width: 0 !important;
+  }
+
+  .quickTaskButton,
+  .reminderButton,
+  .newMessageButton {
+    min-width: auto !important;
+  }
+}
+
+
+/*
+ * Narrow layouts:
+ *
+ * Metrics can scroll horizontally rather than overlap.
+ */
+@media (max-width: 900px) {
+
+  .inboxHeaderSummary {
+    overflow-x: auto !important;
+
+    scrollbar-width: none;
+  }
+
+  .inboxHeaderSummary::-webkit-scrollbar {
+    display: none;
+  }
+
+  .headerMetrics {
+    flex:
+      0 0 auto !important;
+  }
+}
+
+
+/*
+ * Mobile:
+ *
+ * Search is full width.
+ * Quick Task / Reminder / New Message become a clean
+ * three-column command row.
+ */
+@media (max-width: 700px) {
+
+  .pageHeader {
+    display: block !important;
+  }
+
+  .inboxHeaderSummary {
+    width: 100% !important;
+
+    margin-bottom: 8px !important;
+  }
+
+  .pageActions {
+    display: grid !important;
+
+    width: 100% !important;
+
+    grid-template-columns:
+      repeat(
+        3,
+        minmax(0, 1fr)
+      ) !important;
+
+    gap: 7px !important;
+  }
+
+  .globalSearch {
+    grid-column:
+      1 / -1 !important;
+
+    width: 100% !important;
+
+    max-width: none !important;
+
+    min-width: 0 !important;
+  }
+
+  .quickTaskButton,
+  .reminderButton,
+  .newMessageButton {
+    width: 100% !important;
+
+    min-width: 0 !important;
+
+    padding-left: 8px !important;
+
+    padding-right: 8px !important;
+  }
+}
+
+/* INBOX HEADER RESPONSIVE V19 — END */
+
+/* CLEAN INBOX HEADER V20 — START */
+
+/*
+ * Desktop:
+ * Inbox / metrics stay together.
+ * Search + all three commands stay together.
+ */
+
+.pageHeader {
+  width: 100% !important;
+
+  display: flex !important;
+
+  align-items: center !important;
+  gap: 14px !important;
+
+  min-width: 0 !important;
+}
+
+.inboxHeaderSummary {
+  display: flex !important;
+
+  align-items: center !important;
+  gap: 7px !important;
+
+  flex: 0 0 auto !important;
+
+  min-width: 0 !important;
+}
+
+.headerMetrics {
+  display: flex !important;
+
+  align-items: center !important;
+  gap: 6px !important;
+
+  flex-wrap: nowrap !important;
+}
+
+.pageActions {
+  display: grid !important;
+
+  grid-template-columns:
+    minmax(260px, 1fr)
+    auto
+    auto
+    auto !important;
+
+  align-items: center !important;
+  gap: 8px !important;
+
+  flex: 1 1 auto !important;
+
+  min-width: 0 !important;
+
+  flex-wrap: nowrap !important;
+}
+
+.globalSearch {
+  width: 100% !important;
+  min-width: 0 !important;
+  max-width: none !important;
+
+  grid-column: auto !important;
+}
+
+.quickTaskButton,
+.reminderButton,
+.newMessageButton {
+  width: auto !important;
+
+  flex: none !important;
+
+  white-space: nowrap !important;
+
+  margin: 0 !important;
+}
+
+
+/*
+ * Medium desktop / laptop:
+ *
+ * Header becomes two clean rows.
+ *
+ * Row 1:
+ * Inbox + metrics + Live Email
+ *
+ * Row 2:
+ * Search | Quick Task | Reminder | New Message
+ */
+@media
+  (min-width: 901px)
+  and
+  (max-width: 1600px) {
+
+  .pageHeader {
+    display: grid !important;
+
+    grid-template-columns:
+      minmax(0, 1fr) !important;
+
+    gap: 9px !important;
+  }
+
+  .inboxHeaderSummary {
+    width: 100% !important;
+  }
+
+  .pageActions {
+    width: 100% !important;
+
+    display: grid !important;
+
+    grid-template-columns:
+      minmax(260px, 1fr)
+      auto
+      auto
+      auto !important;
+
+    gap: 8px !important;
+  }
+
+  .globalSearch {
+    width: 100% !important;
+
+    min-width: 0 !important;
+  }
+
+  .newMessageButton {
+    grid-column: auto !important;
+
+    justify-self: stretch !important;
+  }
+}
+
+
+/*
+ * Smaller laptop / tablet:
+ * Search gets full row.
+ * Three commands stay together below.
+ */
+@media
+  (min-width: 701px)
+  and
+  (max-width: 1040px) {
+
+  .pageActions {
+    grid-template-columns:
+      repeat(
+        3,
+        minmax(0, 1fr)
+      ) !important;
+  }
+
+  .globalSearch {
+    grid-column:
+      1 / -1 !important;
+  }
+
+  .quickTaskButton,
+  .reminderButton,
+  .newMessageButton {
+    width: 100% !important;
+
+    justify-content: center !important;
+  }
+}
+
+
+/*
+ * Mobile:
+ * Search full-width,
+ * then the three commands evenly below.
+ */
+@media (max-width: 700px) {
+
+  .pageHeader {
+    display: block !important;
+  }
+
+  .inboxHeaderSummary {
+    width: 100% !important;
+
+    overflow-x: auto !important;
+
+    margin-bottom: 8px !important;
+
+    scrollbar-width: none;
+  }
+
+  .inboxHeaderSummary::-webkit-scrollbar {
+    display: none;
+  }
+
+  .pageActions {
+    display: grid !important;
+
+    width: 100% !important;
+
+    grid-template-columns:
+      repeat(
+        3,
+        minmax(0, 1fr)
+      ) !important;
+
+    gap: 7px !important;
+  }
+
+  .globalSearch {
+    grid-column:
+      1 / -1 !important;
+
+    width: 100% !important;
+  }
+
+  .quickTaskButton,
+  .reminderButton,
+  .newMessageButton {
+    width: 100% !important;
+
+    min-width: 0 !important;
+
+    justify-content: center !important;
+  }
+}
+
+/* CLEAN INBOX HEADER V20 — END */
+
+/* SINGLE LINE INBOX HEADER V21C — START */
+
+/*
+ * FINAL DESKTOP HEADER
+ *
+ * Inbox | Unread | Live Email | Search |
+ * Quick Task | Reminder | New Message
+ */
+
+@media (min-width: 901px) {
+
+  .pageHeader {
+    display: flex !important;
+
+    width: 100% !important;
+    min-width: 0 !important;
+
+    align-items: center !important;
+
+    flex-wrap: nowrap !important;
+
+    gap: 8px !important;
+  }
+
+  .inboxHeaderSummary {
+    display: flex !important;
+
+    width: auto !important;
+    min-width: 0 !important;
+
+    flex: 0 0 auto !important;
+
+    align-items: center !important;
+
+    flex-wrap: nowrap !important;
+
+    gap: 6px !important;
+
+    margin: 0 !important;
+
+    overflow: visible !important;
+  }
+
+  .headerMetrics {
+    display: flex !important;
+
+    flex: 0 0 auto !important;
+
+    align-items: center !important;
+
+    gap: 0 !important;
+  }
+
+  .headerMetricButton {
+    min-height: 34px !important;
+    height: 34px !important;
+
+    width: auto !important;
+    min-width: 0 !important;
+
+    flex: 0 0 auto !important;
+
+    padding:
+      0
+      9px !important;
+
+    gap: 6px !important;
+
+    border-radius: 9px !important;
+
+    pointer-events: none !important;
+
+    cursor: default !important;
+
+    white-space: nowrap !important;
+  }
+
+  .headerMetricButton small {
+    font-size:
+      0.61rem !important;
+  }
+
+  .headerMetricButton strong {
+    font-size:
+      0.72rem !important;
+  }
+
+  .pageActions {
+    display: flex !important;
+
+    width: auto !important;
+    min-width: 0 !important;
+
+    flex: 1 1 auto !important;
+
+    align-items: center !important;
+
+    justify-content: flex-end !important;
+
+    flex-wrap: nowrap !important;
+
+    gap: 6px !important;
+
+    margin: 0 !important;
+  }
+
+  .globalSearch {
+    flex:
+      1 1 310px !important;
+
+    width: auto !important;
+
+    min-width: 170px !important;
+
+    max-width: none !important;
+
+    grid-column: auto !important;
+  }
+
+  .quickTaskButton,
+  .reminderButton,
+  .newMessageButton {
+    flex: 0 0 auto !important;
+
+    width: auto !important;
+    min-width: 0 !important;
+
+    margin: 0 !important;
+
+    white-space: nowrap !important;
+
+    grid-column: auto !important;
+  }
+
+  .newMessageButton {
+    justify-self: auto !important;
+  }
+}
+
+
+/*
+ * Ordinary laptop widths:
+ * shrink spacing first — never send New Message to another row.
+ */
+@media
+  (min-width: 901px)
+  and
+  (max-width: 1450px) {
+
+  .pageHeader {
+    gap: 5px !important;
+  }
+
+  .inboxHeaderSummary,
+  .pageActions {
+    gap: 5px !important;
+  }
+
+  .headerMetricButton {
+    padding:
+      0
+      7px !important;
+  }
+
+  .globalSearch {
+    min-width: 145px !important;
+  }
+
+  .quickTaskButton,
+  .reminderButton {
+    padding-left:
+      9px !important;
+
+    padding-right:
+      9px !important;
+  }
+
+  .newMessageButton {
+    padding-left:
+      11px !important;
+
+    padding-right:
+      11px !important;
+  }
+}
+
+
+/*
+ * Very narrow desktop:
+ * maintain one line and scroll horizontally if physically needed.
+ */
+@media
+  (min-width: 901px)
+  and
+  (max-width: 1120px) {
+
+  .pageHeader {
+    overflow-x: auto !important;
+
+    scrollbar-width: none;
+  }
+
+  .pageHeader::-webkit-scrollbar {
+    display: none;
+  }
+
+  .globalSearch {
+    flex:
+      0 0 170px !important;
+
+    min-width: 170px !important;
+  }
+}
+
+/* SINGLE LINE INBOX HEADER V21C — END */
+
+/* REFINED INBOX HEADER V22 — START */
+
+/*
+ * TARGET:
+ *
+ * Inbox  1147 Unread  Live Email
+ *                    Search | Quick Task | Reminder | New Message
+ *
+ * All on one desktop line.
+ */
+
+@media (min-width: 901px) {
+
+  .pageHeader {
+    display: flex !important;
+
+    width: 100% !important;
+    min-width: 0 !important;
+
+    align-items: center !important;
+
+    flex-wrap: nowrap !important;
+
+    gap: 12px !important;
+  }
+
+
+  /*
+   * Make Inbox + Unread feel like one heading group.
+   */
+  .inboxHeaderSummary {
+    display: flex !important;
+
+    flex:
+      0 0 auto !important;
+
+    width: auto !important;
+    min-width: 0 !important;
+
+    align-items: center !important;
+
+    flex-wrap: nowrap !important;
+
+    gap: 6px !important;
+
+    margin: 0 !important;
+
+    overflow: visible !important;
+  }
+
+  .inboxHeaderSummary h1 {
+    margin: 0 !important;
+
+    flex:
+      0 0 auto !important;
+  }
+
+
+  /*
+   * The one remaining header metric is Unread.
+   * Stop making it look like a separate big button.
+   */
+  .headerMetrics {
+    display: flex !important;
+
+    align-items: center !important;
+
+    flex:
+      0 0 auto !important;
+
+    gap: 0 !important;
+  }
+
+  .headerMetricButton {
+    display: inline-flex !important;
+
+    min-height: 0 !important;
+    height: auto !important;
+
+    min-width: 0 !important;
+    width: auto !important;
+
+    align-items: center !important;
+
+    gap: 5px !important;
+
+    padding:
+      3px
+      2px !important;
+
+    border:
+      0 !important;
+
+    border-radius:
+      0 !important;
+
+    background:
+      transparent !important;
+
+    box-shadow:
+      none !important;
+
+    pointer-events:
+      none !important;
+
+    cursor:
+      default !important;
+  }
+
+  .headerMetricButton svg {
+    display:
+      none !important;
+  }
+
+  .headerMetricButton strong {
+    color:
+      #173d62 !important;
+
+    font-size:
+      0.77rem !important;
+
+    font-weight:
+      900 !important;
+  }
+
+  .headerMetricButton small {
+    color:
+      #718698 !important;
+
+    font-size:
+      0.62rem !important;
+
+    font-weight:
+      720 !important;
+  }
+
+
+  /*
+   * Live Email remains a true status control,
+   * but sits immediately after Inbox / Unread.
+   */
+  .topLiveMailboxButton {
+    flex:
+      0 0 auto !important;
+
+    margin-left:
+      4px !important;
+  }
+
+
+  /*
+   * Right-side command group.
+   */
+  .pageActions {
+    display: flex !important;
+
+    flex:
+      1 1 auto !important;
+
+    width: auto !important;
+    min-width: 0 !important;
+
+    align-items: center !important;
+
+    justify-content: flex-end !important;
+
+    flex-wrap: nowrap !important;
+
+    gap: 8px !important;
+
+    margin:
+      0
+      0
+      0
+      auto !important;
+  }
+
+
+  /*
+   * Search should no longer dominate the entire header.
+   */
+  .globalSearch {
+    flex:
+      0 1 430px !important;
+
+    width:
+      min(
+        430px,
+        29vw
+      ) !important;
+
+    min-width:
+      240px !important;
+
+    max-width:
+      430px !important;
+
+    grid-column:
+      auto !important;
+  }
+
+
+  .quickTaskButton,
+  .reminderButton,
+  .newMessageButton {
+    flex:
+      0 0 auto !important;
+
+    width:
+      auto !important;
+
+    min-width:
+      0 !important;
+
+    margin:
+      0 !important;
+
+    white-space:
+      nowrap !important;
+
+    grid-column:
+      auto !important;
+  }
+
+}
+
+
+/*
+ * Standard laptops:
+ * reduce search first instead of squeezing the title/actions.
+ */
+@media
+  (min-width: 1101px)
+  and
+  (max-width: 1450px) {
+
+  .pageHeader {
+    gap:
+      8px !important;
+  }
+
+  .pageActions {
+    gap:
+      6px !important;
+  }
+
+  .globalSearch {
+    flex-basis:
+      330px !important;
+
+    width:
+      min(
+        330px,
+        24vw
+      ) !important;
+
+    min-width:
+      200px !important;
+
+    max-width:
+      330px !important;
+  }
+
+}
+
+
+/*
+ * Tight desktop:
+ * keep the same one-line hierarchy.
+ */
+@media
+  (min-width: 901px)
+  and
+  (max-width: 1100px) {
+
+  .pageHeader {
+    overflow-x:
+      auto !important;
+
+    scrollbar-width:
+      none;
+  }
+
+  .pageHeader::-webkit-scrollbar {
+    display: none;
+  }
+
+  .globalSearch {
+    flex:
+      0 0 200px !important;
+
+    width:
+      200px !important;
+
+    min-width:
+      200px !important;
+  }
+
+}
+
+
+/*
+ * Leave mobile behavior alone.
+ */
+@media (max-width: 900px) {
+
+  .headerMetricButton svg {
+    display: none;
+  }
+
+}
+
+/* REFINED INBOX HEADER V22 — END */
+
+/* CLEAN LIVE EMAIL HEADER V23 — START */
+
+/*
+ * FINAL HEADER:
+ *
+ * Inbox | Live Email ↻ | Search |
+ * Quick Task | Reminder | New Message
+ *
+ * Unread data still exists; it is only hidden
+ * from this premium header space.
+ */
+
+.headerMetrics,
+.headerUnreadSummary {
+  display: none !important;
+}
+
+
+@media (min-width: 901px) {
+
+  .pageHeader {
+    display: flex !important;
+
+    width: 100% !important;
+    min-width: 0 !important;
+
+    align-items: center !important;
+
+    flex-wrap: nowrap !important;
+
+    gap: 10px !important;
+  }
+
+  .inboxHeaderSummary {
+    display: flex !important;
+
+    flex:
+      0 0 auto !important;
+
+    width: auto !important;
+    min-width: 0 !important;
+
+    align-items: center !important;
+
+    flex-wrap: nowrap !important;
+
+    gap: 8px !important;
+
+    margin: 0 !important;
+  }
+
+  .topLiveMailboxButton {
+    flex:
+      0 0 auto !important;
+
+    margin:
+      0 !important;
+  }
+
+  .pageActions {
+    display: flex !important;
+
+    flex:
+      1 1 auto !important;
+
+    width: auto !important;
+    min-width: 0 !important;
+
+    align-items: center !important;
+
+    justify-content: flex-end !important;
+
+    flex-wrap: nowrap !important;
+
+    gap: 7px !important;
+
+    margin-left:
+      auto !important;
+  }
+
+  .globalSearch {
+    flex:
+      0 1 420px !important;
+
+    width:
+      min(
+        420px,
+        30vw
+      ) !important;
+
+    min-width:
+      220px !important;
+
+    max-width:
+      420px !important;
+  }
+
+  .quickTaskButton,
+  .reminderButton,
+  .newMessageButton {
+    flex:
+      0 0 auto !important;
+
+    width:
+      auto !important;
+
+    min-width:
+      0 !important;
+
+    margin:
+      0 !important;
+
+    white-space:
+      nowrap !important;
+  }
+}
+
+
+/*
+ * The refresh icon should clearly behave like refresh.
+ */
+.topLiveMailboxButton svg {
+  flex:
+    0 0 auto;
+}
+
+.topLiveMailboxButton:hover svg {
+  transform:
+    rotate(18deg);
+
+  transition:
+    transform
+    120ms ease;
+}
+
+
+/*
+ * Loading uses the existing spinner.
+ */
+.topLiveMailboxButtonLoading svg {
+  animation:
+    inboxLiveEmailRefreshSpin
+    0.9s linear infinite;
+}
+
+@keyframes inboxLiveEmailRefreshSpin {
+  to {
+    transform:
+      rotate(360deg);
+  }
+}
+
+
+/*
+ * Ordinary laptop widths.
+ */
+@media
+  (min-width: 901px)
+  and
+  (max-width: 1350px) {
+
+  .pageHeader {
+    gap:
+      6px !important;
+  }
+
+  .pageActions {
+    gap:
+      5px !important;
+  }
+
+  .globalSearch {
+    flex-basis:
+      320px !important;
+
+    width:
+      min(
+        320px,
+        25vw
+      ) !important;
+
+    min-width:
+      180px !important;
+  }
+}
+
+/* CLEAN LIVE EMAIL HEADER V23 — END */
+
+/* PROFESSIONAL REPLY COMPOSER V24 — START */
+
+.replyAddressing {
+  display: grid;
+
+  grid-template-columns:
+    1fr;
+
+  border:
+    1px solid
+    #dbe5ec;
+
+  border-radius:
+    10px;
+
+  overflow:
+    hidden;
+
+  background:
+    #ffffff;
+}
+
+.replyAddressing > div {
+  display: grid;
+
+  grid-template-columns:
+    72px
+    minmax(0, 1fr);
+
+  align-items: center;
+
+  min-height: 42px;
+
+  padding:
+    0
+    13px;
+
+  gap:
+    10px;
+}
+
+.replyAddressing > div + div {
+  border-top:
+    1px solid
+    #e6edf2;
+}
+
+.replyAddressing span {
+  color:
+    #74899a;
+
+  font-size:
+    0.66rem;
+
+  font-weight:
+    760;
+}
+
+.replyAddressing strong {
+  min-width: 0;
+
+  overflow:
+    hidden;
+
+  text-overflow:
+    ellipsis;
+
+  white-space:
+    nowrap;
+
+  color:
+    #244b6b;
+
+  font-size:
+    0.72rem;
+
+  font-weight:
+    760;
+}
+
+
+/* ---------------------------------------------------------
+   RICH EDITOR
+   --------------------------------------------------------- */
+
+.richComposerShell {
+  overflow:
+    hidden;
+
+  border:
+    1px solid
+    #b8ccdc;
+
+  border-radius:
+    11px;
+
+  background:
+    #ffffff;
+
+  box-shadow:
+    0 0 0 3px
+    rgba(61, 119, 162, 0.08);
+}
+
+.richComposerToolbar {
+  display: flex;
+
+  min-height:
+    46px;
+
+  align-items: center;
+
+  gap:
+    5px;
+
+  padding:
+    6px
+    9px;
+
+  border-bottom:
+    1px solid
+    #dfe7ed;
+
+  overflow-x:
+    auto;
+
+  background:
+    #f8fafc;
+
+  scrollbar-width:
+    none;
+}
+
+.richComposerToolbar::-webkit-scrollbar {
+  display:
+    none;
+}
+
+.richComposerToolbar button,
+.richComposerToolbar select,
+.richColorControl,
+.richHighlightControl {
+  flex:
+    0 0 auto;
+}
+
+.richComposerToolbar button {
+  display:
+    inline-grid;
+
+  min-width:
+    31px;
+
+  height:
+    31px;
+
+  place-items:
+    center;
+
+  padding:
+    0
+    7px;
+
+  border:
+    1px solid
+    transparent;
+
+  border-radius:
+    7px;
+
+  color:
+    #536d82;
+
+  background:
+    transparent;
+
+  font-size:
+    0.72rem;
+
+  font-weight:
+    760;
+}
+
+.richComposerToolbar button:hover {
+  border-color:
+    #cfdae3;
+
+  background:
+    #ffffff;
+}
+
+.richComposerToolbar select {
+  height:
+    31px;
+
+  padding:
+    0
+    25px
+    0
+    8px;
+
+  border:
+    1px solid
+    #d4dfe7;
+
+  border-radius:
+    7px;
+
+  color:
+    #455f73;
+
+  background:
+    #ffffff;
+
+  font-size:
+    0.66rem;
+
+  font-weight:
+    680;
+}
+
+.richComposerToolbar select:first-of-type {
+  width:
+    112px;
+}
+
+.richComposerToolbar select:nth-of-type(2) {
+  width:
+    64px;
+}
+
+.richToolbarDivider {
+  width:
+    1px;
+
+  height:
+    23px;
+
+  margin:
+    0
+    2px;
+
+  background:
+    #d7e0e7;
+}
+
+.richToolbarBold {
+  color:
+    #263e53 !important;
+
+  font-weight:
+    900 !important;
+}
+
+.richToolbarItalic {
+  color:
+    #263e53 !important;
+
+  font-family:
+    Georgia,
+    serif;
+
+  font-style:
+    italic;
+
+  font-weight:
+    800 !important;
+}
+
+.richToolbarUnderline {
+  color:
+    #263e53 !important;
+
+  text-decoration:
+    underline;
+
+  font-weight:
+    800 !important;
+}
+
+.richColorControl,
+.richHighlightControl {
+  position:
+    relative;
+
+  display:
+    grid;
+
+  width:
+    31px;
+
+  height:
+    31px;
+
+  place-items:
+    center;
+
+  border:
+    1px solid
+    transparent;
+
+  border-radius:
+    7px;
+
+  color:
+    #334f67;
+
+  cursor:
+    pointer;
+}
+
+.richColorControl:hover,
+.richHighlightControl:hover {
+  border-color:
+    #cfdae3;
+
+  background:
+    #ffffff;
+}
+
+.richColorControl span {
+  font-size:
+    0.78rem;
+
+  font-weight:
+    900;
+
+  text-decoration:
+    underline;
+}
+
+.richHighlightControl span {
+  font-size:
+    0.8rem;
+}
+
+.richColorControl input,
+.richHighlightControl input {
+  position:
+    absolute;
+
+  inset:
+    0;
+
+  width:
+    100%;
+
+  height:
+    100%;
+
+  opacity:
+    0;
+
+  cursor:
+    pointer;
+}
+
+.richComposerEditor {
+  min-height:
+    190px;
+
+  max-height:
+    440px;
+
+  overflow-y:
+    auto;
+
+  padding:
+    17px
+    18px;
+
+  color:
+    #314f68;
+
+  background:
+    #ffffff;
+
+  font-family:
+    Aptos,
+    Arial,
+    sans-serif;
+
+  font-size:
+    14px;
+
+  line-height:
+    1.55;
+
+  outline:
+    none;
+
+  white-space:
+    normal;
+
+  overflow-wrap:
+    anywhere;
+}
+
+.richComposerEditor:empty::before {
+  content:
+    attr(data-placeholder);
+
+  color:
+    #8b969e;
+
+  pointer-events:
+    none;
+}
+
+.richComposerEditor p {
+  margin:
+    0
+    0
+    0.8em;
+}
+
+.richComposerEditor ul,
+.richComposerEditor ol {
+  margin:
+    0.5em
+    0;
+
+  padding-left:
+    1.7em;
+}
+
+.richComposerEditor a {
+  color:
+    #1f6f9f;
+
+  text-decoration:
+    underline;
+}
+
+
+/* ---------------------------------------------------------
+   COMPACT CHANNEL IDENTITY
+   --------------------------------------------------------- */
+
+.lockedReplyChannel {
+  width:
+    auto !important;
+
+  min-width:
+    0 !important;
+
+  max-width:
+    max-content !important;
+
+  min-height:
+    36px !important;
+
+  flex:
+    0 0 auto !important;
+
+  padding:
+    0
+    10px !important;
+
+  border-radius:
+    8px !important;
+
+  white-space:
+    nowrap !important;
+}
+
+.lockedReplyChannel small {
+  display:
+    none !important;
+}
+
+.replyChannels {
+  width:
+    auto !important;
+
+  flex:
+    0 0 auto !important;
+}
+
+.composerFooter {
+  align-items:
+    center !important;
+}
+
+
+/*
+ * Give Attach / channel / send normal natural widths.
+ */
+.replyOptions {
+  flex:
+    0 1 auto !important;
+}
+
+.sendButton {
+  flex:
+    0 0 auto !important;
+}
+
+
+@media (max-width: 760px) {
+
+  .replyAddressing > div {
+    grid-template-columns:
+      58px
+      minmax(0, 1fr);
+  }
+
+  .richComposerEditor {
+    min-height:
+      160px;
+  }
+}
+
+/* PROFESSIONAL REPLY COMPOSER V24 — END */
+
+
+/* FINAL LIVE INBOX HEADER — START
+ *
+ * Restore the approved Inbox title row:
+ *
+ * Inbox   1147 Unread   Live Email
+ *
+ * Later responsive rules had hidden the unread metric even though
+ * the live provider unread value was still being calculated.
+ */
+
+.inboxHeaderSummary {
+  display: flex !important;
+  align-items: center !important;
+  flex-wrap: wrap !important;
+  gap: 12px !important;
+}
+
+.inboxHeaderSummary > h1 {
+  flex: 0 0 auto !important;
+  margin: 0 !important;
+}
+
+.inboxHeaderSummary .headerMetrics {
+  display: inline-flex !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  align-items: center !important;
+  width: auto !important;
+  height: auto !important;
+  margin: 0 !important;
+}
+
+.inboxHeaderSummary .headerMetricButton {
+  display: inline-flex !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  align-items: baseline !important;
+  gap: 6px !important;
+  width: auto !important;
+  min-width: 0 !important;
+  height: auto !important;
+  min-height: 0 !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  border: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  color: inherit !important;
+}
+
+.inboxHeaderSummary .headerMetricButton svg {
+  display: none !important;
+}
+
+.inboxHeaderSummary .headerMetricButton strong {
+  display: inline !important;
+  font-size: 15px !important;
+  font-weight: 800 !important;
+  line-height: 1 !important;
+}
+
+.inboxHeaderSummary .headerMetricButton span {
+  display: inline !important;
+  font-size: 13px !important;
+  font-weight: 700 !important;
+  line-height: 1 !important;
+  opacity: 0.68 !important;
+}
+
+.inboxHeaderSummary .topLiveMailboxButton {
+  display: inline-flex !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  flex: 0 0 auto !important;
+  margin: 0 !important;
+}
+
+/* FINAL LIVE INBOX HEADER — END */

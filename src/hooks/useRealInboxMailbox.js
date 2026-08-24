@@ -12,6 +12,12 @@ import {
 const THREAD_PREFIX =
   "nylas-thread-";
 
+const MAILBOX_PAGE_SIZE =
+  20;
+
+const MAILBOX_TARGET_THREAD_COUNT =
+  50;
+
 function clean(value) {
   return String(
     value || "",
@@ -857,6 +863,7 @@ export function useRealInboxMailbox({
   workspaceId,
   enabled,
   selectedConversationId,
+  selectedFolderId = "",
 }) {
   const [
     conversations,
@@ -872,6 +879,11 @@ export function useRealInboxMailbox({
     accountProvider,
     setAccountProvider,
   ] = useState("");
+
+  const [
+    mailboxFolders,
+    setMailboxFolders,
+  ] = useState([]);
 
   const [
     inboxTotalCount,
@@ -976,6 +988,10 @@ export function useRealInboxMailbox({
             [],
           );
 
+          setMailboxFolders(
+            [],
+          );
+
           setInboxTotalCount(
             null,
           );
@@ -1019,6 +1035,10 @@ export function useRealInboxMailbox({
               )
                 ? folderResult.data
                 : [];
+
+            setMailboxFolders(
+              folders,
+            );
 
             const inboxFolder =
               findInboxFolder(
@@ -1068,21 +1088,121 @@ export function useRealInboxMailbox({
             // remains authoritative.
           }
 
-          const threadResult =
-            await invokeMailbox({
-              action:
-                "list_threads",
+          const requestedFolderId =
+            clean(
+              selectedFolderId,
+            );
 
-              limit:
-                20,
+          const targetFolderId =
+            requestedFolderId ||
+            inboxId;
 
-              ...(inboxId
-                ? {
-                    folderId:
-                      inboxId,
-                  }
-                : {}),
-            });
+          let threadResult =
+            null;
+
+          let pageToken =
+            "";
+
+          const threadRows =
+            [];
+
+          const seenThreadIds =
+            new Set();
+
+          while (
+            threadRows.length <
+              MAILBOX_TARGET_THREAD_COUNT
+          ) {
+            const pageResult =
+              await invokeMailbox({
+                action:
+                  "list_threads",
+
+                limit:
+                  MAILBOX_PAGE_SIZE,
+
+                ...(targetFolderId
+                  ? {
+                      folderId:
+                        targetFolderId,
+                    }
+                  : {}),
+
+                ...(pageToken
+                  ? {
+                      pageToken,
+                    }
+                  : {}),
+              });
+
+            if (!threadResult) {
+              threadResult =
+                pageResult;
+            }
+
+            const pageRows =
+              Array.isArray(
+                pageResult.data,
+              )
+                ? pageResult.data
+                : [];
+
+            for (
+              const thread
+              of pageRows
+            ) {
+              const providerId =
+                clean(
+                  thread?.id,
+                );
+
+              if (
+                providerId &&
+                seenThreadIds.has(
+                  providerId,
+                )
+              ) {
+                continue;
+              }
+
+              if (providerId) {
+                seenThreadIds.add(
+                  providerId,
+                );
+              }
+
+              threadRows.push(
+                thread,
+              );
+
+              if (
+                threadRows.length >=
+                  MAILBOX_TARGET_THREAD_COUNT
+              ) {
+                break;
+              }
+            }
+
+            const nextCursor =
+              clean(
+                pageResult
+                  .nextCursor,
+              );
+
+            if (
+              !nextCursor ||
+              pageRows.length === 0
+            ) {
+              break;
+            }
+
+            pageToken =
+              nextCursor;
+          }
+
+          threadResult =
+            threadResult ||
+            {};
 
           const mailboxEmail =
             clean(
@@ -1109,13 +1229,11 @@ export function useRealInboxMailbox({
           }
 
           const next =
-            (
-              Array.isArray(
-                threadResult.data,
+            threadRows
+              .slice(
+                0,
+                MAILBOX_TARGET_THREAD_COUNT,
               )
-                ? threadResult.data
-                : []
-            )
               .map(
                 (thread) => {
                   const transformed =
@@ -1194,6 +1312,7 @@ export function useRealInboxMailbox({
         connectedEmail,
         enabled,
         invokeMailbox,
+        selectedFolderId,
         workspaceId,
       ],
     );
@@ -1337,15 +1456,31 @@ export function useRealInboxMailbox({
             threadResult.data ||
             {};
 
+          const latestThreadMessageId =
+            clean(
+              thread
+                ?.latest_draft_or_message
+                ?.id,
+            );
+
           const messageIds =
-            (
-              Array.isArray(
-                thread.message_ids,
-              )
-                ? thread.message_ids
-                : []
+            Array.from(
+              new Set(
+                [
+                  ...(
+                    Array.isArray(
+                      thread.message_ids,
+                    )
+                      ? thread.message_ids
+                      : []
+                  ),
+
+                  latestThreadMessageId,
+                ]
+                  .map(clean)
+                  .filter(Boolean),
+              ),
             )
-              .filter(Boolean)
               .slice(
                 -20,
               );
@@ -1397,6 +1532,26 @@ export function useRealInboxMailbox({
                   left.order -
                   right.order,
               );
+
+          if (
+            !messages.length &&
+            thread
+              ?.latest_draft_or_message
+              ?.id
+          ) {
+            messages.push(
+              transformMessage({
+                message:
+                  thread
+                    .latest_draft_or_message,
+
+                connectedEmail:
+                  connectedEmail ||
+                  threadResult
+                    .connectedEmail,
+              }),
+            );
+          }
 
           const files =
             messages.flatMap(
@@ -1979,6 +2134,8 @@ export function useRealInboxMailbox({
     conversations,
     connectedEmail,
     accountProvider,
+    folders:
+      mailboxFolders,
     inboxTotalCount,
     inboxUnreadCount,
     isLoading,
