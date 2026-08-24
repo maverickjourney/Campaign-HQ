@@ -1178,3 +1178,70 @@ export async function probeSeatProviderData(
 
   return data;
 }
+
+
+// ============================================================
+// CAMPAIGN SEAT — WORKSPACE PROVIDER SYNC STATUS
+// ============================================================
+
+export async function getWorkspaceProviderSyncStatus(
+  workspaceId,
+) {
+  const {
+    data,
+    error,
+  } =
+    await supabase.rpc(
+      "get_my_workspace_provider_sync_status",
+      {
+        target_workspace_id:
+          workspaceId,
+      },
+    );
+
+
+  if (error) {
+    console.error(error);
+
+    throw new Error(
+      error.message ||
+        "Campaign Seat provider sync status could not be loaded.",
+    );
+  }
+
+
+  return data;
+}
+
+
+export async function retryWorkspaceProviderSync(
+  workspaceId,
+) {
+  const {
+    data,
+    error,
+  } =
+    await supabase
+      .functions
+      .invoke(
+        "nylas-workspace-data-sync",
+        {
+          body: {
+            workspaceId,
+          },
+        },
+      );
+
+
+  if (error) {
+    console.error(error);
+
+    throw new Error(
+      error.message ||
+        "Campaign Seat provider synchronization could not be retried.",
+    );
+  }
+
+
+  return data;
+}
