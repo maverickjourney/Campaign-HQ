@@ -675,6 +675,28 @@ export default function SeatActivationStep() {
         const result =
           await activateMyCampaignSeat();
 
+
+        /*
+         * Campaign Seat launch flow:
+         *
+         * Setup
+         *   → Activation
+         *   → Workspaces
+         *   → Open Campaign HQ
+         *
+         * Never jump directly from onboarding into /dashboard.
+         */
+        if (
+          result?.workspace_id
+        ) {
+          window.location.assign(
+            "/workspaces",
+          );
+
+          return;
+        }
+
+
         setActivationResult(
           result,
         );

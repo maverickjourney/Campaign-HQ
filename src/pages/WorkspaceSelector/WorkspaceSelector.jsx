@@ -116,29 +116,17 @@ function formatLastOpened(value) {
 }
 
 
-const ELIZABETH_WORKSPACE_ID =
-  "11111111-1111-1111-1111-111111111111";
-
-const campaignImagesByWorkspace = {
-  [ELIZABETH_WORKSPACE_ID]: [
-    campaignHero1,
-    campaignHero2,
-    campaignHero3,
-  ],
-};
-
 const fallbackCampaignImages = [
   campaignHero1,
   campaignHero2,
   campaignHero3,
 ];
 
-function getCampaignImages(workspaceId) {
-  return (
-    campaignImagesByWorkspace[workspaceId] ||
-    fallbackCampaignImages
-  );
+
+function getCampaignImages() {
+  return fallbackCampaignImages;
 }
+
 
 function getDashboardLabel(dashboardType) {
   const labels = {
@@ -600,9 +588,7 @@ export default function WorkspaceSelector() {
                     membership.workspace;
 
                   const campaignImages =
-                    getCampaignImages(
-                      membership.workspaceId,
-                    );
+                    getCampaignImages();
 
                   const currentImage =
                     campaignImages[
