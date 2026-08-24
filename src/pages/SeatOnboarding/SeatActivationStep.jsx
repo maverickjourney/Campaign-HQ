@@ -911,10 +911,50 @@ export default function SeatActivationStep() {
                   ]?.success && (
                     <em
                       className={
-                        styles.providerProbeVerified
+                        providerProbeResults[
+                          integration.integration_key
+                        ]?.allCoreCapabilities
+                          ? styles.providerProbeVerified
+                          : styles.providerProbePartial
                       }
                     >
-                      Email · Calendar · Contacts verified
+                      {providerProbeResults[
+                        integration.integration_key
+                      ]?.allCoreCapabilities
+                        ? "Email · Calendar · Contacts verified"
+                        : [
+                            ...(providerProbeResults[
+                              integration.integration_key
+                            ]?.verifiedCapabilities ||
+                              []).map(
+                              (capability) =>
+                                `${
+                                  capability
+                                    .charAt(0)
+                                    .toUpperCase()
+                                }${capability.slice(1)}`,
+                            ),
+
+                            ...(providerProbeResults[
+                              integration.integration_key
+                            ]?.unavailableCapabilities ||
+                              []).map(
+                              (capability) =>
+                                `${
+                                  capability ===
+                                  "email"
+                                    ? integration.integration_key ===
+                                      "google_workspace"
+                                      ? "Gmail"
+                                      : "Email"
+                                    : `${
+                                        capability
+                                          .charAt(0)
+                                          .toUpperCase()
+                                      }${capability.slice(1)}`
+                                } unavailable`,
+                            ),
+                          ].join(" · ")}
                     </em>
                   )}
                 </section>
@@ -978,9 +1018,13 @@ export default function SeatActivationStep() {
                         ? "Checking…"
                         : providerProbeResults[
                             integration.integration_key
-                          ]?.success
+                          ]?.allCoreCapabilities
                           ? "Verified"
-                          : "Verify data"}
+                          : providerProbeResults[
+                              integration.integration_key
+                            ]?.success
+                            ? "Checked"
+                            : "Verify data"}
                     </button>
                   )}
                 </aside>

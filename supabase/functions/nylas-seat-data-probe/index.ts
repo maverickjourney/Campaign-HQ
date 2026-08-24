@@ -537,14 +537,51 @@ Deno.serve(
       );
 
 
-    try {
-      // ------------------------------------------------------
-      // EMAIL
-      //
-      // Verify thread access only. We intentionally do not
-      // return subject lines, senders or message content.
-      // ------------------------------------------------------
+    /*
+     * Probe each connected capability independently.
+     *
+     * A Google account can have Calendar/Contacts access while
+     * Gmail itself is unavailable or not provisioned. One
+     * provider-specific failure must not erase valid access to
+     * the other provider services.
+     */
 
+    let emailRead =
+      false;
+
+    let calendarRead =
+      false;
+
+    let contactsRead =
+      false;
+
+    let mailboxHasVisibleThreads =
+      false;
+
+    let contactsHaveVisibleRecords =
+      false;
+
+    let visibleCalendarCount =
+      0;
+
+    let primaryCalendarName =
+      "";
+
+    let primaryCalendarTimezone =
+      "";
+
+    const capabilityErrors:
+      Record<
+        string,
+        string
+      > = {};
+
+
+    // --------------------------------------------------------
+    // EMAIL
+    // --------------------------------------------------------
+
+    try {
       const threadsUrl =
         new URL(
           `${baseUri}/v3/grants/${grant}/threads`,
@@ -565,12 +602,65 @@ Deno.serve(
         );
 
 
-      // ------------------------------------------------------
-      // CALENDAR
-      //
-      // We may return only sanitized calendar metadata.
-      // ------------------------------------------------------
+      emailRead =
+        true;
 
+
+      mailboxHasVisibleThreads =
+        Array.isArray(
+          threadsPayload?.data,
+        ) &&
+        threadsPayload.data.length >
+          0;
+
+    } catch (
+      emailError
+    ) {
+      const rawMessage =
+        emailError instanceof Error
+          ? emailError.message
+          : "Email access is unavailable.";
+
+
+      if (
+        /failedprecondition|precondition check failed/i.test(
+          rawMessage,
+        )
+      ) {
+        capabilityErrors.email =
+          runtime.provider ===
+            "google"
+            ? "Gmail is not available for this Google account."
+            : "Email is not available for this connected account.";
+      } else {
+        capabilityErrors.email =
+          "Campaign Seat could not verify email access.";
+      }
+
+
+      console.warn(
+        "Campaign Seat provider email probe did not pass",
+        {
+          provider:
+            runtime.provider,
+
+          integrationKey,
+
+          message:
+            rawMessage.slice(
+              0,
+              600,
+            ),
+        },
+      );
+    }
+
+
+    // --------------------------------------------------------
+    // CALENDAR
+    // --------------------------------------------------------
+
+    try {
       const calendarsUrl =
         new URL(
           `${baseUri}/v3/grants/${grant}/calendars`,
@@ -614,12 +704,58 @@ Deno.serve(
         );
 
 
-      // ------------------------------------------------------
-      // CONTACTS
-      //
-      // Verify endpoint access. No contact identity is returned.
-      // ------------------------------------------------------
+      calendarRead =
+        true;
 
+      visibleCalendarCount =
+        calendars.length;
+
+      primaryCalendarName =
+        String(
+          primaryCalendar
+            ?.name ||
+          "",
+        );
+
+      primaryCalendarTimezone =
+        String(
+          primaryCalendar
+            ?.timezone ||
+          "",
+        );
+
+    } catch (
+      calendarError
+    ) {
+      capabilityErrors.calendar =
+        "Campaign Seat could not verify calendar access.";
+
+
+      console.warn(
+        "Campaign Seat provider calendar probe did not pass",
+        {
+          provider:
+            runtime.provider,
+
+          integrationKey,
+
+          message:
+            calendarError instanceof Error
+              ? calendarError.message.slice(
+                  0,
+                  600,
+                )
+              : "Unknown calendar error",
+        },
+      );
+    }
+
+
+    // --------------------------------------------------------
+    // CONTACTS
+    // --------------------------------------------------------
+
+    try {
       const contactsUrl =
         new URL(
           `${baseUri}/v3/grants/${grant}/contacts`,
@@ -640,203 +776,271 @@ Deno.serve(
         );
 
 
-      const threadVisible =
-        Array.isArray(
-          threadsPayload?.data,
-        ) &&
-        threadsPayload.data.length >
-          0;
+      contactsRead =
+        true;
 
 
-      const contactVisible =
+      contactsHaveVisibleRecords =
         Array.isArray(
           contactsPayload?.data,
         ) &&
         contactsPayload.data.length >
           0;
 
-
-      const probeResult = {
-        verified_at:
-          new Date()
-            .toISOString(),
-
-        email_read:
-          true,
-
-        calendar_read:
-          true,
-
-        contacts_read:
-          true,
-
-        mailbox_has_visible_threads:
-          threadVisible,
-
-        contacts_have_visible_records:
-          contactVisible,
-
-        visible_calendar_count:
-          calendars.length,
-
-        primary_calendar_name:
-          String(
-            primaryCalendar
-              ?.name ||
-            "",
-          ),
-
-        primary_calendar_timezone:
-          String(
-            primaryCalendar
-              ?.timezone ||
-            "",
-          ),
-      };
+    } catch (
+      contactsError
+    ) {
+      capabilityErrors.contacts =
+        "Campaign Seat could not verify contacts access.";
 
 
-      const {
-        data:
-          connectionRow,
-        error:
-          connectionReadError,
-      } =
-        await adminClient
-          .from(
-            "seat_product_account_integrations",
-          )
-          .select(
-            "connection_metadata",
-          )
-          .eq(
-            "id",
-            runtime.connection_id,
-          )
-          .maybeSingle();
-
-
-      if (connectionReadError) {
-        console.error(
-          "Provider probe metadata read failed",
-          connectionReadError,
-        );
-      }
-
-
-      const existingMetadata =
-        (
-          connectionRow
-            ?.connection_metadata &&
-          typeof connectionRow
-            .connection_metadata ===
-            "object"
-        )
-          ? connectionRow
-              .connection_metadata
-          : {};
-
-
-      const {
-        error:
-          metadataError,
-      } =
-        await adminClient
-          .from(
-            "seat_product_account_integrations",
-          )
-          .update({
-            connection_metadata: {
-              ...existingMetadata,
-
-              data_probe:
-                probeResult,
-            },
-
-            updated_at:
-              new Date()
-                .toISOString(),
-          })
-          .eq(
-            "id",
-            runtime.connection_id,
-          );
-
-
-      if (metadataError) {
-        console.error(
-          "Provider probe metadata update failed",
-          metadataError,
-        );
-      }
-
-
-      return jsonResponse(
-        request,
-        200,
+      console.warn(
+        "Campaign Seat provider contacts probe did not pass",
         {
-          success:
-            true,
-
-          integrationKey,
-
           provider:
             runtime.provider,
 
-          connectedEmail:
-            runtime.connected_email,
+          integrationKey,
 
-          emailRead:
-            true,
-
-          calendarRead:
-            true,
-
-          contactsRead:
-            true,
-
-          mailboxHasVisibleThreads:
-            threadVisible,
-
-          contactsHaveVisibleRecords:
-            contactVisible,
-
-          visibleCalendarCount:
-            calendars.length,
-
-          primaryCalendarName:
-            String(
-              primaryCalendar
-                ?.name ||
-              "",
-            ),
-
-          primaryCalendarTimezone:
-            String(
-              primaryCalendar
-                ?.timezone ||
-              "",
-            ),
+          message:
+            contactsError instanceof Error
+              ? contactsError.message.slice(
+                  0,
+                  600,
+                )
+              : "Unknown contacts error",
         },
       );
-    } catch (
-      providerError
-    ) {
-      console.error(
-        "Campaign Seat provider data probe failed",
-        providerError,
-      );
+    }
 
+
+    const verifiedCapabilities =
+      [
+        emailRead
+          ? "email"
+          : "",
+
+        calendarRead
+          ? "calendar"
+          : "",
+
+        contactsRead
+          ? "contacts"
+          : "",
+      ]
+        .filter(
+          Boolean,
+        );
+
+
+    const unavailableCapabilities =
+      [
+        !emailRead
+          ? "email"
+          : "",
+
+        !calendarRead
+          ? "calendar"
+          : "",
+
+        !contactsRead
+          ? "contacts"
+          : "",
+      ]
+        .filter(
+          Boolean,
+        );
+
+
+    const anyCapabilityVerified =
+      verifiedCapabilities.length >
+      0;
+
+
+    const allCoreCapabilities =
+      verifiedCapabilities.length ===
+      3;
+
+
+    if (
+      !anyCapabilityVerified
+    ) {
       return jsonResponse(
         request,
         502,
         {
           error:
-            providerError instanceof
-              Error
-              ? providerError.message
-              : "The provider data connection could not be verified.",
+            "Campaign Seat could not verify any connected provider data capability.",
+
+          capabilityErrors,
         },
       );
     }
+
+
+    const probeResult = {
+      verified_at:
+        new Date()
+          .toISOString(),
+
+      email_read:
+        emailRead,
+
+      calendar_read:
+        calendarRead,
+
+      contacts_read:
+        contactsRead,
+
+      all_core_capabilities:
+        allCoreCapabilities,
+
+      partial:
+        !allCoreCapabilities,
+
+      verified_capabilities:
+        verifiedCapabilities,
+
+      unavailable_capabilities:
+        unavailableCapabilities,
+
+      capability_errors:
+        capabilityErrors,
+
+      mailbox_has_visible_threads:
+        mailboxHasVisibleThreads,
+
+      contacts_have_visible_records:
+        contactsHaveVisibleRecords,
+
+      visible_calendar_count:
+        visibleCalendarCount,
+
+      primary_calendar_name:
+        primaryCalendarName,
+
+      primary_calendar_timezone:
+        primaryCalendarTimezone,
+    };
+
+
+    const {
+      data:
+        connectionRow,
+      error:
+        connectionReadError,
+    } =
+      await adminClient
+        .from(
+          "seat_product_account_integrations",
+        )
+        .select(
+          "connection_metadata",
+        )
+        .eq(
+          "id",
+          runtime.connection_id,
+        )
+        .maybeSingle();
+
+
+    if (connectionReadError) {
+      console.error(
+        "Provider probe metadata read failed",
+        connectionReadError,
+      );
+    }
+
+
+    const existingMetadata =
+      (
+        connectionRow
+          ?.connection_metadata &&
+        typeof connectionRow
+          .connection_metadata ===
+          "object"
+      )
+        ? connectionRow
+            .connection_metadata
+        : {};
+
+
+    const {
+      error:
+        metadataError,
+    } =
+      await adminClient
+        .from(
+          "seat_product_account_integrations",
+        )
+        .update({
+          connection_metadata: {
+            ...existingMetadata,
+
+            data_probe:
+              probeResult,
+          },
+
+          updated_at:
+            new Date()
+              .toISOString(),
+        })
+        .eq(
+          "id",
+          runtime.connection_id,
+        );
+
+
+    if (metadataError) {
+      console.error(
+        "Provider probe metadata update failed",
+        metadataError,
+      );
+    }
+
+
+    return jsonResponse(
+      request,
+      200,
+      {
+        success:
+          true,
+
+        integrationKey,
+
+        provider:
+          runtime.provider,
+
+        connectedEmail:
+          runtime.connected_email,
+
+        emailRead,
+
+        calendarRead,
+
+        contactsRead,
+
+        allCoreCapabilities,
+
+        partial:
+          !allCoreCapabilities,
+
+        verifiedCapabilities,
+
+        unavailableCapabilities,
+
+        capabilityErrors,
+
+        mailboxHasVisibleThreads,
+
+        contactsHaveVisibleRecords,
+
+        visibleCalendarCount,
+
+        primaryCalendarName,
+
+        primaryCalendarTimezone,
+      },
+    );
   },
 );
