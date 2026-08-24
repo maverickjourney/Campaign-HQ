@@ -1389,3 +1389,31 @@ export async function retryWorkspaceInvitationDelivery(
       null,
   };
 }
+
+
+// ============================================================
+// CAMPAIGN SEAT — LAUNCH HEALTH / ACTIVATION RECEIPT
+// ============================================================
+
+export async function getCampaignSeatLaunchHealth() {
+  const {
+    data,
+    error,
+  } =
+    await supabase.rpc(
+      "get_my_campaign_seat_launch_health",
+    );
+
+
+  if (error) {
+    console.error(error);
+
+    throw new Error(
+      error.message ||
+        "Campaign Seat launch health could not be loaded.",
+    );
+  }
+
+
+  return data;
+}
