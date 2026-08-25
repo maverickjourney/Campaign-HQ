@@ -23202,3 +23202,22 @@
 }
 
 /* LIVE CAMPAIGN WORKSPACE THEME — END */
+
+
+/* CAMPAIGN CONDITIONS DOCK — START */
+
+.heroPriorityCard .priorityMonitoring {
+  align-items:
+    stretch !important;
+  gap:
+    0 !important;
+}
+
+.heroPriorityCard .priorityMonitoring > * {
+  width:
+    100%;
+  min-width:
+    0;
+}
+
+/* CAMPAIGN CONDITIONS DOCK — END */

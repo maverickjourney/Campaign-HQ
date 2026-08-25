@@ -68,6 +68,10 @@ import { ActivityCenter } from "../../components/ActivityCenter/ActivityCenter";
 import { CampaignSearch } from "../../components/CampaignSearch/CampaignSearch";
 
 import {
+  CampaignConditions,
+} from "../../components/CampaignConditions/CampaignConditions";
+
+import {
   CampaignWorkspaceShell,
 } from "../../components/CampaignWorkspaceShell/CampaignWorkspaceShell";
 import {
@@ -8144,12 +8148,9 @@ const [
               </div>
 
               <div className={styles.priorityMonitoring}>
-                <Sparkles size={15} />
-
-                <span>
-                  Campaign Seat is monitoring{" "}
-                  <strong>23 more items</strong>
-                </span>
+                <CampaignConditions
+                  workspace={workspace}
+                />
               </div>
             </article>
             <div className={styles.centerHeroStack}>

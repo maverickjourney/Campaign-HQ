@@ -1,0 +1,175 @@
+.conditions {
+  box-sizing: border-box;
+  display: grid;
+  width: 100%;
+  min-width: 0;
+  grid-template-columns:
+    minmax(0, 1fr)
+    auto;
+  align-items: center;
+  gap: 4px 8px;
+  container-type:
+    inline-size;
+  color: #1a4f7d;
+}
+
+.conditions svg {
+  color:
+    currentColor !important;
+}
+
+.locationRow {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 6px;
+}
+
+.locationIcon {
+  display: grid;
+  width: 22px;
+  height: 22px;
+  flex: 0 0 22px;
+  place-items: center;
+  border-radius: 7px;
+  color: #2672b6;
+  background:
+    #edf6ff;
+}
+
+.locationText {
+  min-width: 0;
+  overflow: hidden;
+  color: #315f88;
+  font-size: 11.5px;
+  font-weight: 790;
+  line-height: 1.1;
+  text-overflow:
+    ellipsis;
+  white-space:
+    nowrap;
+}
+
+.livePill {
+  display: inline-flex;
+  height: 20px;
+  align-items: center;
+  gap: 5px;
+  padding: 0 7px;
+  border: 1px solid #cce9d9;
+  border-radius: 999px;
+  color: #24744e;
+  background: #f0fbf5;
+  font-size: 8.5px;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+}
+
+.livePill i {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #43b77a;
+  box-shadow:
+    0 0 0 3px
+    rgba(67, 183, 122, 0.12);
+}
+
+.weatherRow {
+  display: grid;
+  min-width: 0;
+  grid-column: 1 / -1;
+  grid-template-columns:
+    24px
+    auto
+    minmax(0, 1fr)
+    auto
+    24px;
+  align-items: center;
+  gap: 6px;
+}
+
+.weatherIcon {
+  display: grid;
+  width: 24px;
+  height: 24px;
+  place-items: center;
+  border: 1px solid #d9e9f7;
+  border-radius: 7px;
+  color: #2875ba;
+  background:
+    linear-gradient(
+      180deg,
+      #f7fbff,
+      #edf6ff
+    );
+}
+
+.temperature {
+  color: #153f67;
+  font-size: 12.5px;
+  font-weight: 900;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.description {
+  min-width: 0;
+  overflow: hidden;
+  color: #6f879d;
+  font-size: 10.5px;
+  font-weight: 650;
+  line-height: 1.1;
+  text-overflow:
+    ellipsis;
+  white-space:
+    nowrap;
+}
+
+.humidity {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  color: #5b7e9d;
+  font-size: 9.5px;
+  font-weight: 790;
+  white-space:
+    nowrap;
+}
+
+.refreshButton {
+  display: grid;
+  width: 24px;
+  height: 24px;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  border-radius: 7px;
+  color: #7390aa;
+  background: transparent;
+  cursor: pointer;
+}
+
+.refreshButton:hover {
+  color: #266da9;
+  background: #edf5fc;
+}
+
+.refreshButton:disabled {
+  cursor: default;
+  opacity: 0.45;
+}
+
+@container (max-width: 285px) {
+  .humidity {
+    display: none;
+  }
+
+  .weatherRow {
+    grid-template-columns:
+      24px
+      auto
+      minmax(0, 1fr)
+      24px;
+  }
+}
