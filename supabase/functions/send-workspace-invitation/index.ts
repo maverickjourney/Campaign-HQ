@@ -84,7 +84,7 @@ const APP_URL =
   Deno.env.get(
     "CAMPAIGN_SEAT_APP_URL",
   ) ||
-  "https://campaignseat.com";
+  "https://app.campaignseat.com";
 
 const FROM_EMAIL =
   Deno.env.get(

@@ -151,6 +151,8 @@ export default function EmailContactsOnboarding({
 
   const productionProviderWritesEnabled =
     window.location.hostname ===
+      "app.campaignseat.com" ||
+    window.location.hostname ===
       "campaignseat.com" ||
     window.location.hostname ===
       "www.campaignseat.com";
