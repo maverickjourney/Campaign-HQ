@@ -74,6 +74,9 @@ import {
   useCandidateProfileManagement,
 } from "../../hooks/useCandidateProfileManagement";
 
+import {
+  getDaysUntilElection,
+} from "../../utils/electionCountdown";
 import { supabase } from "../../lib/supabase";
 import styles from "./DashboardReferencePreview.module.css";
 
@@ -329,16 +332,6 @@ function getGreeting() {
   }
 
   return "Good evening";
-}
-
-function getDaysUntilElection(value) {
-  const date = new Date(`${value || "2026-08-18"}T00:00:00`);
-  const difference = date.getTime() - Date.now();
-
-  return Math.max(
-    0,
-    Math.ceil(difference / (1000 * 60 * 60 * 24)),
-  );
 }
 
 function getEasternDateKey(value) {
@@ -1131,8 +1124,17 @@ const [
   const firstName = user.name.split(" ")[0] || "there";
   const initials = getUserInitials(user.name);
   const daysUntilElection = useMemo(
-    () => getDaysUntilElection(workspace.electionDateRaw),
-    [workspace.electionDateRaw],
+    () =>
+      getDaysUntilElection(
+        workspace.electionDateRaw,
+        workspace.timezone ||
+          workspace.timeZone,
+      ),
+    [
+      workspace.electionDateRaw,
+      workspace.timezone,
+      workspace.timeZone,
+    ],
   );
 
   const openTasks = data.tasks.filter((task) =>

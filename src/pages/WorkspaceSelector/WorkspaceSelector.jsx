@@ -44,6 +44,10 @@ import {
   resolveWorkspaceLocationPhoto,
 } from "../../utils/workspaceLocationMedia";
 
+import {
+  getDaysUntilElection,
+} from "../../utils/electionCountdown";
+
 
 import styles from "./WorkspaceSelector.module.css";
 
@@ -178,39 +182,6 @@ function getGreeting() {
   }
 
   return "Good evening";
-}
-
-function getDaysUntilElection(dateValue) {
-  if (!dateValue) {
-    return null;
-  }
-
-  const electionDate =
-    new Date(`${dateValue}T00:00:00`);
-
-  if (
-    Number.isNaN(
-      electionDate.getTime(),
-    )
-  ) {
-    return null;
-  }
-
-  const today = new Date();
-
-  today.setHours(0, 0, 0, 0);
-
-  const milliseconds =
-    electionDate.getTime() -
-    today.getTime();
-
-  return Math.max(
-    0,
-    Math.ceil(
-      milliseconds /
-        (1000 * 60 * 60 * 24),
-    ),
-  );
 }
 
 export default function WorkspaceSelector() {
@@ -439,6 +410,11 @@ export default function WorkspaceSelector() {
     getDaysUntilElection(
       primaryMembership?.workspace
         ?.electionDateRaw,
+
+      primaryMembership?.workspace
+        ?.timezone ||
+      primaryMembership?.workspace
+        ?.timeZone,
     );
 
   const firstName =
