@@ -131,6 +131,34 @@ export default function Router() {
           />
 
           <Route
+            path="/forgot-password"
+            element={
+              <ForgotPassword />
+            }
+          />
+
+          <Route
+            path="/reset-password"
+            element={
+              <ResetPassword />
+            }
+          />
+
+          <Route
+            path="/mfa/challenge"
+            element={
+              <MfaChallenge />
+            }
+          />
+
+          <Route
+            path="/mfa/setup"
+            element={
+              <MfaSetup />
+            }
+          />
+
+          <Route
             path="/admin"
             element={
               <PlatformAdminGuard>

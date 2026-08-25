@@ -514,6 +514,7 @@ export async function signInToCampaign({
 export async function requestCampaignPasswordReset({
   email,
   captchaToken,
+  redirectTo: requestedRedirectTo,
 }) {
   const normalizedEmail =
     String(email || "")
@@ -539,6 +540,7 @@ export async function requestCampaignPasswordReset({
   }
 
   const redirectTo =
+    requestedRedirectTo ||
     campaignAppUrl(
       "/reset-password",
     );

@@ -25,11 +25,21 @@ import {
   requestCampaignPasswordReset,
 } from "../../services/auth";
 
+import {
+  platformAdminUrl,
+} from "../../config/seatUrls";
+
 import styles from "./PasswordRecovery.module.css";
 
 export default function ForgotPassword() {
   const location =
     useLocation();
+
+  const isPlatformAdminHostname =
+    window.location.hostname
+      .trim()
+      .toLowerCase() ===
+    "admin.campaignseat.com";
 
   const turnstileRef =
     useRef(null);
@@ -113,6 +123,13 @@ export default function ForgotPassword() {
             normalizedEmail,
 
           captchaToken,
+
+          redirectTo:
+            isPlatformAdminHostname
+              ? platformAdminUrl(
+                  "/reset-password",
+                )
+              : undefined,
         });
 
         setStatus(
