@@ -8147,11 +8147,6 @@ const [
                 })}
               </div>
 
-              <div className={styles.priorityMonitoring}>
-                <CampaignConditions
-                  workspace={workspace}
-                />
-              </div>
             </article>
             <div className={styles.centerHeroStack}>
               <article
@@ -8226,6 +8221,17 @@ const [
                             : "days remaining"}
                         </strong>
                       </div>
+                    </div>
+
+                    <div
+                      className={
+                        styles.simpleSpotlightWeatherCard
+                      }
+                    >
+                      <CampaignConditions
+                        workspace={workspace}
+                        variant="hero"
+                      />
                     </div>
 
 

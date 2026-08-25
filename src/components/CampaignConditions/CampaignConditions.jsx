@@ -83,6 +83,7 @@ function safeNumber(
 
 export function CampaignConditions({
   workspace,
+  variant = "default",
 }) {
   const location =
     useMemo(
@@ -336,6 +337,138 @@ export function CampaignConditions({
       : `${Math.round(
           temperature,
         )}°F`;
+
+
+  if (
+    variant ===
+      "hero"
+  ) {
+    return (
+      <div
+        className={
+          styles.heroConditions
+        }
+        title={
+          conditions
+            ?.source
+            ? `Weather source: ${conditions.source}`
+            : undefined
+        }
+      >
+        <div
+          className={
+            styles.heroConditionsHeader
+          }
+        >
+          <small>
+            Current conditions
+          </small>
+
+          {conditions ? (
+            <span
+              className={
+                styles.heroLivePill
+              }
+            >
+              <i />
+              LIVE
+            </span>
+          ) : null}
+        </div>
+
+        <div
+          className={
+            styles.heroConditionsWeather
+          }
+        >
+          <span
+            className={
+              styles.heroWeatherIcon
+            }
+            aria-hidden="true"
+          >
+            <WeatherIcon
+              size={18}
+              strokeWidth={2}
+            />
+          </span>
+
+          <strong>
+            {temperatureLabel}
+          </strong>
+
+          <span
+            className={
+              styles.heroDescription
+            }
+          >
+            {isLoading &&
+            !conditions
+              ? "Loading live weather…"
+              : error ||
+                conditions
+                  ?.description ||
+                "Current conditions"}
+          </span>
+
+          {humidity !==
+            null ? (
+            <span
+              className={
+                styles.heroHumidity
+              }
+              title="Relative humidity"
+            >
+              <Droplets
+                size={13}
+                strokeWidth={2}
+              />
+
+              {Math.round(
+                humidity,
+              )}
+              %
+            </span>
+          ) : null}
+        </div>
+
+        <div
+          className={
+            styles.heroConditionsLocation
+          }
+        >
+          <MapPin
+            size={13}
+            strokeWidth={2}
+          />
+
+          <span>
+            {location}
+          </span>
+
+          <button
+            type="button"
+            aria-label="Refresh campaign weather"
+            title="Refresh campaign weather"
+            disabled={
+              isLoading
+            }
+            onClick={() =>
+              void loadConditions({
+                force:
+                  true,
+              })
+            }
+          >
+            <RefreshCw
+              size={12}
+              strokeWidth={2}
+            />
+          </button>
+        </div>
+      </div>
+    );
+  }
 
 
   return (

@@ -173,3 +173,235 @@
       24px;
   }
 }
+
+
+/* HQ HERO CONDITIONS — START */
+
+.heroConditions {
+  box-sizing: border-box;
+  display: grid;
+  width: 100%;
+  min-width: 0;
+  gap: 5px;
+  color: #ffffff;
+}
+
+.heroConditions svg {
+  color:
+    currentColor !important;
+}
+
+.heroConditionsHeader {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  justify-content:
+    space-between;
+  gap: 8px;
+}
+
+.heroConditionsHeader small {
+  overflow: hidden;
+  color:
+    rgba(
+      255,
+      255,
+      255,
+      0.58
+    );
+  font-size: 9px;
+  font-weight: 900;
+  letter-spacing: 0.11em;
+  line-height: 1;
+  text-overflow:
+    ellipsis;
+  text-transform:
+    uppercase;
+  white-space: nowrap;
+}
+
+.heroLivePill {
+  display: inline-flex;
+  height: 18px;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 5px;
+  padding: 0 7px;
+  border:
+    1px solid
+    rgba(
+      117,
+      224,
+      163,
+      0.22
+    );
+  border-radius: 999px;
+  color: #9ce2bb;
+  background:
+    rgba(
+      49,
+      151,
+      96,
+      0.13
+    );
+  font-size: 8px;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+}
+
+.heroLivePill i {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #55d18b;
+  box-shadow:
+    0 0 0 3px
+    rgba(
+      85,
+      209,
+      139,
+      0.1
+    );
+}
+
+.heroConditionsWeather {
+  display: grid;
+  min-width: 0;
+  grid-template-columns:
+    28px
+    auto
+    minmax(0, 1fr)
+    auto;
+  align-items: center;
+  gap: 7px;
+}
+
+.heroWeatherIcon {
+  display: grid;
+  width: 28px;
+  height: 28px;
+  place-items: center;
+  border:
+    1px solid
+    rgba(
+      255,
+      255,
+      255,
+      0.1
+    );
+  border-radius: 8px;
+  color: #ffffff;
+  background:
+    rgba(
+      255,
+      255,
+      255,
+      0.08
+    );
+}
+
+.heroConditionsWeather > strong {
+  color: #ffffff;
+  font-size: 15px;
+  font-weight: 900;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.heroDescription {
+  min-width: 0;
+  overflow: hidden;
+  color:
+    rgba(
+      255,
+      255,
+      255,
+      0.78
+    );
+  font-size: 11px;
+  font-weight: 720;
+  line-height: 1.1;
+  text-overflow:
+    ellipsis;
+  white-space: nowrap;
+}
+
+.heroHumidity {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  color:
+    rgba(
+      255,
+      255,
+      255,
+      0.62
+    );
+  font-size: 9px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.heroConditionsLocation {
+  display: grid;
+  min-width: 0;
+  grid-template-columns:
+    13px
+    minmax(0, 1fr)
+    22px;
+  align-items: center;
+  gap: 5px;
+  color:
+    rgba(
+      255,
+      255,
+      255,
+      0.54
+    );
+  font-size: 9px;
+  font-weight: 720;
+}
+
+.heroConditionsLocation > span {
+  overflow: hidden;
+  text-overflow:
+    ellipsis;
+  white-space: nowrap;
+}
+
+.heroConditionsLocation > button {
+  display: grid;
+  width: 22px;
+  height: 22px;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  border-radius: 6px;
+  color:
+    rgba(
+      255,
+      255,
+      255,
+      0.55
+    );
+  background: transparent;
+  cursor: pointer;
+}
+
+.heroConditionsLocation > button:hover {
+  color: #ffffff;
+  background:
+    rgba(
+      255,
+      255,
+      255,
+      0.08
+    );
+}
+
+.heroConditionsLocation > button:disabled {
+  cursor: default;
+  opacity: 0.42;
+}
+
+/* HQ HERO CONDITIONS — END */
