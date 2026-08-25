@@ -404,7 +404,7 @@ export function CampaignWorkspaceShell({
     ? "Current workspace"
     : "Campaign workspace";
 
-  const workspaceTitleDetail =
+  const workspaceDescriptionParts =
     String(
       workspace.description ||
         "",
@@ -414,25 +414,20 @@ export function CampaignWorkspaceShell({
         (part) =>
           part.trim(),
       )
-      .filter(Boolean)
-      .at(-1) ||
-    "";
+      .filter(Boolean);
+
+  const workspaceTitleDetail =
+    workspaceDescriptionParts.length > 1
+      ? workspaceDescriptionParts.at(-1)
+      : "";
 
   const workspaceOfficeTitle =
-    String(
-      workspace.description ||
-        "",
-    )
-      .split(",")
-      .map(
-        (part) =>
-          part.trim(),
-      )
-      .filter(Boolean)
-      .slice(0, -1)
-      .join(", ") ||
-    workspace.description ||
-    workspace.name;
+    workspaceDescriptionParts.length > 1
+      ? workspaceDescriptionParts
+          .slice(0, -1)
+          .join(", ")
+      : workspaceDescriptionParts[0] ||
+        workspace.name;
 
   const workspaceTitle =
     [
