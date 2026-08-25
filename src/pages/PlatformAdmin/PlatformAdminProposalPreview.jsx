@@ -30,6 +30,11 @@ import {
   provisionApprovedSeatProposal,
 } from "../../services/seatOnboarding";
 
+import {
+  campaignAppUrl,
+  publicSiteUrl,
+} from "../../config/seatUrls";
+
 import styles
   from "./PlatformAdmin.module.css";
 
@@ -235,7 +240,9 @@ export default function PlatformAdminProposalPreview() {
           );
 
         const link =
-          `${window.location.origin}/proposal/${result.access_token}`;
+          publicSiteUrl(
+            `/proposal/${result.access_token}`,
+          );
 
         setClientLink(link);
 
@@ -619,9 +626,11 @@ export default function PlatformAdminProposalPreview() {
                   type="button"
                   onClick={() =>
                     navigator.clipboard.writeText(
-                      `${window.location.origin}/onboarding/sign-in?email=${encodeURIComponent(
-                        proposal.client_email,
-                      )}`,
+                      campaignAppUrl(
+                        `/onboarding/sign-in?email=${encodeURIComponent(
+                          proposal.client_email,
+                        )}`,
+                      ),
                     )
                   }
                 >
@@ -631,9 +640,11 @@ export default function PlatformAdminProposalPreview() {
 
                 <a
                   className={styles.primaryAction}
-                  href={`${window.location.origin}/onboarding/sign-in?email=${encodeURIComponent(
-                    proposal.client_email,
-                  )}`}
+                  href={campaignAppUrl(
+                    `/onboarding/sign-in?email=${encodeURIComponent(
+                      proposal.client_email,
+                    )}`,
+                  )}
                   target="_blank"
                   rel="noreferrer"
                 >
@@ -649,7 +660,9 @@ export default function PlatformAdminProposalPreview() {
                   </strong>
 
                   <span>
-                    {`${window.location.origin}/onboarding/${onboardingResult.invitation_token}`}
+                    {campaignAppUrl(
+                      `/onboarding/${onboardingResult.invitation_token}`,
+                    )}
                   </span>
                 </div>
 
@@ -658,7 +671,9 @@ export default function PlatformAdminProposalPreview() {
                   type="button"
                   onClick={() =>
                     navigator.clipboard.writeText(
-                      `${window.location.origin}/onboarding/${onboardingResult.invitation_token}`,
+                      campaignAppUrl(
+                        `/onboarding/${onboardingResult.invitation_token}`,
+                      ),
                     )
                   }
                 >
@@ -668,7 +683,9 @@ export default function PlatformAdminProposalPreview() {
 
                 <a
                   className={styles.primaryAction}
-                  href={`${window.location.origin}/onboarding/${onboardingResult.invitation_token}`}
+                  href={campaignAppUrl(
+                    `/onboarding/${onboardingResult.invitation_token}`,
+                  )}
                   target="_blank"
                   rel="noreferrer"
                 >

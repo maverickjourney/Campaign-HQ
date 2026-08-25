@@ -2,6 +2,10 @@ import {
   supabase,
 } from "../lib/supabase";
 
+import {
+  campaignAppUrl,
+} from "../config/seatUrls";
+
 
 function normalizeEmail(
   value,
@@ -184,7 +188,7 @@ export async function createSeatOnboardingAccount({
           captchaToken,
 
           emailRedirectTo:
-            `${window.location.origin}/onboarding/continue`,
+            campaignAppUrl("/onboarding/continue"),
 
           data: {
             full_name:
@@ -277,7 +281,7 @@ export async function resendSeatVerificationEmail(
           captchaToken,
 
           emailRedirectTo:
-            `${window.location.origin}/onboarding/continue`,
+            campaignAppUrl("/onboarding/continue"),
         },
       });
 

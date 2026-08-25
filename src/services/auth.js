@@ -1,4 +1,5 @@
 import { supabase } from "../lib/supabase";
+import { campaignAppUrl } from "../config/seatUrls";
 
 import {
   getMfaState,
@@ -538,10 +539,9 @@ export async function requestCampaignPasswordReset({
   }
 
   const redirectTo =
-    new URL(
+    campaignAppUrl(
       "/reset-password",
-      window.location.origin,
-    ).toString();
+    );
 
   const {
     error,
