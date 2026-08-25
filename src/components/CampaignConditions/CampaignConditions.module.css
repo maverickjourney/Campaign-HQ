@@ -407,126 +407,137 @@
 /* HQ HERO CONDITIONS — END */
 
 
-/* HQ HERO CONDITIONS — FINAL POLISH START */
+
+
+
+/* HQ HERO CONDITIONS — COMPACT START */
 
 .heroConditions {
   gap:
-    8px !important;
+    4px !important;
 }
 
 
 .heroConditionsHeader {
   min-height:
-    20px;
+    15px !important;
 }
 
 
 .heroConditionsHeader
   small {
   font-size:
-    10px !important;
+    8px !important;
 
   letter-spacing:
-    0.12em !important;
+    0.11em !important;
 }
 
 
 .heroLivePill {
   height:
-    22px !important;
+    17px !important;
 
   padding:
-    0 9px !important;
+    0 6px !important;
 
   font-size:
-    9px !important;
+    7.5px !important;
+}
+
+
+.heroLivePill i {
+  width:
+    5px !important;
+
+  height:
+    5px !important;
 }
 
 
 .heroConditionsWeather {
   grid-template-columns:
-    38px
+    28px
     auto
     minmax(0, 1fr)
     auto !important;
 
   gap:
-    9px !important;
+    6px !important;
 }
 
 
 .heroWeatherIcon {
   width:
-    38px !important;
+    28px !important;
 
   height:
-    38px !important;
+    28px !important;
 
   border-radius:
-    10px !important;
+    8px !important;
 }
 
 
 .heroWeatherIcon
   svg {
   width:
-    21px !important;
+    17px !important;
 
   height:
-    21px !important;
+    17px !important;
 }
 
 
 .heroConditionsWeather
   > strong {
   font-size:
-    19px !important;
+    15px !important;
 
-  letter-spacing:
-    -0.025em !important;
+  line-height:
+    1 !important;
 }
 
 
 .heroDescription {
   font-size:
-    12px !important;
-
-  font-weight:
-    730 !important;
+    10px !important;
 }
 
 
 .heroHumidity {
   font-size:
-    10px !important;
+    8.5px !important;
+
+  cursor:
+    default !important;
 }
 
 
 .heroConditionsLocation {
   margin-top:
-    1px !important;
+    0 !important;
 
   grid-template-columns:
-    14px
+    12px
     minmax(0, 1fr)
-    22px !important;
+    18px !important;
 
   gap:
-    7px !important;
+    5px !important;
 
   font-size:
-    10px !important;
+    8.5px !important;
 }
 
 
-/*
- * Do not show a browser tooltip-like visual as part of the design.
- * The humidity remains visible inline.
- */
+.heroConditionsLocation
+  > button {
+  width:
+    18px !important;
 
-.heroHumidity {
-  cursor:
-    default !important;
+  height:
+    18px !important;
 }
 
-/* HQ HERO CONDITIONS — FINAL POLISH END */
+/* HQ HERO CONDITIONS — COMPACT END */

@@ -23288,68 +23288,105 @@
 /* HQ HERO WEATHER CARD — END */
 
 
-/* HQ HERO DATE + COUNTDOWN + CONDITIONS — FINAL LAYOUT START */
+
+
+
+
+
+
+/* HQ HERO — COMPACT DATE + COUNTDOWN + WEATHER START */
+
+/*
+ * Keep the overall hero tight.
+ * Left = campaign information.
+ * Right = candidate photo / initials.
+ */
+
+.centerHeroStack
+  .simpleSpotlightCopy {
+  grid-template-columns:
+    minmax(0, 1.48fr)
+    minmax(235px, 0.72fr) !important;
+
+  column-gap:
+    22px !important;
+}
+
 
 /*
  * Top row:
- *   Election Day | Countdown
+ * Election Day | Countdown
  *
  * Bottom row:
- *   Current Conditions full width
+ * Current Conditions
  */
 
 .centerHeroStack
   .simpleSpotlightInfoStack {
-  display: grid !important;
+  display:
+    grid !important;
 
-  width: 100% !important;
-  min-width: 0 !important;
+  width:
+    100% !important;
+
+  min-width:
+    0 !important;
+
+  height:
+    auto !important;
 
   grid-template-columns:
-    minmax(0, 1.22fr)
-    minmax(0, 0.95fr) !important;
+    minmax(0, 1.28fr)
+    minmax(0, 0.82fr) !important;
 
-  gap: 10px !important;
+  grid-auto-rows:
+    max-content !important;
+
+  align-content:
+    start !important;
 
   align-items:
-    stretch !important;
+    start !important;
+
+  gap:
+    8px !important;
+
+  margin-top:
+    10px !important;
 }
 
 
+/* Compact Election Day + Countdown */
+
 .centerHeroStack
   .simpleSpotlightInfoCard {
-  box-sizing: border-box !important;
+  box-sizing:
+    border-box !important;
 
-  width: 100% !important;
-  min-width: 0 !important;
+  width:
+    100% !important;
 
-  min-height: 84px !important;
+  min-width:
+    0 !important;
+
+  min-height:
+    60px !important;
+
+  height:
+    60px !important;
 
   padding:
-    12px 15px !important;
+    8px 10px !important;
 
   grid-template-columns:
-    48px
+    34px
     minmax(0, 1fr) !important;
-
-  gap:
-    12px !important;
 
   align-items:
     center !important;
 
-  border-radius:
-    13px !important;
-}
-
-
-.centerHeroStack
-  .simpleSpotlightInfoIcon {
-  width:
-    48px !important;
-
-  height:
-    48px !important;
+  gap:
+    8px !important;
 
   border-radius:
     11px !important;
@@ -23357,55 +23394,135 @@
 
 
 .centerHeroStack
+  .simpleSpotlightInfoIcon {
+  width:
+    34px !important;
+
+  height:
+    34px !important;
+
+  min-width:
+    34px !important;
+
+  border-radius:
+    9px !important;
+}
+
+
+.centerHeroStack
   .simpleSpotlightInfoIcon
   svg {
   width:
-    19px !important;
+    16px !important;
 
   height:
-    19px !important;
+    16px !important;
+}
+
+
+/*
+ * No ellipsis.
+ * Both values must show completely.
+ */
+
+.centerHeroStack
+  .simpleSpotlightInfoBody {
+  min-width:
+    0 !important;
+
+  overflow:
+    visible !important;
 }
 
 
 .centerHeroStack
   .simpleSpotlightInfoBody
   small {
-  font-size:
-    9px !important;
+  margin:
+    0 !important;
 
-  letter-spacing:
-    0.12em !important;
-}
+  overflow:
+    visible !important;
 
-
-.centerHeroStack
-  .simpleSpotlightInfoBody
-  strong {
-  margin-top:
-    5px !important;
-
-  font-size:
-    clamp(
-      15px,
-      1.3vw,
-      19px
+  color:
+    rgba(
+      255,
+      255,
+      255,
+      0.56
     ) !important;
 
-  line-height:
-    1.08 !important;
+  font-size:
+    7.5px !important;
+
+  font-weight:
+    900 !important;
 
   letter-spacing:
-    -0.025em !important;
+    0.11em !important;
+
+  line-height:
+    1 !important;
+
+  text-overflow:
+    clip !important;
+
+  text-transform:
+    uppercase !important;
 
   white-space:
     nowrap !important;
 }
 
 
-/* Weather becomes full-width row under both top cards */
+.centerHeroStack
+  .simpleSpotlightInfoBody
+  strong {
+  display:
+    block !important;
+
+  width:
+    auto !important;
+
+  max-width:
+    none !important;
+
+  margin-top:
+    4px !important;
+
+  overflow:
+    visible !important;
+
+  color:
+    #ffffff !important;
+
+  font-size:
+    13.5px !important;
+
+  font-weight:
+    850 !important;
+
+  letter-spacing:
+    -0.02em !important;
+
+  line-height:
+    1 !important;
+
+  text-overflow:
+    clip !important;
+
+  white-space:
+    nowrap !important;
+}
+
+
+/* Weather sits directly underneath without stretching */
 
 .centerHeroStack
   .simpleSpotlightWeatherCard {
+  box-sizing:
+    border-box !important;
+
   grid-column:
     1 / -1 !important;
 
@@ -23416,85 +23533,118 @@
     0 !important;
 
   min-height:
-    112px !important;
+    84px !important;
+
+  height:
+    84px !important;
+
+  align-self:
+    start !important;
 
   padding:
-    13px 16px !important;
+    8px 11px !important;
 
   border-radius:
-    14px !important;
+    11px !important;
 }
 
 
 /*
- * Give the left hero column enough width for the new 2-up row
- * while preserving the candidate photo area.
- */
-
-.centerHeroStack
-  .simpleSpotlightCopy {
-  grid-template-columns:
-    minmax(0, 1.45fr)
-    minmax(235px, 0.75fr) !important;
-
-  column-gap:
-    28px !important;
-}
-
-
-/*
- * Keep Customize HQ below the cards with a clean divider.
+ * Keep Customize HQ close to the information stack.
  */
 
 .centerHeroStack
   .simpleSpotlightCustomize {
   margin-top:
-    13px !important;
+    9px !important;
 
   padding-top:
-    13px !important;
+    9px !important;
 }
 
 
 /*
- * Laptop safety:
- * top cards still remain side-by-side unless the usable hero
- * width becomes too narrow.
+ * Narrower laptops:
+ * keep top cards side by side but tighten them further.
  */
 
 @media (
   max-width: 1320px
+) and (
+  min-width: 1081px
 ) {
+  .centerHeroStack
+    .simpleSpotlightCopy {
+    grid-template-columns:
+      minmax(0, 1.55fr)
+      minmax(215px, 0.68fr) !important;
+
+    column-gap:
+      16px !important;
+  }
+
   .centerHeroStack
     .simpleSpotlightInfoStack {
     grid-template-columns:
-      minmax(0, 1.15fr)
-      minmax(0, 0.9fr) !important;
+      minmax(0, 1.3fr)
+      minmax(0, 0.8fr) !important;
 
     gap:
-      8px !important;
+      7px !important;
   }
 
   .centerHeroStack
     .simpleSpotlightInfoCard {
-    padding:
-      10px 12px !important;
+    height:
+      56px !important;
+
+    min-height:
+      56px !important;
 
     grid-template-columns:
-      42px
+      30px
       minmax(0, 1fr) !important;
 
+    padding:
+      7px 8px !important;
+
     gap:
-      10px !important;
+      7px !important;
   }
 
   .centerHeroStack
     .simpleSpotlightInfoIcon {
     width:
-      42px !important;
+      30px !important;
 
     height:
-      42px !important;
+      30px !important;
+
+    min-width:
+      30px !important;
+  }
+
+  .centerHeroStack
+    .simpleSpotlightInfoBody
+    strong {
+    font-size:
+      12px !important;
+  }
+
+  .centerHeroStack
+    .simpleSpotlightInfoBody
+    small {
+    font-size:
+      7px !important;
+  }
+
+  .centerHeroStack
+    .simpleSpotlightWeatherCard {
+    height:
+      78px !important;
+
+    min-height:
+      78px !important;
   }
 }
 
@@ -23509,242 +23659,18 @@
   }
 
   .centerHeroStack
+    .simpleSpotlightInfoCard,
+  .centerHeroStack
+    .simpleSpotlightWeatherCard {
+    height:
+      auto !important;
+  }
+
+  .centerHeroStack
     .simpleSpotlightWeatherCard {
     grid-column:
       1 !important;
   }
 }
 
-/* HQ HERO DATE + COUNTDOWN + CONDITIONS — FINAL LAYOUT END */
-
-
-/* HQ HERO TOP CARDS — NO TRUNCATION FIX START */
-
-/*
- * Give Election Day + Countdown more usable width.
- * Candidate area stays intact, but becomes slightly less dominant.
- */
-
-.centerHeroStack
-  .simpleSpotlightCopy {
-  grid-template-columns:
-    minmax(0, 1.68fr)
-    minmax(205px, 0.68fr) !important;
-
-  column-gap:
-    24px !important;
-}
-
-
-/*
- * Election Day gets a little more room than Countdown.
- */
-
-.centerHeroStack
-  .simpleSpotlightInfoStack {
-  grid-template-columns:
-    minmax(0, 1.32fr)
-    minmax(0, 0.86fr) !important;
-
-  gap:
-    10px !important;
-}
-
-
-/*
- * Make both top cards compact like the approved mockup.
- */
-
-.centerHeroStack
-  .simpleSpotlightInfoCard {
-  min-height:
-    76px !important;
-
-  padding:
-    10px 12px !important;
-
-  grid-template-columns:
-    40px
-    minmax(0, 1fr) !important;
-
-  gap:
-    10px !important;
-}
-
-
-.centerHeroStack
-  .simpleSpotlightInfoIcon {
-  width:
-    40px !important;
-
-  height:
-    40px !important;
-
-  min-width:
-    40px !important;
-
-  border-radius:
-    10px !important;
-}
-
-
-.centerHeroStack
-  .simpleSpotlightInfoIcon
-  svg {
-  width:
-    17px !important;
-
-  height:
-    17px !important;
-}
-
-
-/*
- * Critical fix:
- * do not inherit ellipsis/truncation on these two values.
- */
-
-.centerHeroStack
-  .simpleSpotlightInfoBody {
-  overflow:
-    visible !important;
-}
-
-
-.centerHeroStack
-  .simpleSpotlightInfoBody
-  small {
-  overflow:
-    visible !important;
-
-  font-size:
-    8.5px !important;
-
-  line-height:
-    1 !important;
-
-  letter-spacing:
-    0.11em !important;
-
-  text-overflow:
-    clip !important;
-
-  white-space:
-    nowrap !important;
-}
-
-
-.centerHeroStack
-  .simpleSpotlightInfoBody
-  strong {
-  width:
-    auto !important;
-
-  max-width:
-    none !important;
-
-  margin-top:
-    5px !important;
-
-  overflow:
-    visible !important;
-
-  font-size:
-    16px !important;
-
-  line-height:
-    1.05 !important;
-
-  letter-spacing:
-    -0.025em !important;
-
-  text-overflow:
-    clip !important;
-
-  white-space:
-    nowrap !important;
-}
-
-
-/*
- * Weather keeps the full width underneath.
- */
-
-.centerHeroStack
-  .simpleSpotlightWeatherCard {
-  grid-column:
-    1 / -1 !important;
-
-  min-height:
-    104px !important;
-}
-
-
-/*
- * At narrower laptop widths, still preserve full text
- * before eventually stacking on true small screens.
- */
-
-@media (
-  max-width: 1360px
-) and (
-  min-width: 1081px
-) {
-  .centerHeroStack
-    .simpleSpotlightCopy {
-    grid-template-columns:
-      minmax(0, 1.75fr)
-      minmax(190px, 0.62fr) !important;
-
-    column-gap:
-      18px !important;
-  }
-
-  .centerHeroStack
-    .simpleSpotlightInfoStack {
-    grid-template-columns:
-      minmax(0, 1.38fr)
-      minmax(0, 0.82fr) !important;
-  }
-
-  .centerHeroStack
-    .simpleSpotlightInfoCard {
-    grid-template-columns:
-      36px
-      minmax(0, 1fr) !important;
-
-    padding:
-      9px 10px !important;
-
-    gap:
-      8px !important;
-  }
-
-  .centerHeroStack
-    .simpleSpotlightInfoIcon {
-    width:
-      36px !important;
-
-    height:
-      36px !important;
-
-    min-width:
-      36px !important;
-  }
-
-  .centerHeroStack
-    .simpleSpotlightInfoBody
-    strong {
-    font-size:
-      14px !important;
-  }
-
-  .centerHeroStack
-    .simpleSpotlightInfoBody
-    small {
-    font-size:
-      8px !important;
-  }
-}
-
-/* HQ HERO TOP CARDS — NO TRUNCATION FIX END */
+/* HQ HERO — COMPACT DATE + COUNTDOWN + WEATHER END */
