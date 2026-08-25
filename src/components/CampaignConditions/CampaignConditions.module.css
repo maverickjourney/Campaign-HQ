@@ -405,3 +405,128 @@
 }
 
 /* HQ HERO CONDITIONS — END */
+
+
+/* HQ HERO CONDITIONS — FINAL POLISH START */
+
+.heroConditions {
+  gap:
+    8px !important;
+}
+
+
+.heroConditionsHeader {
+  min-height:
+    20px;
+}
+
+
+.heroConditionsHeader
+  small {
+  font-size:
+    10px !important;
+
+  letter-spacing:
+    0.12em !important;
+}
+
+
+.heroLivePill {
+  height:
+    22px !important;
+
+  padding:
+    0 9px !important;
+
+  font-size:
+    9px !important;
+}
+
+
+.heroConditionsWeather {
+  grid-template-columns:
+    38px
+    auto
+    minmax(0, 1fr)
+    auto !important;
+
+  gap:
+    9px !important;
+}
+
+
+.heroWeatherIcon {
+  width:
+    38px !important;
+
+  height:
+    38px !important;
+
+  border-radius:
+    10px !important;
+}
+
+
+.heroWeatherIcon
+  svg {
+  width:
+    21px !important;
+
+  height:
+    21px !important;
+}
+
+
+.heroConditionsWeather
+  > strong {
+  font-size:
+    19px !important;
+
+  letter-spacing:
+    -0.025em !important;
+}
+
+
+.heroDescription {
+  font-size:
+    12px !important;
+
+  font-weight:
+    730 !important;
+}
+
+
+.heroHumidity {
+  font-size:
+    10px !important;
+}
+
+
+.heroConditionsLocation {
+  margin-top:
+    1px !important;
+
+  grid-template-columns:
+    14px
+    minmax(0, 1fr)
+    22px !important;
+
+  gap:
+    7px !important;
+
+  font-size:
+    10px !important;
+}
+
+
+/*
+ * Do not show a browser tooltip-like visual as part of the design.
+ * The humidity remains visible inline.
+ */
+
+.heroHumidity {
+  cursor:
+    default !important;
+}
+
+/* HQ HERO CONDITIONS — FINAL POLISH END */

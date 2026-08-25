@@ -8217,8 +8217,8 @@ const [
                         <strong>
                           {daysUntilElection}{" "}
                           {daysUntilElection === 1
-                            ? "day remaining"
-                            : "days remaining"}
+                            ? "day"
+                            : "days"}
                         </strong>
                       </div>
                     </div>
