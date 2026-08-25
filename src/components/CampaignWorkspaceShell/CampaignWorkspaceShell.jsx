@@ -62,6 +62,10 @@ import {
   getUserInitials,
 } from "../../utils/campaignSession";
 
+import {
+  createCandidatePhotoSignedUrl,
+} from "../../utils/candidatePhotoStorage";
+
 import dashboardStyles from "../../pages/DashboardReferencePreview/DashboardReferencePreview.module.css";
 
 import {
@@ -319,29 +323,15 @@ export function CampaignWorkspaceShell({
             return;
           }
 
-          const {
-            data,
-            error:
-              signedUrlError,
-          } =
-            await supabase.storage
-              .from(
-                "campaign-files",
-              )
-              .createSignedUrl(
-                storagePath,
-                21600,
-              );
-
-          if (
-            signedUrlError
-          ) {
-            throw signedUrlError;
-          }
+          const signedUrl =
+            await createCandidatePhotoSignedUrl(
+              storagePath,
+              21600,
+            );
 
           if (!cancelled) {
             setCandidateAvatarUrl(
-              data?.signedUrl ||
+              signedUrl ||
                 "",
             );
           }

@@ -428,6 +428,37 @@ export async function signInSeatOnboarding({
 }
 
 
+export async function saveMySeatCandidatePhotoPath(
+  storagePath,
+) {
+  const {
+    data,
+    error,
+  } =
+    await supabase.rpc(
+      "save_my_seat_candidate_photo_path",
+      {
+        target_candidate_photo_path:
+          String(
+            storagePath || "",
+          ).trim() ||
+          null,
+      },
+    );
+
+  if (error) {
+    console.error(error);
+
+    throw new Error(
+      error.message ||
+        "Candidate photo could not be saved to onboarding.",
+    );
+  }
+
+  return data;
+}
+
+
 export async function saveMySeatCampaignProfile(
   profile,
 ) {
@@ -450,6 +481,24 @@ export async function saveMySeatCampaignProfile(
         "Campaign Profile could not be saved.",
     );
   }
+
+
+  const candidatePhotoPath =
+    profile
+      ?.campaign_type ===
+      "candidate_campaign"
+      ? String(
+          profile
+            ?.candidate_photo_path ||
+          "",
+        ).trim()
+      : "";
+
+
+  await saveMySeatCandidatePhotoPath(
+    candidatePhotoPath,
+  );
+
 
   return data;
 }

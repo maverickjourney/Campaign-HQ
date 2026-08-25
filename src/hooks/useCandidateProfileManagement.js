@@ -7,6 +7,11 @@ import {
 import { supabase } from "../lib/supabase";
 
 import {
+  createCandidatePhotoSignedUrl,
+} from "../utils/candidatePhotoStorage";
+
+
+import {
   saveWorkspace,
 } from "../utils/campaignSession";
 
@@ -261,26 +266,11 @@ export function useCandidateProfileManagement({
         }
 
         try {
-          const {
-            data,
-            error: signedError,
-          } =
-            await supabase.storage
-              .from(
-                "campaign-files",
-              )
-              .createSignedUrl(
-                storagePath,
-                300,
-              );
-
-          if (signedError) {
-            throw signedError;
-          }
-
           const url =
-            data?.signedUrl ||
-            "";
+            await createCandidatePhotoSignedUrl(
+              storagePath,
+              300,
+            );
 
           setPhotoPreviewUrl(
             url,

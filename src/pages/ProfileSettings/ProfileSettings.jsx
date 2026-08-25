@@ -1,5 +1,6 @@
 import {
   useEffect,
+  useRef,
   useState,
 } from "react";
 
@@ -58,6 +59,16 @@ import SecurityOnboardingGate from "../../components/security/SecurityOnboarding
 import {
   useProfileSettings,
 } from "../../hooks/useProfileSettings";
+
+import {
+  useCandidateProfileManagement,
+} from "../../hooks/useCandidateProfileManagement";
+
+import {
+  dataUrlToCandidatePhotoFile,
+  persistWorkspaceCandidatePhoto,
+  uploadCandidatePhoto,
+} from "../../utils/candidatePhotoStorage";
 
 import {
   usePlatformSmsPreferences,
@@ -316,6 +327,13 @@ export default function ProfileSettings() {
   const roleLabel =
     getRoleLabel();
 
+  const isCandidateProfile =
+    /candidate/i.test(
+      String(
+        roleLabel || "",
+      ),
+    );
+
   const leadershipAccess =
     /candidate|consultant|manager|owner|administrator/i
       .test(roleLabel);
@@ -383,6 +401,35 @@ export default function ProfileSettings() {
     initialEmail:
       user.email,
   });
+
+  const {
+    photoPreviewUrl:
+      candidatePhotoPreviewUrl,
+
+    isLoading:
+      candidatePhotoLoading,
+
+    error:
+      candidatePhotoProfileError,
+
+    refresh:
+      refreshCandidateProfile,
+  } = useCandidateProfileManagement({
+    workspaceId:
+      workspace.id,
+
+    initialWorkspace:
+      workspace,
+  });
+
+  const [
+    candidatePhotoSaving,
+    setCandidatePhotoSaving,
+  ] = useState(false);
+
+  const candidatePhotoMigrationRef =
+    useRef(false);
+
 
   const {
     subscription:
@@ -673,8 +720,103 @@ export default function ProfileSettings() {
     };
 
 
+  useEffect(
+    () => {
+      if (
+        !isCandidateProfile ||
+        candidatePhotoMigrationRef.current ||
+        candidatePhotoLoading ||
+        candidatePhotoPreviewUrl ||
+        !localSettings["avatarDataUrl"] ||
+        !workspace?.id
+      ) {
+        return;
+      }
+
+      candidatePhotoMigrationRef.current =
+        true;
+
+      let cancelled =
+        false;
+
+      const migrateExistingPreview =
+        async () => {
+          setCandidatePhotoSaving(
+            true,
+          );
+
+          try {
+            const file =
+              await dataUrlToCandidatePhotoFile(
+                localSettings[
+                  "avatarDataUrl"
+                ],
+              );
+
+            const uploaded =
+              await uploadCandidatePhoto(
+                file,
+              );
+
+            await persistWorkspaceCandidatePhoto({
+              workspaceId:
+                workspace.id,
+
+              storagePath:
+                uploaded.storagePath,
+            });
+
+            if (!cancelled) {
+              await refreshCandidateProfile();
+
+              updateLocal(
+                "avatarDataUrl",
+                "",
+              );
+
+              setLocalMessage(
+                "Candidate photo saved securely and synced across Campaign HQ.",
+              );
+            }
+          } catch (
+            migrationError
+          ) {
+            if (!cancelled) {
+              setFormError(
+                migrationError
+                  ?.message ||
+                  "The existing candidate photo preview could not be synced.",
+              );
+            }
+          } finally {
+            if (!cancelled) {
+              setCandidatePhotoSaving(
+                false,
+              );
+            }
+          }
+        };
+
+      void migrateExistingPreview();
+
+      return () => {
+        cancelled =
+          true;
+      };
+    },
+    [
+      candidatePhotoLoading,
+      candidatePhotoPreviewUrl,
+      isCandidateProfile,
+      localSettings,
+      refreshCandidateProfile,
+      workspace?.id,
+    ],
+  );
+
+
   const handleAvatar =
-    (event) => {
+    async (event) => {
       const file =
         event.currentTarget
           .files?.[0];
@@ -686,47 +828,102 @@ export default function ProfileSettings() {
         return;
       }
 
+
       if (
-        !file.type.startsWith(
-          "image/",
-        )
+        !isCandidateProfile
       ) {
-        setFormError(
-          "Choose a supported image file.",
+        if (
+          !file.type.startsWith(
+            "image/",
+          )
+        ) {
+          setFormError(
+            "Choose a supported image file.",
+          );
+          return;
+        }
+
+        if (
+          file.size >
+          1.5 * 1024 * 1024
+        ) {
+          setFormError(
+            "Choose a profile photo smaller than 1.5 MB.",
+          );
+          return;
+        }
+
+        const reader =
+          new FileReader();
+
+        reader.onload = () => {
+          updateLocal(
+            "avatarDataUrl",
+            reader.result,
+          );
+
+          setFormError("");
+        };
+
+        reader.onerror = () => {
+          setFormError(
+            "The profile photo could not be prepared.",
+          );
+        };
+
+        reader.readAsDataURL(
+          file,
         );
+
         return;
       }
 
-      if (
-        file.size >
-        1.5 * 1024 * 1024
-      ) {
-        setFormError(
-          "Choose a profile photo smaller than 1.5 MB.",
-        );
-        return;
-      }
 
-      const reader =
-        new FileReader();
+      setCandidatePhotoSaving(
+        true,
+      );
 
-      reader.onload = () => {
+      setFormError("");
+
+      try {
+        const uploaded =
+          await uploadCandidatePhoto(
+            file,
+          );
+
+        await persistWorkspaceCandidatePhoto({
+          workspaceId:
+            workspace.id,
+
+          storagePath:
+            uploaded.storagePath,
+        });
+
+        await refreshCandidateProfile();
+
         updateLocal(
           "avatarDataUrl",
-          reader.result,
+          "",
         );
 
-        setFormError("");
-      };
-
-      reader.onerror = () => {
+        setLocalMessage(
+          "Candidate photo saved securely and synced across Campaign HQ.",
+        );
+      } catch (
+        photoError
+      ) {
         setFormError(
-          "The profile photo could not be prepared.",
+          photoError
+            ?.message ||
+            "The candidate photo could not be saved.",
         );
-      };
-
-      reader.readAsDataURL(file);
+      } finally {
+        setCandidatePhotoSaving(
+          false,
+        );
+      }
     };
+
 
   const handleSubmit =
     async (event) => {
@@ -747,8 +944,26 @@ export default function ProfileSettings() {
       }
     };
 
+  const avatarPreviewUrl =
+    isCandidateProfile
+      ? (
+          candidatePhotoPreviewUrl ||
+          localSettings[
+            "avatarDataUrl"
+          ] ||
+          ""
+        )
+      : (
+          localSettings[
+            "avatarDataUrl"
+          ] ||
+          ""
+        );
+
   const combinedError =
-    formError || error;
+    formError ||
+    candidatePhotoProfileError ||
+    error;
 
   const combinedSuccess =
     success || localMessage;
@@ -961,12 +1176,10 @@ export default function ProfileSettings() {
                         styles.avatar
                       }
                     >
-                      {localSettings
-                        .avatarDataUrl ? (
+                      {avatarPreviewUrl ? (
                         <img
                           src={
-                            localSettings
-                              .avatarDataUrl
+                            avatarPreviewUrl
                           }
                           alt=""
                         />
@@ -985,7 +1198,9 @@ export default function ProfileSettings() {
                       <Camera
                         size={16}
                       />
-                      Change photo
+                      {candidatePhotoSaving
+                        ? "Saving photo…"
+                        : "Change photo"}
 
                       <input
                         type="file"

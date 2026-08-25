@@ -4027,3 +4027,146 @@ button:disabled {
 }
 
 /* SECURE WORKSPACE BRANDING + GEOGRAPHY — END */
+
+
+/* CAMPAIGN PROFILE CANDIDATE PHOTO — START */
+
+.candidatePhotoField {
+  display: grid;
+  gap: 8px;
+}
+
+.candidatePhotoField
+  > span {
+  color: #314f6c;
+  font-size: 0.67rem;
+  font-weight: 800;
+}
+
+.candidatePhotoControl {
+  display: grid;
+  grid-template-columns:
+    88px
+    minmax(0, 1fr);
+  align-items: center;
+  gap: 16px;
+
+  padding: 14px;
+
+  border:
+    1px solid
+    #d9e4ee;
+
+  border-radius: 14px;
+
+  background:
+    linear-gradient(
+      180deg,
+      #ffffff,
+      #f8fbfd
+    );
+}
+
+.candidatePhotoPreview {
+  display: grid;
+
+  width: 88px;
+  height: 88px;
+
+  overflow: hidden;
+
+  place-items: center;
+
+  border:
+    1px solid
+    #d3e1ec;
+
+  border-radius: 50%;
+
+  color: #4b7398;
+  background: #edf5fb;
+}
+
+.candidatePhotoPreview
+  img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.candidatePhotoCopy {
+  min-width: 0;
+}
+
+.candidatePhotoCopy
+  strong,
+.candidatePhotoCopy
+  small {
+  display: block;
+}
+
+.candidatePhotoCopy
+  strong {
+  color: #193f63;
+  font-size: 0.75rem;
+  font-weight: 850;
+}
+
+.candidatePhotoCopy
+  small {
+  margin-top: 4px;
+
+  color: #778ba0;
+
+  font-size: 0.61rem;
+  line-height: 1.4;
+}
+
+.candidatePhotoUploadButton {
+  display: inline-flex;
+
+  width: fit-content;
+  min-height: 34px;
+
+  align-items: center;
+  gap: 7px;
+
+  margin-top: 10px;
+  padding: 0 12px;
+
+  border:
+    1px solid
+    #c9dceb;
+
+  border-radius: 9px;
+
+  color: #1e629a;
+  background: #ffffff;
+
+  cursor: pointer;
+
+  font-size: 0.62rem;
+  font-weight: 820;
+}
+
+.candidatePhotoUploadButton
+  input {
+  display: none;
+}
+
+@media (
+  max-width: 700px
+) {
+  .candidatePhotoControl {
+    grid-template-columns:
+      70px
+      minmax(0, 1fr);
+  }
+
+  .candidatePhotoPreview {
+    width: 70px;
+    height: 70px;
+  }
+}
+
+/* CAMPAIGN PROFILE CANDIDATE PHOTO — END */

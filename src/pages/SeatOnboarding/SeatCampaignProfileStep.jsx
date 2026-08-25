@@ -1,4 +1,5 @@
 import {
+  useEffect,
   useMemo,
   useState,
 } from "react";
@@ -7,6 +8,7 @@ import {
   ArrowRight,
   Building2,
   CalendarDays,
+  Camera,
   Globe2,
   Landmark,
   MapPin,
@@ -30,6 +32,12 @@ import {
   WORKSPACE_THEME_OPTIONS,
   getRecommendedWorkspaceTheme,
 } from "../../utils/workspacePresentation";
+
+
+import {
+  createCandidatePhotoSignedUrl,
+  uploadCandidatePhoto,
+} from "../../utils/candidatePhotoStorage";
 
 
 import styles
@@ -347,6 +355,11 @@ export default function SeatCampaignProfileStep({
           ?.full_name ||
         "",
 
+      candidate_photo_path:
+        savedProfile
+          .candidate_photo_path ||
+        "",
+
       legal_committee_name:
         savedProfile
           .legal_committee_name ||
@@ -500,6 +513,69 @@ export default function SeatCampaignProfileStep({
     useState("");
 
 
+  const [
+    candidatePhotoPreviewUrl,
+    setCandidatePhotoPreviewUrl,
+  ] =
+    useState("");
+
+  const [
+    candidatePhotoUploading,
+    setCandidatePhotoUploading,
+  ] =
+    useState(false);
+
+
+  useEffect(
+    () => {
+      let cancelled =
+        false;
+
+      const loadSavedPhoto =
+        async () => {
+          const storagePath =
+            String(
+              form
+                .candidate_photo_path ||
+              "",
+            ).trim();
+
+          if (!storagePath) {
+            setCandidatePhotoPreviewUrl(
+              "",
+            );
+
+            return;
+          }
+
+          const previewUrl =
+            await createCandidatePhotoSignedUrl(
+              storagePath,
+              600,
+            );
+
+          if (!cancelled) {
+            setCandidatePhotoPreviewUrl(
+              previewUrl ||
+              "",
+            );
+          }
+        };
+
+      void loadSavedPhoto();
+
+      return () => {
+        cancelled =
+          true;
+      };
+    },
+    [
+      form
+        .candidate_photo_path,
+    ],
+  );
+
+
   const isCandidate =
     form.campaign_type ===
     "candidate_campaign";
@@ -638,6 +714,56 @@ export default function SeatCampaignProfileStep({
         .filter(Boolean)
         .join(", ");
     })();
+
+
+  const handleCandidatePhoto =
+    async (event) => {
+      const file =
+        event.currentTarget
+          .files?.[0];
+
+      event.currentTarget.value =
+        "";
+
+      if (!file) {
+        return;
+      }
+
+      setError("");
+
+      setCandidatePhotoUploading(
+        true,
+      );
+
+      try {
+        const uploaded =
+          await uploadCandidatePhoto(
+            file,
+          );
+
+        setValue(
+          "candidate_photo_path",
+          uploaded.storagePath,
+        );
+
+        setCandidatePhotoPreviewUrl(
+          uploaded.previewUrl ||
+          "",
+        );
+      } catch (
+        photoError
+      ) {
+        setError(
+          photoError
+            ?.message ||
+            "Candidate photo could not be uploaded.",
+        );
+      } finally {
+        setCandidatePhotoUploading(
+          false,
+        );
+      }
+    };
 
 
   const submit =
@@ -782,6 +908,85 @@ export default function SeatCampaignProfileStep({
               }
             />
           </label>
+
+          {isCandidate ? (
+            <div
+              className={[
+                styles.profileWide,
+                styles.candidatePhotoField,
+              ].join(" ")}
+            >
+              <span>
+                Candidate photo
+              </span>
+
+              <div
+                className={
+                  styles.candidatePhotoControl
+                }
+              >
+                <div
+                  className={
+                    styles.candidatePhotoPreview
+                  }
+                >
+                  {candidatePhotoPreviewUrl ? (
+                    <img
+                      src={
+                        candidatePhotoPreviewUrl
+                      }
+                      alt="Candidate preview"
+                    />
+                  ) : (
+                    <Camera
+                      size={24}
+                    />
+                  )}
+                </div>
+
+                <div
+                  className={
+                    styles.candidatePhotoCopy
+                  }
+                >
+                  <strong>
+                    Campaign profile photo
+                  </strong>
+
+                  <small>
+                    Upload it once here and it will automatically appear throughout Campaign HQ after Activation.
+                  </small>
+
+                  <label
+                    className={
+                      styles.candidatePhotoUploadButton
+                    }
+                  >
+                    <Camera
+                      size={15}
+                    />
+
+                    {candidatePhotoUploading
+                      ? "Uploading…"
+                      : candidatePhotoPreviewUrl
+                        ? "Change photo"
+                        : "Upload photo"}
+
+                    <input
+                      type="file"
+                      accept="image/*"
+                      disabled={
+                        candidatePhotoUploading
+                      }
+                      onChange={
+                        handleCandidatePhoto
+                      }
+                    />
+                  </label>
+                </div>
+              </div>
+            </div>
+          ) : null}
 
           <label
             className={
