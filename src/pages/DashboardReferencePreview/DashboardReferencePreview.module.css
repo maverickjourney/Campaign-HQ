@@ -23674,3 +23674,90 @@
 }
 
 /* HQ HERO — COMPACT DATE + COUNTDOWN + WEATHER END */
+
+
+/* HQ HERO — CANDIDATE AREA BALANCE START */
+
+/*
+ * Slightly reduce the visual weight of the candidate/photo side
+ * without changing the hero layout.
+ */
+
+.centerHeroStack
+  .simpleSpotlightCopy {
+  grid-template-columns:
+    minmax(0, 1.56fr)
+    minmax(210px, 0.64fr) !important;
+
+  column-gap:
+    18px !important;
+}
+
+
+/* Candidate initials fallback */
+
+.centerHeroStack
+  .simpleSpotlightPhotoFallback
+  strong {
+  font-size:
+    clamp(
+      46px,
+      6vw,
+      82px
+    ) !important;
+
+  line-height:
+    1 !important;
+}
+
+
+/* Upload candidate photo label */
+
+.centerHeroStack
+  .simpleSpotlightPhotoFallback
+  span {
+  font-size:
+    9px !important;
+
+  letter-spacing:
+    0.095em !important;
+}
+
+
+/* Slight additional laptop tightening */
+
+@media (
+  max-width: 1320px
+) and (
+  min-width: 1081px
+) {
+  .centerHeroStack
+    .simpleSpotlightCopy {
+    grid-template-columns:
+      minmax(0, 1.6fr)
+      minmax(195px, 0.6fr) !important;
+
+    column-gap:
+      15px !important;
+  }
+
+  .centerHeroStack
+    .simpleSpotlightPhotoFallback
+    strong {
+    font-size:
+      clamp(
+        42px,
+        5.5vw,
+        74px
+      ) !important;
+  }
+
+  .centerHeroStack
+    .simpleSpotlightPhotoFallback
+    span {
+    font-size:
+      8.5px !important;
+  }
+}
+
+/* HQ HERO — CANDIDATE AREA BALANCE END */
