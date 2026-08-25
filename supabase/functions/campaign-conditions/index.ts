@@ -635,7 +635,7 @@ async function loadWeather(
           nearestStation
             ?.id ||
           nearestStation
-            ?."@id",
+            ?.["@id"],
         );
 
 
