@@ -670,6 +670,19 @@ function transformThread({
     providerThreadId:
       thread.id,
 
+    folderIds:
+      Array.isArray(
+        thread.folders,
+      )
+        ? thread.folders
+            .map(
+              clean,
+            )
+            .filter(
+              Boolean,
+            )
+        : [],
+
     contactId:
       null,
 
@@ -919,13 +932,7 @@ export function useRealInboxMailbox({
     useRef(
       new Map(),
     );
-
-  const readThreadsRef =
-    useRef(
-      new Set(),
-    );
-
-  const invokeMailbox =
+const invokeMailbox =
     useCallback(
       async (
         requestBody,
@@ -1243,26 +1250,7 @@ export function useRealInboxMailbox({
                         mailboxEmail ||
                         connectedEmail,
                     });
-
-                  if (
-                    readThreadsRef
-                      .current
-                      .has(
-                        clean(
-                          thread?.id,
-                        ),
-                      )
-                  ) {
-                    return {
-                      ...transformed,
-                      unread:
-                        false,
-                      unreadCount:
-                        0,
-                    };
-                  }
-
-                  return transformed;
+return transformed;
                 },
               )
               .sort(
@@ -1317,9 +1305,65 @@ export function useRealInboxMailbox({
       ],
     );
 
+  const updateThread =
+    useCallback(
+      async (
+        threadIdOrConversationId,
+        updates,
+        {
+          refreshAfter =
+            false,
+        } = {},
+      ) => {
+        const providerThreadId =
+          clean(
+            threadIdOrConversationId,
+          ).replace(
+            THREAD_PREFIX,
+            "",
+          );
+
+        if (
+          !enabled ||
+          !providerThreadId
+        ) {
+          return null;
+        }
+
+
+        const result =
+          await invokeMailbox({
+            action:
+              "update_thread",
+
+            threadId:
+              providerThreadId,
+
+            ...updates,
+          });
+
+
+        if (refreshAfter) {
+          await refresh({
+            showLoading:
+              false,
+          });
+        }
+
+
+        return result;
+      },
+      [
+        enabled,
+        invokeMailbox,
+        refresh,
+      ],
+    );
+
+
   const markThreadRead =
     useCallback(
-      (
+      async (
         threadIdOrConversationId,
       ) => {
         const providerThreadId =
@@ -1334,66 +1378,344 @@ export function useRealInboxMailbox({
           !enabled ||
           !providerThreadId
         ) {
-          return;
+          return null;
         }
 
-        readThreadsRef
-          .current
-          .add(
-            providerThreadId,
-          );
 
-        if (
-          typeof window !==
-            "undefined"
-        ) {
-          try {
-            const storageKey =
-              `campaign-seat-mailbox-read:${workspaceId}`;
+        let wasUnread =
+          false;
 
-            const stored =
-              Array.from(
-                readThreadsRef
-                  .current,
-              )
-                .slice(
-                  -1000,
-                );
-
-            window.localStorage
-              .setItem(
-                storageKey,
-                JSON.stringify(
-                  stored,
-                ),
-              );
-          } catch {
-            // Browser storage is only
-            // an enhancement.
-          }
-        }
 
         setConversations(
           (current) =>
             current.map(
-              (conversation) =>
-                conversation
-                  .providerThreadId ===
-                providerThreadId
-                  ? {
-                      ...conversation,
-                      unread:
-                        false,
-                      unreadCount:
-                        0,
-                    }
-                  : conversation,
+              (conversation) => {
+                if (
+                  conversation
+                    .providerThreadId !==
+                  providerThreadId
+                ) {
+                  return conversation;
+                }
+
+                wasUnread =
+                  Boolean(
+                    conversation
+                      .unread,
+                  );
+
+                return {
+                  ...conversation,
+
+                  unread:
+                    false,
+
+                  unreadCount:
+                    0,
+                };
+              },
             ),
         );
+
+
+        if (wasUnread) {
+          setInboxUnreadCount(
+            (current) =>
+              Number.isFinite(
+                current,
+              )
+                ? Math.max(
+                    0,
+                    current - 1,
+                  )
+                : current,
+          );
+        }
+
+
+        try {
+          const result =
+            await updateThread(
+              providerThreadId,
+              {
+                unread:
+                  false,
+              },
+            );
+
+          setError("");
+
+          return result;
+        } catch (
+          updateError
+        ) {
+          /*
+           * Provider truth wins.
+           * Reload instead of leaving a false local read state.
+           */
+          await refresh({
+            showLoading:
+              false,
+          });
+
+          const message =
+            errorMessage(
+              updateError,
+              "Campaign Seat could not mark this email read in the connected mailbox.",
+            );
+
+          setError(
+            message,
+          );
+
+          throw new Error(
+            message,
+            {
+              cause:
+                updateError,
+            },
+          );
+        }
       },
       [
         enabled,
-        workspaceId,
+        refresh,
+        updateThread,
+      ],
+    );
+
+
+  const markThreadUnread =
+    useCallback(
+      async (
+        threadIdOrConversationId,
+      ) => {
+        const result =
+          await updateThread(
+            threadIdOrConversationId,
+            {
+              unread:
+                true,
+            },
+            {
+              refreshAfter:
+                true,
+            },
+          );
+
+        return result;
+      },
+      [
+        updateThread,
+      ],
+    );
+
+
+  const setThreadStarred =
+    useCallback(
+      async (
+        threadIdOrConversationId,
+        starred,
+      ) => {
+        return updateThread(
+          threadIdOrConversationId,
+          {
+            starred:
+              Boolean(
+                starred,
+              ),
+          },
+          {
+            refreshAfter:
+              true,
+          },
+        );
+      },
+      [
+        updateThread,
+      ],
+    );
+
+
+  const setThreadFolders =
+    useCallback(
+      async (
+        threadIdOrConversationId,
+        folders,
+      ) => {
+        return updateThread(
+          threadIdOrConversationId,
+          {
+            folders:
+              Array.from(
+                new Set(
+                  (
+                    Array.isArray(
+                      folders,
+                    )
+                      ? folders
+                      : []
+                  )
+                    .map(
+                      clean,
+                    )
+                    .filter(
+                      Boolean,
+                    ),
+                ),
+              ),
+          },
+          {
+            refreshAfter:
+              true,
+          },
+        );
+      },
+      [
+        updateThread,
+      ],
+    );
+
+
+  const trashThread =
+    useCallback(
+      async (
+        threadIdOrConversationId,
+      ) => {
+        const providerThreadId =
+          clean(
+            threadIdOrConversationId,
+          ).replace(
+            THREAD_PREFIX,
+            "",
+          );
+
+        if (
+          !enabled ||
+          !providerThreadId
+        ) {
+          return null;
+        }
+
+
+        const result =
+          await invokeMailbox({
+            action:
+              "delete_thread",
+
+            threadId:
+              providerThreadId,
+          });
+
+
+        await refresh({
+          showLoading:
+            false,
+        });
+
+
+        return result;
+      },
+      [
+        enabled,
+        invokeMailbox,
+        refresh,
+      ],
+    );
+
+
+  const createFolder =
+    useCallback(
+      async ({
+        name,
+        parentId = "",
+      }) => {
+        const result =
+          await invokeMailbox({
+            action:
+              "create_folder",
+
+            name,
+
+            parentId,
+          });
+
+
+        await refresh({
+          showLoading:
+            false,
+        });
+
+
+        return result;
+      },
+      [
+        invokeMailbox,
+        refresh,
+      ],
+    );
+
+
+  const renameFolder =
+    useCallback(
+      async ({
+        folderId,
+        name,
+        parentId = "",
+      }) => {
+        const result =
+          await invokeMailbox({
+            action:
+              "update_folder",
+
+            folderId,
+
+            name,
+
+            parentId,
+          });
+
+
+        await refresh({
+          showLoading:
+            false,
+        });
+
+
+        return result;
+      },
+      [
+        invokeMailbox,
+        refresh,
+      ],
+    );
+
+
+  const deleteFolder =
+    useCallback(
+      async (
+        folderId,
+      ) => {
+        const result =
+          await invokeMailbox({
+            action:
+              "delete_folder",
+
+            folderId,
+          });
+
+
+        await refresh({
+          showLoading:
+            false,
+        });
+
+
+        return result;
+      },
+      [
+        invokeMailbox,
+        refresh,
       ],
     );
 
@@ -1610,44 +1932,6 @@ export function useRealInboxMailbox({
       ],
     );
 
-  useEffect(() => {
-    if (
-      !enabled ||
-      !workspaceId ||
-      typeof window ===
-        "undefined"
-    ) {
-      return;
-    }
-
-    try {
-      const stored =
-        JSON.parse(
-          window.localStorage
-            .getItem(
-              `campaign-seat-mailbox-read:${workspaceId}`,
-            ) ||
-          "[]",
-        );
-
-      readThreadsRef.current =
-        new Set(
-          Array.isArray(
-            stored,
-          )
-            ? stored
-                .map(clean)
-                .filter(Boolean)
-            : [],
-        );
-    } catch {
-      readThreadsRef.current =
-        new Set();
-    }
-  }, [
-    enabled,
-    workspaceId,
-  ]);
 
 
   useEffect(() => {
@@ -2145,6 +2429,13 @@ export function useRealInboxMailbox({
     refresh,
     loadThread,
     markThreadRead,
+    markThreadUnread,
+    setThreadStarred,
+    setThreadFolders,
+    trashThread,
+    createFolder,
+    renameFolder,
+    deleteFolder,
     sendEmail,
     replyEmail,
     getAttachmentBlob,

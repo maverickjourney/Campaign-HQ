@@ -311,8 +311,12 @@ Deno.serve(
       new Set([
         "message.created",
         "message.updated",
+        "message.deleted",
         "message.send_success",
         "message.send_failed",
+        "folder.created",
+        "folder.updated",
+        "folder.deleted",
         "grant.updated",
         "grant.expired",
         "grant.deleted",

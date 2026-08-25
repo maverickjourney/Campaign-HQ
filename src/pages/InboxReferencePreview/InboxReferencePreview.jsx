@@ -4036,9 +4036,15 @@ export default function InboxReferencePreview() {
       conversationToOpen
         ?.providerThreadId
     ) {
-      markMailboxThreadRead(
+      void markMailboxThreadRead(
         conversationToOpen
           .providerThreadId,
+      ).catch(
+        () => {
+          setToast(
+            "The email opened, but Campaign Seat could not sync the read state to the connected mailbox.",
+          );
+        },
       );
     } else {
       setConversations(
@@ -4061,7 +4067,7 @@ export default function InboxReferencePreview() {
     setToast(
       conversationToOpen
         ?.providerThreadId
-        ? "Conversation opened · read in Campaign Seat."
+        ? "Conversation opened · syncing read status with connected email."
         : "Conversation opened.",
     );
   };

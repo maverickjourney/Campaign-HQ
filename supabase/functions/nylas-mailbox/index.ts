@@ -381,6 +381,53 @@ Deno.serve(
       );
     }
 
+
+    const mutationActions =
+      new Set([
+        "update_thread",
+        "delete_thread",
+        "create_folder",
+        "update_folder",
+        "delete_folder",
+      ]);
+
+
+    if (
+      mutationActions.has(
+        action,
+      )
+    ) {
+      const {
+        data:
+          canManage,
+        error:
+          managePermissionError,
+      } =
+        await userClient.rpc(
+          "can_manage_connected_email",
+          {
+            target_workspace_id:
+              workspaceId,
+          },
+        );
+
+
+      if (
+        managePermissionError ||
+        canManage !==
+          true
+      ) {
+        return jsonResponse(
+          request,
+          403,
+          {
+            error:
+              "You do not have permission to modify the connected campaign mailbox.",
+          },
+        );
+      }
+    }
+
     const adminClient =
       createClient(
         supabaseUrl,
@@ -467,6 +514,17 @@ Deno.serve(
 
     let binaryResponse =
       false;
+
+
+    let providerMethod =
+      "GET";
+
+    let providerBody:
+      Record<
+        string,
+        unknown
+      > | null =
+      null;
 
     if (
       action ===
@@ -675,6 +733,391 @@ Deno.serve(
 
       binaryResponse =
         true;
+    } else if (
+      action ===
+      "update_thread"
+    ) {
+      const threadId =
+        clean(
+          body.threadId,
+        );
+
+      if (!threadId) {
+        return jsonResponse(
+          request,
+          400,
+          {
+            error:
+              "A thread ID is required.",
+          },
+        );
+      }
+
+
+      const update:
+        Record<
+          string,
+          unknown
+        > = {};
+
+
+      if (
+        typeof body.unread ===
+          "boolean"
+      ) {
+        update.unread =
+          body.unread;
+      }
+
+
+      if (
+        typeof body.starred ===
+          "boolean"
+      ) {
+        update.starred =
+          body.starred;
+      }
+
+
+      if (
+        Array.isArray(
+          body.folders,
+        )
+      ) {
+        const folders =
+          Array.from(
+            new Set(
+              body.folders
+                .map(
+                  clean,
+                )
+                .filter(
+                  Boolean,
+                ),
+            ),
+          )
+            .slice(
+              0,
+              100,
+            );
+
+        update.folders =
+          folders;
+      }
+
+
+      if (
+        Object.keys(
+          update,
+        ).length ===
+        0
+      ) {
+        return jsonResponse(
+          request,
+          400,
+          {
+            error:
+              "Choose a mailbox property to update.",
+          },
+        );
+      }
+
+
+      target =
+        new URL(
+          `${baseUri}/v3/grants/${grant}/threads/${encodeURIComponent(threadId)}`,
+        );
+
+      providerMethod =
+        "PUT";
+
+      providerBody =
+        update;
+
+    } else if (
+      action ===
+      "delete_thread"
+    ) {
+      const threadId =
+        clean(
+          body.threadId,
+        );
+
+      if (!threadId) {
+        return jsonResponse(
+          request,
+          400,
+          {
+            error:
+              "A thread ID is required.",
+          },
+        );
+      }
+
+
+      target =
+        new URL(
+          `${baseUri}/v3/grants/${grant}/threads/${encodeURIComponent(threadId)}`,
+        );
+
+      providerMethod =
+        "DELETE";
+
+    } else if (
+      action ===
+      "create_folder"
+    ) {
+      const folderName =
+        clean(
+          body.name,
+        );
+
+      if (
+        !folderName ||
+        folderName.length >
+          120
+      ) {
+        return jsonResponse(
+          request,
+          400,
+          {
+            error:
+              "Enter a folder name between 1 and 120 characters.",
+          },
+        );
+      }
+
+
+      target =
+        new URL(
+          `${baseUri}/v3/grants/${grant}/folders`,
+        );
+
+      providerMethod =
+        "POST";
+
+      providerBody = {
+        name:
+          folderName,
+      };
+
+
+      const parentId =
+        clean(
+          body.parentId,
+        );
+
+      if (parentId) {
+        providerBody.parent_id =
+          parentId;
+      }
+
+    } else if (
+      action ===
+      "update_folder"
+    ) {
+      const folderId =
+        clean(
+          body.folderId,
+        );
+
+      const folderName =
+        clean(
+          body.name,
+        );
+
+      if (!folderId) {
+        return jsonResponse(
+          request,
+          400,
+          {
+            error:
+              "A folder ID is required.",
+          },
+        );
+      }
+
+
+      if (
+        !folderName ||
+        folderName.length >
+          120
+      ) {
+        return jsonResponse(
+          request,
+          400,
+          {
+            error:
+              "Enter a folder name between 1 and 120 characters.",
+          },
+        );
+      }
+
+
+      target =
+        new URL(
+          `${baseUri}/v3/grants/${grant}/folders/${encodeURIComponent(folderId)}`,
+        );
+
+      providerMethod =
+        "PUT";
+
+      providerBody = {
+        name:
+          folderName,
+      };
+
+
+      const parentId =
+        clean(
+          body.parentId,
+        );
+
+      if (parentId) {
+        providerBody.parent_id =
+          parentId;
+      }
+
+    } else if (
+      action ===
+      "delete_folder"
+    ) {
+      const folderId =
+        clean(
+          body.folderId,
+        );
+
+      if (!folderId) {
+        return jsonResponse(
+          request,
+          400,
+          {
+            error:
+              "A folder ID is required.",
+          },
+        );
+      }
+
+
+      /*
+       * Never let Campaign Seat delete a provider system folder.
+       * Confirm the real folder metadata before the DELETE.
+       */
+      const folderTarget =
+        new URL(
+          `${baseUri}/v3/grants/${grant}/folders/${encodeURIComponent(folderId)}`,
+        );
+
+
+      let folderResponse:
+        Response;
+
+
+      try {
+        folderResponse =
+          await fetch(
+            folderTarget,
+            {
+              method:
+                "GET",
+
+              headers: {
+                "Authorization":
+                  `Bearer ${nylasApiKey}`,
+
+                "Accept":
+                  "application/json",
+              },
+            },
+          );
+      } catch {
+        return jsonResponse(
+          request,
+          502,
+          {
+            error:
+              "Campaign Seat could not verify the provider folder before deletion.",
+          },
+        );
+      }
+
+
+      if (
+        !folderResponse.ok
+      ) {
+        return jsonResponse(
+          request,
+          502,
+          {
+            error:
+              "The provider folder could not be verified before deletion.",
+          },
+        );
+      }
+
+
+      const folderPayload =
+        await folderResponse
+          .json();
+
+      const folder =
+        (
+          folderPayload
+            ?.data ||
+          {}
+        ) as Record<
+          string,
+          unknown
+        >;
+
+
+      const attributes =
+        Array.isArray(
+          folder.attributes,
+        )
+          ? folder.attributes
+              .map(
+                clean,
+              )
+          : [];
+
+
+      if (
+        folder.system_folder ===
+          true ||
+        attributes.some(
+          (
+            attribute,
+          ) =>
+            [
+              "\\Inbox",
+              "\\Sent",
+              "\\Drafts",
+              "\\Junk",
+              "\\Trash",
+              "\\Archive",
+            ].includes(
+              attribute,
+            ),
+        )
+      ) {
+        return jsonResponse(
+          request,
+          409,
+          {
+            error:
+              "Campaign Seat will not delete a provider system folder.",
+          },
+        );
+      }
+
+
+      target =
+        folderTarget;
+
+      providerMethod =
+        "DELETE";
+
     } else {
       return jsonResponse(
         request,
@@ -695,7 +1138,7 @@ Deno.serve(
           target,
           {
             method:
-              "GET",
+              providerMethod,
 
             headers: {
               "Authorization":
@@ -705,7 +1148,27 @@ Deno.serve(
                 binaryResponse
                   ? "*/*"
                   : "application/json",
+
+              ...(
+                providerBody
+                  ? {
+                      "Content-Type":
+                        "application/json",
+                    }
+                  : {}
+              ),
             },
+
+            ...(
+              providerBody
+                ? {
+                    body:
+                      JSON.stringify(
+                        providerBody,
+                      ),
+                  }
+                : {}
+            ),
           },
         );
     } catch {
@@ -795,6 +1258,39 @@ Deno.serve(
         },
       );
     }
+
+    if (
+      providerResponse.status ===
+        204
+    ) {
+      return jsonResponse(
+        request,
+        200,
+        {
+          success:
+            true,
+
+          action,
+
+          connectedEmail:
+            connection
+              .connected_email ||
+            null,
+
+          accountProvider:
+            connection
+              .account_provider ||
+            null,
+
+          data:
+            null,
+
+          nextCursor:
+            null,
+        },
+      );
+    }
+
 
     let providerPayload:
       Record<
