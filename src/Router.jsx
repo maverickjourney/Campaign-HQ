@@ -67,15 +67,148 @@ const VOLUNTEER_EXPERIENCES = [
 ];
 
 export default function Router() {
+  const hostname =
+    window.location.hostname
+      .trim()
+      .toLowerCase();
+
+  const isPlatformAdminHostname =
+    hostname ===
+    "admin.campaignseat.com";
+
+  const isCampaignAppHostname =
+    hostname ===
+    "app.campaignseat.com";
+
+  const isLocalDevelopmentHostname =
+    hostname === "127.0.0.1" ||
+    hostname === "localhost";
+
+  /*
+   * CAMPAIGN SEAT HOSTNAME SEPARATION
+   *
+   * campaignseat.com
+   *   -> public Campaign Seat website
+   *
+   * app.campaignseat.com
+   *   -> campaign/client application
+   *
+   * admin.campaignseat.com
+   *   -> Seat Platform Admin only
+   *
+   * Local development keeps /admin routes available on
+   * 127.0.0.1 and localhost.
+   */
+  if (isPlatformAdminHostname) {
+    return (
+      <BrowserRouter>
+        <Routes>
+          <Route
+            path="/"
+            element={
+              <Navigate
+                to="/admin"
+                replace
+              />
+            }
+          />
+
+          <Route
+            path="/login"
+            element={
+              <Navigate
+                to="/admin/login"
+                replace
+              />
+            }
+          />
+
+          <Route
+            path="/admin/login"
+            element={
+              <PlatformAdminLogin />
+            }
+          />
+
+          <Route
+            path="/admin"
+            element={
+              <PlatformAdminGuard>
+                <PlatformAdminHome />
+              </PlatformAdminGuard>
+            }
+          />
+
+          <Route
+            path="/admin/customers"
+            element={
+              <PlatformAdminGuard>
+                <PlatformAdminCustomers />
+              </PlatformAdminGuard>
+            }
+          />
+
+          <Route
+            path="/admin/customers/new"
+            element={
+              <PlatformAdminGuard>
+                <PlatformAdminNewClient />
+              </PlatformAdminGuard>
+            }
+          />
+
+          <Route
+            path="/admin/deals/:dealCode/proposal"
+            element={
+              <PlatformAdminGuard>
+                <PlatformAdminProposalBuilder />
+              </PlatformAdminGuard>
+            }
+          />
+
+          <Route
+            path="/admin/proposals/:proposalId"
+            element={
+              <PlatformAdminGuard>
+                <PlatformAdminProposalPreview />
+              </PlatformAdminGuard>
+            }
+          />
+
+          <Route
+            path="*"
+            element={
+              <Navigate
+                to="/admin"
+                replace
+              />
+            }
+          />
+        </Routes>
+      </BrowserRouter>
+    );
+  }
+
   return (
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<Login />} />
+        {isCampaignAppHostname ? (
+          <Route
+            path="/admin/*"
+            element={
+              <Navigate
+                to="/"
+                replace
+              />
+            }
+          />
+        ) : (
+          <>
         <Route
           path="/admin/login"
           element={<PlatformAdminLogin />}
         />
-
         <Route
           path="/admin"
           element={
@@ -84,7 +217,6 @@ export default function Router() {
             </PlatformAdminGuard>
           }
         />
-
         <Route
           path="/admin/customers"
           element={
@@ -93,7 +225,6 @@ export default function Router() {
             </PlatformAdminGuard>
           }
         />
-
         <Route
           path="/admin/customers/new"
           element={
@@ -102,7 +233,6 @@ export default function Router() {
             </PlatformAdminGuard>
           }
         />
-
         <Route
           path="/admin/deals/:dealCode/proposal"
           element={
@@ -111,7 +241,6 @@ export default function Router() {
             </PlatformAdminGuard>
           }
         />
-
         <Route
           path="/admin/proposals/:proposalId"
           element={
@@ -120,6 +249,8 @@ export default function Router() {
             </PlatformAdminGuard>
           }
         />
+          </>
+        )}
 
         <Route
           path="/proposal/:token"
