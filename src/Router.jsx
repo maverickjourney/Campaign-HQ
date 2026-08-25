@@ -188,6 +188,15 @@ export default function Router() {
           />
 
           <Route
+            path="/admin/customers/:workspaceId"
+            element={
+              <PlatformAdminGuard>
+                <PlatformAdminCustomer360 />
+              </PlatformAdminGuard>
+            }
+          />
+
+          <Route
             path="/admin/customers/new"
             element={
               <PlatformAdminGuard>
