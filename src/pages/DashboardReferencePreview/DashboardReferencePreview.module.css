@@ -23516,3 +23516,235 @@
 }
 
 /* HQ HERO DATE + COUNTDOWN + CONDITIONS — FINAL LAYOUT END */
+
+
+/* HQ HERO TOP CARDS — NO TRUNCATION FIX START */
+
+/*
+ * Give Election Day + Countdown more usable width.
+ * Candidate area stays intact, but becomes slightly less dominant.
+ */
+
+.centerHeroStack
+  .simpleSpotlightCopy {
+  grid-template-columns:
+    minmax(0, 1.68fr)
+    minmax(205px, 0.68fr) !important;
+
+  column-gap:
+    24px !important;
+}
+
+
+/*
+ * Election Day gets a little more room than Countdown.
+ */
+
+.centerHeroStack
+  .simpleSpotlightInfoStack {
+  grid-template-columns:
+    minmax(0, 1.32fr)
+    minmax(0, 0.86fr) !important;
+
+  gap:
+    10px !important;
+}
+
+
+/*
+ * Make both top cards compact like the approved mockup.
+ */
+
+.centerHeroStack
+  .simpleSpotlightInfoCard {
+  min-height:
+    76px !important;
+
+  padding:
+    10px 12px !important;
+
+  grid-template-columns:
+    40px
+    minmax(0, 1fr) !important;
+
+  gap:
+    10px !important;
+}
+
+
+.centerHeroStack
+  .simpleSpotlightInfoIcon {
+  width:
+    40px !important;
+
+  height:
+    40px !important;
+
+  min-width:
+    40px !important;
+
+  border-radius:
+    10px !important;
+}
+
+
+.centerHeroStack
+  .simpleSpotlightInfoIcon
+  svg {
+  width:
+    17px !important;
+
+  height:
+    17px !important;
+}
+
+
+/*
+ * Critical fix:
+ * do not inherit ellipsis/truncation on these two values.
+ */
+
+.centerHeroStack
+  .simpleSpotlightInfoBody {
+  overflow:
+    visible !important;
+}
+
+
+.centerHeroStack
+  .simpleSpotlightInfoBody
+  small {
+  overflow:
+    visible !important;
+
+  font-size:
+    8.5px !important;
+
+  line-height:
+    1 !important;
+
+  letter-spacing:
+    0.11em !important;
+
+  text-overflow:
+    clip !important;
+
+  white-space:
+    nowrap !important;
+}
+
+
+.centerHeroStack
+  .simpleSpotlightInfoBody
+  strong {
+  width:
+    auto !important;
+
+  max-width:
+    none !important;
+
+  margin-top:
+    5px !important;
+
+  overflow:
+    visible !important;
+
+  font-size:
+    16px !important;
+
+  line-height:
+    1.05 !important;
+
+  letter-spacing:
+    -0.025em !important;
+
+  text-overflow:
+    clip !important;
+
+  white-space:
+    nowrap !important;
+}
+
+
+/*
+ * Weather keeps the full width underneath.
+ */
+
+.centerHeroStack
+  .simpleSpotlightWeatherCard {
+  grid-column:
+    1 / -1 !important;
+
+  min-height:
+    104px !important;
+}
+
+
+/*
+ * At narrower laptop widths, still preserve full text
+ * before eventually stacking on true small screens.
+ */
+
+@media (
+  max-width: 1360px
+) and (
+  min-width: 1081px
+) {
+  .centerHeroStack
+    .simpleSpotlightCopy {
+    grid-template-columns:
+      minmax(0, 1.75fr)
+      minmax(190px, 0.62fr) !important;
+
+    column-gap:
+      18px !important;
+  }
+
+  .centerHeroStack
+    .simpleSpotlightInfoStack {
+    grid-template-columns:
+      minmax(0, 1.38fr)
+      minmax(0, 0.82fr) !important;
+  }
+
+  .centerHeroStack
+    .simpleSpotlightInfoCard {
+    grid-template-columns:
+      36px
+      minmax(0, 1fr) !important;
+
+    padding:
+      9px 10px !important;
+
+    gap:
+      8px !important;
+  }
+
+  .centerHeroStack
+    .simpleSpotlightInfoIcon {
+    width:
+      36px !important;
+
+    height:
+      36px !important;
+
+    min-width:
+      36px !important;
+  }
+
+  .centerHeroStack
+    .simpleSpotlightInfoBody
+    strong {
+    font-size:
+      14px !important;
+  }
+
+  .centerHeroStack
+    .simpleSpotlightInfoBody
+    small {
+    font-size:
+      8px !important;
+  }
+}
+
+/* HQ HERO TOP CARDS — NO TRUNCATION FIX END */
