@@ -1,6 +1,7 @@
 @import "./variables.css";
 @import "./typography.css";
 @import "./animations.css";
+@import "./candidatePhotos.css";
 
 *,
 *::before,

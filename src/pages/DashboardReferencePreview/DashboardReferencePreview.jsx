@@ -8395,7 +8395,10 @@ const [
                   </div>
                 </div>
 
-                <div className={styles.simpleSpotlightMedia}>
+                <div
+                  className={styles.simpleSpotlightMedia}
+                  data-candidate-photo-frame="hq"
+                >
                   {dashboardCandidatePhotoUrl ? (
                     <img
                       className={
@@ -8406,6 +8409,9 @@ const [
                       }
                       alt=""
                       aria-hidden="true"
+                      data-candidate-photo="hq-backdrop"
+                      decoding="async"
+                      draggable="false"
                     />
                   ) : (
                     <div
@@ -8448,6 +8454,11 @@ const [
                           ?.candidateName ||
                         workspace.name
                       }
+                      data-candidate-photo="hq-portrait"
+                      decoding="async"
+                      loading="eager"
+                      fetchPriority="high"
+                      draggable="false"
                     />
                   ) : null}
                 </div>

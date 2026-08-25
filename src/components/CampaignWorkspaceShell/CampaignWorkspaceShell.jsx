@@ -855,6 +855,7 @@ export function CampaignWorkspaceShell({
             className={
               dashboardStyles.profileAvatar
             }
+            data-candidate-photo-frame="sidebar"
           >
             {candidateAvatarUrl ? (
               <img
@@ -866,6 +867,10 @@ export function CampaignWorkspaceShell({
                 }
                 alt=""
                 aria-hidden="true"
+                data-candidate-photo="sidebar"
+                decoding="async"
+                loading="eager"
+                draggable="false"
               />
             ) : (
               initials

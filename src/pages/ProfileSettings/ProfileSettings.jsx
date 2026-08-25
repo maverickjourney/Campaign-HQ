@@ -1175,6 +1175,7 @@ export default function ProfileSettings() {
                       className={
                         styles.avatar
                       }
+                      data-candidate-photo-frame="profile"
                     >
                       {avatarPreviewUrl ? (
                         <img
@@ -1182,6 +1183,10 @@ export default function ProfileSettings() {
                             avatarPreviewUrl
                           }
                           alt=""
+                          data-candidate-photo="profile"
+                          decoding="async"
+                          loading="eager"
+                          draggable="false"
                         />
                       ) : (
                         <span>

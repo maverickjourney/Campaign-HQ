@@ -1,0 +1,207 @@
+/* ============================================================
+   CAMPAIGN SEAT — CANONICAL CANDIDATE PHOTO RENDERING
+
+   Storage/compression is handled separately.
+
+   This file controls how the same candidate image renders in:
+   - Campaign HQ
+   - Profile Settings
+   - Candidate Profile
+   - Onboarding
+   - Workspace sidebar
+
+   RULES:
+   - never distort
+   - never stretch
+   - never overflow its frame
+   - preserve aspect ratio
+   - stable square avatars
+   - face-friendly crop
+   - responsive hero sizing follows its container
+   ============================================================ */
+
+
+/* ------------------------------------------------------------
+   ALL PHOTO FRAMES
+   ------------------------------------------------------------ */
+
+[data-candidate-photo-frame] {
+  box-sizing: border-box;
+
+  min-width: 0;
+
+  overflow: hidden;
+
+  background-color: #e8edf5;
+
+  isolation: isolate;
+}
+
+
+/*
+ * Avatar/profile surfaces are always square.
+ *
+ * Width may change at responsive breakpoints, but the frame
+ * can never accidentally become rectangular.
+ */
+
+[data-candidate-photo-frame="profile"],
+[data-candidate-photo-frame="candidate-profile"],
+[data-candidate-photo-frame="onboarding"],
+[data-candidate-photo-frame="sidebar"] {
+  aspect-ratio: 1 / 1 !important;
+  flex-shrink: 0;
+}
+
+
+/* ------------------------------------------------------------
+   ALL REAL CANDIDATE PHOTOS
+   ------------------------------------------------------------ */
+
+img[data-candidate-photo] {
+  box-sizing: border-box !important;
+
+  display: block !important;
+
+  width: 100% !important;
+  height: 100% !important;
+
+  min-width: 0 !important;
+  min-height: 0 !important;
+
+  max-width: 100% !important;
+  max-height: 100% !important;
+
+  margin: 0 !important;
+  padding: 0 !important;
+
+  /*
+   * Never distort the original aspect ratio.
+   * Crop only when the frame requires it.
+   */
+  object-fit: cover !important;
+
+  /*
+   * Candidate photos are normally portraits/headshots.
+   * A slight upward bias keeps faces safer than dead-center
+   * when tall or landscape images are used.
+   *
+   * These CSS variables also leave us a future focal-point
+   * control without rewriting the renderer.
+   */
+  object-position:
+    var(--campaign-photo-x, 50%)
+    var(--campaign-photo-y, 28%) !important;
+
+  image-orientation: from-image;
+
+  user-select: none;
+
+  -webkit-user-drag: none;
+
+  backface-visibility: hidden;
+}
+
+
+/* ------------------------------------------------------------
+   CAMPAIGN HQ
+   ------------------------------------------------------------ */
+
+/*
+ * The HQ foreground portrait always fills the current HQ media
+ * frame. Its height therefore automatically follows:
+ *
+ * desktop  -> current hero height
+ * tablet   -> current responsive hero height
+ * mobile   -> current responsive hero height
+ *
+ * We no longer rely on the portrait itself independently
+ * matching 292 / 270 / 245px.
+ */
+
+img[data-candidate-photo="hq-portrait"] {
+  position: absolute !important;
+
+  inset: 0 !important;
+
+  width: 100% !important;
+  height: 100% !important;
+
+  object-fit: cover !important;
+
+  object-position:
+    var(--campaign-photo-x, 50%)
+    var(--campaign-photo-y, 35%) !important;
+}
+
+
+/*
+ * HQ blurred background intentionally extends beyond the frame.
+ * This is decorative and must not be constrained by the normal
+ * image max-width/max-height rules.
+ */
+
+img[data-candidate-photo="hq-backdrop"] {
+  position: absolute !important;
+
+  inset: -18px !important;
+
+  width: calc(100% + 36px) !important;
+  height: calc(100% + 36px) !important;
+
+  max-width: none !important;
+  max-height: none !important;
+
+  object-fit: cover !important;
+
+  object-position:
+    var(--campaign-photo-x, 50%)
+    var(--campaign-photo-y, 35%) !important;
+}
+
+
+/* ------------------------------------------------------------
+   SMALL AVATARS
+   ------------------------------------------------------------ */
+
+img[data-candidate-photo="sidebar"],
+img[data-candidate-photo="profile"],
+img[data-candidate-photo="onboarding"],
+img[data-candidate-photo="candidate-profile"] {
+  object-position:
+    var(--campaign-photo-x, 50%)
+    var(--campaign-photo-y, 28%) !important;
+}
+
+
+/* ------------------------------------------------------------
+   VERY SMALL DEVICES
+   ------------------------------------------------------------ */
+
+@media (max-width: 420px) {
+  /*
+   * Frames keep their surface-specific responsive dimensions.
+   * The image simply follows the frame.
+   */
+
+  img[data-candidate-photo] {
+    width: 100% !important;
+    height: 100% !important;
+  }
+}
+
+
+/* ------------------------------------------------------------
+   LARGE / HIGH-DPI DISPLAYS
+   ------------------------------------------------------------ */
+
+@media (min-width: 1800px) {
+  /*
+   * Do not enlarge UI frames merely because the monitor is huge.
+   * The existing component dimensions remain authoritative.
+   */
+
+  [data-candidate-photo-frame] {
+    max-width: 100%;
+  }
+}

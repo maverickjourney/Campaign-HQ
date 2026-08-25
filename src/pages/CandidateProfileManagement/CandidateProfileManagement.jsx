@@ -426,6 +426,7 @@ export default function CandidateProfileManagement() {
                   className={
                     styles.photo
                   }
+                  data-candidate-photo-frame="candidate-profile"
                 >
                   {photoPreviewUrl ? (
                     <img
@@ -437,6 +438,10 @@ export default function CandidateProfileManagement() {
                           .candidateName ||
                         "Candidate"
                       }
+                      data-candidate-photo="candidate-profile"
+                      decoding="async"
+                      loading="eager"
+                      draggable="false"
                     />
                   ) : (
                     <span>

@@ -929,6 +929,7 @@ export default function SeatCampaignProfileStep({
                   className={
                     styles.candidatePhotoPreview
                   }
+                  data-candidate-photo-frame="onboarding"
                 >
                   {candidatePhotoPreviewUrl ? (
                     <img
@@ -936,6 +937,10 @@ export default function SeatCampaignProfileStep({
                         candidatePhotoPreviewUrl
                       }
                       alt="Candidate preview"
+                      data-candidate-photo="onboarding"
+                      decoding="async"
+                      loading="eager"
+                      draggable="false"
                     />
                   ) : (
                     <Camera
