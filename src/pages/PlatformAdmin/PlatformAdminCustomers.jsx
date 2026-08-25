@@ -18,6 +18,7 @@ import PlatformAdminShell
 
 import {
   loadPlatformCustomers,
+  loadPlatformCustomerWorkspaceBindings,
 } from "../../services/platformAdminData";
 
 import styles
@@ -59,11 +60,38 @@ export default function PlatformAdminCustomers() {
 
     const load = async () => {
       try {
-        const result =
-          await loadPlatformCustomers();
+        const [
+          result,
+          workspaceBindings,
+        ] =
+          await Promise.all([
+            loadPlatformCustomers(),
+            loadPlatformCustomerWorkspaceBindings(),
+          ]);
+
+        const workspaceByCustomer =
+          new Map(
+            workspaceBindings.map(
+              (binding) => [
+                binding.customer_id,
+                binding,
+              ],
+            ),
+          );
 
         if (active) {
-          setCustomers(result);
+          setCustomers(
+            result.map(
+              (customer) => ({
+                ...customer,
+
+                workspaceAccess:
+                  workspaceByCustomer.get(
+                    customer.id,
+                  ) || null,
+              }),
+            ),
+          );
         }
       } catch (loadError) {
         if (active) {
@@ -232,7 +260,21 @@ export default function PlatformAdminCustomers() {
                     </span>
                   </div>
 
-                  <div>
+                  <div
+                    className={
+                      styles.customerActions
+                    }
+                  >
+                    {customer.workspaceAccess
+                      ?.workspace_id && (
+                      <Link
+                        className={`${styles.tableAction} ${styles.workspaceAction}`}
+                        to={`/admin/customers/${customer.workspaceAccess.workspace_id}`}
+                      >
+                        Manage Customer
+                      </Link>
+                    )}
+
                     {customer.currentProposal?.id ? (
                       <Link
                         className={styles.tableAction}
@@ -249,9 +291,10 @@ export default function PlatformAdminCustomers() {
                       >
                         Build proposal
                       </Link>
-                    ) : (
+                    ) : !customer.workspaceAccess
+                      ?.workspace_id ? (
                       <span>—</span>
-                    )}
+                    ) : null}
                   </div>
                 </article>
               ),

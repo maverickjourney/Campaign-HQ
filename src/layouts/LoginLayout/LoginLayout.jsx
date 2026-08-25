@@ -3,6 +3,7 @@ import {
 } from "react-router-dom";
 
 import Hero from "../../components/login/Hero/Hero";
+import SeatBrand from "../../components/brand/SeatBrand/SeatBrand";
 import LoginForm from "../../components/login/LoginForm/LoginForm";
 import styles from "./LoginLayout.module.css";
 
@@ -25,6 +26,18 @@ export default function LoginLayout({
 }) {
   const location =
     useLocation();
+
+  const platformAdminFlow =
+    window.location.hostname
+      .trim()
+      .toLowerCase() ===
+      "admin.campaignseat.com" ||
+    String(
+      location.state?.from ||
+      "",
+    ).startsWith(
+      "/admin",
+    );
 
   const isScrollableRoute =
     SCROLLABLE_ACCOUNT_ROUTES.has(
@@ -49,6 +62,38 @@ export default function LoginLayout({
   ]
     .filter(Boolean)
     .join(" ");
+
+  if (platformAdminFlow) {
+    return (
+      <main className={styles.adminAuthLayout}>
+        <header className={styles.adminAuthBrand}>
+          <SeatBrand
+            variant="wordmark"
+            color="white"
+            className={styles.adminAuthLogo}
+          />
+
+          <div>
+            <strong>
+              Seat Platform Admin
+            </strong>
+
+            <span>
+              Protected administrative access
+            </span>
+          </div>
+        </header>
+
+        <section className={styles.adminAuthPanel}>
+          {children || <LoginForm />}
+        </section>
+
+        <footer className={styles.adminAuthFooter}>
+          Platform role + MFA required
+        </footer>
+      </main>
+    );
+  }
 
   return (
     <main

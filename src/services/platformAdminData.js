@@ -760,3 +760,535 @@ export async function respondToClientProposal(
 
   return data;
 }
+
+
+// ============================================================
+// PLATFORM ADMIN — CUSTOMER WORKSPACE MANAGEMENT
+// ============================================================
+
+export async function loadPlatformCustomerWorkspaceBindings() {
+  const [
+    accountsResult,
+    bindingsResult,
+  ] = await Promise.all([
+    supabase
+      .from("seat_product_accounts")
+      .select(
+        `
+          id,
+          customer_id,
+          account_name,
+          status,
+          onboarding_status,
+          created_at
+        `,
+      )
+      .eq("status", "active")
+      .order("created_at", {
+        ascending: false,
+      }),
+
+    supabase
+      .from("seat_workspace_bindings")
+      .select(
+        `
+          id,
+          product_account_id,
+          workspace_id,
+          relationship_type,
+          status,
+          created_at
+        `,
+      )
+      .eq("status", "active")
+      .order("created_at", {
+        ascending: false,
+      }),
+  ]);
+
+  if (
+    accountsResult.error ||
+    bindingsResult.error
+  ) {
+    console.error(
+      accountsResult.error ||
+      bindingsResult.error,
+    );
+
+    throw new Error(
+      "Customer workspace access could not be loaded.",
+    );
+  }
+
+  const bindingsByAccount =
+    new Map();
+
+  for (
+    const binding of
+    bindingsResult.data || []
+  ) {
+    const existing =
+      bindingsByAccount.get(
+        binding.product_account_id,
+      ) || [];
+
+    existing.push(binding);
+
+    bindingsByAccount.set(
+      binding.product_account_id,
+      existing,
+    );
+  }
+
+  const result = [];
+
+  for (
+    const account of
+    accountsResult.data || []
+  ) {
+    const bindings =
+      bindingsByAccount.get(
+        account.id,
+      ) || [];
+
+    const primaryBinding =
+      bindings.find(
+        (binding) =>
+          binding.status === "active" &&
+          binding.relationship_type === "primary",
+      ) ||
+      bindings.find(
+        (binding) =>
+          binding.status === "active",
+      ) ||
+      null;
+
+    if (!primaryBinding?.workspace_id) {
+      continue;
+    }
+
+    result.push({
+      customer_id:
+        account.customer_id,
+
+      product_account_id:
+        account.id,
+
+      account_name:
+        account.account_name,
+
+      product_account_status:
+        account.status,
+
+      onboarding_status:
+        account.onboarding_status,
+
+      binding_id:
+        primaryBinding.id,
+
+      workspace_id:
+        primaryBinding.workspace_id,
+
+      relationship_type:
+        primaryBinding.relationship_type,
+
+      binding_status:
+        primaryBinding.status,
+    });
+  }
+
+  return result;
+}
+
+
+export async function loadPlatformWorkspaceEditor(
+  workspaceId,
+) {
+  const {
+    data,
+    error,
+  } = await supabase.rpc(
+    "get_platform_workspace_editor",
+    {
+      target_workspace_id:
+        workspaceId,
+    },
+  );
+
+  if (error) {
+    console.error(error);
+
+    throw new Error(
+      error.message ||
+      "Workspace editor could not be loaded.",
+    );
+  }
+
+  return data || null;
+}
+
+
+export async function savePlatformWorkspaceDraft(
+  workspaceId,
+  payload,
+  expectedRevisionNumber,
+) {
+  const {
+    data,
+    error,
+  } = await supabase.rpc(
+    "save_platform_workspace_draft",
+    {
+      target_workspace_id:
+        workspaceId,
+
+      target_payload:
+        payload,
+
+      expected_revision_number:
+        expectedRevisionNumber,
+    },
+  );
+
+  if (error) {
+    console.error(error);
+
+    throw new Error(
+      error.message ||
+      "Workspace draft could not be saved.",
+    );
+  }
+
+  return data || null;
+}
+
+
+export async function previewPlatformWorkspaceDraft(
+  workspaceId,
+) {
+  const {
+    data,
+    error,
+  } = await supabase.rpc(
+    "preview_platform_workspace_draft",
+    {
+      target_workspace_id:
+        workspaceId,
+    },
+  );
+
+  if (error) {
+    console.error(error);
+
+    throw new Error(
+      error.message ||
+      "Workspace draft preview could not be loaded.",
+    );
+  }
+
+  return data || null;
+}
+
+
+export async function publishPlatformWorkspaceDraft(
+  workspaceId,
+  revisionId,
+) {
+  const {
+    data,
+    error,
+  } = await supabase.rpc(
+    "publish_platform_workspace_draft",
+    {
+      target_workspace_id:
+        workspaceId,
+
+      target_revision_id:
+        revisionId,
+    },
+  );
+
+  if (error) {
+    console.error(error);
+
+    throw new Error(
+      error.message ||
+      "Workspace draft could not be published.",
+    );
+  }
+
+  return data || null;
+}
+
+// ============================================================
+// SEAT PLATFORM ADMIN — CUSTOMER 360
+// ============================================================
+
+export async function loadPlatformCustomerControlCenter(
+  workspaceId,
+) {
+  const {
+    data,
+    error,
+  } = await supabase.rpc(
+    "get_platform_customer_control_center",
+    {
+      target_workspace_id:
+        workspaceId,
+    },
+  );
+
+  if (error) {
+    console.error(error);
+
+    throw new Error(
+      error.message ||
+      "Customer 360 could not be loaded.",
+    );
+  }
+
+  return data;
+}
+
+
+export async function updatePlatformManualBilling({
+  workspaceId,
+  billing,
+  expectedUpdatedAt,
+  reason,
+}) {
+  const {
+    data,
+    error,
+  } = await supabase.rpc(
+    "update_platform_manual_billing",
+    {
+      target_workspace_id:
+        workspaceId,
+
+      target_billing:
+        billing,
+
+      expected_subscription_updated_at:
+        expectedUpdatedAt ||
+        null,
+
+      target_reason:
+        reason || null,
+    },
+  );
+
+  if (error) {
+    throw new Error(
+      error.message ||
+      "Billing could not be updated.",
+    );
+  }
+
+  return data;
+}
+
+
+export async function setPlatformCustomerModule({
+  workspaceId,
+  moduleKey,
+  enabled,
+  reason,
+}) {
+  const {
+    data,
+    error,
+  } = await supabase.rpc(
+    "set_platform_customer_module",
+    {
+      target_workspace_id:
+        workspaceId,
+
+      target_module_key:
+        moduleKey,
+
+      target_enabled:
+        enabled,
+
+      target_reason:
+        reason,
+    },
+  );
+
+  if (error) {
+    throw new Error(
+      error.message ||
+      "Module access could not be changed.",
+    );
+  }
+
+  return data;
+}
+
+
+export async function setPlatformCustomerAccountStatus({
+  workspaceId,
+  status,
+  reason,
+}) {
+  const {
+    data,
+    error,
+  } = await supabase.rpc(
+    "set_platform_customer_account_status",
+    {
+      target_workspace_id:
+        workspaceId,
+
+      target_status:
+        status,
+
+      target_reason:
+        reason,
+    },
+  );
+
+  if (error) {
+    throw new Error(
+      error.message ||
+      "Account status could not be changed.",
+    );
+  }
+
+  return data;
+}
+
+
+export async function setPlatformCustomerMemberAccess({
+  workspaceId,
+  membershipId,
+  roleKey,
+  displayTitle,
+  status,
+  reason,
+}) {
+  const {
+    data,
+    error,
+  } = await supabase.rpc(
+    "set_platform_customer_member_access",
+    {
+      target_workspace_id:
+        workspaceId,
+
+      target_membership_id:
+        membershipId,
+
+      target_role_key:
+        roleKey,
+
+      target_display_title:
+        displayTitle || null,
+
+      target_status:
+        status,
+
+      target_reason:
+        reason,
+    },
+  );
+
+  if (error) {
+    throw new Error(
+      error.message ||
+      "Team access could not be changed.",
+    );
+  }
+
+  return data;
+}
+
+
+export async function loadPlatformWorkspaceRevisionHistory(
+  workspaceId,
+) {
+  const {
+    data,
+    error,
+  } = await supabase.rpc(
+    "get_platform_workspace_revision_history",
+    {
+      target_workspace_id:
+        workspaceId,
+    },
+  );
+
+  if (error) {
+    throw new Error(
+      error.message ||
+      "Workspace history could not be loaded.",
+    );
+  }
+
+  return Array.isArray(data)
+    ? data
+    : [];
+}
+
+
+export async function discardPlatformWorkspaceDraft({
+  workspaceId,
+  revisionId,
+  reason,
+}) {
+  const {
+    data,
+    error,
+  } = await supabase.rpc(
+    "discard_platform_workspace_draft",
+    {
+      target_workspace_id:
+        workspaceId,
+
+      target_revision_id:
+        revisionId,
+
+      target_reason:
+        reason,
+    },
+  );
+
+  if (error) {
+    throw new Error(
+      error.message ||
+      "Workspace draft could not be discarded.",
+    );
+  }
+
+  return data;
+}
+
+
+export async function loadPlatformCampaignRoles() {
+  const {
+    data,
+    error,
+  } = await supabase
+    .from("campaign_roles")
+    .select(
+      "key, name, dashboard_type, seat_type, authority_rank, is_active",
+    )
+    .eq(
+      "is_active",
+      true,
+    )
+    .order(
+      "authority_rank",
+    );
+
+  if (error) {
+    console.warn(
+      "Campaign roles could not be loaded for Platform Admin.",
+      error,
+    );
+
+    return [];
+  }
+
+  return data || [];
+}

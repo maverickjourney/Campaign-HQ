@@ -3,6 +3,14 @@ import {
   useState,
 } from "react";
 
+// Temporarily disabled while building the Platform Admin.
+// Keep the idle-session system in place so it can be re-enabled
+// before production Admin launch.
+const ADMIN_IDLE_TIMEOUT_MS =
+  import.meta.env.DEV
+    ? 0
+    : 15 * 60 * 1000;
+
 import {
   useNavigate,
 } from "react-router-dom";
@@ -64,20 +72,30 @@ export default function PlatformAdminGuard({
         if (
           !session
             .mfaState
+            ?.hasVerifiedTotp
+        ) {
+          navigate(
+            "/mfa/setup",
+            {
+              replace: true,
+
+              state: {
+                from:
+                  "/admin",
+              },
+            },
+          );
+
+          return;
+        }
+
+        if (
+          !session
+            .mfaState
             ?.isAal2
         ) {
-          const hasFactor =
-            Boolean(
-              session
-                .mfaState
-                ?.verifiedFactors
-                ?.length,
-            );
-
           navigate(
-            hasFactor
-              ? "/mfa/challenge"
-              : "/mfa/setup",
+            "/mfa/challenge",
             {
               replace: true,
 
@@ -117,6 +135,82 @@ export default function PlatformAdminGuard({
       active = false;
     };
   }, [navigate]);
+
+  useEffect(() => {
+    if (
+      !allowed ||
+      ADMIN_IDLE_TIMEOUT_MS <= 0
+    ) {
+      return undefined;
+    }
+
+    let timeoutId;
+
+    const expireAdminSession =
+      async () => {
+        await signOutPlatformAdmin();
+
+        navigate(
+          "/admin/login",
+          {
+            replace: true,
+          },
+        );
+      };
+
+    const resetTimer = () => {
+      window.clearTimeout(
+        timeoutId,
+      );
+
+      timeoutId =
+        window.setTimeout(
+          expireAdminSession,
+          ADMIN_IDLE_TIMEOUT_MS,
+        );
+    };
+
+    const activityEvents = [
+      "pointerdown",
+      "keydown",
+      "touchstart",
+      "scroll",
+    ];
+
+    for (
+      const eventName of
+      activityEvents
+    ) {
+      window.addEventListener(
+        eventName,
+        resetTimer,
+        {
+          passive: true,
+        },
+      );
+    }
+
+    resetTimer();
+
+    return () => {
+      window.clearTimeout(
+        timeoutId,
+      );
+
+      for (
+        const eventName of
+        activityEvents
+      ) {
+        window.removeEventListener(
+          eventName,
+          resetTimer,
+        );
+      }
+    };
+  }, [
+    allowed,
+    navigate,
+  ]);
 
   if (!allowed) {
     return (

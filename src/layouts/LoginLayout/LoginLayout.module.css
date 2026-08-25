@@ -900,3 +900,105 @@
     transform-origin: center center !important;
   }
 }
+
+
+
+/* ==========================================================
+   SEAT PLATFORM ADMIN AUTH SHELL
+   ========================================================== */
+
+.adminAuthLayout {
+  position: relative;
+  width: 100%;
+  min-height: 100dvh;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  padding: 28px 34px 22px;
+  overflow-y: auto;
+
+  background:
+    radial-gradient(
+      circle at 80% 15%,
+      rgba(67, 104, 151, .25),
+      transparent 32%
+    ),
+    linear-gradient(
+      155deg,
+      #071a33 0%,
+      #0b2342 50%,
+      #06162d 100%
+    );
+
+  color: #fff;
+}
+
+.adminAuthBrand {
+  width: min(100%, 1180px);
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.adminAuthLogo {
+  width: 180px;
+  max-height: 46px;
+}
+
+.adminAuthBrand > div {
+  display: grid;
+  gap: 2px;
+  padding-left: 16px;
+  border-left: 1px solid rgba(255,255,255,.2);
+}
+
+.adminAuthBrand strong {
+  font-size: 13px;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+.adminAuthBrand span {
+  color: rgba(255,255,255,.62);
+  font-size: 11px;
+}
+
+.adminAuthPanel {
+  width: min(100%, 610px);
+  margin: auto;
+  padding: 30px 0;
+}
+
+.adminAuthPanel > * {
+  width: 100% !important;
+  max-width: 100% !important;
+}
+
+.adminAuthFooter {
+  width: min(100%, 1180px);
+  margin: 0 auto;
+  color: rgba(255,255,255,.48);
+  font-size: 11px;
+  text-align: center;
+  letter-spacing: .04em;
+}
+
+@media (max-width: 700px) {
+  .adminAuthLayout {
+    padding: 20px 16px;
+  }
+
+  .adminAuthBrand {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .adminAuthBrand > div {
+    padding-left: 0;
+    border-left: 0;
+  }
+
+  .adminAuthPanel {
+    padding: 24px 0;
+  }
+}

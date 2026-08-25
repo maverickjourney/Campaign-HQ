@@ -63,6 +63,11 @@ export default function MfaSetup() {
     location.state?.from ||
     "/workspaces";
 
+  const platformAdminFlow =
+    destination.startsWith(
+      "/admin",
+    );
+
   const visualPreview =
     import.meta.env.DEV &&
     new URLSearchParams(
@@ -83,9 +88,13 @@ export default function MfaSetup() {
     method,
     setMethod,
   ] = useState(
-    PHONE_MFA_ENABLED
-      ? "phone"
-      : "totp",
+    platformAdminFlow
+      ? "totp"
+      : (
+        PHONE_MFA_ENABLED
+          ? "phone"
+          : "totp"
+      ),
   );
 
   const [
@@ -156,7 +165,11 @@ export default function MfaSetup() {
             await getMfaState();
 
           if (
-            mfaState.isAal2
+            mfaState.isAal2 &&
+            (
+              !platformAdminFlow ||
+              mfaState.hasVerifiedTotp
+            )
           ) {
             await restoreCampaignSession();
 
@@ -173,7 +186,11 @@ export default function MfaSetup() {
           if (
             mfaState
               .verifiedFactors
-              .length
+              .length &&
+            (
+              !platformAdminFlow ||
+              mfaState.hasVerifiedTotp
+            )
           ) {
             navigate(
               "/mfa/challenge",
@@ -480,7 +497,9 @@ export default function MfaSetup() {
       await clearCampaignSession();
 
       navigate(
-        "/",
+        platformAdminFlow
+          ? "/admin/login"
+          : "/",
         {
           replace: true,
         },
@@ -1294,15 +1313,25 @@ export default function MfaSetup() {
             styles.footer
           }
         >
-          <Link to="/">
+          <Link
+            to={
+              platformAdminFlow
+                ? "/admin/login"
+                : "/"
+            }
+          >
             <ArrowLeft
               size={15}
             />
-            Sign in
+            {platformAdminFlow
+              ? "Admin sign in"
+              : "Sign in"}
           </Link>
 
           <span>
-            Authorized campaign use only
+            {platformAdminFlow
+              ? "Seat Platform Admin only"
+              : "Authorized campaign use only"}
           </span>
         </footer>
       </div>

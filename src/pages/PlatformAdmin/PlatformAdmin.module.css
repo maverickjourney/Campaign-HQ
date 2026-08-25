@@ -1256,3 +1256,3287 @@
   font: inherit;
   font-size: 12px;
 }
+
+
+
+/* ============================================================
+   SEAT PLATFORM ADMIN — WORKSPACE EDITOR
+   ============================================================ */
+
+.customerCard > .customerActions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 7px;
+}
+
+.workspaceAction {
+  border-color: #102d52;
+  background: #102d52;
+  color: #fff;
+}
+
+.workspaceEditor {
+  width: 100%;
+  max-width: 1240px;
+  margin: 0 auto;
+  display: grid;
+  gap: 16px;
+  padding-bottom: 34px;
+}
+
+.workspaceNotice {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 13px 15px;
+  border: 1px solid #b9dfca;
+  border-radius: 11px;
+  background: #f0fbf5;
+  color: #16623d;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.workspaceStaleWarning {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 14px 16px;
+  border: 1px solid #efc46c;
+  border-radius: 11px;
+  background: #fff9e9;
+  color: #77550e;
+}
+
+.workspaceStaleWarning > div {
+  display: grid;
+  gap: 3px;
+}
+
+.workspaceStaleWarning strong {
+  font-size: 13px;
+}
+
+.workspaceStaleWarning span {
+  font-size: 12px;
+}
+
+.workspaceSummary {
+  display: grid;
+  grid-template-columns:
+    repeat(4, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.workspaceSummary article {
+  min-width: 0;
+  display: grid;
+  gap: 6px;
+  padding: 16px;
+  border: 1px solid #dce3ec;
+  border-radius: 12px;
+  background: #fff;
+}
+
+.workspaceSummary span {
+  color: #65758b;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: .03em;
+  text-transform: uppercase;
+}
+
+.workspaceSummary strong {
+  overflow: hidden;
+  color: #10233f;
+  font-size: 14px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.workspaceEditorSections {
+  display: grid;
+  grid-template-columns:
+    repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  align-items: start;
+}
+
+.workspaceSection {
+  min-width: 0;
+  padding: 22px;
+  border: 1px solid #dce3ec;
+  border-radius: 14px;
+  background: #fff;
+}
+
+.workspaceSection:last-child {
+  grid-column: 1 / -1;
+}
+
+.workspaceSection > header {
+  margin-bottom: 18px;
+}
+
+.workspaceSection h2 {
+  margin: 0 0 5px;
+  color: #10233f;
+  font-size: 18px;
+}
+
+.workspaceSection p {
+  margin: 0;
+  color: #65758b;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.workspaceFieldGrid {
+  display: grid;
+  grid-template-columns:
+    repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.workspaceFieldGrid label {
+  min-width: 0;
+  display: grid;
+  gap: 7px;
+  color: #213a5c;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.workspaceFieldGrid input,
+.workspaceFieldGrid textarea {
+  width: 100%;
+  box-sizing: border-box;
+  border: 1px solid #ccd6e2;
+  border-radius: 9px;
+  background: #fff;
+  color: #10233f;
+  font: inherit;
+  font-weight: 500;
+  outline: none;
+}
+
+.workspaceFieldGrid input {
+  min-height: 43px;
+  padding: 0 11px;
+}
+
+.workspaceFieldGrid textarea {
+  min-height: 118px;
+  padding: 11px;
+  resize: vertical;
+}
+
+.workspaceFieldGrid input:focus,
+.workspaceFieldGrid textarea:focus {
+  border-color: #5d789b;
+  box-shadow:
+    0 0 0 3px
+    rgba(16, 45, 82, .08);
+}
+
+.workspaceWideField {
+  grid-column: 1 / -1;
+}
+
+.workspacePreview {
+  display: grid;
+  gap: 14px;
+  padding: 20px;
+  border: 2px solid #7f96b3;
+  border-radius: 15px;
+  background: #f8fafc;
+}
+
+.workspacePreviewBadge {
+  justify-self: start;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 6px 9px;
+  border-radius: 999px;
+  background: #102d52;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.workspacePreviewHero {
+  padding: 22px;
+  border: 1px solid #dce3ec;
+  border-radius: 12px;
+  background: #fff;
+}
+
+.workspacePreviewHero > span {
+  color: #65758b;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: .05em;
+  text-transform: uppercase;
+}
+
+.workspacePreviewHero h2 {
+  margin: 6px 0;
+  color: #10233f;
+  font-size: 26px;
+}
+
+.workspacePreviewHero p {
+  margin: 0;
+  color: #65758b;
+}
+
+.workspacePreviewChanges {
+  display: grid;
+  gap: 8px;
+}
+
+.workspacePreviewChanges h3 {
+  margin: 0 0 4px;
+  font-size: 15px;
+}
+
+.workspaceChangeRow {
+  display: grid;
+  grid-template-columns:
+    minmax(150px, .8fr)
+    repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  align-items: stretch;
+}
+
+.workspaceChangeRow > strong,
+.workspaceChangeRow > div {
+  min-width: 0;
+  padding: 11px;
+  border: 1px solid #e0e6ee;
+  border-radius: 9px;
+  background: #fff;
+}
+
+.workspaceChangeRow > strong {
+  display: flex;
+  align-items: center;
+  font-size: 12px;
+}
+
+.workspaceChangeRow > div {
+  display: grid;
+  gap: 4px;
+}
+
+.workspaceChangeRow span {
+  color: #65758b;
+  font-size: 10px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.workspaceChangeRow b {
+  overflow-wrap: anywhere;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.workspaceActionBar {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  align-items: center;
+  padding: 17px 18px;
+  border: 1px solid #ccd6e2;
+  border-radius: 13px;
+  background: #fff;
+  box-shadow:
+    0 10px 26px
+    rgba(16, 35, 63, .08);
+}
+
+.workspaceActionBar > div:first-child {
+  min-width: 0;
+  display: grid;
+  gap: 4px;
+}
+
+.workspaceActionBar strong {
+  font-size: 13px;
+}
+
+.workspaceActionBar span {
+  color: #65758b;
+  font-size: 11px;
+  line-height: 1.45;
+}
+
+.workspaceActionButtons {
+  flex: 0 0 auto;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.workspaceActionButtons button {
+  min-height: 40px;
+  padding: 0 13px;
+  font: inherit;
+  cursor: pointer;
+}
+
+.workspaceActionButtons button:disabled {
+  opacity: .48;
+  cursor: not-allowed;
+}
+
+@media (max-width: 1050px) {
+  .workspaceSummary {
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+  }
+
+  .workspaceEditorSections {
+    grid-template-columns: 1fr;
+  }
+
+  .workspaceSection:last-child {
+    grid-column: auto;
+  }
+
+  .workspaceActionBar {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .workspaceActionButtons {
+    justify-content: flex-start;
+  }
+}
+
+@media (max-width: 700px) {
+  .workspaceSummary,
+  .workspaceFieldGrid,
+  .workspaceChangeRow {
+    grid-template-columns: 1fr;
+  }
+
+  .workspaceWideField {
+    grid-column: auto;
+  }
+
+  .workspaceActionButtons {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .workspaceActionButtons button,
+  .workspaceActionButtons a {
+    width: 100%;
+  }
+}
+
+
+
+/* ============================================================
+   SEAT PLATFORM ADMIN — SECURE LOGIN COMPACT OVERRIDE
+   ============================================================ */
+
+.loginPage {
+  box-sizing: border-box;
+  min-height: 100dvh;
+  align-items: center;
+  justify-items: center;
+  padding: 24px;
+  overflow-y: auto;
+}
+
+.loginCard {
+  width: min(100%, 480px);
+  box-sizing: border-box;
+  margin: auto;
+  padding: 28px 32px;
+}
+
+.loginCard .form {
+  gap: 14px;
+  margin-top: 22px;
+}
+
+.loginCard .primaryButton {
+  margin-top: 2px;
+}
+
+.loginCard .lead {
+  margin-bottom: 0;
+  line-height: 1.55;
+}
+
+@media (max-height: 820px) {
+  .loginPage {
+    align-items: start;
+    padding-top: 20px;
+    padding-bottom: 20px;
+  }
+
+  .loginCard {
+    margin: 0 auto;
+    padding-top: 24px;
+    padding-bottom: 24px;
+  }
+
+  .loginCard .form {
+    gap: 12px;
+    margin-top: 18px;
+  }
+}
+
+
+/* ============================================================
+   PREMIUM CAMPAIGN WORKSPACE MANAGER
+   ============================================================ */
+
+.premiumWorkspaceManager {
+  width: 100%;
+  max-width: 1240px;
+  margin: 0 auto;
+  display: grid;
+  gap: 16px;
+  padding-bottom: 44px;
+}
+
+.premiumWorkspaceStatus {
+  display: grid;
+  grid-template-columns:
+    repeat(4, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.premiumWorkspaceStatus article {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 88px;
+  padding: 15px;
+  border: 1px solid #dce4ee;
+  border-radius: 14px;
+  background:
+    linear-gradient(
+      145deg,
+      #ffffff,
+      #f8fafc
+    );
+  box-shadow:
+    0 5px 16px
+    rgba(16, 35, 63, .035);
+}
+
+.premiumStatusIcon {
+  flex: 0 0 auto;
+  width: 40px;
+  height: 40px;
+  display: grid;
+  place-items: center;
+  border: 1px solid #dbe5f0;
+  border-radius: 11px;
+  background: #edf3f9;
+  color: #153b67;
+}
+
+.premiumWorkspaceStatus article > div:last-child {
+  min-width: 0;
+  display: grid;
+  gap: 4px;
+}
+
+.premiumWorkspaceStatus span {
+  color: #6c7d92;
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: .065em;
+  text-transform: uppercase;
+}
+
+.premiumWorkspaceStatus strong {
+  overflow: hidden;
+  color: #10233f;
+  font-size: 13px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+
+/* ------------------------------------------------------------
+   Draft workflow control bar
+   ------------------------------------------------------------ */
+
+.premiumWorkflowBar {
+  position: sticky;
+  top: 12px;
+  z-index: 20;
+
+  display: flex;
+  justify-content: space-between;
+  gap: 18px;
+  align-items: center;
+
+  padding: 14px 15px;
+  border: 1px solid #cbd7e5;
+  border-radius: 15px;
+
+  background:
+    rgba(255,255,255,.96);
+
+  box-shadow:
+    0 14px 34px
+    rgba(9, 31, 58, .11);
+
+  backdrop-filter:
+    blur(16px);
+}
+
+.premiumWorkflowStatus {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 11px;
+}
+
+.premiumStatusDot {
+  flex: 0 0 auto;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #2e9f69;
+  box-shadow:
+    0 0 0 5px
+    rgba(46,159,105,.1);
+}
+
+.premiumStatusDotDirty {
+  background: #d78b16;
+  box-shadow:
+    0 0 0 5px
+    rgba(215,139,22,.11);
+}
+
+.premiumWorkflowStatus > div {
+  min-width: 0;
+  display: grid;
+  gap: 3px;
+}
+
+.premiumWorkflowStatus strong {
+  color: #10233f;
+  font-size: 13px;
+}
+
+.premiumWorkflowStatus span {
+  color: #6d7c90;
+  font-size: 11px;
+}
+
+.premiumWorkflowActions {
+  flex: 0 0 auto;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 7px;
+}
+
+.premiumWorkflowActions button,
+.premiumPublishModal footer button {
+  min-height: 39px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  padding: 0 13px;
+  border-radius: 9px;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 850;
+  cursor: pointer;
+}
+
+.premiumWorkflowActions button:disabled,
+.premiumPublishModal footer button:disabled {
+  opacity: .43;
+  cursor: not-allowed;
+}
+
+.premiumQuietButton {
+  border: 1px solid #d3dce7;
+  background: #fff;
+  color: #52667f;
+}
+
+.premiumPreviewButton {
+  border: 1px solid #bac8d8;
+  background: #f8fafc;
+  color: #17395f;
+}
+
+.premiumSaveButton {
+  border: 1px solid #163e6d;
+  background: #153b67;
+  color: #fff;
+  box-shadow:
+    0 5px 12px
+    rgba(21,59,103,.15);
+}
+
+.premiumPublishButton {
+  border: 1px solid #7c2330;
+  background:
+    linear-gradient(
+      135deg,
+      #922d3d,
+      #70202d
+    );
+  color: #fff;
+  box-shadow:
+    0 6px 14px
+    rgba(125,35,49,.17);
+}
+
+
+/* ------------------------------------------------------------
+   Section navigation
+   ------------------------------------------------------------ */
+
+.premiumSectionNav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  padding: 5px 0 1px;
+}
+
+.premiumSectionNav a {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 34px;
+  padding: 0 11px;
+  border: 1px solid #d8e0e9;
+  border-radius: 999px;
+  background: #fff;
+  color: #455c78;
+  font-size: 11px;
+  font-weight: 800;
+  text-decoration: none;
+  transition:
+    border-color .15s ease,
+    background .15s ease,
+    transform .15s ease;
+}
+
+.premiumSectionNav a:hover {
+  border-color: #a9bbcf;
+  background: #f4f8fc;
+  transform: translateY(-1px);
+}
+
+
+/* ------------------------------------------------------------
+   Sections
+   ------------------------------------------------------------ */
+
+.premiumWorkspaceSections {
+  display: grid;
+  grid-template-columns:
+    repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  align-items: start;
+}
+
+.premiumWorkspaceSection {
+  min-width: 0;
+  scroll-margin-top: 94px;
+  padding: 23px;
+  border: 1px solid #dce4ed;
+  border-radius: 16px;
+  background:
+    linear-gradient(
+      150deg,
+      #ffffff,
+      #fbfcfe
+    );
+  box-shadow:
+    0 7px 22px
+    rgba(16,35,63,.035);
+}
+
+.premiumWorkspaceSection:nth-child(5) {
+  grid-column: 1 / -1;
+}
+
+.premiumSectionHeader {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 21px;
+}
+
+.premiumSectionIcon {
+  flex: 0 0 auto;
+  width: 42px;
+  height: 42px;
+  display: grid;
+  place-items: center;
+  border-radius: 12px;
+  background:
+    linear-gradient(
+      145deg,
+      #eaf1f8,
+      #f5f8fb
+    );
+  color: #153b67;
+  border: 1px solid #dce5ef;
+}
+
+.premiumSectionHeader > div:last-child {
+  display: grid;
+  gap: 5px;
+}
+
+.premiumSectionHeader h2 {
+  margin: 0;
+  color: #10233f;
+  font-size: 18px;
+  letter-spacing: -.01em;
+}
+
+.premiumSectionHeader p {
+  margin: 0;
+  color: #6b7d92;
+  font-size: 11px;
+  line-height: 1.55;
+}
+
+
+/* ------------------------------------------------------------
+   Fields
+   ------------------------------------------------------------ */
+
+.premiumFieldGrid {
+  display: grid;
+  grid-template-columns:
+    repeat(2, minmax(0, 1fr));
+  gap: 15px;
+}
+
+.premiumFieldGrid label {
+  min-width: 0;
+  display: grid;
+  gap: 7px;
+}
+
+.premiumFieldGrid label > span {
+  color: #263f60;
+  font-size: 11px;
+  font-weight: 850;
+}
+
+.premiumFieldGrid input,
+.premiumFieldGrid select,
+.premiumFieldGrid textarea {
+  width: 100%;
+  box-sizing: border-box;
+  border: 1px solid #cad6e3;
+  border-radius: 10px;
+  background: #fff;
+  color: #112a49;
+  font:
+    500 13px/1.4
+    Inter,
+    ui-sans-serif,
+    system-ui,
+    sans-serif;
+  outline: none;
+  transition:
+    border-color .15s ease,
+    box-shadow .15s ease,
+    background .15s ease;
+}
+
+.premiumFieldGrid input,
+.premiumFieldGrid select {
+  min-height: 44px;
+  padding: 0 12px;
+}
+
+.premiumFieldGrid textarea {
+  min-height: 125px;
+  padding: 12px;
+  resize: vertical;
+}
+
+.premiumFieldGrid input:hover,
+.premiumFieldGrid select:hover,
+.premiumFieldGrid textarea:hover {
+  border-color: #aebfd1;
+}
+
+.premiumFieldGrid input:focus,
+.premiumFieldGrid select:focus,
+.premiumFieldGrid textarea:focus {
+  border-color: #587a9f;
+  background: #fff;
+  box-shadow:
+    0 0 0 4px
+    rgba(30,76,124,.075);
+}
+
+.premiumSelectWrap {
+  position: relative;
+}
+
+.premiumSelectWrap select {
+  appearance: none;
+  padding-right: 38px;
+  cursor: pointer;
+
+  background-image:
+    linear-gradient(
+      45deg,
+      transparent 50%,
+      #637992 50%
+    ),
+    linear-gradient(
+      135deg,
+      #637992 50%,
+      transparent 50%
+    );
+
+  background-position:
+    calc(100% - 17px) 18px,
+    calc(100% - 12px) 18px;
+
+  background-size:
+    5px 5px,
+    5px 5px;
+
+  background-repeat:
+    no-repeat;
+}
+
+.premiumWideField {
+  grid-column: 1 / -1;
+}
+
+.premiumColorControl {
+  display: grid;
+  grid-template-columns:
+    52px minmax(0, 1fr);
+  gap: 8px;
+}
+
+.premiumColorPicker {
+  width: 52px !important;
+  min-width: 52px;
+  padding: 5px !important;
+  cursor: pointer;
+}
+
+
+/* ------------------------------------------------------------
+   Supplemental info
+   ------------------------------------------------------------ */
+
+.premiumBrandMeta,
+.premiumMediaNotice {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin-top: 18px;
+  padding: 13px 14px;
+  border: 1px solid #dce4ed;
+  border-radius: 11px;
+  background: #f6f9fc;
+  color: #37516f;
+}
+
+.premiumBrandMeta > div,
+.premiumMediaNotice > div {
+  display: grid;
+  gap: 3px;
+}
+
+.premiumBrandMeta strong,
+.premiumMediaNotice strong {
+  font-size: 11px;
+}
+
+.premiumBrandMeta span,
+.premiumMediaNotice span {
+  color: #687a90;
+  font-size: 10px;
+  line-height: 1.5;
+}
+
+
+/* ------------------------------------------------------------
+   Preview
+   ------------------------------------------------------------ */
+
+.premiumPreviewPanel {
+  display: grid;
+  gap: 14px;
+  padding: 20px;
+  border: 1px solid #9fb3ca;
+  border-radius: 16px;
+  background:
+    linear-gradient(
+      145deg,
+      #f7fafd,
+      #eef4fa
+    );
+}
+
+.premiumPreviewPanel > header {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  align-items: center;
+}
+
+.premiumPreviewPanel > header > div {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #173f6d;
+}
+
+.premiumPreviewPanel > header > div > div {
+  display: grid;
+  gap: 2px;
+}
+
+.premiumPreviewPanel header span {
+  color: #647b94;
+  font-size: 9px;
+  font-weight: 900;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+.premiumPreviewPanel header h2 {
+  margin: 0;
+  font-size: 17px;
+}
+
+.premiumPreviewPanel > header > strong {
+  padding: 5px 8px;
+  border-radius: 999px;
+  background: #193f6a;
+  color: #fff;
+  font-size: 9px;
+  text-transform: uppercase;
+}
+
+.premiumPreviewIdentity {
+  padding: 19px;
+  border: 1px solid #d9e3ed;
+  border-radius: 12px;
+  background: #fff;
+}
+
+.premiumPreviewIdentity > span {
+  color: #6d7d91;
+  font-size: 9px;
+  font-weight: 900;
+  letter-spacing: .07em;
+  text-transform: uppercase;
+}
+
+.premiumPreviewIdentity h3 {
+  margin: 5px 0;
+  color: #10233f;
+  font-size: 24px;
+}
+
+.premiumPreviewIdentity p {
+  margin: 0;
+  color: #65778e;
+  font-size: 12px;
+}
+
+.premiumCompareList {
+  display: grid;
+  gap: 7px;
+}
+
+.premiumCompareList article {
+  display: grid;
+  grid-template-columns:
+    minmax(150px, .8fr)
+    repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.premiumCompareList article > strong,
+.premiumCompareList article > div {
+  min-width: 0;
+  display: grid;
+  gap: 3px;
+  padding: 10px;
+  border: 1px solid #dce4ed;
+  border-radius: 9px;
+  background: #fff;
+}
+
+.premiumCompareList article > strong {
+  align-content: center;
+  font-size: 11px;
+}
+
+.premiumCompareList span {
+  color: #74859a;
+  font-size: 8px;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.premiumCompareList b {
+  overflow-wrap: anywhere;
+  color: #203b5b;
+  font-size: 11px;
+}
+
+
+/* ------------------------------------------------------------
+   End safety card
+   ------------------------------------------------------------ */
+
+.premiumEndCard {
+  display: flex;
+  align-items: flex-start;
+  gap: 11px;
+  padding: 15px 16px;
+  border: 1px solid #d7e0ea;
+  border-radius: 13px;
+  background: #fff;
+  color: #284765;
+}
+
+.premiumEndCard > div {
+  display: grid;
+  gap: 3px;
+}
+
+.premiumEndCard strong {
+  font-size: 11px;
+}
+
+.premiumEndCard span {
+  color: #6d7d91;
+  font-size: 10px;
+  line-height: 1.5;
+}
+
+
+/* ------------------------------------------------------------
+   Publish confirmation modal
+   ------------------------------------------------------------ */
+
+.premiumModalBackdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background:
+    rgba(4, 18, 35, .64);
+  backdrop-filter:
+    blur(7px);
+}
+
+.premiumPublishModal {
+  width: min(100%, 540px);
+  display: grid;
+  gap: 17px;
+  padding: 23px;
+  border: 1px solid #d8e0ea;
+  border-radius: 18px;
+  background: #fff;
+  box-shadow:
+    0 28px 80px
+    rgba(0,0,0,.28);
+}
+
+.premiumPublishModal > header {
+  display: grid;
+  grid-template-columns:
+    auto 1fr auto;
+  gap: 11px;
+  align-items: center;
+}
+
+.premiumPublishIcon {
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  border-radius: 12px;
+  background: #f8e9ec;
+  color: #84293a;
+}
+
+.premiumPublishModal header > div:nth-child(2) {
+  display: grid;
+  gap: 2px;
+}
+
+.premiumPublishModal header span {
+  color: #8e3443;
+  font-size: 9px;
+  font-weight: 900;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+.premiumPublishModal header h2 {
+  margin: 0;
+  color: #112a49;
+  font-size: 20px;
+}
+
+.premiumPublishModal header > button {
+  width: 34px;
+  height: 34px;
+  display: grid;
+  place-items: center;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: #60738a;
+  cursor: pointer;
+}
+
+.premiumPublishLead {
+  margin: 0;
+  color: #5d7087;
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.premiumPublishChanges {
+  display: grid;
+  gap: 9px;
+  padding: 13px;
+  border: 1px solid #e0e6ed;
+  border-radius: 10px;
+  background: #f8fafc;
+}
+
+.premiumPublishChanges > span {
+  color: #73849a;
+  font-size: 9px;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.premiumPublishChanges > div {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.premiumPublishChanges strong {
+  padding: 5px 8px;
+  border: 1px solid #d9e1ea;
+  border-radius: 999px;
+  background: #fff;
+  color: #304d6d;
+  font-size: 9px;
+}
+
+.premiumPublishCheck {
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+  padding: 13px;
+  border: 1px solid #e3d2d5;
+  border-radius: 10px;
+  background: #fff9fa;
+  color: #5c3840;
+  font-size: 11px;
+  line-height: 1.5;
+  cursor: pointer;
+}
+
+.premiumPublishCheck input {
+  margin-top: 2px;
+}
+
+.premiumPublishModal footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+
+/* ------------------------------------------------------------
+   Responsive
+   ------------------------------------------------------------ */
+
+@media (max-width: 1080px) {
+  .premiumWorkspaceStatus {
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+  }
+
+  .premiumWorkspaceSections {
+    grid-template-columns: 1fr;
+  }
+
+  .premiumWorkspaceSection:nth-child(5) {
+    grid-column: auto;
+  }
+
+  .premiumWorkflowBar {
+    position: static;
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .premiumWorkflowActions {
+    justify-content: flex-start;
+  }
+}
+
+@media (max-width: 700px) {
+  .premiumWorkspaceStatus,
+  .premiumFieldGrid,
+  .premiumCompareList article {
+    grid-template-columns: 1fr;
+  }
+
+  .premiumWideField {
+    grid-column: auto;
+  }
+
+  .premiumWorkflowActions {
+    display: grid;
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+  }
+
+  .premiumWorkflowActions button {
+    width: 100%;
+  }
+
+  .premiumPublishModal footer {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .premiumPublishModal footer button {
+    width: 100%;
+  }
+}
+
+/* ============================================================
+   CUSTOMER 360 — OVERVIEW SHELL
+   ============================================================ */
+
+.customer360 {
+  width: 100%;
+  max-width: 1240px;
+  margin: 0 auto;
+  display: grid;
+  gap: 14px;
+  padding-bottom: 42px;
+}
+
+.customer360BackButton {
+  min-height: 40px;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 0 13px;
+  border: 1px solid #d2dce7;
+  border-radius: 9px;
+  background: #fff;
+  color: #35536f;
+  font-size: 11px;
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.customer360Hero {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 22px 24px;
+  border: 1px solid #d9e2ec;
+  border-radius: 17px;
+  background:
+    radial-gradient(
+      circle at 88% 10%,
+      rgba(54,93,136,.12),
+      transparent 38%
+    ),
+    linear-gradient(
+      145deg,
+      #ffffff,
+      #f8fafc
+    );
+  box-shadow:
+    0 8px 24px
+    rgba(16,35,63,.045);
+}
+
+.customer360Hero > div:first-child {
+  display: grid;
+  gap: 3px;
+}
+
+.customer360Hero > div:first-child > span {
+  color: #74859a;
+  font-size: 9px;
+  font-weight: 900;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+}
+
+.customer360Hero h2 {
+  margin: 2px 0;
+  color: #10233f;
+  font-size: 25px;
+}
+
+.customer360Hero p {
+  margin: 0;
+  color: #6b7d91;
+  font-size: 11px;
+}
+
+.customer360HeroActions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 7px;
+}
+
+.customer360HeroActions > button {
+  min-height: 31px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 9px;
+  border: 1px solid #d1dbe5;
+  border-radius: 8px;
+  background: #fff;
+  color: #526a83;
+  font: inherit;
+  font-size: 9px;
+  font-weight: 850;
+  cursor: pointer;
+}
+
+.customer360Status {
+  min-height: 27px;
+  display: inline-flex;
+  align-items: center;
+  padding: 0 9px;
+  border: 1px solid #d7dfe8;
+  border-radius: 999px;
+  background: #f6f8fa;
+  color: #617387;
+  font-size: 9px;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.customer360StatusGood {
+  border-color: #c8e3d3;
+  background: #eef8f2;
+  color: #25704b;
+}
+
+.customer360StatusWarning {
+  border-color: #ecd6a0;
+  background: #fff8e7;
+  color: #94600d;
+}
+
+.customer360Tabs {
+  display: flex;
+  gap: 5px;
+  overflow-x: auto;
+  padding: 5px;
+  border: 1px solid #d9e2eb;
+  border-radius: 13px;
+  background: #fff;
+}
+
+.customer360Tabs button {
+  flex: 0 0 auto;
+  min-height: 37px;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 0 11px;
+  border: 0;
+  border-radius: 9px;
+  background: transparent;
+  color: #63768d;
+  font: inherit;
+  font-size: 10px;
+  font-weight: 850;
+  cursor: pointer;
+}
+
+.customer360Tabs
+.customer360TabActive {
+  background: #102f54;
+  color: #fff;
+  box-shadow:
+    0 5px 13px
+    rgba(16,47,84,.16);
+}
+
+.customer360Overview {
+  display: grid;
+  gap: 14px;
+}
+
+.customer360Metrics {
+  display: grid;
+  grid-template-columns:
+    repeat(6, minmax(0, 1fr));
+  gap: 9px;
+}
+
+.customer360Metrics article {
+  min-width: 0;
+  display: grid;
+  gap: 7px;
+  padding: 14px;
+  border: 1px solid #dce4ed;
+  border-radius: 13px;
+  background: #fff;
+}
+
+.customer360Metrics svg {
+  color: #355d84;
+}
+
+.customer360Metrics span {
+  color: #77889b;
+  font-size: 9px;
+  font-weight: 850;
+  text-transform: uppercase;
+}
+
+.customer360Metrics strong {
+  overflow: hidden;
+  color: #16314f;
+  font-size: 13px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.customer360OverviewGrid {
+  display: grid;
+  grid-template-columns:
+    repeat(2, minmax(0, 1fr));
+  gap: 13px;
+}
+
+.customer360Card {
+  min-width: 0;
+  display: grid;
+  gap: 15px;
+  padding: 20px;
+  border: 1px solid #dce4ed;
+  border-radius: 15px;
+  background: #fff;
+  box-shadow:
+    0 5px 19px
+    rgba(16,35,63,.035);
+}
+
+.customer360Card > header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #234b71;
+}
+
+.customer360Card > header strong {
+  font-size: 11px;
+}
+
+.customer360Card dl {
+  margin: 0;
+  display: grid;
+  gap: 9px;
+}
+
+.customer360Card dl > div {
+  display: flex;
+  justify-content: space-between;
+  gap: 14px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #edf1f5;
+}
+
+.customer360Card dt {
+  color: #78899c;
+  font-size: 9px;
+}
+
+.customer360Card dd {
+  margin: 0;
+  color: #294663;
+  font-size: 9px;
+  font-weight: 800;
+}
+
+.customer360OpenWorkspace,
+.customer360Card > button {
+  width: fit-content;
+  min-height: 34px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 10px;
+  border: 1px solid #ccd8e3;
+  border-radius: 8px;
+  background: #fff;
+  color: #365978;
+  font: inherit;
+  font-size: 9px;
+  font-weight: 850;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.customer360BigStat {
+  display: grid;
+  gap: 2px;
+}
+
+.customer360BigStat b {
+  color: #102f54;
+  font-size: 28px;
+}
+
+.customer360BigStat span {
+  color: #75869a;
+  font-size: 10px;
+}
+
+.customer360SecurityLine {
+  display: flex;
+  gap: 9px;
+  align-items: flex-start;
+  padding: 12px;
+  border: 1px solid #d8e8df;
+  border-radius: 10px;
+  background: #f3f9f5;
+  color: #28734f;
+}
+
+.customer360SecurityLine > div {
+  display: grid;
+  gap: 2px;
+}
+
+.customer360SecurityLine strong {
+  font-size: 10px;
+}
+
+.customer360SecurityLine span {
+  color: #62806f;
+  font-size: 9px;
+  line-height: 1.45;
+}
+
+.customer360ComingNext {
+  min-height: 300px;
+  display: grid;
+  place-items: center;
+  align-content: center;
+  gap: 7px;
+  padding: 35px;
+  border: 1px dashed #cfd9e4;
+  border-radius: 16px;
+  background: #fff;
+  text-align: center;
+}
+
+.customer360ComingNext > div {
+  width: 48px;
+  height: 48px;
+  display: grid;
+  place-items: center;
+  border-radius: 13px;
+  background: #edf3f8;
+  color: #315a80;
+}
+
+.customer360ComingNext > span {
+  color: #798a9d;
+  font-size: 9px;
+  font-weight: 900;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+.customer360ComingNext h2 {
+  margin: 0;
+  color: #173553;
+  font-size: 20px;
+}
+
+.customer360ComingNext p {
+  max-width: 520px;
+  margin: 0;
+  color: #728397;
+  font-size: 10px;
+  line-height: 1.6;
+}
+
+@media (max-width: 1100px) {
+  .customer360Metrics {
+    grid-template-columns:
+      repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 720px) {
+  .customer360Hero {
+    display: grid;
+  }
+
+  .customer360HeroActions {
+    justify-content: flex-start;
+  }
+
+  .customer360Metrics,
+  .customer360OverviewGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ============================================================
+   CUSTOMER 360 — BILLING
+   ============================================================ */
+
+.customer360Billing {
+  display: grid;
+  gap: 13px;
+}
+
+.customer360BillingMetrics {
+  display: grid;
+  grid-template-columns:
+    repeat(4, minmax(0, 1fr));
+  gap: 9px;
+}
+
+.customer360BillingMetrics article {
+  display: grid;
+  gap: 5px;
+  padding: 14px;
+  border: 1px solid #dce4ed;
+  border-radius: 12px;
+  background: #fff;
+}
+
+.customer360BillingMetrics span {
+  color: #7a899a;
+  font-size: 9px;
+  font-weight: 850;
+  text-transform: uppercase;
+}
+
+.customer360BillingMetrics strong {
+  color: #173653;
+  font-size: 14px;
+}
+
+.customer360Billing .customer360Card > header {
+  justify-content: flex-start;
+}
+
+.customer360Billing
+.customer360Card
+> header
+.customer360Status {
+  margin-left: auto;
+}
+
+.customer360BillingGrid {
+  display: grid;
+  grid-template-columns:
+    repeat(2, minmax(0, 1fr));
+  gap: 13px;
+}
+
+.customer360BillingGrid label,
+.customer360BillingReason {
+  display: grid;
+  gap: 6px;
+}
+
+.customer360BillingGrid label > span,
+.customer360BillingReason > span {
+  color: #34516e;
+  font-size: 9px;
+  font-weight: 850;
+}
+
+.customer360BillingGrid input,
+.customer360BillingGrid select,
+.customer360BillingReason textarea {
+  width: 100%;
+  box-sizing: border-box;
+  border: 1px solid #cad6e2;
+  border-radius: 9px;
+  background: #fff;
+  color: #173653;
+  font: inherit;
+  font-size: 10px;
+  outline: none;
+}
+
+.customer360BillingGrid input,
+.customer360BillingGrid select {
+  min-height: 40px;
+  padding: 0 10px;
+}
+
+.customer360BillingReason textarea {
+  min-height: 82px;
+  padding: 10px;
+  resize: vertical;
+}
+
+.customer360BillingGrid input:focus,
+.customer360BillingGrid select:focus,
+.customer360BillingReason textarea:focus {
+  border-color: #6785a4;
+  box-shadow:
+    0 0 0 4px
+    rgba(38,78,121,.07);
+}
+
+.customer360BillingDivider {
+  height: 1px;
+  background: #e7edf3;
+}
+
+.customer360Billing h3 {
+  margin: 0;
+  color: #173653;
+  font-size: 13px;
+}
+
+.customer360BillingActions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.customer360BillingActions button {
+  min-height: 38px;
+  padding: 0 13px;
+  border: 1px solid #143b65;
+  border-radius: 8px;
+  background: #143b65;
+  color: #fff;
+  font: inherit;
+  font-size: 10px;
+  font-weight: 850;
+  cursor: pointer;
+}
+
+.customer360BillingActions button:disabled {
+  opacity: .45;
+  cursor: not-allowed;
+}
+
+.customer360BillingLocked {
+  padding: 11px 12px;
+  border: 1px solid #d7e0e9;
+  border-radius: 9px;
+  background: #f6f8fa;
+  color: #68798d;
+  font-size: 9px;
+  line-height: 1.5;
+}
+
+.customer360BillingNotice {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 11px 12px;
+  border: 1px solid #cbe2d3;
+  border-radius: 10px;
+  background: #f0f8f3;
+  color: #347254;
+  font-size: 10px;
+  font-weight: 750;
+}
+
+@media (max-width: 760px) {
+  .customer360BillingMetrics,
+  .customer360BillingGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Customer 360 header action must never inherit oversized Admin actions */
+.customer360BackButton {
+  width: auto !important;
+  height: 40px !important;
+  min-height: 40px !important;
+  max-height: 40px !important;
+  align-self: flex-start !important;
+}
+
+/* ============================================================
+   CUSTOMER 360 — PRODUCT MODULES
+   ============================================================ */
+
+.customer360Modules {
+  display: grid;
+  gap: 13px;
+}
+
+.customer360ModuleSummary {
+  display: grid;
+  grid-template-columns:
+    repeat(3, minmax(0, 1fr));
+  gap: 9px;
+}
+
+.customer360ModuleSummary article {
+  display: grid;
+  gap: 4px;
+  padding: 14px;
+  border: 1px solid #dce4ed;
+  border-radius: 12px;
+  background: #fff;
+}
+
+.customer360ModuleSummary span {
+  color: #798a9c;
+  font-size: 9px;
+  font-weight: 850;
+  text-transform: uppercase;
+}
+
+.customer360ModuleSummary strong {
+  color: #173653;
+  font-size: 17px;
+}
+
+.customer360Modules
+.customer360Card
+> header {
+  justify-content: flex-start;
+}
+
+.customer360ModuleCount {
+  margin-left: auto;
+  color: #66809a;
+  font-size: 9px;
+  font-weight: 850;
+}
+
+.customer360ModuleIntro {
+  max-width: 850px;
+  margin: -3px 0 0;
+  color: #738498;
+  font-size: 10px;
+  line-height: 1.55;
+}
+
+.customer360ModuleGrid {
+  display: grid;
+  grid-template-columns:
+    repeat(2, minmax(0, 1fr));
+  gap: 9px;
+}
+
+.customer360ModuleGrid > article {
+  min-width: 0;
+  display: grid;
+  grid-template-columns:
+    auto minmax(0, 1fr) auto auto;
+  gap: 10px;
+  align-items: center;
+  padding: 12px;
+  border: 1px solid #e0e6ed;
+  border-radius: 11px;
+  background: #fbfcfd;
+}
+
+.customer360ModuleIcon {
+  width: 37px;
+  height: 37px;
+  display: grid;
+  place-items: center;
+  border-radius: 10px;
+  background: #edf3f8;
+  color: #315980;
+}
+
+.customer360ModuleIdentity {
+  min-width: 0;
+  display: grid;
+  gap: 2px;
+}
+
+.customer360ModuleIdentity strong {
+  overflow: hidden;
+  color: #1d3958;
+  font-size: 10px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.customer360ModuleIdentity span {
+  color: #79899b;
+  font-size: 8px;
+}
+
+.customer360ModuleSource {
+  padding: 4px 7px;
+  border-radius: 999px;
+  background: #eef2f6;
+  color: #66788b;
+  font-size: 8px;
+  font-weight: 850;
+}
+
+.customer360ModuleToggle {
+  min-width: 78px;
+  min-height: 30px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 0 8px;
+  border: 1px solid #d4dde6;
+  border-radius: 999px;
+  background: #f5f7f9;
+  color: #718194;
+  font: inherit;
+  font-size: 8px;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.customer360ModuleToggle > span {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #98a5b2;
+}
+
+.customer360ModuleToggleOn {
+  border-color: #b9dac7;
+  background: #eef8f2;
+  color: #2b724f;
+}
+
+.customer360ModuleToggleOn > span {
+  background: #409a6c;
+}
+
+
+/* Module confirmation */
+
+.customer360ModuleModalBackdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1300;
+  display: grid;
+  place-items: center;
+  padding: 22px;
+  background: rgba(5,18,34,.66);
+  backdrop-filter: blur(7px);
+}
+
+.customer360ModuleModal {
+  width: min(100%, 500px);
+  display: grid;
+  gap: 15px;
+  padding: 22px;
+  border: 1px solid #d7e0e8;
+  border-radius: 16px;
+  background: #fff;
+  box-shadow:
+    0 30px 80px
+    rgba(0,0,0,.25);
+}
+
+.customer360ModuleModal > header {
+  display: flex;
+  justify-content: space-between;
+  gap: 15px;
+}
+
+.customer360ModuleModal
+> header
+> div {
+  display: grid;
+  gap: 3px;
+}
+
+.customer360ModuleModal
+> header span {
+  color: #7a899b;
+  font-size: 8px;
+  font-weight: 900;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+.customer360ModuleModal h2 {
+  margin: 0;
+  color: #173653;
+  font-size: 18px;
+}
+
+.customer360ModuleModal
+> header
+> button {
+  width: 32px;
+  height: 32px;
+  border: 0;
+  border-radius: 8px;
+  background: #f3f6f8;
+  color: #617488;
+  font-size: 20px;
+  cursor: pointer;
+}
+
+.customer360ModuleModal > p {
+  margin: 0;
+  color: #6f8093;
+  font-size: 10px;
+  line-height: 1.55;
+}
+
+.customer360ModuleModal label {
+  display: grid;
+  gap: 6px;
+}
+
+.customer360ModuleModal label span {
+  color: #35516f;
+  font-size: 9px;
+  font-weight: 850;
+}
+
+.customer360ModuleModal textarea {
+  min-height: 90px;
+  padding: 10px;
+  border: 1px solid #cad6e2;
+  border-radius: 9px;
+  color: #173653;
+  font: inherit;
+  font-size: 10px;
+  resize: vertical;
+}
+
+.customer360ModuleModal footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 7px;
+}
+
+.customer360ModuleCancel,
+.customer360ModuleConfirm {
+  min-height: 37px;
+  padding: 0 12px;
+  border-radius: 8px;
+  font: inherit;
+  font-size: 9px;
+  font-weight: 850;
+  cursor: pointer;
+}
+
+.customer360ModuleCancel {
+  border: 1px solid #ccd7e2;
+  background: #fff;
+  color: #50677f;
+}
+
+.customer360ModuleConfirm {
+  border: 1px solid #153d66;
+  background: #153d66;
+  color: #fff;
+}
+
+.customer360ModuleConfirm:disabled {
+  opacity: .45;
+  cursor: not-allowed;
+}
+
+@media (max-width: 900px) {
+  .customer360ModuleGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 650px) {
+  .customer360ModuleSummary {
+    grid-template-columns: 1fr;
+  }
+
+  .customer360ModuleGrid > article {
+    grid-template-columns:
+      auto minmax(0, 1fr);
+  }
+
+  .customer360ModuleSource,
+  .customer360ModuleToggle {
+    grid-column: 2;
+  }
+}
+
+/* ============================================================
+   CUSTOMER 360 — TEAM ACCESS
+   ============================================================ */
+
+.customer360Team {
+  display: grid;
+  gap: 13px;
+}
+
+.customer360TeamSummary {
+  display: grid;
+  grid-template-columns:
+    repeat(3, minmax(0, 1fr));
+  gap: 9px;
+}
+
+.customer360TeamSummary article {
+  display: grid;
+  gap: 4px;
+  padding: 14px;
+  border: 1px solid #dce4ed;
+  border-radius: 12px;
+  background: #fff;
+}
+
+.customer360TeamSummary span {
+  color: #798a9c;
+  font-size: 9px;
+  font-weight: 850;
+  text-transform: uppercase;
+}
+
+.customer360TeamSummary strong {
+  color: #173653;
+  font-size: 17px;
+}
+
+.customer360Team
+.customer360Card
+> header {
+  justify-content: flex-start;
+}
+
+.customer360TeamCount {
+  margin-left: auto;
+  color: #698099;
+  font-size: 9px;
+  font-weight: 850;
+}
+
+.customer360TeamIntro {
+  max-width: 850px;
+  margin: -3px 0 0;
+  color: #738498;
+  font-size: 10px;
+  line-height: 1.55;
+}
+
+.customer360TeamList {
+  display: grid;
+  gap: 8px;
+}
+
+.customer360TeamList > article {
+  display: grid;
+  grid-template-columns:
+    auto minmax(0, 1.25fr)
+    minmax(0, .9fr)
+    auto
+    minmax(105px, auto)
+    auto;
+  gap: 12px;
+  align-items: center;
+  padding: 12px 13px;
+  border: 1px solid #dfe6ed;
+  border-radius: 11px;
+  background: #fbfcfd;
+}
+
+.customer360TeamAvatar {
+  width: 39px;
+  height: 39px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: #153b64;
+  color: #fff;
+  font-size: 10px;
+  font-weight: 900;
+}
+
+.customer360TeamIdentity,
+.customer360TeamRole,
+.customer360TeamLastAccess {
+  min-width: 0;
+  display: grid;
+  gap: 2px;
+}
+
+.customer360TeamIdentity strong,
+.customer360TeamRole strong,
+.customer360TeamLastAccess strong {
+  overflow: hidden;
+  color: #1e3a59;
+  font-size: 9px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.customer360TeamIdentity span,
+.customer360TeamRole span,
+.customer360TeamLastAccess span {
+  overflow: hidden;
+  color: #7a8a9b;
+  font-size: 8px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.customer360TeamAccess {
+  display: grid;
+  justify-items: start;
+  gap: 4px;
+}
+
+.customer360OwnerBadge {
+  padding: 4px 7px;
+  border: 1px solid #d5c89c;
+  border-radius: 999px;
+  background: #fff9e7;
+  color: #805d12;
+  font-size: 7px;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.customer360TeamManage {
+  min-height: 32px;
+  padding: 0 9px;
+  border: 1px solid #ccd7e2;
+  border-radius: 8px;
+  background: #fff;
+  color: #3f5d79;
+  font: inherit;
+  font-size: 8px;
+  font-weight: 850;
+  cursor: pointer;
+}
+
+
+/* Team modal */
+
+.customer360TeamModalBackdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1300;
+  display: grid;
+  place-items: center;
+  padding: 22px;
+  background: rgba(5,18,34,.66);
+  backdrop-filter: blur(7px);
+}
+
+.customer360TeamModal {
+  width: min(100%, 520px);
+  display: grid;
+  gap: 15px;
+  padding: 22px;
+  border: 1px solid #d7e0e8;
+  border-radius: 16px;
+  background: #fff;
+  box-shadow:
+    0 30px 80px
+    rgba(0,0,0,.25);
+}
+
+.customer360TeamModal > header {
+  display: flex;
+  justify-content: space-between;
+  gap: 15px;
+}
+
+.customer360TeamModal
+> header
+> div {
+  display: grid;
+  gap: 3px;
+}
+
+.customer360TeamModal
+> header span {
+  color: #7a899b;
+  font-size: 8px;
+  font-weight: 900;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+.customer360TeamModal h2 {
+  margin: 0;
+  color: #173653;
+  font-size: 18px;
+}
+
+.customer360TeamModal
+> header
+> button {
+  width: 32px;
+  height: 32px;
+  border: 0;
+  border-radius: 8px;
+  background: #f3f6f8;
+  color: #617488;
+  font-size: 20px;
+  cursor: pointer;
+}
+
+.customer360TeamModalGrid {
+  display: grid;
+  gap: 11px;
+}
+
+.customer360TeamModalGrid label,
+.customer360TeamReason {
+  display: grid;
+  gap: 6px;
+}
+
+.customer360TeamModalGrid label > span,
+.customer360TeamReason > span {
+  color: #35516f;
+  font-size: 9px;
+  font-weight: 850;
+}
+
+.customer360TeamModalGrid input,
+.customer360TeamModalGrid select,
+.customer360TeamReason textarea {
+  width: 100%;
+  box-sizing: border-box;
+  border: 1px solid #cad6e2;
+  border-radius: 9px;
+  background: #fff;
+  color: #173653;
+  font: inherit;
+  font-size: 10px;
+}
+
+.customer360TeamModalGrid input,
+.customer360TeamModalGrid select {
+  min-height: 39px;
+  padding: 0 10px;
+}
+
+.customer360TeamReason textarea {
+  min-height: 88px;
+  padding: 10px;
+  resize: vertical;
+}
+
+.customer360TeamModal footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 7px;
+}
+
+.customer360OwnerProtection {
+  display: flex;
+  gap: 9px;
+  align-items: flex-start;
+  padding: 11px;
+  border: 1px solid #e3d4aa;
+  border-radius: 10px;
+  background: #fff9e9;
+  color: #805b13;
+}
+
+.customer360OwnerProtection > div {
+  display: grid;
+  gap: 2px;
+}
+
+.customer360OwnerProtection strong {
+  font-size: 9px;
+}
+
+.customer360OwnerProtection span {
+  color: #8e7442;
+  font-size: 8px;
+  line-height: 1.45;
+}
+
+@media (max-width: 1050px) {
+  .customer360TeamList > article {
+    grid-template-columns:
+      auto minmax(0, 1fr)
+      auto;
+  }
+
+  .customer360TeamRole,
+  .customer360TeamAccess,
+  .customer360TeamLastAccess {
+    grid-column: 2;
+  }
+
+  .customer360TeamManage {
+    grid-column: 3;
+    grid-row: 1;
+  }
+}
+
+@media (max-width: 650px) {
+  .customer360TeamSummary {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ============================================================
+   CUSTOMER 360 — INTEGRATIONS HISTORY SECURITY
+   ============================================================ */
+
+.customer360Integrations,
+.customer360History {
+  display: grid;
+  gap: 13px;
+}
+
+.customer360IntegrationSummary {
+  display: grid;
+  grid-template-columns:
+    repeat(2, minmax(0, 1fr));
+  gap: 9px;
+}
+
+.customer360IntegrationSummary article {
+  display: grid;
+  gap: 4px;
+  padding: 14px;
+  border: 1px solid #dce4ed;
+  border-radius: 12px;
+  background: #fff;
+}
+
+.customer360IntegrationSummary span {
+  color: #798a9c;
+  font-size: 9px;
+  font-weight: 850;
+  text-transform: uppercase;
+}
+
+.customer360IntegrationSummary strong {
+  color: #173653;
+  font-size: 17px;
+}
+
+.customer360Integrations
+.customer360Card
+> header,
+.customer360History
+.customer360Card
+> header {
+  justify-content: flex-start;
+}
+
+.customer360IntegrationGrid {
+  display: grid;
+  gap: 9px;
+}
+
+.customer360IntegrationGrid > article {
+  display: grid;
+  grid-template-columns:
+    auto minmax(0, 1.2fr)
+    minmax(110px, auto)
+    minmax(150px, auto)
+    auto;
+  gap: 12px;
+  align-items: center;
+  padding: 13px;
+  border: 1px solid #dfe6ed;
+  border-radius: 11px;
+  background: #fbfcfd;
+}
+
+.customer360IntegrationIcon {
+  width: 40px;
+  height: 40px;
+  display: grid;
+  place-items: center;
+  border-radius: 10px;
+  background: #edf3f8;
+  color: #315980;
+}
+
+.customer360IntegrationIdentity,
+.customer360IntegrationMeta {
+  min-width: 0;
+  display: grid;
+  gap: 2px;
+}
+
+.customer360IntegrationIdentity strong,
+.customer360IntegrationMeta strong {
+  overflow: hidden;
+  color: #1e3a59;
+  font-size: 9px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.customer360IntegrationIdentity span,
+.customer360IntegrationMeta span {
+  overflow: hidden;
+  color: #7a8a9c;
+  font-size: 8px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.customer360IntegrationEmpty {
+  padding: 22px;
+  border: 1px dashed #d1dbe5;
+  border-radius: 10px;
+  color: #78899b;
+  font-size: 9px;
+  text-align: center;
+}
+
+
+/* Security cards */
+
+.customer360HistoryGrid {
+  display: grid;
+  grid-template-columns:
+    repeat(2, minmax(0, 1fr));
+  gap: 13px;
+}
+
+.customer360HistoryGrid
+.customer360Card
+> header
+.customer360Status {
+  margin-left: auto;
+}
+
+.customer360SecurityRows {
+  display: grid;
+  gap: 8px;
+}
+
+.customer360SecurityRows > div {
+  display: flex;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 9px 0;
+  border-bottom: 1px solid #edf1f5;
+}
+
+.customer360SecurityRows > div:last-child {
+  border-bottom: 0;
+}
+
+.customer360SecurityRows span {
+  color: #78899c;
+  font-size: 9px;
+}
+
+.customer360SecurityRows strong {
+  color: #254360;
+  font-size: 9px;
+}
+
+.customer360ReverifyButton {
+  width: fit-content;
+  min-height: 35px;
+  padding: 0 11px;
+  border: 1px solid #ccd8e3;
+  border-radius: 8px;
+  background: #fff;
+  color: #365978;
+  font: inherit;
+  font-size: 9px;
+  font-weight: 850;
+  cursor: pointer;
+}
+
+
+/* Account lifecycle */
+
+.customer360LifecycleButtons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+}
+
+.customer360LifecyclePrimary,
+.customer360LifecycleWarning,
+.customer360LifecycleDanger {
+  min-height: 37px;
+  padding: 0 12px;
+  border-radius: 8px;
+  font: inherit;
+  font-size: 9px;
+  font-weight: 850;
+  cursor: pointer;
+}
+
+.customer360LifecyclePrimary {
+  border: 1px solid #173e68;
+  background: #173e68;
+  color: #fff;
+}
+
+.customer360LifecycleWarning {
+  border: 1px solid #d4ab58;
+  background: #fff8e8;
+  color: #865b0c;
+}
+
+.customer360LifecycleDanger {
+  border: 1px solid #8b2c3b;
+  background: #8b2c3b;
+  color: #fff;
+}
+
+.customer360LifecycleDanger:disabled,
+.customer360LifecyclePrimary:disabled {
+  opacity: .45;
+}
+
+.customer360LifecycleWarningBox {
+  padding: 10px 11px;
+  border: 1px solid #e3c4ca;
+  border-radius: 9px;
+  background: #fff4f5;
+  color: #863443;
+  font-size: 9px;
+  font-weight: 750;
+}
+
+
+/* Audit */
+
+.customer360AuditList {
+  display: grid;
+  gap: 8px;
+}
+
+.customer360AuditList > article {
+  display: grid;
+  grid-template-columns:
+    auto minmax(0, 1.2fr)
+    minmax(130px, .6fr)
+    auto;
+  gap: 11px;
+  align-items: center;
+  padding: 11px 12px;
+  border: 1px solid #e0e6ed;
+  border-radius: 10px;
+  background: #fbfcfd;
+}
+
+.customer360AuditIcon {
+  width: 34px;
+  height: 34px;
+  display: grid;
+  place-items: center;
+  border-radius: 9px;
+  background: #edf3f8;
+  color: #315980;
+}
+
+.customer360AuditIdentity,
+.customer360AuditTarget {
+  min-width: 0;
+  display: grid;
+  gap: 2px;
+}
+
+.customer360AuditIdentity strong,
+.customer360AuditTarget strong {
+  overflow: hidden;
+  color: #213e5c;
+  font-size: 9px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.customer360AuditIdentity span,
+.customer360AuditTarget span,
+.customer360AuditList time {
+  color: #7a899b;
+  font-size: 8px;
+}
+
+@media (max-width: 900px) {
+  .customer360HistoryGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .customer360IntegrationGrid > article,
+  .customer360AuditList > article {
+    grid-template-columns:
+      auto minmax(0, 1fr);
+  }
+
+  .customer360IntegrationMeta,
+  .customer360IntegrationGrid
+  .customer360Status,
+  .customer360AuditTarget,
+  .customer360AuditList time {
+    grid-column: 2;
+  }
+}
+
+@media (max-width: 650px) {
+  .customer360IntegrationSummary {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ============================================================
+   CUSTOMER 360 — WORKSPACE TAB
+   ============================================================ */
+
+.customer360Workspace {
+  display: grid;
+  gap: 13px;
+}
+
+.customer360WorkspaceSummary {
+  display: grid;
+  grid-template-columns:
+    repeat(4, minmax(0, 1fr));
+  gap: 9px;
+}
+
+.customer360WorkspaceSummary article {
+  min-width: 0;
+  display: grid;
+  gap: 5px;
+  padding: 14px;
+  border: 1px solid #dce4ed;
+  border-radius: 12px;
+  background: #fff;
+}
+
+.customer360WorkspaceSummary span {
+  color: #798a9c;
+  font-size: 9px;
+  font-weight: 850;
+  text-transform: uppercase;
+}
+
+.customer360WorkspaceSummary strong {
+  overflow: hidden;
+  color: #173653;
+  font-size: 12px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.customer360WorkspaceLaunch {
+  display: grid;
+  grid-template-columns:
+    auto minmax(0, 1fr) auto;
+  gap: 16px;
+  align-items: center;
+  padding: 24px;
+  border-radius: 16px;
+  background:
+    linear-gradient(
+      135deg,
+      #102f54,
+      #173f6b
+    );
+  color: #fff;
+  box-shadow:
+    0 13px 30px
+    rgba(16,47,84,.15);
+}
+
+.customer360WorkspaceLaunchIcon {
+  width: 52px;
+  height: 52px;
+  display: grid;
+  place-items: center;
+  border: 1px solid rgba(255,255,255,.16);
+  border-radius: 13px;
+  background: rgba(255,255,255,.09);
+}
+
+.customer360WorkspaceLaunch > div:nth-child(2) {
+  display: grid;
+  gap: 4px;
+}
+
+.customer360WorkspaceLaunch span {
+  color: rgba(255,255,255,.62);
+  font-size: 8px;
+  font-weight: 900;
+  letter-spacing: .09em;
+  text-transform: uppercase;
+}
+
+.customer360WorkspaceLaunch h2 {
+  margin: 0;
+  font-size: 19px;
+}
+
+.customer360WorkspaceLaunch p {
+  max-width: 760px;
+  margin: 0;
+  color: rgba(255,255,255,.7);
+  font-size: 9px;
+  line-height: 1.55;
+}
+
+.customer360WorkspaceLaunchButton {
+  min-height: 39px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 13px;
+  border-radius: 9px;
+  background: #fff;
+  color: #14395f;
+  font-size: 9px;
+  font-weight: 900;
+  text-decoration: none;
+}
+
+.customer360Workspace
+.customer360Card
+> header {
+  justify-content: flex-start;
+}
+
+.customer360WorkspaceHistory {
+  display: grid;
+  gap: 8px;
+}
+
+.customer360WorkspaceHistory > article {
+  display: grid;
+  grid-template-columns:
+    auto minmax(0, 1fr)
+    auto
+    minmax(150px, auto)
+    auto;
+  gap: 11px;
+  align-items: center;
+  padding: 11px 12px;
+  border: 1px solid #e0e6ed;
+  border-radius: 10px;
+  background: #fbfcfd;
+}
+
+.customer360WorkspaceRevisionNumber {
+  width: 35px;
+  height: 35px;
+  display: grid;
+  place-items: center;
+  border-radius: 9px;
+  background: #edf3f8;
+  color: #315980;
+  font-size: 9px;
+  font-weight: 900;
+}
+
+.customer360WorkspaceRevisionIdentity {
+  min-width: 0;
+  display: grid;
+  gap: 2px;
+}
+
+.customer360WorkspaceRevisionIdentity strong {
+  color: #203d5c;
+  font-size: 9px;
+}
+
+.customer360WorkspaceRevisionIdentity span,
+.customer360WorkspaceRevisionTime {
+  color: #7a899b;
+  font-size: 8px;
+}
+
+.customer360DiscardDraftButton {
+  min-height: 31px;
+  padding: 0 9px;
+  border: 1px solid #dfc7cb;
+  border-radius: 8px;
+  background: #fff;
+  color: #8a3644;
+  font: inherit;
+  font-size: 8px;
+  font-weight: 850;
+  cursor: pointer;
+}
+
+.customer360WorkspaceEmpty {
+  min-height: 130px;
+  display: grid;
+  place-items: center;
+  align-content: center;
+  gap: 5px;
+  padding: 20px;
+  border: 1px dashed #d3dce6;
+  border-radius: 10px;
+  color: #76889b;
+  text-align: center;
+}
+
+.customer360WorkspaceEmpty strong {
+  color: #36536f;
+  font-size: 10px;
+}
+
+.customer360WorkspaceEmpty span {
+  font-size: 9px;
+}
+
+.customer360WorkspaceDiscardWarning {
+  padding: 11px;
+  border: 1px solid #e4ccd0;
+  border-radius: 9px;
+  background: #fff5f6;
+  color: #83404c;
+  font-size: 9px;
+  line-height: 1.5;
+}
+
+@media (max-width: 900px) {
+  .customer360WorkspaceSummary {
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+  }
+
+  .customer360WorkspaceLaunch {
+    grid-template-columns: 1fr;
+  }
+
+  .customer360WorkspaceHistory > article {
+    grid-template-columns:
+      auto minmax(0, 1fr);
+  }
+
+  .customer360WorkspaceHistory
+  .customer360Status,
+  .customer360WorkspaceRevisionTime,
+  .customer360DiscardDraftButton {
+    grid-column: 2;
+  }
+}
+
+@media (max-width: 600px) {
+  .customer360WorkspaceSummary {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ============================================================
+   CUSTOMER 360 — REAL WORKSPACE TAB
+   ============================================================ */
+
+.customer360Workspace {
+  display: grid;
+  gap: 13px;
+}
+
+.customer360WorkspaceSummary {
+  display: grid;
+  grid-template-columns:
+    repeat(4, minmax(0, 1fr));
+  gap: 9px;
+}
+
+.customer360WorkspaceSummary article {
+  min-width: 0;
+  display: grid;
+  gap: 5px;
+  padding: 14px;
+  border: 1px solid #dce4ed;
+  border-radius: 12px;
+  background: #fff;
+}
+
+.customer360WorkspaceSummary span {
+  color: #798a9c;
+  font-size: 9px;
+  font-weight: 850;
+  text-transform: uppercase;
+}
+
+.customer360WorkspaceSummary strong {
+  overflow: hidden;
+  color: #173653;
+  font-size: 12px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.customer360WorkspaceLaunch {
+  display: grid;
+  grid-template-columns:
+    auto minmax(0, 1fr) auto;
+  gap: 16px;
+  align-items: center;
+  padding: 24px;
+  border-radius: 16px;
+  background:
+    linear-gradient(
+      135deg,
+      #102f54,
+      #173f6b
+    );
+  color: #fff;
+  box-shadow:
+    0 13px 30px
+    rgba(16,47,84,.15);
+}
+
+.customer360WorkspaceLaunchIcon {
+  width: 52px;
+  height: 52px;
+  display: grid;
+  place-items: center;
+  border: 1px solid rgba(255,255,255,.16);
+  border-radius: 13px;
+  background: rgba(255,255,255,.09);
+}
+
+.customer360WorkspaceLaunch
+> div:nth-child(2) {
+  display: grid;
+  gap: 4px;
+}
+
+.customer360WorkspaceLaunch span {
+  color: rgba(255,255,255,.62);
+  font-size: 8px;
+  font-weight: 900;
+  letter-spacing: .09em;
+  text-transform: uppercase;
+}
+
+.customer360WorkspaceLaunch h2 {
+  margin: 0;
+  font-size: 19px;
+}
+
+.customer360WorkspaceLaunch p {
+  max-width: 760px;
+  margin: 0;
+  color: rgba(255,255,255,.72);
+  font-size: 9px;
+  line-height: 1.55;
+}
+
+.customer360WorkspaceLaunchButton {
+  min-height: 39px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 13px;
+  border-radius: 9px;
+  background: #fff;
+  color: #14395f;
+  font-size: 9px;
+  font-weight: 900;
+  text-decoration: none;
+}
+
+.customer360Workspace
+.customer360Card
+> header {
+  justify-content: flex-start;
+}
+
+.customer360WorkspaceHistory {
+  display: grid;
+  gap: 8px;
+}
+
+.customer360WorkspaceHistory
+> article {
+  display: grid;
+  grid-template-columns:
+    auto minmax(0, 1fr)
+    auto minmax(150px, auto)
+    auto;
+  gap: 11px;
+  align-items: center;
+  padding: 11px 12px;
+  border: 1px solid #e0e6ed;
+  border-radius: 10px;
+  background: #fbfcfd;
+}
+
+.customer360WorkspaceRevisionNumber {
+  width: 35px;
+  height: 35px;
+  display: grid;
+  place-items: center;
+  border-radius: 9px;
+  background: #edf3f8;
+  color: #315980;
+  font-size: 9px;
+  font-weight: 900;
+}
+
+.customer360WorkspaceRevisionIdentity {
+  min-width: 0;
+  display: grid;
+  gap: 2px;
+}
+
+.customer360WorkspaceRevisionIdentity strong {
+  color: #203d5c;
+  font-size: 9px;
+}
+
+.customer360WorkspaceRevisionIdentity span,
+.customer360WorkspaceRevisionTime {
+  color: #7a899b;
+  font-size: 8px;
+}
+
+.customer360DiscardDraftButton {
+  min-height: 31px;
+  padding: 0 9px;
+  border: 1px solid #dfc7cb;
+  border-radius: 8px;
+  background: #fff;
+  color: #8a3644;
+  font: inherit;
+  font-size: 8px;
+  font-weight: 850;
+  cursor: pointer;
+}
+
+.customer360WorkspaceEmpty {
+  min-height: 125px;
+  display: grid;
+  place-items: center;
+  align-content: center;
+  gap: 5px;
+  padding: 20px;
+  border: 1px dashed #d3dce6;
+  border-radius: 10px;
+  color: #76889b;
+  text-align: center;
+}
+
+.customer360WorkspaceEmpty strong {
+  color: #36536f;
+  font-size: 10px;
+}
+
+.customer360WorkspaceEmpty span {
+  font-size: 9px;
+}
+
+.customer360WorkspaceDiscardWarning {
+  padding: 11px;
+  border: 1px solid #e4ccd0;
+  border-radius: 9px;
+  background: #fff5f6;
+  color: #83404c;
+  font-size: 9px;
+  line-height: 1.5;
+}
+
+@media (max-width: 900px) {
+  .customer360WorkspaceSummary {
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+  }
+
+  .customer360WorkspaceLaunch {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 600px) {
+  .customer360WorkspaceSummary {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ============================================================
+   CUSTOMER 360 — FINAL POLISH
+   ============================================================ */
+
+/* Protected owner fields should visually read as protected. */
+.customer360TeamModalGrid
+input:disabled,
+.customer360TeamModalGrid
+select:disabled {
+  border-color: #d9e0e7;
+  background: #f2f5f8;
+  color: #64778b;
+  cursor: not-allowed;
+  opacity: 1;
+}
+
+/* Make confirmation screens feel intentionally locked. */
+.customer360OwnerProtection {
+  box-shadow:
+    inset 3px 0 0
+    rgba(166,116,18,.25);
+}
+
+/* Keep destructive confirmation visually distinct. */
+.customer360LifecycleWarningBox {
+  font-weight: 800;
+}
+
+/* Tighten top-level Customer 360 action sizing. */
+.customer360BackButton {
+  width: auto !important;
+  min-width: 0 !important;
+  height: 40px !important;
+  min-height: 40px !important;
+  max-height: 40px !important;
+  padding: 0 13px !important;
+}

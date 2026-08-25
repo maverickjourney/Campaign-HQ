@@ -44,6 +44,8 @@ import PlatformAdminGuard from "./components/auth/PlatformAdminGuard/PlatformAdm
 import PlatformAdminLogin from "./pages/PlatformAdmin/PlatformAdminLogin";
 import PlatformAdminHome from "./pages/PlatformAdmin/PlatformAdminHome";
 import PlatformAdminCustomers from "./pages/PlatformAdmin/PlatformAdminCustomers";
+import PlatformAdminCustomer360 from "./pages/PlatformAdmin/PlatformAdminCustomer360";
+import PlatformAdminWorkspaceEditor from "./pages/PlatformAdmin/PlatformAdminWorkspaceEditor";
 import PlatformAdminNewClient from "./pages/PlatformAdmin/PlatformAdminNewClient";
 import PlatformAdminProposalBuilder from "./pages/PlatformAdmin/PlatformAdminProposalBuilder";
 import PlatformAdminProposalPreview from "./pages/PlatformAdmin/PlatformAdminProposalPreview";
@@ -177,6 +179,15 @@ export default function Router() {
           />
 
           <Route
+            path="/admin/workspaces/:workspaceId"
+            element={
+              <PlatformAdminGuard>
+                <PlatformAdminWorkspaceEditor />
+              </PlatformAdminGuard>
+            }
+          />
+
+          <Route
             path="/admin/customers/new"
             element={
               <PlatformAdminGuard>
@@ -250,6 +261,23 @@ export default function Router() {
           element={
             <PlatformAdminGuard>
               <PlatformAdminCustomers />
+            </PlatformAdminGuard>
+          }
+        />
+        <Route
+          path="/admin/workspaces/:workspaceId"
+          element={
+            <PlatformAdminGuard>
+              <PlatformAdminWorkspaceEditor />
+            </PlatformAdminGuard>
+          }
+        />
+
+        <Route
+          path="/admin/customers/:workspaceId"
+          element={
+            <PlatformAdminGuard>
+              <PlatformAdminCustomer360 />
             </PlatformAdminGuard>
           }
         />

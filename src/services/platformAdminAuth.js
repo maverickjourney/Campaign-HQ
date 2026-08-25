@@ -142,9 +142,22 @@ export async function signInToPlatformAdmin({
     const mfaState =
       await getMfaState();
 
-    if (mfaState.isAal2) {
+    if (
+      mfaState.isAal2 &&
+      mfaState.hasVerifiedTotp
+    ) {
       return {
         status: "ready",
+        user: data.user,
+        mfaState,
+      };
+    }
+
+    if (
+      !mfaState.hasVerifiedTotp
+    ) {
+      return {
+        status: "mfa-setup",
         user: data.user,
         mfaState,
       };

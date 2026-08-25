@@ -107,6 +107,17 @@ export default function MfaChallenge() {
     location.state?.from ||
     "/workspaces";
 
+  const forceReverify =
+    Boolean(
+      location.state
+        ?.forceReverify,
+    );
+
+  const platformAdminFlow =
+    destination.startsWith(
+      "/admin",
+    );
+
   const visualPreview =
     import.meta.env.DEV &&
     new URLSearchParams(
@@ -254,7 +265,8 @@ export default function MfaChallenge() {
             await getMfaState();
 
           if (
-            mfaState.isAal2
+            mfaState.isAal2 &&
+            !forceReverify
           ) {
             await restoreCampaignSession();
 
@@ -269,9 +281,39 @@ export default function MfaChallenge() {
           }
 
           const verifiedFactors =
-            mfaState
-              .verifiedFactors ||
-            [];
+            [
+              ...(
+                mfaState
+                  .verifiedFactors ||
+                []
+              ),
+            ].sort(
+              (a, b) => {
+                if (
+                  !platformAdminFlow
+                ) {
+                  return 0;
+                }
+
+                const aTotp =
+                  getFactorType(a) ===
+                  "totp";
+
+                const bTotp =
+                  getFactorType(b) ===
+                  "totp";
+
+                if (
+                  aTotp === bTotp
+                ) {
+                  return 0;
+                }
+
+                return aTotp
+                  ? -1
+                  : 1;
+              },
+            );
 
           if (
             !verifiedFactors.length
@@ -295,8 +337,19 @@ export default function MfaChallenge() {
             verifiedFactors,
           );
 
+          const preferredFactor =
+            forceReverify
+              ? verifiedFactors.find(
+                  (factor) =>
+                    getFactorType(
+                      factor,
+                    ) === "totp",
+                ) ||
+                verifiedFactors[0]
+              : verifiedFactors[0];
+
           setSelectedFactorId(
-            verifiedFactors[0].id,
+            preferredFactor.id,
           );
 
           setStatus(
@@ -524,7 +577,9 @@ export default function MfaChallenge() {
       await clearCampaignSession();
 
       navigate(
-        "/",
+        platformAdminFlow
+          ? "/admin/login"
+          : "/",
         {
           replace: true,
         },
@@ -962,15 +1017,25 @@ export default function MfaChallenge() {
             styles.footer
           }
         >
-          <Link to="/">
+          <Link
+            to={
+              platformAdminFlow
+                ? "/admin/login"
+                : "/"
+            }
+          >
             <ArrowLeft
               size={15}
             />
-            Sign in
+            {platformAdminFlow
+              ? "Admin sign in"
+              : "Sign in"}
           </Link>
 
           <span>
-            Authorized campaign use only
+            {platformAdminFlow
+              ? "Seat Platform Admin only"
+              : "Authorized campaign use only"}
           </span>
         </footer>
       </div>
