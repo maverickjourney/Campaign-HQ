@@ -2,6 +2,7 @@ import { createClient } from "npm:@supabase/supabase-js@2";
 
 const ALLOWED_ORIGINS = new Set([
   "https://campaignseat.com",
+  "https://app.campaignseat.com",
   "https://www.campaignseat.com",
   "http://127.0.0.1:5180",
   "http://localhost:5180",

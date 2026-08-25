@@ -7,6 +7,7 @@ import {
 
 const ALLOWED_ORIGINS = new Set([
   "https://campaignseat.com",
+  "https://app.campaignseat.com",
   "https://www.campaignseat.com",
   "http://localhost:5173",
   "http://localhost:5174",
