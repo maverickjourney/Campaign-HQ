@@ -51,6 +51,10 @@ import { useCommunicationAttachments } from "../../hooks/useCommunicationAttachm
 import { useExternalOutreachHandoff } from "../../hooks/useExternalOutreachHandoff";
 import { MAX_CAMPAIGN_FILE_SIZE } from "../../hooks/useFilesCommandCenter";
 import { useRealInboxMailbox } from "../../hooks/useRealInboxMailbox";
+import {
+  inboxWorkflowKey,
+  useInboxConversationWorkflows,
+} from "../../hooks/useInboxConversationWorkflows";
 import { useWorkspaceEmailSignature } from "../../hooks/useWorkspaceEmailSignature";
 import { useTasksCommandCenter } from "../../hooks/useTasksCommandCenter";
 import {
@@ -1946,6 +1950,35 @@ export default function InboxReferencePreview() {
       window.location.search,
     ).get("mailbox-live") === "enabled";
 
+  /*
+   * Command Center persistence is prepared in this pass,
+   * but remains disabled until the additive database
+   * migration is reviewed and applied.
+   */
+  const inboxWorkflowRuntimeEnabled =
+    false;
+
+  const {
+    rows:
+      inboxWorkflowRows,
+
+    byKey:
+      inboxWorkflowByKey,
+
+    error:
+      inboxWorkflowError,
+  } =
+    useInboxConversationWorkflows({
+      workspaceId:
+        workspace.id,
+
+      userId:
+        user.id,
+
+      enabled:
+        inboxWorkflowRuntimeEnabled,
+    });
+
   const {
     conversations: mailboxConversations,
     connectedEmail: mailboxConnectedEmail,
@@ -2102,6 +2135,11 @@ export default function InboxReferencePreview() {
 
   const [activeFilter, setActiveFilter] =
     useState("");
+
+  const [
+    activeCommandFilter,
+    setActiveCommandFilter,
+  ] = useState("");
 
   const [activeTag, setActiveTag] = useState("");
 
@@ -3185,6 +3223,208 @@ export default function InboxReferencePreview() {
       ],
     );
 
+  const inboxCommandMetrics =
+    useMemo(
+      () => {
+        const todayKey =
+          new Intl.DateTimeFormat(
+            "en-CA",
+            {
+              timeZone:
+                "America/New_York",
+
+              year:
+                "numeric",
+
+              month:
+                "2-digit",
+
+              day:
+                "2-digit",
+            },
+          ).format(
+            new Date(),
+          );
+
+        const commandRows =
+          emailAccountScopedConversations
+            .filter(
+              (conversation) =>
+                Boolean(
+                  conversation
+                    .providerThreadId,
+                ),
+            )
+            .map(
+              (conversation) => {
+                const workflow =
+                  inboxWorkflowByKey.get(
+                    inboxWorkflowKey(
+                      conversation,
+                    ),
+                  ) ||
+                  null;
+
+                const status =
+                  workflow
+                    ?.workflow_status ||
+                  (
+                    conversation
+                      .needsResponse
+                      ? "needs_reply"
+                      : "open"
+                  );
+
+                const followUpKey =
+                  workflow
+                    ?.follow_up_at
+                    ? new Intl.DateTimeFormat(
+                        "en-CA",
+                        {
+                          timeZone:
+                            "America/New_York",
+
+                          year:
+                            "numeric",
+
+                          month:
+                            "2-digit",
+
+                          day:
+                            "2-digit",
+                        },
+                      ).format(
+                        new Date(
+                          workflow
+                            .follow_up_at,
+                        ),
+                      )
+                    : "";
+
+                const dueToday =
+                  Boolean(
+                    followUpKey &&
+                    followUpKey ===
+                      todayKey,
+                  );
+
+                const actionable =
+                  status ===
+                    "needs_reply" ||
+                  status ===
+                    "waiting_on" ||
+                  dueToday;
+
+                return {
+                  conversation,
+                  workflow,
+                  status,
+                  dueToday,
+                  actionable,
+                };
+              },
+            );
+
+        return [
+          {
+            id:
+              "needs_reply",
+
+            label:
+              "Needs Reply",
+
+            icon:
+              Mail,
+
+            value:
+              commandRows.filter(
+                (item) =>
+                  item.status ===
+                  "needs_reply",
+              ).length,
+          },
+
+          {
+            id:
+              "waiting_on",
+
+            label:
+              "Waiting On",
+
+            icon:
+              Clock3,
+
+            value:
+              commandRows.filter(
+                (item) =>
+                  item.status ===
+                  "waiting_on",
+              ).length,
+          },
+
+          {
+            id:
+              "due_today",
+
+            label:
+              "Due Today",
+
+            icon:
+              Bell,
+
+            value:
+              commandRows.filter(
+                (item) =>
+                  item.dueToday,
+              ).length,
+          },
+
+          {
+            id:
+              "unassigned",
+
+            label:
+              "Unassigned",
+
+            icon:
+              UserPlus,
+
+            value:
+              commandRows.filter(
+                (item) =>
+                  item.actionable &&
+                  !item.workflow
+                    ?.assigned_to,
+              ).length,
+          },
+
+          {
+            id:
+              "vip",
+
+            label:
+              "VIP",
+
+            icon:
+              Star,
+
+            value:
+              commandRows.filter(
+                (item) =>
+                  item.workflow
+                    ?.is_vip ===
+                  true,
+              ).length,
+          },
+        ];
+      },
+      [
+        emailAccountScopedConversations,
+        inboxWorkflowByKey,
+      ],
+    );
+
+
   const filteredConversations = useMemo(() => {
     const normalizedQuery = query
       .trim()
@@ -3192,6 +3432,123 @@ export default function InboxReferencePreview() {
 
     const filtered = emailAccountScopedConversations.filter(
       (conversation) => {
+        const workflow =
+          inboxWorkflowByKey.get(
+            inboxWorkflowKey(
+              conversation,
+            ),
+          ) ||
+          null;
+
+        const commandStatus =
+          workflow
+            ?.workflow_status ||
+          (
+            conversation
+              .needsResponse
+              ? "needs_reply"
+              : "open"
+          );
+
+        const followUpToday =
+          workflow
+            ?.follow_up_at
+            ? new Intl.DateTimeFormat(
+                "en-CA",
+                {
+                  timeZone:
+                    "America/New_York",
+
+                  year:
+                    "numeric",
+
+                  month:
+                    "2-digit",
+
+                  day:
+                    "2-digit",
+                },
+              ).format(
+                new Date(
+                  workflow
+                    .follow_up_at,
+                ),
+              ) ===
+              new Intl.DateTimeFormat(
+                "en-CA",
+                {
+                  timeZone:
+                    "America/New_York",
+
+                  year:
+                    "numeric",
+
+                  month:
+                    "2-digit",
+
+                  day:
+                    "2-digit",
+                },
+              ).format(
+                new Date(),
+              )
+            : false;
+
+        const commandActionable =
+          commandStatus ===
+            "needs_reply" ||
+          commandStatus ===
+            "waiting_on" ||
+          followUpToday;
+
+        if (
+          activeCommandFilter ===
+            "needs_reply" &&
+          commandStatus !==
+            "needs_reply"
+        ) {
+          return false;
+        }
+
+        if (
+          activeCommandFilter ===
+            "waiting_on" &&
+          commandStatus !==
+            "waiting_on"
+        ) {
+          return false;
+        }
+
+        if (
+          activeCommandFilter ===
+            "due_today" &&
+          !followUpToday
+        ) {
+          return false;
+        }
+
+        if (
+          activeCommandFilter ===
+            "unassigned" &&
+          (
+            !commandActionable ||
+            workflow
+              ?.assigned_to
+          )
+        ) {
+          return false;
+        }
+
+        if (
+          activeCommandFilter ===
+            "vip" &&
+          workflow
+            ?.is_vip !==
+            true
+        ) {
+          return false;
+        }
+
         if (
           activeChannel !== "all" &&
           conversation.channel !== activeChannel
@@ -3272,9 +3629,11 @@ export default function InboxReferencePreview() {
     );
   }, [
     activeChannel,
+    activeCommandFilter,
     activeFilter,
     activeTag,
     emailAccountScopedConversations,
+    inboxWorkflowByKey,
     query,
     sortDirection,
   ]);
@@ -6137,6 +6496,110 @@ export default function InboxReferencePreview() {
             </button>
           </section>
         ) : null}
+
+        <section
+          className={
+            styles.inboxCommandBar
+          }
+          aria-label="Inbox command queue"
+        >
+          <div
+            className={
+              styles.inboxCommandBarLabel
+            }
+          >
+            <strong>
+              Command Queue
+            </strong>
+
+            <span>
+              Campaign follow-up
+            </span>
+          </div>
+
+          <div
+            className={
+              styles.inboxCommandMetrics
+            }
+          >
+            {inboxCommandMetrics.map(
+              (metric) => {
+                const Icon =
+                  metric.icon;
+
+                const active =
+                  activeCommandFilter ===
+                  metric.id;
+
+                return (
+                  <button
+                    key={
+                      metric.id
+                    }
+                    className={
+                      active
+                        ? styles.inboxCommandMetricActive
+                        : ""
+                    }
+                    type="button"
+                    aria-pressed={
+                      active
+                    }
+                    onClick={() => {
+                      setActiveCommandFilter(
+                        (current) =>
+                          current ===
+                            metric.id
+                            ? ""
+                            : metric.id,
+                      );
+
+                      setActiveFilter(
+                        "",
+                      );
+                    }}
+                  >
+                    <Icon
+                      size={15}
+                    />
+
+                    <span>
+                      {
+                        metric.label
+                      }
+                    </span>
+
+                    <strong>
+                      {
+                        metric.value
+                      }
+                    </strong>
+                  </button>
+                );
+              },
+            )}
+          </div>
+
+          {activeCommandFilter ? (
+            <button
+              className={
+                styles.inboxCommandClear
+              }
+              type="button"
+              onClick={() =>
+                setActiveCommandFilter(
+                  "",
+                )
+              }
+            >
+              <X
+                size={13}
+              />
+
+              Clear
+            </button>
+          ) : null}
+        </section>
 
         <section
           className={

@@ -19368,3 +19368,290 @@ span {
 }
 
 /* INBOX MAILBOX ACTION POLISH V25 — END */
+
+
+/* INBOX COMMAND CENTER V1 — START */
+
+.inboxCommandBar {
+  display: flex;
+  min-width: 0;
+  min-height: 48px;
+
+  align-items: center;
+  gap: 8px;
+
+  margin-bottom: 8px;
+  padding:
+    6px
+    7px;
+
+  border:
+    1px solid
+    #d7e2ea;
+
+  border-radius:
+    11px;
+
+  background:
+    linear-gradient(
+      90deg,
+      #ffffff,
+      #f8fbfd
+    );
+}
+
+.inboxCommandBarLabel {
+  flex:
+    0
+    0
+    auto;
+
+  display: grid;
+
+  min-width:
+    105px;
+
+  padding:
+    0
+    7px;
+}
+
+.inboxCommandBarLabel strong {
+  color:
+    #173d62;
+
+  font-size:
+    0.61rem;
+
+  font-weight:
+    860;
+}
+
+.inboxCommandBarLabel span {
+  margin-top:
+    2px;
+
+  color:
+    #8497a8;
+
+  font-size:
+    0.47rem;
+
+  font-weight:
+    650;
+}
+
+.inboxCommandMetrics {
+  display: flex;
+
+  min-width: 0;
+  flex:
+    1
+    1
+    auto;
+
+  align-items: center;
+  gap: 6px;
+
+  overflow-x:
+    auto;
+
+  scrollbar-width:
+    none;
+}
+
+.inboxCommandMetrics::-webkit-scrollbar {
+  display:
+    none;
+}
+
+.inboxCommandMetrics button {
+  flex:
+    0
+    0
+    auto;
+
+  display:
+    inline-flex;
+
+  min-height:
+    34px;
+
+  align-items:
+    center;
+  gap: 6px;
+
+  padding:
+    0
+    9px;
+
+  border:
+    1px solid
+    #d9e4ec;
+
+  border-radius:
+    9px;
+
+  color:
+    #527087;
+
+  background:
+    #ffffff;
+
+  font-size:
+    0.54rem;
+
+  font-weight:
+    770;
+}
+
+.inboxCommandMetrics button:hover {
+  border-color:
+    #b9ccda;
+
+  background:
+    #f5f9fc;
+}
+
+.inboxCommandMetrics button strong {
+  display: grid;
+
+  min-width:
+    20px;
+
+  height:
+    20px;
+
+  place-items:
+    center;
+
+  padding:
+    0
+    5px;
+
+  border-radius:
+    999px;
+
+  color:
+    #44657d;
+
+  background:
+    #edf3f7;
+
+  font-size:
+    0.48rem;
+
+  font-weight:
+    880;
+}
+
+.inboxCommandMetrics
+.inboxCommandMetricActive {
+  border-color:
+    #ef8d95;
+
+  color:
+    #be2532;
+
+  background:
+    #fff3f4;
+}
+
+.inboxCommandMetrics
+.inboxCommandMetricActive
+strong {
+  color:
+    #ffffff;
+
+  background:
+    #ef3340;
+}
+
+.inboxCommandClear {
+  flex:
+    0
+    0
+    auto;
+
+  display:
+    inline-flex;
+
+  min-height:
+    32px;
+
+  align-items:
+    center;
+  gap: 5px;
+
+  padding:
+    0
+    8px;
+
+  border:
+    0;
+
+  border-radius:
+    8px;
+
+  color:
+    #718697;
+
+  background:
+    transparent;
+
+  font-size:
+    0.51rem;
+
+  font-weight:
+    760;
+}
+
+.inboxCommandClear:hover {
+  color:
+    #bd2734;
+
+  background:
+    #fff1f2;
+}
+
+
+@media (max-width: 900px) {
+
+  .inboxCommandBar {
+    align-items:
+      stretch;
+
+    flex-wrap:
+      wrap;
+  }
+
+  .inboxCommandBarLabel {
+    width:
+      100%;
+  }
+
+  .inboxCommandMetrics {
+    width:
+      100%;
+  }
+}
+
+
+@media (max-width: 700px) {
+
+  .inboxCommandBar {
+    padding:
+      7px;
+  }
+
+  .inboxCommandMetrics button {
+    min-height:
+      33px;
+
+    padding:
+      0
+      8px;
+  }
+}
+
+/* INBOX COMMAND CENTER V1 — END */
