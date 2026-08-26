@@ -399,6 +399,80 @@ function inboxWorkflowIsSnoozed(
 }
 
 
+function inboxTaskFormDateParts(
+  value,
+) {
+  if (!value) {
+    return null;
+  }
+
+  const date =
+    new Date(
+      value,
+    );
+
+  if (
+    Number.isNaN(
+      date.getTime(),
+    )
+  ) {
+    return null;
+  }
+
+  const parts =
+    new Intl.DateTimeFormat(
+      "en-US",
+      {
+        timeZone:
+          "America/New_York",
+
+        year:
+          "numeric",
+
+        month:
+          "2-digit",
+
+        day:
+          "2-digit",
+
+        hour:
+          "2-digit",
+
+        minute:
+          "2-digit",
+
+        hourCycle:
+          "h23",
+      },
+    ).formatToParts(
+      date,
+    );
+
+  const values =
+    Object.fromEntries(
+      parts.map(
+        (part) => [
+          part.type,
+          part.value,
+        ],
+      ),
+    );
+
+  return {
+    date: [
+      values.year,
+      values.month,
+      values.day,
+    ].join("-"),
+
+    time: [
+      values.hour,
+      values.minute,
+    ].join(":"),
+  };
+}
+
+
 function getEasternDateInput(daysAhead = 0) {
   const parts = new Intl.DateTimeFormat(
     "en-US",
@@ -2813,6 +2887,11 @@ export default function InboxReferencePreview() {
     setQuickTaskMode,
   ] = useState("task");
 
+  const [
+    quickTaskWorkflowConversationId,
+    setQuickTaskWorkflowConversationId,
+  ] = useState("");
+
   const [quickTaskForm, setQuickTaskForm] =
     useState(() =>
       defaultTaskForm(
@@ -4358,23 +4437,174 @@ export default function InboxReferencePreview() {
     }
   };
 
-  const openQuickTask = () => {
-    setQuickTaskMode(
-      "task",
-    );
-    setQuickTaskForm(
-      defaultTaskForm(
-        selectedConversation,
-        user.id,
-      ),
-    );
-    setQuickTaskError("");
-    setQuickTaskOpen(true);
-  };
+  const closeQuickTaskModal =
+    () => {
+      setQuickTaskOpen(
+        false,
+      );
+
+      setQuickTaskWorkflowConversationId(
+        "",
+      );
+
+      setQuickTaskError(
+        "",
+      );
+    };
+
+
+  const openQuickTask =
+    () => {
+      setQuickTaskMode(
+        "task",
+      );
+
+      setQuickTaskWorkflowConversationId(
+        "",
+      );
+
+      setQuickTaskForm(
+        defaultTaskForm(
+          selectedConversation,
+          user.id,
+        ),
+      );
+
+      setQuickTaskError(
+        "",
+      );
+
+      setQuickTaskOpen(
+        true,
+      );
+    };
+
+
+  const openInboxWorkflowTaskComposer =
+    () => {
+      const linkedTaskId =
+        selectedInboxWorkflow
+          ?.linked_task_id ||
+        "";
+
+      if (linkedTaskId) {
+        window.location.assign(
+          `/tasks?task=${encodeURIComponent(
+            linkedTaskId,
+          )}`,
+        );
+
+        return;
+      }
+
+      const baseForm =
+        defaultTaskForm(
+          selectedConversation,
+          user.id,
+        );
+
+      const workflowDue =
+        inboxTaskFormDateParts(
+          selectedInboxWorkflow
+            ?.follow_up_at,
+        );
+
+      const sender =
+        selectedConversation
+          ?.sender ||
+        selectedConversation
+          ?.email ||
+        "Campaign contact";
+
+      const subject =
+        selectedConversation
+          ?.subject ||
+        "(No subject)";
+
+      const senderEmail =
+        selectedConversation
+          ?.email ||
+        "";
+
+      const preview =
+        selectedConversation
+          ?.preview ||
+        "";
+
+      setQuickTaskMode(
+        "task",
+      );
+
+      setQuickTaskWorkflowConversationId(
+        selectedConversation
+          ?.id ||
+        "",
+      );
+
+      setQuickTaskForm({
+        ...baseForm,
+
+        title:
+          `Follow up with ${sender}`,
+
+        description: [
+          "Review and act on this email.",
+          "",
+          "Email context",
+          `From: ${sender}${
+            senderEmail
+              ? ` <${senderEmail}>`
+              : ""
+          }`,
+          `Subject: ${subject}`,
+          preview
+            ? `Preview: ${preview}`
+            : "",
+        ]
+          .filter(Boolean)
+          .join("\n"),
+
+        dueDate:
+          workflowDue
+            ?.date ||
+          baseForm.dueDate,
+
+        dueTime:
+          workflowDue
+            ?.time ||
+          baseForm.dueTime,
+
+        priority:
+          selectedInboxWorkflow
+            ?.is_vip ||
+          selectedConversation
+            ?.priority
+            ? "high"
+            : baseForm.priority,
+
+        assignedTo:
+          selectedInboxAssignee ||
+          user.id ||
+          "",
+      });
+
+      setQuickTaskError(
+        "",
+      );
+
+      setQuickTaskOpen(
+        true,
+      );
+    };
+
 
   const openQuickReminder = () => {
     setQuickTaskMode(
       "reminder",
+    );
+
+    setQuickTaskWorkflowConversationId(
+      "",
     );
 
     const reminderForm =
@@ -4501,15 +4731,93 @@ export default function InboxReferencePreview() {
       }
 
 
-      setQuickTaskOpen(false);
+      const workflowConversation =
+        (
+          quickTaskMode ===
+            "task" &&
+          quickTaskWorkflowConversationId
+        )
+          ? conversations.find(
+              (conversation) =>
+                conversation.id ===
+                quickTaskWorkflowConversationId,
+            ) ||
+            null
+          : null;
+
+      let linkedWorkflowTask =
+        false;
+
+      if (
+        workflowConversation &&
+        createdTask?.id
+      ) {
+        try {
+          await upsertInboxWorkflow(
+            workflowConversation,
+            {
+              assigned_to:
+                quickTaskForm
+                  .assignedTo ||
+                user.id ||
+                null,
+
+              linked_task_id:
+                createdTask.id,
+
+              metadata: {
+                sender:
+                  workflowConversation
+                    .sender ||
+                  "",
+
+                email:
+                  workflowConversation
+                    .email ||
+                  "",
+
+                subject:
+                  workflowConversation
+                    .subject ||
+                  "",
+
+                linked_task_title:
+                  createdTask.title,
+              },
+            },
+          );
+
+          linkedWorkflowTask =
+            true;
+        } catch (
+          linkError
+        ) {
+          closeQuickTaskModal();
+
+          setToast(
+            "Task created, but Campaign Seat could not link it back to the Inbox conversation.",
+          );
+
+          return;
+        }
+      }
+
+      closeQuickTaskModal();
 
       addActivity(
-        "Quick task created",
-        `Follow-up task created for ${selectedConversation.sender}.`,
+        linkedWorkflowTask
+          ? "Inbox task created and linked"
+          : "Quick task created",
+
+        linkedWorkflowTask
+          ? `Task created from the ${workflowConversation?.sender || "selected"} email conversation.`
+          : `Follow-up task created for ${selectedConversation.sender}.`,
       );
 
       setToast(
-        `Task created for ${selectedConversation.sender}.`,
+        linkedWorkflowTask
+          ? "Task created and linked to this Inbox conversation."
+          : `Task created for ${selectedConversation.sender}.`,
       );
     } catch (createError) {
       setQuickTaskError(
@@ -6372,148 +6680,9 @@ export default function InboxReferencePreview() {
     };
 
 
-  const handleCreateInboxTask =
-    async () => {
-      if (
-        selectedInboxWorkflow
-          ?.linked_task_id ||
-        inboxWorkflowActionBusy
-      ) {
-        return;
-      }
-
-      setInboxWorkflowActionBusy(
-        "task",
-      );
-
-      try {
-        const task =
-          await createTask({
-            title:
-              `Inbox follow-up: ${
-                selectedConversation
-                  .sender ||
-                selectedConversation
-                  .subject ||
-                "Campaign contact"
-              }`,
-
-            description: [
-              "Created from Campaign Seat Inbox.",
-              "",
-              `From: ${
-                selectedConversation
-                  .sender ||
-                "Unknown sender"
-              }${
-                selectedConversation
-                  .email
-                  ? ` <${selectedConversation.email}>`
-                  : ""
-              }`,
-              `Subject: ${
-                selectedConversation
-                  .subject ||
-                "(No subject)"
-              }`,
-              "",
-              selectedConversation
-                .preview ||
-                "",
-            ]
-              .filter(
-                (
-                  value,
-                  index,
-                ) =>
-                  value !==
-                    "" ||
-                  index ===
-                    1,
-              )
-              .join(
-                "\n",
-              ),
-
-            category:
-              "Communications",
-
-            priority:
-              selectedInboxWorkflow
-                ?.is_vip ||
-              selectedConversation
-                .priority
-                ? "high"
-                : "normal",
-
-            visibility:
-              "workspace",
-
-            tags: [
-              "Inbox",
-              "Follow Up",
-            ],
-
-            assigned_to:
-              selectedInboxAssignee ||
-              user.id,
-
-            due_at:
-              selectedInboxWorkflow
-                ?.follow_up_at ||
-              null,
-
-            status:
-              "open",
-          });
-
-        await upsertInboxWorkflow(
-          selectedConversation,
-          {
-            assigned_to:
-              selectedInboxAssignee ||
-              user.id,
-
-            linked_task_id:
-              task.id,
-
-            metadata: {
-              sender:
-                selectedConversation
-                  .sender ||
-                "",
-
-              email:
-                selectedConversation
-                  .email ||
-                "",
-
-              subject:
-                selectedConversation
-                  .subject ||
-                "",
-
-              linked_task_title:
-                task.title,
-            },
-          },
-        );
-
-        setToast(
-          "Campaign follow-up task created and linked.",
-        );
-      } catch (
-        taskCreateError
-      ) {
-        setToast(
-          taskCreateError?.message ||
-            "Campaign Seat could not create the Inbox follow-up task.",
-        );
-      } finally {
-        setInboxWorkflowActionBusy(
-          "",
-        );
-      }
+  const handleInboxTaskAction =
+    () => {
+      openInboxWorkflowTaskComposer();
     };
 
 
@@ -9414,18 +9583,16 @@ type="button"
                     Boolean(
                       inboxWorkflowActionBusy,
                     ) ||
-                    Boolean(
-                      selectedInboxWorkflow?.linked_task_id,
-                    )
+                    taskSaving
                   }
-                  onClick={() =>
-                    void handleCreateInboxTask()
+                  onClick={
+                    handleInboxTaskAction
                   }
                 >
                   <ListTodo size={14} />
 
                   {selectedInboxWorkflow?.linked_task_id
-                    ? "Task Linked"
+                    ? "Open Task"
                     : "Create Task"}
                 </button>
 
@@ -11611,7 +11778,7 @@ type="button"
                 event.target ===
                 event.currentTarget
               ) {
-                setQuickTaskOpen(false);
+                closeQuickTaskModal();
               }
             }}
           >
@@ -11633,14 +11800,18 @@ type="button"
                       {quickTaskMode ===
                       "reminder"
                         ? "Timed follow-up"
-                        : "Inbox follow-up"}
+                        : quickTaskWorkflowConversationId
+                          ? "Email action"
+                          : "Inbox follow-up"}
                     </small>
 
                     <h2 id="quick-task-title">
                       {quickTaskMode ===
                       "reminder"
                         ? "Create Reminder"
-                        : "Create Quick Task"}
+                        : quickTaskWorkflowConversationId
+                          ? "Create Task from Email"
+                          : "Create Quick Task"}
                     </h2>
                   </div>
                 </div>
@@ -11648,7 +11819,7 @@ type="button"
                 <button
                   type="button"
                   onClick={() =>
-                    setQuickTaskOpen(false)
+                    closeQuickTaskModal()
                   }
                   aria-label="Close Quick Task"
                 >
@@ -11693,6 +11864,22 @@ type="button"
                     This creates a task for you and
                     schedules a Campaign Seat reminder
                     at the date and time below.
+                  </span>
+                </div>
+              ) : quickTaskWorkflowConversationId ? (
+                <div
+                  className={
+                    styles.reminderModeNotice
+                  }
+                >
+                  <Mail
+                    size={16}
+                  />
+
+                  <span>
+                    Review what needs to be done, who owns it,
+                    priority and deadline. Nothing is created
+                    until you press Create & Link Task.
                   </span>
                 </div>
               ) : null}
@@ -11858,7 +12045,7 @@ type="button"
                 <button
                   type="button"
                   onClick={() =>
-                    setQuickTaskOpen(false)
+                    closeQuickTaskModal()
                   }
                   disabled={taskSaving}
                 >
@@ -11882,7 +12069,10 @@ type="button"
                   ) : (
                     <>
                       <ListTodo size={16} />
-                      Create Task
+
+                      {quickTaskWorkflowConversationId
+                        ? "Create & Link Task"
+                        : "Create Task"}
                     </>
                   )}
                 </button>

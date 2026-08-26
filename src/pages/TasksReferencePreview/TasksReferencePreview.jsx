@@ -486,6 +486,19 @@ export default function TasksReferencePreview() {
   const [selectedTaskId, setSelectedTaskId] =
     useState("");
 
+  const requestedTaskId =
+    typeof window !==
+      "undefined"
+      ? (
+          new URLSearchParams(
+            window.location.search,
+          ).get(
+            "task",
+          ) ||
+          ""
+        )
+      : "";
+
   const [modalMode, setModalMode] =
     useState("");
 
@@ -826,6 +839,63 @@ export default function TasksReferencePreview() {
   const selectedTask = tasks.find(
     (task) => task.id === selectedTaskId,
   );
+
+  useEffect(() => {
+    if (
+      !requestedTaskId ||
+      !tasks.length
+    ) {
+      return;
+    }
+
+    const requestedTask =
+      tasks.find(
+        (task) =>
+          task.id ===
+          requestedTaskId,
+      );
+
+    if (!requestedTask) {
+      return;
+    }
+
+    const completed =
+      requestedTask.status ===
+        "completed";
+
+    setActiveTab(
+      completed
+        ? "completed"
+        : "all",
+    );
+
+    setSearch(
+      "",
+    );
+
+    setPriorityFilter(
+      "all",
+    );
+
+    setStatusFilter(
+      completed
+        ? "completed"
+        : "active",
+    );
+
+    setSummaryFilter(
+      completed
+        ? "completed"
+        : "all",
+    );
+
+    setSelectedTaskId(
+      requestedTask.id,
+    );
+  }, [
+    requestedTaskId,
+    tasks,
+  ]);
 
   useEffect(() => {
     if (typeof document === "undefined") {
