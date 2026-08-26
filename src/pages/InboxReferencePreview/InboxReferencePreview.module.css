@@ -20037,3 +20037,376 @@ strong {
 }
 
 /* INBOX COMMAND CENTER SCHEDULE ACTIONS — END */
+
+
+/* INBOX CUSTOM SCHEDULE PICKER — START */
+
+.inboxScheduleModal {
+  width:
+    min(
+      420px,
+      calc(
+        100vw -
+        34px
+      )
+    );
+
+  overflow:
+    hidden;
+
+  border:
+    1px solid
+    #cfdae3;
+
+  border-radius:
+    14px;
+
+  background:
+    #ffffff;
+
+  box-shadow:
+    0
+    26px
+    70px
+    rgba(
+      16,
+      42,
+      66,
+      0.25
+    );
+}
+
+.inboxScheduleModal > header {
+  display:
+    flex;
+
+  align-items:
+    center;
+
+  justify-content:
+    space-between;
+
+  gap:
+    12px;
+
+  padding:
+    15px
+    16px;
+
+  border-bottom:
+    1px solid
+    #e1e8ee;
+}
+
+.inboxScheduleModal > header > div {
+  display:
+    flex;
+
+  align-items:
+    center;
+
+  gap:
+    9px;
+}
+
+.inboxScheduleModal > header > div > span {
+  display:
+    grid;
+
+  width:
+    35px;
+
+  height:
+    35px;
+
+  place-items:
+    center;
+
+  border-radius:
+    9px;
+
+  color:
+    #ffffff;
+
+  background:
+    #286799;
+}
+
+.inboxScheduleModal h2,
+.inboxScheduleModal small {
+  display:
+    block;
+
+  margin:
+    0;
+}
+
+.inboxScheduleModal small {
+  color:
+    #ef3340;
+
+  font-size:
+    0.48rem;
+
+  font-weight:
+    850;
+
+  letter-spacing:
+    0.06em;
+
+  text-transform:
+    uppercase;
+}
+
+.inboxScheduleModal h2 {
+  margin-top:
+    2px;
+
+  color:
+    #173f62;
+
+  font-size:
+    0.85rem;
+
+  font-weight:
+    880;
+}
+
+.inboxScheduleModal > header > button {
+  display:
+    grid;
+
+  width:
+    32px;
+
+  height:
+    32px;
+
+  place-items:
+    center;
+
+  border:
+    1px solid
+    #d4dfe7;
+
+  border-radius:
+    8px;
+
+  color:
+    #6c8294;
+
+  background:
+    #ffffff;
+}
+
+.inboxScheduleConversation {
+  display:
+    flex;
+
+  align-items:
+    center;
+
+  gap:
+    9px;
+
+  margin:
+    14px
+    15px
+    0;
+
+  padding:
+    10px;
+
+  border:
+    1px solid
+    #dce6ed;
+
+  border-radius:
+    9px;
+
+  background:
+    #f8fbfd;
+}
+
+.inboxScheduleConversation strong,
+.inboxScheduleConversation small {
+  display:
+    block;
+}
+
+.inboxScheduleConversation strong {
+  color:
+    #29516f;
+
+  font-size:
+    0.58rem;
+
+  font-weight:
+    820;
+}
+
+.inboxScheduleConversation small {
+  margin-top:
+    2px;
+
+  overflow:
+    hidden;
+
+  color:
+    #8093a2;
+
+  font-size:
+    0.49rem;
+
+  text-overflow:
+    ellipsis;
+
+  white-space:
+    nowrap;
+}
+
+.inboxScheduleField {
+  display:
+    grid;
+
+  gap:
+    5px;
+
+  margin:
+    14px
+    15px
+    0;
+
+  color:
+    #557188;
+
+  font-size:
+    0.53rem;
+
+  font-weight:
+    780;
+}
+
+.inboxScheduleField input {
+  min-height:
+    42px;
+
+  padding:
+    0
+    10px;
+
+  border:
+    1px solid
+    #ccdbe5;
+
+  border-radius:
+    9px;
+
+  outline:
+    0;
+
+  color:
+    #234d6d;
+
+  background:
+    #ffffff;
+
+  font:
+    inherit;
+}
+
+.inboxScheduleField input:focus {
+  border-color:
+    #6da5cc;
+
+  box-shadow:
+    0
+    0
+    0
+    3px
+    rgba(
+      62,
+      127,
+      175,
+      0.1
+    );
+}
+
+.inboxScheduleHelp {
+  margin:
+    11px
+    15px
+    0;
+
+  color:
+    #758b9c;
+
+  font-size:
+    0.5rem;
+
+  line-height:
+    1.5;
+}
+
+.inboxScheduleModal > footer {
+  display:
+    flex;
+
+  justify-content:
+    flex-end;
+
+  gap:
+    7px;
+
+  margin-top:
+    14px;
+
+  padding:
+    12px
+    15px;
+
+  border-top:
+    1px solid
+    #e4ebf0;
+}
+
+.inboxScheduleModal > footer button {
+  min-height:
+    34px;
+
+  padding:
+    0
+    11px;
+
+  border:
+    1px solid
+    #d2dee7;
+
+  border-radius:
+    8px;
+
+  color:
+    #557087;
+
+  background:
+    #ffffff;
+
+  font-size:
+    0.52rem;
+
+  font-weight:
+    800;
+}
+
+.inboxScheduleModal > footer button:last-child {
+  border-color:
+    #ef3340;
+
+  color:
+    #ffffff;
+
+  background:
+    #ef3340;
+}
+
+/* INBOX CUSTOM SCHEDULE PICKER — END */

@@ -268,6 +268,109 @@ function buildOutboundEmailBody({
 }
 
 
+function inboxWorkflowDurationIso(
+  minutes,
+) {
+  const duration =
+    Number(
+      minutes,
+    );
+
+  if (
+    !Number.isFinite(
+      duration,
+    ) ||
+    duration <= 0
+  ) {
+    return null;
+  }
+
+  return new Date(
+    Date.now() +
+    duration *
+      60 *
+      1000,
+  ).toISOString();
+}
+
+
+function inboxWorkflowLocalInputValue(
+  value = null,
+) {
+  const date =
+    value
+      ? new Date(
+          value,
+        )
+      : new Date(
+          Date.now() +
+          60 *
+            60 *
+            1000,
+        );
+
+  if (
+    Number.isNaN(
+      date.getTime(),
+    )
+  ) {
+    return "";
+  }
+
+  const pad =
+    (number) =>
+      String(
+        number,
+      ).padStart(
+        2,
+        "0",
+      );
+
+  return [
+    date.getFullYear(),
+    "-",
+    pad(
+      date.getMonth() +
+      1,
+    ),
+    "-",
+    pad(
+      date.getDate(),
+    ),
+    "T",
+    pad(
+      date.getHours(),
+    ),
+    ":",
+    pad(
+      date.getMinutes(),
+    ),
+  ].join(
+    "",
+  );
+}
+
+
+function inboxWorkflowCustomIso(
+  value,
+) {
+  const date =
+    new Date(
+      value,
+    );
+
+  if (
+    Number.isNaN(
+      date.getTime(),
+    )
+  ) {
+    return null;
+  }
+
+  return date.toISOString();
+}
+
+
 function inboxWorkflowPresetIso(
   preset,
 ) {
@@ -6425,6 +6528,19 @@ export default function InboxReferencePreview() {
     setInboxFollowUpMenuOpen,
   ] = useState(false);
 
+  const [
+    inboxCustomScheduleMode,
+    setInboxCustomScheduleMode,
+  ] = useState("");
+
+  const [
+    inboxCustomScheduleValue,
+    setInboxCustomScheduleValue,
+  ] = useState(
+    () =>
+      inboxWorkflowLocalInputValue(),
+  );
+
 
   const runInboxWorkflowAction =
     async (
@@ -6571,9 +6687,24 @@ export default function InboxReferencePreview() {
         preset ===
           "clear"
           ? null
-          : inboxWorkflowPresetIso(
-              preset,
-            );
+          : preset ===
+              "30_minutes"
+            ? inboxWorkflowDurationIso(
+                30,
+              )
+            : preset ===
+                "one_hour"
+              ? inboxWorkflowDurationIso(
+                  60,
+                )
+              : preset ===
+                  "three_hours"
+                ? inboxWorkflowDurationIso(
+                    180,
+                  )
+                : inboxWorkflowPresetIso(
+                    preset,
+                  );
 
       const saved =
         await runInboxWorkflowAction(
@@ -6658,6 +6789,138 @@ export default function InboxReferencePreview() {
           );
         }
       }
+    };
+
+
+  const openInboxCustomSchedule =
+    (
+      mode,
+    ) => {
+      const existing =
+        mode ===
+          "snooze"
+          ? selectedInboxWorkflow
+              ?.snoozed_until
+          : selectedInboxWorkflow
+              ?.follow_up_at;
+
+      setInboxCustomScheduleMode(
+        mode,
+      );
+
+      setInboxCustomScheduleValue(
+        inboxWorkflowLocalInputValue(
+          existing,
+        ),
+      );
+
+      setInboxSnoozeMenuOpen(
+        false,
+      );
+
+      setInboxFollowUpMenuOpen(
+        false,
+      );
+    };
+
+
+  const saveInboxCustomSchedule =
+    async () => {
+      const scheduledAt =
+        inboxWorkflowCustomIso(
+          inboxCustomScheduleValue,
+        );
+
+      if (!scheduledAt) {
+        setToast(
+          "Choose a valid date and time.",
+        );
+
+        return;
+      }
+
+      if (
+        new Date(
+          scheduledAt,
+        ).getTime() <=
+        Date.now()
+      ) {
+        setToast(
+          "Choose a future date and time.",
+        );
+
+        return;
+      }
+
+      if (
+        inboxCustomScheduleMode ===
+        "snooze"
+      ) {
+        const saved =
+          await runInboxWorkflowAction(
+            "snooze",
+            {
+              snoozed_until:
+                scheduledAt,
+            },
+            `Conversation snoozed until ${inboxWorkflowScheduleLabel(
+              scheduledAt,
+            )}.`,
+          );
+
+        if (!saved) {
+          return;
+        }
+      } else if (
+        inboxCustomScheduleMode ===
+        "follow-up"
+      ) {
+        const saved =
+          await runInboxWorkflowAction(
+            "follow-up",
+            {
+              follow_up_at:
+                scheduledAt,
+            },
+            `Follow-up set for ${inboxWorkflowScheduleLabel(
+              scheduledAt,
+            )}.`,
+          );
+
+        if (!saved) {
+          return;
+        }
+
+        if (
+          selectedInboxWorkflow
+            ?.linked_task_id
+        ) {
+          try {
+            await updateTask(
+              selectedInboxWorkflow
+                .linked_task_id,
+              {
+                due_at:
+                  scheduledAt,
+              },
+            );
+
+            setToast(
+              "Follow-up and linked Task due date updated.",
+            );
+          } catch (
+            taskSyncError
+          ) {
+            setToast(
+              "Follow-up saved, but the linked Task due date could not be synchronized.",
+            );
+          }
+        }
+      }
+
+      setInboxCustomScheduleMode(
+        "",
+      );
     };
 
 
@@ -9377,6 +9640,39 @@ type="button"
                         type="button"
                         onClick={() =>
                           void handleInboxSnooze(
+                            "30_minutes",
+                          )
+                        }
+                      >
+                        30 minutes
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() =>
+                          void handleInboxSnooze(
+                            "one_hour",
+                          )
+                        }
+                      >
+                        1 hour
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() =>
+                          void handleInboxSnooze(
+                            "three_hours",
+                          )
+                        }
+                      >
+                        3 hours
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() =>
+                          void handleInboxSnooze(
                             "tomorrow",
                           )
                         }
@@ -9387,23 +9683,12 @@ type="button"
                       <button
                         type="button"
                         onClick={() =>
-                          void handleInboxSnooze(
-                            "friday",
+                          openInboxCustomSchedule(
+                            "snooze",
                           )
                         }
                       >
-                        Friday
-                      </button>
-
-                      <button
-                        type="button"
-                        onClick={() =>
-                          void handleInboxSnooze(
-                            "next_week",
-                          )
-                        }
-                      >
-                        Next week
+                        Pick date & time…
                       </button>
 
                       {selectedInboxWorkflow
@@ -9518,6 +9803,17 @@ type="button"
                         }
                       >
                         Next week
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() =>
+                          openInboxCustomSchedule(
+                            "follow-up",
+                          )
+                        }
+                      >
+                        Pick date & time…
                       </button>
 
                       {selectedInboxWorkflow
@@ -11763,6 +12059,179 @@ type="button"
                   }
                 >
                   Close
+                </button>
+              </footer>
+            </section>
+          </div>
+        ) : null}
+
+        {inboxCustomScheduleMode ? (
+          <div
+            className={
+              styles.modalOverlay
+            }
+            role="presentation"
+            onMouseDown={(
+              event,
+            ) => {
+              if (
+                event.target ===
+                event.currentTarget
+              ) {
+                setInboxCustomScheduleMode(
+                  "",
+                );
+              }
+            }}
+          >
+            <section
+              className={
+                styles.inboxScheduleModal
+              }
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="inbox-schedule-title"
+            >
+              <header>
+                <div>
+                  <span>
+                    {inboxCustomScheduleMode ===
+                    "snooze" ? (
+                      <Clock3
+                        size={19}
+                      />
+                    ) : (
+                      <Bell
+                        size={19}
+                      />
+                    )}
+                  </span>
+
+                  <div>
+                    <small>
+                      Campaign follow-up
+                    </small>
+
+                    <h2 id="inbox-schedule-title">
+                      {inboxCustomScheduleMode ===
+                      "snooze"
+                        ? "Snooze until"
+                        : "Follow up at"}
+                    </h2>
+                  </div>
+                </div>
+
+                <button
+                  type="button"
+                  aria-label="Close"
+                  onClick={() =>
+                    setInboxCustomScheduleMode(
+                      "",
+                    )
+                  }
+                >
+                  <X
+                    size={17}
+                  />
+                </button>
+              </header>
+
+              <div
+                className={
+                  styles.inboxScheduleConversation
+                }
+              >
+                <span
+                  className={
+                    styles.avatar
+                  }
+                >
+                  {
+                    selectedConversation
+                      .initials
+                  }
+                </span>
+
+                <span>
+                  <strong>
+                    {
+                      selectedConversation
+                        .sender
+                    }
+                  </strong>
+
+                  <small>
+                    {
+                      selectedConversation
+                        .subject
+                    }
+                  </small>
+                </span>
+              </div>
+
+              <label
+                className={
+                  styles.inboxScheduleField
+                }
+              >
+                Date and time
+
+                <input
+                  type="datetime-local"
+                  value={
+                    inboxCustomScheduleValue
+                  }
+                  min={
+                    inboxWorkflowLocalInputValue()
+                  }
+                  onChange={(
+                    event,
+                  ) =>
+                    setInboxCustomScheduleValue(
+                      event.target.value,
+                    )
+                  }
+                />
+              </label>
+
+              <p
+                className={
+                  styles.inboxScheduleHelp
+                }
+              >
+                {inboxCustomScheduleMode ===
+                "snooze"
+                  ? "This conversation will temporarily leave active action queues and return automatically at this time."
+                  : "Campaign Seat will include this conversation in the appropriate follow-up queue at this time."}
+              </p>
+
+              <footer>
+                <button
+                  type="button"
+                  onClick={() =>
+                    setInboxCustomScheduleMode(
+                      "",
+                    )
+                  }
+                >
+                  Cancel
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() =>
+                    void saveInboxCustomSchedule()
+                  }
+                  disabled={
+                    Boolean(
+                      inboxWorkflowActionBusy,
+                    )
+                  }
+                >
+                  {inboxCustomScheduleMode ===
+                  "snooze"
+                    ? "Set Snooze"
+                    : "Set Follow Up"}
                 </button>
               </footer>
             </section>
