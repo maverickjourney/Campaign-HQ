@@ -14,8 +14,8 @@ import {
 } from "react-router-dom";
 
 import {
-  supabase,
-} from "../../lib/supabase";
+  invokeProtectedOAuthExchange,
+} from "../../utils/providerOAuthCallback";
 
 import styles
   from "./NylasOAuthCallback.module.css";
@@ -26,6 +26,18 @@ const activeExchangeStates =
 export default function NylasOAuthCallback() {
   const location =
     useLocation();
+
+  const callbackState =
+    new URLSearchParams(
+      location.search,
+    ).get(
+      "state",
+    ) || "";
+
+  const seatOnboardingConnection =
+    callbackState.startsWith(
+      "seat.",
+    );
 
   const [
     status,
@@ -81,14 +93,6 @@ export default function NylasOAuthCallback() {
       return;
     }
 
-    const seatOnboardingConnection =
-      Boolean(
-        state?.startsWith(
-          "seat.",
-        ),
-      );
-
-
     if (
       !code ||
       !state
@@ -123,113 +127,88 @@ export default function NylasOAuthCallback() {
 
     const finish =
       async () => {
-        const {
-          data,
-          error,
-        } =
-          await supabase
-            .functions
-            .invoke(
-              seatOnboardingConnection
-                ? "nylas-seat-oauth-exchange"
-                : "nylas-oauth-exchange",
-              {
-                body: {
-                  code,
-                  state,
-                },
+        try {
+          const data =
+            await invokeProtectedOAuthExchange({
+              functionName:
+                seatOnboardingConnection
+                  ? "nylas-seat-oauth-exchange"
+                  : "nylas-oauth-exchange",
+
+              body: {
+                code,
+                state,
               },
-            );
 
-        if (
-          error ||
-          data?.success !==
-            true
-        ) {
-          let functionErrorMessage =
-            "";
+              fallbackErrorMessage:
+                "Campaign Seat could not finalize the provider connection.",
+            });
 
-          if (
-            error?.context instanceof
-              Response
-          ) {
-            try {
-              const errorPayload =
-                await error.context.json();
-
-              functionErrorMessage =
-                errorPayload?.error ||
-                errorPayload?.message ||
-                "";
-            } catch {
-              // Fall through to the normal
-              // Supabase error message.
-            }
-          }
+          const reauthorized =
+            data?.mode ===
+              "reauthorize";
 
           setStatus(
-            "error",
+            "success",
           );
 
+          if (
+            seatOnboardingConnection
+          ) {
+            setMessage(
+              `Connected ${data.email}. Returning to Campaign Seat Activation…`,
+            );
+
+            window.setTimeout(
+              () => {
+                window.location.replace(
+                  `/onboarding/continue?provider-connection=success&provider=${encodeURIComponent(
+                    data.provider ||
+                      "",
+                  )}`,
+                );
+              },
+              750,
+            );
+
+            return;
+          }
+
           setMessage(
-            functionErrorMessage ||
-            data?.error ||
-            error?.message ||
-            "Campaign Seat could not finalize the provider connection.",
-          );
-
-          return;
-        }
-
-        const reauthorized =
-          data?.mode ===
-            "reauthorize";
-
-        setStatus(
-          "success",
-        );
-
-        if (
-          seatOnboardingConnection
-        ) {
-          setMessage(
-            `Connected ${data.email}. Returning to Campaign Seat Activation…`,
+            reauthorized
+              ? `Reconnected ${data.email}. Returning to Email & Contacts…`
+              : `Connected ${data.email}. Returning to Email & Contacts…`,
           );
 
           window.setTimeout(
             () => {
               window.location.replace(
-                `/onboarding/continue?provider-connection=success&provider=${encodeURIComponent(
-                  data.provider ||
-                    "",
-                )}`,
+                reauthorized
+                  ? "/workspace/settings?tab=integrations&onboarding=communications&provider-connection=reauthorized"
+                  : "/workspace/settings?tab=integrations&onboarding=communications&provider-connection=success",
               );
             },
             750,
           );
+        } catch (
+          exchangeError
+        ) {
+          setStatus(
+            "error",
+          );
 
-          return;
+          setMessage(
+            exchangeError?.message ||
+              "Campaign Seat could not finalize the provider connection.",
+          );
+        } finally {
+          activeExchangeStates.delete(
+            state,
+          );
         }
-
-        setMessage(
-          reauthorized
-            ? `Reconnected ${data.email}. Returning to Email & Contacts…`
-            : `Connected ${data.email}. Returning to Email & Contacts…`,
-        );
-
-        window.setTimeout(
-          () => {
-            window.location.replace(
-              reauthorized
-                ? "/workspace/settings?tab=integrations&onboarding=communications&provider-connection=reauthorized"
-                : "/workspace/settings?tab=integrations&onboarding=communications&provider-connection=success",
-            );
-          },
-          750,
-        );
       };
 
-    finish();
+    void finish();
   }, [
     location.search,
   ]);

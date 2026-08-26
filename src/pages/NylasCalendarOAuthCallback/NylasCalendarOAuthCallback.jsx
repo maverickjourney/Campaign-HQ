@@ -14,11 +14,14 @@ import {
 } from "react-router-dom";
 
 import {
-  supabase,
-} from "../../lib/supabase";
+  invokeProtectedOAuthExchange,
+} from "../../utils/providerOAuthCallback";
 
 import styles
   from "./NylasCalendarOAuthCallback.module.css";
+
+const activeCalendarExchangeStates =
+  new Set();
 
 export default function NylasCalendarOAuthCallback() {
   const location =
@@ -98,101 +101,70 @@ export default function NylasCalendarOAuthCallback() {
       return;
     }
 
-    const marker =
-      `campaign-seat-nylas-calendar-exchange:${state}`;
-
     if (
-      window.sessionStorage
-        .getItem(
-          marker,
-        )
+      activeCalendarExchangeStates.has(
+        state,
+      )
     ) {
       return;
     }
 
-    window.sessionStorage
-      .setItem(
-        marker,
-        "started",
-      );
+    activeCalendarExchangeStates.add(
+      state,
+    );
 
     const finish =
       async () => {
-        const {
-          data,
-          error,
-        } =
-          await supabase
-            .functions
-            .invoke(
-              "nylas-calendar-oauth-exchange",
-              {
-                body: {
-                  code,
-                  state,
-                },
+        try {
+          const data =
+            await invokeProtectedOAuthExchange({
+              functionName:
+                "nylas-calendar-oauth-exchange",
+
+              body: {
+                code,
+                state,
               },
-            );
 
-        if (
-          error ||
-          data?.success !==
-            true
+              fallbackErrorMessage:
+                "Campaign Seat could not finalize the Calendar connection.",
+            });
+
+          setStatus(
+            "success",
+          );
+
+          setMessage(
+            `Connected Calendar for ${data.email}. Returning to Calendar…`,
+          );
+
+          window.setTimeout(
+            () => {
+              window.location.replace(
+                "/calendar?onboarding=calendar&calendar-connection=success",
+              );
+            },
+            750,
+          );
+        } catch (
+          exchangeError
         ) {
-          let functionErrorMessage =
-            "";
-
-          if (
-            error?.context instanceof
-              Response
-          ) {
-            try {
-              const errorPayload =
-                await error.context.json();
-
-              functionErrorMessage =
-                errorPayload?.error ||
-                errorPayload?.message ||
-                "";
-            } catch {
-              // Fall through to the normal
-              // Supabase error message.
-            }
-          }
-
           setStatus(
             "error",
           );
 
           setMessage(
-            functionErrorMessage ||
-            data?.error ||
-            error?.message ||
-            "Campaign Seat could not finalize the Calendar connection.",
+            exchangeError?.message ||
+              "Campaign Seat could not finalize the Calendar connection.",
           );
-
-          return;
+        } finally {
+          activeCalendarExchangeStates.delete(
+            state,
+          );
         }
-
-        setStatus(
-          "success",
-        );
-
-        setMessage(
-          `Connected Calendar for ${data.email}. Returning to Calendar…`,
-        );
-
-        window.setTimeout(
-          () => {
-            window.location.replace(
-              "/calendar?onboarding=calendar&calendar-connection=success",
-            );
-          },
-          750,
-        );
       };
 
-    finish();
+    void finish();
   }, [
     location.search,
   ]);
