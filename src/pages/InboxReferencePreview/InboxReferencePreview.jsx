@@ -268,6 +268,137 @@ function buildOutboundEmailBody({
 }
 
 
+function inboxWorkflowPresetIso(
+  preset,
+) {
+  const next =
+    new Date();
+
+  if (
+    preset ===
+    "tomorrow"
+  ) {
+    next.setDate(
+      next.getDate() +
+      1,
+    );
+  } else if (
+    preset ===
+    "three_days"
+  ) {
+    next.setDate(
+      next.getDate() +
+      3,
+    );
+  } else if (
+    preset ===
+    "next_week"
+  ) {
+    next.setDate(
+      next.getDate() +
+      7,
+    );
+  } else if (
+    preset ===
+    "friday"
+  ) {
+    let days =
+      (
+        5 -
+        next.getDay() +
+        7
+      ) %
+      7;
+
+    if (days === 0) {
+      days =
+        7;
+    }
+
+    next.setDate(
+      next.getDate() +
+      days,
+    );
+  } else {
+    return null;
+  }
+
+  next.setSeconds(
+    0,
+    0,
+  );
+
+  return next.toISOString();
+}
+
+
+function inboxWorkflowScheduleLabel(
+  value,
+) {
+  if (!value) {
+    return "";
+  }
+
+  const date =
+    new Date(
+      value,
+    );
+
+  if (
+    Number.isNaN(
+      date.getTime(),
+    )
+  ) {
+    return "";
+  }
+
+  return new Intl.DateTimeFormat(
+    "en-US",
+    {
+      timeZone:
+        "America/New_York",
+
+      weekday:
+        "short",
+
+      month:
+        "short",
+
+      day:
+        "numeric",
+
+      hour:
+        "numeric",
+
+      minute:
+        "2-digit",
+    },
+  ).format(
+    date,
+  );
+}
+
+
+function inboxWorkflowIsSnoozed(
+  workflow,
+) {
+  const until =
+    Date.parse(
+      workflow
+        ?.snoozed_until ||
+      "",
+    );
+
+  return (
+    Number.isFinite(
+      until,
+    ) &&
+    until >
+      Date.now()
+  );
+}
+
+
 function getEasternDateInput(daysAhead = 0) {
   const parts = new Intl.DateTimeFormat(
     "en-US",
@@ -1913,6 +2044,7 @@ export default function InboxReferencePreview() {
     isSaving: taskSaving,
     error: taskError,
     createTask,
+    updateTask,
     createTaskReminder,
   } = useTasksCommandCenter({
     workspaceId: workspace.id,
@@ -2839,6 +2971,28 @@ export default function InboxReferencePreview() {
       ?.assigned_to ||
     "";
 
+  const selectedInboxSnoozed =
+    inboxWorkflowIsSnoozed(
+      selectedInboxWorkflow,
+    );
+
+  const selectedInboxSnoozeLabel =
+    selectedInboxSnoozed
+      ? inboxWorkflowScheduleLabel(
+          selectedInboxWorkflow
+            ?.snoozed_until,
+        )
+      : "";
+
+  const selectedInboxFollowUpLabel =
+    selectedInboxWorkflow
+      ?.follow_up_at
+      ? inboxWorkflowScheduleLabel(
+          selectedInboxWorkflow
+            .follow_up_at,
+        )
+      : "";
+
   const hasSelectedConversation =
     Boolean(
       selectedConversation.id,
@@ -3340,18 +3494,27 @@ export default function InboxReferencePreview() {
                       todayKey,
                   );
 
+                const snoozed =
+                  inboxWorkflowIsSnoozed(
+                    workflow,
+                  );
+
                 const actionable =
-                  status ===
-                    "needs_reply" ||
-                  status ===
-                    "waiting_on" ||
-                  dueToday;
+                  !snoozed &&
+                  (
+                    status ===
+                      "needs_reply" ||
+                    status ===
+                      "waiting_on" ||
+                    dueToday
+                  );
 
                 return {
                   conversation,
                   workflow,
                   status,
                   dueToday,
+                  snoozed,
                   actionable,
                 };
               },
@@ -3372,7 +3535,8 @@ export default function InboxReferencePreview() {
               commandRows.filter(
                 (item) =>
                   item.status ===
-                  "needs_reply",
+                    "needs_reply" &&
+                  !item.snoozed,
               ).length,
           },
 
@@ -3390,7 +3554,8 @@ export default function InboxReferencePreview() {
               commandRows.filter(
                 (item) =>
                   item.status ===
-                  "waiting_on",
+                    "waiting_on" &&
+                  !item.snoozed,
               ).length,
           },
 
@@ -3407,7 +3572,8 @@ export default function InboxReferencePreview() {
             value:
               commandRows.filter(
                 (item) =>
-                  item.dueToday,
+                  item.dueToday &&
+                  !item.snoozed,
               ).length,
           },
 
@@ -3526,18 +3692,29 @@ export default function InboxReferencePreview() {
               )
             : false;
 
+        const commandSnoozed =
+          inboxWorkflowIsSnoozed(
+            workflow,
+          );
+
         const commandActionable =
-          commandStatus ===
-            "needs_reply" ||
-          commandStatus ===
-            "waiting_on" ||
-          followUpToday;
+          !commandSnoozed &&
+          (
+            commandStatus ===
+              "needs_reply" ||
+            commandStatus ===
+              "waiting_on" ||
+            followUpToday
+          );
 
         if (
           activeCommandFilter ===
             "needs_reply" &&
-          commandStatus !==
-            "needs_reply"
+          (
+            commandSnoozed ||
+            commandStatus !==
+              "needs_reply"
+          )
         ) {
           return false;
         }
@@ -3545,8 +3722,11 @@ export default function InboxReferencePreview() {
         if (
           activeCommandFilter ===
             "waiting_on" &&
-          commandStatus !==
-            "waiting_on"
+          (
+            commandSnoozed ||
+            commandStatus !==
+              "waiting_on"
+          )
         ) {
           return false;
         }
@@ -3554,7 +3734,10 @@ export default function InboxReferencePreview() {
         if (
           activeCommandFilter ===
             "due_today" &&
-          !followUpToday
+          (
+            commandSnoozed ||
+            !followUpToday
+          )
         ) {
           return false;
         }
@@ -5924,6 +6107,16 @@ export default function InboxReferencePreview() {
     setInboxWorkflowActionBusy,
   ] = useState("");
 
+  const [
+    inboxSnoozeMenuOpen,
+    setInboxSnoozeMenuOpen,
+  ] = useState(false);
+
+  const [
+    inboxFollowUpMenuOpen,
+    setInboxFollowUpMenuOpen,
+  ] = useState(false);
+
 
   const runInboxWorkflowAction =
     async (
@@ -6059,6 +6252,104 @@ export default function InboxReferencePreview() {
         },
         `Conversation marked ${label}.`,
       );
+    };
+
+
+  const handleInboxSnooze =
+    async (
+      preset,
+    ) => {
+      const snoozedUntil =
+        preset ===
+          "clear"
+          ? null
+          : inboxWorkflowPresetIso(
+              preset,
+            );
+
+      const saved =
+        await runInboxWorkflowAction(
+          "snooze",
+          {
+            snoozed_until:
+              snoozedUntil,
+          },
+          snoozedUntil
+            ? `Conversation snoozed until ${inboxWorkflowScheduleLabel(
+                snoozedUntil,
+              )}.`
+            : "Conversation snooze cleared.",
+        );
+
+      if (saved) {
+        setInboxSnoozeMenuOpen(
+          false,
+        );
+      }
+    };
+
+
+  const handleInboxFollowUp =
+    async (
+      preset,
+    ) => {
+      const followUpAt =
+        preset ===
+          "clear"
+          ? null
+          : inboxWorkflowPresetIso(
+              preset,
+            );
+
+      const saved =
+        await runInboxWorkflowAction(
+          "follow-up",
+          {
+            follow_up_at:
+              followUpAt,
+          },
+          followUpAt
+            ? `Follow-up set for ${inboxWorkflowScheduleLabel(
+                followUpAt,
+              )}.`
+            : "Follow-up date cleared.",
+        );
+
+      if (!saved) {
+        return;
+      }
+
+      setInboxFollowUpMenuOpen(
+        false,
+      );
+
+      if (
+        selectedInboxWorkflow
+          ?.linked_task_id
+      ) {
+        try {
+          await updateTask(
+            selectedInboxWorkflow
+              .linked_task_id,
+            {
+              due_at:
+                followUpAt,
+            },
+          );
+
+          setToast(
+            followUpAt
+              ? "Follow-up and linked Task due date updated."
+              : "Follow-up and linked Task due date cleared.",
+          );
+        } catch (
+          taskSyncError
+        ) {
+          setToast(
+            "Follow-up saved, but the linked Task due date could not be synchronized.",
+          );
+        }
+      }
     };
 
 
@@ -8849,6 +9140,236 @@ type="button"
                     Waiting On
                   </button>
                 </div>
+
+                <span
+                  className={
+                    styles.inboxWorkflowMenuAction
+                  }
+                >
+                  <button
+                    className={[
+                      styles.inboxWorkflowMenuTrigger,
+
+                      selectedInboxSnoozed
+                        ? styles.inboxWorkflowMenuTriggerActive
+                        : "",
+                    ]
+                      .filter(Boolean)
+                      .join(" ")}
+                    type="button"
+                    aria-expanded={
+                      inboxSnoozeMenuOpen
+                    }
+                    title={
+                      selectedInboxSnoozeLabel
+                        ? `Snoozed until ${selectedInboxSnoozeLabel}`
+                        : "Snooze conversation"
+                    }
+                    disabled={
+                      Boolean(
+                        inboxWorkflowActionBusy,
+                      )
+                    }
+                    onClick={() => {
+                      setInboxSnoozeMenuOpen(
+                        (current) =>
+                          !current,
+                      );
+
+                      setInboxFollowUpMenuOpen(
+                        false,
+                      );
+                    }}
+                  >
+                    <Clock3
+                      size={14}
+                    />
+
+                    {selectedInboxSnoozed
+                      ? "Snoozed"
+                      : "Snooze"}
+
+                    <ChevronDown
+                      size={12}
+                    />
+                  </button>
+
+                  {inboxSnoozeMenuOpen ? (
+                    <div
+                      className={
+                        styles.inboxWorkflowActionMenu
+                      }
+                    >
+                      <header>
+                        Snooze conversation
+                      </header>
+
+                      <button
+                        type="button"
+                        onClick={() =>
+                          void handleInboxSnooze(
+                            "tomorrow",
+                          )
+                        }
+                      >
+                        Tomorrow
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() =>
+                          void handleInboxSnooze(
+                            "friday",
+                          )
+                        }
+                      >
+                        Friday
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() =>
+                          void handleInboxSnooze(
+                            "next_week",
+                          )
+                        }
+                      >
+                        Next week
+                      </button>
+
+                      {selectedInboxWorkflow
+                        ?.snoozed_until ? (
+                        <button
+                          className={
+                            styles.inboxWorkflowActionMenuClear
+                          }
+                          type="button"
+                          onClick={() =>
+                            void handleInboxSnooze(
+                              "clear",
+                            )
+                          }
+                        >
+                          Clear snooze
+                        </button>
+                      ) : null}
+                    </div>
+                  ) : null}
+                </span>
+
+                <span
+                  className={
+                    styles.inboxWorkflowMenuAction
+                  }
+                >
+                  <button
+                    className={[
+                      styles.inboxWorkflowMenuTrigger,
+
+                      selectedInboxFollowUpLabel
+                        ? styles.inboxWorkflowFollowUpActive
+                        : "",
+                    ]
+                      .filter(Boolean)
+                      .join(" ")}
+                    type="button"
+                    aria-expanded={
+                      inboxFollowUpMenuOpen
+                    }
+                    title={
+                      selectedInboxFollowUpLabel
+                        ? `Follow up ${selectedInboxFollowUpLabel}`
+                        : "Set follow-up"
+                    }
+                    disabled={
+                      Boolean(
+                        inboxWorkflowActionBusy,
+                      )
+                    }
+                    onClick={() => {
+                      setInboxFollowUpMenuOpen(
+                        (current) =>
+                          !current,
+                      );
+
+                      setInboxSnoozeMenuOpen(
+                        false,
+                      );
+                    }}
+                  >
+                    <Bell
+                      size={14}
+                    />
+
+                    Follow Up
+
+                    <ChevronDown
+                      size={12}
+                    />
+                  </button>
+
+                  {inboxFollowUpMenuOpen ? (
+                    <div
+                      className={
+                        styles.inboxWorkflowActionMenu
+                      }
+                    >
+                      <header>
+                        Follow up
+                      </header>
+
+                      <button
+                        type="button"
+                        onClick={() =>
+                          void handleInboxFollowUp(
+                            "tomorrow",
+                          )
+                        }
+                      >
+                        Tomorrow
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() =>
+                          void handleInboxFollowUp(
+                            "three_days",
+                          )
+                        }
+                      >
+                        In 3 days
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() =>
+                          void handleInboxFollowUp(
+                            "next_week",
+                          )
+                        }
+                      >
+                        Next week
+                      </button>
+
+                      {selectedInboxWorkflow
+                        ?.follow_up_at ? (
+                        <button
+                          className={
+                            styles.inboxWorkflowActionMenuClear
+                          }
+                          type="button"
+                          onClick={() =>
+                            void handleInboxFollowUp(
+                              "clear",
+                            )
+                          }
+                        >
+                          Clear follow-up
+                        </button>
+                      ) : null}
+                    </div>
+                  ) : null}
+                </span>
 
                 <button
                   className={[

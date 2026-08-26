@@ -19810,3 +19810,230 @@ strong {
 }
 
 /* INBOX COMMAND CENTER V1 ACTIONS — END */
+
+
+/* INBOX COMMAND CENTER SCHEDULE ACTIONS — START */
+
+.inboxWorkflowMenuAction {
+  position:
+    relative;
+
+  display:
+    inline-flex;
+
+  flex:
+    0
+    0
+    auto;
+}
+
+.inboxWorkflowMenuTrigger {
+  display:
+    inline-flex;
+
+  min-height:
+    31px;
+
+  align-items:
+    center;
+
+  gap:
+    5px;
+
+  padding:
+    0
+    8px;
+
+  border:
+    1px solid
+    #d7e2ea;
+
+  border-radius:
+    8px;
+
+  color:
+    #587288;
+
+  background:
+    #ffffff;
+
+  font-size:
+    0.5rem;
+
+  font-weight:
+    780;
+
+  white-space:
+    nowrap;
+}
+
+.inboxWorkflowMenuTrigger:hover {
+  border-color:
+    #b9ccd9;
+
+  background:
+    #f5f9fb;
+}
+
+.inboxWorkflowMenuTriggerActive {
+  border-color:
+    #b8a9df !important;
+
+  color:
+    #674ca2 !important;
+
+  background:
+    #f7f4fc !important;
+}
+
+.inboxWorkflowFollowUpActive {
+  border-color:
+    #8fb8d7 !important;
+
+  color:
+    #286a9e !important;
+
+  background:
+    #f1f8fc !important;
+}
+
+.inboxWorkflowActionMenu {
+  position:
+    absolute;
+
+  z-index:
+    180;
+
+  top:
+    calc(
+      100% +
+      6px
+    );
+
+  right:
+    0;
+
+  display:
+    grid;
+
+  width:
+    176px;
+
+  gap:
+    2px;
+
+  padding:
+    6px;
+
+  border:
+    1px solid
+    #d6e1e9;
+
+  border-radius:
+    10px;
+
+  background:
+    #ffffff;
+
+  box-shadow:
+    0
+    16px
+    38px
+    rgba(
+      18,
+      48,
+      76,
+      0.17
+    );
+}
+
+.inboxWorkflowActionMenu header {
+  padding:
+    5px
+    7px
+    7px;
+
+  color:
+    #788c9d;
+
+  font-size:
+    0.48rem;
+
+  font-weight:
+    850;
+
+  letter-spacing:
+    0.06em;
+
+  text-transform:
+    uppercase;
+}
+
+.inboxWorkflowActionMenu button {
+  width:
+    100%;
+
+  min-height:
+    34px;
+
+  padding:
+    0
+    8px;
+
+  border:
+    0;
+
+  border-radius:
+    7px;
+
+  color:
+    #355b78;
+
+  background:
+    transparent;
+
+  text-align:
+    left;
+
+  font-size:
+    0.54rem;
+
+  font-weight:
+    740;
+}
+
+.inboxWorkflowActionMenu button:hover {
+  background:
+    #f2f7fa;
+}
+
+.inboxWorkflowActionMenu
+.inboxWorkflowActionMenuClear {
+  margin-top:
+    3px;
+
+  border-top:
+    1px solid
+    #e4ebf0;
+
+  border-radius:
+    0
+    0
+    7px
+    7px;
+
+  color:
+    #a34d55;
+}
+
+@media (max-width: 1000px) {
+  .inboxWorkflowActionMenu {
+    right:
+      auto;
+
+    left:
+      0;
+  }
+}
+
+/* INBOX COMMAND CENTER SCHEDULE ACTIONS — END */
