@@ -18,6 +18,18 @@ const MAILBOX_PAGE_SIZE =
 const MAILBOX_TARGET_THREAD_COUNT =
   50;
 
+const MICROSOFT_MAILBOX_PAGE_SIZE =
+  10;
+
+const MICROSOFT_MAILBOX_TARGET_THREAD_COUNT =
+  10;
+
+const QUIET_REFRESH_INTERVAL_MS =
+  120000;
+
+const QUIET_REFRESH_COOLDOWN_MS =
+  30000;
+
 function clean(value) {
   return String(
     value || "",
@@ -955,6 +967,16 @@ export function useRealInboxMailbox({
     useRef(
       new Map(),
     );
+
+  const refreshInFlightRef =
+    useRef(
+      false,
+    );
+
+  const lastQuietRefreshAtRef =
+    useRef(
+      0,
+    );
 const invokeMailbox =
     useCallback(
       async (
@@ -1045,11 +1067,17 @@ const invokeMailbox =
           );
         }
 
+        refreshInFlightRef.current =
+          true;
+
         try {
           let folders =
             [];
 
           let inboxId =
+            "";
+
+          let refreshProvider =
             "";
 
           try {
@@ -1112,11 +1140,30 @@ const invokeMailbox =
                 folderResult
                   .accountProvider,
               );
+
+              refreshProvider =
+                clean(
+                  folderResult
+                    .accountProvider,
+                )
+                  .toLowerCase();
             }
           } catch {
             // A thread request below
             // remains authoritative.
           }
+
+          const pageSize =
+            refreshProvider ===
+              "microsoft"
+              ? MICROSOFT_MAILBOX_PAGE_SIZE
+              : MAILBOX_PAGE_SIZE;
+
+          const targetThreadCount =
+            refreshProvider ===
+              "microsoft"
+              ? MICROSOFT_MAILBOX_TARGET_THREAD_COUNT
+              : MAILBOX_TARGET_THREAD_COUNT;
 
           const requestedFolderId =
             clean(
@@ -1141,7 +1188,7 @@ const invokeMailbox =
 
           while (
             threadRows.length <
-              MAILBOX_TARGET_THREAD_COUNT
+              targetThreadCount
           ) {
             const pageResult =
               await invokeMailbox({
@@ -1149,7 +1196,7 @@ const invokeMailbox =
                   "list_threads",
 
                 limit:
-                  MAILBOX_PAGE_SIZE,
+                  pageSize,
 
                 ...(targetFolderId
                   ? {
@@ -1207,7 +1254,7 @@ const invokeMailbox =
 
               if (
                 threadRows.length >=
-                  MAILBOX_TARGET_THREAD_COUNT
+                  targetThreadCount
               ) {
                 break;
               }
@@ -1262,7 +1309,7 @@ const invokeMailbox =
             threadRows
               .slice(
                 0,
-                MAILBOX_TARGET_THREAD_COUNT,
+                targetThreadCount,
               )
               .map(
                 (thread) => {
@@ -1301,10 +1348,6 @@ return transformed;
         } catch (
           loadError
         ) {
-          setConversations(
-            [],
-          );
-
           setError(
             errorMessage(
               loadError,
@@ -1314,6 +1357,9 @@ return transformed;
 
           return [];
         } finally {
+          refreshInFlightRef.current =
+            false;
+
           setIsLoading(
             false,
           );
@@ -2281,10 +2327,25 @@ return transformed;
       () => {
         if (
           document.visibilityState !==
-            "visible"
+            "visible" ||
+          refreshInFlightRef.current
         ) {
           return;
         }
+
+        const now =
+          Date.now();
+
+        if (
+          now -
+            lastQuietRefreshAtRef.current <
+          QUIET_REFRESH_COOLDOWN_MS
+        ) {
+          return;
+        }
+
+        lastQuietRefreshAtRef.current =
+          now;
 
         void refresh({
           showLoading:
@@ -2295,7 +2356,7 @@ return transformed;
     const intervalId =
       window.setInterval(
         refreshQuietly,
-        60000,
+        QUIET_REFRESH_INTERVAL_MS,
       );
 
     const handleFocus =
