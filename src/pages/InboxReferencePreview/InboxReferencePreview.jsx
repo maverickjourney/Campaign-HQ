@@ -1951,12 +1951,18 @@ export default function InboxReferencePreview() {
     ).get("mailbox-live") === "enabled";
 
   /*
-   * Command Center persistence is prepared in this pass,
-   * but remains disabled until the additive database
-   * migration is reviewed and applied.
+   * Campaign Seat workflow state is separate from
+   * Gmail / Microsoft mailbox state.
+   *
+   * Provider:
+   *   read, unread, star, archive, folders, trash.
+   *
+   * Campaign Seat:
+   *   assignment, operational status, VIP,
+   *   follow-up and linked Tasks.
    */
   const inboxWorkflowRuntimeEnabled =
-    false;
+    true;
 
   const {
     rows:
@@ -1967,6 +1973,9 @@ export default function InboxReferencePreview() {
 
     error:
       inboxWorkflowError,
+
+    upsertWorkflow:
+      upsertInboxWorkflow,
   } =
     useInboxConversationWorkflows({
       workspaceId:
@@ -2806,6 +2815,29 @@ export default function InboxReferencePreview() {
           inboxMailboxItem.id,
         ),
     );
+
+  const selectedInboxWorkflow =
+    inboxWorkflowByKey.get(
+      inboxWorkflowKey(
+        selectedConversation,
+      ),
+    ) ||
+    null;
+
+  const selectedInboxWorkflowStatus =
+    selectedInboxWorkflow
+      ?.workflow_status ||
+    (
+      selectedConversation
+        ?.needsResponse
+        ? "needs_reply"
+        : "open"
+    );
+
+  const selectedInboxAssignee =
+    selectedInboxWorkflow
+      ?.assigned_to ||
+    "";
 
   const hasSelectedConversation =
     Boolean(
@@ -5887,6 +5919,313 @@ export default function InboxReferencePreview() {
     );
   };
 
+  const [
+    inboxWorkflowActionBusy,
+    setInboxWorkflowActionBusy,
+  ] = useState("");
+
+
+  const runInboxWorkflowAction =
+    async (
+      actionKey,
+      updates,
+      successMessage,
+    ) => {
+      if (
+        !selectedConversation
+          ?.id ||
+        inboxWorkflowActionBusy
+      ) {
+        return null;
+      }
+
+      setInboxWorkflowActionBusy(
+        actionKey,
+      );
+
+      try {
+        const saved =
+          await upsertInboxWorkflow(
+            selectedConversation,
+            {
+              ...updates,
+
+              metadata: {
+                sender:
+                  selectedConversation
+                    .sender ||
+                  "",
+
+                email:
+                  selectedConversation
+                    .email ||
+                  "",
+
+                subject:
+                  selectedConversation
+                    .subject ||
+                  "",
+
+                ...(
+                  updates
+                    ?.metadata ||
+                  {}
+                ),
+              },
+            },
+          );
+
+        setToast(
+          successMessage,
+        );
+
+        return saved;
+      } catch (
+        workflowError
+      ) {
+        setToast(
+          workflowError?.message ||
+            "Campaign Seat could not update the conversation workflow.",
+        );
+
+        return null;
+      } finally {
+        setInboxWorkflowActionBusy(
+          "",
+        );
+      }
+    };
+
+
+  const handleInboxAssignment =
+    (
+      assignedTo,
+    ) => {
+      const nextAssignee =
+        String(
+          assignedTo ||
+          "",
+        ).trim() ||
+        null;
+
+      const person =
+        team.find(
+          (member) =>
+            member.id ===
+            nextAssignee,
+        ) ||
+        null;
+
+      void runInboxWorkflowAction(
+        "assign",
+        {
+          assigned_to:
+            nextAssignee,
+        },
+        nextAssignee
+          ? `Assigned to ${person?.fullName || "campaign team member"}.`
+          : "Conversation is now unassigned.",
+      );
+    };
+
+
+  const handleInboxWorkflowStatus =
+    (
+      requestedStatus,
+    ) => {
+      const nextStatus =
+        selectedInboxWorkflowStatus ===
+          requestedStatus
+          ? "open"
+          : requestedStatus;
+
+      const label =
+        nextStatus ===
+          "waiting_on"
+          ? "Waiting On"
+          : nextStatus ===
+              "needs_reply"
+            ? "Needs Reply"
+            : "Open";
+
+      void runInboxWorkflowAction(
+        `status:${nextStatus}`,
+        {
+          workflow_status:
+            nextStatus,
+
+          snoozed_until:
+            null,
+        },
+        `Conversation marked ${label}.`,
+      );
+    };
+
+
+  const handleInboxVipToggle =
+    () => {
+      const nextVip =
+        !selectedInboxWorkflow
+          ?.is_vip;
+
+      void runInboxWorkflowAction(
+        "vip",
+        {
+          is_vip:
+            nextVip,
+        },
+        nextVip
+          ? "Conversation added to VIP."
+          : "Conversation removed from VIP.",
+      );
+    };
+
+
+  const handleCreateInboxTask =
+    async () => {
+      if (
+        selectedInboxWorkflow
+          ?.linked_task_id ||
+        inboxWorkflowActionBusy
+      ) {
+        return;
+      }
+
+      setInboxWorkflowActionBusy(
+        "task",
+      );
+
+      try {
+        const task =
+          await createTask({
+            title:
+              `Inbox follow-up: ${
+                selectedConversation
+                  .sender ||
+                selectedConversation
+                  .subject ||
+                "Campaign contact"
+              }`,
+
+            description: [
+              "Created from Campaign Seat Inbox.",
+              "",
+              `From: ${
+                selectedConversation
+                  .sender ||
+                "Unknown sender"
+              }${
+                selectedConversation
+                  .email
+                  ? ` <${selectedConversation.email}>`
+                  : ""
+              }`,
+              `Subject: ${
+                selectedConversation
+                  .subject ||
+                "(No subject)"
+              }`,
+              "",
+              selectedConversation
+                .preview ||
+                "",
+            ]
+              .filter(
+                (
+                  value,
+                  index,
+                ) =>
+                  value !==
+                    "" ||
+                  index ===
+                    1,
+              )
+              .join(
+                "\n",
+              ),
+
+            category:
+              "Communications",
+
+            priority:
+              selectedInboxWorkflow
+                ?.is_vip ||
+              selectedConversation
+                .priority
+                ? "high"
+                : "normal",
+
+            visibility:
+              "workspace",
+
+            tags: [
+              "Inbox",
+              "Follow Up",
+            ],
+
+            assigned_to:
+              selectedInboxAssignee ||
+              user.id,
+
+            due_at:
+              selectedInboxWorkflow
+                ?.follow_up_at ||
+              null,
+
+            status:
+              "open",
+          });
+
+        await upsertInboxWorkflow(
+          selectedConversation,
+          {
+            assigned_to:
+              selectedInboxAssignee ||
+              user.id,
+
+            linked_task_id:
+              task.id,
+
+            metadata: {
+              sender:
+                selectedConversation
+                  .sender ||
+                "",
+
+              email:
+                selectedConversation
+                  .email ||
+                "",
+
+              subject:
+                selectedConversation
+                  .subject ||
+                "",
+
+              linked_task_title:
+                task.title,
+            },
+          },
+        );
+
+        setToast(
+          "Campaign follow-up task created and linked.",
+        );
+      } catch (
+        taskCreateError
+      ) {
+        setToast(
+          taskCreateError?.message ||
+            "Campaign Seat could not create the Inbox follow-up task.",
+        );
+      } finally {
+        setInboxWorkflowActionBusy(
+          "",
+        );
+      }
+    };
+
+
   const runMailboxAction =
     async (
       actionKey,
@@ -8365,6 +8704,222 @@ type="button"
                 </div>
               </header>
             )}
+
+            {!newMessageMode &&
+            selectedProviderThread ? (
+              <section
+                className={
+                  styles.inboxWorkflowActionBar
+                }
+                aria-label="Campaign conversation workflow"
+              >
+                <div
+                  className={
+                    styles.inboxWorkflowActionIdentity
+                  }
+                >
+                  <span>
+                    Campaign Action
+                  </span>
+
+                  <strong>
+                    {selectedInboxWorkflowStatus ===
+                    "waiting_on"
+                      ? "Waiting On"
+                      : selectedInboxWorkflowStatus ===
+                          "needs_reply"
+                        ? "Needs Reply"
+                        : "Open"}
+                  </strong>
+                </div>
+
+                <label
+                  className={
+                    styles.inboxWorkflowAssign
+                  }
+                >
+                  <span>
+                    Owner
+                  </span>
+
+                  <select
+                    value={
+                      selectedInboxAssignee
+                    }
+                    disabled={
+                      Boolean(
+                        inboxWorkflowActionBusy,
+                      )
+                    }
+                    onChange={(
+                      event,
+                    ) =>
+                      handleInboxAssignment(
+                        event.target.value,
+                      )
+                    }
+                  >
+                    <option value="">
+                      Unassigned
+                    </option>
+
+                    {user.id ? (
+                      <option
+                        value={user.id}
+                      >
+                        Assign to me
+                      </option>
+                    ) : null}
+
+                    {team
+                      .filter(
+                        (member) =>
+                          member.id !==
+                          user.id,
+                      )
+                      .map(
+                        (member) => (
+                          <option
+                            key={member.id}
+                            value={member.id}
+                          >
+                            {member.fullName} · {member.displayTitle}
+                          </option>
+                        ),
+                      )}
+                  </select>
+                </label>
+
+                <div
+                  className={
+                    styles.inboxWorkflowStatusButtons
+                  }
+                >
+                  <button
+                    className={
+                      selectedInboxWorkflowStatus ===
+                        "needs_reply"
+                        ? styles.inboxWorkflowActionActive
+                        : ""
+                    }
+                    type="button"
+                    aria-pressed={
+                      selectedInboxWorkflowStatus ===
+                      "needs_reply"
+                    }
+                    disabled={
+                      Boolean(
+                        inboxWorkflowActionBusy,
+                      )
+                    }
+                    onClick={() =>
+                      handleInboxWorkflowStatus(
+                        "needs_reply",
+                      )
+                    }
+                  >
+                    <Mail size={14} />
+                    Needs Reply
+                  </button>
+
+                  <button
+                    className={
+                      selectedInboxWorkflowStatus ===
+                        "waiting_on"
+                        ? styles.inboxWorkflowActionActive
+                        : ""
+                    }
+                    type="button"
+                    aria-pressed={
+                      selectedInboxWorkflowStatus ===
+                      "waiting_on"
+                    }
+                    disabled={
+                      Boolean(
+                        inboxWorkflowActionBusy,
+                      )
+                    }
+                    onClick={() =>
+                      handleInboxWorkflowStatus(
+                        "waiting_on",
+                      )
+                    }
+                  >
+                    <Clock3 size={14} />
+                    Waiting On
+                  </button>
+                </div>
+
+                <button
+                  className={[
+                    styles.inboxWorkflowVipButton,
+                    selectedInboxWorkflow?.is_vip
+                      ? styles.inboxWorkflowVipButtonActive
+                      : "",
+                  ]
+                    .filter(Boolean)
+                    .join(" ")}
+                  type="button"
+                  aria-pressed={
+                    selectedInboxWorkflow?.is_vip ===
+                    true
+                  }
+                  disabled={
+                    Boolean(
+                      inboxWorkflowActionBusy,
+                    )
+                  }
+                  onClick={
+                    handleInboxVipToggle
+                  }
+                >
+                  <Star
+                    size={14}
+                    fill={
+                      selectedInboxWorkflow?.is_vip
+                        ? "currentColor"
+                        : "none"
+                    }
+                  />
+                  VIP
+                </button>
+
+                <button
+                  className={
+                    styles.inboxWorkflowTaskButton
+                  }
+                  type="button"
+                  disabled={
+                    Boolean(
+                      inboxWorkflowActionBusy,
+                    ) ||
+                    Boolean(
+                      selectedInboxWorkflow?.linked_task_id,
+                    )
+                  }
+                  onClick={() =>
+                    void handleCreateInboxTask()
+                  }
+                >
+                  <ListTodo size={14} />
+
+                  {selectedInboxWorkflow?.linked_task_id
+                    ? "Task Linked"
+                    : "Create Task"}
+                </button>
+
+                {inboxWorkflowError ? (
+                  <span
+                    className={
+                      styles.inboxWorkflowError
+                    }
+                    title={inboxWorkflowError}
+                  >
+                    Workflow sync needs attention
+                  </span>
+                ) : null}
+              </section>
+            ) : null}
 
             {!newMessageMode ? (
               <nav className={styles.threadTabs}>

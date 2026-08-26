@@ -19655,3 +19655,158 @@ strong {
 }
 
 /* INBOX COMMAND CENTER V1 — END */
+
+
+/* INBOX COMMAND CENTER V1 ACTIONS — START */
+
+.inboxWorkflowActionBar {
+  display: flex;
+  min-width: 0;
+  min-height: 50px;
+  align-items: center;
+  gap: 7px;
+  padding: 7px 12px;
+  border-bottom: 1px solid #e2e9ef;
+  background:
+    linear-gradient(
+      90deg,
+      #fbfdff,
+      #f7fafc
+    );
+}
+
+.inboxWorkflowActionIdentity {
+  flex: 0 0 auto;
+  display: grid;
+  min-width: 92px;
+  padding-right: 8px;
+  border-right: 1px solid #dce5eb;
+}
+
+.inboxWorkflowActionIdentity span,
+.inboxWorkflowAssign > span {
+  color: #8396a6;
+  font-size: 0.45rem;
+  font-weight: 760;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.inboxWorkflowActionIdentity strong {
+  margin-top: 2px;
+  color: #214b6f;
+  font-size: 0.59rem;
+  font-weight: 860;
+}
+
+.inboxWorkflowAssign {
+  flex: 0 1 190px;
+  display: grid;
+  min-width: 120px;
+  gap: 2px;
+}
+
+.inboxWorkflowAssign select {
+  width: 100%;
+  min-width: 0;
+  height: 29px;
+  padding: 0 25px 0 7px;
+  border: 1px solid #d7e2ea;
+  border-radius: 7px;
+  outline: 0;
+  color: #355c79;
+  background: #ffffff;
+  font-size: 0.52rem;
+  font-weight: 720;
+}
+
+.inboxWorkflowStatusButtons {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.inboxWorkflowStatusButtons button,
+.inboxWorkflowVipButton,
+.inboxWorkflowTaskButton {
+  display: inline-flex;
+  min-height: 31px;
+  align-items: center;
+  gap: 5px;
+  padding: 0 8px;
+  border: 1px solid #d7e2ea;
+  border-radius: 8px;
+  color: #587288;
+  background: #ffffff;
+  font-size: 0.5rem;
+  font-weight: 780;
+  white-space: nowrap;
+}
+
+.inboxWorkflowStatusButtons button:hover,
+.inboxWorkflowVipButton:hover,
+.inboxWorkflowTaskButton:hover {
+  border-color: #b9ccd9;
+  background: #f5f9fb;
+}
+
+.inboxWorkflowStatusButtons
+.inboxWorkflowActionActive {
+  border-color: #f08b94;
+  color: #bc2633;
+  background: #fff1f2;
+}
+
+.inboxWorkflowVipButtonActive {
+  border-color: #e2bf6d !important;
+  color: #9d7118 !important;
+  background: #fff9e9 !important;
+}
+
+.inboxWorkflowTaskButton {
+  margin-left: auto;
+}
+
+.inboxWorkflowError {
+  flex: 0 1 auto;
+  overflow: hidden;
+  color: #b84952;
+  font-size: 0.47rem;
+  font-weight: 720;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@media (max-width: 1000px) {
+  .inboxWorkflowActionBar {
+    flex-wrap: wrap;
+  }
+
+  .inboxWorkflowTaskButton {
+    margin-left: 0;
+  }
+}
+
+@media (max-width: 700px) {
+  .inboxWorkflowActionIdentity {
+    width: 100%;
+    border-right: 0;
+    border-bottom: 1px solid #e2e9ef;
+    padding: 0 0 6px;
+  }
+
+  .inboxWorkflowAssign {
+    flex: 1 1 100%;
+  }
+
+  .inboxWorkflowStatusButtons {
+    width: 100%;
+  }
+
+  .inboxWorkflowStatusButtons button {
+    flex: 1 1 0;
+    justify-content: center;
+  }
+}
+
+/* INBOX COMMAND CENTER V1 ACTIONS — END */
