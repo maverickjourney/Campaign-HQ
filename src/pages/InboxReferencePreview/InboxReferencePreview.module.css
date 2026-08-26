@@ -18798,3 +18798,347 @@
 }
 
 /* FINAL LIVE INBOX HEADER — END */
+
+
+/* ============================================================
+   CAMPAIGN SEAT — REAL MAILBOX ACTIONS
+   ============================================================ */
+
+.threadHeaderActions {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.threadHeaderActions > button,
+.threadMoveAction > button {
+  flex: 0 0 auto;
+}
+
+.mailboxActionActive {
+  color: #b77900 !important;
+  background:
+    rgba(
+      246,
+      183,
+      56,
+      0.12
+    ) !important;
+}
+
+.mailboxActionDanger {
+  color: #c53a45 !important;
+}
+
+.threadActionDivider {
+  display: block;
+  width: 1px;
+  height: 23px;
+  margin:
+    0
+    2px;
+  background:
+    rgba(
+      105,
+      126,
+      151,
+      0.2
+    );
+}
+
+.threadMoveAction {
+  position: relative;
+  display: inline-flex;
+}
+
+.threadMoveMenu {
+  position: absolute;
+  z-index: 60;
+  top:
+    calc(
+      100% +
+      8px
+    );
+  right: 0;
+  width:
+    min(
+      230px,
+      72vw
+    );
+  max-height: 310px;
+  overflow-y: auto;
+  padding: 7px;
+  border:
+    1px
+    solid
+    rgba(
+      57,
+      91,
+      128,
+      0.18
+    );
+  border-radius: 12px;
+  background: #ffffff;
+  box-shadow:
+    0
+    16px
+    36px
+    rgba(
+      18,
+      42,
+      71,
+      0.16
+    );
+}
+
+.threadMoveMenu header {
+  padding:
+    7px
+    9px
+    8px;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color:
+    #6d8197;
+}
+
+.threadMoveMenu > button {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  min-height: 38px;
+  padding:
+    8px
+    10px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: #1b446f;
+  text-align: left;
+}
+
+.threadMoveMenu > button:hover {
+  background:
+    rgba(
+      33,
+      102,
+      165,
+      0.08
+    );
+}
+
+.mailboxFolderMenuHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.mailboxFolderMenuHeader > button {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  min-height: 29px;
+  padding:
+    5px
+    8px;
+  border:
+    1px
+    solid
+    rgba(
+      40,
+      98,
+      155,
+      0.18
+    );
+  border-radius: 8px;
+  background: #ffffff;
+  color: #245d93;
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.mailboxFolderCreate,
+.mailboxFolderRename {
+  display: grid;
+  grid-template-columns:
+    minmax(
+      0,
+      1fr
+    )
+    auto
+    auto;
+  align-items: center;
+  gap: 6px;
+  padding:
+    7px
+    8px;
+}
+
+.mailboxFolderCreate input,
+.mailboxFolderRename input {
+  min-width: 0;
+  height: 32px;
+  padding:
+    0
+    9px;
+  border:
+    1px
+    solid
+    rgba(
+      45,
+      91,
+      134,
+      0.22
+    );
+  border-radius: 8px;
+  outline: none;
+  font: inherit;
+}
+
+.mailboxFolderCreate input:focus,
+.mailboxFolderRename input:focus {
+  border-color:
+    rgba(
+      33,
+      102,
+      165,
+      0.55
+    );
+  box-shadow:
+    0
+    0
+    0
+    3px
+    rgba(
+      33,
+      102,
+      165,
+      0.08
+    );
+}
+
+.mailboxFolderCreate button,
+.mailboxFolderRename button {
+  min-height: 31px;
+  padding:
+    5px
+    8px;
+  border:
+    1px
+    solid
+    rgba(
+      40,
+      98,
+      155,
+      0.17
+    );
+  border-radius: 8px;
+  background: #ffffff;
+  color: #245d93;
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.mailboxFolderRow {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+}
+
+.mailboxFolderRow >
+.inboxMailboxMenuItem {
+  flex:
+    1
+    1
+    auto;
+  min-width: 0;
+}
+
+.mailboxFolderRowActions {
+  flex:
+    0
+    0
+    auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding-right: 5px;
+}
+
+.mailboxFolderRowActions button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 27px;
+  height: 27px;
+  padding: 0;
+  border: 0;
+  border-radius: 7px;
+  background: transparent;
+  color: #61778e;
+}
+
+.mailboxFolderRowActions button:hover {
+  background:
+    rgba(
+      33,
+      102,
+      165,
+      0.08
+    );
+  color: #245d93;
+}
+
+.mailboxFolderRowActions
+.mailboxFolderDeleteButton {
+  color: #b95059;
+}
+
+.mailboxFolderRowActions
+.mailboxFolderDeleteButton:hover {
+  background:
+    rgba(
+      197,
+      58,
+      69,
+      0.08
+    );
+  color: #bd303d;
+}
+
+
+@media (max-width: 700px) {
+  .threadHeaderActions {
+    gap: 5px;
+  }
+
+  .threadActionDivider {
+    display: none;
+  }
+
+  .threadMoveMenu {
+    right: -44px;
+  }
+
+  .mailboxFolderCreate,
+  .mailboxFolderRename {
+    grid-template-columns:
+      minmax(
+        0,
+        1fr
+      )
+      auto;
+  }
+
+  .mailboxFolderCreate >
+  button:last-child,
+  .mailboxFolderRename >
+  button:last-child {
+    grid-column: 2;
+  }
+}

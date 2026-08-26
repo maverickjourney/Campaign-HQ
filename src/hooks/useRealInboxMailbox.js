@@ -541,6 +541,29 @@ function transformMessage({
     providerThreadId:
       message.thread_id,
 
+    folderIds:
+      Array.isArray(
+        message.folders,
+      )
+        ? message.folders
+            .map(
+              clean,
+            )
+            .filter(
+              Boolean,
+            )
+        : [],
+
+    unread:
+      Boolean(
+        message.unread,
+      ),
+
+    starred:
+      Boolean(
+        message.starred,
+      ),
+
     direction:
       outbound
         ? "outbound"
@@ -1305,6 +1328,45 @@ return transformed;
       ],
     );
 
+  const updateMessage =
+    useCallback(
+      async (
+        messageId,
+        updates,
+      ) => {
+        const providerMessageId =
+          clean(
+            messageId,
+          ).replace(
+            "nylas-message-",
+            "",
+          );
+
+        if (
+          !enabled ||
+          !providerMessageId
+        ) {
+          return null;
+        }
+
+
+        return invokeMailbox({
+          action:
+            "update_message",
+
+          messageId:
+            providerMessageId,
+
+          ...updates,
+        });
+      },
+      [
+        enabled,
+        invokeMailbox,
+      ],
+    );
+
+
   const updateThread =
     useCallback(
       async (
@@ -1933,6 +1995,252 @@ return transformed;
     );
 
 
+  const moveThreadMessages =
+    useCallback(
+      async ({
+        threadIdOrConversationId,
+        fromFolderId,
+        targetFolderId = "",
+      }) => {
+        const providerThreadId =
+          clean(
+            threadIdOrConversationId,
+          ).replace(
+            THREAD_PREFIX,
+            "",
+          );
+
+        const sourceFolderId =
+          clean(
+            fromFolderId,
+          );
+
+        const destinationFolderId =
+          clean(
+            targetFolderId,
+          );
+
+
+        if (
+          !enabled ||
+          !providerThreadId ||
+          !sourceFolderId
+        ) {
+          return {
+            updated:
+              0,
+          };
+        }
+
+
+        const hydrated =
+          await loadThread(
+            providerThreadId,
+          );
+
+
+        const messages =
+          Array.isArray(
+            hydrated?.messages,
+          )
+            ? hydrated.messages
+            : [];
+
+
+        const matchingMessages =
+          messages.filter(
+            (message) =>
+              message
+                ?.providerMessageId &&
+              Array.isArray(
+                message.folderIds,
+              ) &&
+              message.folderIds.includes(
+                sourceFolderId,
+              ),
+          );
+
+
+        if (
+          !matchingMessages.length
+        ) {
+          await refresh({
+            showLoading:
+              false,
+          });
+
+          return {
+            updated:
+              0,
+          };
+        }
+
+
+        let updated =
+          0;
+
+
+        for (
+          const message
+          of matchingMessages
+        ) {
+          let nextFolders;
+
+
+          if (
+            accountProvider ===
+            "microsoft"
+          ) {
+            if (
+              !destinationFolderId
+            ) {
+              throw new Error(
+                "Microsoft requires a destination folder.",
+              );
+            }
+
+            nextFolders = [
+              destinationFolderId,
+            ];
+          } else {
+            nextFolders =
+              Array.from(
+                new Set(
+                  (
+                    message
+                      .folderIds ||
+                    []
+                  )
+                    .filter(
+                      (folderId) =>
+                        folderId !==
+                        sourceFolderId,
+                    )
+                    .concat(
+                      destinationFolderId
+                        ? [
+                            destinationFolderId,
+                          ]
+                        : [],
+                    ),
+                ),
+              );
+          }
+
+
+          const currentFolders =
+            Array.from(
+              new Set(
+                message
+                  .folderIds ||
+                [],
+              ),
+            );
+
+
+          if (
+            JSON.stringify(
+              currentFolders,
+            ) ===
+            JSON.stringify(
+              nextFolders,
+            )
+          ) {
+            continue;
+          }
+
+
+          await updateMessage(
+            message
+              .providerMessageId,
+            {
+              folders:
+                nextFolders,
+            },
+          );
+
+          updated +=
+            1;
+        }
+
+
+        await refresh({
+          showLoading:
+            false,
+        });
+
+
+        return {
+          updated,
+        };
+      },
+      [
+        accountProvider,
+        enabled,
+        loadThread,
+        refresh,
+        updateMessage,
+      ],
+    );
+
+
+  const archiveThreadMessages =
+    useCallback(
+      async (
+        threadIdOrConversationId,
+        {
+          inboxFolderId,
+          archiveFolderId = "",
+        },
+      ) => {
+        const inboxId =
+          clean(
+            inboxFolderId,
+          );
+
+        const archiveId =
+          clean(
+            archiveFolderId,
+          );
+
+
+        if (!inboxId) {
+          throw new Error(
+            "Campaign Seat could not identify the provider Inbox folder.",
+          );
+        }
+
+
+        if (
+          accountProvider ===
+            "microsoft" &&
+          !archiveId
+        ) {
+          throw new Error(
+            "Campaign Seat could not identify the Microsoft Archive folder.",
+          );
+        }
+
+
+        return moveThreadMessages({
+          threadIdOrConversationId,
+          fromFolderId:
+            inboxId,
+
+          targetFolderId:
+            accountProvider ===
+              "microsoft"
+              ? archiveId
+              : "",
+        });
+      },
+      [
+        accountProvider,
+        moveThreadMessages,
+      ],
+    );
+
+
 
   useEffect(() => {
     if (
@@ -2432,6 +2740,8 @@ return transformed;
     markThreadUnread,
     setThreadStarred,
     setThreadFolders,
+    moveThreadMessages,
+    archiveThreadMessages,
     trashThread,
     createFolder,
     renameFolder,

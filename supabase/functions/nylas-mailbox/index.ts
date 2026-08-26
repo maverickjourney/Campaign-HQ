@@ -384,6 +384,7 @@ Deno.serve(
 
     const mutationActions =
       new Set([
+        "update_message",
         "update_thread",
         "delete_thread",
         "create_folder",
@@ -733,6 +734,104 @@ Deno.serve(
 
       binaryResponse =
         true;
+    } else if (
+      action ===
+      "update_message"
+    ) {
+      const messageId =
+        clean(
+          body.messageId,
+        );
+
+      if (!messageId) {
+        return jsonResponse(
+          request,
+          400,
+          {
+            error:
+              "A message ID is required.",
+          },
+        );
+      }
+
+
+      const update:
+        Record<
+          string,
+          unknown
+        > = {};
+
+
+      if (
+        typeof body.unread ===
+          "boolean"
+      ) {
+        update.unread =
+          body.unread;
+      }
+
+
+      if (
+        typeof body.starred ===
+          "boolean"
+      ) {
+        update.starred =
+          body.starred;
+      }
+
+
+      if (
+        Array.isArray(
+          body.folders,
+        )
+      ) {
+        update.folders =
+          Array.from(
+            new Set(
+              body.folders
+                .map(
+                  clean,
+                )
+                .filter(
+                  Boolean,
+                ),
+            ),
+          )
+            .slice(
+              0,
+              100,
+            );
+      }
+
+
+      if (
+        Object.keys(
+          update,
+        ).length ===
+        0
+      ) {
+        return jsonResponse(
+          request,
+          400,
+          {
+            error:
+              "Choose a message property to update.",
+          },
+        );
+      }
+
+
+      target =
+        new URL(
+          `${baseUri}/v3/grants/${grant}/messages/${encodeURIComponent(messageId)}`,
+        );
+
+      providerMethod =
+        "PUT";
+
+      providerBody =
+        update;
+
     } else if (
       action ===
       "update_thread"

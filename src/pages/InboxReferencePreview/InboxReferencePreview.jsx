@@ -39,6 +39,7 @@ import {
   Sparkles,
   Star,
   Trash2,
+  Pencil,
   UserPlus,
   X,
 } from "lucide-react";
@@ -1957,6 +1958,14 @@ export default function InboxReferencePreview() {
     refresh: refreshMailbox,
     loadThread: loadMailboxThread,
     markThreadRead: markMailboxThreadRead,
+    markThreadUnread: markMailboxThreadUnread,
+    setThreadStarred: setMailboxThreadStarred,
+    moveThreadMessages: moveMailboxThreadMessages,
+    archiveThreadMessages: archiveMailboxThreadMessages,
+    trashThread: trashMailboxThread,
+    createFolder: createMailboxFolder,
+    renameFolder: renameMailboxFolder,
+    deleteFolder: deleteMailboxFolder,
     sendEmail: sendMailboxEmail,
     replyEmail: replyMailboxEmail,
     getAttachmentBlob: getMailboxAttachmentBlob,
@@ -2096,6 +2105,36 @@ export default function InboxReferencePreview() {
 
   const [activeTag, setActiveTag] = useState("");
 
+  const [
+    mailboxActionBusy,
+    setMailboxActionBusy,
+  ] = useState("");
+
+  const [
+    threadMoveMenuOpen,
+    setThreadMoveMenuOpen,
+  ] = useState(false);
+
+  const [
+    createFolderOpen,
+    setCreateFolderOpen,
+  ] = useState(false);
+
+  const [
+    newFolderName,
+    setNewFolderName,
+  ] = useState("");
+
+  const [
+    renamingFolderId,
+    setRenamingFolderId,
+  ] = useState("");
+
+  const [
+    renamingFolderName,
+    setRenamingFolderName,
+  ] = useState("");
+
   const mailboxMenuItems =
     useMemo(
       () => {
@@ -2185,7 +2224,10 @@ export default function InboxReferencePreview() {
           providerItems.filter(
             (item) =>
               item.kind ===
-              "folder",
+                "folder" &&
+              item.folder
+                ?.system_folder !==
+                true,
           );
 
         return [
@@ -2231,6 +2273,58 @@ export default function InboxReferencePreview() {
   const activeMailboxKind =
     activeMailboxItem.kind ||
     "inbox";
+
+  const archiveMailboxItem =
+    mailboxMenuItems.find(
+      (item) =>
+        item.kind ===
+          "archive" &&
+        item.available &&
+        !item.synthetic,
+    ) ||
+    null;
+
+  const selectedMailboxSourceFolderId =
+    (
+      activeMailboxItem
+        ?.available &&
+      !activeMailboxItem
+        ?.synthetic
+    )
+      ? activeMailboxItem.id
+      : (
+          inboxMailboxItem
+            ?.available &&
+          !inboxMailboxItem
+            ?.synthetic
+            ? inboxMailboxItem.id
+            : ""
+        );
+
+  const threadMoveTargets =
+    mailboxMenuItems.filter(
+      (item) =>
+        item.available &&
+        !item.synthetic &&
+        item.id &&
+        (
+          item.kind !==
+            "folder" ||
+          item.folder
+            ?.system_folder !==
+            true
+        ) &&
+        item.id !==
+          selectedMailboxSourceFolderId &&
+        ![
+          "drafts",
+          "sent",
+          "junk",
+          "trash",
+        ].includes(
+          item.kind,
+        ),
+    );
 
   const mailboxQuickKinds = [
     "inbox",
@@ -2653,6 +2747,27 @@ export default function InboxReferencePreview() {
     ) ||
     conversations[0] ||
     EMPTY_CONVERSATION;
+
+  const selectedProviderThread =
+    Boolean(
+      selectedConversation
+        ?.providerThreadId,
+    );
+
+  const selectedThreadInInbox =
+    Boolean(
+      inboxMailboxItem
+        ?.id &&
+      Array.isArray(
+        selectedConversation
+          ?.folderIds,
+      ) &&
+      selectedConversation
+        .folderIds
+        .includes(
+          inboxMailboxItem.id,
+        ),
+    );
 
   const hasSelectedConversation =
     Boolean(
@@ -5413,21 +5528,330 @@ export default function InboxReferencePreview() {
     );
   };
 
-  const toggleConversationField = (field) => {
-    setConversations((current) =>
-      current.map((conversation) =>
-        conversation.id ===
-        selectedConversation.id
-          ? {
-              ...conversation,
-              [field]: !conversation[field],
-            }
-          : conversation,
-      ),
-    );
+  const runMailboxAction =
+    async (
+      actionKey,
+      action,
+      successMessage,
+    ) => {
+      if (
+        mailboxActionBusy
+      ) {
+        return;
+      }
 
-    setToast(`${field} updated.`);
-  };
+      setMailboxActionBusy(
+        actionKey,
+      );
+
+      try {
+        await action();
+
+        setToast(
+          successMessage,
+        );
+
+        setThreadMoveMenuOpen(
+          false,
+        );
+      } catch (
+        actionError
+      ) {
+        setToast(
+          actionError?.message ||
+            "Campaign Seat could not update the connected mailbox.",
+        );
+      } finally {
+        setMailboxActionBusy(
+          "",
+        );
+      }
+    };
+
+
+  const handleMailboxReadToggle =
+    () => {
+      if (
+        !selectedConversation
+          ?.providerThreadId
+      ) {
+        return;
+      }
+
+      const markUnread =
+        !selectedConversation
+          .unread;
+
+      void runMailboxAction(
+        "read",
+        () =>
+          markUnread
+            ? markMailboxThreadUnread(
+                selectedConversation
+                  .providerThreadId,
+              )
+            : markMailboxThreadRead(
+                selectedConversation
+                  .providerThreadId,
+              ),
+        markUnread
+          ? "Marked unread in the connected mailbox."
+          : "Marked read in the connected mailbox.",
+      );
+    };
+
+
+  const handleMailboxStarToggle =
+    () => {
+      if (
+        !selectedConversation
+          ?.providerThreadId
+      ) {
+        return;
+      }
+
+      const nextStarred =
+        !selectedConversation
+          .priority;
+
+      void runMailboxAction(
+        "star",
+        () =>
+          setMailboxThreadStarred(
+            selectedConversation
+              .providerThreadId,
+            nextStarred,
+          ),
+        nextStarred
+          ? "Starred in the connected mailbox."
+          : "Star removed from the connected mailbox.",
+      );
+    };
+
+
+  const handleMailboxArchive =
+    () => {
+      if (
+        !selectedConversation
+          ?.providerThreadId ||
+        !inboxMailboxItem
+          ?.id
+      ) {
+        return;
+      }
+
+      void runMailboxAction(
+        "archive",
+        () =>
+          archiveMailboxThreadMessages(
+            selectedConversation
+              .providerThreadId,
+            {
+              inboxFolderId:
+                inboxMailboxItem.id,
+
+              archiveFolderId:
+                archiveMailboxItem
+                  ?.id ||
+                "",
+            },
+          ),
+        "Conversation archived in the connected mailbox.",
+      );
+    };
+
+
+  const handleMailboxMove =
+    (
+      targetItem,
+    ) => {
+      if (
+        !selectedConversation
+          ?.providerThreadId ||
+        !selectedMailboxSourceFolderId ||
+        !targetItem?.id
+      ) {
+        return;
+      }
+
+      void runMailboxAction(
+        `move:${targetItem.id}`,
+        () =>
+          moveMailboxThreadMessages({
+            threadIdOrConversationId:
+              selectedConversation
+                .providerThreadId,
+
+            fromFolderId:
+              selectedMailboxSourceFolderId,
+
+            targetFolderId:
+              targetItem.id,
+          }),
+        `Moved to ${targetItem.label} in the connected mailbox.`,
+      );
+    };
+
+
+  const handleMailboxTrash =
+    () => {
+      if (
+        !selectedConversation
+          ?.providerThreadId
+      ) {
+        return;
+      }
+
+      const confirmed =
+        window.confirm(
+          "Move this entire email conversation to the connected mailbox Trash?",
+        );
+
+      if (!confirmed) {
+        return;
+      }
+
+      void runMailboxAction(
+        "trash",
+        async () => {
+          await trashMailboxThread(
+            selectedConversation
+              .providerThreadId,
+          );
+
+          setSelectedId(
+            "",
+          );
+        },
+        "Conversation moved to the connected mailbox Trash.",
+      );
+    };
+
+
+  const handleCreateMailboxFolder =
+    async (
+      event,
+    ) => {
+      event.preventDefault();
+
+      const name =
+        newFolderName
+          .trim();
+
+      if (!name) {
+        return;
+      }
+
+      await runMailboxAction(
+        "create-folder",
+        () =>
+          createMailboxFolder({
+            name,
+          }),
+        `Folder "${name}" created in the connected mailbox.`,
+      );
+
+      setNewFolderName(
+        "",
+      );
+
+      setCreateFolderOpen(
+        false,
+      );
+    };
+
+
+  const startRenameMailboxFolder =
+    (
+      item,
+    ) => {
+      setRenamingFolderId(
+        item.id,
+      );
+
+      setRenamingFolderName(
+        item.label,
+      );
+    };
+
+
+  const saveMailboxFolderRename =
+    async (
+      item,
+    ) => {
+      const name =
+        renamingFolderName
+          .trim();
+
+      if (
+        !name ||
+        !item?.id
+      ) {
+        return;
+      }
+
+      await runMailboxAction(
+        `rename-folder:${item.id}`,
+        () =>
+          renameMailboxFolder({
+            folderId:
+              item.id,
+
+            name,
+          }),
+        `Folder renamed to "${name}".`,
+      );
+
+      setRenamingFolderId(
+        "",
+      );
+
+      setRenamingFolderName(
+        "",
+      );
+    };
+
+
+  const handleDeleteMailboxFolder =
+    (
+      item,
+    ) => {
+      if (
+        !item?.id ||
+        item.kind !==
+          "folder"
+      ) {
+        return;
+      }
+
+      const confirmed =
+        window.confirm(
+          `Delete the mailbox folder "${item.label}"? This affects the real connected mailbox.`,
+        );
+
+      if (!confirmed) {
+        return;
+      }
+
+      void runMailboxAction(
+        `delete-folder:${item.id}`,
+        async () => {
+          await deleteMailboxFolder(
+            item.id,
+          );
+
+          if (
+            selectedMailboxFolderId ===
+            item.id
+          ) {
+            setSelectedMailboxFolderId(
+              "",
+            );
+          }
+        },
+        `Folder "${item.label}" deleted from the connected mailbox.`,
+      );
+    };
 
   return (
     <CampaignWorkspaceShell activeItem="Inbox">
@@ -5886,11 +6310,89 @@ export default function InboxReferencePreview() {
                   styles.inboxMailboxMenu
                 }
               >
-                <header>
+                <header
+                  className={
+                    styles.mailboxFolderMenuHeader
+                  }
+                >
                   <strong>
                     Folders
                   </strong>
+
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setCreateFolderOpen(
+                        (current) =>
+                          !current,
+                      )
+                    }
+                  >
+                    <Plus
+                      size={14}
+                    />
+
+                    New
+                  </button>
                 </header>
+
+                {createFolderOpen ? (
+                  <form
+                    className={
+                      styles.mailboxFolderCreate
+                    }
+                    onSubmit={
+                      handleCreateMailboxFolder
+                    }
+                  >
+                    <input
+                      value={
+                        newFolderName
+                      }
+                      maxLength={120}
+                      autoFocus
+                      onChange={(
+                        event,
+                      ) =>
+                        setNewFolderName(
+                          event.target
+                            .value,
+                        )
+                      }
+                      placeholder="Folder name"
+                    />
+
+                    <button
+                      type="submit"
+                      disabled={
+                        !newFolderName
+                          .trim() ||
+                        Boolean(
+                          mailboxActionBusy,
+                        )
+                      }
+                    >
+                      Create
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setCreateFolderOpen(
+                          false,
+                        );
+
+                        setNewFolderName(
+                          "",
+                        );
+                      }}
+                    >
+                      <X
+                        size={14}
+                      />
+                    </button>
+                  </form>
+                ) : null}
 
                 <div>
                   {mailboxFolderMenuItems.length ? (
@@ -5905,83 +6407,241 @@ export default function InboxReferencePreview() {
                           activeMailboxItem.id ===
                           item.id;
 
+                        const customFolder =
+                          item.kind ===
+                            "folder" &&
+                          !item.synthetic;
+
+                        const renaming =
+                          renamingFolderId ===
+                          item.id;
+
                         return (
-                          <button
+                          <div
                             key={
                               item.id
                             }
-                            className={[
-                              styles.inboxMailboxMenuItem,
-
-                              active
-                                ? styles.inboxMailboxMenuItemActive
-                                : "",
-
-                              !item.available
-                                ? styles.inboxMailboxMenuItemDisabled
-                                : "",
-                            ]
-                              .filter(Boolean)
-                              .join(" ")}
-                            type="button"
-                            disabled={
-                              !item.available
+                            className={
+                              styles.mailboxFolderRow
                             }
-                            onClick={() => {
-                              if (
-                                !item.available
-                              ) {
-                                return;
-                              }
-
-                              setSelectedMailboxFolderId(
-                                item.synthetic
-                                  ? ""
-                                  : item.id,
-                              );
-
-                              setMailboxMenuOpen(
-                                false,
-                              );
-
-                              setSourceMenuOpen(
-                                false,
-                              );
-
-                              setTagMenuOpen(
-                                false,
-                              );
-
-                              setActiveFilter(
-                                "",
-                              );
-
-                              setActiveChannel(
-                                "email",
-                              );
-                            }}
                           >
-                            <span
-                              className={
-                                styles.inboxMailboxMenuIcon
-                              }
-                            >
-                              <ItemIcon
-                                size={16}
-                              />
-                            </span>
+                            {renaming ? (
+                              <div
+                                className={
+                                  styles.mailboxFolderRename
+                                }
+                              >
+                                <input
+                                  value={
+                                    renamingFolderName
+                                  }
+                                  maxLength={120}
+                                  autoFocus
+                                  onChange={(
+                                    event,
+                                  ) =>
+                                    setRenamingFolderName(
+                                      event.target
+                                        .value,
+                                    )
+                                  }
+                                  onKeyDown={(
+                                    event,
+                                  ) => {
+                                    if (
+                                      event.key ===
+                                      "Enter"
+                                    ) {
+                                      event.preventDefault();
 
-                            <strong>
-                              {item.label}
-                            </strong>
+                                      void saveMailboxFolderRename(
+                                        item,
+                                      );
+                                    }
 
-                            {item.count !==
-                            null ? (
-                              <em>
-                                {item.count}
-                              </em>
-                            ) : null}
-                          </button>
+                                    if (
+                                      event.key ===
+                                      "Escape"
+                                    ) {
+                                      setRenamingFolderId(
+                                        "",
+                                      );
+
+                                      setRenamingFolderName(
+                                        "",
+                                      );
+                                    }
+                                  }}
+                                />
+
+                                <button
+                                  type="button"
+                                  disabled={
+                                    !renamingFolderName
+                                      .trim() ||
+                                    Boolean(
+                                      mailboxActionBusy,
+                                    )
+                                  }
+                                  onClick={() =>
+                                    void saveMailboxFolderRename(
+                                      item,
+                                    )
+                                  }
+                                >
+                                  Save
+                                </button>
+
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    setRenamingFolderId(
+                                      "",
+                                    );
+
+                                    setRenamingFolderName(
+                                      "",
+                                    );
+                                  }}
+                                >
+                                  <X
+                                    size={14}
+                                  />
+                                </button>
+                              </div>
+                            ) : (
+                              <>
+                                <button
+                                  className={[
+                                    styles.inboxMailboxMenuItem,
+
+                                    active
+                                      ? styles.inboxMailboxMenuItemActive
+                                      : "",
+
+                                    !item.available
+                                      ? styles.inboxMailboxMenuItemDisabled
+                                      : "",
+                                  ]
+                                    .filter(Boolean)
+                                    .join(" ")}
+                                  type="button"
+                                  disabled={
+                                    !item.available
+                                  }
+                                  onClick={() => {
+                                    if (
+                                      !item.available
+                                    ) {
+                                      return;
+                                    }
+
+                                    setSelectedMailboxFolderId(
+                                      item.synthetic
+                                        ? ""
+                                        : item.id,
+                                    );
+
+                                    setMailboxMenuOpen(
+                                      false,
+                                    );
+
+                                    setSourceMenuOpen(
+                                      false,
+                                    );
+
+                                    setTagMenuOpen(
+                                      false,
+                                    );
+
+                                    setActiveFilter(
+                                      "",
+                                    );
+
+                                    setActiveChannel(
+                                      "email",
+                                    );
+                                  }}
+                                >
+                                  <span
+                                    className={
+                                      styles.inboxMailboxMenuIcon
+                                    }
+                                  >
+                                    <ItemIcon
+                                      size={16}
+                                    />
+                                  </span>
+
+                                  <strong>
+                                    {
+                                      item.label
+                                    }
+                                  </strong>
+
+                                  {item.count !==
+                                  null ? (
+                                    <em>
+                                      {
+                                        item.count
+                                      }
+                                    </em>
+                                  ) : null}
+                                </button>
+
+                                {customFolder ? (
+                                  <span
+                                    className={
+                                      styles.mailboxFolderRowActions
+                                    }
+                                  >
+                                    <button
+                                      type="button"
+                                      title="Rename folder"
+                                      aria-label={`Rename ${item.label}`}
+                                      disabled={
+                                        Boolean(
+                                          mailboxActionBusy,
+                                        )
+                                      }
+                                      onClick={() =>
+                                        startRenameMailboxFolder(
+                                          item,
+                                        )
+                                      }
+                                    >
+                                      <Pencil
+                                        size={13}
+                                      />
+                                    </button>
+
+                                    <button
+                                      className={
+                                        styles.mailboxFolderDeleteButton
+                                      }
+                                      type="button"
+                                      title="Delete folder"
+                                      aria-label={`Delete ${item.label}`}
+                                      disabled={
+                                        Boolean(
+                                          mailboxActionBusy,
+                                        )
+                                      }
+                                      onClick={() =>
+                                        handleDeleteMailboxFolder(
+                                          item,
+                                        )
+                                      }
+                                    >
+                                      <Trash2
+                                        size={13}
+                                      />
+                                    </button>
+                                  </span>
+                                ) : null}
+                              </>
+                            )}
+                          </div>
                         );
                       },
                     )
@@ -6951,7 +7611,216 @@ type="button"
                   </span>
                 </div>
 
-                <div>
+                <div
+                  className={
+                    styles.threadHeaderActions
+                  }
+                >
+                  {selectedProviderThread ? (
+                    <>
+                      <button
+                        type="button"
+                        aria-label={
+                          selectedConversation
+                            .unread
+                            ? "Mark email read"
+                            : "Mark email unread"
+                        }
+                        title={
+                          selectedConversation
+                            .unread
+                            ? "Mark read"
+                            : "Mark unread"
+                        }
+                        disabled={
+                          Boolean(
+                            mailboxActionBusy,
+                          )
+                        }
+                        onClick={
+                          handleMailboxReadToggle
+                        }
+                      >
+                        <Mail
+                          size={17}
+                        />
+                      </button>
+
+                      <button
+                        className={
+                          selectedConversation
+                            .priority
+                            ? styles.mailboxActionActive
+                            : ""
+                        }
+                        type="button"
+                        aria-label={
+                          selectedConversation
+                            .priority
+                            ? "Remove star"
+                            : "Star email"
+                        }
+                        aria-pressed={
+                          selectedConversation
+                            .priority
+                        }
+                        title={
+                          selectedConversation
+                            .priority
+                            ? "Remove star"
+                            : "Star"
+                        }
+                        disabled={
+                          Boolean(
+                            mailboxActionBusy,
+                          )
+                        }
+                        onClick={
+                          handleMailboxStarToggle
+                        }
+                      >
+                        <Star
+                          size={17}
+                          fill={
+                            selectedConversation
+                              .priority
+                              ? "currentColor"
+                              : "none"
+                          }
+                        />
+                      </button>
+
+                      <button
+                        type="button"
+                        aria-label="Archive email"
+                        title="Archive"
+                        disabled={
+                          Boolean(
+                            mailboxActionBusy,
+                          ) ||
+                          !selectedThreadInInbox ||
+                          (
+                            mailboxAccountProvider ===
+                              "microsoft" &&
+                            !archiveMailboxItem
+                              ?.id
+                          )
+                        }
+                        onClick={
+                          handleMailboxArchive
+                        }
+                      >
+                        <Archive
+                          size={17}
+                        />
+                      </button>
+
+                      <span
+                        className={
+                          styles.threadMoveAction
+                        }
+                      >
+                        <button
+                          type="button"
+                          aria-label="Move email"
+                          title="Move"
+                          aria-expanded={
+                            threadMoveMenuOpen
+                          }
+                          disabled={
+                            Boolean(
+                              mailboxActionBusy,
+                            ) ||
+                            !selectedMailboxSourceFolderId ||
+                            !threadMoveTargets
+                              .length
+                          }
+                          onClick={() =>
+                            setThreadMoveMenuOpen(
+                              (current) =>
+                                !current,
+                            )
+                          }
+                        >
+                          <Folder
+                            size={17}
+                          />
+                        </button>
+
+                        {threadMoveMenuOpen ? (
+                          <div
+                            className={
+                              styles.threadMoveMenu
+                            }
+                          >
+                            <header>
+                              Move to
+                            </header>
+
+                            {threadMoveTargets.map(
+                              (item) => (
+                                <button
+                                  key={
+                                    item.id
+                                  }
+                                  type="button"
+                                  disabled={
+                                    Boolean(
+                                      mailboxActionBusy,
+                                    )
+                                  }
+                                  onClick={() =>
+                                    handleMailboxMove(
+                                      item,
+                                    )
+                                  }
+                                >
+                                  <Folder
+                                    size={15}
+                                  />
+
+                                  <span>
+                                    {
+                                      item.label
+                                    }
+                                  </span>
+                                </button>
+                              ),
+                            )}
+                          </div>
+                        ) : null}
+                      </span>
+
+                      <button
+                        className={
+                          styles.mailboxActionDanger
+                        }
+                        type="button"
+                        aria-label="Move email conversation to Trash"
+                        title="Move to Trash"
+                        disabled={
+                          Boolean(
+                            mailboxActionBusy,
+                          )
+                        }
+                        onClick={
+                          handleMailboxTrash
+                        }
+                      >
+                        <Trash2
+                          size={17}
+                        />
+                      </button>
+
+                      <span
+                        className={
+                          styles.threadActionDivider
+                        }
+                        aria-hidden="true"
+                      />
+                    </>
+                  ) : null}
+
                   <button
                     type="button"
                     aria-label={
