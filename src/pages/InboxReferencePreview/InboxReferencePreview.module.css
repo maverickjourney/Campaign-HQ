@@ -19142,3 +19142,229 @@
     grid-column: 2;
   }
 }
+
+
+/* INBOX MAILBOX ACTION POLISH V25 — START */
+
+.threadHeader
+.threadMoveMenu {
+  z-index:
+    120 !important;
+
+  width:
+    250px !important;
+
+  max-height:
+    285px !important;
+
+  overflow-x:
+    hidden !important;
+
+  overflow-y:
+    auto !important;
+
+  padding:
+    7px !important;
+
+  border:
+    1px solid
+    #d6e1e9 !important;
+
+  border-radius:
+    12px !important;
+
+  background:
+    #ffffff !important;
+
+  box-shadow:
+    0
+    18px
+    42px
+    rgba(
+      18,
+      48,
+      76,
+      0.18
+    ) !important;
+}
+
+
+.threadHeader
+.threadMoveMenu
+header {
+  display:
+    block !important;
+
+  min-height:
+    auto !important;
+
+  padding:
+    6px
+    8px
+    8px !important;
+
+  color:
+    #718699 !important;
+
+  font-size:
+    0.58rem !important;
+
+  font-weight:
+    850 !important;
+
+  letter-spacing:
+    0.08em !important;
+
+  line-height:
+    1.2 !important;
+
+  text-transform:
+    uppercase !important;
+}
+
+
+.threadHeader
+.threadMoveMenu
+> button {
+  display:
+    flex !important;
+
+  width:
+    100% !important;
+
+  height:
+    auto !important;
+
+  min-height:
+    39px !important;
+
+  align-items:
+    center !important;
+
+  justify-content:
+    flex-start !important;
+
+  gap:
+    9px !important;
+
+  padding:
+    7px
+    9px !important;
+
+  border:
+    0 !important;
+
+  border-radius:
+    8px !important;
+
+  color:
+    #294f70 !important;
+
+  background:
+    transparent !important;
+
+  text-align:
+    left !important;
+
+  font-size:
+    0.66rem !important;
+
+  font-weight:
+    720 !important;
+
+  line-height:
+    1.2 !important;
+}
+
+
+.threadHeader
+.threadMoveMenu
+> button:hover {
+  color:
+    #173f63 !important;
+
+  background:
+    #f1f6fa !important;
+}
+
+
+.threadHeader
+.threadMoveMenu
+> button
+svg {
+  width:
+    16px !important;
+
+  height:
+    16px !important;
+
+  flex:
+    0
+    0
+    16px !important;
+}
+
+
+.threadHeader
+.threadMoveMenu
+> button
+span {
+  min-width:
+    0 !important;
+
+  overflow:
+    hidden !important;
+
+  text-overflow:
+    ellipsis !important;
+
+  white-space:
+    nowrap !important;
+}
+
+
+.conversationList
+> button[data-channel="email"]
+.conversationCopy
+> small::before {
+  display:
+    none !important;
+
+  width:
+    0 !important;
+
+  height:
+    0 !important;
+
+  margin:
+    0 !important;
+
+  content:
+    none !important;
+}
+
+
+/*
+ * The colored account avatar and Email label still identify
+ * the source. Unread state now comes only from provider data.
+ */
+
+@media (max-width: 700px) {
+
+  .threadHeader
+  .threadMoveMenu {
+    right:
+      -18px !important;
+
+    width:
+      min(
+        250px,
+        calc(
+          100vw -
+          42px
+        )
+      ) !important;
+  }
+}
+
+/* INBOX MAILBOX ACTION POLISH V25 — END */

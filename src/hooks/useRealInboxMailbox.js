@@ -25,10 +25,13 @@ const MICROSOFT_MAILBOX_TARGET_THREAD_COUNT =
   10;
 
 const QUIET_REFRESH_INTERVAL_MS =
-  120000;
+  60000;
 
 const QUIET_REFRESH_COOLDOWN_MS =
   30000;
+
+const RATE_LIMIT_BACKOFF_MS =
+  180000;
 
 function clean(value) {
   return String(
@@ -977,7 +980,13 @@ export function useRealInboxMailbox({
     useRef(
       0,
     );
-const invokeMailbox =
+
+  const rateLimitBackoffUntilRef =
+    useRef(
+      0,
+    );
+
+  const invokeMailbox =
     useCallback(
       async (
         requestBody,
@@ -1336,6 +1345,9 @@ return transformed;
             next,
           );
 
+          rateLimitBackoffUntilRef.current =
+            0;
+
           setError(
             "",
           );
@@ -1348,11 +1360,24 @@ return transformed;
         } catch (
           loadError
         ) {
-          setError(
+          const nextError =
             errorMessage(
               loadError,
               "Campaign Seat could not load the connected mailbox.",
-            ),
+            );
+
+          if (
+            /rate limit/i.test(
+              nextError,
+            )
+          ) {
+            rateLimitBackoffUntilRef.current =
+              Date.now() +
+              RATE_LIMIT_BACKOFF_MS;
+          }
+
+          setError(
+            nextError,
           );
 
           return [];
@@ -2335,6 +2360,13 @@ return transformed;
 
         const now =
           Date.now();
+
+        if (
+          now <
+          rateLimitBackoffUntilRef.current
+        ) {
+          return;
+        }
 
         if (
           now -
