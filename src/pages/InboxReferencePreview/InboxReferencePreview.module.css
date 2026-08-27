@@ -24563,3 +24563,299 @@ header {
 }
 
 /* INBOX CONVERSATION ASSETS — END */
+
+
+/* INSTANT INBOX TOOLTIP SYSTEM — START */
+
+/*
+ * Icon-only Inbox controls need immediate explanation.
+ * Use aria-label as the tooltip source so accessibility
+ * and visual labeling stay synchronized.
+ */
+
+.threadHeader {
+  overflow:
+    visible !important;
+}
+
+
+.threadHeaderActions {
+  position:
+    relative;
+
+  z-index:
+    40;
+
+  overflow:
+    visible !important;
+}
+
+
+.threadHeaderActions
+button[aria-label] {
+  position:
+    relative;
+}
+
+
+@media (
+  hover: hover
+) and (
+  pointer: fine
+) {
+
+  .threadHeaderActions
+  button[aria-label]::after {
+    position:
+      absolute;
+
+    z-index:
+      500;
+
+    top:
+      calc(
+        100% +
+        8px
+      );
+
+    left:
+      50%;
+
+    max-width:
+      220px;
+
+    padding:
+      6px
+      9px;
+
+    border:
+      1px solid
+      rgba(
+        255,
+        255,
+        255,
+        0.14
+      );
+
+    border-radius:
+      7px;
+
+    color:
+      #ffffff;
+
+    background:
+      #173f62;
+
+    box-shadow:
+      0
+      8px
+      22px
+      rgba(
+        14,
+        39,
+        61,
+        0.22
+      );
+
+    content:
+      attr(
+        aria-label
+      );
+
+    font-size:
+      12px;
+
+    font-weight:
+      750;
+
+    line-height:
+      1.25;
+
+    opacity:
+      0;
+
+    pointer-events:
+      none;
+
+    text-align:
+      center;
+
+    transform:
+      translate(
+        -50%,
+        -3px
+      );
+
+    transition:
+      opacity
+      90ms
+      ease,
+      transform
+      90ms
+      ease;
+
+    white-space:
+      nowrap;
+
+    visibility:
+      hidden;
+  }
+
+
+  .threadHeaderActions
+  button[aria-label]::before {
+    position:
+      absolute;
+
+    z-index:
+      501;
+
+    top:
+      calc(
+        100% +
+        3px
+      );
+
+    left:
+      50%;
+
+    width:
+      8px;
+
+    height:
+      8px;
+
+    content:
+      "";
+
+    background:
+      #173f62;
+
+    opacity:
+      0;
+
+    pointer-events:
+      none;
+
+    transform:
+      translateX(
+        -50%
+      )
+      rotate(
+        45deg
+      );
+
+    transition:
+      opacity
+      90ms
+      ease;
+
+    visibility:
+      hidden;
+  }
+
+
+  .threadHeaderActions
+  button[aria-label]:hover::after,
+  .threadHeaderActions
+  button[aria-label]:focus-visible::after {
+    opacity:
+      1;
+
+    transform:
+      translate(
+        -50%,
+        0
+      );
+
+    visibility:
+      visible;
+
+    transition-delay:
+      80ms;
+  }
+
+
+  .threadHeaderActions
+  button[aria-label]:hover::before,
+  .threadHeaderActions
+  button[aria-label]:focus-visible::before {
+    opacity:
+      1;
+
+    visibility:
+      visible;
+
+    transition-delay:
+      80ms;
+  }
+}
+
+
+/*
+ * Keep right-edge actions from clipping outside
+ * the conversation panel.
+ */
+
+.threadHeaderActions
+button[aria-label]:last-child::after {
+  right:
+    0;
+
+  left:
+    auto;
+
+  transform:
+    translate(
+      0,
+      -3px
+    );
+}
+
+
+.threadHeaderActions
+button[aria-label]:last-child:hover::after,
+.threadHeaderActions
+button[aria-label]:last-child:focus-visible::after {
+  transform:
+    translate(
+      0,
+      0
+    );
+}
+
+
+.threadHeaderActions
+button[aria-label]:last-child::before {
+  right:
+    14px;
+
+  left:
+    auto;
+
+  transform:
+    rotate(
+      45deg
+    );
+}
+
+
+/*
+ * Touchscreens do not need hover labels;
+ * aria-label remains available to accessibility tools.
+ */
+
+@media (
+  hover: none
+) {
+
+  .threadHeaderActions
+  button[aria-label]::before,
+  .threadHeaderActions
+  button[aria-label]::after {
+    display:
+      none !important;
+  }
+}
+
+/* INSTANT INBOX TOOLTIP SYSTEM — END */

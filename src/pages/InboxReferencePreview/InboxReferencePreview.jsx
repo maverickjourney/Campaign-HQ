@@ -10723,12 +10723,6 @@ type="button"
                             ? "Mark email read"
                             : "Mark email unread"
                         }
-                        title={
-                          selectedConversation
-                            .unread
-                            ? "Mark read"
-                            : "Mark unread"
-                        }
                         disabled={
                           Boolean(
                             mailboxActionBusy,
@@ -10761,12 +10755,6 @@ type="button"
                           selectedConversation
                             .priority
                         }
-                        title={
-                          selectedConversation
-                            .priority
-                            ? "Remove star"
-                            : "Star"
-                        }
                         disabled={
                           Boolean(
                             mailboxActionBusy,
@@ -10790,7 +10778,6 @@ type="button"
                       <button
                         type="button"
                         aria-label="Archive email"
-                        title="Archive"
                         disabled={
                           Boolean(
                             mailboxActionBusy,
@@ -10820,7 +10807,6 @@ type="button"
                         <button
                           type="button"
                           aria-label="Move email"
-                          title="Move"
                           aria-expanded={
                             threadMoveMenuOpen
                           }
@@ -10894,7 +10880,6 @@ type="button"
                         }
                         type="button"
                         aria-label="Move email conversation to Trash"
-                        title="Move to Trash"
                         disabled={
                           Boolean(
                             mailboxActionBusy,
@@ -10925,11 +10910,6 @@ type="button"
                         ? "Exit expanded email view"
                         : "Open email in larger view"
                     }
-                    title={
-                      threadExpanded
-                        ? "Exit larger view"
-                        : "Open message larger"
-                    }
                     onClick={() =>
                       setThreadExpanded(
                         (current) =>
@@ -10951,7 +10931,6 @@ type="button"
                   <button
                     type="button"
                     aria-label="Reply to conversation"
-                    title="Reply"
                     onClick={() =>
                       startInlineReply()
                     }
@@ -10969,7 +10948,6 @@ type="button"
                     <button
                       type="button"
                       aria-label="Reply all"
-                      title="Reply All"
                       onClick={() =>
                         startInlineReply({
                           replyAll:
@@ -10986,7 +10964,6 @@ type="button"
                   <button
                     type="button"
                     aria-label="Forward conversation"
-                    title="Forward"
                     onClick={
                       forwardSelectedMessage
                     }
