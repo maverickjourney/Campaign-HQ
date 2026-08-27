@@ -23613,3 +23613,398 @@ header {
 }
 
 /* CONTACT INTELLIGENCE TEXT WRAP — END */
+
+
+/* INBOX REAL ACTIVITY AUDIT — START */
+
+.activityAuditPanel {
+  display:
+    grid;
+
+  gap:
+    12px;
+
+  padding:
+    14px;
+
+  overflow-y:
+    auto;
+
+  background:
+    #f7fafc;
+}
+
+
+.activityAuditHeader {
+  display:
+    grid;
+
+  grid-template-columns:
+    auto
+    minmax(
+      0,
+      1fr
+    )
+    auto;
+
+  align-items:
+    center;
+
+  gap:
+    11px;
+
+  padding:
+    13px
+    14px;
+
+  border:
+    1px solid
+    #d8e4ec;
+
+  border-radius:
+    11px;
+
+  background:
+    #ffffff;
+}
+
+
+.activityAuditHeader > span {
+  display:
+    grid;
+
+  width:
+    40px;
+
+  height:
+    40px;
+
+  place-items:
+    center;
+
+  border-radius:
+    10px;
+
+  color:
+    #ffffff;
+
+  background:
+    #286b9e;
+}
+
+
+.activityAuditHeader small,
+.activityAuditHeader strong,
+.activityAuditHeader p {
+  display:
+    block;
+}
+
+
+.activityAuditHeader small {
+  color:
+    #d62d39;
+
+  font-size:
+    12px;
+
+  font-weight:
+    850;
+
+  letter-spacing:
+    0.05em;
+
+  text-transform:
+    uppercase;
+}
+
+
+.activityAuditHeader strong {
+  margin-top:
+    2px;
+
+  color:
+    #173f62;
+
+  font-size:
+    16px;
+
+  font-weight:
+    880;
+}
+
+
+.activityAuditHeader p {
+  margin:
+    3px
+    0
+    0;
+
+  color:
+    #6d8395;
+
+  font-size:
+    13px;
+
+  line-height:
+    1.4;
+}
+
+
+.activityAuditHeader em {
+  padding:
+    5px
+    9px;
+
+  border-radius:
+    999px;
+
+  color:
+    #267054;
+
+  background:
+    #ebf8f2;
+
+  font-size:
+    12px;
+
+  font-style:
+    normal;
+
+  font-weight:
+    800;
+}
+
+
+.activityAuditTimeline {
+  display:
+    grid;
+
+  gap:
+    8px;
+}
+
+
+.activityAuditItem {
+  display:
+    grid;
+
+  grid-template-columns:
+    auto
+    minmax(
+      0,
+      1fr
+    );
+
+  gap:
+    10px;
+
+  padding:
+    12px;
+
+  border:
+    1px solid
+    #dce6ed;
+
+  border-radius:
+    10px;
+
+  background:
+    #ffffff;
+}
+
+
+.activityAuditIcon {
+  display:
+    grid;
+
+  width:
+    35px;
+
+  height:
+    35px;
+
+  place-items:
+    center;
+
+  border-radius:
+    9px;
+
+  color:
+    #316b96;
+
+  background:
+    #edf5fa;
+}
+
+
+.activityAuditItem > div {
+  min-width:
+    0;
+}
+
+
+.activityAuditItem header {
+  display:
+    flex;
+
+  align-items:
+    flex-start;
+
+  justify-content:
+    space-between;
+
+  gap:
+    12px;
+}
+
+
+.activityAuditItem header strong {
+  color:
+    #294f6d;
+
+  font-size:
+    14px;
+
+  font-weight:
+    840;
+}
+
+
+.activityAuditItem time {
+  flex:
+    0
+    0
+    auto;
+
+  color:
+    #8395a4;
+
+  font-size:
+    12px;
+}
+
+
+.activityAuditItem p {
+  margin:
+    4px
+    0
+    0;
+
+  color:
+    #667e91;
+
+  font-size:
+    13px;
+
+  line-height:
+    1.5;
+
+  overflow-wrap:
+    anywhere;
+}
+
+
+.activityAuditItem small {
+  display:
+    block;
+
+  margin-top:
+    5px;
+
+  color:
+    #8a9aa7;
+
+  font-size:
+    12px;
+
+  font-weight:
+    700;
+}
+
+
+.activityAuditEmpty {
+  display:
+    flex;
+
+  align-items:
+    center;
+
+  gap:
+    11px;
+
+  padding:
+    16px;
+
+  border:
+    1px dashed
+    #bdcfdb;
+
+  border-radius:
+    10px;
+
+  color:
+    #456d8b;
+
+  background:
+    #ffffff;
+}
+
+
+.activityAuditEmpty strong {
+  color:
+    #2c5878;
+
+  font-size:
+    14px;
+}
+
+
+.activityAuditEmpty p {
+  margin:
+    3px
+    0
+    0;
+
+  color:
+    #708596;
+
+  font-size:
+    13px;
+
+  line-height:
+    1.45;
+}
+
+
+@media (max-width: 700px) {
+
+  .activityAuditHeader {
+    grid-template-columns:
+      auto
+      minmax(
+        0,
+        1fr
+      );
+  }
+
+
+  .activityAuditHeader em {
+    grid-column:
+      1 / -1;
+
+    justify-self:
+      start;
+  }
+
+
+  .activityAuditItem header {
+    flex-direction:
+      column;
+
+    gap:
+      3px;
+  }
+}
+
+/* INBOX REAL ACTIVITY AUDIT — END */

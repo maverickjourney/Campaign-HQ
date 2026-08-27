@@ -103,6 +103,89 @@ export function useInboxConversationWorkflows({
     setError,
   ] = useState("");
 
+  const [
+    activityRows,
+    setActivityRows,
+  ] = useState([]);
+
+
+  const refreshActivity =
+    useCallback(
+      async () => {
+        if (
+          !enabled ||
+          !workspaceId
+        ) {
+          setActivityRows([]);
+
+          return [];
+        }
+
+        try {
+          const {
+            data,
+            error:
+              activityError,
+          } =
+            await supabase
+              .from(
+                "inbox_conversation_activity",
+              )
+              .select(
+                `
+                  id,
+                  workspace_id,
+                  conversation_key,
+                  channel,
+                  event_type,
+                  event_label,
+                  event_detail,
+                  actor_user_id,
+                  metadata,
+                  created_at
+                `,
+              )
+              .eq(
+                "workspace_id",
+                workspaceId,
+              )
+              .order(
+                "created_at",
+                {
+                  ascending:
+                    false,
+                },
+              )
+              .limit(
+                1000,
+              );
+
+          if (activityError) {
+            throw activityError;
+          }
+
+          setActivityRows(
+            data || [],
+          );
+
+          return data || [];
+        } catch (
+          activityError
+        ) {
+          console.error(
+            "Inbox activity could not load:",
+            activityError,
+          );
+
+          return [];
+        }
+      },
+      [
+        enabled,
+        workspaceId,
+      ],
+    );
+
 
   const refresh =
     useCallback(
@@ -250,6 +333,54 @@ export function useInboxConversationWorkflows({
   ]);
 
 
+  useEffect(() => {
+    if (
+      !enabled ||
+      !workspaceId
+    ) {
+      return undefined;
+    }
+
+    void refreshActivity();
+
+    const activityChannel =
+      supabase
+        .channel(
+          `inbox-activity-${workspaceId}`,
+        )
+        .on(
+          "postgres_changes",
+          {
+            event:
+              "*",
+
+            schema:
+              "public",
+
+            table:
+              "inbox_conversation_activity",
+
+            filter:
+              `workspace_id=eq.${workspaceId}`,
+          },
+          () => {
+            void refreshActivity();
+          },
+        )
+        .subscribe();
+
+    return () => {
+      supabase.removeChannel(
+        activityChannel,
+      );
+    };
+  }, [
+    enabled,
+    refreshActivity,
+    workspaceId,
+  ]);
+
+
   const byKey =
     useMemo(
       () =>
@@ -264,6 +395,49 @@ export function useInboxConversationWorkflows({
         ),
       [
         rows,
+      ],
+    );
+
+
+  const activityByKey =
+    useMemo(
+      () => {
+        const map =
+          new Map();
+
+        activityRows.forEach(
+          (row) => {
+            const key =
+              row
+                .conversation_key;
+
+            if (!key) {
+              return;
+            }
+
+            if (
+              !map.has(
+                key,
+              )
+            ) {
+              map.set(
+                key,
+                [],
+              );
+            }
+
+            map.get(
+              key,
+            ).push(
+              row,
+            );
+          },
+        );
+
+        return map;
+      },
+      [
+        activityRows,
       ],
     );
 
@@ -524,14 +698,151 @@ export function useInboxConversationWorkflows({
     );
 
 
+  const logActivity =
+    useCallback(
+      async (
+        conversation,
+        {
+          eventType,
+          eventLabel,
+          eventDetail = "",
+          metadata = {},
+        },
+      ) => {
+        if (
+          !enabled ||
+          !workspaceId ||
+          !userId
+        ) {
+          return null;
+        }
+
+        const conversationKey =
+          inboxWorkflowKey(
+            conversation,
+          );
+
+        if (
+          !conversationKey ||
+          !clean(
+            eventType,
+          ) ||
+          !clean(
+            eventLabel,
+          )
+        ) {
+          return null;
+        }
+
+        const payload = {
+          workspace_id:
+            workspaceId,
+
+          conversation_key:
+            conversationKey,
+
+          channel:
+            clean(
+              conversation
+                ?.channel ||
+              "email",
+            )
+              .toLowerCase(),
+
+          event_type:
+            clean(
+              eventType,
+            ),
+
+          event_label:
+            clean(
+              eventLabel,
+            ),
+
+          event_detail:
+            clean(
+              eventDetail,
+            ) ||
+            null,
+
+          actor_user_id:
+            userId,
+
+          metadata: {
+            sender:
+              clean(
+                conversation
+                  ?.sender,
+              ),
+
+            email:
+              normalizedEmail(
+                conversation
+                  ?.email,
+              ),
+
+            subject:
+              clean(
+                conversation
+                  ?.subject,
+              ),
+
+            ...metadata,
+          },
+        };
+
+        const {
+          data,
+          error:
+            insertError,
+        } =
+          await supabase
+            .from(
+              "inbox_conversation_activity",
+            )
+            .insert(
+              payload,
+            )
+            .select()
+            .single();
+
+        if (insertError) {
+          throw insertError;
+        }
+
+        setActivityRows(
+          (current) => [
+            data,
+            ...current.filter(
+              (row) =>
+                row.id !==
+                data.id,
+            ),
+          ],
+        );
+
+        return data;
+      },
+      [
+        enabled,
+        userId,
+        workspaceId,
+      ],
+    );
+
+
   return {
     rows,
     byKey,
+    activityRows,
+    activityByKey,
     isLoading,
     error,
 
     refresh,
+    refreshActivity,
     getWorkflow,
     upsertWorkflow,
+    logActivity,
   };
 }

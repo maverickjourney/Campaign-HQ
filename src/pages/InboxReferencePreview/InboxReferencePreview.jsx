@@ -2289,6 +2289,218 @@ function emailAccountTone(
   );
 }
 
+function inboxActivityEventLabel(
+  actionKey,
+  updates = {},
+) {
+  const key =
+    String(
+      actionKey ||
+      "",
+    );
+
+  if (
+    key ===
+    "assign"
+  ) {
+    return updates
+      .assigned_to
+      ? "Conversation assigned"
+      : "Conversation unassigned";
+  }
+
+  if (
+    key.startsWith(
+      "status:",
+    )
+  ) {
+    return "Workflow status changed";
+  }
+
+  if (
+    key ===
+    "vip"
+  ) {
+    return updates
+      .is_vip
+      ? "VIP added"
+      : "VIP removed";
+  }
+
+  if (
+    key ===
+    "snooze"
+  ) {
+    return updates
+      .snoozed_until
+      ? "Conversation snoozed"
+      : "Snooze cleared";
+  }
+
+  if (
+    key ===
+    "follow-up"
+  ) {
+    return updates
+      .follow_up_at
+      ? "Follow-up scheduled"
+      : "Follow-up cleared";
+  }
+
+  return "Campaign workflow updated";
+}
+
+
+function inboxMailboxActivityLabel(
+  actionKey,
+) {
+  const key =
+    String(
+      actionKey ||
+      "",
+    );
+
+  if (
+    key ===
+    "read"
+  ) {
+    return "Read state updated";
+  }
+
+  if (
+    key ===
+    "star"
+  ) {
+    return "Mailbox star updated";
+  }
+
+  if (
+    key ===
+    "archive"
+  ) {
+    return "Conversation archived";
+  }
+
+  if (
+    key ===
+    "trash"
+  ) {
+    return "Conversation moved to Trash";
+  }
+
+  if (
+    key ===
+    "not-spam"
+  ) {
+    return "Removed from Spam / Junk";
+  }
+
+  if (
+    key.startsWith(
+      "move:",
+    )
+  ) {
+    return "Conversation moved";
+  }
+
+  return "Mailbox updated";
+}
+
+
+function inboxActivityIcon(
+  eventType,
+) {
+  const type =
+    String(
+      eventType ||
+      "",
+    ).toLowerCase();
+
+  if (
+    type.includes(
+      "assign",
+    ) ||
+    type.includes(
+      "contact",
+    )
+  ) {
+    return UserPlus;
+  }
+
+  if (
+    type.includes(
+      "vip",
+    ) ||
+    type.includes(
+      "star",
+    )
+  ) {
+    return Star;
+  }
+
+  if (
+    type.includes(
+      "snooze",
+    ) ||
+    type.includes(
+      "follow-up",
+    )
+  ) {
+    return Bell;
+  }
+
+  if (
+    type.includes(
+      "task",
+    )
+  ) {
+    return ListTodo;
+  }
+
+  if (
+    type.includes(
+      "archive",
+    )
+  ) {
+    return Archive;
+  }
+
+  if (
+    type.includes(
+      "trash",
+    )
+  ) {
+    return Trash2;
+  }
+
+  if (
+    type.includes(
+      "move",
+    )
+  ) {
+    return Folder;
+  }
+
+  if (
+    type.includes(
+      "message:sent",
+    )
+  ) {
+    return Send;
+  }
+
+  if (
+    type.includes(
+      "message:received",
+    )
+  ) {
+    return Mail;
+  }
+
+  return Clock3;
+}
+
+
 function getChannelLabel(channel) {
   return (
     CHANNELS.find((item) => item.id === channel)
@@ -2378,8 +2590,14 @@ export default function InboxReferencePreview() {
     error:
       inboxWorkflowError,
 
+    activityByKey:
+      inboxActivityByKey,
+
     upsertWorkflow:
       upsertInboxWorkflow,
+
+    logActivity:
+      logInboxActivity,
   } =
     useInboxConversationWorkflows({
       workspaceId:
@@ -3541,6 +3759,158 @@ export default function InboxReferencePreview() {
           null
         )
       : null;
+
+
+  const selectedPersistentActivity =
+    useMemo(
+      () =>
+        inboxActivityByKey.get(
+          inboxWorkflowKey(
+            selectedConversation,
+          ),
+        ) ||
+        [],
+      [
+        inboxActivityByKey,
+        selectedConversation,
+      ],
+    );
+
+
+  const selectedActivityTimeline =
+    useMemo(
+      () => {
+        const persistent =
+          selectedPersistentActivity.map(
+            (activity) => ({
+              ...activity,
+
+              source:
+                "audit",
+
+              sortAt:
+                Date.parse(
+                  activity
+                    .created_at ||
+                  "",
+                ) ||
+                0,
+            }),
+          );
+
+        const communication =
+          (
+            Array.isArray(
+              selectedConversation
+                ?.messages,
+            )
+              ? selectedConversation
+                  .messages
+              : []
+          ).map(
+            (
+              message,
+              index,
+            ) => {
+              const outbound =
+                message
+                  ?.direction ===
+                "outbound";
+
+              const channel =
+                message
+                  ?.channel ||
+                "Message";
+
+              const attachmentCount =
+                Array.isArray(
+                  message
+                    ?.attachments,
+                )
+                  ? message
+                      .attachments
+                      .length
+                  : 0;
+
+              return {
+                id:
+                  `message-activity-${message?.id || index}`,
+
+                source:
+                  "message",
+
+                event_type:
+                  outbound
+                    ? "message:sent"
+                    : "message:received",
+
+                event_label:
+                  `${channel} ${
+                    outbound
+                      ? "sent"
+                      : "received"
+                  }`,
+
+                event_detail:
+                  attachmentCount
+                    ? `${outbound ? "Sent" : "Received"} with ${attachmentCount} attachment${attachmentCount === 1 ? "" : "s"}.`
+                    : outbound
+                      ? "Message sent by the campaign."
+                      : `Message received from ${message?.author || selectedConversation?.sender || "sender"}.`,
+
+                actor_user_id:
+                  outbound
+                    ? user.id
+                    : null,
+
+                display_time:
+                  message
+                    ?.time ||
+                  "",
+
+                direction:
+                  message
+                    ?.direction ||
+                  "",
+
+                sortAt:
+                  Number(
+                    message
+                      ?.order ||
+                    0,
+                  ) ||
+                  0,
+              };
+            },
+          );
+
+        return [
+          ...persistent,
+          ...communication,
+        ].sort(
+          (
+            left,
+            right,
+          ) =>
+            (
+              right.sortAt ||
+              0
+            ) -
+            (
+              left.sortAt ||
+              0
+            ),
+        );
+      },
+      [
+        selectedConversation
+          ?.messages,
+        selectedConversation
+          ?.sender,
+        selectedPersistentActivity,
+        user.id,
+      ],
+    );
 
 
   const hasSelectedConversation =
@@ -5268,6 +5638,41 @@ export default function InboxReferencePreview() {
 
           linkedWorkflowTask =
             true;
+
+          try {
+            await logInboxActivity(
+              workflowConversation,
+              {
+                eventType:
+                  "task:linked",
+
+                eventLabel:
+                  "Task created and linked",
+
+                eventDetail:
+                  createdTask?.title
+                    ? `Linked task: ${createdTask.title}`
+                    : "A Campaign Seat task was linked to this conversation.",
+
+                metadata: {
+                  task_id:
+                    createdTask?.id ||
+                    null,
+
+                  task_title:
+                    createdTask?.title ||
+                    "",
+                },
+              },
+            );
+          } catch (
+            activityError
+          ) {
+            console.warn(
+              "Linked task activity could not be recorded:",
+              activityError,
+            );
+          }
         } catch (
           linkError
         ) {
@@ -6974,6 +7379,39 @@ export default function InboxReferencePreview() {
             },
           );
 
+        try {
+          await logInboxActivity(
+            selectedConversation,
+            {
+              eventType:
+                `workflow:${actionKey}`,
+
+              eventLabel:
+                inboxActivityEventLabel(
+                  actionKey,
+                  updates,
+                ),
+
+              eventDetail:
+                successMessage,
+
+              metadata: {
+                action_key:
+                  actionKey,
+
+                updates,
+              },
+            },
+          );
+        } catch (
+          activityError
+        ) {
+          console.warn(
+            "Inbox workflow activity could not be recorded:",
+            activityError,
+          );
+        }
+
         setToast(
           successMessage,
         );
@@ -7094,6 +7532,35 @@ export default function InboxReferencePreview() {
             consentSource:
               "",
           });
+
+        try {
+          await logInboxActivity(
+            selectedConversation,
+            {
+              eventType:
+                "contact:added",
+
+              eventLabel:
+                "Sender added to Contacts",
+
+              eventDetail:
+                `${created?.full_name || name} was added to Campaign Contacts.`,
+
+              metadata: {
+                contact_id:
+                  created?.id ||
+                  null,
+              },
+            },
+          );
+        } catch (
+          activityError
+        ) {
+          console.warn(
+            "Contact activity could not be recorded:",
+            activityError,
+          );
+        }
 
         setToast(
           `${created?.full_name || name} added to Campaign Contacts.`,
@@ -7462,6 +7929,46 @@ export default function InboxReferencePreview() {
 
       try {
         await action();
+
+        if (
+          selectedConversation
+            ?.id &&
+          !String(
+            actionKey,
+          ).includes(
+            "folder",
+          )
+        ) {
+          try {
+            await logInboxActivity(
+              selectedConversation,
+              {
+                eventType:
+                  `mailbox:${actionKey}`,
+
+                eventLabel:
+                  inboxMailboxActivityLabel(
+                    actionKey,
+                  ),
+
+                eventDetail:
+                  successMessage,
+
+                metadata: {
+                  action_key:
+                    actionKey,
+                },
+              },
+            );
+          } catch (
+            activityError
+          ) {
+            console.warn(
+              "Mailbox activity could not be recorded:",
+              activityError,
+            );
+          }
+        }
 
         setToast(
           successMessage,
@@ -11748,40 +12255,6 @@ type="button"
                   </article>
                 </section>
 
-                {!selectedInboxContact ? (
-                  <section
-                    className={
-                      styles.contactIntelUnknown
-                    }
-                  >
-                    <UserPlus
-                      size={22}
-                    />
-
-                    <div>
-                      <strong>
-                        Build campaign context for this sender
-                      </strong>
-
-                      <p>
-                        Save this sender to Contacts to track organization, relationship type, campaign owner, tags, notes and follow-up history across Campaign Seat.
-                      </p>
-                    </div>
-
-                    <button
-                      type="button"
-                      disabled={
-                        contactsSaving
-                      }
-                      onClick={() =>
-                        void handleAddInboxSenderToContacts()
-                      }
-                    >
-                      Add to Contacts
-                    </button>
-                  </section>
-                ) : null}
-
                 {contactsError ? (
                   <div
                     className={
@@ -11914,59 +12387,183 @@ type="button"
 
             {!newMessageMode &&
             activeThreadTab === "activity" ? (
-              <div className={styles.activityPanel}>
-                <div className={styles.aiFollowUp}>
+              <div
+                className={
+                  styles.activityAuditPanel
+                }
+              >
+                <header
+                  className={
+                    styles.activityAuditHeader
+                  }
+                >
                   <span>
-                    <Sparkles size={20} />
+                    <Clock3
+                      size={20}
+                    />
                   </span>
 
                   <div>
+                    <small>
+                      Campaign Audit
+                    </small>
+
                     <strong>
-                      AI follow-up tracking
+                      Conversation activity
                     </strong>
 
                     <p>
-                      Email and Campaign Seat activity can
-                      eventually update automatically.
-                      Text and WhatsApp activity remains
-                      pending until a team member confirms
-                      what happened.
+                      Communication history and Campaign Seat actions for this conversation.
                     </p>
                   </div>
 
-                  <button
-                    type="button"
-                    onClick={openQuickTask}
-                  >
-                    <ListTodo size={16} />
-                    Create follow-up task
-                  </button>
-                </div>
+                  <em>
+                    Live
+                  </em>
+                </header>
 
-                <div className={styles.activityList}>
-                  {(
-                    selectedConversation
-                      ?.activity ||
-                    activityLog
-                  ).map((activity) => (
-                    <div key={activity.id}>
-                      <span>
-                        <Clock3 size={16} />
-                      </span>
+                <div
+                  className={
+                    styles.activityAuditTimeline
+                  }
+                >
+                  {selectedActivityTimeline
+                    .length ? (
+                    selectedActivityTimeline.map(
+                      (activity) => {
+                        const ActivityIcon =
+                          inboxActivityIcon(
+                            activity
+                              .event_type,
+                          );
 
-                      <span>
+                        const actorMember =
+                          activity
+                            .actor_user_id
+                            ? (
+                                team.find(
+                                  (member) =>
+                                    member.id ===
+                                    activity
+                                      .actor_user_id,
+                                ) ||
+                                null
+                              )
+                            : null;
+
+                        const actorLabel =
+                          actorMember
+                            ?.fullName ||
+                          (
+                            activity
+                              .actor_user_id ===
+                            user.id
+                              ? (
+                                  user.name ||
+                                  "You"
+                                )
+                              : activity
+                                  .source ===
+                                  "message"
+                                ? (
+                                    activity
+                                      .direction ===
+                                      "outbound"
+                                      ? "Campaign"
+                                      : selectedConversation
+                                          .sender ||
+                                        "Sender"
+                                  )
+                                : "Campaign Seat"
+                          );
+
+                        const timeLabel =
+                          activity
+                            .display_time ||
+                          (
+                            activity
+                              .created_at
+                              ? inboxContactDateLabel(
+                                  activity
+                                    .created_at,
+                                )
+                              : ""
+                          );
+
+                        return (
+                          <article
+                            key={
+                              activity.id
+                            }
+                            className={
+                              styles.activityAuditItem
+                            }
+                          >
+                            <span
+                              className={
+                                styles.activityAuditIcon
+                              }
+                            >
+                              <ActivityIcon
+                                size={17}
+                              />
+                            </span>
+
+                            <div>
+                              <header>
+                                <strong>
+                                  {
+                                    activity
+                                      .event_label
+                                  }
+                                </strong>
+
+                                {timeLabel ? (
+                                  <time>
+                                    {timeLabel}
+                                  </time>
+                                ) : null}
+                              </header>
+
+                              {activity
+                                .event_detail ? (
+                                <p>
+                                  {
+                                    activity
+                                      .event_detail
+                                  }
+                                </p>
+                              ) : null}
+
+                              <small>
+                                {actorLabel}
+                              </small>
+                            </div>
+                          </article>
+                        );
+                      },
+                    )
+                  ) : (
+                    <div
+                      className={
+                        styles.activityAuditEmpty
+                      }
+                    >
+                      <Clock3
+                        size={22}
+                      />
+
+                      <div>
                         <strong>
-                          {activity.action}
+                          No activity recorded yet
                         </strong>
 
-                        <small>
-                          {activity.detail}
-                        </small>
-                      </span>
-
-                      <time>{activity.time}</time>
+                        <p>
+                          Campaign Seat will record communication and workflow actions for this conversation here.
+                        </p>
+                      </div>
                     </div>
-                  ))}
+                  )}
                 </div>
               </div>
             ) : null}
