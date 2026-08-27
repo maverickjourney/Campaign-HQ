@@ -22594,3 +22594,222 @@ header {
 }
 
 /* FINAL CAMPAIGN ACTION WIDTH FIX — END */
+
+
+/* NEW MESSAGE SAFARI LAYERING FIX — START */
+
+/*
+ * Safari can incorrectly composite backdrop-filter
+ * across fixed sibling layers.
+ *
+ * Keep the modal backdrop, but remove backdrop blur.
+ */
+
+.newMessageScrim {
+  position: fixed !important;
+
+  z-index:
+    2147483500 !important;
+
+  inset:
+    0 !important;
+
+  width:
+    100vw !important;
+
+  height:
+    100dvh !important;
+
+  border:
+    0 !important;
+
+  border-radius:
+    0 !important;
+
+  background:
+    rgba(
+      8,
+      25,
+      43,
+      0.58
+    ) !important;
+
+  backdrop-filter:
+    none !important;
+
+  -webkit-backdrop-filter:
+    none !important;
+
+  pointer-events:
+    auto !important;
+}
+
+
+.inboxWorkspace.newMessageWorkspace
+> .threadPanel.newMessageModal,
+.newMessageModal {
+  position:
+    fixed !important;
+
+  z-index:
+    2147483600 !important;
+
+  top:
+    50% !important;
+
+  left:
+    50% !important;
+
+  right:
+    auto !important;
+
+  bottom:
+    auto !important;
+
+  transform:
+    translate(
+      -50%,
+      -50%
+    ) !important;
+
+  translate:
+    none !important;
+
+  isolation:
+    isolate !important;
+
+  pointer-events:
+    auto !important;
+
+  width:
+    min(
+      940px,
+      calc(
+        100vw -
+        48px
+      )
+    ) !important;
+
+  max-height:
+    calc(
+      100dvh -
+      48px
+    ) !important;
+
+  overflow-x:
+    hidden !important;
+
+  overflow-y:
+    auto !important;
+
+  border:
+    1px solid
+    #d2dee7 !important;
+
+  border-radius:
+    16px !important;
+
+  background:
+    #ffffff !important;
+
+  opacity:
+    1 !important;
+
+  filter:
+    none !important;
+
+  backdrop-filter:
+    none !important;
+
+  -webkit-backdrop-filter:
+    none !important;
+
+  box-shadow:
+    0
+    32px
+    90px
+    rgba(
+      7,
+      25,
+      43,
+      0.32
+    ) !important;
+}
+
+
+.newMessageModal
+.threadHeader {
+  position:
+    relative !important;
+
+  z-index:
+    2 !important;
+
+  background:
+    #ffffff !important;
+}
+
+
+.newMessageModal
+.newMessageFields,
+.newMessageModal
+.replyComposer {
+  position:
+    relative !important;
+
+  z-index:
+    1 !important;
+
+  background:
+    #ffffff !important;
+
+  pointer-events:
+    auto !important;
+}
+
+
+.newMessageModal input,
+.newMessageModal textarea,
+.newMessageModal select,
+.newMessageModal button,
+.newMessageModal [contenteditable="true"] {
+  pointer-events:
+    auto !important;
+}
+
+
+/*
+ * Prevent the Inbox underneath from accidentally
+ * receiving interaction while compose is open.
+ */
+
+.inboxWorkspace.newMessageWorkspace
+> .conversationPanel {
+  pointer-events:
+    none !important;
+}
+
+
+@media (max-width: 760px) {
+
+  .inboxWorkspace.newMessageWorkspace
+  > .threadPanel.newMessageModal,
+  .newMessageModal {
+    width:
+      calc(
+        100vw -
+        20px
+      ) !important;
+
+    max-height:
+      calc(
+        100dvh -
+        20px
+      ) !important;
+
+    border-radius:
+      13px !important;
+  }
+}
+
+/* NEW MESSAGE SAFARI LAYERING FIX — END */
