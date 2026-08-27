@@ -2012,7 +2012,7 @@ const STANDARD_MAILBOX_FOLDERS = [
   },
   {
     kind: "junk",
-    label: "Junk",
+    label: "Spam / Junk",
   },
 ];
 
@@ -2314,6 +2314,7 @@ export default function InboxReferencePreview() {
     moveThreadMessages: moveMailboxThreadMessages,
     archiveThreadMessages: archiveMailboxThreadMessages,
     trashThread: trashMailboxThread,
+    emptyTrashBatch: emptyMailboxTrashBatch,
     createFolder: createMailboxFolder,
     renameFolder: renameMailboxFolder,
     deleteFolder: deleteMailboxFolder,
@@ -2464,6 +2465,26 @@ export default function InboxReferencePreview() {
   const [
     mailboxActionBusy,
     setMailboxActionBusy,
+  ] = useState("");
+
+  const [
+    emptyTrashConfirmOpen,
+    setEmptyTrashConfirmOpen,
+  ] = useState(false);
+
+  const [
+    emptyTrashAcknowledged,
+    setEmptyTrashAcknowledged,
+  ] = useState(false);
+
+  const [
+    emptyTrashBusy,
+    setEmptyTrashBusy,
+  ] = useState(false);
+
+  const [
+    emptyTrashError,
+    setEmptyTrashError,
   ] = useState("");
 
   const [
@@ -2640,6 +2661,26 @@ export default function InboxReferencePreview() {
     ) ||
     null;
 
+  const trashMailboxItem =
+    mailboxMenuItems.find(
+      (item) =>
+        item.kind ===
+          "trash" &&
+        item.available &&
+        !item.synthetic,
+    ) ||
+    null;
+
+  const junkMailboxItem =
+    mailboxMenuItems.find(
+      (item) =>
+        item.kind ===
+          "junk" &&
+        item.available &&
+        !item.synthetic,
+    ) ||
+    null;
+
   const selectedMailboxSourceFolderId =
     (
       activeMailboxItem
@@ -2687,6 +2728,7 @@ export default function InboxReferencePreview() {
     "drafts",
     "sent",
     "trash",
+    "junk",
   ];
 
   const mailboxQuickItems =
@@ -7114,6 +7156,203 @@ export default function InboxReferencePreview() {
     };
 
 
+  const handleMailboxNotSpam =
+    () => {
+      if (
+        activeMailboxKind !==
+          "junk" ||
+        !selectedConversation
+          ?.providerThreadId ||
+        !junkMailboxItem
+          ?.id ||
+        !inboxMailboxItem
+          ?.id
+      ) {
+        return;
+      }
+
+      void runMailboxAction(
+        "not-spam",
+        () =>
+          moveMailboxThreadMessages({
+            threadIdOrConversationId:
+              selectedConversation
+                .providerThreadId,
+
+            fromFolderId:
+              junkMailboxItem.id,
+
+            targetFolderId:
+              inboxMailboxItem.id,
+          }),
+        "Conversation moved to Inbox and removed from Spam / Junk.",
+      );
+    };
+
+
+  const openEmptyTrashConfirmation =
+    () => {
+      setEmptyTrashAcknowledged(
+        false,
+      );
+
+      setEmptyTrashError(
+        "",
+      );
+
+      setEmptyTrashConfirmOpen(
+        true,
+      );
+    };
+
+
+  const closeEmptyTrashConfirmation =
+    () => {
+      if (
+        emptyTrashBusy
+      ) {
+        return;
+      }
+
+      setEmptyTrashConfirmOpen(
+        false,
+      );
+
+      setEmptyTrashAcknowledged(
+        false,
+      );
+
+      setEmptyTrashError(
+        "",
+      );
+    };
+
+
+  const permanentlyEmptyTrash =
+    async () => {
+      if (
+        !trashMailboxItem
+          ?.id ||
+        !emptyTrashAcknowledged ||
+        emptyTrashBusy
+      ) {
+        return;
+      }
+
+
+      if (
+        String(
+          mailboxAccountProvider ||
+          "",
+        )
+          .toLowerCase() ===
+        "google"
+      ) {
+        setEmptyTrashError(
+          "Permanent Google Trash deletion requires an additional Google mailbox authorization. Campaign Seat will not request that broader permission automatically.",
+        );
+
+        return;
+      }
+
+
+      setEmptyTrashBusy(
+        true,
+      );
+
+      setEmptyTrashError(
+        "",
+      );
+
+
+      let deleted =
+        0;
+
+      try {
+        for (
+          let batch =
+            0;
+          batch <
+            30;
+          batch +=
+            1
+        ) {
+          const result =
+            await emptyMailboxTrashBatch(
+              trashMailboxItem.id,
+            );
+
+          const batchDeleted =
+            Number(
+              result?.deleted ||
+              0,
+            );
+
+          deleted +=
+            Number.isFinite(
+              batchDeleted,
+            )
+              ? batchDeleted
+              : 0;
+
+          if (
+            result?.complete ===
+              true ||
+            batchDeleted ===
+              0
+          ) {
+            break;
+          }
+
+          await new Promise(
+            (resolve) =>
+              window.setTimeout(
+                resolve,
+                400,
+              ),
+          );
+        }
+
+
+        setSelectedId(
+          "",
+        );
+
+        await refreshMailbox({
+          showLoading:
+            false,
+        });
+
+
+        setEmptyTrashConfirmOpen(
+          false,
+        );
+
+        setEmptyTrashAcknowledged(
+          false,
+        );
+
+
+        setToast(
+          deleted
+            ? `${deleted} Trash message${deleted === 1 ? "" : "s"} permanently deleted.`
+            : "Trash is already empty.",
+        );
+      } catch (
+        deleteError
+      ) {
+        setEmptyTrashError(
+          deleteError?.message ||
+            "Campaign Seat could not permanently empty Trash.",
+        );
+      } finally {
+        setEmptyTrashBusy(
+          false,
+        );
+      }
+    };
+
+
   const handleMailboxTrash =
     () => {
       if (
@@ -8785,6 +9024,62 @@ export default function InboxReferencePreview() {
                   conversations loaded
                 </small>
               </div>
+
+              {activeMailboxKind ===
+              "trash" &&
+              trashMailboxItem
+                ?.available ? (
+                <button
+                  className={
+                    styles.emptyTrashAction
+                  }
+                  type="button"
+                  disabled={
+                    emptyTrashBusy ||
+                    !Number(
+                      trashMailboxItem
+                        .count ||
+                      0,
+                    )
+                  }
+                  onClick={
+                    openEmptyTrashConfirmation
+                  }
+                >
+                  <Trash2
+                    size={15}
+                  />
+
+                  Empty Trash
+                </button>
+              ) : null}
+
+              {activeMailboxKind ===
+              "junk" &&
+              junkMailboxItem
+                ?.available ? (
+                <button
+                  className={
+                    styles.notSpamAction
+                  }
+                  type="button"
+                  disabled={
+                    Boolean(
+                      mailboxActionBusy,
+                    ) ||
+                    !selectedProviderThread
+                  }
+                  onClick={
+                    handleMailboxNotSpam
+                  }
+                >
+                  <Inbox
+                    size={15}
+                  />
+
+                  Not Spam
+                </button>
+              ) : null}
 
               <label>
                 Sort by:
@@ -12059,6 +12354,212 @@ type="button"
                   }
                 >
                   Close
+                </button>
+              </footer>
+            </section>
+          </div>
+        ) : null}
+
+        {emptyTrashConfirmOpen ? (
+          <div
+            className={
+              styles.modalOverlay
+            }
+            role="presentation"
+            onMouseDown={(
+              event,
+            ) => {
+              if (
+                event.target ===
+                  event.currentTarget &&
+                !emptyTrashBusy
+              ) {
+                closeEmptyTrashConfirmation();
+              }
+            }}
+          >
+            <section
+              className={
+                styles.emptyTrashModal
+              }
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="empty-trash-title"
+            >
+              <header>
+                <div>
+                  <span>
+                    <Trash2
+                      size={22}
+                    />
+                  </span>
+
+                  <div>
+                    <small>
+                      Permanent mailbox action
+                    </small>
+
+                    <h2 id="empty-trash-title">
+                      Permanently empty Trash?
+                    </h2>
+                  </div>
+                </div>
+
+                <button
+                  type="button"
+                  aria-label="Close"
+                  disabled={
+                    emptyTrashBusy
+                  }
+                  onClick={
+                    closeEmptyTrashConfirmation
+                  }
+                >
+                  <X
+                    size={18}
+                  />
+                </button>
+              </header>
+
+              <div
+                className={
+                  styles.emptyTrashWarning
+                }
+              >
+                <ShieldAlert
+                  size={22}
+                />
+
+                <div>
+                  <strong>
+                    This cannot be undone.
+                  </strong>
+
+                  <p>
+                    Every message currently inside the connected mailbox Trash will be permanently deleted from the email provider.
+                  </p>
+                </div>
+              </div>
+
+              <div
+                className={
+                  styles.emptyTrashMailbox
+                }
+              >
+                <small>
+                  Connected mailbox
+                </small>
+
+                <strong>
+                  {mailboxConnectedEmail ||
+                    "Campaign email"}
+                </strong>
+
+                <span>
+                  {Number(
+                    trashMailboxItem
+                      ?.count ||
+                    0,
+                  )}{" "}
+                  message{
+                    Number(
+                      trashMailboxItem
+                        ?.count ||
+                      0,
+                    ) ===
+                    1
+                      ? ""
+                      : "s"
+                  } currently shown in Trash
+                </span>
+              </div>
+
+              {String(
+                mailboxAccountProvider ||
+                "",
+              )
+                .toLowerCase() ===
+              "google" ? (
+                <div
+                  className={
+                    styles.emptyTrashProviderNotice
+                  }
+                >
+                  Google permanent deletion requires an additional full-mailbox authorization. Campaign Seat will not silently request that broader access.
+                </div>
+              ) : null}
+
+              <label
+                className={
+                  styles.emptyTrashAcknowledge
+                }
+              >
+                <input
+                  type="checkbox"
+                  checked={
+                    emptyTrashAcknowledged
+                  }
+                  disabled={
+                    emptyTrashBusy
+                  }
+                  onChange={(
+                    event,
+                  ) =>
+                    setEmptyTrashAcknowledged(
+                      event.target
+                        .checked,
+                    )
+                  }
+                />
+
+                <span>
+                  I understand these messages cannot be recovered after permanent deletion.
+                </span>
+              </label>
+
+              {emptyTrashError ? (
+                <div
+                  className={
+                    styles.emptyTrashError
+                  }
+                  role="alert"
+                >
+                  {emptyTrashError}
+                </div>
+              ) : null}
+
+              <footer>
+                <button
+                  type="button"
+                  disabled={
+                    emptyTrashBusy
+                  }
+                  onClick={
+                    closeEmptyTrashConfirmation
+                  }
+                >
+                  Cancel
+                </button>
+
+                <button
+                  type="button"
+                  disabled={
+                    !emptyTrashAcknowledged ||
+                    emptyTrashBusy ||
+                    String(
+                      mailboxAccountProvider ||
+                      "",
+                    )
+                      .toLowerCase() ===
+                      "google"
+                  }
+                  onClick={() =>
+                    void permanentlyEmptyTrash()
+                  }
+                >
+                  {emptyTrashBusy
+                    ? "Deleting…"
+                    : "Permanently Empty Trash"}
                 </button>
               </footer>
             </section>

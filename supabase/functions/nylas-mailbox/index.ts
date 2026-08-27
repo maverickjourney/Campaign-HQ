@@ -387,6 +387,7 @@ Deno.serve(
         "update_message",
         "update_thread",
         "delete_thread",
+        "empty_trash_batch",
         "create_folder",
         "update_folder",
         "delete_folder",
@@ -932,6 +933,416 @@ Deno.serve(
 
       providerBody =
         update;
+
+    } else if (
+      action ===
+      "empty_trash_batch"
+    ) {
+      const folderId =
+        clean(
+          body.folderId,
+        );
+
+      const confirmation =
+        clean(
+          body.confirmation,
+        );
+
+
+      if (
+        !folderId ||
+        confirmation !==
+          "PERMANENTLY_EMPTY_TRASH"
+      ) {
+        return jsonResponse(
+          request,
+          400,
+          {
+            error:
+              "Permanent Trash deletion requires explicit confirmation.",
+          },
+        );
+      }
+
+
+      const accountProvider =
+        clean(
+          connection
+            ?.account_provider,
+        )
+          .toLowerCase();
+
+
+      /*
+       * Campaign Seat currently uses gmail.modify
+       * for Google mailbox management.
+       *
+       * Nylas requires the broader mail.google.com
+       * authorization for irreversible Google hard delete.
+       * Do not silently escalate that permission.
+       */
+      if (
+        accountProvider ===
+          "google"
+      ) {
+        return jsonResponse(
+          request,
+          409,
+          {
+            error:
+              "Permanent Google Trash deletion requires additional Google mailbox authorization. Campaign Seat has not enabled that broader permission.",
+          },
+        );
+      }
+
+
+      /*
+       * Verify that the caller supplied the provider's
+       * actual Trash system folder before touching messages.
+       */
+      const folderTarget =
+        new URL(
+          `${baseUri}/v3/grants/${grant}/folders/${encodeURIComponent(folderId)}`,
+        );
+
+
+      let folderResponse:
+        Response;
+
+
+      try {
+        folderResponse =
+          await fetch(
+            folderTarget,
+            {
+              method:
+                "GET",
+
+              headers: {
+                "Authorization":
+                  `Bearer ${nylasApiKey}`,
+
+                "Accept":
+                  "application/json",
+              },
+            },
+          );
+      } catch {
+        return jsonResponse(
+          request,
+          502,
+          {
+            error:
+              "Campaign Seat could not verify the provider Trash folder.",
+          },
+        );
+      }
+
+
+      if (
+        !folderResponse.ok
+      ) {
+        return jsonResponse(
+          request,
+          502,
+          {
+            error:
+              "The provider Trash folder could not be verified.",
+          },
+        );
+      }
+
+
+      const folderPayload =
+        await folderResponse
+          .json();
+
+      const folder =
+        (
+          folderPayload
+            ?.data ||
+          {}
+        ) as Record<
+          string,
+          unknown
+        >;
+
+      const trashAttributes =
+        Array.isArray(
+          folder.attributes,
+        )
+          ? folder.attributes
+              .map(
+                clean,
+              )
+          : [];
+
+
+      if (
+        !trashAttributes.includes(
+          "\\Trash",
+        )
+      ) {
+        return jsonResponse(
+          request,
+          409,
+          {
+            error:
+              "Campaign Seat will permanently delete messages only from the provider's verified Trash folder.",
+          },
+        );
+      }
+
+
+      /*
+       * Delete only a small provider-safe batch at a time.
+       * The frontend repeats this action until Trash is empty.
+       * This reduces mailbox rate pressure.
+       */
+      const listTarget =
+        new URL(
+          `${baseUri}/v3/grants/${grant}/messages`,
+        );
+
+      listTarget.searchParams.set(
+        "in",
+        folderId,
+      );
+
+      listTarget.searchParams.set(
+        "limit",
+        "10",
+      );
+
+
+      let listResponse:
+        Response;
+
+
+      try {
+        listResponse =
+          await fetch(
+            listTarget,
+            {
+              method:
+                "GET",
+
+              headers: {
+                "Authorization":
+                  `Bearer ${nylasApiKey}`,
+
+                "Accept":
+                  "application/json",
+              },
+            },
+          );
+      } catch {
+        return jsonResponse(
+          request,
+          502,
+          {
+            error:
+              "Campaign Seat could not read the provider Trash folder.",
+          },
+        );
+      }
+
+
+      if (
+        listResponse.status ===
+          429
+      ) {
+        return jsonResponse(
+          request,
+          429,
+          {
+            error:
+              "The mailbox is temporarily rate limited. Try Empty Trash again shortly.",
+          },
+        );
+      }
+
+
+      if (
+        !listResponse.ok
+      ) {
+        return jsonResponse(
+          request,
+          502,
+          {
+            error:
+              "The provider could not list Trash messages.",
+          },
+        );
+      }
+
+
+      const messagePayload =
+        await listResponse
+          .json();
+
+      const trashMessages =
+        Array.isArray(
+          messagePayload
+            ?.data,
+        )
+          ? messagePayload.data
+          : [];
+
+
+      if (
+        !trashMessages.length
+      ) {
+        return jsonResponse(
+          request,
+          200,
+          {
+            success:
+              true,
+
+            deleted:
+              0,
+
+            complete:
+              true,
+          },
+        );
+      }
+
+
+      let deleted =
+        0;
+
+
+      for (
+        const message
+        of trashMessages
+      ) {
+        const messageId =
+          clean(
+            message?.id,
+          );
+
+        if (!messageId) {
+          continue;
+        }
+
+
+        const deleteTarget =
+          new URL(
+            `${baseUri}/v3/grants/${grant}/messages/${encodeURIComponent(messageId)}`,
+          );
+
+        deleteTarget.searchParams.set(
+          "hard_delete",
+          "true",
+        );
+
+
+        let deleteResponse:
+          Response;
+
+
+        try {
+          deleteResponse =
+            await fetch(
+              deleteTarget,
+              {
+                method:
+                  "DELETE",
+
+                headers: {
+                  "Authorization":
+                    `Bearer ${nylasApiKey}`,
+
+                  "Accept":
+                    "application/json",
+                },
+              },
+            );
+        } catch {
+          return jsonResponse(
+            request,
+            502,
+            {
+              error:
+                "Campaign Seat lost the provider connection while permanently emptying Trash.",
+
+              deleted,
+            },
+          );
+        }
+
+
+        if (
+          deleteResponse.status ===
+            429
+        ) {
+          return jsonResponse(
+            request,
+            429,
+            {
+              error:
+                "The mailbox was rate limited while emptying Trash. Some messages may already have been permanently deleted.",
+
+              deleted,
+            },
+          );
+        }
+
+
+        if (
+          deleteResponse.status ===
+            400
+        ) {
+          return jsonResponse(
+            request,
+            409,
+            {
+              error:
+                "Permanent mailbox deletion is not enabled for this Campaign Seat email integration. Enable Nylas hard delete before using Empty Trash.",
+
+              deleted,
+            },
+          );
+        }
+
+
+        if (
+          !deleteResponse.ok
+        ) {
+          return jsonResponse(
+            request,
+            502,
+            {
+              error:
+                "The provider could not permanently delete every Trash message.",
+
+              deleted,
+            },
+          );
+        }
+
+
+        deleted +=
+          1;
+      }
+
+
+      return jsonResponse(
+        request,
+        200,
+        {
+          success:
+            true,
+
+          deleted,
+
+          complete:
+            trashMessages.length <
+            10,
+        },
+      );
 
     } else if (
       action ===

@@ -1710,6 +1710,48 @@ return transformed;
     );
 
 
+  const emptyTrashBatch =
+    useCallback(
+      async (
+        folderId,
+      ) => {
+        const providerFolderId =
+          clean(
+            folderId,
+          );
+
+        if (
+          !enabled ||
+          !providerFolderId
+        ) {
+          return {
+            deleted:
+              0,
+
+            complete:
+              true,
+          };
+        }
+
+
+        return invokeMailbox({
+          action:
+            "empty_trash_batch",
+
+          folderId:
+            providerFolderId,
+
+          confirmation:
+            "PERMANENTLY_EMPTY_TRASH",
+        });
+      },
+      [
+        enabled,
+        invokeMailbox,
+      ],
+    );
+
+
   const trashThread =
     useCallback(
       async (
@@ -2836,6 +2878,7 @@ return transformed;
     moveThreadMessages,
     archiveThreadMessages,
     trashThread,
+    emptyTrashBatch,
     createFolder,
     renameFolder,
     deleteFolder,
