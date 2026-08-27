@@ -46,6 +46,7 @@ import {
 } from "lucide-react";
 
 import { CampaignWorkspaceShell } from "../../components/CampaignWorkspaceShell/CampaignWorkspaceShell";
+import { InboxConversationBrief } from "../../components/InboxConversationBrief/InboxConversationBrief";
 import { useContactsCommandCenter } from "../../hooks/useContactsCommandCenter";
 import { useInternalInboxThreads } from "../../hooks/useInternalInboxThreads";
 import { useCommunicationAttachments } from "../../hooks/useCommunicationAttachments";
@@ -11955,6 +11956,41 @@ type="button"
                 ref={threadBodyRef}
                 className={styles.threadBody}
               >
+                <InboxConversationBrief
+                  workspaceId={
+                    workspace.id
+                  }
+                  conversationKey={
+                    inboxWorkflowKey(
+                      selectedConversation,
+                    )
+                  }
+                  conversation={
+                    selectedConversation
+                  }
+                  contact={
+                    selectedInboxContact
+                  }
+                  workflow={
+                    selectedInboxWorkflow
+                  }
+                  onUseDraft={(
+                    draft,
+                  ) => {
+                    setReplyAllEnabled(
+                      false,
+                    );
+
+                    setReplyText(
+                      draft,
+                    );
+
+                    setReplyComposerOpen(
+                      true,
+                    );
+                  }}
+                />
+
                 <div className={styles.dateDivider}>
                   <span>Today</span>
                 </div>

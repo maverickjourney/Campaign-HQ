@@ -1,0 +1,705 @@
+.brief {
+  margin-bottom: 12px;
+
+  border:
+    1px solid
+    #d7e3eb;
+
+  border-radius:
+    11px;
+
+  background:
+    #ffffff;
+
+  box-shadow:
+    0
+    5px
+    16px
+    rgba(
+      22,
+      58,
+      88,
+      0.04
+    );
+}
+
+
+.header {
+  display:
+    grid;
+
+  grid-template-columns:
+    auto
+    minmax(
+      0,
+      1fr
+    )
+    auto
+    auto;
+
+  align-items:
+    center;
+
+  gap:
+    10px;
+
+  min-height:
+    58px;
+
+  padding:
+    9px
+    11px;
+}
+
+
+.icon {
+  display:
+    grid;
+
+  width:
+    36px;
+
+  height:
+    36px;
+
+  place-items:
+    center;
+
+  border-radius:
+    9px;
+
+  color:
+    #ffffff;
+
+  background:
+    linear-gradient(
+      135deg,
+      #286b9e,
+      #6845c7
+    );
+}
+
+
+.headerCopy {
+  min-width: 0;
+}
+
+
+.headerCopy small,
+.headerCopy strong,
+.headerCopy p {
+  display: block;
+}
+
+
+.headerCopy small {
+  color:
+    #ef3340;
+
+  font-size:
+    11px;
+
+  font-weight:
+    850;
+
+  letter-spacing:
+    0.05em;
+
+  text-transform:
+    uppercase;
+}
+
+
+.headerCopy strong {
+  margin-top:
+    1px;
+
+  color:
+    #173f62;
+
+  font-size:
+    14px;
+
+  font-weight:
+    880;
+}
+
+
+.headerCopy p {
+  margin:
+    2px
+    0
+    0;
+
+  overflow:
+    hidden;
+
+  color:
+    #718697;
+
+  font-size:
+    12px;
+
+  line-height:
+    1.35;
+
+  text-overflow:
+    ellipsis;
+
+  white-space:
+    nowrap;
+}
+
+
+.brief[data-expanded="true"]
+.headerCopy p {
+  white-space:
+    normal;
+}
+
+
+.headerActions {
+  display:
+    flex;
+
+  align-items:
+    center;
+
+  gap:
+    6px;
+}
+
+
+.headerActions button {
+  display:
+    inline-flex;
+
+  min-height:
+    34px;
+
+  align-items:
+    center;
+
+  justify-content:
+    center;
+
+  gap:
+    5px;
+
+  padding:
+    0
+    9px;
+
+  border:
+    1px solid
+    #cbdbe6;
+
+  border-radius:
+    8px;
+
+  color:
+    #315f82;
+
+  background:
+    #ffffff;
+
+  font-size:
+    12px;
+
+  font-weight:
+    800;
+}
+
+
+.headerActions
+.expandButton {
+  width:
+    34px;
+
+  padding:
+    0;
+}
+
+
+.expandButton svg {
+  transition:
+    transform
+    140ms
+    ease;
+}
+
+
+.brief[data-expanded="true"]
+.expandButton svg {
+  transform:
+    rotate(
+      180deg
+    );
+}
+
+
+.urgencyLow,
+.urgencyNormal,
+.urgencyHigh,
+.urgencyCritical {
+  padding:
+    5px
+    8px;
+
+  border-radius:
+    999px;
+
+  font-size:
+    11px;
+
+  font-weight:
+    850;
+}
+
+
+.urgencyLow {
+  color:
+    #396780;
+
+  background:
+    #edf5fa;
+}
+
+
+.urgencyNormal {
+  color:
+    #456178;
+
+  background:
+    #eef2f5;
+}
+
+
+.urgencyHigh {
+  color:
+    #89601b;
+
+  background:
+    #fff6dd;
+}
+
+
+.urgencyCritical {
+  color:
+    #b82935;
+
+  background:
+    #fff0f1;
+}
+
+
+.body {
+  padding:
+    0
+    11px
+    11px;
+
+  border-top:
+    1px solid
+    #e6edf2;
+}
+
+
+.grid {
+  display:
+    grid;
+
+  grid-template-columns:
+    repeat(
+      2,
+      minmax(
+        0,
+        1fr
+      )
+    );
+
+  gap:
+    8px;
+
+  padding-top:
+    10px;
+}
+
+
+.grid article {
+  min-width:
+    0;
+
+  padding:
+    10px;
+
+  border:
+    1px solid
+    #e0e8ee;
+
+  border-radius:
+    9px;
+
+  background:
+    #f9fbfc;
+}
+
+
+.grid small {
+  color:
+    #718697;
+
+  font-size:
+    11px;
+
+  font-weight:
+    800;
+
+  text-transform:
+    uppercase;
+}
+
+
+.grid p {
+  margin:
+    5px
+    0
+    0;
+
+  color:
+    #31536f;
+
+  font-size:
+    13px;
+
+  line-height:
+    1.5;
+
+  overflow-wrap:
+    anywhere;
+}
+
+
+.draft {
+  margin-top:
+    8px;
+
+  padding:
+    10px;
+
+  border:
+    1px solid
+    #d7e3eb;
+
+  border-radius:
+    9px;
+
+  background:
+    #ffffff;
+}
+
+
+.draft header {
+  display:
+    flex;
+
+  align-items:
+    center;
+
+  justify-content:
+    space-between;
+
+  gap:
+    10px;
+}
+
+
+.draft header > div {
+  display:
+    flex;
+
+  align-items:
+    center;
+
+  gap:
+    6px;
+
+  color:
+    #2d648d;
+}
+
+
+.draft strong {
+  color:
+    #294f6d;
+
+  font-size:
+    13px;
+}
+
+
+.draft button {
+  min-height:
+    34px;
+
+  padding:
+    0
+    10px;
+
+  border:
+    1px solid
+    #ef3340;
+
+  border-radius:
+    8px;
+
+  color:
+    #ffffff;
+
+  background:
+    #ef3340;
+
+  font-size:
+    12px;
+
+  font-weight:
+    820;
+}
+
+
+.draft > p {
+  margin:
+    8px
+    0
+    0;
+
+  white-space:
+    pre-wrap;
+
+  color:
+    #405e75;
+
+  font-size:
+    13px;
+
+  line-height:
+    1.55;
+
+  overflow-wrap:
+    anywhere;
+}
+
+
+.blockedDraft {
+  display:
+    flex;
+
+  align-items:
+    flex-start;
+
+  gap:
+    7px;
+
+  margin-top:
+    8px;
+
+  padding:
+    9px;
+
+  border-radius:
+    8px;
+
+  color:
+    #795f28;
+
+  background:
+    #fff8e8;
+
+  font-size:
+    12px;
+
+  line-height:
+    1.45;
+}
+
+
+.disclaimer {
+  margin:
+    8px
+    2px
+    0;
+
+  color:
+    #8394a2;
+
+  font-size:
+    11px;
+
+  line-height:
+    1.4;
+}
+
+
+.loading {
+  display:
+    flex;
+
+  align-items:
+    center;
+
+  gap:
+    8px;
+
+  margin-top:
+    10px;
+
+  padding:
+    10px;
+
+  border-radius:
+    8px;
+
+  color:
+    #476d89;
+
+  background:
+    #f1f7fb;
+
+  font-size:
+    12px;
+
+  font-weight:
+    750;
+}
+
+
+.error {
+  display:
+    flex;
+
+  align-items:
+    flex-start;
+
+  gap:
+    8px;
+
+  margin-top:
+    10px;
+
+  padding:
+    10px;
+
+  border:
+    1px solid
+    #efc1c5;
+
+  border-radius:
+    8px;
+
+  color:
+    #a72e38;
+
+  background:
+    #fff3f4;
+}
+
+
+.error strong {
+  display:
+    block;
+
+  font-size:
+    13px;
+}
+
+
+.error p {
+  margin:
+    3px
+    0
+    0;
+
+  font-size:
+    12px;
+
+  line-height:
+    1.4;
+}
+
+
+.spinner {
+  animation:
+    briefSpin
+    900ms
+    linear
+    infinite;
+}
+
+
+@keyframes briefSpin {
+
+  to {
+    transform:
+      rotate(
+        360deg
+      );
+  }
+}
+
+
+@media (max-width: 760px) {
+
+  .header {
+    grid-template-columns:
+      auto
+      minmax(
+        0,
+        1fr
+      );
+
+    align-items:
+      start;
+  }
+
+
+  .urgencyLow,
+  .urgencyNormal,
+  .urgencyHigh,
+  .urgencyCritical {
+    grid-column:
+      1 / -1;
+
+    justify-self:
+      start;
+  }
+
+
+  .headerActions {
+    grid-column:
+      1 / -1;
+
+    width:
+      100%;
+  }
+
+
+  .headerActions button:first-child {
+    flex:
+      1;
+  }
+
+
+  .grid {
+    grid-template-columns:
+      1fr;
+  }
+
+
+  .draft header {
+    align-items:
+      flex-start;
+
+    flex-direction:
+      column;
+  }
+}
