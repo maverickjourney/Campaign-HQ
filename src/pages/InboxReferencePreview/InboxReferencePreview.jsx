@@ -9005,14 +9005,25 @@ export default function InboxReferencePreview() {
             .join(" ")}
         >
           <section className={styles.conversationPanel}>
-            <header className={styles.listHeader}>
+            <header
+              className={
+                styles.listHeader
+              }
+              data-mailbox-kind={
+                activeMailboxKind
+              }
+            >
               <div
                 className={
                   styles.listHeaderTitle
                 }
               >
                 <strong>
-                  Inbox
+                  {activeMailboxKind ===
+                  "inbox"
+                    ? "Inbox"
+                    : activeMailboxItem
+                        .label}
                 </strong>
 
                 <small>
