@@ -22377,3 +22377,220 @@ header {
 }
 
 /* COMPACT CAMPAIGN ACTION BAR — END */
+
+
+/* FINAL CAMPAIGN ACTION WIDTH FIX — START */
+
+@media (min-width: 1001px) {
+
+  .inboxWorkflowActionBar {
+    display: flex !important;
+
+    min-width: 0 !important;
+
+    min-height: 52px !important;
+
+    align-items: center !important;
+
+    flex-wrap: nowrap !important;
+
+    gap: 6px !important;
+
+    padding:
+      6px
+      8px !important;
+  }
+
+
+  .inboxWorkflowActionIdentity {
+    display: none !important;
+  }
+
+
+  .inboxWorkflowAssign {
+    display: block !important;
+
+    flex:
+      0
+      0
+      175px !important;
+
+    width:
+      175px !important;
+
+    min-width:
+      175px !important;
+
+    max-width:
+      175px !important;
+  }
+
+
+  .inboxWorkflowAssign > span {
+    position: absolute !important;
+
+    width: 1px !important;
+    height: 1px !important;
+
+    padding: 0 !important;
+    margin: -1px !important;
+
+    overflow: hidden !important;
+
+    clip: rect(
+      0,
+      0,
+      0,
+      0
+    ) !important;
+
+    white-space: nowrap !important;
+
+    border: 0 !important;
+  }
+
+
+  .inboxWorkflowAssign select {
+    width: 100% !important;
+
+    height: 38px !important;
+
+    min-height: 38px !important;
+
+    padding:
+      0
+      29px
+      0
+      10px !important;
+
+    font-size:
+      13px !important;
+  }
+
+
+  .inboxWorkflowStatusButtons {
+    display: inline-flex !important;
+
+    flex:
+      0
+      0
+      auto !important;
+
+    width: auto !important;
+
+    gap: 6px !important;
+  }
+
+
+  .inboxWorkflowMenuAction,
+  .inboxWorkflowVipButton,
+  .inboxWorkflowTaskButton {
+    flex:
+      0
+      0
+      auto !important;
+  }
+
+
+  .inboxWorkflowTaskButton {
+    margin-left:
+      auto !important;
+  }
+
+
+  .inboxWorkflowStatusButtons button,
+  .inboxWorkflowMenuTrigger,
+  .inboxWorkflowVipButton,
+  .inboxWorkflowTaskButton {
+    min-height:
+      38px !important;
+
+    padding:
+      0
+      9px !important;
+
+    font-size:
+      13px !important;
+
+    white-space:
+      nowrap !important;
+  }
+}
+
+
+@media (
+  min-width: 701px
+) and (
+  max-width: 1000px
+) {
+
+  .inboxWorkflowActionBar {
+    display: flex !important;
+
+    align-items: center !important;
+
+    flex-wrap: wrap !important;
+
+    gap: 6px !important;
+
+    padding:
+      7px
+      8px !important;
+  }
+
+
+  .inboxWorkflowActionIdentity {
+    display: none !important;
+  }
+
+
+  .inboxWorkflowAssign {
+    flex:
+      1
+      1
+      180px !important;
+
+    width:
+      auto !important;
+
+    min-width:
+      160px !important;
+
+    max-width:
+      240px !important;
+  }
+
+
+  .inboxWorkflowAssign > span {
+    position: absolute !important;
+
+    width: 1px !important;
+    height: 1px !important;
+
+    overflow: hidden !important;
+
+    clip: rect(
+      0,
+      0,
+      0,
+      0
+    ) !important;
+  }
+
+
+  .inboxWorkflowStatusButtons {
+    display:
+      inline-flex !important;
+
+    width:
+      auto !important;
+  }
+
+
+  .inboxWorkflowTaskButton {
+    margin-left:
+      0 !important;
+  }
+}
+
+/* FINAL CAMPAIGN ACTION WIDTH FIX — END */
