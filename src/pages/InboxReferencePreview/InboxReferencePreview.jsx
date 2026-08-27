@@ -624,6 +624,29 @@ function defaultTaskForm(conversation, userId) {
   };
 }
 
+function defaultGeneralTaskForm(
+  userId,
+  {
+    reminder = false,
+  } = {},
+) {
+  return {
+    title: "",
+    description: "",
+    dueDate:
+      getEasternDateInput(1),
+    dueTime:
+      reminder
+        ? "09:00"
+        : "17:00",
+    priority:
+      "normal",
+    assignedTo:
+      userId || "",
+  };
+}
+
+
 function toTaskDueIso(dateValue, timeValue) {
   if (!dateValue) {
     return null;
@@ -2406,8 +2429,8 @@ export default function InboxReferencePreview() {
   ] = useState(false);
 
   const [
-    selectedEmailAccountKeys,
-    setSelectedEmailAccountKeys,
+    selectedAccountKeys,
+    setSelectedAccountKeys,
   ] = useState([]);
 
   const [
@@ -2848,91 +2871,198 @@ export default function InboxReferencePreview() {
       ],
     );
 
-  const selectedEmailAccountSet =
+  const communicationAccountOptions =
     useMemo(
-      () =>
-        new Set(
-          selectedEmailAccountKeys,
-        ),
+      () => {
+        const options =
+          emailAccountOptions.map(
+            (account) => ({
+              key:
+                `email:${account.key}`,
+
+              channel:
+                "email",
+
+              email:
+                account.email,
+
+              provider:
+                [
+                  "Email",
+                  account.provider,
+                ]
+                  .filter(Boolean)
+                  .join(" · "),
+
+              tone:
+                account.tone,
+            }),
+          );
+
+
+        if (
+          liveMailboxEnabled &&
+          workspace.id
+        ) {
+          options.push({
+            key:
+              `dashboard:${workspace.id}`,
+
+            channel:
+              "dashboard",
+
+            email:
+              "Campaign Seat",
+
+            provider:
+              [
+                "Workspace",
+                workspace.name ||
+                  "Campaign Seat",
+              ]
+                .filter(Boolean)
+                .join(" · "),
+
+            tone:
+              "seat",
+          });
+        }
+
+
+        return options;
+      },
       [
-        selectedEmailAccountKeys,
+        emailAccountOptions,
+        liveMailboxEnabled,
+        workspace.id,
+        workspace.name,
       ],
     );
 
-  const emailAccountFilterActive =
-    emailAccountOptions.length >
+
+  const selectedAccountSet =
+    useMemo(
+      () =>
+        new Set(
+          selectedAccountKeys,
+        ),
+      [
+        selectedAccountKeys,
+      ],
+    );
+
+
+  const accountFilterActive =
+    communicationAccountOptions.length >
       1 &&
-    selectedEmailAccountKeys.length >
+    selectedAccountKeys.length >
       0;
 
-  const conversationEmailAccountKey =
+
+  const conversationAccountKey =
     (conversation) => {
+      const channel =
+        String(
+          conversation
+            ?.channel ||
+          "",
+        ).toLowerCase();
+
+
       if (
-        conversation?.channel !==
+        channel ===
         "email"
       ) {
-        return "";
+        const emailKey =
+          normalizeEmailAccountKey(
+            conversation
+              .mailboxEmail ||
+            mailboxConnectedEmail,
+          );
+
+        return emailKey
+          ? `email:${emailKey}`
+          : "";
       }
 
-      return normalizeEmailAccountKey(
-        conversation.mailboxEmail ||
-          mailboxConnectedEmail,
-      );
+
+      if (
+        channel ===
+        "dashboard"
+      ) {
+        return workspace.id
+          ? `dashboard:${workspace.id}`
+          : "";
+      }
+
+
+      /*
+       * Text / WhatsApp conversations remain visible
+       * under All Accounts until Campaign Seat has a
+       * real connected-account identity for that channel.
+       *
+       * Do not infer the campaign's sending number from
+       * a contact/recipient phone number.
+       */
+      return "";
     };
 
-  const emailAccountScopedConversations =
+
+  const accountScopedConversations =
     useMemo(
       () => {
         if (
-          !selectedEmailAccountKeys.length
+          !selectedAccountKeys.length
         ) {
           return conversations;
         }
 
         return conversations.filter(
           (conversation) => {
-            if (
-              conversation.channel !==
-              "email"
-            ) {
-              return true;
-            }
-
-            return selectedEmailAccountSet
-              .has(
-                normalizeEmailAccountKey(
-                  conversation.mailboxEmail ||
-                    mailboxConnectedEmail,
-                ),
+            const accountKey =
+              conversationAccountKey(
+                conversation,
               );
+
+            return (
+              Boolean(
+                accountKey,
+              ) &&
+              selectedAccountSet.has(
+                accountKey,
+              )
+            );
           },
         );
       },
       [
         conversations,
         mailboxConnectedEmail,
-        selectedEmailAccountKeys,
-        selectedEmailAccountSet,
+        selectedAccountKeys,
+        selectedAccountSet,
+        workspace.id,
       ],
     );
 
-  const emailAccountButtonLabel =
-    selectedEmailAccountKeys.length ===
+
+  const accountButtonLabel =
+    selectedAccountKeys.length ===
       0
-      ? "All Email Accounts"
-      : selectedEmailAccountKeys.length ===
+      ? "All Accounts"
+      : selectedAccountKeys.length ===
           1
         ? (
-            emailAccountOptions.find(
+            communicationAccountOptions.find(
               (account) =>
                 account.key ===
-                selectedEmailAccountKeys[
+                selectedAccountKeys[
                   0
                 ],
             )?.email ||
-            "Email Account"
+            "Account"
           )
-        : `${selectedEmailAccountKeys.length} Email Accounts`;
+        : `${selectedAccountKeys.length} Accounts`;
+
 
   const [query, setQuery] = useState("");
 
@@ -3039,8 +3169,7 @@ export default function InboxReferencePreview() {
 
   const [quickTaskForm, setQuickTaskForm] =
     useState(() =>
-      defaultTaskForm(
-        STARTING_CONVERSATIONS[0],
+      defaultGeneralTaskForm(
         user.id,
       ),
     );
@@ -3520,8 +3649,8 @@ export default function InboxReferencePreview() {
       () =>
         activeChannel ===
           "all"
-          ? emailAccountScopedConversations
-          : emailAccountScopedConversations
+          ? accountScopedConversations
+          : accountScopedConversations
               .filter(
                 (conversation) =>
                   conversation.channel ===
@@ -3529,7 +3658,7 @@ export default function InboxReferencePreview() {
               ),
       [
         activeChannel,
-        emailAccountScopedConversations,
+        accountScopedConversations,
       ],
     );
 
@@ -3561,7 +3690,7 @@ export default function InboxReferencePreview() {
               if (
                 activeChannel ===
                   "email" &&
-                !selectedEmailAccountKeys.length &&
+                !selectedAccountKeys.length &&
                 providerInboxUnreadCount !==
                   null
               ) {
@@ -3570,7 +3699,7 @@ export default function InboxReferencePreview() {
               } else if (
                 activeChannel ===
                   "all" &&
-                !selectedEmailAccountKeys.length &&
+                !selectedAccountKeys.length &&
                 providerInboxUnreadCount !==
                   null
               ) {
@@ -3628,7 +3757,7 @@ export default function InboxReferencePreview() {
         activeChannel,
         metricScopeConversations,
         providerInboxUnreadCount,
-        selectedEmailAccountKeys.length,
+        selectedAccountKeys.length,
         sourceNonEmailUnreadCount,
       ],
     );
@@ -3657,7 +3786,7 @@ export default function InboxReferencePreview() {
           );
 
         const commandRows =
-          emailAccountScopedConversations
+          accountScopedConversations
             .filter(
               (conversation) =>
                 Boolean(
@@ -3841,7 +3970,7 @@ export default function InboxReferencePreview() {
         ];
       },
       [
-        emailAccountScopedConversations,
+        accountScopedConversations,
         inboxWorkflowByKey,
       ],
     );
@@ -3852,7 +3981,7 @@ export default function InboxReferencePreview() {
       .trim()
       .toLowerCase();
 
-    const filtered = emailAccountScopedConversations.filter(
+    const filtered = accountScopedConversations.filter(
       (conversation) => {
         const workflow =
           inboxWorkflowByKey.get(
@@ -4071,7 +4200,7 @@ export default function InboxReferencePreview() {
     activeCommandFilter,
     activeFilter,
     activeTag,
-    emailAccountScopedConversations,
+    accountScopedConversations,
     inboxWorkflowByKey,
     query,
     sortDirection,
@@ -4148,7 +4277,7 @@ export default function InboxReferencePreview() {
       liveMailboxEnabled &&
       providerInboxTotalCount !==
         null &&
-      !selectedEmailAccountKeys.length
+      !selectedAccountKeys.length
     ) {
       if (
         channelId ===
@@ -4176,11 +4305,11 @@ export default function InboxReferencePreview() {
       channelId ===
       "all"
     ) {
-      return emailAccountScopedConversations
+      return accountScopedConversations
         .length;
     }
 
-    return emailAccountScopedConversations
+    return accountScopedConversations
       .filter(
         (conversation) =>
           conversation.channel ===
@@ -4609,8 +4738,7 @@ export default function InboxReferencePreview() {
       );
 
       setQuickTaskForm(
-        defaultTaskForm(
-          selectedConversation,
+        defaultGeneralTaskForm(
           user.id,
         ),
       );
@@ -4752,29 +4880,15 @@ export default function InboxReferencePreview() {
       "",
     );
 
-    const reminderForm =
-      defaultTaskForm(
-        selectedConversation,
+    setQuickTaskForm(
+      defaultGeneralTaskForm(
         user.id,
-      );
-
-    setQuickTaskForm({
-      ...reminderForm,
-
-      title:
-        selectedConversation?.sender
-          ? `Follow up with ${selectedConversation.sender}`
-          : "Reminder",
-
-      dueDate:
-        getEasternDateInput(1),
-
-      dueTime:
-        "09:00",
-
-      assignedTo:
-        user.id,
-    });
+        {
+          reminder:
+            true,
+        },
+      ),
+    );
 
     setQuickTaskError(
       "",
@@ -4802,31 +4916,60 @@ export default function InboxReferencePreview() {
       quickTaskForm.dueTime,
     );
 
+    const taskSourceConversation =
+      quickTaskWorkflowConversationId
+        ? (
+            conversations.find(
+              (conversation) =>
+                conversation.id ===
+                quickTaskWorkflowConversationId,
+            ) ||
+            null
+          )
+        : null;
+
     try {
       const createdTask =
         await createTask({
         title: quickTaskForm.title.trim(),
         description: [
           quickTaskForm.description.trim(),
-          selectedConversation?.email
-            ? `Email: ${selectedConversation.email}`
+
+          taskSourceConversation
+            ?.email
+            ? `Email: ${taskSourceConversation.email}`
             : "",
-          selectedConversation?.phone
-            ? `Phone: ${selectedConversation.phone}`
+
+          taskSourceConversation
+            ?.phone
+            ? `Phone: ${taskSourceConversation.phone}`
             : "",
         ]
           .filter(Boolean)
           .join("\n"),
-        category: "Communications",
+
+        category:
+          taskSourceConversation
+            ? "Communications"
+            : "General",
         priority: quickTaskForm.priority,
         status: "open",
         visibility: "workspace",
-        tags: [
-          "Inbox",
-          "Follow-up",
-          selectedConversation?.sender ||
-            "Campaign contact",
-        ],
+        tags:
+          taskSourceConversation
+            ? [
+                "Inbox",
+                "Follow-up",
+                taskSourceConversation
+                  .sender ||
+                  "Campaign contact",
+              ]
+            : [
+                quickTaskMode ===
+                  "reminder"
+                  ? "Reminder"
+                  : "Quick Task",
+              ],
         due_at: dueAt,
         assigned_to:
           quickTaskForm.assignedTo ||
@@ -4879,15 +5022,9 @@ export default function InboxReferencePreview() {
       const workflowConversation =
         (
           quickTaskMode ===
-            "task" &&
-          quickTaskWorkflowConversationId
+            "task"
         )
-          ? conversations.find(
-              (conversation) =>
-                conversation.id ===
-                quickTaskWorkflowConversationId,
-            ) ||
-            null
+          ? taskSourceConversation
           : null;
 
       let linkedWorkflowTask =
@@ -4956,13 +5093,19 @@ export default function InboxReferencePreview() {
 
         linkedWorkflowTask
           ? `Task created from the ${workflowConversation?.sender || "selected"} email conversation.`
-          : `Follow-up task created for ${selectedConversation.sender}.`,
+          : quickTaskMode ===
+              "reminder"
+            ? "General Campaign Seat reminder created."
+            : "General Campaign Seat task created.",
       );
 
       setToast(
         linkedWorkflowTask
           ? "Task created and linked to this Inbox conversation."
-          : `Task created for ${selectedConversation.sender}.`,
+          : quickTaskMode ===
+              "reminder"
+            ? "Reminder created."
+            : "Quick Task created.",
       );
     } catch (createError) {
       setQuickTaskError(
@@ -8610,11 +8753,7 @@ export default function InboxReferencePreview() {
             ) : null}
           </div>
 
-          {(
-            activeChannel === "all" ||
-            activeChannel === "email"
-          ) &&
-          emailAccountOptions.length ? (
+          {communicationAccountOptions.length ? (
             <div
               className={
                 styles.inboxEmailAccountPicker
@@ -8624,7 +8763,7 @@ export default function InboxReferencePreview() {
                 className={[
                   styles.inboxEmailAccountTrigger,
 
-                  selectedEmailAccountKeys.length
+                  selectedAccountKeys.length
                     ? styles.inboxEmailAccountTriggerActive
                     : "",
                 ]
@@ -8662,7 +8801,7 @@ export default function InboxReferencePreview() {
                     styles.emailAccountTriggerLabel
                   }
                 >
-                  {emailAccountButtonLabel}
+                  {accountButtonLabel}
                 </span>
 
                 <ChevronDown
@@ -8678,7 +8817,7 @@ export default function InboxReferencePreview() {
                 >
                   <header>
                     <strong>
-                      Email Accounts
+                      Accounts
                     </strong>
                   </header>
 
@@ -8687,7 +8826,7 @@ export default function InboxReferencePreview() {
                       className={[
                         styles.emailAccountMenuItem,
 
-                        !selectedEmailAccountKeys
+                        !selectedAccountKeys
                           .length
                           ? styles.emailAccountMenuItemActive
                           : "",
@@ -8696,7 +8835,7 @@ export default function InboxReferencePreview() {
                         .join(" ")}
                       type="button"
                       onClick={() => {
-                        setSelectedEmailAccountKeys(
+                        setSelectedAccountKeys(
                           [],
                         );
 
@@ -8715,11 +8854,11 @@ export default function InboxReferencePreview() {
 
                       <span>
                         <strong>
-                          All Email Accounts
+                          All Accounts
                         </strong>
                       </span>
 
-                      {!selectedEmailAccountKeys
+                      {!selectedAccountKeys
                         .length ? (
                         <CheckCircle2
                           size={16}
@@ -8727,10 +8866,10 @@ export default function InboxReferencePreview() {
                       ) : null}
                     </button>
 
-                    {emailAccountOptions.map(
+                    {communicationAccountOptions.map(
                       (account) => {
                         const selected =
-                          selectedEmailAccountSet
+                          selectedAccountSet
                             .has(
                               account.key,
                             );
@@ -8754,7 +8893,7 @@ export default function InboxReferencePreview() {
                             }
                             type="button"
                             onClick={() => {
-                              setSelectedEmailAccountKeys(
+                              setSelectedAccountKeys(
                                 (current) => {
                                   if (
                                     !current.length
@@ -8822,7 +8961,7 @@ export default function InboxReferencePreview() {
                         )
                       }
                     >
-                      Manage email accounts
+                      Manage communication accounts
                     </button>
                   </footer>
                 </div>
@@ -8930,6 +9069,7 @@ export default function InboxReferencePreview() {
 
           {(
             activeChannel !== "all" ||
+            selectedAccountKeys.length ||
             activeTag
           ) ? (
             <button
@@ -8944,6 +9084,10 @@ export default function InboxReferencePreview() {
 
                 setActiveTag(
                   "",
+                );
+
+                setSelectedAccountKeys(
+                  [],
                 );
 
                 setActiveFilter(
@@ -9847,7 +9991,7 @@ type="button"
                       )
                     }
                   >
-                    <Mail size={14} />
+                    <Inbox size={14} />
                     Needs Reply
                   </button>
 
@@ -12780,10 +12924,10 @@ type="button"
                     <small>
                       {quickTaskMode ===
                       "reminder"
-                        ? "Timed follow-up"
+                        ? "Workspace reminder"
                         : quickTaskWorkflowConversationId
                           ? "Email action"
-                          : "Inbox follow-up"}
+                          : "Workspace task"}
                     </small>
 
                     <h2 id="quick-task-title">
@@ -12808,27 +12952,29 @@ type="button"
                 </button>
               </header>
 
-              <div className={styles.quickTaskContact}>
-                <span className={styles.avatar}>
-                  {
-                    selectedConversation.initials
-                  }
-                </span>
-
-                <span>
-                  <strong>
+              {quickTaskWorkflowConversationId ? (
+                <div className={styles.quickTaskContact}>
+                  <span className={styles.avatar}>
                     {
-                      selectedConversation.sender
+                      selectedConversation.initials
                     }
-                  </strong>
+                  </span>
 
-                  <small>
-                    {
-                      selectedConversation.subject
-                    }
-                  </small>
-                </span>
-              </div>
+                  <span>
+                    <strong>
+                      {
+                        selectedConversation.sender
+                      }
+                    </strong>
+
+                    <small>
+                      {
+                        selectedConversation.subject
+                      }
+                    </small>
+                  </span>
+                </div>
+              ) : null}
 
               {quickTaskMode ===
               "reminder" ? (

@@ -22813,3 +22813,41 @@ header {
 }
 
 /* NEW MESSAGE SAFARI LAYERING FIX — END */
+
+
+/* UNIFIED COMMUNICATION ACCOUNTS — START */
+
+.inboxEmailAccountMenu
+[data-mailbox-tone="seat"]
+.emailAccountColorDot {
+  background:
+    linear-gradient(
+      135deg,
+      #244f77,
+      #4f80aa
+    ) !important;
+}
+
+.inboxEmailAccountMenu header strong {
+  font-size:
+    13px !important;
+}
+
+.inboxEmailAccountMenu
+.emailAccountMenuItem strong {
+  font-size:
+    13px !important;
+}
+
+.inboxEmailAccountMenu
+.emailAccountMenuItem small {
+  font-size:
+    12px !important;
+}
+
+.inboxEmailAccountMenu footer button {
+  font-size:
+    12px !important;
+}
+
+/* UNIFIED COMMUNICATION ACCOUNTS — END */
