@@ -22058,3 +22058,322 @@ header {
 }
 
 /* INBOX WORKFLOW LAYOUT CLEANUP — END */
+
+
+/* COMPACT CAMPAIGN ACTION BAR — START */
+
+@media (min-width: 1201px) {
+
+  .inboxWorkflowActionBar {
+    display:
+      flex !important;
+
+    min-height:
+      54px !important;
+
+    align-items:
+      center !important;
+
+    flex-wrap:
+      nowrap !important;
+
+    gap:
+      8px !important;
+
+    padding:
+      7px
+      10px !important;
+  }
+
+
+  /*
+   * Status becomes a compact pill instead of
+   * taking its own tall labeled section.
+   */
+
+  .inboxWorkflowActionIdentity {
+    display:
+      flex !important;
+
+    flex:
+      0
+      0
+      auto !important;
+
+    align-items:
+      center !important;
+
+    min-width:
+      auto !important;
+
+    padding:
+      0 !important;
+
+    border:
+      0 !important;
+  }
+
+
+  .inboxWorkflowActionIdentity span {
+    display:
+      none !important;
+  }
+
+
+  .inboxWorkflowActionIdentity strong {
+    display:
+      inline-flex !important;
+
+    min-height:
+      36px;
+
+    align-items:
+      center;
+
+    padding:
+      0
+      11px;
+
+    margin:
+      0 !important;
+
+    border:
+      1px solid
+      #d5e1e9;
+
+    border-radius:
+      8px;
+
+    color:
+      #294f6d;
+
+    background:
+      #f7fafc;
+
+    font-size:
+      13px !important;
+
+    white-space:
+      nowrap;
+  }
+
+
+  /*
+   * Owner becomes horizontal instead of label-over-input.
+   */
+
+  .inboxWorkflowAssign {
+    display:
+      flex !important;
+
+    flex:
+      0
+      1
+      255px !important;
+
+    width:
+      auto !important;
+
+    max-width:
+      255px !important;
+
+    min-width:
+      190px !important;
+
+    align-items:
+      center !important;
+
+    gap:
+      7px !important;
+  }
+
+
+  .inboxWorkflowAssign > span {
+    flex:
+      0
+      0
+      auto;
+
+    font-size:
+      12px !important;
+
+    white-space:
+      nowrap;
+  }
+
+
+  .inboxWorkflowAssign select {
+    flex:
+      1
+      1
+      auto;
+
+    min-width:
+      0 !important;
+
+    height:
+      38px !important;
+
+    min-height:
+      38px !important;
+  }
+
+
+  .inboxWorkflowStatusButtons {
+    display:
+      inline-flex !important;
+
+    flex:
+      0
+      0
+      auto !important;
+
+    align-items:
+      center !important;
+
+    gap:
+      6px !important;
+  }
+
+
+  .inboxWorkflowMenuAction {
+    flex:
+      0
+      0
+      auto !important;
+  }
+
+
+  .inboxWorkflowVipButton {
+    flex:
+      0
+      0
+      auto !important;
+  }
+
+
+  .inboxWorkflowTaskButton {
+    flex:
+      0
+      0
+      auto !important;
+
+    margin-left:
+      auto !important;
+  }
+
+
+  .inboxWorkflowStatusButtons button,
+  .inboxWorkflowMenuTrigger,
+  .inboxWorkflowVipButton,
+  .inboxWorkflowTaskButton {
+    min-height:
+      38px !important;
+
+    padding:
+      0
+      10px !important;
+
+    font-size:
+      13px !important;
+  }
+
+
+  .inboxWorkflowError {
+    position:
+      absolute;
+
+    left:
+      12px;
+
+    bottom:
+      -18px;
+  }
+}
+
+
+/*
+ * Medium widths: allow one controlled wrap,
+ * not the large three-row layout.
+ */
+
+@media (
+  min-width: 701px
+) and (
+  max-width: 1200px
+) {
+
+  .inboxWorkflowActionBar {
+    display:
+      flex !important;
+
+    min-height:
+      auto !important;
+
+    align-items:
+      center !important;
+
+    flex-wrap:
+      wrap !important;
+
+    gap:
+      7px !important;
+
+    padding:
+      8px
+      10px !important;
+  }
+
+
+  .inboxWorkflowActionIdentity,
+  .inboxWorkflowAssign,
+  .inboxWorkflowStatusButtons,
+  .inboxWorkflowMenuAction,
+  .inboxWorkflowVipButton,
+  .inboxWorkflowTaskButton {
+    grid-column:
+      auto !important;
+
+    grid-row:
+      auto !important;
+  }
+
+
+  .inboxWorkflowActionIdentity {
+    flex:
+      0
+      0
+      auto;
+  }
+
+
+  .inboxWorkflowAssign {
+    flex:
+      1
+      1
+      240px !important;
+
+    width:
+      auto !important;
+
+    max-width:
+      320px !important;
+  }
+
+
+  .inboxWorkflowStatusButtons {
+    display:
+      inline-flex !important;
+
+    width:
+      auto !important;
+  }
+
+
+  .inboxWorkflowTaskButton {
+    margin-left:
+      auto !important;
+  }
+}
+
+/* COMPACT CAMPAIGN ACTION BAR — END */
