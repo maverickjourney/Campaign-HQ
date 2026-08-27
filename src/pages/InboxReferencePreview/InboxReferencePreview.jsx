@@ -663,6 +663,78 @@ function toTaskDueIso(dateValue, timeValue) {
   return date.toISOString();
 }
 
+function inboxContactTypeLabel(
+  value,
+) {
+  const normalized =
+    String(
+      value ||
+      "contact",
+    )
+      .trim()
+      .replaceAll(
+        "_",
+        " ",
+      );
+
+  return normalized
+    .split(
+      /\s+/,
+    )
+    .filter(Boolean)
+    .map(
+      (word) =>
+        word.charAt(0)
+          .toUpperCase() +
+        word.slice(1),
+    )
+    .join(" ");
+}
+
+
+function inboxContactDateLabel(
+  value,
+) {
+  if (!value) {
+    return "Not set";
+  }
+
+  const date =
+    new Date(value);
+
+  if (
+    Number.isNaN(
+      date.getTime(),
+    )
+  ) {
+    return "Not set";
+  }
+
+  return new Intl.DateTimeFormat(
+    "en-US",
+    {
+      timeZone:
+        "America/New_York",
+
+      month:
+        "short",
+
+      day:
+        "numeric",
+
+      year:
+        "numeric",
+
+      hour:
+        "numeric",
+
+      minute:
+        "2-digit",
+    },
+  ).format(date);
+}
+
+
 function contactName(contact) {
   return (
     contact?.full_name ||
@@ -3345,6 +3417,131 @@ export default function InboxReferencePreview() {
             .follow_up_at,
         )
       : "";
+
+  const selectedInboxContact =
+    useMemo(
+      () => {
+        const contacts =
+          Array.isArray(
+            liveContacts,
+          )
+            ? liveContacts
+            : [];
+
+        if (
+          selectedConversation
+            ?.contactId
+        ) {
+          const direct =
+            contacts.find(
+              (contact) =>
+                contact.id ===
+                selectedConversation
+                  .contactId,
+            );
+
+          if (direct) {
+            return direct;
+          }
+        }
+
+        const conversationEmail =
+          String(
+            selectedConversation
+              ?.email ||
+            "",
+          )
+            .trim()
+            .toLowerCase();
+
+        const conversationPhone =
+          String(
+            selectedConversation
+              ?.phone ||
+            "",
+          )
+            .replace(
+              /\D/g,
+              "",
+            );
+
+        return (
+          contacts.find(
+            (contact) => {
+              const contactEmail =
+                String(
+                  contact?.email ||
+                  "",
+                )
+                  .trim()
+                  .toLowerCase();
+
+              const contactPhone =
+                String(
+                  contact?.phone ||
+                  "",
+                )
+                  .replace(
+                    /\D/g,
+                    "",
+                  );
+
+              return (
+                (
+                  conversationEmail &&
+                  contactEmail ===
+                    conversationEmail
+                ) ||
+                (
+                  conversationPhone &&
+                  contactPhone ===
+                    conversationPhone
+                )
+              );
+            },
+          ) ||
+          null
+        );
+      },
+      [
+        liveContacts,
+        selectedConversation
+          ?.contactId,
+        selectedConversation
+          ?.email,
+        selectedConversation
+          ?.phone,
+      ],
+    );
+
+
+  const selectedInboxContactOwner =
+    selectedInboxContact
+      ?.assigned_to
+      ? (
+          team.find(
+            (member) =>
+              member.id ===
+              selectedInboxContact
+                .assigned_to,
+          ) ||
+          null
+        )
+      : null;
+
+
+  const selectedInboxWorkflowOwner =
+    selectedInboxAssignee
+      ? (
+          team.find(
+            (member) =>
+              member.id ===
+              selectedInboxAssignee,
+          ) ||
+          null
+        )
+      : null;
+
 
   const hasSelectedConversation =
     Boolean(
@@ -6794,6 +6991,119 @@ export default function InboxReferencePreview() {
       } finally {
         setInboxWorkflowActionBusy(
           "",
+        );
+      }
+    };
+
+
+  const handleAddInboxSenderToContacts =
+    async () => {
+      if (
+        selectedInboxContact ||
+        contactsSaving ||
+        !selectedConversation
+          ?.id
+      ) {
+        return;
+      }
+
+      const name =
+        String(
+          selectedConversation
+            ?.sender ||
+          selectedConversation
+            ?.email ||
+          selectedConversation
+            ?.phone ||
+          "Campaign contact",
+        ).trim();
+
+      try {
+        const created =
+          await saveContact({
+            fullName:
+              name,
+
+            email:
+              selectedConversation
+                ?.email ||
+              "",
+
+            phone:
+              selectedConversation
+                ?.phone ||
+              "",
+
+            organization:
+              selectedConversation
+                ?.details
+                ?.organization &&
+              selectedConversation
+                .details
+                .organization !==
+                "Connected email"
+                ? selectedConversation
+                    .details
+                    .organization
+                : "",
+
+            contactType:
+              "supporter",
+
+            assignedTo:
+              selectedInboxAssignee ||
+              null,
+
+            precinct:
+              selectedConversation
+                ?.details
+                ?.location ||
+              "",
+
+            source:
+              "Inbox",
+
+            status:
+              "active",
+
+            notes:
+              selectedConversation
+                ?.subject
+                ? `Added from Inbox conversation: ${selectedConversation.subject}`
+                : "Added from Campaign Seat Inbox.",
+
+            tags: [
+              "Inbox",
+            ],
+
+            lastContactAt:
+              new Date()
+                .toISOString(),
+
+            nextFollowUpAt:
+              selectedInboxWorkflow
+                ?.follow_up_at ||
+              null,
+
+            emailConsent:
+              false,
+
+            smsConsent:
+              false,
+
+            consentSource:
+              "",
+          });
+
+        setToast(
+          `${created?.full_name || name} added to Campaign Contacts.`,
+        );
+      } catch (
+        contactError
+      ) {
+        setToast(
+          contactError?.message ||
+            "Campaign Seat could not add this sender to Contacts.",
         );
       }
     };
@@ -11060,60 +11370,428 @@ type="button"
 
             {!newMessageMode &&
             activeThreadTab === "details" ? (
-              <div className={styles.detailsPanel}>
-                <div>
-                  <small>Organization</small>
-                  <strong>
-                    {
-                      selectedConversation.details
-                        .organization
+              <div
+                className={
+                  styles.contactIntelligencePanel
+                }
+              >
+                <section
+                  className={
+                    styles.contactIntelHero
+                  }
+                >
+                  <div
+                    className={
+                      styles.contactIntelIdentity
                     }
-                  </strong>
-                </div>
+                  >
+                    <span
+                      className={
+                        styles.contactIntelAvatar
+                      }
+                    >
+                      {selectedInboxContact
+                        ? contactInitials(
+                            selectedInboxContact,
+                          )
+                        : selectedConversation
+                            .initials}
+                    </span>
 
-                <div>
-                  <small>Role</small>
-                  <strong>
-                    {
-                      selectedConversation.details
-                        .role
+                    <div>
+                      <small>
+                        Contact Intelligence
+                      </small>
+
+                      <strong>
+                        {selectedInboxContact
+                          ? contactName(
+                              selectedInboxContact,
+                            )
+                          : selectedConversation
+                              .sender}
+                      </strong>
+
+                      <p>
+                        {selectedInboxContact
+                          ? [
+                              inboxContactTypeLabel(
+                                selectedInboxContact
+                                  .contact_type,
+                              ),
+                              selectedInboxContact
+                                .organization,
+                            ]
+                              .filter(Boolean)
+                              .join(" · ")
+                          : "This sender is not yet saved in Campaign Contacts."}
+                      </p>
+                    </div>
+                  </div>
+
+                  {selectedInboxContact ? (
+                    <div
+                      className={
+                        styles.contactIntelHeroActions
+                      }
+                    >
+                      <span
+                        className={
+                          styles.contactIntelSaved
+                        }
+                      >
+                        <CheckCircle2
+                          size={16}
+                        />
+
+                        Campaign Contact
+                      </span>
+
+                      <button
+                        type="button"
+                        onClick={() =>
+                          window.location.assign(
+                            "/contacts",
+                          )
+                        }
+                      >
+                        Open Contacts
+                      </button>
+                    </div>
+                  ) : (
+                    <button
+                      className={
+                        styles.contactIntelAdd
+                      }
+                      type="button"
+                      disabled={
+                        contactsSaving
+                      }
+                      onClick={() =>
+                        void handleAddInboxSenderToContacts()
+                      }
+                    >
+                      <UserPlus
+                        size={16}
+                      />
+
+                      {contactsSaving
+                        ? "Adding…"
+                        : "Add to Contacts"}
+                    </button>
+                  )}
+                </section>
+
+                <section
+                  className={
+                    styles.contactIntelGrid
+                  }
+                >
+                  <article>
+                    <small>
+                      Contact Type
+                    </small>
+
+                    <strong>
+                      {selectedInboxContact
+                        ? inboxContactTypeLabel(
+                            selectedInboxContact
+                              .contact_type,
+                          )
+                        : selectedConversation
+                            .details
+                            ?.role ||
+                          "Email contact"}
+                    </strong>
+                  </article>
+
+                  <article>
+                    <small>
+                      Organization
+                    </small>
+
+                    <strong>
+                      {selectedInboxContact
+                        ?.organization ||
+                        selectedConversation
+                          .details
+                          ?.organization ||
+                        "Not set"}
+                    </strong>
+                  </article>
+
+                  <article>
+                    <small>
+                      Campaign Owner
+                    </small>
+
+                    <strong>
+                      {selectedInboxContactOwner
+                        ?.fullName ||
+                        "Unassigned"}
+                    </strong>
+
+                    {selectedInboxContactOwner
+                      ?.displayTitle ? (
+                      <span>
+                        {
+                          selectedInboxContactOwner
+                            .displayTitle
+                        }
+                      </span>
+                    ) : null}
+                  </article>
+
+                  <article>
+                    <small>
+                      Email
+                    </small>
+
+                    <strong>
+                      {selectedInboxContact
+                        ?.email ||
+                        selectedConversation
+                          .email ||
+                        "Not set"}
+                    </strong>
+                  </article>
+
+                  <article>
+                    <small>
+                      Phone
+                    </small>
+
+                    <strong>
+                      {selectedInboxContact
+                        ?.phone ||
+                        selectedConversation
+                          .phone ||
+                        "Not set"}
+                    </strong>
+                  </article>
+
+                  <article>
+                    <small>
+                      Precinct / Location
+                    </small>
+
+                    <strong>
+                      {selectedInboxContact
+                        ?.precinct ||
+                        selectedConversation
+                          .details
+                          ?.location ||
+                        "Not set"}
+                    </strong>
+                  </article>
+
+                  <article>
+                    <small>
+                      Last Contact
+                    </small>
+
+                    <strong>
+                      {selectedInboxContact
+                        ? inboxContactDateLabel(
+                            selectedInboxContact
+                              .last_contact_at,
+                          )
+                        : selectedConversation
+                            .details
+                            ?.lastContact ||
+                          "Not set"}
+                    </strong>
+                  </article>
+
+                  <article>
+                    <small>
+                      Next Follow Up
+                    </small>
+
+                    <strong>
+                      {selectedInboxContact
+                        ? inboxContactDateLabel(
+                            selectedInboxContact
+                              .next_follow_up_at,
+                          )
+                        : selectedInboxFollowUpLabel ||
+                          "Not set"}
+                    </strong>
+                  </article>
+                </section>
+
+                <section
+                  className={
+                    styles.contactIntelContext
+                  }
+                >
+                  <article>
+                    <header>
+                      <strong>
+                        Campaign Tags
+                      </strong>
+                    </header>
+
+                    {selectedInboxContact
+                      ?.tags
+                      ?.length ? (
+                      <div
+                        className={
+                          styles.contactIntelTags
+                        }
+                      >
+                        {selectedInboxContact
+                          .tags
+                          .map(
+                            (tag) => (
+                              <span
+                                key={tag}
+                              >
+                                {tag}
+                              </span>
+                            ),
+                          )}
+                      </div>
+                    ) : (
+                      <p>
+                        No campaign tags saved.
+                      </p>
+                    )}
+                  </article>
+
+                  <article>
+                    <header>
+                      <strong>
+                        Campaign Notes
+                      </strong>
+                    </header>
+
+                    <p>
+                      {selectedInboxContact
+                        ?.notes ||
+                        "No campaign notes saved for this contact yet."}
+                    </p>
+                  </article>
+                </section>
+
+                <section
+                  className={
+                    styles.contactIntelWorkflow
+                  }
+                >
+                  <article>
+                    <small>
+                      Inbox Owner
+                    </small>
+
+                    <strong>
+                      {selectedInboxWorkflowOwner
+                        ?.fullName ||
+                        "Unassigned"}
+                    </strong>
+                  </article>
+
+                  <article>
+                    <small>
+                      Workflow
+                    </small>
+
+                    <strong>
+                      {selectedInboxWorkflowStatus ===
+                      "waiting_on"
+                        ? "Waiting On"
+                        : selectedInboxWorkflowStatus ===
+                            "needs_reply"
+                          ? "Needs Reply"
+                          : "Open"}
+                    </strong>
+                  </article>
+
+                  <article>
+                    <small>
+                      VIP
+                    </small>
+
+                    <strong>
+                      {selectedInboxWorkflow
+                        ?.is_vip
+                        ? "Yes"
+                        : "No"}
+                    </strong>
+                  </article>
+
+                  <article>
+                    <small>
+                      Linked Task
+                    </small>
+
+                    {selectedInboxWorkflow
+                      ?.linked_task_id ? (
+                      <button
+                        type="button"
+                        onClick={() =>
+                          window.location.assign(
+                            `/tasks?task=${encodeURIComponent(
+                              selectedInboxWorkflow
+                                .linked_task_id,
+                            )}`,
+                          )
+                        }
+                      >
+                        Open Task
+                      </button>
+                    ) : (
+                      <strong>
+                        None
+                      </strong>
+                    )}
+                  </article>
+                </section>
+
+                {!selectedInboxContact ? (
+                  <section
+                    className={
+                      styles.contactIntelUnknown
                     }
-                  </strong>
-                </div>
+                  >
+                    <UserPlus
+                      size={22}
+                    />
 
-                <div>
-                  <small>Email</small>
-                  <strong>
-                    {selectedConversation.email}
-                  </strong>
-                </div>
+                    <div>
+                      <strong>
+                        Build campaign context for this sender
+                      </strong>
 
-                <div>
-                  <small>Phone</small>
-                  <strong>
-                    {selectedConversation.phone}
-                  </strong>
-                </div>
+                      <p>
+                        Save this sender to Contacts to track organization, relationship type, campaign owner, tags, notes and follow-up history across Campaign Seat.
+                      </p>
+                    </div>
 
-                <div>
-                  <small>Location</small>
-                  <strong>
-                    {
-                      selectedConversation.details
-                        .location
+                    <button
+                      type="button"
+                      disabled={
+                        contactsSaving
+                      }
+                      onClick={() =>
+                        void handleAddInboxSenderToContacts()
+                      }
+                    >
+                      Add to Contacts
+                    </button>
+                  </section>
+                ) : null}
+
+                {contactsError ? (
+                  <div
+                    className={
+                      styles.workflowError
                     }
-                  </strong>
-                </div>
-
-                <div>
-                  <small>Last Contact</small>
-                  <strong>
-                    {
-                      selectedConversation.details
-                        .lastContact
-                    }
-                  </strong>
-                </div>
+                    role="alert"
+                  >
+                    {contactsError}
+                  </div>
+                ) : null}
               </div>
             ) : null}
 

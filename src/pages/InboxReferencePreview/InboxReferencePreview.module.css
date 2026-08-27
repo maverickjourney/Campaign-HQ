@@ -22851,3 +22851,575 @@ header {
 }
 
 /* UNIFIED COMMUNICATION ACCOUNTS — END */
+
+
+/* INBOX CONTACT INTELLIGENCE — START */
+
+.contactIntelligencePanel {
+  display: grid;
+  gap: 12px;
+
+  padding: 14px;
+
+  overflow-y: auto;
+
+  background: #f7fafc;
+}
+
+
+.contactIntelHero {
+  display: flex;
+
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 14px;
+
+  padding: 14px 15px;
+
+  border:
+    1px solid
+    #d8e4ec;
+
+  border-radius: 12px;
+
+  background: #ffffff;
+}
+
+
+.contactIntelIdentity {
+  display: flex;
+
+  min-width: 0;
+
+  align-items: center;
+
+  gap: 11px;
+}
+
+
+.contactIntelAvatar {
+  display: grid;
+
+  width: 44px;
+  height: 44px;
+
+  flex:
+    0 0
+    44px;
+
+  place-items: center;
+
+  border-radius: 50%;
+
+  color: #ffffff;
+
+  background:
+    linear-gradient(
+      135deg,
+      #306f9f,
+      #6040bb
+    );
+
+  font-size: 14px;
+
+  font-weight: 900;
+}
+
+
+.contactIntelIdentity > div {
+  min-width: 0;
+}
+
+
+.contactIntelIdentity small,
+.contactIntelIdentity strong,
+.contactIntelIdentity p {
+  display: block;
+}
+
+
+.contactIntelIdentity small {
+  color: #d62d39;
+
+  font-size: 12px;
+
+  font-weight: 850;
+
+  letter-spacing: 0.05em;
+
+  text-transform: uppercase;
+}
+
+
+.contactIntelIdentity strong {
+  margin-top: 3px;
+
+  overflow: hidden;
+
+  color: #173f62;
+
+  font-size: 17px;
+
+  font-weight: 880;
+
+  text-overflow: ellipsis;
+
+  white-space: nowrap;
+}
+
+
+.contactIntelIdentity p {
+  margin:
+    3px
+    0
+    0;
+
+  color: #6e8496;
+
+  font-size: 13px;
+
+  line-height: 1.4;
+}
+
+
+.contactIntelHeroActions {
+  display: flex;
+
+  flex:
+    0
+    0
+    auto;
+
+  align-items: center;
+
+  gap: 8px;
+}
+
+
+.contactIntelSaved {
+  display: inline-flex;
+
+  min-height: 36px;
+
+  align-items: center;
+
+  gap: 6px;
+
+  padding:
+    0
+    10px;
+
+  border-radius: 8px;
+
+  color: #287356;
+
+  background: #edf8f3;
+
+  font-size: 13px;
+
+  font-weight: 780;
+}
+
+
+.contactIntelHeroActions button,
+.contactIntelAdd {
+  display: inline-flex;
+
+  min-height: 38px;
+
+  align-items: center;
+
+  gap: 6px;
+
+  padding:
+    0
+    11px;
+
+  border:
+    1px solid
+    #bfd1df;
+
+  border-radius: 8px;
+
+  color: #285f89;
+
+  background: #ffffff;
+
+  font-size: 13px;
+
+  font-weight: 800;
+}
+
+
+.contactIntelGrid {
+  display: grid;
+
+  grid-template-columns:
+    repeat(
+      4,
+      minmax(
+        0,
+        1fr
+      )
+    );
+
+  gap: 9px;
+}
+
+
+.contactIntelGrid article {
+  min-width: 0;
+
+  min-height: 82px;
+
+  padding: 11px 12px;
+
+  border:
+    1px solid
+    #dce6ed;
+
+  border-radius: 10px;
+
+  background: #ffffff;
+}
+
+
+.contactIntelGrid small,
+.contactIntelGrid strong,
+.contactIntelGrid span {
+  display: block;
+}
+
+
+.contactIntelGrid small {
+  color: #798e9f;
+
+  font-size: 12px;
+
+  font-weight: 760;
+}
+
+
+.contactIntelGrid strong {
+  margin-top: 5px;
+
+  overflow: hidden;
+
+  color: #294f6e;
+
+  font-size: 14px;
+
+  font-weight: 820;
+
+  line-height: 1.35;
+
+  text-overflow: ellipsis;
+}
+
+
+.contactIntelGrid span {
+  margin-top: 3px;
+
+  color: #7d91a1;
+
+  font-size: 12px;
+}
+
+
+.contactIntelContext {
+  display: grid;
+
+  grid-template-columns:
+    minmax(
+      0,
+      0.8fr
+    )
+    minmax(
+      0,
+      1.2fr
+    );
+
+  gap: 9px;
+}
+
+
+.contactIntelContext article {
+  min-width: 0;
+
+  padding: 13px;
+
+  border:
+    1px solid
+    #dce6ed;
+
+  border-radius: 10px;
+
+  background: #ffffff;
+}
+
+
+.contactIntelContext header strong {
+  color: #315977;
+
+  font-size: 14px;
+
+  font-weight: 850;
+}
+
+
+.contactIntelContext p {
+  margin:
+    8px
+    0
+    0;
+
+  color: #687f91;
+
+  font-size: 13px;
+
+  line-height: 1.55;
+}
+
+
+.contactIntelTags {
+  display: flex;
+
+  flex-wrap: wrap;
+
+  gap: 6px;
+
+  margin-top: 9px;
+}
+
+
+.contactIntelTags span {
+  padding:
+    5px
+    8px;
+
+  border-radius: 999px;
+
+  color: #2f6792;
+
+  background: #eaf4fb;
+
+  font-size: 12px;
+
+  font-weight: 770;
+}
+
+
+.contactIntelWorkflow {
+  display: grid;
+
+  grid-template-columns:
+    repeat(
+      4,
+      minmax(
+        0,
+        1fr
+      )
+    );
+
+  gap: 8px;
+
+  padding: 10px;
+
+  border:
+    1px solid
+    #dce6ed;
+
+  border-radius: 10px;
+
+  background: #eef4f8;
+}
+
+
+.contactIntelWorkflow article {
+  min-width: 0;
+
+  padding:
+    4px
+    7px;
+}
+
+
+.contactIntelWorkflow small,
+.contactIntelWorkflow strong {
+  display: block;
+}
+
+
+.contactIntelWorkflow small {
+  color: #71889a;
+
+  font-size: 12px;
+
+  font-weight: 760;
+}
+
+
+.contactIntelWorkflow strong {
+  margin-top: 4px;
+
+  color: #315873;
+
+  font-size: 13px;
+
+  font-weight: 830;
+}
+
+
+.contactIntelWorkflow button {
+  margin-top: 4px;
+
+  min-height: 32px;
+
+  padding:
+    0
+    9px;
+
+  border:
+    1px solid
+    #c7d7e3;
+
+  border-radius: 7px;
+
+  color: #2d648e;
+
+  background: #ffffff;
+
+  font-size: 12px;
+
+  font-weight: 800;
+}
+
+
+.contactIntelUnknown {
+  display: grid;
+
+  grid-template-columns:
+    auto
+    minmax(
+      0,
+      1fr
+    )
+    auto;
+
+  align-items: center;
+
+  gap: 12px;
+
+  padding: 14px;
+
+  border:
+    1px dashed
+    #b8cbd9;
+
+  border-radius: 10px;
+
+  color: #3e6888;
+
+  background: #ffffff;
+}
+
+
+.contactIntelUnknown strong {
+  color: #295473;
+
+  font-size: 14px;
+}
+
+
+.contactIntelUnknown p {
+  margin:
+    4px
+    0
+    0;
+
+  color: #6f8495;
+
+  font-size: 13px;
+
+  line-height: 1.5;
+}
+
+
+.contactIntelUnknown button {
+  min-height: 38px;
+
+  padding:
+    0
+    11px;
+
+  border:
+    1px solid
+    #bcd0df;
+
+  border-radius: 8px;
+
+  color: #2d648e;
+
+  background: #ffffff;
+
+  font-size: 13px;
+
+  font-weight: 800;
+
+  white-space: nowrap;
+}
+
+
+@media (max-width: 1100px) {
+
+  .contactIntelGrid,
+  .contactIntelWorkflow {
+    grid-template-columns:
+      repeat(
+        2,
+        minmax(
+          0,
+          1fr
+        )
+      );
+  }
+}
+
+
+@media (max-width: 700px) {
+
+  .contactIntelHero {
+    align-items: flex-start;
+
+    flex-direction: column;
+  }
+
+
+  .contactIntelHeroActions {
+    width: 100%;
+
+    flex-wrap: wrap;
+  }
+
+
+  .contactIntelGrid,
+  .contactIntelContext,
+  .contactIntelWorkflow {
+    grid-template-columns:
+      1fr;
+  }
+
+
+  .contactIntelUnknown {
+    grid-template-columns:
+      1fr;
+  }
+
+
+  .contactIntelUnknown button {
+    width: 100%;
+  }
+}
+
+/* INBOX CONTACT INTELLIGENCE — END */
