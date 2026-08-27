@@ -24008,3 +24008,558 @@ header {
 }
 
 /* INBOX REAL ACTIVITY AUDIT — END */
+
+
+/* INBOX CONVERSATION ASSETS — START */
+
+.conversationAssetsPanel {
+  display:
+    grid;
+
+  gap:
+    12px;
+
+  padding:
+    14px;
+
+  overflow-y:
+    auto;
+
+  background:
+    #f7fafc;
+}
+
+
+.conversationAssetsHeader {
+  display:
+    flex;
+
+  align-items:
+    center;
+
+  justify-content:
+    space-between;
+
+  gap:
+    14px;
+
+  padding:
+    13px
+    14px;
+
+  border:
+    1px solid
+    #d8e4ec;
+
+  border-radius:
+    11px;
+
+  background:
+    #ffffff;
+}
+
+
+.conversationAssetsHeader small,
+.conversationAssetsHeader strong,
+.conversationAssetsHeader p {
+  display:
+    block;
+}
+
+
+.conversationAssetsHeader small {
+  color:
+    #d62d39;
+
+  font-size:
+    12px;
+
+  font-weight:
+    850;
+
+  letter-spacing:
+    0.05em;
+
+  text-transform:
+    uppercase;
+}
+
+
+.conversationAssetsHeader strong {
+  margin-top:
+    2px;
+
+  color:
+    #173f62;
+
+  font-size:
+    16px;
+
+  font-weight:
+    880;
+}
+
+
+.conversationAssetsHeader p {
+  margin:
+    3px
+    0
+    0;
+
+  color:
+    #6d8395;
+
+  font-size:
+    13px;
+
+  line-height:
+    1.45;
+}
+
+
+.conversationAssetsHeader > span {
+  flex:
+    0
+    0
+    auto;
+
+  padding:
+    6px
+    9px;
+
+  border-radius:
+    999px;
+
+  color:
+    #32658a;
+
+  background:
+    #edf5fa;
+
+  font-size:
+    12px;
+
+  font-weight:
+    800;
+}
+
+
+.conversationAssetsList {
+  display:
+    grid;
+
+  gap:
+    8px;
+}
+
+
+.conversationAssetCard {
+  display:
+    grid;
+
+  grid-template-columns:
+    auto
+    minmax(
+      0,
+      1fr
+    )
+    auto;
+
+  align-items:
+    center;
+
+  gap:
+    11px;
+
+  padding:
+    12px;
+
+  border:
+    1px solid
+    #dce6ed;
+
+  border-radius:
+    10px;
+
+  background:
+    #ffffff;
+}
+
+
+.conversationAssetIcon {
+  display:
+    grid;
+
+  width:
+    42px;
+
+  height:
+    42px;
+
+  place-items:
+    center;
+
+  border-radius:
+    10px;
+
+  color:
+    #316b96;
+
+  background:
+    #edf5fa;
+}
+
+
+.conversationAssetCopy {
+  min-width:
+    0;
+}
+
+
+.conversationAssetCopy > strong {
+  display:
+    block;
+
+  color:
+    #294f6d;
+
+  font-size:
+    14px;
+
+  font-weight:
+    850;
+
+  overflow-wrap:
+    anywhere;
+}
+
+
+.conversationAssetMeta {
+  display:
+    flex;
+
+  flex-wrap:
+    wrap;
+
+  gap:
+    5px
+    9px;
+
+  margin-top:
+    5px;
+}
+
+
+.conversationAssetMeta span {
+  color:
+    #718697;
+
+  font-size:
+    12px;
+}
+
+
+.conversationAssetMeta span + span::before {
+  margin-right:
+    8px;
+
+  color:
+    #b2c0ca;
+
+  content:
+    "•";
+}
+
+
+.conversationAssetStorage {
+  margin-top:
+    7px;
+}
+
+
+.conversationAssetStorage > span {
+  display:
+    inline-flex;
+
+  align-items:
+    center;
+
+  gap:
+    5px;
+
+  color:
+    #7c8e9c;
+
+  font-size:
+    12px;
+
+  font-weight:
+    700;
+}
+
+
+.conversationAssetStorage
+.conversationAssetSaved {
+  color:
+    #247053;
+}
+
+
+.conversationAssetActions {
+  display:
+    flex;
+
+  flex-wrap:
+    wrap;
+
+  justify-content:
+    flex-end;
+
+  gap:
+    6px;
+
+  max-width:
+    360px;
+}
+
+
+.conversationAssetActions button {
+  display:
+    inline-flex;
+
+  min-height:
+    36px;
+
+  align-items:
+    center;
+
+  justify-content:
+    center;
+
+  gap:
+    5px;
+
+  padding:
+    0
+    10px;
+
+  border:
+    1px solid
+    #cfdee8;
+
+  border-radius:
+    8px;
+
+  color:
+    #345f7f;
+
+  background:
+    #ffffff;
+
+  font-size:
+    12px;
+
+  font-weight:
+    800;
+
+  white-space:
+    nowrap;
+}
+
+
+.conversationAssetActions
+.conversationAssetDownload {
+  color:
+    #27628f;
+
+  background:
+    #f7fbfe;
+}
+
+
+.conversationAssetActions
+.conversationAssetSave {
+  border-color:
+    #b9d2c5;
+
+  color:
+    #276d52;
+
+  background:
+    #f4fbf7;
+}
+
+
+.conversationAssetActions button:disabled {
+  cursor:
+    not-allowed;
+
+  opacity:
+    0.5;
+}
+
+
+.conversationAssetsEmpty {
+  display:
+    flex;
+
+  align-items:
+    center;
+
+  gap:
+    11px;
+
+  padding:
+    17px;
+
+  border:
+    1px dashed
+    #bccedb;
+
+  border-radius:
+    10px;
+
+  color:
+    #416d8d;
+
+  background:
+    #ffffff;
+}
+
+
+.conversationAssetsEmpty strong {
+  color:
+    #2c5878;
+
+  font-size:
+    14px;
+}
+
+
+.conversationAssetsEmpty p {
+  margin:
+    3px
+    0
+    0;
+
+  color:
+    #718697;
+
+  font-size:
+    13px;
+
+  line-height:
+    1.45;
+}
+
+
+.conversationAssetsOffline {
+  display:
+    flex;
+
+  align-items:
+    flex-start;
+
+  gap:
+    10px;
+
+  padding:
+    12px
+    13px;
+
+  border:
+    1px solid
+    #d8e4ec;
+
+  border-radius:
+    10px;
+
+  color:
+    #336887;
+
+  background:
+    #eef6fb;
+}
+
+
+.conversationAssetsOffline strong {
+  display:
+    block;
+
+  color:
+    #2b5877;
+
+  font-size:
+    13px;
+}
+
+
+.conversationAssetsOffline p {
+  margin:
+    3px
+    0
+    0;
+
+  color:
+    #687f91;
+
+  font-size:
+    12px;
+
+  line-height:
+    1.5;
+}
+
+
+@media (max-width: 900px) {
+
+  .conversationAssetCard {
+    grid-template-columns:
+      auto
+      minmax(
+        0,
+        1fr
+      );
+  }
+
+
+  .conversationAssetActions {
+    grid-column:
+      1 / -1;
+
+    justify-content:
+      flex-start;
+
+    max-width:
+      none;
+  }
+}
+
+
+@media (max-width: 700px) {
+
+  .conversationAssetsHeader {
+    align-items:
+      flex-start;
+
+    flex-direction:
+      column;
+  }
+
+
+  .conversationAssetActions {
+    display:
+      grid;
+
+    grid-template-columns:
+      1fr;
+  }
+
+
+  .conversationAssetActions button {
+    width:
+      100%;
+  }
+}
+
+/* INBOX CONVERSATION ASSETS — END */

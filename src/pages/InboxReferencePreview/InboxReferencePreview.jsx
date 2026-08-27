@@ -14,6 +14,7 @@ import {
   LoaderCircle,
   ChevronDown,
   Clock3,
+  Download,
   FileText,
   Folder,
   Filter,
@@ -2672,6 +2673,9 @@ export default function InboxReferencePreview() {
     attachFilesToExternalOutreach,
     getCommunicationFileUrl,
     downloadCommunicationFile,
+    saveFilesToDocuments,
+    saveProviderAttachmentToDocuments,
+    getSavedProviderAttachment,
   } = useCommunicationAttachments({
     workspaceId: workspace.id,
     userId: user.id,
@@ -3404,6 +3408,12 @@ export default function InboxReferencePreview() {
     attachmentPreviewLoading,
     setAttachmentPreviewLoading,
   ] = useState("");
+
+  const [
+    conversationFileBusy,
+    setConversationFileBusy,
+  ] = useState("");
+
 
   const attachmentInputRef =
     useRef(null);
@@ -6640,30 +6650,126 @@ export default function InboxReferencePreview() {
           );
         }
 
-        await replyMailboxEmail({
-          replyToMessageId:
-            replySource.providerMessageId,
+        const sentAttachmentFiles = [
+          ...pendingAttachments,
+        ];
 
-          subject:
-            selectedConversation.subject,
+        const sendResult =
+          await replyMailboxEmail({
+            replyToMessageId:
+              replySource.providerMessageId,
 
-          body:
-            buildOutboundEmailBody({
-              message:
-                replyText,
-              signatureText:
-                configuredSignatureText,
-              includeSignature:
-                includeSignature &&
-                signatureEnabled,
-            }),
+            subject:
+              selectedConversation.subject,
 
-          replyAll:
-            replyAllEnabled,
+            body:
+              buildOutboundEmailBody({
+                message:
+                  replyText,
+                signatureText:
+                  configuredSignatureText,
+                includeSignature:
+                  includeSignature &&
+                  signatureEnabled,
+              }),
 
-          attachments:
-            pendingAttachments,
-        });
+            replyAll:
+              replyAllEnabled,
+
+            attachments:
+              sentAttachmentFiles,
+          });
+
+        let attachmentArchiveWarning =
+          "";
+
+        if (
+          sentAttachmentFiles.length
+        ) {
+          try {
+            await saveFilesToDocuments({
+              files:
+                sentAttachmentFiles,
+
+              category:
+                "Communications",
+
+              contexts: [
+                {
+                  type:
+                    "inbox_conversation",
+
+                  key:
+                    inboxWorkflowKey(
+                      selectedConversation,
+                    ),
+
+                  metadata: {
+                    direction:
+                      "outbound",
+
+                    channel:
+                      "email",
+
+                    subject:
+                      selectedConversation
+                        .subject ||
+                      "",
+                  },
+                },
+
+                ...(sendResult
+                  ?.data
+                  ?.id
+                  ? [
+                      {
+                        type:
+                          "outbound_email_message",
+
+                        key:
+                          `${mailboxConnectedEmail || "mailbox"}:${sendResult.data.id}`,
+
+                        metadata: {
+                          subject:
+                            selectedConversation
+                              .subject ||
+                            "",
+                        },
+                      },
+                    ]
+                  : []),
+              ],
+            });
+
+            try {
+              await logInboxActivity(
+                selectedConversation,
+                {
+                  eventType:
+                    "file:sent-preserved",
+
+                  eventLabel:
+                    "Sent attachments preserved",
+
+                  eventDetail:
+                    `${sentAttachmentFiles.length} sent attachment${sentAttachmentFiles.length === 1 ? "" : "s"} saved to Campaign Seat Documents.`,
+                },
+              );
+            } catch (
+              activityError
+            ) {
+              console.warn(
+                "Sent attachment activity could not be recorded:",
+                activityError,
+              );
+            }
+          } catch (
+            archiveError
+          ) {
+            attachmentArchiveWarning =
+              " Email sent, but Campaign Seat could not preserve the attachment copy in Documents.";
+          }
+        }
 
         setReplyText("");
         setReplyAllThreadId("");
@@ -6671,9 +6777,12 @@ export default function InboxReferencePreview() {
         setAttachmentError("");
 
         setToast(
-          replyAllEnabled
-            ? "Email Reply All sent from the connected campaign mailbox."
-            : "Email reply sent from the connected campaign mailbox.",
+          (
+            replyAllEnabled
+              ? "Email Reply All sent from the connected campaign mailbox."
+              : "Email reply sent from the connected campaign mailbox."
+          ) +
+          attachmentArchiveWarning,
         );
 
         await refreshMailbox();
@@ -6868,6 +6977,145 @@ export default function InboxReferencePreview() {
         );
       } finally {
         setAttachmentPreviewLoading(
+          "",
+        );
+      }
+    };
+
+
+  const saveConversationFileToDocuments =
+    async (
+      file,
+    ) => {
+      if (
+        !file ||
+        conversationFileBusy
+      ) {
+        return;
+      }
+
+      if (
+        file.source ===
+          "campaign-file"
+      ) {
+        window.location.assign(
+          "/documents",
+        );
+
+        return;
+      }
+
+      if (
+        !file
+          .providerAttachmentId ||
+        !file
+          .providerMessageId
+      ) {
+        setToast(
+          "This file is not linked to a provider attachment that can be saved.",
+        );
+
+        return;
+      }
+
+      const busyKey =
+        file.id ||
+        file.name;
+
+      setConversationFileBusy(
+        busyKey,
+      );
+
+      try {
+        const blob =
+          await getMailboxAttachmentBlob(
+            file,
+          );
+
+        await saveProviderAttachmentToDocuments({
+          file,
+          blob,
+
+          accountKey:
+            selectedConversation
+              ?.mailboxEmail ||
+            mailboxConnectedEmail ||
+            "",
+
+          conversationKey:
+            inboxWorkflowKey(
+              selectedConversation,
+            ),
+
+          metadata: {
+            sender:
+              selectedConversation
+                ?.sender ||
+              "",
+
+            subject:
+              selectedConversation
+                ?.subject ||
+              "",
+
+            channel:
+              selectedConversation
+                ?.channel ||
+              "email",
+          },
+        });
+
+        try {
+          await logInboxActivity(
+            selectedConversation,
+            {
+              eventType:
+                "file:saved",
+
+              eventLabel:
+                "Attachment saved to Documents",
+
+              eventDetail:
+                `${file.name || "Attachment"} was copied into Campaign Seat Documents.`,
+
+              metadata: {
+                file_name:
+                  file.name ||
+                  "",
+
+                provider_message_id:
+                  file
+                    .providerMessageId ||
+                  null,
+
+                provider_attachment_id:
+                  file
+                    .providerAttachmentId ||
+                  null,
+              },
+            },
+          );
+        } catch (
+          activityError
+        ) {
+          console.warn(
+            "Saved-file activity could not be recorded:",
+            activityError,
+          );
+        }
+
+        setToast(
+          `${file.name || "Attachment"} saved to Documents.`,
+        );
+      } catch (
+        saveError
+      ) {
+        setToast(
+          saveError?.message ||
+            "Campaign Seat could not save this attachment to Documents.",
+        );
+      } finally {
+        setConversationFileBusy(
           "",
         );
       }
@@ -7112,43 +7360,99 @@ export default function InboxReferencePreview() {
       liveMailboxEnabled
     ) {
       try {
-        await sendMailboxEmail({
-          to: [
-            {
-              name:
-                recipientName,
-              email:
-                recipientEmail,
-            },
-          ],
+        const sentAttachmentFiles = [
+          ...pendingAttachments,
+        ];
 
-          cc:
-            parseComposerRecipients(
-              newCc,
-            ),
+        const sendResult =
+          await sendMailboxEmail({
+            to: [
+              {
+                name:
+                  recipientName,
+                email:
+                  recipientEmail,
+              },
+            ],
 
-          bcc:
-            parseComposerRecipients(
-              newBcc,
-            ),
+            cc:
+              parseComposerRecipients(
+                newCc,
+              ),
 
-          subject:
-            newSubject.trim(),
+            bcc:
+              parseComposerRecipients(
+                newBcc,
+              ),
 
-          body:
-            buildOutboundEmailBody({
-              message:
-                replyText,
-              signatureText:
-                configuredSignatureText,
-              includeSignature:
-                includeSignature &&
-                signatureEnabled,
-            }),
+            subject:
+              newSubject.trim(),
 
-          attachments:
-            pendingAttachments,
-        });
+            body:
+              buildOutboundEmailBody({
+                message:
+                  replyText,
+                signatureText:
+                  configuredSignatureText,
+                includeSignature:
+                  includeSignature &&
+                  signatureEnabled,
+              }),
+
+            attachments:
+              sentAttachmentFiles,
+          });
+
+        let attachmentArchiveWarning =
+          "";
+
+        if (
+          sentAttachmentFiles.length
+        ) {
+          try {
+            await saveFilesToDocuments({
+              files:
+                sentAttachmentFiles,
+
+              category:
+                "Communications",
+
+              contexts:
+                sendResult
+                  ?.data
+                  ?.id
+                  ? [
+                      {
+                        type:
+                          "outbound_email_message",
+
+                        key:
+                          `${mailboxConnectedEmail || "mailbox"}:${sendResult.data.id}`,
+
+                        metadata: {
+                          recipient:
+                            recipientEmail,
+
+                          subject:
+                            newSubject.trim(),
+
+                          direction:
+                            "outbound",
+
+                          channel:
+                            "email",
+                        },
+                      },
+                    ]
+                  : [],
+            });
+          } catch (
+            archiveError
+          ) {
+            attachmentArchiveWarning =
+              " Email sent, but Campaign Seat could not preserve the attachment copy in Documents.";
+          }
+        }
 
         setReplyText("");
         setNewRecipient("");
@@ -7164,7 +7468,8 @@ export default function InboxReferencePreview() {
         );
 
         setToast(
-          "Email sent from the connected campaign mailbox.",
+          "Email sent from the connected campaign mailbox." +
+            attachmentArchiveWarning,
         );
 
         const nextMailbox =
@@ -12270,69 +12575,238 @@ type="button"
 
             {!newMessageMode &&
             activeThreadTab === "files" ? (
-              <div className={styles.filesPanel}>
-                <header>
-                  <strong>
-                    Conversation files
-                  </strong>
+              <div
+                className={
+                  styles.conversationAssetsPanel
+                }
+              >
+                <header
+                  className={
+                    styles.conversationAssetsHeader
+                  }
+                >
+                  <div>
+                    <small>
+                      Conversation Assets
+                    </small>
 
-                  {selectedConversation.files.length ? (
-                    <span className={styles.fileCount}>
-                      {selectedConversation.files.length}
-                      {" "}
-                      {selectedConversation.files.length === 1
-                        ? "attachment"
-                        : "attachments"}
-                    </span>
-                  ) : null}
+                    <strong>
+                      Files exchanged in this conversation
+                    </strong>
+
+                    <p>
+                      Preview files, preserve provider attachments in Campaign Seat Documents, or download a copy directly to this device.
+                    </p>
+                  </div>
+
+                  <span>
+                    {
+                      selectedConversation
+                        .files
+                        ?.length ||
+                      0
+                    }
+                    {" "}
+                    {
+                      (
+                        selectedConversation
+                          .files
+                          ?.length ||
+                        0
+                      ) ===
+                      1
+                        ? "file"
+                        : "files"
+                    }
+                  </span>
                 </header>
 
-                {selectedConversation.files.length ? (
-                  <div>
-                    {selectedConversation.files.map(
-                      (file) => (
-                        <div
-                          key={file.name}
-                          className={styles.fileCard}
-                        >
-                          <span>
-                            <FileText size={20} />
-                          </span>
+                {selectedConversation
+                  .files
+                  ?.length ? (
+                  <div
+                    className={
+                      styles.conversationAssetsList
+                    }
+                  >
+                    {selectedConversation
+                      .files
+                      .map(
+                        (file) => {
+                          const kind =
+                            attachmentKind(
+                              file,
+                            );
 
-                          <span>
-                            <strong>
-                              {file.name}
-                            </strong>
+                          const savedFile =
+                            file.source ===
+                              "campaign-file"
+                              ? file
+                              : getSavedProviderAttachment(
+                                  file,
+                                  selectedConversation
+                                    ?.mailboxEmail ||
+                                    mailboxConnectedEmail ||
+                                    "",
+                                );
 
-                            <small>
-                              {humanFileSize(
-                                file.size,
-                              )}
-                              {file.contentType
-                                ? ` · ${file.contentType}`
-                                : ""}
-                            </small>
-                          </span>
-
-                            {(file.source ===
+                          const canOpenFile =
+                            file.source ===
                               "campaign-file" ||
                             (
-                              file.providerAttachmentId &&
-                              file.providerMessageId
-                            )) ? (
-                              <div
+                              file
+                                .providerAttachmentId &&
+                              file
+                                .providerMessageId
+                            );
+
+                          const sourceDirection =
+                            file
+                              .sourceDirection ===
+                            "outbound"
+                              ? "Sent by"
+                              : "Received from";
+
+                          const sourceAuthor =
+                            file
+                              .sourceAuthor ||
+                            (
+                              file.source ===
+                                "campaign-file"
+                                ? "Campaign Seat"
+                                : selectedConversation
+                                    ?.sender ||
+                                  "Campaign contact"
+                            );
+
+                          return (
+                            <article
+                              key={
+                                file.id ||
+                                `${file.name}-${file.size}`
+                              }
+                              className={
+                                styles.conversationAssetCard
+                              }
+                            >
+                              <span
                                 className={
-                                  styles.fileActions
+                                  styles.conversationAssetIcon
                                 }
                               >
-                                {attachmentKind(
-                                  file,
-                                ) !==
-                                "file" ? (
-                                  <button
-                                    className={
-                                      styles.filePreviewButton
+                                {kind ===
+                                "image" ? (
+                                  <Image
+                                    size={22}
+                                  />
+                                ) : (
+                                  <FileText
+                                    size={22}
+                                  />
+                                )}
+                              </span>
+
+                              <div
+                                className={
+                                  styles.conversationAssetCopy
+                                }
+                              >
+                                <strong>
+                                  {
+                                    file.name
+                                  }
+                                </strong>
+
+                                <div
+                                  className={
+                                    styles.conversationAssetMeta
+                                  }
+                                >
+                                  <span>
+                                    {kind ===
+                                    "image"
+                                      ? "Image"
+                                      : kind ===
+                                          "pdf"
+                                        ? "PDF"
+                                        : "File"}
+                                  </span>
+
+                                  <span>
+                                    {humanFileSize(
+                                      file.size,
+                                    )}
+                                  </span>
+
+                                  <span>
+                                    {
+                                      file
+                                        .sourceChannel ||
+                                      getChannelLabel(
+                                        selectedConversation
+                                          .channel,
+                                      )
                                     }
+                                  </span>
+
+                                  {file.source !==
+                                  "campaign-file" ? (
+                                    <span>
+                                      {sourceDirection}
+                                      {" "}
+                                      {sourceAuthor}
+                                    </span>
+                                  ) : (
+                                    <span>
+                                      Campaign Seat
+                                    </span>
+                                  )}
+
+                                  {file
+                                    .sourceTime ? (
+                                    <span>
+                                      {
+                                        file
+                                          .sourceTime
+                                      }
+                                    </span>
+                                  ) : null}
+                                </div>
+
+                                <div
+                                  className={
+                                    styles.conversationAssetStorage
+                                  }
+                                >
+                                  {savedFile ? (
+                                    <span
+                                      className={
+                                        styles.conversationAssetSaved
+                                      }
+                                    >
+                                      <CheckCircle2
+                                        size={14}
+                                      />
+
+                                      Saved in Documents
+                                    </span>
+                                  ) : (
+                                    <span>
+                                      Provider attachment
+                                    </span>
+                                  )}
+                                </div>
+                              </div>
+
+                              <div
+                                className={
+                                  styles.conversationAssetActions
+                                }
+                              >
+                                {canOpenFile &&
+                                kind !==
+                                  "file" ? (
+                                  <button
                                     type="button"
                                     disabled={
                                       attachmentPreviewLoading ===
@@ -12343,6 +12817,7 @@ type="button"
                                     }
                                     onClick={() =>
                                       void previewConversationFile(
+                                        savedFile ||
                                         file,
                                       )
                                     }
@@ -12357,31 +12832,118 @@ type="button"
                                   </button>
                                 ) : null}
 
-                                <button
-                                  className={
-                                    styles.fileDownloadButton
-                                  }
-                                  type="button"
-                                  onClick={() =>
-                                    downloadConversationFile(
-                                      file,
-                                    )
-                                  }
-                                >
-                                  Download
-                                </button>
+                                {canOpenFile ? (
+                                  <button
+                                    className={
+                                      styles.conversationAssetDownload
+                                    }
+                                    type="button"
+                                    onClick={() =>
+                                      void downloadConversationFile(
+                                        savedFile ||
+                                        file,
+                                      )
+                                    }
+                                  >
+                                    <Download
+                                      size={15}
+                                    />
+
+                                    Download to Device
+                                  </button>
+                                ) : null}
+
+                                {savedFile ? (
+                                  <button
+                                    type="button"
+                                    onClick={() =>
+                                      window.location.assign(
+                                        "/documents",
+                                      )
+                                    }
+                                  >
+                                    Open Documents
+                                  </button>
+                                ) : (
+                                  file
+                                    .providerAttachmentId &&
+                                  file
+                                    .providerMessageId ? (
+                                    <button
+                                      className={
+                                        styles.conversationAssetSave
+                                      }
+                                      type="button"
+                                      disabled={
+                                        conversationFileBusy ===
+                                        (
+                                          file.id ||
+                                          file.name
+                                        )
+                                      }
+                                      onClick={() =>
+                                        void saveConversationFileToDocuments(
+                                          file,
+                                        )
+                                      }
+                                    >
+                                      {conversationFileBusy ===
+                                      (
+                                        file.id ||
+                                        file.name
+                                      )
+                                        ? "Saving…"
+                                        : "Save to Documents"}
+                                    </button>
+                                  ) : null
+                                )}
                               </div>
-                            ) : null}
-                        </div>
-                      ),
-                    )}
+                            </article>
+                          );
+                        },
+                      )}
                   </div>
                 ) : (
-                  <p>
-                    No files are attached to this
-                    conversation.
-                  </p>
+                  <div
+                    className={
+                      styles.conversationAssetsEmpty
+                    }
+                  >
+                    <FileText
+                      size={25}
+                    />
+
+                    <div>
+                      <strong>
+                        No files in this conversation
+                      </strong>
+
+                      <p>
+                        Attachments received or sent through this conversation will appear here.
+                      </p>
+                    </div>
+                  </div>
                 )}
+
+                <section
+                  className={
+                    styles.conversationAssetsOffline
+                  }
+                >
+                  <Download
+                    size={20}
+                  />
+
+                  <div>
+                    <strong>
+                      Need a copy offline?
+                    </strong>
+
+                    <p>
+                      Download to Device saves the real file to this phone or computer so it can be opened from the device Files or Downloads area without relying on Campaign Seat.
+                    </p>
+                  </div>
+                </section>
               </div>
             ) : null}
 

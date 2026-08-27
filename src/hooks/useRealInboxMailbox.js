@@ -640,6 +640,42 @@ function transformMessage({
     attachments:
       messageAttachments(
         message,
+      ).map(
+        (file) => ({
+          ...file,
+
+          source:
+            "provider-attachment",
+
+          sourceChannel:
+            "Email",
+
+          sourceDirection:
+            outbound
+              ? "outbound"
+              : "inbound",
+
+          sourceAuthor:
+            outbound
+              ? "You"
+              : (
+                  sender.name ||
+                  sender.email ||
+                  "Email contact"
+                ),
+
+          sourceTime:
+            relativeTime(
+              message.date ||
+              message.created_at,
+            ),
+
+          sourceTimestamp:
+            unixMilliseconds(
+              message.date ||
+              message.created_at,
+            ),
+        }),
       ),
   };
 }
