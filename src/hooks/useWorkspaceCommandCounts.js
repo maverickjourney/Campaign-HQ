@@ -203,6 +203,30 @@ export function useWorkspaceCommandCounts(
         }
 
         try {
+          const authorityUntil =
+            Number(
+              window.localStorage
+                .getItem(
+                  `campaign-seat:inbox-unread-authority:${workspaceId}`,
+                ) ||
+                0,
+            );
+
+          if (
+            Number.isFinite(
+              authorityUntil,
+            ) &&
+            Date.now() <
+              authorityUntil
+          ) {
+            return;
+          }
+        } catch {
+          // Local read authority is optional.
+        }
+
+
+        try {
           const {
             data,
             error:

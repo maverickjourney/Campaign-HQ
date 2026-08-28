@@ -34,6 +34,7 @@ import {
   Users,
   Vote,
   Menu,
+  X,
 } from "lucide-react";
 
 import {
@@ -80,6 +81,11 @@ import {
 import {
   useWorkspaceProviderFreshness,
 } from "../../hooks/useWorkspaceProviderFreshness";
+
+
+import {
+  useWorkspaceEmailRealtime,
+} from "../../hooks/useWorkspaceEmailRealtime";
 
 
 import styles from "./CampaignWorkspaceShell.module.css";
@@ -244,6 +250,24 @@ export function CampaignWorkspaceShell({
         workspace?.id,
       ),
   });
+
+  const {
+    notification:
+      emailNotification,
+
+    dismissNotification:
+      dismissEmailNotification,
+  } =
+    useWorkspaceEmailRealtime({
+      workspaceId:
+        workspace?.id,
+
+      enabled:
+        Boolean(
+          workspace?.id,
+        ),
+    });
+
 
   const [
     candidateAvatarUrl,
@@ -1037,6 +1061,78 @@ export function CampaignWorkspaceShell({
           {children}
         </div>
       </section>
+
+      {emailNotification ? (
+        <aside
+          className={
+            styles.emailRealtimeToast
+          }
+          role="status"
+          aria-live="polite"
+        >
+          <span
+            className={
+              styles.emailRealtimeToastIcon
+            }
+          >
+            <Mail
+              size={20}
+              strokeWidth={2}
+            />
+          </span>
+
+          <div
+            className={
+              styles.emailRealtimeToastCopy
+            }
+          >
+            <strong>
+              {
+                emailNotification
+                  .title
+              }
+            </strong>
+
+            <span>
+              {
+                emailNotification
+                  .message
+              }
+            </span>
+          </div>
+
+          <button
+            className={
+              styles.emailRealtimeToastOpen
+            }
+            type="button"
+            onClick={() => {
+              dismissEmailNotification();
+
+              navigate(
+                "/inbox",
+              );
+            }}
+          >
+            Open Inbox
+          </button>
+
+          <button
+            className={
+              styles.emailRealtimeToastClose
+            }
+            type="button"
+            aria-label="Dismiss new email notification"
+            onClick={
+              dismissEmailNotification
+            }
+          >
+            <X
+              size={17}
+            />
+          </button>
+        </aside>
+      ) : null}
     </div>
   );
 }

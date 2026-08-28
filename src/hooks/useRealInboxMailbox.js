@@ -1140,6 +1140,9 @@ function mailboxCount(
 function publishInboxUnreadCount(
   workspaceId,
   count,
+  {
+    authoritativeForMs = 0,
+  } = {},
 ) {
   if (
     typeof window ===
@@ -1170,6 +1173,20 @@ function publishInboxUnreadCount(
           safeCount,
         ),
       );
+
+    if (
+      authoritativeForMs >
+        0
+    ) {
+      window.localStorage
+        .setItem(
+          `campaign-seat:inbox-unread-authority:${workspaceId}`,
+          String(
+            Date.now() +
+            authoritativeForMs,
+          ),
+        );
+    }
   } catch {
     // Badge persistence is optional.
   }
@@ -2121,6 +2138,10 @@ return transformed;
                 publishInboxUnreadCount(
                   workspaceId,
                   next,
+                  {
+                    authoritativeForMs:
+                      20000,
+                  },
                 );
               }
 
@@ -3045,6 +3066,90 @@ return transformed;
     refresh,
     workspaceId,
   ]);
+
+  useEffect(
+    () => {
+      if (
+        !enabled ||
+        !workspaceId
+      ) {
+        return undefined;
+      }
+
+      let timerId;
+
+      const handleProviderChange =
+        (
+          event,
+        ) => {
+          if (
+            event?.detail
+              ?.workspaceId !==
+            workspaceId ||
+            document
+              .visibilityState ===
+              "hidden"
+          ) {
+            return;
+          }
+
+          if (
+            rateLimitBackoffUntilRef
+              .current >
+            Date.now()
+          ) {
+            return;
+          }
+
+          window.clearTimeout(
+            timerId,
+          );
+
+          timerId =
+            window.setTimeout(
+              () => {
+                if (
+                  refreshInFlightRef
+                    .current
+                ) {
+                  return;
+                }
+
+                lastQuietRefreshAtRef.current =
+                  Date.now();
+
+                void refresh({
+                  showLoading:
+                    false,
+                });
+              },
+              250,
+            );
+        };
+
+      window.addEventListener(
+        "campaign-seat-email-provider-change",
+        handleProviderChange,
+      );
+
+      return () => {
+        window.clearTimeout(
+          timerId,
+        );
+
+        window.removeEventListener(
+          "campaign-seat-email-provider-change",
+          handleProviderChange,
+        );
+      };
+    },
+    [
+      enabled,
+      refresh,
+      workspaceId,
+    ],
+  );
+
 
   const selectedLatestProviderMessageId =
     conversations.find(

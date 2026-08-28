@@ -28044,3 +28044,85 @@ pre {
 }
 
 /* TALLER DESKTOP INBOX WORKSPACE — END */
+
+
+/* EXTRA INBOX VERTICAL WORKSPACE — START */
+
+@media (min-width: 901px) {
+
+  .inboxWorkspace,
+  .conversationPanel,
+  .threadPanel {
+    min-height:
+      clamp(
+        820px,
+        calc(
+          100dvh -
+          145px
+        ),
+        1000px
+      ) !important;
+  }
+
+
+  .threadPanelReplying
+  .replyComposer {
+    max-height:
+      min(
+        32dvh,
+        305px
+      ) !important;
+  }
+
+
+  .threadPanelExpanded.threadPanelReplying
+  .replyComposer {
+    max-height:
+      min(
+        34dvh,
+        330px
+      ) !important;
+  }
+
+
+  .threadPanelReplying
+  .threadBody {
+    min-height:
+      320px !important;
+
+    flex:
+      1
+      1
+      auto !important;
+  }
+
+
+  .threadPanelReplying
+  .richComposerEditor {
+    min-height:
+      88px !important;
+
+    max-height:
+      115px !important;
+  }
+}
+
+
+@media (min-width: 901px) and (max-height: 820px) {
+
+  .inboxWorkspace,
+  .conversationPanel,
+  .threadPanel {
+    min-height:
+      760px !important;
+  }
+
+
+  .threadPanelReplying
+  .threadBody {
+    min-height:
+      270px !important;
+  }
+}
+
+/* EXTRA INBOX VERTICAL WORKSPACE — END */
