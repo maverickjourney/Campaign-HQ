@@ -262,6 +262,58 @@ function stripHtml(value) {
   );
 }
 
+function stripQuotedEmailHistory(
+  value,
+) {
+  let text =
+    clean(
+      value,
+    )
+      .replace(
+        /\r/g,
+        "",
+      )
+      .trim();
+
+  if (!text) {
+    return "";
+  }
+
+  const patterns = [
+    /\n-{2,}\s*Original Message\s*-{2,}[\s\S]*$/i,
+
+    /\nFrom:\s*[^\n]+\n(?:Sent|Date):\s*[^\n]+\nTo:\s*[^\n]+\nSubject:\s*[^\n]+[\s\S]*$/i,
+
+    /\nOn\s.+?\swrote:\s*[\s\S]*$/i,
+
+    /\n_{5,}[\s\S]*$/i,
+  ];
+
+  for (
+    const pattern
+    of patterns
+  ) {
+    const cleaned =
+      text.replace(
+        pattern,
+        "",
+      ).trim();
+
+    if (
+      cleaned !==
+      text
+    ) {
+      text =
+        cleaned;
+
+      break;
+    }
+  }
+
+  return text;
+}
+
+
 function initials(value) {
   return clean(value)
     .split(/\s+/)
@@ -565,6 +617,17 @@ function transformMessage({
   const outbound =
     sender.email === own;
 
+  const fullTextBody =
+    stripHtml(
+      message.body ||
+      message.snippet,
+    );
+
+  const displayBody =
+    stripQuotedEmailHistory(
+      fullTextBody,
+    );
+
   return {
     id:
       `nylas-message-${
@@ -653,9 +716,14 @@ function transformMessage({
       "Email",
 
     body:
-      stripHtml(
-        message.body ||
-        message.snippet,
+      displayBody,
+
+    quotedHistoryHidden:
+      Boolean(
+        fullTextBody &&
+        displayBody &&
+        fullTextBody !==
+          displayBody,
       ),
 
     htmlBody:
@@ -2143,8 +2211,8 @@ return transformed;
                   left,
                   right,
                 ) =>
-                  left.order -
-                  right.order,
+                  right.order -
+                  left.order,
               );
 
           if (

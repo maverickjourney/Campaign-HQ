@@ -1362,6 +1362,8 @@ function emailHasRemoteImages(
   html,
 ) {
   if (
+    message
+      ?.quotedHistoryHidden ||
     !html ||
     typeof window ===
       "undefined"
@@ -2911,6 +2913,8 @@ export default function InboxReferencePreview() {
   const {
     signature:
       workspaceEmailSignature,
+    exists:
+      signatureExists,
     isLoading:
       signatureLoading,
   } =
@@ -3927,6 +3931,12 @@ export default function InboxReferencePreview() {
   ] = useState(false);
 
   const [
+    replySendState,
+    setReplySendState,
+  ] = useState("idle");
+
+
+  const [
     includeSignature,
     setIncludeSignature,
   ] = useState(false);
@@ -4518,9 +4528,7 @@ export default function InboxReferencePreview() {
           }
 
           threadBody.scrollTop =
-            replyComposerOpen
-              ? threadBody.scrollHeight
-              : 0;
+            0;
         },
       );
 
@@ -4568,32 +4576,75 @@ export default function InboxReferencePreview() {
               : "Connect campaign email during Email & Contacts setup to send and receive messages here."
         : "Text and WhatsApp open externally. Confirm the result when you return to Campaign Seat.";
 
+  const defaultCampaignSignatureText =
+    [
+      String(
+        user.name ||
+        user.fullName ||
+        "",
+      ).trim(),
+
+      String(
+        workspace.name ||
+        "",
+      ).trim(),
+    ]
+      .filter(Boolean)
+      .filter(
+        (
+          value,
+          index,
+          values,
+        ) =>
+          values.indexOf(
+            value,
+          ) ===
+          index,
+      )
+      .join(
+        "\n",
+      );
+
   const configuredSignatureText =
-    String(
-      workspaceEmailSignature
-        ?.signature_text ||
-      "",
-    ).trim();
+    signatureExists
+      ? String(
+          workspaceEmailSignature
+            ?.signature_text ||
+          "",
+        ).trim()
+      : defaultCampaignSignatureText;
 
   const signatureEnabled =
-    workspaceEmailSignature
-      ?.enabled ===
-      true &&
-    Boolean(
-      configuredSignatureText,
-    );
+    signatureExists
+      ? (
+          workspaceEmailSignature
+            ?.enabled ===
+            true &&
+          Boolean(
+            configuredSignatureText,
+          )
+        )
+      : Boolean(
+          configuredSignatureText,
+        );
 
   const defaultSignatureOnNew =
     signatureEnabled &&
-    workspaceEmailSignature
-      ?.include_on_new ===
-      true;
+    (
+      !signatureExists ||
+      workspaceEmailSignature
+        ?.include_on_new ===
+        true
+    );
 
   const defaultSignatureOnReply =
     signatureEnabled &&
-    workspaceEmailSignature
-      ?.include_on_reply ===
-      true;
+    (
+      !signatureExists ||
+      workspaceEmailSignature
+        ?.include_on_reply ===
+        true
+    );
 
 
   const contacts = useMemo(() => {
@@ -5750,6 +5801,10 @@ export default function InboxReferencePreview() {
 
 
   const openNewMessage = () => {
+    setReplySendState(
+      "idle",
+    );
+
     setThreadExpanded(false);
     setNewMessageMode(true);
     setReplyText("");
@@ -6344,6 +6399,14 @@ export default function InboxReferencePreview() {
           : "",
       );
 
+      setIncludeSignature(
+        defaultSignatureOnReply,
+      );
+
+      setReplySendState(
+        "idle",
+      );
+
       setReplyComposerOpen(
         true,
       );
@@ -6355,7 +6418,7 @@ export default function InboxReferencePreview() {
 
           if (threadBody) {
             threadBody.scrollTop =
-              threadBody.scrollHeight;
+              0;
           }
 
           document
@@ -6369,6 +6432,10 @@ export default function InboxReferencePreview() {
 
   const cancelInlineReply =
     () => {
+      setReplySendState(
+        "idle",
+      );
+
       setReplyComposerOpen(
         false,
       );
@@ -6402,9 +6469,21 @@ export default function InboxReferencePreview() {
           : [];
 
       const latestMessage =
-        messages[
-          messages.length - 1
-        ] ||
+        [...messages]
+          .sort(
+            (
+              left,
+              right,
+            ) =>
+              Number(
+                right?.order ||
+                0,
+              ) -
+              Number(
+                left?.order ||
+                0,
+              ),
+          )[0] ||
         null;
 
       const subject =
@@ -6465,6 +6544,10 @@ export default function InboxReferencePreview() {
     };
 
   const openConversation = (id) => {
+    setReplySendState(
+      "idle",
+    );
+
     setReplyComposerOpen(
       false,
     );
@@ -7195,6 +7278,10 @@ export default function InboxReferencePreview() {
         return;
       }
 
+      setReplySendState(
+        "sending",
+      );
+
       try {
         const hydrated =
           await loadMailboxThread(
@@ -7209,7 +7296,20 @@ export default function InboxReferencePreview() {
               []
             ),
           ]
-            .reverse()
+            .sort(
+              (
+                left,
+                right,
+              ) =>
+                Number(
+                  right?.order ||
+                  0,
+                ) -
+                Number(
+                  left?.order ||
+                  0,
+                ),
+            )
             .find(
               (message) =>
                 message.providerMessageId,
@@ -7364,7 +7464,28 @@ export default function InboxReferencePreview() {
         await loadMailboxThread(
           selectedConversation.providerThreadId,
         );
+
+        setReplySendState(
+          "sent",
+        );
+
+        window.setTimeout(
+          () => {
+            setReplyComposerOpen(
+              false,
+            );
+
+            setReplySendState(
+              "idle",
+            );
+          },
+          1400,
+        );
       } catch (sendError) {
+        setReplySendState(
+          "idle",
+        );
+
         setToast(
           sendError?.message ||
           "Campaign Seat could not send this email reply.",
@@ -12718,10 +12839,6 @@ type="button"
                   }}
                 />
 
-                <div className={styles.dateDivider}>
-                  <span>Today</span>
-                </div>
-
                 {selectedConversation.messages.map(
                   (message) => (
                     <div
@@ -14904,16 +15021,60 @@ type="button"
                   )}
 
                   <button
-                    className={styles.sendButton}
+                    className={[
+                      styles.sendButton,
+
+                      !newMessageMode &&
+                      replyChannel ===
+                        "email" &&
+                      replySendState ===
+                        "sent"
+                        ? styles.sendButtonSuccess
+                        : "",
+                    ]
+                      .filter(Boolean)
+                      .join(" ")}
                     type="button"
+                    disabled={
+                      !newMessageMode &&
+                      replyChannel ===
+                        "email" &&
+                      replySendState ===
+                        "sending"
+                    }
                     onClick={
                       newMessageMode
                         ? sendNewMessage
                         : sendReply
                     }
                   >
-                    <Send size={17} />
-                    {newMessageMode
+                    {!newMessageMode &&
+                    replyChannel ===
+                      "email" &&
+                    replySendState ===
+                      "sent" ? (
+                      <CheckCircle2
+                        size={17}
+                      />
+                    ) : (
+                      <Send
+                        size={17}
+                      />
+                    )}
+
+                    {!newMessageMode &&
+                    replyChannel ===
+                      "email" &&
+                    replySendState ===
+                      "sending"
+                      ? "Sending…"
+                      : !newMessageMode &&
+                          replyChannel ===
+                            "email" &&
+                          replySendState ===
+                            "sent"
+                        ? "Email Sent"
+                        : newMessageMode
                       ? replyChannel === "text"
                         ? "Prepare Text"
                         : replyChannel === "whatsapp"

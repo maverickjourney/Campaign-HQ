@@ -27193,3 +27193,60 @@ small {
 }
 
 /* INBOX HEADER ACTION FIT — END */
+
+
+/* EMAIL THREAD + SEND CONFIRMATION — START */
+
+.sendButton:disabled {
+  cursor:
+    wait !important;
+
+  opacity:
+    0.78 !important;
+}
+
+
+.sendButtonSuccess {
+  border-color:
+    #247a57 !important;
+
+  color:
+    #ffffff !important;
+
+  background:
+    #247a57 !important;
+
+  box-shadow:
+    0
+    7px
+    18px
+    rgba(
+      36,
+      122,
+      87,
+      0.22
+    ) !important;
+}
+
+
+.sendButtonSuccess:hover {
+  border-color:
+    #247a57 !important;
+
+  background:
+    #247a57 !important;
+}
+
+
+/*
+ * Newest message is intentionally shown first.
+ * Older exchanges follow directly below with no
+ * artificial global date separator.
+ */
+
+.threadBody {
+  scroll-behavior:
+    smooth;
+}
+
+/* EMAIL THREAD + SEND CONFIRMATION — END */
