@@ -262,6 +262,47 @@ export function useWorkspaceCommandCounts(
             unread !==
               null
           ) {
+            /*
+             * The shared shell already performs this mailbox
+             * check outside Inbox. Reuse the trustworthy provider
+             * unread count to bridge missed Nylas webhooks into
+             * the normal Campaign Seat Activity Center.
+             *
+             * This adds no additional provider request.
+             */
+            try {
+              const {
+                error:
+                  reconciliationError,
+              } =
+                await supabase.rpc(
+                  "reconcile_email_unread_activity",
+                  {
+                    target_workspace_id:
+                      workspaceId,
+
+                    target_unread_count:
+                      unread,
+                  },
+                );
+
+              if (
+                reconciliationError
+              ) {
+                console.warn(
+                  "Campaign Seat email Activity Center reconciliation failed:",
+                  reconciliationError,
+                );
+              }
+            } catch (
+              reconciliationError
+            ) {
+              console.warn(
+                "Campaign Seat email Activity Center reconciliation failed:",
+                reconciliationError,
+              );
+            }
+
             setInboxCount(
               unread,
             );
