@@ -535,6 +535,27 @@ function transformMessage({
       message?.from,
     );
 
+  const to =
+    recipientList(
+      message?.to,
+    );
+
+  const cc =
+    recipientList(
+      message?.cc,
+    );
+
+  const bcc =
+    recipientList(
+      message?.bcc,
+    );
+
+  const replyTo =
+    recipientList(
+      message?.reply_to ||
+      message?.replyTo,
+    );
+
   const sender =
     from[0] || {
       email: "",
@@ -583,6 +604,21 @@ function transformMessage({
       outbound
         ? "outbound"
         : "inbound",
+
+    fromRecipients:
+      from,
+
+    toRecipients:
+      to,
+
+    ccRecipients:
+      cc,
+
+    bccRecipients:
+      bcc,
+
+    replyToRecipients:
+      replyTo,
 
     author:
       outbound

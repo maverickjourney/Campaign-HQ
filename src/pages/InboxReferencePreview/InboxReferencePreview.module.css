@@ -26109,3 +26109,223 @@ span {
 }
 
 /* CAMPAIGN SEAT DIRECTIONAL CONVERSATION FLOW — END */
+
+
+/* REAL EMAIL ENVELOPE + SUBJECT — START */
+
+.emailEnvelopeMeta {
+  display:
+    grid !important;
+
+  grid-template-columns:
+    1fr !important;
+
+  gap:
+    0 !important;
+
+  padding:
+    0 !important;
+
+  background:
+    #f8fafc !important;
+}
+
+
+.emailEnvelopeRecipients {
+  display:
+    grid;
+
+  grid-template-columns:
+    auto
+    minmax(
+      0,
+      1fr
+    );
+
+  align-items:
+    start;
+
+  gap:
+    6px
+    12px;
+
+  padding:
+    10px
+    13px
+    9px;
+}
+
+
+.emailEnvelopeRecipients
+.emailDirectionBadge {
+  grid-column:
+    1 / -1;
+
+  justify-self:
+    start;
+
+  margin-bottom:
+    2px;
+}
+
+
+.emailEnvelopeRow {
+  display:
+    contents;
+}
+
+
+.emailEnvelopeRow
+> b {
+  color:
+    #365c79;
+
+  font-size:
+    12px;
+
+  font-weight:
+    850;
+
+  line-height:
+    1.5;
+
+  white-space:
+    nowrap;
+}
+
+
+.emailEnvelopeRow
+> span {
+  min-width:
+    0;
+
+  color:
+    #617b90;
+
+  font-size:
+    12px;
+
+  line-height:
+    1.5;
+
+  overflow-wrap:
+    anywhere;
+
+  word-break:
+    normal;
+}
+
+
+.emailSubjectRow {
+  display:
+    grid;
+
+  grid-template-columns:
+    auto
+    minmax(
+      0,
+      1fr
+    );
+
+  align-items:
+    baseline;
+
+  gap:
+    12px;
+
+  padding:
+    9px
+    13px
+    10px;
+
+  border-top:
+    1px solid
+    #e3ebf0;
+
+  background:
+    #ffffff;
+}
+
+
+.emailSubjectRow
+> span {
+  color:
+    #74899a;
+
+  font-size:
+    11px;
+
+  font-weight:
+    800;
+
+  letter-spacing:
+    0.035em;
+
+  text-transform:
+    uppercase;
+}
+
+
+.emailSubjectRow
+> strong {
+  min-width:
+    0;
+
+  color:
+    #234d6c;
+
+  font-size:
+    14px;
+
+  font-weight:
+    850;
+
+  line-height:
+    1.4;
+
+  overflow-wrap:
+    anywhere;
+}
+
+
+/*
+ * Sent email keeps the same envelope structure while
+ * retaining the subtle sent-message treatment.
+ */
+
+.outboundMessage.emailMessage
+.emailEnvelopeRecipients {
+  background:
+    #f4f7f9;
+}
+
+
+.outboundMessage.emailMessage
+.emailSubjectRow {
+  background:
+    #fbfcfd;
+}
+
+
+@media (max-width: 760px) {
+
+  .emailEnvelopeRecipients {
+    grid-template-columns:
+      44px
+      minmax(
+        0,
+        1fr
+      );
+  }
+
+
+  .emailSubjectRow {
+    grid-template-columns:
+      1fr;
+
+    gap:
+      3px;
+  }
+}
+
+/* REAL EMAIL ENVELOPE + SUBJECT — END */

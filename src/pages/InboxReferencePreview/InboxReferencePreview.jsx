@@ -2358,6 +2358,65 @@ function emailAccountTone(
   );
 }
 
+function emailRecipientDisplay(
+  recipient,
+) {
+  const name =
+    String(
+      recipient?.name ||
+      "",
+    ).trim();
+
+  const email =
+    String(
+      recipient?.email ||
+      "",
+    ).trim();
+
+  if (
+    name &&
+    email &&
+    name.toLowerCase() !==
+      email.toLowerCase()
+  ) {
+    return `${name} <${email}>`;
+  }
+
+  return (
+    name ||
+    email ||
+    ""
+  );
+}
+
+
+function emailRecipientListDisplay(
+  recipients,
+  fallback = "",
+) {
+  const values =
+    (
+      Array.isArray(
+        recipients,
+      )
+        ? recipients
+        : []
+    )
+      .map(
+        emailRecipientDisplay,
+      )
+      .filter(Boolean);
+
+  return (
+    values.join(
+      ", ",
+    ) ||
+    fallback ||
+    "Not available"
+  );
+}
+
+
 function inboxActivityEventLabel(
   actionKey,
   updates = {},
@@ -12137,65 +12196,141 @@ type="button"
                               styles.emailEnvelopeMeta
                             }
                           >
-                            <span
+                            <div
                               className={
-                                styles.emailDirectionBadge
+                                styles.emailEnvelopeRecipients
                               }
                             >
-                              {message.direction ===
-                              "outbound"
-                                ? "Sent email"
-                                : "Received email"}
-                            </span>
+                              <span
+                                className={
+                                  styles.emailDirectionBadge
+                                }
+                              >
+                                {message.direction ===
+                                "outbound"
+                                  ? "Sent email"
+                                  : "Received email"}
+                              </span>
 
-                            <span>
-                              <b>
-                                From
-                              </b>
+                              <div
+                                className={
+                                  styles.emailEnvelopeRow
+                                }
+                              >
+                                <b>
+                                  From
+                                </b>
 
-                              {message.direction ===
-                              "outbound"
-                                ? (
-                                    mailboxConnectedEmail ||
-                                    "Connected campaign mailbox"
-                                  )
-                                : (
-                                    selectedConversation
-                                      ?.email ||
-                                    message.author
+                                <span>
+                                  {emailRecipientListDisplay(
+                                    message
+                                      .fromRecipients,
+                                    message.direction ===
+                                    "outbound"
+                                      ? (
+                                          mailboxConnectedEmail ||
+                                          "Connected campaign mailbox"
+                                        )
+                                      : (
+                                          selectedConversation
+                                            ?.email ||
+                                          message.author
+                                        ),
                                   )}
-                            </span>
+                                </span>
+                              </div>
 
-                            <span>
-                              <b>
-                                To
-                              </b>
+                              <div
+                                className={
+                                  styles.emailEnvelopeRow
+                                }
+                              >
+                                <b>
+                                  To
+                                </b>
+
+                                <span>
+                                  {emailRecipientListDisplay(
+                                    message
+                                      .toRecipients,
+                                    message.direction ===
+                                    "outbound"
+                                      ? (
+                                          selectedConversation
+                                            ?.email ||
+                                          selectedConversation
+                                            ?.sender ||
+                                          "Recipient"
+                                        )
+                                      : (
+                                          mailboxConnectedEmail ||
+                                          "Connected campaign mailbox"
+                                        ),
+                                  )}
+                                </span>
+                              </div>
+
+                              {message
+                                .ccRecipients
+                                ?.length ? (
+                                <div
+                                  className={
+                                    styles.emailEnvelopeRow
+                                  }
+                                >
+                                  <b>
+                                    Cc
+                                  </b>
+
+                                  <span>
+                                    {emailRecipientListDisplay(
+                                      message
+                                        .ccRecipients,
+                                    )}
+                                  </span>
+                                </div>
+                              ) : null}
 
                               {message.direction ===
-                              "outbound"
-                                ? (
-                                    selectedConversation
-                                      ?.email ||
-                                    selectedConversation
-                                      ?.sender ||
-                                    "Recipient"
-                                  )
-                                : (
-                                    mailboxConnectedEmail ||
-                                    "Connected campaign mailbox"
-                                  )}
-                            </span>
+                                "outbound" &&
+                              message
+                                .bccRecipients
+                                ?.length ? (
+                                <div
+                                  className={
+                                    styles.emailEnvelopeRow
+                                  }
+                                >
+                                  <b>
+                                    Bcc
+                                  </b>
 
-                            <span>
-                              <b>
+                                  <span>
+                                    {emailRecipientListDisplay(
+                                      message
+                                        .bccRecipients,
+                                    )}
+                                  </span>
+                                </div>
+                              ) : null}
+                            </div>
+
+                            <div
+                              className={
+                                styles.emailSubjectRow
+                              }
+                            >
+                              <span>
                                 Subject
-                              </b>
+                              </span>
 
-                              {message.subject ||
-                                selectedConversation
-                                  ?.subject ||
-                                "(No subject)"}
-                            </span>
+                              <strong>
+                                {message.subject ||
+                                  selectedConversation
+                                    ?.subject ||
+                                  "(No subject)"}
+                              </strong>
+                            </div>
                           </div>
                         ) : (
                           <small>
