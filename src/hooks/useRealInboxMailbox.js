@@ -40,6 +40,23 @@ const SEND_REQUEST_TIMEOUT_MS =
   25000;
 
 
+/*
+ * CAMPAIGN SEAT FAST MAILBOX HYDRATION V1
+ *
+ * The newest message is already present in the thread-list
+ * payload. Render that immediately, then hydrate older history
+ * after the first paint and in provider-safe batches.
+ */
+const THREAD_HYDRATION_DELAY_MS =
+  300;
+
+const THREAD_HYDRATION_BATCH_SIZE =
+  3;
+
+const THREAD_HYDRATION_BATCH_PAUSE_MS =
+  120;
+
+
 async function withRequestTimeout(
   promise,
   timeoutMs,
@@ -1685,7 +1702,6 @@ export function useRealInboxMailbox({
 
             if (
               deepRefresh &&
-              !pageToken &&
               threadRows.length
             ) {
               const progressiveMailboxEmail =
@@ -2570,9 +2586,25 @@ return transformed;
                 -20,
               );
 
-          const messageResults =
-            await Promise.all(
-              messageIds.map(
+          const messageResults = [];
+
+          for (
+            let messageIndex = 0;
+            messageIndex <
+              messageIds.length;
+            messageIndex +=
+              THREAD_HYDRATION_BATCH_SIZE
+          ) {
+            const messageBatch =
+              messageIds.slice(
+                messageIndex,
+                messageIndex +
+                  THREAD_HYDRATION_BATCH_SIZE,
+              );
+
+            const batchResults =
+              await Promise.all(
+                messageBatch.map(
                 async (
                   messageId,
                 ) => {
@@ -2595,6 +2627,25 @@ return transformed;
                 },
               ),
             );
+
+            messageResults.push(
+              ...batchResults,
+            );
+
+            if (
+              messageIndex +
+                THREAD_HYDRATION_BATCH_SIZE <
+              messageIds.length
+            ) {
+              await new Promise(
+                (resolve) =>
+                  window.setTimeout(
+                    resolve,
+                    THREAD_HYDRATION_BATCH_PAUSE_MS,
+                  ),
+              );
+            }
+          }
 
           const messages =
             messageResults
@@ -3181,7 +3232,7 @@ return transformed;
             selectedConversationId,
           );
         },
-        0,
+        THREAD_HYDRATION_DELAY_MS,
       );
 
     return () => {
