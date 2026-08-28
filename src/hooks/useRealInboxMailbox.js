@@ -22,7 +22,7 @@ const MICROSOFT_MAILBOX_PAGE_SIZE =
   10;
 
 const MICROSOFT_MAILBOX_TARGET_THREAD_COUNT =
-  30;
+  20;
 
 const QUIET_REFRESH_INTERVAL_MS =
   60000;
@@ -932,6 +932,11 @@ function transformThread({
     providerThreadId:
       thread.id,
 
+    latestProviderMessageId:
+      clean(
+        latest?.id,
+      ),
+
     folderIds:
       Array.isArray(
         thread.folders,
@@ -1142,6 +1147,49 @@ function errorMessage(
   );
 }
 
+function mergeMailboxConversationState(
+  existing,
+  incoming,
+) {
+  if (!existing) {
+    return incoming;
+  }
+
+  const preserveHydrated =
+    existing
+      .mailboxHydrated ===
+    true;
+
+  return {
+    ...existing,
+    ...incoming,
+
+    messages:
+      preserveHydrated &&
+      Array.isArray(
+        existing.messages,
+      ) &&
+      existing.messages.length
+        ? existing.messages
+        : incoming.messages,
+
+    files:
+      preserveHydrated &&
+      Array.isArray(
+        existing.files,
+      )
+        ? existing.files
+        : incoming.files,
+
+    mailboxHydrated:
+      preserveHydrated ||
+      incoming
+        .mailboxHydrated ===
+        true,
+  };
+}
+
+
 export function useRealInboxMailbox({
   workspaceId,
   enabled,
@@ -1217,6 +1265,41 @@ export function useRealInboxMailbox({
     useRef(
       0,
     );
+
+  const conversationsRef =
+    useRef(
+      [],
+    );
+
+  const connectedEmailRef =
+    useRef(
+      "",
+    );
+
+  const hasMailboxSnapshotRef =
+    useRef(
+      false,
+    );
+
+  useEffect(
+    () => {
+      conversationsRef.current =
+        conversations;
+    },
+    [
+      conversations,
+    ],
+  );
+
+  useEffect(
+    () => {
+      connectedEmailRef.current =
+        connectedEmail;
+    },
+    [
+      connectedEmail,
+    ],
+  );
 
   const invokeMailbox =
     useCallback(
@@ -1306,8 +1389,16 @@ export function useRealInboxMailbox({
           return [];
         }
 
+        const deepRefresh =
+          !hasMailboxSnapshotRef
+            .current;
+
+        const shouldShowLoading =
+          showLoading &&
+          deepRefresh;
+
         if (
-          showLoading
+          shouldShowLoading
         ) {
           setIsLoading(
             true,
@@ -1410,12 +1501,12 @@ export function useRealInboxMailbox({
             refreshProvider ===
               "microsoft"
               ? (
-                  showLoading
+                  deepRefresh
                     ? MICROSOFT_MAILBOX_TARGET_THREAD_COUNT
                     : MICROSOFT_MAILBOX_PAGE_SIZE
                 )
               : (
-                  showLoading
+                  deepRefresh
                     ? MAILBOX_TARGET_THREAD_COUNT
                     : MAILBOX_PAGE_SIZE
                 );
@@ -1516,7 +1607,8 @@ export function useRealInboxMailbox({
             }
 
             if (
-              showLoading &&
+              deepRefresh &&
+              !pageToken &&
               threadRows.length
             ) {
               const progressiveMailboxEmail =
@@ -1524,7 +1616,8 @@ export function useRealInboxMailbox({
                   pageResult
                     .connectedEmail,
                 ) ||
-                connectedEmail;
+                connectedEmailRef
+                  .current;
 
               const progressive =
                 threadRows
@@ -1550,8 +1643,35 @@ export function useRealInboxMailbox({
                   );
 
               setConversations(
-                progressive,
+                (current) => {
+                  const existingById =
+                    new Map(
+                      current.map(
+                        (
+                          conversation,
+                        ) => [
+                          conversation.id,
+                          conversation,
+                        ],
+                      ),
+                    );
+
+                  return progressive.map(
+                    (
+                      conversation,
+                    ) =>
+                      mergeMailboxConversationState(
+                        existingById.get(
+                          conversation.id,
+                        ),
+                        conversation,
+                      ),
+                  );
+                },
               );
+
+              hasMailboxSnapshotRef.current =
+                true;
 
               setIsLoading(
                 false,
@@ -1617,7 +1737,8 @@ export function useRealInboxMailbox({
                       thread,
                       connectedEmail:
                         mailboxEmail ||
-                        connectedEmail,
+                        connectedEmailRef
+                          .current,
                     });
 return transformed;
                 },
@@ -1633,10 +1754,41 @@ return transformed;
 
           setConversations(
             (current) => {
+              const existingById =
+                new Map(
+                  current.map(
+                    (
+                      conversation,
+                    ) => [
+                      conversation.id,
+                      conversation,
+                    ],
+                  ),
+                );
+
               if (
-                showLoading
+                deepRefresh
               ) {
-                return next;
+                return next
+                  .map(
+                    (
+                      conversation,
+                    ) =>
+                      mergeMailboxConversationState(
+                        existingById.get(
+                          conversation.id,
+                        ),
+                        conversation,
+                      ),
+                  )
+                  .sort(
+                    (
+                      left,
+                      right,
+                    ) =>
+                      right.order -
+                      left.order,
+                  );
               }
 
               const merged =
@@ -1657,7 +1809,12 @@ return transformed;
                 ) => {
                   merged.set(
                     conversation.id,
-                    conversation,
+                    mergeMailboxConversationState(
+                      merged.get(
+                        conversation.id,
+                      ),
+                      conversation,
+                    ),
                   );
                 },
               );
@@ -1674,6 +1831,9 @@ return transformed;
               );
             },
           );
+
+          hasMailboxSnapshotRef.current =
+            true;
 
           rateLimitBackoffUntilRef.current =
             0;
@@ -1721,7 +1881,6 @@ return transformed;
         }
       },
       [
-        connectedEmail,
         enabled,
         invokeMailbox,
         selectedFolderId,
@@ -2253,12 +2412,14 @@ return transformed;
             )
         ) {
           return (
-            conversations.find(
-              (item) =>
-                item
-                  .providerThreadId ===
-                providerThreadId,
-            ) ||
+            conversationsRef
+              .current
+              .find(
+                (item) =>
+                  item
+                    .providerThreadId ===
+                  providerThreadId,
+              ) ||
             null
           );
         }
@@ -2346,7 +2507,8 @@ return transformed;
                   transformMessage({
                     message,
                     connectedEmail:
-                      connectedEmail ||
+                      connectedEmailRef
+                        .current ||
                       threadResult
                         .connectedEmail,
                   }),
@@ -2373,7 +2535,8 @@ return transformed;
                     .latest_draft_or_message,
 
                 connectedEmail:
-                  connectedEmail ||
+                  connectedEmailRef
+                    .current ||
                   threadResult
                     .connectedEmail,
               }),
@@ -2430,8 +2593,6 @@ return transformed;
         }
       },
       [
-        connectedEmail,
-        conversations,
         enabled,
         invokeMailbox,
       ],
@@ -2809,6 +2970,18 @@ return transformed;
     workspaceId,
   ]);
 
+  const selectedLatestProviderMessageId =
+    conversations.find(
+      (
+        conversation,
+      ) =>
+        conversation.id ===
+        selectedConversationId,
+    )
+      ?.latestProviderMessageId ||
+    "";
+
+
   useEffect(() => {
     if (
       !enabled ||
@@ -2839,6 +3012,7 @@ return transformed;
     enabled,
     loadThread,
     selectedConversationId,
+    selectedLatestProviderMessageId,
   ]);
 
   const invokeSend =
