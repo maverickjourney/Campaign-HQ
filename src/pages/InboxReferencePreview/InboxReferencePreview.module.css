@@ -25697,3 +25697,105 @@ img {
 }
 
 /* CAMPAIGN SEAT EMAIL SHEET — END */
+
+
+/* OUTBOUND EMAIL SHEET GRID FIX — START */
+
+.outboundMessage.emailMessage {
+  grid-template-columns:
+    42px
+    minmax(
+      0,
+      1fr
+    ) !important;
+
+  grid-template-rows:
+    auto !important;
+}
+
+
+.outboundMessage.emailMessage
+> .avatar {
+  grid-column:
+    1 !important;
+
+  grid-row:
+    1 !important;
+
+  justify-self:
+    start !important;
+}
+
+
+.outboundMessage.emailMessage
+> div {
+  grid-column:
+    2 !important;
+
+  grid-row:
+    1 !important;
+
+  width:
+    100% !important;
+
+  min-width:
+    0 !important;
+
+  margin:
+    0 !important;
+}
+
+
+.outboundMessage.emailMessage
+.emailEnvelopeMeta {
+  width:
+    100% !important;
+
+  min-width:
+    0 !important;
+}
+
+
+.outboundMessage.emailMessage
+.emailEnvelopeMeta
+span {
+  min-width:
+    0 !important;
+
+  white-space:
+    normal !important;
+
+  overflow-wrap:
+    anywhere !important;
+
+  word-break:
+    normal !important;
+}
+
+
+.outboundMessage.emailMessage
+.emailDirectionBadge {
+  white-space:
+    nowrap !important;
+
+  overflow-wrap:
+    normal !important;
+}
+
+
+@media (max-width: 760px) {
+
+  .outboundMessage.emailMessage {
+    grid-template-columns:
+      1fr !important;
+  }
+
+
+  .outboundMessage.emailMessage
+  > div {
+    grid-column:
+      1 !important;
+  }
+}
+
+/* OUTBOUND EMAIL SHEET GRID FIX — END */

@@ -2807,9 +2807,26 @@ return transformed;
             new Blob([
               data,
             ]);
+        } else if (
+          ArrayBuffer.isView(
+            data,
+          )
+        ) {
+          blob =
+            new Blob([
+              data.buffer,
+            ]);
         } else {
           throw new Error(
-            "The attachment response was not a readable file.",
+            "The attachment response was not returned as binary data.",
+          );
+        }
+
+        if (
+          !blob.size
+        ) {
+          throw new Error(
+            "The attachment downloaded from the email provider was empty.",
           );
         }
 

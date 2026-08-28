@@ -1752,6 +1752,9 @@ Deno.serve(
             ),
 
             "Content-Type":
+              "application/octet-stream",
+
+            "X-Campaign-Seat-Original-Content-Type":
               providerResponse
                 .headers
                 .get(
