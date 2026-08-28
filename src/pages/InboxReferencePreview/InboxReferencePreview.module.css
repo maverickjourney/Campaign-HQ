@@ -25214,3 +25214,486 @@ button[aria-label]:last-child::before {
 }
 
 /* EMAIL READING + REPLY EXPERIENCE — END */
+
+
+/* CAMPAIGN SEAT EMAIL SHEET — START */
+
+.emailMessage {
+  display:
+    grid !important;
+
+  width:
+    100% !important;
+
+  max-width:
+    100% !important;
+
+  grid-template-columns:
+    42px
+    minmax(
+      0,
+      1fr
+    ) !important;
+
+  align-items:
+    flex-start !important;
+
+  gap:
+    10px !important;
+
+  margin:
+    0
+    0
+    14px !important;
+}
+
+
+.emailMessage
+> .avatar {
+  width:
+    38px !important;
+
+  height:
+    38px !important;
+
+  margin-top:
+    4px;
+
+  font-size:
+    12px !important;
+}
+
+
+.emailMessage
+> div {
+  box-sizing:
+    border-box;
+
+  width:
+    100% !important;
+
+  max-width:
+    none !important;
+
+  padding:
+    0 !important;
+
+  overflow:
+    hidden;
+
+  border:
+    1px solid
+    #d8e4ec !important;
+
+  border-radius:
+    11px !important;
+
+  background:
+    #ffffff !important;
+
+  box-shadow:
+    0
+    4px
+    14px
+    rgba(
+      18,
+      54,
+      82,
+      0.045
+    ) !important;
+}
+
+
+.emailMessage
+> div
+> header {
+  min-height:
+    48px;
+
+  padding:
+    10px
+    13px
+    8px;
+
+  border-bottom:
+    1px solid
+    #e6edf2;
+}
+
+
+.emailMessage
+> div
+> header strong {
+  color:
+    #234d6c !important;
+
+  font-size:
+    14px !important;
+
+  font-weight:
+    850 !important;
+}
+
+
+.emailMessage
+> div
+> header time {
+  color:
+    #7f94a5 !important;
+
+  font-size:
+    12px !important;
+}
+
+
+.emailEnvelopeMeta {
+  display:
+    flex;
+
+  min-width:
+    0;
+
+  flex-wrap:
+    wrap;
+
+  align-items:
+    center;
+
+  gap:
+    6px
+    14px;
+
+  padding:
+    8px
+    13px;
+
+  border-bottom:
+    1px solid
+    #e8eef3;
+
+  color:
+    #637d91;
+
+  background:
+    #f8fafc;
+
+  font-size:
+    12px;
+
+  line-height:
+    1.45;
+}
+
+
+.emailEnvelopeMeta
+span {
+  min-width:
+    0;
+
+  overflow-wrap:
+    anywhere;
+}
+
+
+.emailEnvelopeMeta
+span:not(
+  .emailDirectionBadge
+)
+b {
+  margin-right:
+    5px;
+
+  color:
+    #365c79;
+
+  font-weight:
+    820;
+}
+
+
+.emailDirectionBadge {
+  padding:
+    4px
+    7px;
+
+  border-radius:
+    999px;
+
+  color:
+    #2f678e;
+
+  background:
+    #eaf4fb;
+
+  font-size:
+    11px;
+
+  font-weight:
+    820;
+
+  white-space:
+    nowrap;
+}
+
+
+.emailMessage
+.plainEmailBody {
+  margin:
+    0 !important;
+
+  padding:
+    16px
+    16px
+    17px !important;
+
+  border:
+    0 !important;
+
+  border-radius:
+    0 !important;
+
+  color:
+    #243f55 !important;
+
+  background:
+    #ffffff !important;
+
+  font-size:
+    14px !important;
+
+  line-height:
+    1.6 !important;
+}
+
+
+.emailMessage
+.richEmail {
+  margin:
+    0 !important;
+
+  padding:
+    12px
+    13px
+    14px;
+}
+
+
+.emailMessage
+.messageAttachments {
+  margin:
+    0 !important;
+
+  padding:
+    0
+    13px
+    13px;
+}
+
+
+.emailMessage
+.messageAttachmentCard {
+  min-height:
+    54px !important;
+
+  border:
+    1px solid
+    #d6e2ea !important;
+
+  border-radius:
+    8px !important;
+
+  background:
+    #f8fbfd !important;
+
+  text-align:
+    left;
+}
+
+
+.emailMessage
+.messageAttachmentCard:hover {
+  border-color:
+    #8eb1ca !important;
+
+  background:
+    #eef7fc !important;
+
+  box-shadow:
+    0
+    4px
+    12px
+    rgba(
+      37,
+      100,
+      143,
+      0.08
+    );
+}
+
+
+/*
+ * The preview is now rendered through a React portal.
+ * These rules guarantee it behaves as a viewport-level
+ * attachment viewer rather than part of the Inbox grid.
+ */
+
+.attachmentPreviewOverlay {
+  position:
+    fixed !important;
+
+  z-index:
+    2147483646 !important;
+
+  inset:
+    0 !important;
+
+  width:
+    100vw !important;
+
+  height:
+    100dvh !important;
+
+  padding:
+    24px !important;
+
+  place-items:
+    center !important;
+
+  background:
+    rgba(
+      8,
+      25,
+      43,
+      0.72
+    ) !important;
+
+  isolation:
+    isolate;
+
+  transform:
+    none !important;
+}
+
+
+.attachmentPreviewModal {
+  position:
+    relative !important;
+
+  z-index:
+    1 !important;
+
+  width:
+    min(
+      1120px,
+      calc(
+        100vw -
+        48px
+      )
+    ) !important;
+
+  height:
+    min(
+      820px,
+      calc(
+        100dvh -
+        48px
+      )
+    ) !important;
+
+  max-height:
+    calc(
+      100dvh -
+      48px
+    ) !important;
+
+  overflow:
+    hidden !important;
+
+  background:
+    #ffffff !important;
+}
+
+
+.attachmentPreviewBody {
+  min-height:
+    0 !important;
+
+  overflow:
+    auto !important;
+}
+
+
+.attachmentPreviewBody
+img {
+  width:
+    auto !important;
+
+  max-width:
+    100% !important;
+
+  height:
+    auto !important;
+
+  max-height:
+    calc(
+      100dvh -
+      190px
+    ) !important;
+
+  object-fit:
+    contain !important;
+}
+
+
+@media (max-width: 760px) {
+
+  .emailMessage {
+    grid-template-columns:
+      1fr !important;
+  }
+
+
+  .emailMessage
+  > .avatar {
+    display:
+      none !important;
+  }
+
+
+  .emailEnvelopeMeta {
+    display:
+      grid;
+
+    grid-template-columns:
+      1fr;
+  }
+
+
+  .attachmentPreviewOverlay {
+    padding:
+      10px !important;
+  }
+
+
+  .attachmentPreviewModal {
+    width:
+      calc(
+        100vw -
+        20px
+      ) !important;
+
+    height:
+      calc(
+        100dvh -
+        20px
+      ) !important;
+
+    max-height:
+      calc(
+        100dvh -
+        20px
+      ) !important;
+  }
+}
+
+/* CAMPAIGN SEAT EMAIL SHEET — END */

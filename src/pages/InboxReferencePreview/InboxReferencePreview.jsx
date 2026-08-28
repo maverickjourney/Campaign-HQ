@@ -5,6 +5,9 @@ import {
   useState,
 } from "react";
 import {
+  createPortal,
+} from "react-dom";
+import {
   Archive,
   ArrowLeft,
   AtSign,
@@ -1774,6 +1777,35 @@ function buildSafeEmailDocument({
 }
 
 
+function emailNeedsRichRendering(
+  html,
+) {
+  const value =
+    String(
+      html ||
+      "",
+    );
+
+  if (!value.trim()) {
+    return false;
+  }
+
+  return (
+    /<(table|img|picture|style|video|audio|svg|blockquote|a)\b/i
+      .test(
+        value,
+      ) ||
+    /cid:/i.test(
+      value,
+    ) ||
+    /background(?:-image)?\s*:/i
+      .test(
+        value,
+      )
+  );
+}
+
+
 function SafeEmailBody({
   message,
   getAttachmentBlob,
@@ -1973,6 +2005,9 @@ function SafeEmailBody({
   if (
     !html ||
     !/<[a-z][\s\S]*>/i.test(
+      html,
+    ) ||
+    !emailNeedsRichRendering(
       html,
     )
   ) {
@@ -12092,9 +12127,81 @@ type="button"
                           </time>
                         </header>
 
-                        <small>
-                          {message.channel}
-                        </small>
+                        {String(
+                          message.channel ||
+                          "",
+                        ).toLowerCase() ===
+                        "email" ? (
+                          <div
+                            className={
+                              styles.emailEnvelopeMeta
+                            }
+                          >
+                            <span
+                              className={
+                                styles.emailDirectionBadge
+                              }
+                            >
+                              {message.direction ===
+                              "outbound"
+                                ? "Sent email"
+                                : "Received email"}
+                            </span>
+
+                            <span>
+                              <b>
+                                From
+                              </b>
+
+                              {message.direction ===
+                              "outbound"
+                                ? (
+                                    mailboxConnectedEmail ||
+                                    "Connected campaign mailbox"
+                                  )
+                                : (
+                                    selectedConversation
+                                      ?.email ||
+                                    message.author
+                                  )}
+                            </span>
+
+                            <span>
+                              <b>
+                                To
+                              </b>
+
+                              {message.direction ===
+                              "outbound"
+                                ? (
+                                    selectedConversation
+                                      ?.email ||
+                                    selectedConversation
+                                      ?.sender ||
+                                    "Recipient"
+                                  )
+                                : (
+                                    mailboxConnectedEmail ||
+                                    "Connected campaign mailbox"
+                                  )}
+                            </span>
+
+                            <span>
+                              <b>
+                                Subject
+                              </b>
+
+                              {message.subject ||
+                                selectedConversation
+                                  ?.subject ||
+                                "(No subject)"}
+                            </span>
+                          </div>
+                        ) : (
+                          <small>
+                            {message.channel}
+                          </small>
+                        )}
 
                         <SafeEmailBody
                           message={
@@ -12168,13 +12275,19 @@ type="button"
                                         <small>
                                           {kind ===
                                             "image"
-                                            ? "Image · Preview"
+                                            ? "Image · Open preview"
                                             : kind ===
                                                 "pdf"
-                                              ? "PDF · Preview"
-                                              : humanFileSize(
-                                                  file.size,
-                                                )}
+                                              ? "PDF · Open preview"
+                                              : kind ===
+                                                  "video"
+                                                ? "Video · Open preview"
+                                                : kind ===
+                                                    "audio"
+                                                  ? "Audio · Open preview"
+                                                  : `${humanFileSize(
+                                                      file.size,
+                                                    )} · Download`}
                                         </small>
                                       </span>
 
@@ -14309,11 +14422,13 @@ type="button"
           </div>
         ) : null}
 
-        {attachmentPreview ? (
-          <div
-            className={
-              styles.attachmentPreviewOverlay
-            }
+        {attachmentPreview &&
+        typeof document !== "undefined"
+          ? createPortal(
+              <div
+                className={
+                  styles.attachmentPreviewOverlay
+                }
             role="presentation"
             onMouseDown={(
               event,
@@ -14454,8 +14569,10 @@ type="button"
                 </button>
               </footer>
             </section>
-          </div>
-        ) : null}
+              </div>,
+              document.body,
+            )
+          : null}
 
         {emptyTrashConfirmOpen ? (
           <div
