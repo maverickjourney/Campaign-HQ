@@ -24859,3 +24859,358 @@ button[aria-label]:last-child::before {
 }
 
 /* INSTANT INBOX TOOLTIP SYSTEM — END */
+
+
+/* EMAIL READING + REPLY EXPERIENCE — START */
+
+.emailMessage {
+  width:
+    100% !important;
+
+  max-width:
+    100% !important;
+}
+
+
+.emailMessage
+> div {
+  box-sizing:
+    border-box;
+
+  width:
+    min(
+      100%,
+      1080px
+    ) !important;
+
+  max-width:
+    1080px !important;
+
+  padding:
+    12px
+    14px !important;
+
+  border:
+    1px solid
+    #dfe8ee !important;
+
+  border-radius:
+    11px !important;
+
+  background:
+    #ffffff !important;
+
+  box-shadow:
+    0
+    3px
+    10px
+    rgba(
+      22,
+      58,
+      88,
+      0.035
+    );
+}
+
+
+.emailMessage.inboundMessage
+> div {
+  margin-right:
+    auto;
+}
+
+
+.emailMessage.outboundMessage
+> div {
+  margin-left:
+    auto;
+}
+
+
+.plainEmailBody {
+  margin:
+    10px
+    0
+    0 !important;
+
+  padding:
+    13px
+    14px !important;
+
+  border:
+    1px solid
+    #e3ebf0;
+
+  border-radius:
+    8px;
+
+  color:
+    #294f6d !important;
+
+  background:
+    #ffffff;
+
+  font-size:
+    14px !important;
+
+  line-height:
+    1.6 !important;
+
+  white-space:
+    pre-wrap;
+
+  overflow-wrap:
+    anywhere;
+
+  word-break:
+    break-word;
+}
+
+
+.richEmail {
+  margin-top:
+    10px;
+}
+
+
+.richEmailFrame {
+  border-radius:
+    8px;
+
+  background:
+    #ffffff;
+}
+
+
+/*
+ * Attachment preview must sit above both the normal Inbox
+ * and the full-screen/expanded message reader.
+ */
+
+.attachmentPreviewOverlay {
+  z-index:
+    2147483640 !important;
+}
+
+
+.attachmentPreviewModal {
+  z-index:
+    2147483641 !important;
+}
+
+
+.attachmentPreviewBody video {
+  display:
+    block;
+
+  width:
+    100%;
+
+  max-width:
+    1100px;
+
+  max-height:
+    calc(
+      100dvh -
+      220px
+    );
+
+  border-radius:
+    8px;
+
+  background:
+    #000000;
+}
+
+
+.attachmentPreviewBody audio {
+  display:
+    block;
+
+  width:
+    min(
+      720px,
+      100%
+    );
+}
+
+
+/*
+ * Reply mode keeps the source message visible, but gives
+ * most of the usable space to the composer.
+ */
+
+.threadPanelReplying
+.threadBody {
+  height:
+    clamp(
+      145px,
+      22vh,
+      220px
+    ) !important;
+
+  min-height:
+    145px !important;
+
+  max-height:
+    220px !important;
+
+  flex:
+    0
+    0
+    clamp(
+      145px,
+      22vh,
+      220px
+    ) !important;
+
+  overflow-y:
+    auto !important;
+
+  padding:
+    10px
+    14px !important;
+}
+
+
+.threadPanelExpanded.threadPanelReplying
+.threadBody {
+  height:
+    clamp(
+      170px,
+      24vh,
+      250px
+    ) !important;
+
+  min-height:
+    170px !important;
+
+  max-height:
+    250px !important;
+
+  flex-basis:
+    clamp(
+      170px,
+      24vh,
+      250px
+    ) !important;
+}
+
+
+.threadPanelReplying
+[aria-label="Campaign Seat Brief"] {
+  display:
+    none !important;
+}
+
+
+.threadPanelReplying
+.replyComposer {
+  display:
+    flex !important;
+
+  min-height:
+    330px !important;
+
+  max-height:
+    none !important;
+
+  flex:
+    1
+    1
+    auto !important;
+
+  flex-direction:
+    column;
+
+  overflow-x:
+    hidden !important;
+
+  overflow-y:
+    auto !important;
+}
+
+
+.threadPanelExpanded.threadPanelReplying
+.replyComposer {
+  min-height:
+    400px !important;
+
+  max-height:
+    none !important;
+}
+
+
+.threadPanelReplying
+.richComposerShell {
+  display:
+    flex;
+
+  min-height:
+    220px;
+
+  flex:
+    1
+    1
+    auto;
+
+  flex-direction:
+    column;
+}
+
+
+.threadPanelReplying
+.richComposerEditor {
+  min-height:
+    220px !important;
+
+  max-height:
+    none !important;
+
+  flex:
+    1
+    1
+    auto;
+}
+
+
+.threadPanelExpanded.threadPanelReplying
+.richComposerEditor {
+  min-height:
+    280px !important;
+}
+
+
+@media (max-width: 760px) {
+
+  .threadPanelReplying
+  .threadBody {
+    height:
+      150px !important;
+
+    min-height:
+      150px !important;
+
+    max-height:
+      150px !important;
+
+    flex-basis:
+      150px !important;
+  }
+
+
+  .threadPanelReplying
+  .replyComposer {
+    min-height:
+      300px !important;
+  }
+
+
+  .threadPanelReplying
+  .richComposerEditor {
+    min-height:
+      180px !important;
+  }
+}
+
+/* EMAIL READING + REPLY EXPERIENCE — END */

@@ -1218,6 +1218,32 @@ function attachmentKind(
     return "pdf";
   }
 
+  if (
+    contentType
+      .startsWith(
+        "video/",
+      ) ||
+    /\.(mp4|m4v|mov|webm|ogv|ogg)$/i
+      .test(
+        name,
+      )
+  ) {
+    return "video";
+  }
+
+  if (
+    contentType
+      .startsWith(
+        "audio/",
+      ) ||
+    /\.(mp3|m4a|aac|wav|flac|oga|ogg)$/i
+      .test(
+        name,
+      )
+  ) {
+    return "audio";
+  }
+
   return "file";
 }
 
@@ -1776,7 +1802,7 @@ function SafeEmailBody({
   const contentScale =
     expanded
       ? 1
-      : 0.68;
+      : 0.92;
 
   const maxFrameHeight =
     expanded
@@ -1951,7 +1977,11 @@ function SafeEmailBody({
     )
   ) {
     return (
-      <p>
+      <p
+        className={
+          styles.plainEmailBody
+        }
+      >
         {message?.body || ""}
       </p>
     );
@@ -2045,15 +2075,17 @@ function SafeEmailBody({
                 Math.max(
                   height + 12,
                   expanded
-                    ? 620
-                    : 520,
+                    ? 180
+                    : 140,
                 ),
                 maxFrameHeight,
               ),
             );
           } catch {
             setFrameHeight(
-              360,
+              expanded
+                ? 220
+                : 160,
             );
           }
         }}
@@ -3929,11 +3961,6 @@ export default function InboxReferencePreview() {
       selectedConversation.id,
     );
 
-  const selectedMessageCount =
-    selectedConversation
-      ?.messages
-      ?.length || 0;
-
   useEffect(() => {
     if (
       newMessageMode ||
@@ -3955,7 +3982,9 @@ export default function InboxReferencePreview() {
           }
 
           threadBody.scrollTop =
-            threadBody.scrollHeight;
+            replyComposerOpen
+              ? threadBody.scrollHeight
+              : 0;
         },
       );
 
@@ -3967,8 +3996,8 @@ export default function InboxReferencePreview() {
     activeThreadTab,
     hasSelectedConversation,
     newMessageMode,
+    replyComposerOpen,
     selectedConversation.id,
-    selectedMessageCount,
   ]);
 
   const replyAllEnabled =
@@ -5785,6 +5814,14 @@ export default function InboxReferencePreview() {
 
       window.requestAnimationFrame(
         () => {
+          const threadBody =
+            threadBodyRef.current;
+
+          if (threadBody) {
+            threadBody.scrollTop =
+              threadBody.scrollHeight;
+          }
+
           document
             .querySelector(
               '[data-inline-reply="true"] textarea',
@@ -6955,9 +6992,24 @@ export default function InboxReferencePreview() {
             file,
           );
 
+        const previewBlob =
+          file?.contentType &&
+          blob?.type !==
+            file.contentType
+            ? new Blob(
+                [
+                  blob,
+                ],
+                {
+                  type:
+                    file.contentType,
+                },
+              )
+            : blob;
+
         const objectUrl =
           URL.createObjectURL(
-            blob,
+            previewBlob,
           );
 
         setAttachmentPreview({
@@ -10558,6 +10610,12 @@ type="button"
           <article
             className={[
               styles.threadPanel,
+
+              replyComposerOpen &&
+              !newMessageMode
+                ? styles.threadPanelReplying
+                : "",
+
               newMessageMode
                 ? styles.newMessageModal
                 : "",
@@ -12006,6 +12064,14 @@ type="button"
                           : styles.inboundMessage,
                         message.htmlBody
                           ? styles.richMessage
+                          : "",
+
+                        String(
+                          message.channel ||
+                          "",
+                        ).toLowerCase() ===
+                        "email"
+                          ? styles.emailMessage
                           : "",
                       ]
                         .filter(Boolean)
@@ -14325,6 +14391,32 @@ type="button"
                       "Email attachment"
                     }
                   />
+                ) : attachmentPreview
+                    .kind ===
+                  "video" ? (
+                  <video
+                    controls
+                    preload="metadata"
+                    src={
+                      attachmentPreview
+                        .objectUrl
+                    }
+                  >
+                    Your browser cannot preview this video. Use Download instead.
+                  </video>
+                ) : attachmentPreview
+                    .kind ===
+                  "audio" ? (
+                  <audio
+                    controls
+                    preload="metadata"
+                    src={
+                      attachmentPreview
+                        .objectUrl
+                    }
+                  >
+                    Your browser cannot preview this audio file. Use Download instead.
+                  </audio>
                 ) : (
                   <iframe
                     title={
