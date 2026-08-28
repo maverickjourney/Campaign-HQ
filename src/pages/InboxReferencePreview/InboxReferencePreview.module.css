@@ -25799,3 +25799,313 @@ span {
 }
 
 /* OUTBOUND EMAIL SHEET GRID FIX — END */
+
+
+/* CAMPAIGN SEAT DIRECTIONAL CONVERSATION FLOW — START */
+
+/*
+ * Universal conversation rule:
+ *
+ * Received messages = left.
+ * Campaign messages = right.
+ *
+ * Applies to email, Campaign Seat internal,
+ * text and WhatsApp conversation bubbles.
+ */
+
+.inboundMessage {
+  justify-self:
+    start !important;
+
+  margin-right:
+    auto !important;
+
+  margin-left:
+    0 !important;
+}
+
+
+.outboundMessage {
+  justify-self:
+    end !important;
+
+  margin-right:
+    0 !important;
+
+  margin-left:
+    auto !important;
+}
+
+
+/*
+ * Normal chat-style channels already use two-column
+ * message bubbles. Keep the sender avatar beside the
+ * correct edge.
+ */
+
+.inboundMessage:not(.emailMessage) {
+  grid-template-columns:
+    auto
+    minmax(
+      0,
+      1fr
+    ) !important;
+}
+
+
+.inboundMessage:not(.emailMessage)
+> .avatar {
+  grid-column:
+    1 !important;
+
+  justify-self:
+    start !important;
+}
+
+
+.inboundMessage:not(.emailMessage)
+> div {
+  grid-column:
+    2 !important;
+}
+
+
+.outboundMessage:not(.emailMessage) {
+  grid-template-columns:
+    minmax(
+      0,
+      1fr
+    )
+    auto !important;
+}
+
+
+.outboundMessage:not(.emailMessage)
+> div {
+  grid-column:
+    1 !important;
+
+  grid-row:
+    1 !important;
+}
+
+
+.outboundMessage:not(.emailMessage)
+> .avatar {
+  grid-column:
+    2 !important;
+
+  grid-row:
+    1 !important;
+
+  justify-self:
+    end !important;
+}
+
+
+/*
+ * Email sheets are wider than chat bubbles but should
+ * still clearly communicate direction.
+ */
+
+.inboundMessage.emailMessage {
+  width:
+    min(
+      94%,
+      1120px
+    ) !important;
+
+  max-width:
+    1120px !important;
+
+  grid-template-columns:
+    42px
+    minmax(
+      0,
+      1fr
+    ) !important;
+
+  margin-right:
+    auto !important;
+
+  margin-left:
+    0 !important;
+}
+
+
+.inboundMessage.emailMessage
+> .avatar {
+  grid-column:
+    1 !important;
+
+  grid-row:
+    1 !important;
+
+  justify-self:
+    start !important;
+}
+
+
+.inboundMessage.emailMessage
+> div {
+  grid-column:
+    2 !important;
+
+  grid-row:
+    1 !important;
+
+  margin:
+    0 !important;
+}
+
+
+.outboundMessage.emailMessage {
+  width:
+    min(
+      94%,
+      1120px
+    ) !important;
+
+  max-width:
+    1120px !important;
+
+  grid-template-columns:
+    minmax(
+      0,
+      1fr
+    )
+    42px !important;
+
+  margin-right:
+    0 !important;
+
+  margin-left:
+    auto !important;
+}
+
+
+.outboundMessage.emailMessage
+> div {
+  grid-column:
+    1 !important;
+
+  grid-row:
+    1 !important;
+
+  margin:
+    0 !important;
+}
+
+
+.outboundMessage.emailMessage
+> .avatar {
+  grid-column:
+    2 !important;
+
+  grid-row:
+    1 !important;
+
+  justify-self:
+    end !important;
+}
+
+
+/*
+ * Give sent email a tiny visual difference while
+ * remaining clean and professional.
+ */
+
+.outboundMessage.emailMessage
+> div {
+  border-color:
+    #d6e0e8 !important;
+
+  background:
+    #fbfcfd !important;
+}
+
+
+.outboundMessage.emailMessage
+.emailEnvelopeMeta {
+  background:
+    #f4f7f9 !important;
+}
+
+
+.inboundMessage.emailMessage
+.emailEnvelopeMeta {
+  background:
+    #f7fafc !important;
+}
+
+
+/*
+ * Keep the message body itself full width inside
+ * each left/right email sheet.
+ */
+
+.emailMessage
+.plainEmailBody,
+.emailMessage
+.richEmail,
+.emailMessage
+.messageAttachments {
+  width:
+    100% !important;
+
+  box-sizing:
+    border-box !important;
+}
+
+
+/*
+ * Narrow screens still preserve the visual direction,
+ * but allow more width for readability.
+ */
+
+@media (max-width: 760px) {
+
+  .inboundMessage.emailMessage,
+  .outboundMessage.emailMessage {
+    width:
+      97% !important;
+
+    max-width:
+      97% !important;
+
+    grid-template-columns:
+      1fr !important;
+  }
+
+
+  .inboundMessage.emailMessage
+  > div,
+  .outboundMessage.emailMessage
+  > div {
+    grid-column:
+      1 !important;
+  }
+
+
+  .inboundMessage.emailMessage
+  > .avatar,
+  .outboundMessage.emailMessage
+  > .avatar {
+    display:
+      none !important;
+  }
+
+
+  .outboundMessage:not(.emailMessage) {
+    max-width:
+      92% !important;
+  }
+
+
+  .inboundMessage:not(.emailMessage) {
+    max-width:
+      92% !important;
+  }
+}
+
+/* CAMPAIGN SEAT DIRECTIONAL CONVERSATION FLOW — END */
