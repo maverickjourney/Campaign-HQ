@@ -27033,3 +27033,163 @@ span {
 }
 
 /* INBOX INTERNAL TEAM NOTES — END */
+
+
+/* INBOX HEADER ACTION FIT — START */
+
+.threadHeader {
+  grid-template-columns:
+    minmax(
+      0,
+      1fr
+    )
+    auto !important;
+
+  overflow:
+    visible !important;
+}
+
+
+.threadHeader
+> div:first-of-type {
+  min-width:
+    0 !important;
+
+  overflow:
+    hidden;
+}
+
+
+.threadHeader
+> div:first-of-type
+> span:last-child {
+  min-width:
+    0 !important;
+}
+
+
+.threadHeader
+> div:first-of-type
+strong,
+.threadHeader
+> div:first-of-type
+small {
+  overflow:
+    hidden;
+
+  text-overflow:
+    ellipsis;
+
+  white-space:
+    nowrap;
+}
+
+
+.threadHeaderActions {
+  display:
+    flex !important;
+
+  min-width:
+    max-content !important;
+
+  flex:
+    0
+    0
+    auto !important;
+
+  flex-wrap:
+    nowrap !important;
+
+  align-items:
+    center;
+
+  justify-content:
+    flex-end;
+
+  gap:
+    5px !important;
+
+  padding-right:
+    3px;
+
+  overflow:
+    visible !important;
+}
+
+
+.threadHeaderActions
+> button,
+.threadHeaderActions
+> span
+> button {
+  width:
+    38px !important;
+
+  min-width:
+    38px !important;
+
+  height:
+    38px !important;
+
+  min-height:
+    38px !important;
+
+  flex:
+    0
+    0
+    38px !important;
+
+  padding:
+    0 !important;
+}
+
+
+.threadHeaderActions
+.threadActionDivider {
+  width:
+    1px;
+
+  min-width:
+    1px;
+
+  margin:
+    0
+    2px;
+}
+
+
+@media (
+  min-width: 760px
+) and (
+  max-width: 1250px
+) {
+
+  .threadHeaderActions {
+    gap:
+      3px !important;
+  }
+
+
+  .threadHeaderActions
+  > button,
+  .threadHeaderActions
+  > span
+  > button {
+    width:
+      36px !important;
+
+    min-width:
+      36px !important;
+
+    height:
+      36px !important;
+
+    min-height:
+      36px !important;
+
+    flex-basis:
+      36px !important;
+  }
+}
+
+/* INBOX HEADER ACTION FIT — END */
