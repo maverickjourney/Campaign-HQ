@@ -760,6 +760,43 @@ function transformThread({
         own,
     );
 
+  const latestReceivedOrder =
+    thread
+      ?.latest_message_received_date
+      ? unixMilliseconds(
+          thread
+            .latest_message_received_date,
+        )
+      : 0;
+
+  const latestSentOrder =
+    thread
+      ?.latest_message_sent_date
+      ? unixMilliseconds(
+          thread
+            .latest_message_sent_date,
+        )
+      : 0;
+
+  const latestCommunicationOrder =
+    Math.max(
+      latestReceivedOrder,
+      latestSentOrder,
+    );
+
+  const latestCommunicationDirection =
+    latestCommunicationOrder <=
+      0
+      ? (
+          needsResponse
+            ? "inbound"
+            : ""
+        )
+      : latestReceivedOrder >=
+          latestSentOrder
+        ? "inbound"
+        : "outbound";
+
   const initialMessages =
     latest?.id
       ? [
@@ -860,6 +897,14 @@ function transformThread({
       ),
 
     needsResponse,
+
+    latestReceivedOrder,
+
+    latestSentOrder,
+
+    latestCommunicationOrder,
+
+    latestCommunicationDirection,
 
     mentions:
       false,

@@ -707,6 +707,8 @@ export function useInboxConversationWorkflows({
           eventLabel,
           eventDetail = "",
           metadata = {},
+          actorUserId =
+            userId,
         },
       ) => {
         if (
@@ -766,7 +768,10 @@ export function useInboxConversationWorkflows({
             null,
 
           actor_user_id:
-            userId,
+            actorUserId ===
+              undefined
+              ? userId
+              : actorUserId,
 
           metadata: {
             sender:

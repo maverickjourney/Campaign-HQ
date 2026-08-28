@@ -2629,6 +2629,143 @@ function inboxActivityIcon(
 }
 
 
+function conversationWorkflowSignal(
+  conversation,
+) {
+  if (!conversation) {
+    return null;
+  }
+
+  const channel =
+    String(
+      conversation
+        ?.channel ||
+      "",
+    ).toLowerCase();
+
+  if (
+    channel ===
+      "email" &&
+    Number(
+      conversation
+        ?.latestCommunicationOrder ||
+      0
+    ) >
+      0
+  ) {
+    return {
+      direction:
+        conversation
+          .latestCommunicationDirection ||
+        (
+          conversation
+            .needsResponse
+            ? "inbound"
+            : "outbound"
+        ),
+
+      order:
+        Number(
+          conversation
+            .latestCommunicationOrder,
+        ),
+
+      source:
+        "provider",
+    };
+  }
+
+  const messages =
+    Array.isArray(
+      conversation
+        ?.messages,
+    )
+      ? conversation
+          .messages
+      : [];
+
+  const latestMessage =
+    [...messages]
+      .filter(
+        (message) =>
+          message &&
+          (
+            message.direction ===
+              "inbound" ||
+            message.direction ===
+              "outbound"
+          ),
+      )
+      .sort(
+        (
+          left,
+          right,
+        ) =>
+          Number(
+            right?.order ||
+            0,
+          ) -
+          Number(
+            left?.order ||
+            0,
+          ),
+      )[0] ||
+    null;
+
+  if (
+    latestMessage &&
+    Number(
+      latestMessage.order ||
+      0,
+    ) >
+      0
+  ) {
+    return {
+      direction:
+        latestMessage
+          .direction,
+
+      order:
+        Number(
+          latestMessage
+            .order,
+        ),
+
+      source:
+        "message",
+    };
+  }
+
+  const fallbackOrder =
+    Number(
+      conversation
+        ?.order ||
+      0,
+    );
+
+  if (
+    fallbackOrder >
+      0
+  ) {
+    return {
+      direction:
+        conversation
+          ?.needsResponse
+          ? "inbound"
+          : "outbound",
+
+      order:
+        fallbackOrder,
+
+      source:
+        "conversation",
+    };
+  }
+
+  return null;
+}
+
+
 function getChannelLabel(channel) {
   return (
     CHANNELS.find((item) => item.id === channel)
@@ -2835,6 +2972,284 @@ export default function InboxReferencePreview() {
         previewConversations,
       ],
     );
+
+  useEffect(() => {
+    if (
+      !inboxWorkflowRuntimeEnabled ||
+      !workspace.id ||
+      !user.id
+    ) {
+      return undefined;
+    }
+
+    let cancelled =
+      false;
+
+    const reconcile =
+      async () => {
+        for (
+          const conversation
+          of conversations
+        ) {
+          if (cancelled) {
+            return;
+          }
+
+          const channel =
+            String(
+              conversation
+                ?.channel ||
+              "",
+            ).toLowerCase();
+
+          if (
+            ![
+              "email",
+              "dashboard",
+            ].includes(
+              channel,
+            )
+          ) {
+            continue;
+          }
+
+          /*
+           * Never make an automated email workflow
+           * decision from a provider snapshot that is
+           * currently failing or still loading.
+           */
+          if (
+            channel ===
+              "email" &&
+            (
+              mailboxLoading ||
+              mailboxError
+            )
+          ) {
+            continue;
+          }
+
+          const signal =
+            conversationWorkflowSignal(
+              conversation,
+            );
+
+          if (
+            !signal ||
+            ![
+              "inbound",
+              "outbound",
+            ].includes(
+              signal.direction,
+            ) ||
+            !Number.isFinite(
+              signal.order,
+            ) ||
+            signal.order <=
+              0
+          ) {
+            continue;
+          }
+
+          const conversationKey =
+            inboxWorkflowKey(
+              conversation,
+            );
+
+          if (!conversationKey) {
+            continue;
+          }
+
+          const existing =
+            inboxWorkflowByKey.get(
+              conversationKey,
+            ) ||
+            null;
+
+          /*
+           * Manual staff choices win.
+           *
+           * A workflow row changed after the latest
+           * communication must not be overwritten by
+           * automation. The next genuinely newer
+           * communication unlocks automation again.
+           */
+          const workflowUpdatedAt =
+            existing
+              ?.updated_at
+              ? Date.parse(
+                  existing
+                    .updated_at,
+                ) ||
+                0
+              : 0;
+
+          if (
+            existing &&
+            signal.order <=
+              workflowUpdatedAt
+          ) {
+            continue;
+          }
+
+          const desiredStatus =
+            signal.direction ===
+              "inbound"
+              ? "needs_reply"
+              : "waiting_on";
+
+          const wakeFromSnooze =
+            signal.direction ===
+              "inbound" &&
+            Boolean(
+              existing
+                ?.snoozed_until,
+            );
+
+          if (
+            existing &&
+            existing
+              .workflow_status ===
+              desiredStatus &&
+            !wakeFromSnooze
+          ) {
+            continue;
+          }
+
+          if (
+            autoWorkflowInFlightRef
+              .current
+              .has(
+                conversationKey,
+              )
+          ) {
+            continue;
+          }
+
+          autoWorkflowInFlightRef
+            .current
+            .add(
+              conversationKey,
+            );
+
+          try {
+            await upsertInboxWorkflow(
+              conversation,
+              {
+                workflow_status:
+                  desiredStatus,
+
+                ...(wakeFromSnooze
+                  ? {
+                      snoozed_until:
+                        null,
+                    }
+                  : {}),
+
+                metadata: {
+                  status_source:
+                    "automatic",
+
+                  status_signal_direction:
+                    signal.direction,
+
+                  status_signal_order:
+                    signal.order,
+
+                  status_signal_source:
+                    signal.source,
+
+                  status_automated_at:
+                    new Date()
+                      .toISOString(),
+                },
+              },
+            );
+
+            try {
+              await logInboxActivity(
+                conversation,
+                {
+                  eventType:
+                    "workflow:auto-status",
+
+                  eventLabel:
+                    desiredStatus ===
+                      "needs_reply"
+                      ? "Needs Reply automatically set"
+                      : "Waiting On automatically set",
+
+                  eventDetail:
+                    desiredStatus ===
+                      "needs_reply"
+                      ? (
+                          wakeFromSnooze
+                            ? "A new message arrived. Campaign Seat woke the conversation and marked it Needs Reply."
+                            : "A new message arrived from the contact, so Campaign Seat marked the conversation Needs Reply."
+                        )
+                      : "The campaign was the latest sender, so Campaign Seat marked the conversation Waiting On.",
+
+                  actorUserId:
+                    null,
+
+                  metadata: {
+                    automated:
+                      true,
+
+                    workflow_status:
+                      desiredStatus,
+
+                    signal_direction:
+                      signal.direction,
+
+                    signal_order:
+                      signal.order,
+                  },
+                },
+              );
+            } catch (
+              activityError
+            ) {
+              console.warn(
+                "Automatic workflow activity could not be recorded:",
+                activityError,
+              );
+            }
+          } catch (
+            syncError
+          ) {
+            console.warn(
+              "Automatic Inbox workflow could not reconcile:",
+              syncError,
+            );
+          } finally {
+            autoWorkflowInFlightRef
+              .current
+              .delete(
+                conversationKey,
+              );
+          }
+        }
+      };
+
+    void reconcile();
+
+    return () => {
+      cancelled =
+        true;
+    };
+  }, [
+    conversations,
+    inboxWorkflowByKey,
+    inboxWorkflowRuntimeEnabled,
+    logInboxActivity,
+    mailboxError,
+    mailboxLoading,
+    upsertInboxWorkflow,
+    user.id,
+    workspace.id,
+  ]);
+
 
   const [activeChannel, setActiveChannel] =
     useState("all");
@@ -3659,6 +4074,12 @@ export default function InboxReferencePreview() {
     externalHandoffBusy,
     setExternalHandoffBusy,
   ] = useState(false);
+
+  const autoWorkflowInFlightRef =
+    useRef(
+      new Set(),
+    );
+
 
   const threadBodyRef =
     useRef(null);
