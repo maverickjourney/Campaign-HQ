@@ -18,8 +18,15 @@ const EMPTY_COUNTS = {
 };
 
 
+/*
+ * Realtime webhook events now update Inbox unread state.
+ * This provider request is only a missed-event safety net.
+ */
 const INBOX_BADGE_REFRESH_MS =
-  60000;
+  10 * 60 * 1000;
+
+const INBOX_BADGE_REFRESH_COOLDOWN_MS =
+  2 * 60 * 1000;
 
 
 function inboxUnreadFromFolders(
@@ -118,6 +125,9 @@ export function useWorkspaceCommandCounts(
   const inboxRefreshTimerRef =
     useRef(null);
 
+  const lastInboxProviderRefreshAtRef =
+    useRef(0);
+
 
   const setInboxCount =
     useCallback(
@@ -190,9 +200,8 @@ export function useWorkspaceCommandCounts(
         }
 
         /*
-         * Inbox itself already owns the faster 30-second
-         * mailbox refresh. Do not duplicate that provider
-         * traffic from the shared shell.
+         * Inbox owns its own webhook-driven mailbox refresh.
+         * Never duplicate provider traffic from the shell.
          */
         if (
           window.location
@@ -225,6 +234,20 @@ export function useWorkspaceCommandCounts(
           // Local read authority is optional.
         }
 
+
+        const now =
+          Date.now();
+
+        if (
+          now -
+            lastInboxProviderRefreshAtRef.current <
+          INBOX_BADGE_REFRESH_COOLDOWN_MS
+        ) {
+          return;
+        }
+
+        lastInboxProviderRefreshAtRef.current =
+          now;
 
         try {
           const {

@@ -24,11 +24,20 @@ const MICROSOFT_MAILBOX_PAGE_SIZE =
 const MICROSOFT_MAILBOX_TARGET_THREAD_COUNT =
   20;
 
+/*
+ * CAMPAIGN SEAT REALTIME-FIRST MAILBOX V1
+ *
+ * Nylas webhooks are now the primary mailbox-change transport.
+ * Timed provider requests remain only as a slow safety fallback.
+ */
 const QUIET_REFRESH_INTERVAL_MS =
-  30000;
+  5 * 60 * 1000;
 
 const QUIET_REFRESH_COOLDOWN_MS =
-  20000;
+  2 * 60 * 1000;
+
+const PROVIDER_CHANGE_REFRESH_DELAY_MS =
+  750;
 
 const RATE_LIMIT_BACKOFF_MS =
   180000;
@@ -1812,6 +1821,27 @@ export function useRealInboxMailbox({
           return [];
         }
 
+        /*
+         * Do not allow initial load, focus refresh, timed
+         * fallback and webhook refresh to hit Microsoft at
+         * the same time.
+         */
+        if (
+          refreshInFlightRef.current
+        ) {
+          return (
+            conversationsRef.current
+          );
+        }
+
+        /*
+         * Any successful attempt counts as recent provider
+         * activity. This prevents a focus/visibility event
+         * immediately launching another refresh.
+         */
+        lastQuietRefreshAtRef.current =
+          Date.now();
+
         const deepRefresh =
           !hasMailboxSnapshotRef
             .current;
@@ -3443,7 +3473,7 @@ return transformed;
                     false,
                 });
               },
-              250,
+              PROVIDER_CHANGE_REFRESH_DELAY_MS,
             );
         };
 
