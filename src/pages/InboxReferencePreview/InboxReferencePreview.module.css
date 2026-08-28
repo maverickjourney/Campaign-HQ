@@ -27674,3 +27674,258 @@ small {
 }
 
 /* FINAL REPLY READING + COMPOSER SPLIT — END */
+
+
+/* EMAIL REPLY COMPACT DRAWER V2 — START */
+
+.threadPanelReplying {
+  min-height:
+    0 !important;
+
+  overflow:
+    hidden !important;
+}
+
+
+.threadPanelReplying
+.threadBody {
+  height:
+    auto !important;
+
+  min-height:
+    240px !important;
+
+  max-height:
+    none !important;
+
+  flex:
+    1
+    1
+    auto !important;
+
+  overflow-x:
+    hidden !important;
+
+  overflow-y:
+    auto !important;
+}
+
+
+.threadPanelExpanded.threadPanelReplying
+.threadBody {
+  height:
+    auto !important;
+
+  min-height:
+    300px !important;
+
+  max-height:
+    none !important;
+
+  flex:
+    1
+    1
+    auto !important;
+}
+
+
+.threadPanelReplying
+.replyComposer {
+  box-sizing:
+    border-box !important;
+
+  height:
+    auto !important;
+
+  min-height:
+    0 !important;
+
+  max-height:
+    min(
+      38dvh,
+      350px
+    ) !important;
+
+  flex:
+    0
+    0
+    auto !important;
+
+  overflow-x:
+    hidden !important;
+
+  overflow-y:
+    auto !important;
+}
+
+
+.threadPanelExpanded.threadPanelReplying
+.replyComposer {
+  max-height:
+    min(
+      40dvh,
+      390px
+    ) !important;
+}
+
+
+.threadPanelReplying
+.richComposerShell {
+  min-height:
+    0 !important;
+
+  flex:
+    0
+    0
+    auto !important;
+}
+
+
+.threadPanelReplying
+.richComposerEditor {
+  min-height:
+    95px !important;
+
+  max-height:
+    130px !important;
+
+  flex:
+    0
+    0
+    auto !important;
+
+  overflow-y:
+    auto !important;
+
+  font-size:
+    14px !important;
+
+  line-height:
+    1.55 !important;
+}
+
+
+.threadPanelExpanded.threadPanelReplying
+.richComposerEditor {
+  min-height:
+    105px !important;
+
+  max-height:
+    145px !important;
+}
+
+
+.threadPanelReplying
+.composerSignature {
+  margin-top:
+    7px !important;
+
+  padding:
+    7px
+    10px !important;
+}
+
+
+.threadPanelReplying
+.composerSignature
+pre {
+  max-height:
+    54px !important;
+
+  margin:
+    3px
+    0
+    0 !important;
+
+  overflow:
+    auto !important;
+
+  font-size:
+    13px !important;
+
+  line-height:
+    1.4 !important;
+}
+
+
+.threadPanelReplying
+.composerFooter {
+  position:
+    sticky !important;
+
+  z-index:
+    30 !important;
+
+  bottom:
+    0 !important;
+
+  margin-top:
+    7px !important;
+
+  padding-top:
+    7px !important;
+
+  padding-bottom:
+    7px !important;
+
+  border-top:
+    1px solid
+    #dce6ed;
+
+  background:
+    #ffffff !important;
+}
+
+
+@media (max-height: 760px) and (min-width: 761px) {
+
+  .threadPanelReplying
+  .threadBody {
+    min-height:
+      190px !important;
+  }
+
+
+  .threadPanelReplying
+  .replyComposer,
+  .threadPanelExpanded.threadPanelReplying
+  .replyComposer {
+    max-height:
+      315px !important;
+  }
+
+
+  .threadPanelReplying
+  .richComposerEditor,
+  .threadPanelExpanded.threadPanelReplying
+  .richComposerEditor {
+    min-height:
+      82px !important;
+
+    max-height:
+      108px !important;
+  }
+}
+
+
+@media (max-width: 760px) {
+
+  .threadPanelReplying
+  .threadBody,
+  .threadPanelExpanded.threadPanelReplying
+  .threadBody {
+    min-height:
+      190px !important;
+  }
+
+
+  .threadPanelReplying
+  .replyComposer,
+  .threadPanelExpanded.threadPanelReplying
+  .replyComposer {
+    max-height:
+      48dvh !important;
+  }
+}
+
+/* EMAIL REPLY COMPACT DRAWER V2 — END */

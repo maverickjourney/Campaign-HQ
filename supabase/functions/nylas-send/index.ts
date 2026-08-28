@@ -295,6 +295,41 @@ function stripGrantReferences(
   return value;
 }
 
+const NYLAS_SEND_TIMEOUT_MS =
+  20000;
+
+
+async function fetchProvider(
+  input: string | URL,
+  init: RequestInit = {},
+) {
+  const controller =
+    new AbortController();
+
+  const timeoutId =
+    setTimeout(
+      () =>
+        controller.abort(),
+      NYLAS_SEND_TIMEOUT_MS,
+    );
+
+  try {
+    return await fetch(
+      input,
+      {
+        ...init,
+        signal:
+          controller.signal,
+      },
+    );
+  } finally {
+    clearTimeout(
+      timeoutId,
+    );
+  }
+}
+
+
 Deno.serve(
   async (
     request: Request,
@@ -921,7 +956,7 @@ Deno.serve(
 
       try {
         sourceResponse =
-          await fetch(
+          await fetchProvider(
             `${baseUri}/v3/grants/${grant}/messages/${encodeURIComponent(replyToMessageId)}`,
             {
               method:
@@ -1151,7 +1186,7 @@ Deno.serve(
           );
 
         sendResponse =
-          await fetch(
+          await fetchProvider(
             `${baseUri}/v3/grants/${grant}/messages/send?fields=include_basic_headers`,
             {
               method:
@@ -1174,7 +1209,7 @@ Deno.serve(
           );
       } else {
         sendResponse =
-          await fetch(
+          await fetchProvider(
             `${baseUri}/v3/grants/${grant}/messages/send?fields=include_basic_headers`,
             {
               method:
@@ -1261,29 +1296,51 @@ Deno.serve(
       );
     }
 
-    await adminClient.rpc(
-      "touch_email_runtime_connection",
-      {
-        target_provider_grant_id:
-          connection
-            .grant_reference,
+    try {
+      await Promise.race([
+        adminClient.rpc(
+          "touch_email_runtime_connection",
+          {
+            target_provider_grant_id:
+              connection
+                .grant_reference,
 
-        target_event_type:
-          "campaign_seat.send_success",
+            target_event_type:
+              "campaign_seat.send_success",
 
-        target_event_id:
-          clean(
-            (
-              sendResult.data as
-                | Record<
-                    string,
-                    unknown
-                  >
-                | undefined
-            )?.id,
-          ),
-      },
-    );
+            target_event_id:
+              clean(
+                (
+                  sendResult.data as
+                    | Record<
+                        string,
+                        unknown
+                      >
+                    | undefined
+                )?.id,
+              ),
+          },
+        ),
+
+        new Promise(
+          (resolve) =>
+            setTimeout(
+              () =>
+                resolve(
+                  null,
+                ),
+              1500,
+            ),
+        ),
+      ]);
+    } catch (
+      touchError
+    ) {
+      console.warn(
+        "Email provider accepted the send, but the runtime metadata touch did not finish:",
+        touchError,
+      );
+    }
 
     return jsonResponse(
       request,

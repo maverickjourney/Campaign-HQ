@@ -131,6 +131,41 @@ function stripGrantReferences(
   return value;
 }
 
+const NYLAS_MAILBOX_TIMEOUT_MS =
+  12000;
+
+
+async function fetchProvider(
+  input: string | URL,
+  init: RequestInit = {},
+) {
+  const controller =
+    new AbortController();
+
+  const timeoutId =
+    setTimeout(
+      () =>
+        controller.abort(),
+      NYLAS_MAILBOX_TIMEOUT_MS,
+    );
+
+  try {
+    return await fetch(
+      input,
+      {
+        ...init,
+        signal:
+          controller.signal,
+      },
+    );
+  } finally {
+    clearTimeout(
+      timeoutId,
+    );
+  }
+}
+
+
 Deno.serve(
   async (
     request: Request,
@@ -1644,7 +1679,7 @@ Deno.serve(
 
     try {
       providerResponse =
-        await fetch(
+        await fetchProvider(
           target,
           {
             method:

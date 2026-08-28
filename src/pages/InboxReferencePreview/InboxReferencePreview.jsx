@@ -7283,16 +7283,11 @@ export default function InboxReferencePreview() {
       );
 
       try {
-        const hydrated =
-          await loadMailboxThread(
-            selectedConversation.providerThreadId,
-          );
-
-        const replySource =
+        let replySource =
           [
             ...(
-              hydrated?.messages ||
-              selectedConversation.messages ||
+              selectedConversation
+                .messages ||
               []
             ),
           ]
@@ -7314,6 +7309,43 @@ export default function InboxReferencePreview() {
               (message) =>
                 message.providerMessageId,
             );
+
+        if (
+          !replySource
+            ?.providerMessageId
+        ) {
+          const hydrated =
+            await loadMailboxThread(
+              selectedConversation
+                .providerThreadId,
+            );
+
+          replySource =
+            [
+              ...(
+                hydrated?.messages ||
+                []
+              ),
+            ]
+              .sort(
+                (
+                  left,
+                  right,
+                ) =>
+                  Number(
+                    right?.order ||
+                    0,
+                  ) -
+                  Number(
+                    left?.order ||
+                    0,
+                  ),
+              )
+              .find(
+                (message) =>
+                  message.providerMessageId,
+              );
+        }
 
         if (
           !replySource
@@ -7353,6 +7385,24 @@ export default function InboxReferencePreview() {
             attachments:
               sentAttachmentFiles,
           });
+
+        setReplySendState(
+          "sent",
+        );
+
+        window.setTimeout(
+          () => {
+            setReplyComposerOpen(
+              false,
+            );
+
+            setReplySendState(
+              "idle",
+            );
+          },
+          1400,
+        );
+
 
         let attachmentArchiveWarning =
           "";
@@ -7459,28 +7509,31 @@ export default function InboxReferencePreview() {
           attachmentArchiveWarning,
         );
 
-        await refreshMailbox();
+        const sentThreadId =
+          selectedConversation
+            .providerThreadId;
 
-        await loadMailboxThread(
-          selectedConversation.providerThreadId,
-        );
+        void (
+          async () => {
+            try {
+              await refreshMailbox({
+                showLoading:
+                  false,
+              });
 
-        setReplySendState(
-          "sent",
-        );
-
-        window.setTimeout(
-          () => {
-            setReplyComposerOpen(
-              false,
-            );
-
-            setReplySendState(
-              "idle",
-            );
-          },
-          1400,
-        );
+              await loadMailboxThread(
+                sentThreadId,
+              );
+            } catch (
+              refreshError
+            ) {
+              console.warn(
+                "Email sent successfully; background mailbox reconciliation is still pending:",
+                refreshError,
+              );
+            }
+          }
+        )();
       } catch (sendError) {
         setReplySendState(
           "idle",

@@ -22,7 +22,7 @@ const MICROSOFT_MAILBOX_PAGE_SIZE =
   10;
 
 const MICROSOFT_MAILBOX_TARGET_THREAD_COUNT =
-  10;
+  30;
 
 const QUIET_REFRESH_INTERVAL_MS =
   60000;
@@ -32,6 +32,53 @@ const QUIET_REFRESH_COOLDOWN_MS =
 
 const RATE_LIMIT_BACKOFF_MS =
   180000;
+
+const MAILBOX_REQUEST_TIMEOUT_MS =
+  12000;
+
+const SEND_REQUEST_TIMEOUT_MS =
+  25000;
+
+
+async function withRequestTimeout(
+  promise,
+  timeoutMs,
+  message,
+) {
+  let timeoutId;
+
+  try {
+    return await Promise.race([
+      promise,
+
+      new Promise(
+        (
+          _resolve,
+          reject,
+        ) => {
+          timeoutId =
+            window.setTimeout(
+              () => {
+                reject(
+                  new Error(
+                    message,
+                  ),
+                );
+              },
+              timeoutMs,
+            );
+        },
+      ),
+    ]);
+  } finally {
+    if (timeoutId) {
+      window.clearTimeout(
+        timeoutId,
+      );
+    }
+  }
+}
+
 
 function clean(value) {
   return String(
@@ -1181,17 +1228,23 @@ export function useRealInboxMailbox({
           error:
             invokeError,
         } =
-          await supabase
-            .functions
-            .invoke(
-              "nylas-mailbox",
-              {
-                body: {
-                  workspaceId,
-                  ...requestBody,
+          await withRequestTimeout(
+            supabase
+              .functions
+              .invoke(
+                "nylas-mailbox",
+                {
+                  body: {
+                    workspaceId,
+                    ...requestBody,
+                  },
                 },
-              },
-            );
+              ),
+
+            MAILBOX_REQUEST_TIMEOUT_MS,
+
+            "The connected mailbox took too long to respond. Campaign Seat kept the email already loaded and will retry.",
+          );
 
         if (
           invokeError
@@ -1356,8 +1409,16 @@ export function useRealInboxMailbox({
           const targetThreadCount =
             refreshProvider ===
               "microsoft"
-              ? MICROSOFT_MAILBOX_TARGET_THREAD_COUNT
-              : MAILBOX_TARGET_THREAD_COUNT;
+              ? (
+                  showLoading
+                    ? MICROSOFT_MAILBOX_TARGET_THREAD_COUNT
+                    : MICROSOFT_MAILBOX_PAGE_SIZE
+                )
+              : (
+                  showLoading
+                    ? MAILBOX_TARGET_THREAD_COUNT
+                    : MAILBOX_PAGE_SIZE
+                );
 
           const requestedFolderId =
             clean(
@@ -1454,6 +1515,50 @@ export function useRealInboxMailbox({
               }
             }
 
+            if (
+              showLoading &&
+              threadRows.length
+            ) {
+              const progressiveMailboxEmail =
+                clean(
+                  pageResult
+                    .connectedEmail,
+                ) ||
+                connectedEmail;
+
+              const progressive =
+                threadRows
+                  .slice(
+                    0,
+                    targetThreadCount,
+                  )
+                  .map(
+                    (thread) =>
+                      transformThread({
+                        thread,
+                        connectedEmail:
+                          progressiveMailboxEmail,
+                      }),
+                  )
+                  .sort(
+                    (
+                      left,
+                      right,
+                    ) =>
+                      right.order -
+                      left.order,
+                  );
+
+              setConversations(
+                progressive,
+              );
+
+              setIsLoading(
+                false,
+              );
+            }
+
+
             const nextCursor =
               clean(
                 pageResult
@@ -1527,7 +1632,47 @@ return transformed;
               );
 
           setConversations(
-            next,
+            (current) => {
+              if (
+                showLoading
+              ) {
+                return next;
+              }
+
+              const merged =
+                new Map(
+                  current.map(
+                    (
+                      conversation,
+                    ) => [
+                      conversation.id,
+                      conversation,
+                    ],
+                  ),
+                );
+
+              next.forEach(
+                (
+                  conversation,
+                ) => {
+                  merged.set(
+                    conversation.id,
+                    conversation,
+                  );
+                },
+              );
+
+              return [
+                ...merged.values(),
+              ].sort(
+                (
+                  left,
+                  right,
+                ) =>
+                  right.order -
+                  left.order,
+              );
+            },
           );
 
           rateLimitBackoffUntilRef.current =
@@ -2803,15 +2948,21 @@ return transformed;
           error:
             invokeError,
         } =
-          await supabase
-            .functions
-            .invoke(
-              "nylas-send",
-              {
-                body:
-                  functionBody,
-              },
-            );
+          await withRequestTimeout(
+            supabase
+              .functions
+              .invoke(
+                "nylas-send",
+                {
+                  body:
+                    functionBody,
+                },
+              ),
+
+            SEND_REQUEST_TIMEOUT_MS,
+
+            "Campaign Seat could not confirm this email send within 25 seconds. The same send identifier is preserved so retrying the exact message remains protected from intentional duplication.",
+          );
 
         if (
           invokeError
