@@ -50,6 +50,230 @@ const SEND_REQUEST_TIMEOUT_MS =
 const THREAD_HYDRATION_DELAY_MS =
   300;
 
+
+/*
+ * CAMPAIGN SEAT MAILBOX SNAPSHOT CACHE V1
+ *
+ * Inbox navigation must never depend on a brand-new Microsoft
+ * provider request. Keep the last trustworthy mailbox list in
+ * sessionStorage so Dashboard/Bell -> Inbox can render instantly.
+ *
+ * Provider refresh remains authoritative and runs quietly after
+ * the cached snapshot is visible.
+ */
+const MAILBOX_SNAPSHOT_MAX_AGE_MS =
+  6 * 60 * 60 * 1000;
+
+
+function mailboxSnapshotStorageKey(
+  workspaceId,
+) {
+  return `campaign-seat:mailbox-snapshot:${workspaceId}`;
+}
+
+
+function readMailboxSnapshot(
+  workspaceId,
+) {
+  if (
+    typeof window ===
+      "undefined" ||
+    !workspaceId
+  ) {
+    return null;
+  }
+
+  try {
+    const raw =
+      window.sessionStorage
+        .getItem(
+          mailboxSnapshotStorageKey(
+            workspaceId,
+          ),
+        );
+
+    if (!raw) {
+      return null;
+    }
+
+    const snapshot =
+      JSON.parse(
+        raw,
+      );
+
+    const savedAt =
+      Number(
+        snapshot?.savedAt ||
+        0,
+      );
+
+    if (
+      !savedAt ||
+      Date.now() -
+        savedAt >
+        MAILBOX_SNAPSHOT_MAX_AGE_MS ||
+      !Array.isArray(
+        snapshot?.conversations,
+      )
+    ) {
+      window.sessionStorage
+        .removeItem(
+          mailboxSnapshotStorageKey(
+            workspaceId,
+          ),
+        );
+
+      return null;
+    }
+
+    return {
+      conversations:
+        snapshot.conversations,
+
+      mailboxFolders:
+        Array.isArray(
+          snapshot.mailboxFolders,
+        )
+          ? snapshot.mailboxFolders
+          : [],
+
+      connectedEmail:
+        clean(
+          snapshot.connectedEmail,
+        ),
+
+      accountProvider:
+        clean(
+          snapshot.accountProvider,
+        ),
+
+      savedAt,
+    };
+  } catch {
+    return null;
+  }
+}
+
+
+function lightweightSnapshotConversation(
+  conversation,
+) {
+  const messages =
+    Array.isArray(
+      conversation?.messages,
+    )
+      ? conversation.messages
+          .slice(
+            0,
+            1,
+          )
+          .map(
+            (message) => ({
+              ...message,
+
+              body:
+                clean(
+                  message?.body,
+                ).slice(
+                  0,
+                  5000,
+                ),
+
+              /*
+               * Full HTML and inline media can be large.
+               * Provider hydration restores them when needed.
+               */
+              htmlBody:
+                "",
+
+              inlineAttachments:
+                [],
+            }),
+          )
+      : [];
+
+  return {
+    ...conversation,
+
+    messages,
+
+    /*
+     * File metadata is hydrated again when the thread opens.
+     */
+    files:
+      [],
+  };
+}
+
+
+function writeMailboxSnapshot(
+  workspaceId,
+  {
+    conversations,
+    mailboxFolders,
+    connectedEmail,
+    accountProvider,
+  },
+) {
+  if (
+    typeof window ===
+      "undefined" ||
+    !workspaceId ||
+    !Array.isArray(
+      conversations,
+    ) ||
+    !conversations.length
+  ) {
+    return;
+  }
+
+  try {
+    window.sessionStorage
+      .setItem(
+        mailboxSnapshotStorageKey(
+          workspaceId,
+        ),
+
+        JSON.stringify({
+          savedAt:
+            Date.now(),
+
+          conversations:
+            conversations
+              .slice(
+                0,
+                50,
+              )
+              .map(
+                lightweightSnapshotConversation,
+              ),
+
+          mailboxFolders:
+            Array.isArray(
+              mailboxFolders,
+            )
+              ? mailboxFolders
+              : [],
+
+          connectedEmail:
+            clean(
+              connectedEmail,
+            ),
+
+          accountProvider:
+            clean(
+              accountProvider,
+            ),
+        }),
+      );
+  } catch {
+    /*
+     * Browser storage is only an acceleration layer.
+     * Live provider access continues to work without it.
+     */
+  }
+}
+
 async function withRequestTimeout(
   promise,
   timeoutMs,
@@ -1360,6 +1584,91 @@ export function useRealInboxMailbox({
       false,
     );
 
+
+  /*
+   * Restore the most recent trustworthy mailbox immediately
+   * when Inbox mounts. This happens before the initial provider
+   * refresh timer runs.
+   */
+  useEffect(
+    () => {
+      if (
+        !workspaceId
+      ) {
+        return;
+      }
+
+      const snapshot =
+        readMailboxSnapshot(
+          workspaceId,
+        );
+
+      if (
+        !snapshot ||
+        !snapshot
+          .conversations
+          .length
+      ) {
+        return;
+      }
+
+      conversationsRef.current =
+        snapshot.conversations;
+
+      connectedEmailRef.current =
+        snapshot.connectedEmail;
+
+      hasMailboxSnapshotRef.current =
+        true;
+
+      setConversations(
+        snapshot.conversations,
+      );
+
+      setMailboxFolders(
+        snapshot.mailboxFolders,
+      );
+
+      if (
+        snapshot.connectedEmail
+      ) {
+        setConnectedEmail(
+          snapshot.connectedEmail,
+        );
+      }
+
+      if (
+        snapshot.accountProvider
+      ) {
+        setAccountProvider(
+          snapshot.accountProvider,
+        );
+      }
+
+      /*
+       * Never carry an old provider error into a newly opened
+       * Inbox when we already have usable local email state.
+       */
+      setError(
+        "",
+      );
+
+      setIsLoading(
+        false,
+      );
+
+      setLastUpdated(
+        new Date(
+          snapshot.savedAt,
+        ),
+      );
+    },
+    [
+      workspaceId,
+    ],
+  );
+
+
   useEffect(
     () => {
       conversationsRef.current =
@@ -1379,6 +1688,41 @@ export function useRealInboxMailbox({
       connectedEmail,
     ],
   );
+
+
+  /*
+   * Keep a lightweight last-known-good mailbox between route
+   * transitions. Dashboard -> Inbox therefore does not need to
+   * wait for Microsoft before the user sees their messages.
+   */
+  useEffect(
+    () => {
+      if (
+        !workspaceId ||
+        !conversations.length
+      ) {
+        return;
+      }
+
+      writeMailboxSnapshot(
+        workspaceId,
+        {
+          conversations,
+          mailboxFolders,
+          connectedEmail,
+          accountProvider,
+        },
+      );
+    },
+    [
+      accountProvider,
+      connectedEmail,
+      conversations,
+      mailboxFolders,
+      workspaceId,
+    ],
+  );
+
 
   const invokeMailbox =
     useCallback(
@@ -1942,6 +2286,12 @@ return transformed;
               "Campaign Seat could not load the connected mailbox.",
             );
 
+          const transientProviderProblem =
+            /rate limit|too long to respond|could not reach/i
+              .test(
+                nextError,
+              );
+
           if (
             /rate limit/i.test(
               nextError,
@@ -1950,6 +2300,34 @@ return transformed;
             rateLimitBackoffUntilRef.current =
               Date.now() +
               RATE_LIMIT_BACKOFF_MS;
+          }
+
+          /*
+           * If Campaign Seat already has trustworthy mailbox
+           * data, a temporary Microsoft/Nylas problem is a sync
+           * delay — not an Inbox failure.
+           *
+           * Keep all existing conversations visible and allow
+           * the normal quiet refresh to reconcile later.
+           */
+          if (
+            transientProviderProblem &&
+            conversationsRef
+              .current
+              .length
+          ) {
+            setError(
+              "",
+            );
+
+            setLastUpdated(
+              new Date(),
+            );
+
+            return (
+              conversationsRef
+                .current
+            );
           }
 
           setError(
