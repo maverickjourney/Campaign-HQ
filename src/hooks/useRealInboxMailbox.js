@@ -1841,6 +1841,22 @@ export function useRealInboxMailbox({
          */
         lastQuietRefreshAtRef.current =
           Date.now();
+        /*
+         * CAMPAIGN SEAT MAILBOX REFRESH OVERLAP GUARD V1
+         *
+         * Initial load, focus, visibility, timed fallback and
+         * webhook refresh must never hit Microsoft concurrently.
+         */
+        if (
+          refreshInFlightRef.current
+        ) {
+          return (
+            conversationsRef.current
+          );
+        }
+
+        lastQuietRefreshAtRef.current =
+          Date.now();
 
         const deepRefresh =
           !hasMailboxSnapshotRef
