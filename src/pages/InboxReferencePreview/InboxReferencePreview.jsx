@@ -1362,8 +1362,6 @@ function emailHasRemoteImages(
   html,
 ) {
   if (
-    message
-      ?.quotedHistoryHidden ||
     !html ||
     typeof window ===
       "undefined"
@@ -2005,6 +2003,8 @@ function SafeEmailBody({
 
 
   if (
+    message
+      ?.quotedHistoryHidden ||
     !html ||
     !/<[a-z][\s\S]*>/i.test(
       html,
