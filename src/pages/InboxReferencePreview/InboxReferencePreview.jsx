@@ -3604,6 +3604,27 @@ export default function InboxReferencePreview() {
   const [quickTaskError, setQuickTaskError] =
     useState("");
 
+  const [
+    internalNoteOpen,
+    setInternalNoteOpen,
+  ] = useState(false);
+
+  const [
+    internalNoteText,
+    setInternalNoteText,
+  ] = useState("");
+
+  const [
+    internalNoteBusy,
+    setInternalNoteBusy,
+  ] = useState(false);
+
+  const [
+    internalNoteError,
+    setInternalNoteError,
+  ] = useState("");
+
+
   const [activityLog, setActivityLog] =
     useState([
       {
@@ -8602,6 +8623,127 @@ export default function InboxReferencePreview() {
     };
 
 
+  const openInternalNote =
+    () => {
+      if (
+        !hasSelectedConversation
+      ) {
+        return;
+      }
+
+      setInternalNoteText(
+        "",
+      );
+
+      setInternalNoteError(
+        "",
+      );
+
+      setInternalNoteOpen(
+        true,
+      );
+    };
+
+
+  const closeInternalNote =
+    () => {
+      if (
+        internalNoteBusy
+      ) {
+        return;
+      }
+
+      setInternalNoteOpen(
+        false,
+      );
+
+      setInternalNoteText(
+        "",
+      );
+
+      setInternalNoteError(
+        "",
+      );
+    };
+
+
+  const saveInternalNote =
+    async () => {
+      const note =
+        String(
+          internalNoteText ||
+          "",
+        ).trim();
+
+      if (
+        !note ||
+        !hasSelectedConversation ||
+        internalNoteBusy
+      ) {
+        return;
+      }
+
+      setInternalNoteBusy(
+        true,
+      );
+
+      setInternalNoteError(
+        "",
+      );
+
+      try {
+        await logInboxActivity(
+          selectedConversation,
+          {
+            eventType:
+              "note:internal",
+
+            eventLabel:
+              "Internal note",
+
+            eventDetail:
+              note,
+
+            metadata: {
+              visibility:
+                "internal",
+
+              note_type:
+                "team_note",
+            },
+          },
+        );
+
+        setInternalNoteText(
+          "",
+        );
+
+        setInternalNoteOpen(
+          false,
+        );
+
+        setActiveThreadTab(
+          "activity",
+        );
+
+        setToast(
+          "Internal note saved. Nothing was sent to the contact.",
+        );
+      } catch (
+        noteError
+      ) {
+        setInternalNoteError(
+          noteError?.message ||
+            "Campaign Seat could not save this internal note.",
+        );
+      } finally {
+        setInternalNoteBusy(
+          false,
+        );
+      }
+    };
+
+
   const openEmptyTrashConfirmation =
     () => {
       setEmptyTrashAcknowledged(
@@ -11126,6 +11268,18 @@ type="button"
                     />
                   </button>
 
+                  <button
+                    type="button"
+                    aria-label="Add internal note"
+                    onClick={
+                      openInternalNote
+                    }
+                  >
+                    <Pencil
+                      size={17}
+                    />
+                  </button>
+
                 </div>
               </header>
             )}
@@ -13306,9 +13460,28 @@ type="button"
                     </p>
                   </div>
 
-                  <em>
-                    Live
-                  </em>
+                  <div
+                    className={
+                      styles.activityAuditHeaderActions
+                    }
+                  >
+                    <em>
+                      Live
+                    </em>
+
+                    <button
+                      type="button"
+                      onClick={
+                        openInternalNote
+                      }
+                    >
+                      <Pencil
+                        size={15}
+                      />
+
+                      Add Internal Note
+                    </button>
+                  </div>
                 </header>
 
                 <div
@@ -13320,11 +13493,18 @@ type="button"
                     .length ? (
                     selectedActivityTimeline.map(
                       (activity) => {
+                        const internalNote =
+                          activity
+                            .event_type ===
+                          "note:internal";
+
                         const ActivityIcon =
-                          inboxActivityIcon(
-                            activity
-                              .event_type,
-                          );
+                          internalNote
+                            ? Pencil
+                            : inboxActivityIcon(
+                                activity
+                                  .event_type,
+                              );
 
                         const actorMember =
                           activity
@@ -13384,9 +13564,15 @@ type="button"
                             key={
                               activity.id
                             }
-                            className={
-                              styles.activityAuditItem
-                            }
+                            className={[
+                              styles.activityAuditItem,
+
+                              internalNote
+                                ? styles.activityAuditInternalNote
+                                : "",
+                            ]
+                              .filter(Boolean)
+                              .join(" ")}
                           >
                             <span
                               className={
@@ -13406,6 +13592,16 @@ type="button"
                                       .event_label
                                   }
                                 </strong>
+
+                                {internalNote ? (
+                                  <span
+                                    className={
+                                      styles.activityAuditInternalBadge
+                                    }
+                                  >
+                                    Internal only
+                                  </span>
+                                ) : null}
 
                                 {timeLabel ? (
                                   <time>
@@ -14704,6 +14900,221 @@ type="button"
                 </button>
               </footer>
             </section>
+              </div>,
+              document.body,
+            )
+          : null}
+
+        {internalNoteOpen &&
+        typeof document !== "undefined"
+          ? createPortal(
+              <div
+                className={
+                  styles.internalNoteOverlay
+                }
+                role="presentation"
+                onMouseDown={(
+                  event,
+                ) => {
+                  if (
+                    event.target ===
+                      event.currentTarget &&
+                    !internalNoteBusy
+                  ) {
+                    closeInternalNote();
+                  }
+                }}
+              >
+                <section
+                  className={
+                    styles.internalNoteModal
+                  }
+                  role="dialog"
+                  aria-modal="true"
+                  aria-labelledby="internal-note-title"
+                >
+                  <header>
+                    <span>
+                      <Pencil
+                        size={21}
+                      />
+                    </span>
+
+                    <div>
+                      <small>
+                        Campaign Team
+                      </small>
+
+                      <h2
+                        id="internal-note-title"
+                      >
+                        Add Internal Note
+                      </h2>
+                    </div>
+
+                    <button
+                      type="button"
+                      aria-label="Close internal note"
+                      disabled={
+                        internalNoteBusy
+                      }
+                      onClick={
+                        closeInternalNote
+                      }
+                    >
+                      <X
+                        size={18}
+                      />
+                    </button>
+                  </header>
+
+                  <div
+                    className={
+                      styles.internalNoteWarning
+                    }
+                  >
+                    <ShieldAlert
+                      size={20}
+                    />
+
+                    <div>
+                      <strong>
+                        Internal only — never sent.
+                      </strong>
+
+                      <p>
+                        This note is visible to authorized Campaign Seat team members and will appear in this conversation's Activity history.
+                      </p>
+                    </div>
+                  </div>
+
+                  <div
+                    className={
+                      styles.internalNoteConversation
+                    }
+                  >
+                    <small>
+                      Conversation
+                    </small>
+
+                    <strong>
+                      {
+                        selectedConversation
+                          .sender
+                      }
+                    </strong>
+
+                    <span>
+                      {
+                        selectedConversation
+                          .subject
+                      }
+                    </span>
+                  </div>
+
+                  <label
+                    className={
+                      styles.internalNoteField
+                    }
+                  >
+                    <span>
+                      Team note
+                    </span>
+
+                    <textarea
+                      autoFocus
+                      value={
+                        internalNoteText
+                      }
+                      maxLength={3000}
+                      placeholder="Example: Spoke with them by phone. They need the updated event time before Friday."
+                      disabled={
+                        internalNoteBusy
+                      }
+                      onChange={(
+                        event,
+                      ) =>
+                        setInternalNoteText(
+                          event.target
+                            .value,
+                        )
+                      }
+                      onKeyDown={(
+                        event,
+                      ) => {
+                        if (
+                          (
+                            event.metaKey ||
+                            event.ctrlKey
+                          ) &&
+                          event.key ===
+                            "Enter"
+                        ) {
+                          event.preventDefault();
+
+                          void saveInternalNote();
+                        }
+                      }}
+                    />
+
+                    <small>
+                      {
+                        internalNoteText
+                          .length
+                      }
+                      /3000
+                    </small>
+                  </label>
+
+                  {internalNoteError ? (
+                    <div
+                      className={
+                        styles.internalNoteError
+                      }
+                      role="alert"
+                    >
+                      {
+                        internalNoteError
+                      }
+                    </div>
+                  ) : null}
+
+                  <footer>
+                    <span>
+                      ⌘/Ctrl + Enter to save
+                    </span>
+
+                    <div>
+                      <button
+                        type="button"
+                        disabled={
+                          internalNoteBusy
+                        }
+                        onClick={
+                          closeInternalNote
+                        }
+                      >
+                        Cancel
+                      </button>
+
+                      <button
+                        type="button"
+                        disabled={
+                          internalNoteBusy ||
+                          !internalNoteText
+                            .trim()
+                        }
+                        onClick={() =>
+                          void saveInternalNote()
+                        }
+                      >
+                        {internalNoteBusy
+                          ? "Saving…"
+                          : "Save Internal Note"}
+                      </button>
+                    </div>
+                  </footer>
+                </section>
               </div>,
               document.body,
             )
