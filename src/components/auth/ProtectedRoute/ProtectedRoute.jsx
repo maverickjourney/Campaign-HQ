@@ -9,6 +9,8 @@ import {
 } from "react-router-dom";
 
 import {
+  RefreshCw,
+  ShieldAlert,
   ShieldCheck,
 } from "lucide-react";
 
@@ -24,6 +26,46 @@ import {
 
 import styles from "./ProtectedRoute.module.css";
 
+const CAMPAIGN_ACCESS_TIMEOUT_MS =
+  15000;
+
+
+async function restoreCampaignSessionWithTimeout() {
+  let timeoutId;
+
+  try {
+    return await Promise.race([
+      restoreCampaignSession(),
+
+      new Promise(
+        (
+          _resolve,
+          reject,
+        ) => {
+          timeoutId =
+            window.setTimeout(
+              () => {
+                reject(
+                  new Error(
+                    "Campaign access verification took too long.",
+                  ),
+                );
+              },
+              CAMPAIGN_ACCESS_TIMEOUT_MS,
+            );
+        },
+      ),
+    ]);
+  } finally {
+    if (timeoutId) {
+      window.clearTimeout(
+        timeoutId,
+      );
+    }
+  }
+}
+
+
 export default function ProtectedRoute({
   children,
   allowedExperiences = [],
@@ -38,6 +80,16 @@ export default function ProtectedRoute({
     "checking",
   );
 
+  const [
+    accessError,
+    setAccessError,
+  ] = useState("");
+
+  const [
+    retryKey,
+    setRetryKey,
+  ] = useState(0);
+
   const allowedKey =
     allowedExperiences
       .join("|");
@@ -47,8 +99,42 @@ export default function ProtectedRoute({
 
     const verify =
       async () => {
-        const authentication =
-          await restoreCampaignSession();
+        setStatus(
+          "checking",
+        );
+
+        setAccessError(
+          "",
+        );
+
+        let authentication;
+
+        try {
+          authentication =
+            await restoreCampaignSessionWithTimeout();
+        } catch (
+          error
+        ) {
+          console.error(
+            "Campaign access verification failed:",
+            error,
+          );
+
+          if (!mounted) {
+            return;
+          }
+
+          setAccessError(
+            error?.message ||
+              "Campaign Seat could not verify your campaign access.",
+          );
+
+          setStatus(
+            "error",
+          );
+
+          return;
+        }
 
         if (!mounted) {
           return;
@@ -156,6 +242,7 @@ export default function ProtectedRoute({
   }, [
     allowedKey,
     location.pathname,
+    retryKey,
   ]);
 
   const returnDestination =
@@ -193,6 +280,66 @@ export default function ProtectedRoute({
       </div>
     );
   }
+
+  if (
+    status ===
+    "error"
+  ) {
+    return (
+      <div
+        className={
+          styles.loadingPage
+        }
+      >
+        <div
+          className={[
+            styles.loadingMark,
+            styles.errorMark,
+          ]
+            .filter(Boolean)
+            .join(" ")}
+        >
+          <ShieldAlert
+            size={28}
+            strokeWidth={1.8}
+          />
+        </div>
+
+        <strong>
+          Campaign access needs another check
+        </strong>
+
+        <span
+          className={
+            styles.errorMessage
+          }
+        >
+          {accessError ||
+            "Campaign Seat could not finish verifying your secure access."}
+        </span>
+
+        <button
+          type="button"
+          className={
+            styles.retryButton
+          }
+          onClick={() =>
+            setRetryKey(
+              (current) =>
+                current + 1,
+            )
+          }
+        >
+          <RefreshCw
+            size={17}
+          />
+
+          Retry access check
+        </button>
+      </div>
+    );
+  }
+
 
   if (
     status ===

@@ -54,3 +54,108 @@
     box-shadow: 0 20px 42px rgba(7, 27, 53, 0.27);
   }
 }
+
+
+/* CAMPAIGN ACCESS RECOVERY — START */
+
+.errorMark {
+  background:
+    #8f1f2d;
+
+  animation:
+    none;
+}
+
+
+.errorMessage {
+  width:
+    min(
+      520px,
+      calc(
+        100vw -
+        40px
+      )
+    );
+
+  color:
+    #66788d !important;
+
+  line-height:
+    1.5;
+
+  text-align:
+    center;
+}
+
+
+.retryButton {
+  display:
+    inline-flex;
+
+  min-height:
+    44px;
+
+  align-items:
+    center;
+
+  justify-content:
+    center;
+
+  gap:
+    7px;
+
+  margin-top:
+    8px;
+
+  padding:
+    0
+    16px;
+
+  border:
+    1px solid
+    #173f62;
+
+  border-radius:
+    9px;
+
+  color:
+    #ffffff;
+
+  background:
+    #173f62;
+
+  cursor:
+    pointer;
+
+  font:
+    inherit;
+
+  font-size:
+    14px;
+
+  font-weight:
+    800;
+}
+
+
+.retryButton:hover {
+  background:
+    #0f3455;
+}
+
+
+.retryButton:focus-visible {
+  outline:
+    3px solid
+    rgba(
+      39,
+      112,
+      167,
+      0.22
+    );
+
+  outline-offset:
+    3px;
+}
+
+/* CAMPAIGN ACCESS RECOVERY — END */
