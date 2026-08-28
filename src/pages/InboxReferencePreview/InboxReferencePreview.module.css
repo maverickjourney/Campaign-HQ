@@ -28126,3 +28126,213 @@ pre {
 }
 
 /* EXTRA INBOX VERTICAL WORKSPACE — END */
+
+
+/* CAMPAIGN SEAT — MAXIMUM VERTICAL INBOX WORKSPACE V3 — START */
+
+@media (min-width: 901px) {
+
+  /*
+   * Make the three Inbox columns visually deeper.
+   * Each column owns its scrolling instead of forcing the user
+   * to move the entire page just to reach more messages.
+   */
+
+  .inboxWorkspace {
+    height:
+      clamp(
+        880px,
+        calc(100dvh - 105px),
+        1120px
+      ) !important;
+
+    min-height:
+      clamp(
+        880px,
+        calc(100dvh - 105px),
+        1120px
+      ) !important;
+
+    align-items:
+      stretch !important;
+  }
+
+
+  .utilityPanel,
+  .conversationPanel,
+  .threadPanel {
+    height:
+      100% !important;
+
+    min-height:
+      0 !important;
+
+    max-height:
+      none !important;
+  }
+
+
+  /*
+   * LEFT COLUMN
+   * Channels / filters / tags can scroll vertically while
+   * the full box stays the same height as the other panes.
+   */
+
+  .utilityPanel {
+    overflow-x:
+      hidden !important;
+
+    overflow-y:
+      auto !important;
+
+    overscroll-behavior:
+      contain;
+
+    scrollbar-width:
+      thin;
+  }
+
+
+  /*
+   * MIDDLE COLUMN
+   * Header remains visible while conversations consume all
+   * remaining height and scroll independently.
+   */
+
+  .conversationPanel {
+    display:
+      flex !important;
+
+    flex-direction:
+      column !important;
+
+    overflow:
+      hidden !important;
+  }
+
+
+  .conversationList {
+    min-height:
+      0 !important;
+
+    flex:
+      1 1 auto !important;
+
+    overflow-x:
+      hidden !important;
+
+    overflow-y:
+      auto !important;
+
+    overscroll-behavior:
+      contain;
+  }
+
+
+  /*
+   * RIGHT COLUMN
+   * Thread uses the remaining panel height instead of the
+   * historic fixed/max-height limits.
+   */
+
+  .threadPanel {
+    display:
+      flex !important;
+
+    flex-direction:
+      column !important;
+
+    overflow:
+      hidden !important;
+  }
+
+
+  .threadPanel:not(.threadPanelReplying)
+  .threadBody {
+    min-height:
+      0 !important;
+
+    max-height:
+      none !important;
+
+    flex:
+      1 1 auto !important;
+
+    overflow-x:
+      hidden !important;
+
+    overflow-y:
+      auto !important;
+
+    overscroll-behavior:
+      contain;
+  }
+
+
+  /*
+   * While replying, preserve a large email-reading area and
+   * keep the composer compact at the bottom.
+   */
+
+  .threadPanelReplying
+  .threadBody {
+    min-height:
+      0 !important;
+
+    max-height:
+      none !important;
+
+    flex:
+      1 1 auto !important;
+
+    overflow-y:
+      auto !important;
+  }
+
+
+  .threadPanelReplying
+  .replyComposer {
+    flex:
+      0 0 auto !important;
+
+    max-height:
+      min(
+        29dvh,
+        290px
+      ) !important;
+  }
+
+
+  .threadPanelExpanded.threadPanelReplying
+  .replyComposer {
+    max-height:
+      min(
+        31dvh,
+        315px
+      ) !important;
+  }
+
+
+  .threadPanelReplying
+  .richComposerEditor {
+    min-height:
+      80px !important;
+
+    max-height:
+      108px !important;
+  }
+}
+
+
+@media (min-width: 901px) and (max-height: 820px) {
+
+  .inboxWorkspace {
+    height:
+      790px !important;
+
+    min-height:
+      790px !important;
+  }
+}
+
+/* CAMPAIGN SEAT — MAXIMUM VERTICAL INBOX WORKSPACE V3 — END */
