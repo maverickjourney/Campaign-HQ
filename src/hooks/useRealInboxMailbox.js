@@ -1558,6 +1558,17 @@ export function useRealInboxMailbox({
       new Set(),
     );
 
+  /*
+   * CAMPAIGN SEAT THREAD HYDRATION VERSION CACHE V1
+   *
+   * Reopening the same unchanged email conversation should
+   * reuse the fully-loaded thread instead of calling Nylas again.
+   */
+  const hydratedThreadVersionsRef =
+    useRef(
+      new Map(),
+    );
+
   const sendKeysRef =
     useRef(
       new Map(),
@@ -1821,26 +1832,6 @@ export function useRealInboxMailbox({
           return [];
         }
 
-        /*
-         * Do not allow initial load, focus refresh, timed
-         * fallback and webhook refresh to hit Microsoft at
-         * the same time.
-         */
-        if (
-          refreshInFlightRef.current
-        ) {
-          return (
-            conversationsRef.current
-          );
-        }
-
-        /*
-         * Any successful attempt counts as recent provider
-         * activity. This prevents a focus/visibility event
-         * immediately launching another refresh.
-         */
-        lastQuietRefreshAtRef.current =
-          Date.now();
         /*
          * CAMPAIGN SEAT MAILBOX REFRESH OVERLAP GUARD V1
          *
@@ -2934,6 +2925,53 @@ return transformed;
           return null;
         }
 
+        const hydrationKey =
+          `${workspaceId}:${providerThreadId}`;
+
+        const currentConversation =
+          conversationsRef
+            .current
+            .find(
+              (conversation) =>
+                conversation
+                  .providerThreadId ===
+                providerThreadId,
+            ) ||
+          null;
+
+        const currentThreadVersion =
+          clean(
+            currentConversation
+              ?.latestProviderMessageId,
+          );
+
+        const hydratedThreadVersion =
+          clean(
+            hydratedThreadVersionsRef
+              .current
+              .get(
+                hydrationKey,
+              ),
+          );
+
+        /*
+         * CAMPAIGN SEAT THREAD HYDRATION CACHE HIT V1
+         *
+         * A fully hydrated thread whose latest provider message
+         * has not changed can be reopened without another
+         * Microsoft/Nylas request.
+         */
+        if (
+          currentConversation
+            ?.mailboxHydrated ===
+            true &&
+          currentThreadVersion &&
+          hydratedThreadVersion ===
+            currentThreadVersion
+        ) {
+          return currentConversation;
+        }
+
         if (
           loadingThreadsRef
             .current
@@ -3041,7 +3079,23 @@ return transformed;
                       true,
                   };
 
-                  return hydrated;
+                  const hydratedVersion =
+            currentThreadVersion ||
+            clean(
+              messages[0]
+                ?.providerMessageId,
+            );
+
+          if (hydratedVersion) {
+            hydratedThreadVersionsRef
+              .current
+              .set(
+                hydrationKey,
+                hydratedVersion,
+              );
+          }
+
+          return hydrated;
                 },
               ),
           );
@@ -3058,6 +3112,7 @@ return transformed;
       [
         enabled,
         invokeMailbox,
+        workspaceId,
       ],
     );
 
