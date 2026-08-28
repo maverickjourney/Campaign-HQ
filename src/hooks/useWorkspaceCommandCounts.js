@@ -11,10 +11,84 @@ import {
 
 
 const EMPTY_COUNTS = {
+  inbox: 0,
   tasks: 0,
   waiting_on: 0,
   approvals: 0,
 };
+
+
+const INBOX_BADGE_REFRESH_MS =
+  60000;
+
+
+function inboxUnreadFromFolders(
+  folders,
+) {
+  const rows =
+    Array.isArray(
+      folders,
+    )
+      ? folders
+      : [];
+
+  const inbox =
+    rows.find(
+      (folder) => {
+        const values = [
+          folder?.id,
+          folder?.name,
+          folder?.display_name,
+          folder?.system_folder,
+          ...(
+            Array.isArray(
+              folder?.attributes,
+            )
+              ? folder.attributes
+              : []
+          ),
+        ]
+          .map(
+            (value) =>
+              String(
+                value ||
+                "",
+              )
+                .trim()
+                .toLowerCase(),
+          )
+          .filter(Boolean);
+
+        return values.some(
+          (value) =>
+            value ===
+              "inbox" ||
+            value ===
+              "\\inbox" ||
+            value.endsWith(
+              "/inbox",
+            ),
+        );
+      },
+    );
+
+  const count =
+    Number(
+      inbox?.unread_count,
+    );
+
+  return (
+    Number.isFinite(
+      count,
+    ) &&
+    count >=
+      0
+      ? Math.floor(
+          count,
+        )
+      : null
+  );
+}
 
 
 export function useWorkspaceCommandCounts(
@@ -41,6 +115,148 @@ export function useWorkspaceCommandCounts(
     useRef(null);
 
 
+  const inboxRefreshTimerRef =
+    useRef(null);
+
+
+  const setInboxCount =
+    useCallback(
+      (
+        nextCount,
+      ) => {
+        const numeric =
+          Number(
+            nextCount,
+          );
+
+        if (
+          !Number.isFinite(
+            numeric,
+          )
+        ) {
+          return;
+        }
+
+        const safeCount =
+          Math.max(
+            0,
+            Math.floor(
+              numeric,
+            ),
+          );
+
+        setCounts(
+          (current) => ({
+            ...current,
+            inbox:
+              safeCount,
+          }),
+        );
+
+        if (
+          workspaceId
+        ) {
+          try {
+            window.localStorage
+              .setItem(
+                `campaign-seat:inbox-unread:${workspaceId}`,
+                String(
+                  safeCount,
+                ),
+              );
+          } catch {
+            // Local badge persistence is optional.
+          }
+        }
+      },
+      [
+        workspaceId,
+      ],
+    );
+
+
+  const loadInboxUnread =
+    useCallback(
+      async () => {
+        if (
+          !workspaceId ||
+          typeof document ===
+            "undefined" ||
+          document
+            .visibilityState ===
+            "hidden"
+        ) {
+          return;
+        }
+
+        /*
+         * Inbox itself already owns the faster 30-second
+         * mailbox refresh. Do not duplicate that provider
+         * traffic from the shared shell.
+         */
+        if (
+          window.location
+            .pathname ===
+          "/inbox"
+        ) {
+          return;
+        }
+
+        try {
+          const {
+            data,
+            error:
+              mailboxError,
+          } =
+            await supabase
+              .functions
+              .invoke(
+                "nylas-mailbox",
+                {
+                  body: {
+                    workspaceId,
+                    action:
+                      "list_folders",
+                  },
+                },
+              );
+
+          if (
+            mailboxError ||
+            data?.success !==
+              true
+          ) {
+            return;
+          }
+
+          const unread =
+            inboxUnreadFromFolders(
+              data?.data,
+            );
+
+          if (
+            unread !==
+              null
+          ) {
+            setInboxCount(
+              unread,
+            );
+          }
+        } catch {
+          /*
+           * Sidebar unread is supplemental.
+           * Keep the last trustworthy number on transient
+           * provider errors instead of flashing back to zero.
+           */
+        }
+      },
+      [
+        setInboxCount,
+        workspaceId,
+      ],
+    );
+
+
   const loadCounts =
     useCallback(
       async ({
@@ -48,7 +264,12 @@ export function useWorkspaceCommandCounts(
       } = {}) => {
         if (!workspaceId) {
           setCounts(
-            EMPTY_COUNTS,
+            (current) => ({
+              ...EMPTY_COUNTS,
+              inbox:
+                current.inbox ||
+                0,
+            }),
           );
 
           setIsLoading(false);
@@ -161,19 +382,23 @@ export function useWorkspaceCommandCounts(
           }
 
 
-          setCounts({
-            tasks:
-              tasksResult.count ||
-              0,
+          setCounts(
+            (current) => ({
+              ...current,
 
-            waiting_on:
-              waitingResult.count ||
-              0,
+              tasks:
+                tasksResult.count ||
+                0,
 
-            approvals:
-              approvalsResult.count ||
-              0,
-          });
+              waiting_on:
+                waitingResult.count ||
+                0,
+
+              approvals:
+                approvalsResult.count ||
+                0,
+            }),
+          );
 
 
           setError("");
@@ -227,6 +452,124 @@ export function useWorkspaceCommandCounts(
         loadCounts,
       ],
     );
+
+
+  useEffect(
+    () => {
+      if (
+        !workspaceId
+      ) {
+        return undefined;
+      }
+
+      try {
+        const cached =
+          Number(
+            window.localStorage
+              .getItem(
+                `campaign-seat:inbox-unread:${workspaceId}`,
+              ),
+          );
+
+        if (
+          Number.isFinite(
+            cached,
+          )
+        ) {
+          setInboxCount(
+            cached,
+          );
+        }
+      } catch {
+        // Cached badge is optional.
+      }
+
+      const handleInboxUnread =
+        (
+          event,
+        ) => {
+          if (
+            event?.detail
+              ?.workspaceId !==
+            workspaceId
+          ) {
+            return;
+          }
+
+          setInboxCount(
+            event?.detail
+              ?.count,
+          );
+        };
+
+      const handleVisibility =
+        () => {
+          if (
+            document
+              .visibilityState ===
+              "visible"
+          ) {
+            void loadInboxUnread();
+          }
+        };
+
+      const handleFocus =
+        () => {
+          void loadInboxUnread();
+        };
+
+      window.addEventListener(
+        "campaign-seat-inbox-unread-count",
+        handleInboxUnread,
+      );
+
+      document.addEventListener(
+        "visibilitychange",
+        handleVisibility,
+      );
+
+      window.addEventListener(
+        "focus",
+        handleFocus,
+      );
+
+      void loadInboxUnread();
+
+      inboxRefreshTimerRef.current =
+        window.setInterval(
+          () => {
+            void loadInboxUnread();
+          },
+          INBOX_BADGE_REFRESH_MS,
+        );
+
+      return () => {
+        window.clearInterval(
+          inboxRefreshTimerRef.current,
+        );
+
+        window.removeEventListener(
+          "campaign-seat-inbox-unread-count",
+          handleInboxUnread,
+        );
+
+        document.removeEventListener(
+          "visibilitychange",
+          handleVisibility,
+        );
+
+        window.removeEventListener(
+          "focus",
+          handleFocus,
+        );
+      };
+    },
+    [
+      loadInboxUnread,
+      setInboxCount,
+      workspaceId,
+    ],
+  );
 
 
   useEffect(() => {

@@ -25,10 +25,10 @@ const MICROSOFT_MAILBOX_TARGET_THREAD_COUNT =
   20;
 
 const QUIET_REFRESH_INTERVAL_MS =
-  60000;
+  30000;
 
 const QUIET_REFRESH_COOLDOWN_MS =
-  30000;
+  20000;
 
 const RATE_LIMIT_BACKOFF_MS =
   180000;
@@ -1137,6 +1137,58 @@ function mailboxCount(
   );
 }
 
+function publishInboxUnreadCount(
+  workspaceId,
+  count,
+) {
+  if (
+    typeof window ===
+      "undefined" ||
+    !workspaceId ||
+    count ===
+      null
+  ) {
+    return;
+  }
+
+  const safeCount =
+    Math.max(
+      0,
+      Math.floor(
+        Number(
+          count,
+        ) ||
+        0,
+      ),
+    );
+
+  try {
+    window.localStorage
+      .setItem(
+        `campaign-seat:inbox-unread:${workspaceId}`,
+        String(
+          safeCount,
+        ),
+      );
+  } catch {
+    // Badge persistence is optional.
+  }
+
+  window.dispatchEvent(
+    new CustomEvent(
+      "campaign-seat-inbox-unread-count",
+      {
+        detail: {
+          workspaceId,
+          count:
+            safeCount,
+        },
+      },
+    ),
+  );
+}
+
+
 function errorMessage(
   error,
   fallback,
@@ -1453,11 +1505,19 @@ export function useRealInboxMailbox({
               ),
             );
 
-            setInboxUnreadCount(
+            const nextInboxUnreadCount =
               mailboxCount(
                 inboxFolder
                   ?.unread_count,
-              ),
+              );
+
+            setInboxUnreadCount(
+              nextInboxUnreadCount,
+            );
+
+            publishInboxUnreadCount(
+              workspaceId,
+              nextInboxUnreadCount,
             );
 
             if (

@@ -706,61 +706,15 @@ Deno.serve(
         },
       );
 
-    const {
-      data:
-        userData,
-      error:
-        userError,
-    } =
-      await userClient
-        .auth
-        .getUser();
-
-    if (
-      userError ||
-      !userData
-        ?.user
-        ?.id
-    ) {
-      return jsonResponse(
-        request,
-        401,
-        {
-          error:
-            "The Campaign Seat session could not be verified.",
-        },
-      );
-    }
-
-    const {
-      data:
-        canSend,
-      error:
-        permissionError,
-    } =
-      await userClient.rpc(
-        "can_send_connected_email",
-        {
-          target_workspace_id:
-            workspaceId,
-        },
-      );
-
-    if (
-      permissionError ||
-      canSend !==
-        true
-    ) {
-      return jsonResponse(
-        request,
-        403,
-        {
-          error:
-            "You do not have permission to send from the connected campaign mailbox.",
-        },
-      );
-    }
-
+    /*
+     * The permission RPC itself is authenticated with the
+     * caller's JWT and uses Campaign Seat authorization.
+     * A separate auth.getUser() network round-trip here was
+     * redundant and added latency to every send.
+     *
+     * Resolve permission and protected mailbox metadata in
+     * parallel before contacting Nylas.
+     */
     const adminClient =
       createClient(
         supabaseUrl,
@@ -779,19 +733,52 @@ Deno.serve(
         },
       );
 
-    const {
-      data:
-        connectionData,
-      error:
-        connectionError,
-    } =
-      await adminClient.rpc(
-        "get_email_runtime_connection",
+    const [
+      {
+        data:
+          canSend,
+        error:
+          permissionError,
+      },
+      {
+        data:
+          connectionData,
+        error:
+          connectionError,
+      },
+    ] =
+      await Promise.all([
+        userClient.rpc(
+          "can_send_connected_email",
+          {
+            target_workspace_id:
+              workspaceId,
+          },
+        ),
+
+        adminClient.rpc(
+          "get_email_runtime_connection",
+          {
+            target_workspace_id:
+              workspaceId,
+          },
+        ),
+      ]);
+
+    if (
+      permissionError ||
+      canSend !==
+        true
+    ) {
+      return jsonResponse(
+        request,
+        403,
         {
-          target_workspace_id:
-            workspaceId,
+          error:
+            "You do not have permission to send from the connected campaign mailbox.",
         },
       );
+    }
 
     if (
       connectionError
