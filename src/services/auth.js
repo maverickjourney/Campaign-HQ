@@ -10,6 +10,49 @@ import {
   saveAuthenticatedSession,
 } from "../utils/campaignSession";
 
+const CAMPAIGN_SESSION_STEP_TIMEOUT_MS =
+  8000;
+
+
+async function campaignSessionStep(
+  label,
+  operation,
+) {
+  let timeoutId;
+
+  try {
+    return await Promise.race([
+      operation(),
+
+      new Promise(
+        (
+          _resolve,
+          reject,
+        ) => {
+          timeoutId =
+            window.setTimeout(
+              () => {
+                reject(
+                  new Error(
+                    `${label} took too long.`,
+                  ),
+                );
+              },
+              CAMPAIGN_SESSION_STEP_TIMEOUT_MS,
+            );
+        },
+      ),
+    ]);
+  } finally {
+    if (timeoutId) {
+      window.clearTimeout(
+        timeoutId,
+      );
+    }
+  }
+}
+
+
 async function loadProfile(authUser) {
   const { data, error } = await supabase
     .from("profiles")
@@ -785,35 +828,77 @@ export async function updateCampaignPassword({
 }
 
 export async function restoreCampaignSession() {
-  const {
-    data: { user },
-    error,
-  } = await supabase.auth.getUser();
+  const startedAt =
+    performance.now();
 
-  if (error || !user) {
+  const {
+    data: {
+      session,
+    },
+    error:
+      sessionError,
+  } =
+    await campaignSessionStep(
+      "Campaign session restore",
+      () =>
+        supabase.auth
+          .getSession(),
+    );
+
+  if (
+    sessionError ||
+    !session?.user
+  ) {
     clearLocalCampaignSession();
+
     return null;
   }
 
+  const user =
+    session.user;
+
+  console.info(
+    "Campaign Seat session restored from browser storage in",
+    Math.round(
+      performance.now() -
+      startedAt,
+    ),
+    "ms",
+  );
+
   try {
     const access =
-      await loadCampaignAccess(user);
+      await campaignSessionStep(
+        "Campaign access loading",
+        () =>
+          loadCampaignAccess(
+            user,
+          ),
+      );
 
-    if (!access.memberships.length) {
+    if (
+      !access.memberships.length
+    ) {
       clearLocalCampaignSession();
+
       return null;
     }
 
-    return finalizeCampaignAuthentication(
-      access,
+    return await campaignSessionStep(
+      "Campaign MFA verification",
+      () =>
+        finalizeCampaignAuthentication(
+          access,
+        ),
     );
-  } catch (accessError) {
+  } catch (
+    accessError
+  ) {
     console.error(
       "Campaign session restoration failed:",
       accessError,
     );
 
-    clearLocalCampaignSession();
-    return null;
+    throw accessError;
   }
 }
