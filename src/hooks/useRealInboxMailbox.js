@@ -44,18 +44,11 @@ const SEND_REQUEST_TIMEOUT_MS =
  * CAMPAIGN SEAT FAST MAILBOX HYDRATION V1
  *
  * The newest message is already present in the thread-list
- * payload. Render that immediately, then hydrate older history
- * after the first paint and in provider-safe batches.
+ * payload. Render that immediately, then hydrate the conversation
+ * after first paint with one filtered provider request.
  */
 const THREAD_HYDRATION_DELAY_MS =
   300;
-
-const THREAD_HYDRATION_BATCH_SIZE =
-  3;
-
-const THREAD_HYDRATION_BATCH_PAUSE_MS =
-  120;
-
 
 async function withRequestTimeout(
   promise,
@@ -2544,120 +2537,39 @@ return transformed;
           );
 
         try {
-          const threadResult =
+          /*
+           * CAMPAIGN SEAT SINGLE-REQUEST THREAD HYDRATION V2
+           *
+           * Nylas can return the messages for one conversation
+           * directly with thread_id. Do that once instead of
+           * requesting each message independently.
+           */
+          const messageResult =
             await invokeMailbox({
               action:
-                "get_thread",
+                "list_thread_messages",
 
               threadId:
                 providerThreadId,
             });
 
-          const thread =
-            threadResult.data ||
-            {};
-
-          const latestThreadMessageId =
-            clean(
-              thread
-                ?.latest_draft_or_message
-                ?.id,
-            );
-
-          const messageIds =
-            Array.from(
-              new Set(
-                [
-                  ...(
-                    Array.isArray(
-                      thread.message_ids,
-                    )
-                      ? thread.message_ids
-                      : []
-                  ),
-
-                  latestThreadMessageId,
-                ]
-                  .map(clean)
-                  .filter(Boolean),
-              ),
-            )
-              .slice(
-                -20,
-              );
-
-          const messageResults = [];
-
-          for (
-            let messageIndex = 0;
-            messageIndex <
-              messageIds.length;
-            messageIndex +=
-              THREAD_HYDRATION_BATCH_SIZE
-          ) {
-            const messageBatch =
-              messageIds.slice(
-                messageIndex,
-                messageIndex +
-                  THREAD_HYDRATION_BATCH_SIZE,
-              );
-
-            const batchResults =
-              await Promise.all(
-                messageBatch.map(
-                async (
-                  messageId,
-                ) => {
-                  try {
-                    const result =
-                      await invokeMailbox({
-                        action:
-                          "get_message",
-
-                        messageId,
-                      });
-
-                    return (
-                      result.data ||
-                      null
-                    );
-                  } catch {
-                    return null;
-                  }
-                },
-              ),
-            );
-
-            messageResults.push(
-              ...batchResults,
-            );
-
-            if (
-              messageIndex +
-                THREAD_HYDRATION_BATCH_SIZE <
-              messageIds.length
-            ) {
-              await new Promise(
-                (resolve) =>
-                  window.setTimeout(
-                    resolve,
-                    THREAD_HYDRATION_BATCH_PAUSE_MS,
-                  ),
-              );
-            }
-          }
-
           const messages =
-            messageResults
-              .filter(Boolean)
+            (
+              Array.isArray(
+                messageResult.data,
+              )
+                ? messageResult.data
+                : []
+            )
               .map(
                 (message) =>
                   transformMessage({
                     message,
+
                     connectedEmail:
                       connectedEmailRef
                         .current ||
-                      threadResult
+                      messageResult
                         .connectedEmail,
                   }),
               )
@@ -2669,27 +2581,6 @@ return transformed;
                   right.order -
                   left.order,
               );
-
-          if (
-            !messages.length &&
-            thread
-              ?.latest_draft_or_message
-              ?.id
-          ) {
-            messages.push(
-              transformMessage({
-                message:
-                  thread
-                    .latest_draft_or_message,
-
-                connectedEmail:
-                  connectedEmailRef
-                    .current ||
-                  threadResult
-                    .connectedEmail,
-              }),
-            );
-          }
 
           const files =
             messages.flatMap(

@@ -272,6 +272,9 @@ export function useWorkspaceCommandCounts(
              */
             try {
               const {
+                data:
+                  reconciliation,
+
                 error:
                   reconciliationError,
               } =
@@ -292,6 +295,32 @@ export function useWorkspaceCommandCounts(
                 console.warn(
                   "Campaign Seat email Activity Center reconciliation failed:",
                   reconciliationError,
+                );
+              }
+
+              /*
+               * Supabase Realtime remains the primary Activity
+               * Center transport. This local event guarantees
+               * that the same browser refreshes its bell even if
+               * the realtime socket briefly reconnects.
+               */
+              if (
+                !reconciliationError &&
+                reconciliation
+                  ?.notified ===
+                  true
+              ) {
+                window.dispatchEvent(
+                  new CustomEvent(
+                    "campaign-seat-activity-refresh",
+                    {
+                      detail: {
+                        workspaceId,
+                        source:
+                          "email",
+                      },
+                    },
+                  ),
                 );
               }
             } catch (

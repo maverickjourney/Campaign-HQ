@@ -439,6 +439,30 @@ export function useActivityCenter({
           );
       };
 
+    const handleLocalActivityRefresh =
+      (
+        event,
+      ) => {
+        const eventWorkspaceId =
+          event?.detail
+            ?.workspaceId;
+
+        if (
+          eventWorkspaceId &&
+          eventWorkspaceId !==
+            workspaceId
+        ) {
+          return;
+        }
+
+        scheduleRefresh();
+      };
+
+    window.addEventListener(
+      "campaign-seat-activity-refresh",
+      handleLocalActivityRefresh,
+    );
+
     const channel = supabase
       .channel(
         `campaign-activity-center-${workspaceId}-${userId}`,
@@ -483,6 +507,11 @@ export function useActivityCenter({
     return () => {
       window.clearTimeout(
         refreshTimerRef.current,
+      );
+
+      window.removeEventListener(
+        "campaign-seat-activity-refresh",
+        handleLocalActivityRefresh,
       );
 
       supabase.removeChannel(

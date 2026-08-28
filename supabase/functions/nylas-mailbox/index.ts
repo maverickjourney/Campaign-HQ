@@ -680,6 +680,49 @@ Deno.serve(
       }
     } else if (
       action ===
+      "list_thread_messages"
+    ) {
+      const threadId =
+        clean(
+          body.threadId,
+        );
+
+      if (
+        !threadId
+      ) {
+        return jsonResponse(
+          request,
+          400,
+          {
+            error:
+              "A thread ID is required.",
+          },
+        );
+      }
+
+      /*
+       * One filtered Messages request replaces the previous
+       * get-thread + many get-message fan-out.
+       *
+       * This is especially important for Microsoft mailboxes,
+       * where repeated provider calls can trigger 429 responses.
+       */
+      target =
+        new URL(
+          `${baseUri}/v3/grants/${grant}/messages`,
+        );
+
+      target.searchParams.set(
+        "thread_id",
+        threadId,
+      );
+
+      target.searchParams.set(
+        "limit",
+        "20",
+      );
+    } else if (
+      action ===
       "get_thread"
     ) {
       const threadId =
