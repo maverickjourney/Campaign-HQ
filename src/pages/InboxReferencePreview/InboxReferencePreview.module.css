@@ -27929,3 +27929,118 @@ pre {
 }
 
 /* EMAIL REPLY COMPACT DRAWER V2 — END */
+
+
+/* TALLER DESKTOP INBOX WORKSPACE — START */
+
+/*
+ * Give the conversation list and message reader more of the
+ * browser height. Keep the existing typography and controls.
+ */
+
+@media (min-width: 901px) {
+
+  .inboxWorkspace {
+    min-height:
+      clamp(
+        760px,
+        calc(
+          100dvh -
+          205px
+        ),
+        920px
+      ) !important;
+  }
+
+
+  .conversationPanel,
+  .threadPanel {
+    min-height:
+      clamp(
+        760px,
+        calc(
+          100dvh -
+          205px
+        ),
+        920px
+      ) !important;
+
+    height:
+      100% !important;
+  }
+
+
+  .threadPanel {
+    display:
+      flex !important;
+
+    min-width:
+      0;
+
+    flex-direction:
+      column !important;
+  }
+
+
+  /*
+   * In normal reading mode, let the email thread use the
+   * available panel height rather than stopping around the
+   * old 430px cap.
+   */
+
+  .threadPanel:not(.threadPanelReplying)
+  .threadBody {
+    min-height:
+      0 !important;
+
+    max-height:
+      none !important;
+
+    flex:
+      1
+      1
+      auto !important;
+
+    overflow-y:
+      auto !important;
+  }
+
+
+  /*
+   * Reply mode already uses a compact lower drawer.
+   * The taller parent now gives the source email substantially
+   * more room without making the composer larger.
+   */
+
+  .threadPanelReplying
+  .threadBody {
+    flex:
+      1
+      1
+      auto !important;
+  }
+
+
+  .conversationList {
+    flex:
+      1
+      1
+      auto !important;
+
+    min-height:
+      0 !important;
+  }
+}
+
+
+@media (min-width: 901px) and (max-height: 820px) {
+
+  .inboxWorkspace,
+  .conversationPanel,
+  .threadPanel {
+    min-height:
+      700px !important;
+  }
+}
+
+/* TALLER DESKTOP INBOX WORKSPACE — END */

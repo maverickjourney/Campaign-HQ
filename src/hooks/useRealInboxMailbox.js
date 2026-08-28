@@ -2102,15 +2102,30 @@ return transformed;
 
         if (wasUnread) {
           setInboxUnreadCount(
-            (current) =>
-              Number.isFinite(
-                current,
-              )
-                ? Math.max(
-                    0,
-                    current - 1,
-                  )
-                : current,
+            (current) => {
+              const next =
+                Number.isFinite(
+                  current,
+                )
+                  ? Math.max(
+                      0,
+                      current - 1,
+                    )
+                  : current;
+
+              if (
+                Number.isFinite(
+                  next,
+                )
+              ) {
+                publishInboxUnreadCount(
+                  workspaceId,
+                  next,
+                );
+              }
+
+              return next;
+            },
           );
         }
 
@@ -2163,6 +2178,7 @@ return transformed;
         enabled,
         refresh,
         updateThread,
+        workspaceId,
       ],
     );
 
