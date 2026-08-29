@@ -6,10 +6,18 @@ import {
 // Temporarily disabled while building the Platform Admin.
 // Keep the idle-session system in place so it can be re-enabled
 // before production Admin launch.
+/*
+ * TEMPORARY PLATFORM ADMIN WORK SESSION
+ *
+ * Keep the private Admin signed in during active build sessions.
+ * Production still expires after 8 hours of inactivity.
+ *
+ * Revisit before wider Platform Admin access is introduced.
+ */
 const ADMIN_IDLE_TIMEOUT_MS =
   import.meta.env.DEV
     ? 0
-    : 15 * 60 * 1000;
+    : 8 * 60 * 60 * 1000;
 
 import {
   useNavigate,
