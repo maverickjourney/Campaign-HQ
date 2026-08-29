@@ -4428,7 +4428,14 @@ export default function CalendarReferencePreview() {
                   Next up
                 </strong>
 
-                <button type="button">
+                <button
+                  type="button"
+                  onClick={() =>
+                    setViewMode(
+                      "agenda",
+                    )
+                  }
+                >
                   View all
                 </button>
               </header>
@@ -4537,7 +4544,11 @@ export default function CalendarReferencePreview() {
                           }
 
                           window.location.assign(
-                            "/tasks",
+                            item.task?.id
+                              ? `/tasks?task=${encodeURIComponent(
+                                  item.task.id,
+                                )}`
+                              : "/tasks",
                           );
                         }}
                       >
@@ -4627,7 +4638,9 @@ export default function CalendarReferencePreview() {
                           type="button"
                           onClick={() =>
                             window.location.assign(
-                              "/tasks",
+                              `/tasks?task=${encodeURIComponent(
+                                task.id,
+                              )}`,
                             )
                           }
                         >

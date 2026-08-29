@@ -990,6 +990,55 @@ function TaskCard({
   );
 }
 
+function getRequestedTaskId() {
+  if (
+    typeof window ===
+    "undefined"
+  ) {
+    return "";
+  }
+
+  return (
+    new URLSearchParams(
+      window.location.search,
+    ).get(
+      "task",
+    ) || ""
+  );
+}
+
+function clearRequestedTaskId() {
+  if (
+    typeof window ===
+    "undefined"
+  ) {
+    return;
+  }
+
+  const url =
+    new URL(
+      window.location.href,
+    );
+
+  if (
+    !url.searchParams.has(
+      "task",
+    )
+  ) {
+    return;
+  }
+
+  url.searchParams.delete(
+    "task",
+  );
+
+  window.history.replaceState(
+    window.history.state,
+    "",
+    `${url.pathname}${url.search}${url.hash}`,
+  );
+}
+
 export default function Tasks() {
 const user = getCurrentUser();
   const currentUserId = user.id;
@@ -1024,7 +1073,24 @@ const canCreateTasks =
   const [sidebarOpen, setSidebarOpen] =
     useState(false);
   const [selectedTaskId, setSelectedTaskId] =
-    useState("");
+    useState(
+      getRequestedTaskId,
+    );
+
+  useEffect(() => {
+    if (
+      !getRequestedTaskId()
+    ) {
+      return;
+    }
+
+    /*
+     * Calendar may deep-link directly into a task.
+     * The task drawer keeps the selected ID after
+     * the query parameter is cleaned from the URL.
+     */
+    clearRequestedTaskId();
+  }, []);
   const [viewMode, setViewMode] = useState("list");
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] =
