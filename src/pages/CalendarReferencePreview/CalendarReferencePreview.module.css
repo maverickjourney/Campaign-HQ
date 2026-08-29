@@ -5652,3 +5652,124 @@ button[data-campaign-hq-launcher="floating"] {
     padding: 20px;
   }
 }
+
+/* =========================================================
+   CALENDAR LIVE RIGHT RAIL
+   ========================================================= */
+
+.deadlineList,
+.liveTaskList {
+  padding:
+    5px
+    13px
+    10px;
+}
+
+.deadlineList > button,
+.liveTaskList > button {
+  display: grid;
+  width: 100%;
+  min-height: 49px;
+  align-items: center;
+  gap: 9px;
+  padding:
+    9px
+    0;
+  border: 0;
+  border-bottom:
+    1px solid
+    #e2e9ef;
+  color: #284c6d;
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
+}
+
+.deadlineList > button {
+  grid-template-columns:
+    27px
+    minmax(0, 1fr);
+}
+
+.liveTaskList > button {
+  grid-template-columns:
+    27px
+    minmax(0, 1fr)
+    auto;
+}
+
+.deadlineList > button:last-child,
+.liveTaskList > button:last-child {
+  border-bottom: 0;
+}
+
+.deadlineIcon,
+.taskRailIcon {
+  display: inline-flex;
+  width: 25px;
+  height: 25px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  color: #5f7890;
+  background: #f2f6f9;
+}
+
+.deadlineList strong,
+.liveTaskList strong {
+  display: block;
+  overflow: hidden;
+  color: #244767;
+  font-size: 0.7rem;
+  line-height: 1.25;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.deadlineList small,
+.taskRailCopy small {
+  display: block;
+  margin-top: 3px;
+  color: #75899c;
+  font-size: 0.59rem;
+}
+
+.urgentDeadline .deadlineIcon {
+  color: #d82432;
+  background: #fff0f1;
+}
+
+.urgentDeadline strong {
+  color: #b8232e;
+}
+
+.taskRailCopy {
+  min-width: 0;
+}
+
+.taskDue,
+.taskDueUrgent {
+  justify-self: end;
+  font-size: 0.58rem !important;
+  font-weight: 750;
+  white-space: nowrap;
+}
+
+.taskDue {
+  color: #55758f !important;
+}
+
+.taskDueUrgent {
+  color: #d82432 !important;
+}
+
+.railEmpty {
+  margin:
+    0;
+  padding:
+    12px
+    0;
+  color: #7a8e9f;
+  font-size: 0.65rem;
+  line-height: 1.45;
+}

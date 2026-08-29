@@ -245,35 +245,6 @@ const TEMPLATE_EVENTS = [
   },
 ];
 
-const TASKS = [
-  {
-    id: "task-1",
-    title: "Prepare debate briefing",
-    due: "Due today",
-    urgent: true,
-  },
-  {
-    id: "task-2",
-    title: "Call list for voter outreach",
-    due: "Today",
-  },
-  {
-    id: "task-3",
-    title: "Review direct mail designs",
-    due: "Tomorrow",
-  },
-  {
-    id: "task-4",
-    title: "Confirm event vendors",
-    due: "Thursday",
-  },
-  {
-    id: "task-5",
-    title: "Post social media content",
-    due: "Friday",
-  },
-];
-
 function startOfWeek(value) {
   const date = new Date(value);
   date.setHours(0, 0, 0, 0);
@@ -321,6 +292,140 @@ function formatTime(value) {
     hour: "numeric",
     minute: "2-digit",
   }).format(value);
+}
+
+function taskDueDate(task) {
+  if (!task?.due_at) {
+    return null;
+  }
+
+  const value =
+    new Date(task.due_at);
+
+  return Number.isNaN(
+    value.getTime(),
+  )
+    ? null
+    : value;
+}
+
+function taskIsActive(task) {
+  return ![
+    "completed",
+    "done",
+    "cancelled",
+    "archived",
+  ].includes(
+    String(
+      task?.status || "",
+    )
+      .trim()
+      .toLowerCase(),
+  );
+}
+
+function taskPriorityScore(task) {
+  const priority =
+    String(
+      task?.priority || "",
+    )
+      .trim()
+      .toLowerCase();
+
+  if (
+    priority === "critical" ||
+    priority === "urgent"
+  ) {
+    return 4;
+  }
+
+  if (priority === "high") {
+    return 3;
+  }
+
+  if (priority === "medium") {
+    return 2;
+  }
+
+  return 1;
+}
+
+function formatDueLabel(
+  value,
+  reference = new Date(),
+) {
+  const due =
+    value instanceof Date
+      ? value
+      : new Date(value);
+
+  if (
+    Number.isNaN(
+      due.getTime(),
+    )
+  ) {
+    return "Due date";
+  }
+
+  const today =
+    new Date(
+      reference.getFullYear(),
+      reference.getMonth(),
+      reference.getDate(),
+    );
+
+  const dueDay =
+    new Date(
+      due.getFullYear(),
+      due.getMonth(),
+      due.getDate(),
+    );
+
+  const tomorrow =
+    addDays(
+      today,
+      1,
+    );
+
+  const nextWeek =
+    addDays(
+      today,
+      7,
+    );
+
+  if (dueDay < today) {
+    return "Overdue";
+  }
+
+  if (sameDay(dueDay, today)) {
+    return "Today";
+  }
+
+  if (
+    sameDay(
+      dueDay,
+      tomorrow,
+    )
+  ) {
+    return "Tomorrow";
+  }
+
+  if (dueDay < nextWeek) {
+    return new Intl.DateTimeFormat(
+      "en-US",
+      {
+        weekday: "long",
+      },
+    ).format(dueDay);
+  }
+
+  return new Intl.DateTimeFormat(
+    "en-US",
+    {
+      month: "short",
+      day: "numeric",
+    },
+  ).format(dueDay);
 }
 
 function formatShortDay(value) {
@@ -1842,9 +1947,6 @@ export default function CalendarReferencePreview() {
         )
       : "";
 
-  const [completedTasks, setCompletedTasks] =
-    useState([]);
-
   const [eventForm, setEventForm] =
     useState({
       title: "",
@@ -2328,6 +2430,160 @@ export default function CalendarReferencePreview() {
         .slice(0, 4),
     [events, now],
   );
+
+  const activeTaskDeadlines =
+    useMemo(
+      () =>
+        (storedTasks || [])
+          .filter(
+            taskIsActive,
+          )
+          .map(
+            (task) => ({
+              ...task,
+              dueDate:
+                taskDueDate(
+                  task,
+                ),
+            }),
+          )
+          .filter(
+            (task) =>
+              task.dueDate,
+          )
+          .sort(
+            (left, right) =>
+              left.dueDate -
+                right.dueDate ||
+              taskPriorityScore(
+                right,
+              ) -
+                taskPriorityScore(
+                  left,
+                ),
+          ),
+      [storedTasks],
+    );
+
+  const myCalendarTasks =
+    useMemo(
+      () => {
+        const userId =
+          sessionUser?.id ||
+          "";
+
+        if (!userId) {
+          return [];
+        }
+
+        return activeTaskDeadlines
+          .filter(
+            (task) =>
+              task.assigned_to ===
+              userId,
+          )
+          .slice(
+            0,
+            5,
+          );
+      },
+      [
+        activeTaskDeadlines,
+        sessionUser?.id,
+      ],
+    );
+
+  const criticalDeadlines =
+    useMemo(
+      () => {
+        const todayStart =
+          new Date(
+            now.getFullYear(),
+            now.getMonth(),
+            now.getDate(),
+          );
+
+        const horizon =
+          addDays(
+            todayStart,
+            14,
+          );
+
+        const taskItems =
+          activeTaskDeadlines
+            .filter(
+              (task) =>
+                task.dueDate <
+                horizon,
+            )
+            .map(
+              (task) => ({
+                id:
+                  `task-${task.id}`,
+                title:
+                  task.title ||
+                  "Campaign task",
+                due:
+                  task.dueDate,
+                kind:
+                  "Task",
+                urgent:
+                  task.dueDate <
+                    todayStart ||
+                  taskPriorityScore(
+                    task,
+                  ) >= 3,
+                task,
+              }),
+            );
+
+        const eventItems =
+          events
+            .filter(
+              (event) =>
+                event.type ===
+                  "deadline" &&
+                event.start >=
+                  todayStart &&
+                event.start <
+                  horizon,
+            )
+            .map(
+              (event) => ({
+                id:
+                  `event-${event.id}`,
+                title:
+                  event.title,
+                due:
+                  event.start,
+                kind:
+                  "Calendar",
+                urgent:
+                  false,
+                event,
+              }),
+            );
+
+        return [
+          ...taskItems,
+          ...eventItems,
+        ]
+          .sort(
+            (left, right) =>
+              left.due -
+              right.due,
+          )
+          .slice(
+            0,
+            5,
+          );
+      },
+      [
+        activeTaskDeadlines,
+        events,
+        now,
+      ],
+    );
 
   const toggleType = (type) => {
     setActiveTypes((current) =>
@@ -4304,7 +4560,7 @@ export default function CalendarReferencePreview() {
             <section className={styles.railCard}>
               <header>
                 <strong>
-                  Upcoming events
+                  Next up
                 </strong>
 
                 <button type="button">
@@ -4373,66 +4629,204 @@ export default function CalendarReferencePreview() {
             <section className={styles.railCard}>
               <header>
                 <strong>
-                  My calendar tasks
+                  Critical deadlines
                 </strong>
 
-                <button type="button">
+                <button
+                  type="button"
+                  onClick={() =>
+                    setViewMode(
+                      "agenda",
+                    )
+                  }
+                >
                   View all
                 </button>
               </header>
 
-              <div className={styles.taskList}>
-                {TASKS.map((task) => {
-                  const completed =
-                    completedTasks.includes(
-                      task.id,
-                    );
-
-                  return (
-                    <label key={task.id}>
-                      <input
-                        type="checkbox"
-                        checked={completed}
-                        onChange={() =>
-                          setCompletedTasks(
-                            (current) =>
-                              completed
-                                ? current.filter(
-                                    (id) =>
-                                      id !==
-                                      task.id,
-                                  )
-                                : [
-                                    ...current,
-                                    task.id,
-                                  ],
-                          )
-                        }
-                      />
-
-                      <span
+              <div
+                className={
+                  styles.deadlineList
+                }
+              >
+                {criticalDeadlines.length ? (
+                  criticalDeadlines.map(
+                    (item) => (
+                      <button
+                        key={item.id}
+                        type="button"
                         className={
-                          completed
-                            ? styles.completedTask
+                          item.urgent
+                            ? styles.urgentDeadline
                             : ""
                         }
-                      >
-                        {task.title}
-                      </span>
+                        onClick={() => {
+                          if (
+                            item.event
+                          ) {
+                            setSelectedEvent(
+                              item.event,
+                            );
 
-                      <small
-                        className={
-                          task.urgent
-                            ? styles.urgentTask
-                            : ""
-                        }
+                            return;
+                          }
+
+                          window.location.assign(
+                            "/tasks",
+                          );
+                        }}
                       >
-                        {task.due}
-                      </small>
-                    </label>
-                  );
-                })}
+                        <span
+                          className={
+                            styles.deadlineIcon
+                          }
+                        >
+                          <AlertTriangle
+                            size={15}
+                          />
+                        </span>
+
+                        <span>
+                          <strong>
+                            {item.title}
+                          </strong>
+
+                          <small>
+                            {item.kind}
+                            {" · "}
+                            {formatDueLabel(
+                              item.due,
+                              now,
+                            )}
+                          </small>
+                        </span>
+                      </button>
+                    ),
+                  )
+                ) : (
+                  <p
+                    className={
+                      styles.railEmpty
+                    }
+                  >
+                    No critical deadlines
+                    in the next 14 days.
+                  </p>
+                )}
               </div>
+            </section>
+
+            <section className={styles.railCard}>
+              <header>
+                <strong>
+                  My tasks
+                </strong>
+
+                <button
+                  type="button"
+                  onClick={() =>
+                    window.location.assign(
+                      "/tasks",
+                    )
+                  }
+                >
+                  View all
+                </button>
+              </header>
+
+              <div
+                className={
+                  styles.liveTaskList
+                }
+              >
+                {myCalendarTasks.length ? (
+                  myCalendarTasks.map(
+                    (task) => {
+                      const overdue =
+                        task.dueDate <
+                        new Date(
+                          now.getFullYear(),
+                          now.getMonth(),
+                          now.getDate(),
+                        );
+
+                      const urgent =
+                        overdue ||
+                        taskPriorityScore(
+                          task,
+                        ) >= 3;
+
+                      return (
+                        <button
+                          key={task.id}
+                          type="button"
+                          onClick={() =>
+                            window.location.assign(
+                              "/tasks",
+                            )
+                          }
+                        >
+                          <span
+                            className={
+                              styles.taskRailIcon
+                            }
+                          >
+                            <ListChecks
+                              size={15}
+                            />
+                          </span>
+
+                          <span
+                            className={
+                              styles.taskRailCopy
+                            }
+                          >
+                            <strong>
+                              {task.title ||
+                                "Campaign task"}
+                            </strong>
+
+                            <small>
+                              {task.category ||
+                                "Campaign task"}
+                            </small>
+                          </span>
+
+                          <small
+                            className={
+                              urgent
+                                ? styles.taskDueUrgent
+                                : styles.taskDue
+                            }
+                          >
+                            {formatDueLabel(
+                              task.dueDate,
+                              now,
+                            )}
+                          </small>
+                        </button>
+                      );
+                    },
+                  )
+                ) : (
+                  <p
+                    className={
+                      styles.railEmpty
+                    }
+                  >
+                    No upcoming tasks
+                    are assigned to you.
+                  </p>
+                )}
+              </div>
+            </section>
+
+            <section className={styles.railCard}>
+              <header>
+                <strong>
+                  Calendar connection
+                </strong>
+              </header>
 
               {calendarConnectionLoading ? (
                 <div
