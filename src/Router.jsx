@@ -49,6 +49,7 @@ import PlatformAdminWorkspaceEditor from "./pages/PlatformAdmin/PlatformAdminWor
 import PlatformAdminNewClient from "./pages/PlatformAdmin/PlatformAdminNewClient";
 import PlatformAdminProposalBuilder from "./pages/PlatformAdmin/PlatformAdminProposalBuilder";
 import PlatformAdminProposalPreview from "./pages/PlatformAdmin/PlatformAdminProposalPreview";
+import PlatformAdminReleases from "./pages/PlatformAdmin/PlatformAdminReleases";
 import SeatProposal from "./pages/SeatProposal/SeatProposal";
 import SeatOnboardingStart from "./pages/SeatOnboarding/SeatOnboardingStart";
 import SeatOnboardingSignIn from "./pages/SeatOnboarding/SeatOnboardingSignIn";
@@ -182,6 +183,15 @@ export default function Router() {
             element={
               <PlatformAdminGuard>
                 <PlatformAdminHome />
+              </PlatformAdminGuard>
+            }
+          />
+
+          <Route
+            path="/admin/releases"
+            element={
+              <PlatformAdminGuard>
+                <PlatformAdminReleases />
               </PlatformAdminGuard>
             }
           />

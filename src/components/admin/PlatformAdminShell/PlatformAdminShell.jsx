@@ -7,6 +7,7 @@ import {
   Building2,
   LayoutDashboard,
   LogOut,
+  Rocket,
   ShieldCheck,
   UserPlus,
 } from "lucide-react";
@@ -100,6 +101,19 @@ export default function PlatformAdminShell({
           >
             <Building2 size={18} />
             Customers
+          </NavLink>
+
+          <NavLink
+            end
+            to="/admin/releases"
+            className={({ isActive }) =>
+              isActive
+                ? styles.active
+                : undefined
+            }
+          >
+            <Rocket size={18} />
+            Releases
           </NavLink>
 
           <NavLink
