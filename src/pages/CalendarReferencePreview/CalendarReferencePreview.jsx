@@ -1611,6 +1611,8 @@ export default function CalendarReferencePreview() {
   const {
     events:
       storedEvents,
+    tasks:
+      storedTasks,
     refresh:
       refreshCalendar,
     saveEvent:
@@ -2170,40 +2172,146 @@ export default function CalendarReferencePreview() {
   }, [events, search, activeTypes]);
 
   const summary = useMemo(() => {
-    const todayEvents = events.filter(
-      (event) =>
-        sameDay(event.start, now),
-    );
+    const todayStart =
+      new Date(
+        now.getFullYear(),
+        now.getMonth(),
+        now.getDate(),
+      );
 
-    const currentWeekStart =
-      startOfWeek(now);
+    const tomorrowStart =
+      addDays(
+        todayStart,
+        1,
+      );
 
-    const currentWeekEnd =
-      addDays(currentWeekStart, 7);
+    const nextSevenEnd =
+      addDays(
+        todayStart,
+        7,
+      );
 
-    const weekEvents = events.filter(
-      (event) =>
-        event.start >= currentWeekStart &&
-        event.start < currentWeekEnd,
-    );
+    const activeTasks =
+      (storedTasks || [])
+        .filter(
+          (task) =>
+            ![
+              "completed",
+              "done",
+              "cancelled",
+              "archived",
+            ].includes(
+              String(
+                task?.status || "",
+              )
+                .trim()
+                .toLowerCase(),
+            ),
+        );
 
-    const upcoming = events.filter(
-      (event) => event.start >= now,
-    );
+    const taskDate =
+      (task) => {
+        const value =
+          task?.due_at
+            ? new Date(
+                task.due_at,
+              )
+            : null;
 
-    const meetings = weekEvents.filter(
-      (event) =>
-        event.type === "meeting",
-    );
+        return (
+          value &&
+          !Number.isNaN(
+            value.getTime(),
+          )
+            ? value
+            : null
+        );
+      };
+
+    const todayEvents =
+      events.filter(
+        (event) =>
+          event.start >=
+            todayStart &&
+          event.start <
+            tomorrowStart,
+      );
+
+    const todayTasks =
+      activeTasks.filter(
+        (task) => {
+          const due =
+            taskDate(task);
+
+          return (
+            due &&
+            due >=
+              todayStart &&
+            due <
+              tomorrowStart
+          );
+        },
+      );
+
+    const nextSevenEvents =
+      events.filter(
+        (event) =>
+          event.start >=
+            todayStart &&
+          event.start <
+            nextSevenEnd,
+      );
+
+    const nextSevenTasks =
+      activeTasks.filter(
+        (task) => {
+          const due =
+            taskDate(task);
+
+          return (
+            due &&
+            due >=
+              todayStart &&
+            due <
+              nextSevenEnd
+          );
+        },
+      );
+
+    const eventDeadlines =
+      nextSevenEvents.filter(
+        (event) =>
+          event.type ===
+          "deadline",
+      );
+
+    const meetings =
+      nextSevenEvents.filter(
+        (event) =>
+          event.type ===
+          "meeting",
+      );
 
     return {
-      today: todayEvents.length,
-      week: weekEvents.length,
-      upcoming: upcoming.length,
-      overdue: 3,
-      meetings: meetings.length,
+      today:
+        todayEvents.length +
+        todayTasks.length,
+
+      nextSeven:
+        nextSevenEvents.length,
+
+      deadlines:
+        eventDeadlines.length +
+        nextSevenTasks.length,
+
+      meetings:
+        meetings.length,
     };
-  }, [events, now, weekStart]);
+  }, [
+    events,
+    now,
+    storedTasks,
+  ]);
 
   const upcomingEvents = useMemo(
     () =>
@@ -3795,18 +3903,8 @@ export default function CalendarReferencePreview() {
     <CampaignWorkspaceShell activeItem="Calendar">
       <main className={styles.page}>
         <section className={styles.pageHeader}>
-          <div>
-            <span className={styles.eyebrow}>
-              Campaign scheduling
-            </span>
-
+          <div className={styles.headerTitle}>
             <h1>Calendar</h1>
-
-            <p>
-              Manage campaign events,
-              meetings, deadlines and team
-              schedules.
-            </p>
           </div>
 
           <div className={styles.headerActions}>
@@ -3860,20 +3958,27 @@ export default function CalendarReferencePreview() {
 
         <section
           className={styles.summaryGrid}
-          aria-label="Calendar summary"
+          aria-label="Calendar command summary"
         >
           <article>
             <span
               className={`${styles.summaryIcon} ${styles.redIcon}`}
             >
-              <CalendarDays size={21} />
+              <CalendarDays size={20} />
             </span>
 
             <div>
               <small>Today</small>
-              <strong>{summary.today}</strong>
-              <span>campaign items</span>
-              <p>Meetings and tasks</p>
+
+              <strong>
+                {summary.today}
+              </strong>
+
+              <span>items</span>
+
+              <p>
+                Events + due tasks
+              </p>
             </div>
           </article>
 
@@ -3881,14 +3986,23 @@ export default function CalendarReferencePreview() {
             <span
               className={`${styles.summaryIcon} ${styles.purpleIcon}`}
             >
-              <CalendarRange size={21} />
+              <CalendarRange size={20} />
             </span>
 
             <div>
-              <small>This week</small>
-              <strong>{summary.week}</strong>
-              <span>events</span>
-              <p>Across the campaign</p>
+              <small>
+                Next 7 days
+              </small>
+
+              <strong>
+                {summary.nextSeven}
+              </strong>
+
+              <span>scheduled</span>
+
+              <p>
+                Campaign schedule
+              </p>
             </div>
           </article>
 
@@ -3896,31 +4010,23 @@ export default function CalendarReferencePreview() {
             <span
               className={`${styles.summaryIcon} ${styles.goldIcon}`}
             >
-              <CalendarClock size={21} />
+              <ListChecks size={20} />
             </span>
 
             <div>
-              <small>Upcoming</small>
+              <small>
+                Deadlines
+              </small>
+
               <strong>
-                {summary.upcoming}
+                {summary.deadlines}
               </strong>
-              <span>events</span>
-              <p>Next scheduled items</p>
-            </div>
-          </article>
 
-          <article>
-            <span
-              className={`${styles.summaryIcon} ${styles.redIcon}`}
-            >
-              <AlertTriangle size={21} />
-            </span>
+              <span>due</span>
 
-            <div>
-              <small>Overdue</small>
-              <strong>{summary.overdue}</strong>
-              <span>items</span>
-              <p>Require attention</p>
+              <p>
+                Next 7 days
+              </p>
             </div>
           </article>
 
@@ -3928,16 +4034,23 @@ export default function CalendarReferencePreview() {
             <span
               className={`${styles.summaryIcon} ${styles.greenIcon}`}
             >
-              <UsersRound size={21} />
+              <UsersRound size={20} />
             </span>
 
             <div>
-              <small>Meetings</small>
+              <small>
+                Meetings
+              </small>
+
               <strong>
                 {summary.meetings}
               </strong>
+
               <span>scheduled</span>
-              <p>This week</p>
+
+              <p>
+                Next 7 days
+              </p>
             </div>
           </article>
         </section>
