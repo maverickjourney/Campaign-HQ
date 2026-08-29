@@ -74,13 +74,30 @@ export default function Router() {
       .trim()
       .toLowerCase();
 
+  /*
+   * CAMPAIGN SEAT BUILD SURFACE OVERRIDE
+   *
+   * Separate Vercel projects may force their intended surface
+   * at build time while production custom domains continue to
+   * enforce hostname separation.
+   */
+  const buildSurface =
+    String(
+      import.meta.env.VITE_SEAT_SURFACE ||
+      "",
+    )
+      .trim()
+      .toLowerCase();
+
   const isPlatformAdminHostname =
+    buildSurface === "admin" ||
     hostname ===
-    "admin.campaignseat.com";
+      "admin.campaignseat.com";
 
   const isCampaignAppHostname =
+    buildSurface === "app" ||
     hostname ===
-    "app.campaignseat.com";
+      "app.campaignseat.com";
 
   const isLocalDevelopmentHostname =
     hostname === "127.0.0.1" ||
