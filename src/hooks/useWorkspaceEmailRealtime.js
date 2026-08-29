@@ -120,6 +120,48 @@ export function useWorkspaceEmailRealtime({
           return;
         }
 
+        /*
+         * CAMPAIGN SEAT LOCAL EMAIL UPDATE ECHO GUARD V1
+         *
+         * Marking an email read/unread inside Campaign Seat can
+         * produce a Nylas message.updated webhook a moment later.
+         *
+         * The local Inbox has already updated its unread state,
+         * so treating that webhook echo as a new provider change
+         * creates unnecessary folder/thread refreshes and can
+         * push Microsoft into rate limiting.
+         *
+         * External message.updated events still reconcile normally
+         * because they do not have this local authority window.
+         */
+        if (
+          eventType ===
+            "message.updated"
+        ) {
+          try {
+            const authorityUntil =
+              Number(
+                window.localStorage
+                  .getItem(
+                    `campaign-seat:inbox-unread-authority:${workspaceId}`,
+                  ) ||
+                  0,
+              );
+
+            if (
+              Number.isFinite(
+                authorityUntil,
+              ) &&
+              Date.now() <
+                authorityUntil
+            ) {
+              return;
+            }
+          } catch {
+            // Local authority is only an optimization layer.
+          }
+        }
+
         try {
           const {
             data,
