@@ -2505,8 +2505,42 @@ return transformed;
         }
 
 
-        let wasUnread =
-          false;
+        const currentConversation =
+          conversationsRef
+            .current
+            .find(
+              (conversation) =>
+                conversation
+                  .providerThreadId ===
+                providerThreadId,
+            ) ||
+          null;
+
+        const wasUnread =
+          Boolean(
+            currentConversation
+              ?.unread,
+          );
+
+        /*
+         * CAMPAIGN SEAT ALREADY-READ NO-OP V1
+         *
+         * Opening an email that Campaign Seat already knows is
+         * read must not send another unread:false update to Nylas.
+         *
+         * This keeps normal Inbox navigation provider-free after
+         * the conversation has already been reconciled.
+         */
+        if (
+          currentConversation &&
+          !wasUnread
+        ) {
+          setError(
+            "",
+          );
+
+          return currentConversation;
+        }
 
 
         setConversations(
@@ -2520,12 +2554,6 @@ return transformed;
                 ) {
                   return conversation;
                 }
-
-                wasUnread =
-                  Boolean(
-                    conversation
-                      .unread,
-                  );
 
                 return {
                   ...conversation,
