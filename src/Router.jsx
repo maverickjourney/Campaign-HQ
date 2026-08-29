@@ -76,6 +76,33 @@ export default function Router() {
       .toLowerCase();
 
   /*
+   * CAMPAIGN SEAT CANONICAL ADMIN DOMAIN
+   *
+   * Stable Vercel project aliases are technical addresses only.
+   * Send normal Admin traffic to the branded production domain.
+   * Unique deployment URLs remain available for troubleshooting.
+   */
+  const isPlatformAdminTechnicalAlias =
+    hostname ===
+      "campaign-seat-admin.vercel.app" ||
+    hostname ===
+      "campaign-seat-admin-maverickjourneys-projects.vercel.app";
+
+  if (isPlatformAdminTechnicalAlias) {
+    const canonicalAdminUrl =
+      new URL(
+        `${window.location.pathname}${window.location.search}${window.location.hash}`,
+        "https://admin.campaignseat.com",
+      );
+
+    window.location.replace(
+      canonicalAdminUrl.toString(),
+    );
+
+    return null;
+  }
+
+  /*
    * CAMPAIGN SEAT BUILD SURFACE OVERRIDE
    *
    * Separate Vercel projects may force their intended surface
