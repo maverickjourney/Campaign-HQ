@@ -2504,7 +2504,6 @@ return transformed;
           return null;
         }
 
-
         const currentConversation =
           conversationsRef
             .current
@@ -2523,53 +2522,49 @@ return transformed;
           );
 
         /*
-         * CAMPAIGN SEAT ALREADY-READ NO-OP V1
+         * CAMPAIGN SEAT ALREADY-READ PROVIDER NO-OP V1
          *
-         * Opening an email that Campaign Seat already knows is
-         * read must not send another unread:false update to Nylas.
+         * If Campaign Seat already knows this thread is read,
+         * reopening it must not send another unread:false request
+         * to Microsoft/Nylas.
          *
-         * This keeps normal Inbox navigation provider-free after
-         * the conversation has already been reconciled.
+         * Unknown local state still falls through to provider truth.
          */
         if (
           currentConversation &&
           !wasUnread
         ) {
-          setError(
-            "",
-          );
+          setError("");
 
           return currentConversation;
         }
 
-
-        setConversations(
-          (current) =>
-            current.map(
-              (conversation) => {
-                if (
-                  conversation
-                    .providerThreadId !==
-                  providerThreadId
-                ) {
-                  return conversation;
-                }
-
-                return {
-                  ...conversation,
-
-                  unread:
-                    false,
-
-                  unreadCount:
-                    0,
-                };
-              },
-            ),
-        );
-
-
         if (wasUnread) {
+          setConversations(
+            (current) =>
+              current.map(
+                (conversation) => {
+                  if (
+                    conversation
+                      .providerThreadId !==
+                    providerThreadId
+                  ) {
+                    return conversation;
+                  }
+
+                  return {
+                    ...conversation,
+
+                    unread:
+                      false,
+
+                    unreadCount:
+                      0,
+                  };
+                },
+              ),
+          );
+
           setInboxUnreadCount(
             (current) => {
               const next =
@@ -2602,7 +2597,6 @@ return transformed;
           );
         }
 
-
         try {
           const result =
             await updateThread(
@@ -2620,8 +2614,8 @@ return transformed;
           updateError
         ) {
           /*
-           * Provider truth wins.
-           * Reload instead of leaving a false local read state.
+           * Provider truth wins if the real unread -> read
+           * operation fails.
            */
           await refresh({
             showLoading:
