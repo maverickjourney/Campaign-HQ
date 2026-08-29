@@ -3079,7 +3079,7 @@ return transformed;
                       true,
                   };
 
-                  const hydratedVersion =
+          const hydratedVersion =
             currentThreadVersion ||
             clean(
               messages[0]
