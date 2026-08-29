@@ -64,187 +64,6 @@ const EVENT_TYPE_LABELS = {
   fundraiser: "Fundraising",
 };
 
-const TEMPLATE_EVENTS = [
-  {
-    id: "setup",
-    dayOffset: 0,
-    title: "Palm Beach Event Setup",
-    location: "Campaign HQ",
-    type: "meeting",
-    allDay: true,
-  },
-  {
-    id: "standup",
-    dayOffset: 1,
-    title: "Campaign Team Standup",
-    location: "HQ Meeting Room",
-    type: "meeting",
-    startHour: 9,
-    startMinute: 0,
-    duration: 90,
-  },
-  {
-    id: "communications",
-    dayOffset: 2,
-    title: "Communications Meeting",
-    location: "Strategy Room",
-    type: "deadline",
-    startHour: 10,
-    startMinute: 0,
-    duration: 90,
-  },
-  {
-    id: "press",
-    dayOffset: 3,
-    title: "Press Interview",
-    location: "WPTV Studios",
-    type: "media",
-    startHour: 11,
-    startMinute: 0,
-    duration: 90,
-  },
-  {
-    id: "policy",
-    dayOffset: 4,
-    title: "Policy Meeting",
-    location: "Transportation Plan",
-    type: "outreach",
-    startHour: 10,
-    startMinute: 0,
-    duration: 90,
-  },
-  {
-    id: "debate",
-    dayOffset: 5,
-    title: "Debate Preparation",
-    location: "Strategy Session",
-    type: "media",
-    startHour: 9,
-    startMinute: 0,
-    duration: 90,
-  },
-  {
-    id: "social",
-    dayOffset: 6,
-    title: "Social Media Content Day",
-    location: "Campaign HQ",
-    type: "meeting",
-    startHour: 10,
-    startMinute: 0,
-    duration: 60,
-  },
-  {
-    id: "canvass",
-    dayOffset: 0,
-    title: "Canvassing Training",
-    location: "Community Room",
-    type: "media",
-    startHour: 13,
-    startMinute: 0,
-    duration: 120,
-  },
-  {
-    id: "fundraising",
-    dayOffset: 1,
-    title: "Fundraising Call with Donors",
-    location: "Campaign HQ",
-    type: "outreach",
-    startHour: 14,
-    startMinute: 0,
-    duration: 90,
-  },
-  {
-    id: "volunteers",
-    dayOffset: 2,
-    title: "Volunteer Recruitment Call",
-    location: "Zoom Meeting",
-    type: "media",
-    startHour: 15,
-    startMinute: 0,
-    duration: 90,
-  },
-  {
-    id: "finance",
-    dayOffset: 3,
-    title: "Finance Review",
-    location: "Treasurer Office",
-    type: "deadline",
-    startHour: 14,
-    startMinute: 0,
-    duration: 60,
-  },
-  {
-    id: "mail",
-    dayOffset: 4,
-    title: "Mail Piece Review",
-    location: "Final Approval",
-    type: "media",
-    startHour: 13,
-    startMinute: 0,
-    duration: 90,
-  },
-  {
-    id: "planning",
-    dayOffset: 5,
-    title: "Event Planning Meeting",
-    location: "Campaign HQ",
-    type: "deadline",
-    startHour: 14,
-    startMinute: 0,
-    duration: 90,
-  },
-  {
-    id: "outreach",
-    dayOffset: 6,
-    title: "Community Outreach Event",
-    location: "Wellington Green",
-    type: "media",
-    startHour: 11,
-    startMinute: 0,
-    duration: 120,
-  },
-  {
-    id: "website",
-    dayOffset: 1,
-    title: "Website Content Review",
-    location: "Digital Team",
-    type: "fundraiser",
-    startHour: 17,
-    startMinute: 0,
-    duration: 90,
-  },
-  {
-    id: "evening",
-    dayOffset: 3,
-    title: "Evening with Elizabeth",
-    location: "The Wanderers Club",
-    type: "meeting",
-    startHour: 18,
-    startMinute: 0,
-    duration: 120,
-  },
-  {
-    id: "volunteer-checkin",
-    dayOffset: 4,
-    title: "Volunteer Check-In",
-    location: "Wellington Field Office",
-    type: "outreach",
-    startHour: 16,
-    startMinute: 0,
-    duration: 60,
-  },
-  {
-    id: "yard-sign",
-    dayOffset: 6,
-    title: "Yard Sign Drop-Off & Pickup",
-    location: "Campaign Warehouse",
-    type: "fundraiser",
-    startHour: 16,
-    startMinute: 0,
-    duration: 90,
-  },
-];
-
 function startOfWeek(value) {
   const date = new Date(value);
   date.setHours(0, 0, 0, 0);
@@ -428,6 +247,81 @@ function formatDueLabel(
   ).format(dueDay);
 }
 
+function formatEventPeople(
+  event,
+  team,
+) {
+  const participants =
+    Array.isArray(
+      event?.participants,
+    )
+      ? event.participants
+      : [];
+
+  const participantNames =
+    participants
+      .map(
+        (participant) => {
+          if (
+            typeof participant ===
+            "string"
+          ) {
+            return participant.trim();
+          }
+
+          return String(
+            participant?.name ||
+            participant?.full_name ||
+            participant?.fullName ||
+            participant?.email ||
+            "",
+          ).trim();
+        },
+      )
+      .filter(Boolean);
+
+  if (participantNames.length) {
+    const visible =
+      participantNames.slice(
+        0,
+        3,
+      );
+
+    const remaining =
+      participantNames.length -
+      visible.length;
+
+    return remaining > 0
+      ? `${visible.join(", ")} +${remaining} more`
+      : visible.join(", ");
+  }
+
+  const teamNames =
+    (Array.isArray(team)
+      ? team
+      : [])
+      .map(
+        (member) =>
+          String(
+            member?.fullName ||
+            member?.full_name ||
+            member?.email ||
+            "",
+          ).trim(),
+      )
+      .filter(Boolean)
+      .slice(
+        0,
+        3,
+      );
+
+  if (teamNames.length) {
+    return teamNames.join(", ");
+  }
+
+  return "Campaign team";
+}
+
 function formatShortDay(value) {
   return new Intl.DateTimeFormat("en-US", {
     weekday: "short",
@@ -460,37 +354,6 @@ function formatWeekRange(days) {
   }).format(last);
 
   return `${firstLabel} – ${lastLabel}`;
-}
-
-function buildInitialEvents(anchor) {
-  const weekStart = startOfWeek(anchor);
-
-  return TEMPLATE_EVENTS.map((item) => {
-    const date = addDays(weekStart, item.dayOffset);
-
-    if (item.allDay) {
-      return {
-        ...item,
-        tone: EVENT_TONES[item.type],
-        start: date,
-        end: addDays(date, 1),
-      };
-    }
-
-    date.setHours(
-      item.startHour,
-      item.startMinute,
-      0,
-      0,
-    );
-
-    return {
-      ...item,
-      tone: EVENT_TONES[item.type],
-      start: date,
-      end: addMinutes(date, item.duration),
-    };
-  });
 }
 
 function TimelineView({
@@ -1718,6 +1581,8 @@ export default function CalendarReferencePreview() {
       storedEvents,
     tasks:
       storedTasks,
+    team:
+      storedTeam,
     refresh:
       refreshCalendar,
     saveEvent:
@@ -5003,10 +4868,15 @@ export default function CalendarReferencePreview() {
                   <UsersRound size={18} />
 
                   <div>
-                    <small>Campaign team</small>
+                    <small>
+                      People
+                    </small>
+
                     <strong>
-                      Elizabeth Accomando,
-                      Chris Isaak and team
+                      {formatEventPeople(
+                        selectedEvent,
+                        storedTeam,
+                      )}
                     </strong>
                   </div>
                 </span>
