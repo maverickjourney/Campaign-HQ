@@ -336,6 +336,20 @@ Deno.serve(
       );
     }
 
+
+    /*
+     * CAMPAIGN SEAT MAILBOX ACTION DIAGNOSTICS V1
+     *
+     * Log only the requested mailbox action name so production
+     * provider traffic can be attributed safely.
+     *
+     * Never log request bodies, message contents, addresses,
+     * tokens, provider IDs, attachments, or credentials here.
+     */
+    console.log(
+      `[campaign-seat-mailbox-action] ${action || "missing"}`,
+    );
+
     const userClient =
       createClient(
         supabaseUrl,
