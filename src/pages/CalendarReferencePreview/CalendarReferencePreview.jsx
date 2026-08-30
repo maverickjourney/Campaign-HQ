@@ -3030,81 +3030,122 @@ export default function CalendarReferencePreview() {
                 right.start,
             );
 
-        const conflicts =
+        const groups =
           [];
 
+        let currentGroup =
+          null;
+
+        const finishGroup =
+          () => {
+            if (
+              currentGroup &&
+              currentGroup
+                .events
+                .length >
+                1
+            ) {
+              groups.push(
+                {
+                  ...currentGroup,
+
+                  id:
+                    currentGroup
+                      .events
+                      .map(
+                        (event) =>
+                          event.id,
+                      )
+                      .join("-"),
+                },
+              );
+            }
+
+            currentGroup =
+              null;
+          };
+
         for (
-          let leftIndex = 0;
-          leftIndex <
-          timedEvents.length;
-          leftIndex += 1
+          const event of
+          timedEvents
         ) {
-          const left =
-            timedEvents[
-              leftIndex
-            ];
-
-          for (
-            let rightIndex =
-              leftIndex + 1;
-            rightIndex <
-            timedEvents.length;
-            rightIndex += 1
+          if (
+            !currentGroup
           ) {
-            const right =
-              timedEvents[
-                rightIndex
-              ];
+            currentGroup = {
+              date:
+                event.start,
 
-            if (
-              right.start >=
-              left.end
-            ) {
-              break;
-            }
+              startsAt:
+                event.start,
 
-            if (
-              !sameDay(
-                left.start,
-                right.start,
-              )
-            ) {
-              continue;
-            }
+              endsAt:
+                event.end,
 
-            if (
-              right.start <
-                left.end &&
-              right.end >
-                left.start
-            ) {
-              conflicts.push({
-                id:
-                  `${left.id}-${right.id}`,
+              events: [
+                event,
+              ],
+            };
 
-                first:
-                  left,
-
-                second:
-                  right,
-
-                startsAt:
-                  right.start >
-                  left.start
-                    ? right.start
-                    : left.start,
-
-                endsAt:
-                  right.end <
-                  left.end
-                    ? right.end
-                    : left.end,
-              });
-            }
+            continue;
           }
+
+          const sameDate =
+            sameDay(
+              currentGroup
+                .date,
+              event.start,
+            );
+
+          const overlapsGroup =
+            sameDate &&
+            event.start <
+              currentGroup
+                .endsAt;
+
+          if (
+            overlapsGroup
+          ) {
+            currentGroup
+              .events
+              .push(
+                event,
+              );
+
+            if (
+              event.end >
+              currentGroup
+                .endsAt
+            ) {
+              currentGroup
+                .endsAt =
+                event.end;
+            }
+
+            continue;
+          }
+
+          finishGroup();
+
+          currentGroup = {
+            date:
+              event.start,
+
+            startsAt:
+              event.start,
+
+            endsAt:
+              event.end,
+
+            events: [
+              event,
+            ],
+          };
         }
 
-        return conflicts.slice(
+        finishGroup();
+
+        return groups.slice(
           0,
           6,
         );
@@ -5461,60 +5502,89 @@ export default function CalendarReferencePreview() {
                   }
                 >
                   {scheduleConflicts.map(
-                    (conflict) => (
-                      <button
-                        key={
-                          conflict.id
-                        }
-                        type="button"
-                        onClick={() =>
-                          setSelectedEvent(
-                            conflict.first,
-                          )
-                        }
-                      >
-                        <span
-                          className={
-                            styles.conflictIcon
+                    (conflict) => {
+                      const primaryEvent =
+                        conflict
+                          .events[0];
+
+                      const additionalCount =
+                        conflict
+                          .events
+                          .length -
+                        1;
+
+                      return (
+                        <button
+                          key={
+                            conflict.id
+                          }
+                          type="button"
+                          onClick={() =>
+                            setSelectedEvent(
+                              primaryEvent,
+                            )
                           }
                         >
-                          <AlertTriangle
-                            size={15}
-                          />
-                        </span>
-
-                        <span>
-                          <strong>
-                            {
-                              conflict
-                                .first
-                                .title
+                          <span
+                            className={
+                              styles.conflictIcon
                             }
-                          </strong>
+                          >
+                            <AlertTriangle
+                              size={15}
+                            />
+                          </span>
 
-                          <small>
-                            overlaps{" "}
-                            {
-                              conflict
-                                .second
-                                .title
-                            }
-                          </small>
+                          <span>
+                            <strong>
+                              {
+                                conflict
+                                  .events
+                                  .length
+                              }
+                              {" "}
+                              events overlap
+                            </strong>
 
-                          <small>
-                            {formatTime(
-                              conflict
-                                .startsAt,
-                            )}
-                            {" – "}
-                            {formatTime(
-                              conflict
-                                .endsAt,
-                            )}
-                          </small>
-                        </span>
-                      </button>
-                    ),
+                            <small>
+                              {
+                                primaryEvent
+                                  .title
+                              }
+                              {additionalCount >
+                              0
+                                ? ` + ${additionalCount} more`
+                                : ""}
+                            </small>
+
+                            <small>
+                              {new Intl.DateTimeFormat(
+                                "en-US",
+                                {
+                                  month:
+                                    "short",
+                                  day:
+                                    "numeric",
+                                },
+                              ).format(
+                                conflict
+                                  .date,
+                              )}
+                              {" · "}
+                              {formatTime(
+                                conflict
+                                  .startsAt,
+                              )}
+                              {" – "}
+                              {formatTime(
+                                conflict
+                                  .endsAt,
+                              )}
+                            </small>
+                          </span>
+                        </button>
+                      );
+                    },
                   )}
                 </div>
               </section>
