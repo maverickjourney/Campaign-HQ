@@ -699,102 +699,521 @@ function MonthView({
 
 function AgendaView({
   events,
+  tasks,
+  now,
   onEventClick,
 }) {
-  const grouped = events.reduce(
-    (result, event) => {
-      const key = formatDateKey(event.start);
+  const todayStart =
+    new Date(
+      now.getFullYear(),
+      now.getMonth(),
+      now.getDate(),
+    );
 
-      if (!result[key]) {
-        result[key] = [];
+  const tomorrowStart =
+    addDays(
+      todayStart,
+      1,
+    );
+
+  const dayAfterTomorrow =
+    addDays(
+      todayStart,
+      2,
+    );
+
+  const nextWeekStart =
+    addDays(
+      todayStart,
+      7,
+    );
+
+  const bucketForDate =
+    (
+      date,
+      {
+        overdue = false,
+      } = {},
+    ) => {
+      if (overdue) {
+        return {
+          key: "overdue",
+          label: "Overdue",
+          rank: 0,
+        };
       }
 
-      result[key].push(event);
-      return result;
-    },
-    {},
-  );
+      if (
+        date >= todayStart &&
+        date < tomorrowStart
+      ) {
+        return {
+          key: "today",
+          label: "Today",
+          rank: 1,
+        };
+      }
 
-  return (
-    <div className={styles.agendaView}>
-      {Object.entries(grouped).map(
-        ([key, dayEvents]) => {
-          const date = new Date(
-            `${key}T12:00:00`,
-          );
+      if (
+        date >= tomorrowStart &&
+        date < dayAfterTomorrow
+      ) {
+        return {
+          key: "tomorrow",
+          label: "Tomorrow",
+          rank: 2,
+        };
+      }
+
+      if (
+        date >= dayAfterTomorrow &&
+        date < nextWeekStart
+      ) {
+        return {
+          key: "this-week",
+          label: "This week",
+          rank: 3,
+        };
+      }
+
+      return {
+        key: "later",
+        label: "Later",
+        rank: 4,
+      };
+    };
+
+  const eventItems =
+    (events || [])
+      .filter(
+        (event) =>
+          event.end >=
+          todayStart,
+      )
+      .map(
+        (event) => ({
+          id:
+            `event-${event.id}`,
+          source:
+            "event",
+          date:
+            event.start,
+          sortDate:
+            event.start,
+          bucket:
+            bucketForDate(
+              event.start,
+            ),
+          title:
+            event.title,
+          typeLabel:
+            EVENT_TYPE_LABELS[
+              event.type
+            ] ||
+            "Event",
+          location:
+            event.location,
+          tone:
+            event.tone,
+          allDay:
+            event.allDay,
+          event,
+        }),
+      );
+
+  const taskItems =
+    (tasks || [])
+      .filter(
+        taskIsActive,
+      )
+      .map(
+        (task) => {
+          const due =
+            taskDueDate(
+              task,
+            );
+
+          if (!due) {
+            return null;
+          }
+
+          const overdue =
+            due <
+            todayStart;
+
+          return {
+            id:
+              `task-${task.id}`,
+            source:
+              "task",
+            date:
+              due,
+            sortDate:
+              due,
+            bucket:
+              bucketForDate(
+                due,
+                {
+                  overdue,
+                },
+              ),
+            title:
+              task.title ||
+              "Campaign task",
+            typeLabel:
+              task.category ||
+              "Campaign task",
+            priority:
+              task.priority ||
+              "normal",
+            urgent:
+              overdue ||
+              taskPriorityScore(
+                task,
+              ) >= 3,
+            overdue,
+            task,
+          };
+        },
+      )
+      .filter(Boolean);
+
+  const groups =
+    [
+      ...eventItems,
+      ...taskItems,
+    ]
+      .sort(
+        (left, right) => {
+          if (
+            left.bucket.rank !==
+            right.bucket.rank
+          ) {
+            return (
+              left.bucket.rank -
+              right.bucket.rank
+            );
+          }
+
+          if (
+            left.source === "task" &&
+            right.source === "task"
+          ) {
+            const priorityDifference =
+              taskPriorityScore(
+                right.task,
+              ) -
+              taskPriorityScore(
+                left.task,
+              );
+
+            if (
+              priorityDifference
+            ) {
+              return (
+                priorityDifference
+              );
+            }
+          }
 
           return (
-            <section
-              className={styles.agendaDay}
-              key={key}
-            >
-              <header>
-                <strong>
-                  {new Intl.DateTimeFormat(
-                    "en-US",
-                    {
-                      weekday: "long",
-                      month: "long",
-                      day: "numeric",
-                    },
-                  ).format(date)}
-                </strong>
-
-                <span>
-                  {dayEvents.length} events
-                </span>
-              </header>
-
-              {dayEvents.map((event) => (
-                <button
-                  className={styles.agendaEvent}
-                  key={event.id}
-                  type="button"
-                  onClick={() =>
-                    onEventClick(event)
-                  }
-                >
-                  <span
-                    className={`${styles.agendaTone} ${
-                      styles[
-                        `tone_${event.tone}`
-                      ]
-                    }`}
-                  />
-
-                  <time>
-                    {event.allDay
-                      ? "All day"
-                      : formatTime(event.start)}
-                  </time>
-
-                  <div>
-                    <strong>
-                      {event.title}
-                    </strong>
-
-                    <small
-                      className={styles.agendaType}
-                    >
-                      {
-                        EVENT_TYPE_LABELS[
-                          event.type
-                        ]
-                      }
-                    </small>
-
-                    <span>
-                      <MapPin size={14} />
-                      {event.location}
-                    </span>
-                  </div>
-
-                  <ChevronRight size={17} />
-                </button>
-              ))}
-            </section>
+            left.sortDate -
+            right.sortDate
           );
         },
+      )
+      .reduce(
+        (result, item) => {
+          const key =
+            item.bucket.key;
+
+          if (!result[key]) {
+            result[key] = {
+              ...item.bucket,
+              items: [],
+            };
+          }
+
+          result[key]
+            .items
+            .push(
+              item,
+            );
+
+          return result;
+        },
+        {},
+      );
+
+  const orderedGroups =
+    Object.values(
+      groups,
+    ).sort(
+      (left, right) =>
+        left.rank -
+        right.rank,
+    );
+
+  if (
+    !orderedGroups.length
+  ) {
+    return (
+      <div
+        className={
+          styles.agendaEmpty
+        }
+      >
+        <CalendarDays
+          size={28}
+        />
+
+        <strong>
+          Nothing scheduled yet
+        </strong>
+
+        <span>
+          Upcoming campaign events
+          and task deadlines will
+          appear here.
+        </span>
+      </div>
+    );
+  }
+
+  return (
+    <div
+      className={
+        styles.agendaView
+      }
+    >
+      <div
+        className={
+          styles.agendaCommandHeader
+        }
+      >
+        <div>
+          <small>
+            Campaign command view
+          </small>
+
+          <strong>
+            Upcoming schedule & deadlines
+          </strong>
+        </div>
+
+        <span>
+          {eventItems.length}
+          {" "}
+          event{
+            eventItems.length === 1
+              ? ""
+              : "s"
+          }
+          {" · "}
+          {taskItems.length}
+          {" "}
+          task{
+            taskItems.length === 1
+              ? ""
+              : "s"
+          }
+        </span>
+      </div>
+
+      {orderedGroups.map(
+        (group) => (
+          <section
+            className={`${styles.agendaDay} ${
+              group.key ===
+              "overdue"
+                ? styles.agendaOverdueGroup
+                : ""
+            }`}
+            key={
+              group.key
+            }
+          >
+            <header>
+              <strong>
+                {group.label}
+              </strong>
+
+              <span>
+                {
+                  group.items
+                    .length
+                }
+                {" "}
+                item{
+                  group.items
+                    .length === 1
+                    ? ""
+                    : "s"
+                }
+              </span>
+            </header>
+
+            {group.items.map(
+              (item) => {
+                if (
+                  item.source ===
+                  "task"
+                ) {
+                  const priorityLabel =
+                    String(
+                      item.priority,
+                    );
+
+                  return (
+                    <button
+                      className={`${styles.agendaEvent} ${styles.agendaTask} ${
+                        item.urgent
+                          ? styles.agendaUrgent
+                          : ""
+                      }`}
+                      key={
+                        item.id
+                      }
+                      type="button"
+                      onClick={() =>
+                        window.location.assign(
+                          `/tasks?task=${encodeURIComponent(
+                            item.task.id,
+                          )}`,
+                        )
+                      }
+                    >
+                      <span
+                        className={`${styles.agendaTone} ${styles.agendaTaskTone}`}
+                      />
+
+                      <time>
+                        {formatDueLabel(
+                          item.date,
+                          now,
+                        )}
+                      </time>
+
+                      <div>
+                        <strong>
+                          {
+                            item.title
+                          }
+                        </strong>
+
+                        <small
+                          className={
+                            styles.agendaType
+                          }
+                        >
+                          Task
+                          {" · "}
+                          {
+                            item.typeLabel
+                          }
+                          {" · "}
+                          {
+                            priorityLabel
+                              .charAt(0)
+                              .toUpperCase() +
+                            priorityLabel
+                              .slice(1)
+                          }
+                        </small>
+
+                        <span>
+                          {item.overdue ? (
+                            <>
+                              <AlertTriangle
+                                size={14}
+                              />
+                              Deadline passed
+                            </>
+                          ) : (
+                            <>
+                              <ListChecks
+                                size={14}
+                              />
+                              Open task details
+                            </>
+                          )}
+                        </span>
+                      </div>
+
+                      <ChevronRight
+                        size={17}
+                      />
+                    </button>
+                  );
+                }
+
+                return (
+                  <button
+                    className={
+                      styles.agendaEvent
+                    }
+                    key={
+                      item.id
+                    }
+                    type="button"
+                    onClick={() =>
+                      onEventClick(
+                        item.event,
+                      )
+                    }
+                  >
+                    <span
+                      className={`${styles.agendaTone} ${
+                        styles[
+                          `tone_${item.tone}`
+                        ]
+                      }`}
+                    />
+
+                    <time>
+                      {item.allDay
+                        ? "All day"
+                        : formatTime(
+                            item.date,
+                          )}
+                    </time>
+
+                    <div>
+                      <strong>
+                        {
+                          item.title
+                        }
+                      </strong>
+
+                      <small
+                        className={
+                          styles.agendaType
+                        }
+                      >
+                        {
+                          item.typeLabel
+                        }
+                      </small>
+
+                      <span>
+                        <MapPin
+                          size={14}
+                        />
+                        {
+                          item.location
+                        }
+                      </span>
+                    </div>
+
+                    <ChevronRight
+                      size={17}
+                    />
+                  </button>
+                );
+              },
+            )}
+          </section>
+        ),
       )}
     </div>
   );
@@ -4001,6 +4420,8 @@ export default function CalendarReferencePreview() {
       return (
         <AgendaView
           events={visibleEvents}
+          tasks={storedTasks}
+          now={now}
           onEventClick={setSelectedEvent}
         />
       );

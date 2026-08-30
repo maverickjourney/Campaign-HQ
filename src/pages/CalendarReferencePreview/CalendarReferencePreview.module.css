@@ -5773,3 +5773,125 @@ button[data-campaign-hq-launcher="floating"] {
   font-size: 0.65rem;
   line-height: 1.45;
 }
+
+/* CAMPAIGN SEAT AGENDA COMMAND VIEW — START */
+
+.agendaCommandHeader {
+  display: flex;
+  min-height: 62px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  padding: 12px 15px;
+  border: 1px solid #d5e1eb;
+  border-radius: 13px;
+  background: #f8fafc;
+}
+
+.agendaCommandHeader div {
+  min-width: 0;
+}
+
+.agendaCommandHeader small,
+.agendaCommandHeader strong {
+  display: block;
+}
+
+.agendaCommandHeader small {
+  color: #758a9e;
+  font-size: 0.62rem;
+  font-weight: 750;
+  letter-spacing: 0.045em;
+  text-transform: uppercase;
+}
+
+.agendaCommandHeader strong {
+  margin-top: 4px;
+  color: #173b5d;
+  font-size: 0.9rem;
+}
+
+.agendaCommandHeader > span {
+  flex: 0 0 auto;
+  color: #607a91;
+  font-size: 0.66rem;
+  font-weight: 700;
+}
+
+.agendaOverdueGroup {
+  border-color: #f0c7cb;
+}
+
+.agendaOverdueGroup > header {
+  background: #fff4f5;
+}
+
+.agendaOverdueGroup > header strong,
+.agendaOverdueGroup > header span {
+  color: #bd2935;
+}
+
+.agendaTaskTone {
+  background: #4d6d88;
+}
+
+.agendaTask {
+  background: #fbfcfd;
+}
+
+.agendaUrgent {
+  background: #fffafb;
+}
+
+.agendaUrgent .agendaTaskTone {
+  background: #df2d3a;
+}
+
+.agendaUrgent time {
+  color: #c32935;
+}
+
+.agendaEvent .agendaType {
+  display: inline-flex;
+  width: fit-content;
+  margin-top: 4px;
+  padding: 2px 6px;
+  border-radius: 999px;
+  color: #58748d;
+  background: #eef3f7;
+  font-size: 0.56rem;
+  font-weight: 750;
+}
+
+.agendaUrgent .agendaType {
+  color: #b92834;
+  background: #fff0f1;
+}
+
+.agendaEmpty {
+  display: grid;
+  min-height: 280px;
+  place-items: center;
+  align-content: center;
+  gap: 8px;
+  padding: 30px;
+  color: #6f8598;
+  text-align: center;
+}
+
+.agendaEmpty svg {
+  color: #a7b6c3;
+}
+
+.agendaEmpty strong {
+  color: #234866;
+  font-size: 0.88rem;
+}
+
+.agendaEmpty span {
+  max-width: 340px;
+  font-size: 0.68rem;
+  line-height: 1.45;
+}
+
+/* CAMPAIGN SEAT AGENDA COMMAND VIEW — END */
