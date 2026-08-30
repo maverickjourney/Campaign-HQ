@@ -2058,6 +2058,11 @@ export default function CalendarReferencePreview() {
       Object.keys(EVENT_TYPE_LABELS),
     );
 
+  const [
+    summaryFocus,
+    setSummaryFocus,
+  ] = useState("");
+
   const [selectedEvent, setSelectedEvent] =
     useState(null);
 
@@ -2529,6 +2534,106 @@ export default function CalendarReferencePreview() {
     [viewDate],
   );
 
+  const summaryWindow =
+    useMemo(
+      () => {
+        if (!summaryFocus) {
+          return null;
+        }
+
+        const start =
+          new Date(
+            now.getFullYear(),
+            now.getMonth(),
+            now.getDate(),
+          );
+
+        const end =
+          addDays(
+            start,
+            summaryFocus ===
+              "today"
+              ? 1
+              : 7,
+          );
+
+        return {
+          start,
+          end,
+
+          eventType:
+            summaryFocus ===
+            "deadlines"
+              ? "deadline"
+              : summaryFocus ===
+                  "meetings"
+                ? "meeting"
+                : "",
+        };
+      },
+      [
+        now,
+        summaryFocus,
+      ],
+    );
+
+  const focusedTasks =
+    useMemo(
+      () => {
+        if (!summaryFocus) {
+          return (
+            storedTasks ||
+            []
+          );
+        }
+
+        if (
+          summaryFocus ===
+          "meetings"
+        ) {
+          return [];
+        }
+
+        if (!summaryWindow) {
+          return (
+            storedTasks ||
+            []
+          );
+        }
+
+        return (
+          storedTasks ||
+          []
+        )
+          .filter(
+            taskIsActive,
+          )
+          .filter(
+            (task) => {
+              const due =
+                taskDueDate(
+                  task,
+                );
+
+              return (
+                due &&
+                due >=
+                  summaryWindow
+                    .start &&
+                due <
+                  summaryWindow
+                    .end
+              );
+            },
+          );
+      },
+      [
+        storedTasks,
+        summaryFocus,
+        summaryWindow,
+      ],
+    );
+
   const visibleEvents = useMemo(() => {
     const normalizedSearch =
       search.trim().toLowerCase();
@@ -2537,6 +2642,30 @@ export default function CalendarReferencePreview() {
       .filter((event) =>
         activeTypes.includes(event.type),
       )
+      .filter((event) => {
+        if (!summaryWindow) {
+          return true;
+        }
+
+        if (
+          event.start <
+            summaryWindow.start ||
+          event.start >=
+            summaryWindow.end
+        ) {
+          return false;
+        }
+
+        if (
+          summaryWindow.eventType &&
+          event.type !==
+            summaryWindow.eventType
+        ) {
+          return false;
+        }
+
+        return true;
+      })
       .filter((event) => {
         if (!normalizedSearch) {
           return true;
@@ -2555,7 +2684,12 @@ export default function CalendarReferencePreview() {
         (left, right) =>
           left.start - right.start,
       );
-  }, [events, search, activeTypes]);
+  }, [
+    events,
+    search,
+    activeTypes,
+    summaryWindow,
+  ]);
 
   const summary = useMemo(() => {
     const todayStart =
@@ -2684,7 +2818,8 @@ export default function CalendarReferencePreview() {
         todayTasks.length,
 
       nextSeven:
-        nextSevenEvents.length,
+        nextSevenEvents.length +
+        nextSevenTasks.length,
 
       deadlines:
         eventDeadlines.length +
@@ -2869,7 +3004,189 @@ export default function CalendarReferencePreview() {
       ],
     );
 
+  const scheduleConflicts =
+    useMemo(
+      () => {
+        const todayStart =
+          new Date(
+            now.getFullYear(),
+            now.getMonth(),
+            now.getDate(),
+          );
+
+        const timedEvents =
+          events
+            .filter(
+              (event) =>
+                !event.allDay &&
+                event.end >
+                  event.start &&
+                event.end >=
+                  todayStart,
+            )
+            .sort(
+              (left, right) =>
+                left.start -
+                right.start,
+            );
+
+        const conflicts =
+          [];
+
+        for (
+          let leftIndex = 0;
+          leftIndex <
+          timedEvents.length;
+          leftIndex += 1
+        ) {
+          const left =
+            timedEvents[
+              leftIndex
+            ];
+
+          for (
+            let rightIndex =
+              leftIndex + 1;
+            rightIndex <
+            timedEvents.length;
+            rightIndex += 1
+          ) {
+            const right =
+              timedEvents[
+                rightIndex
+              ];
+
+            if (
+              right.start >=
+              left.end
+            ) {
+              break;
+            }
+
+            if (
+              !sameDay(
+                left.start,
+                right.start,
+              )
+            ) {
+              continue;
+            }
+
+            if (
+              right.start <
+                left.end &&
+              right.end >
+                left.start
+            ) {
+              conflicts.push({
+                id:
+                  `${left.id}-${right.id}`,
+
+                first:
+                  left,
+
+                second:
+                  right,
+
+                startsAt:
+                  right.start >
+                  left.start
+                    ? right.start
+                    : left.start,
+
+                endsAt:
+                  right.end <
+                  left.end
+                    ? right.end
+                    : left.end,
+              });
+            }
+          }
+        }
+
+        return conflicts.slice(
+          0,
+          6,
+        );
+      },
+      [
+        events,
+        now,
+      ],
+    );
+
+  const clearSummaryFocus =
+    () => {
+      setSummaryFocus("");
+
+      setActiveTypes(
+        Object.keys(
+          EVENT_TYPE_LABELS,
+        ),
+      );
+    };
+
+  const applySummaryFocus =
+    (focus) => {
+      if (
+        summaryFocus ===
+        focus
+      ) {
+        clearSummaryFocus();
+
+        return;
+      }
+
+      setSummaryFocus(
+        focus,
+      );
+
+      setFiltersOpen(
+        false,
+      );
+
+      setViewDate(
+        new Date(),
+      );
+
+      if (
+        focus ===
+        "meetings"
+      ) {
+        setActiveTypes([
+          "meeting",
+        ]);
+
+        setViewMode(
+          "week",
+        );
+
+        return;
+      }
+
+      if (
+        focus ===
+        "deadlines"
+      ) {
+        setActiveTypes([
+          "deadline",
+        ]);
+      } else {
+        setActiveTypes(
+          Object.keys(
+            EVENT_TYPE_LABELS,
+          ),
+        );
+      }
+
+      setViewMode(
+        "agenda",
+      );
+    };
+
   const toggleType = (type) => {
+    setSummaryFocus("");
+
     setActiveTypes((current) =>
       current.includes(type)
         ? current.filter(
@@ -2880,6 +3197,8 @@ export default function CalendarReferencePreview() {
   };
 
   const moveCalendar = (direction) => {
+    clearSummaryFocus();
+
     const next = new Date(viewDate);
 
     if (viewMode === "month") {
@@ -4420,7 +4739,7 @@ export default function CalendarReferencePreview() {
       return (
         <AgendaView
           events={visibleEvents}
-          tasks={storedTasks}
+          tasks={focusedTasks}
           now={now}
           onEventClick={setSelectedEvent}
         />
@@ -4502,33 +4821,75 @@ export default function CalendarReferencePreview() {
           className={styles.summaryGrid}
           aria-label="Calendar command summary"
         >
-          <article>
+          <button
+            className={`${styles.summaryCommandCard} ${
+              summaryFocus ===
+              "today"
+                ? styles.summaryCommandActive
+                : ""
+            }`}
+            type="button"
+            aria-pressed={
+              summaryFocus ===
+              "today"
+            }
+            onClick={() =>
+              applySummaryFocus(
+                "today",
+              )
+            }
+          >
             <span
               className={`${styles.summaryIcon} ${styles.redIcon}`}
             >
-              <CalendarDays size={20} />
+              <CalendarDays
+                size={20}
+              />
             </span>
 
             <div>
-              <small>Today</small>
+              <small>
+                Today
+              </small>
 
               <strong>
                 {summary.today}
               </strong>
 
-              <span>items</span>
+              <span>
+                items
+              </span>
 
               <p>
                 Events + due tasks
               </p>
             </div>
-          </article>
+          </button>
 
-          <article>
+          <button
+            className={`${styles.summaryCommandCard} ${
+              summaryFocus ===
+              "next-seven"
+                ? styles.summaryCommandActive
+                : ""
+            }`}
+            type="button"
+            aria-pressed={
+              summaryFocus ===
+              "next-seven"
+            }
+            onClick={() =>
+              applySummaryFocus(
+                "next-seven",
+              )
+            }
+          >
             <span
               className={`${styles.summaryIcon} ${styles.purpleIcon}`}
             >
-              <CalendarRange size={20} />
+              <CalendarRange
+                size={20}
+              />
             </span>
 
             <div>
@@ -4540,19 +4901,40 @@ export default function CalendarReferencePreview() {
                 {summary.nextSeven}
               </strong>
 
-              <span>scheduled</span>
+              <span>
+                items
+              </span>
 
               <p>
-                Campaign schedule
+                Events + task deadlines
               </p>
             </div>
-          </article>
+          </button>
 
-          <article>
+          <button
+            className={`${styles.summaryCommandCard} ${
+              summaryFocus ===
+              "deadlines"
+                ? styles.summaryCommandActive
+                : ""
+            }`}
+            type="button"
+            aria-pressed={
+              summaryFocus ===
+              "deadlines"
+            }
+            onClick={() =>
+              applySummaryFocus(
+                "deadlines",
+              )
+            }
+          >
             <span
               className={`${styles.summaryIcon} ${styles.goldIcon}`}
             >
-              <ListChecks size={20} />
+              <ListChecks
+                size={20}
+              />
             </span>
 
             <div>
@@ -4564,19 +4946,40 @@ export default function CalendarReferencePreview() {
                 {summary.deadlines}
               </strong>
 
-              <span>due</span>
+              <span>
+                due
+              </span>
 
               <p>
                 Next 7 days
               </p>
             </div>
-          </article>
+          </button>
 
-          <article>
+          <button
+            className={`${styles.summaryCommandCard} ${
+              summaryFocus ===
+              "meetings"
+                ? styles.summaryCommandActive
+                : ""
+            }`}
+            type="button"
+            aria-pressed={
+              summaryFocus ===
+              "meetings"
+            }
+            onClick={() =>
+              applySummaryFocus(
+                "meetings",
+              )
+            }
+          >
             <span
               className={`${styles.summaryIcon} ${styles.greenIcon}`}
             >
-              <UsersRound size={20} />
+              <UsersRound
+                size={20}
+              />
             </span>
 
             <div>
@@ -4588,13 +4991,15 @@ export default function CalendarReferencePreview() {
                 {summary.meetings}
               </strong>
 
-              <span>scheduled</span>
+              <span>
+                scheduled
+              </span>
 
               <p>
                 Next 7 days
               </p>
             </div>
-          </article>
+          </button>
         </section>
 
         <section className={styles.calendarLayout}>
@@ -4603,9 +5008,13 @@ export default function CalendarReferencePreview() {
               <div className={styles.dateControls}>
                 <button
                   type="button"
-                  onClick={() =>
-                    setViewDate(new Date())
-                  }
+                  onClick={() => {
+                    clearSummaryFocus();
+
+                    setViewDate(
+                      new Date(),
+                    );
+                  }}
                 >
                   Today
                 </button>
@@ -4670,9 +5079,13 @@ export default function CalendarReferencePreview() {
                     }
                     key={value}
                     type="button"
-                    onClick={() =>
-                      setViewMode(value)
-                    }
+                    onClick={() => {
+                      clearSummaryFocus();
+
+                      setViewMode(
+                        value,
+                      );
+                    }}
                   >
                     {label}
                   </button>
@@ -4746,13 +5159,15 @@ export default function CalendarReferencePreview() {
 
                       <button
                         type="button"
-                        onClick={() =>
+                        onClick={() => {
+                          clearSummaryFocus();
+
                           setActiveTypes(
                             Object.keys(
                               EVENT_TYPE_LABELS,
                             ),
-                          )
-                        }
+                          );
+                        }}
                       >
                         Reset filters
                       </button>
@@ -4789,6 +5204,8 @@ export default function CalendarReferencePreview() {
           </div>
 
           <aside className={styles.rightRail}>
+            {viewMode !== "agenda" ? (
+              <>
             <section className={styles.railCard}>
               <header>
                 <strong>
@@ -5012,6 +5429,96 @@ export default function CalendarReferencePreview() {
                 )}
               </div>
             </section>
+
+              </>
+            ) : null}
+
+            {viewMode === "agenda" &&
+            scheduleConflicts.length ? (
+              <section
+                className={`${styles.railCard} ${styles.conflictRailCard}`}
+              >
+                <header>
+                  <strong>
+                    Schedule conflicts
+                  </strong>
+
+                  <span
+                    className={
+                      styles.conflictCount
+                    }
+                  >
+                    {
+                      scheduleConflicts
+                        .length
+                    }
+                  </span>
+                </header>
+
+                <div
+                  className={
+                    styles.conflictList
+                  }
+                >
+                  {scheduleConflicts.map(
+                    (conflict) => (
+                      <button
+                        key={
+                          conflict.id
+                        }
+                        type="button"
+                        onClick={() =>
+                          setSelectedEvent(
+                            conflict.first,
+                          )
+                        }
+                      >
+                        <span
+                          className={
+                            styles.conflictIcon
+                          }
+                        >
+                          <AlertTriangle
+                            size={15}
+                          />
+                        </span>
+
+                        <span>
+                          <strong>
+                            {
+                              conflict
+                                .first
+                                .title
+                            }
+                          </strong>
+
+                          <small>
+                            overlaps{" "}
+                            {
+                              conflict
+                                .second
+                                .title
+                            }
+                          </small>
+
+                          <small>
+                            {formatTime(
+                              conflict
+                                .startsAt,
+                            )}
+                            {" – "}
+                            {formatTime(
+                              conflict
+                                .endsAt,
+                            )}
+                          </small>
+                        </span>
+                      </button>
+                    ),
+                  )}
+                </div>
+              </section>
+            ) : null}
 
             <section className={styles.railCard}>
               <header>

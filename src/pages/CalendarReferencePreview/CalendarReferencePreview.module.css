@@ -152,7 +152,7 @@
   margin-bottom: 14px;
 }
 
-.summaryGrid article {
+.summaryGrid > button {
   display: flex;
   min-height: 88px;
   align-items: center;
@@ -196,7 +196,7 @@
   background: #eaf9f1;
 }
 
-.summaryGrid article > div {
+.summaryGrid > button > div {
   min-width: 0;
   flex: 1;
 }
@@ -217,7 +217,7 @@
   line-height: 1;
 }
 
-.summaryGrid article > div > span {
+.summaryGrid > button > div > span {
   margin-left: 5px;
   color: #536f89;
   font-size: 0.76rem;
@@ -1311,7 +1311,7 @@
     grid-template-columns: 1fr 1fr;
   }
 
-  .summaryGrid article {
+  .summaryGrid > button {
     min-height: 104px;
     padding: 14px;
   }
@@ -1559,7 +1559,7 @@
     13px !important;
 }
 
-.summaryGrid article {
+.summaryGrid > button {
   box-sizing: border-box !important;
 
   min-width: 0 !important;
@@ -1605,7 +1605,7 @@
   line-height: 1 !important;
 }
 
-.summaryGrid article > div > span {
+.summaryGrid > button > div > span {
   margin-left: 4px !important;
 
   font-size: 0.68rem !important;
@@ -4154,7 +4154,7 @@ button[data-campaign-hq-launcher="floating"] {
       8px !important;
   }
 
-  .summaryGrid article {
+  .summaryGrid > button {
     box-sizing:
       border-box !important;
 
@@ -4167,12 +4167,12 @@ button[data-campaign-hq-launcher="floating"] {
       10px !important;
   }
 
-  .summaryGrid article:last-child {
+  .summaryGrid > button:last-child {
     grid-column:
       1 / -1 !important;
   }
 
-  .summaryGrid article > div {
+  .summaryGrid > button > div {
     min-width:
       0 !important;
   }
@@ -5895,3 +5895,178 @@ button[data-campaign-hq-launcher="floating"] {
 }
 
 /* CAMPAIGN SEAT AGENDA COMMAND VIEW — END */
+
+
+/* CAMPAIGN SEAT CALENDAR COMMAND FILTERS — START */
+
+.summaryCommandCard {
+  position: relative;
+  appearance: none;
+  width: 100%;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition:
+    transform 150ms ease,
+    border-color 150ms ease,
+    box-shadow 150ms ease,
+    background 150ms ease;
+}
+
+.summaryCommandCard:hover {
+  transform:
+    translateY(-1px);
+  border-color:
+    #b8ccdc !important;
+  box-shadow:
+    0 9px 24px
+    rgba(
+      24,
+      65,
+      103,
+      0.08
+    ) !important;
+}
+
+.summaryCommandCard:focus-visible {
+  outline:
+    3px solid
+    rgba(
+      239,
+      51,
+      64,
+      0.2
+    );
+  outline-offset: 2px;
+}
+
+.summaryCommandActive {
+  border-color:
+    #ef3340 !important;
+  background:
+    linear-gradient(
+      180deg,
+      #ffffff,
+      #fffafb
+    ) !important;
+  box-shadow:
+    0 0 0 2px
+      rgba(
+        239,
+        51,
+        64,
+        0.1
+      ),
+    0 9px 24px
+      rgba(
+        24,
+        65,
+        103,
+        0.07
+      ) !important;
+}
+
+.summaryCommandActive::after {
+  position: absolute;
+  right: 12px;
+  bottom: 9px;
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  background: #ef3340;
+  content: "";
+}
+
+.conflictRailCard {
+  border-color:
+    #f0c9cd !important;
+}
+
+.conflictRailCard > header {
+  background:
+    #fff7f8;
+}
+
+.conflictRailCard > header strong {
+  color:
+    #b92531 !important;
+}
+
+.conflictCount {
+  display: inline-flex !important;
+  min-width: 22px;
+  height: 22px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  color: #ffffff !important;
+  background: #df2d3a;
+  font-size: 0.62rem !important;
+  font-weight: 800;
+}
+
+.conflictList {
+  padding:
+    4px
+    13px
+    9px;
+}
+
+.conflictList > button {
+  display: grid;
+  width: 100%;
+  grid-template-columns:
+    28px
+    minmax(0, 1fr);
+  align-items: start;
+  gap: 9px;
+  padding:
+    10px
+    0;
+  border: 0;
+  border-bottom:
+    1px solid
+    #e8e1e3;
+  color: #294d6d;
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
+}
+
+.conflictList > button:last-child {
+  border-bottom: 0;
+}
+
+.conflictIcon {
+  display: inline-flex;
+  width: 26px;
+  height: 26px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  color: #c72935;
+  background: #fff0f1;
+}
+
+.conflictList strong,
+.conflictList small {
+  display: block;
+}
+
+.conflictList strong {
+  overflow: hidden;
+  color: #244767;
+  font-size: 0.7rem;
+  line-height: 1.25;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.conflictList small {
+  margin-top: 3px;
+  color: #7a8e9f;
+  font-size: 0.58rem;
+  line-height: 1.25;
+}
+
+/* CAMPAIGN SEAT CALENDAR COMMAND FILTERS — END */
