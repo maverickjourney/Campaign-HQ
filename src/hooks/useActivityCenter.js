@@ -308,12 +308,41 @@ export function useActivityCenter({
                   return true;
                 }
 
+                const genericTaskTitle =
+                  String(
+                    activity.detail ||
+                      "",
+                  )
+                    .trim()
+                    .toLowerCase();
+
                 const matchingDeadlineAlert =
                   deadlineTaskAlerts.some(
                     (alert) => {
                       if (
                         alert.entity_id !==
                         activity.entity_id
+                      ) {
+                        return false;
+                      }
+
+                      const alertTaskTitle =
+                        String(
+                          alert.title ||
+                            "",
+                        )
+                          .replace(
+                            /^task deadline updated:\s*/i,
+                            "",
+                          )
+                          .trim()
+                          .toLowerCase();
+
+                      if (
+                        !genericTaskTitle ||
+                        !alertTaskTitle ||
+                        alertTaskTitle !==
+                          genericTaskTitle
                       ) {
                         return false;
                       }
@@ -336,7 +365,7 @@ export function useActivityCenter({
                           alertTime -
                             activityTime,
                         ) <=
-                        15000
+                        120000
                       );
                     },
                   );
