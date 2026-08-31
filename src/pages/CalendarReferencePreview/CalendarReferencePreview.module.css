@@ -6220,3 +6220,198 @@ button[data-campaign-hq-launcher="floating"] {
 }
 
 /* CAMPAIGN SEAT UNSCHEDULED CALENDAR WORK — END */
+
+
+/* CAMPAIGN SEAT SCHEDULED TASK TIMELINE FIX — START */
+
+/*
+ * A task deadline is intentionally rendered as a compact marker,
+ * not as an event block. A due_at value is a deadline, not a
+ * statement that the task occupies a duration on the calendar.
+ */
+
+.taskDeadlineMarker {
+  position: absolute;
+  z-index: 9;
+
+  right: 7px;
+  left: 7px;
+
+  display: grid;
+
+  min-width: 0;
+  min-height: 34px;
+
+  grid-template-columns:
+    22px
+    minmax(0, 1fr);
+
+  align-items: center;
+
+  gap: 6px;
+
+  padding:
+    5px
+    7px;
+
+  overflow: hidden;
+
+  border:
+    1px
+    dashed
+    #d8ac48;
+
+  border-radius: 7px;
+
+  color: #604710;
+
+  background:
+    rgba(
+      255,
+      248,
+      224,
+      0.97
+    );
+
+  box-shadow:
+    0 4px 10px
+    rgba(
+      86,
+      63,
+      12,
+      0.08
+    );
+
+  text-align: left;
+
+  cursor: pointer;
+
+  transform:
+    translateY(-50%);
+}
+
+.taskDeadlineMarker:hover {
+  border-style: solid;
+
+  background:
+    #fff4cf;
+
+  box-shadow:
+    0 6px 14px
+    rgba(
+      86,
+      63,
+      12,
+      0.13
+    );
+}
+
+.taskDeadlineIcon {
+  display: inline-flex;
+
+  width: 22px;
+  height: 22px;
+
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 6px;
+
+  color: #9d6a08;
+
+  background:
+    #ffedb9;
+}
+
+.taskDeadlineCopy {
+  display: block;
+
+  min-width: 0;
+}
+
+.taskDeadlineCopy small,
+.taskDeadlineCopy strong {
+  display: block;
+
+  overflow: hidden;
+
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.taskDeadlineCopy small {
+  color: #8b681e;
+
+  font-size: 0.52rem;
+  font-weight: 760;
+}
+
+.taskDeadlineCopy strong {
+  margin-top: 2px;
+
+  color: #5a4312;
+
+  font-size: 0.63rem;
+  line-height: 1.1;
+}
+
+.dayModeTimeline
+.taskDeadlineMarker {
+  right: auto;
+  left: 16px;
+
+  width:
+    min(
+      460px,
+      calc(100% - 32px)
+    );
+
+  max-width:
+    calc(100% - 32px);
+}
+
+/*
+ * The timeline already has a viewport-aware scroll area.
+ * Give the desktop rail the matching frame so its lower cards
+ * remain reachable rather than extending below the workspace.
+ */
+
+@media (min-width: 1181px) {
+  .rightRail {
+    max-height:
+      clamp(
+        591px,
+        calc(100vh - 254px),
+        801px
+      ) !important;
+
+    padding-right: 3px !important;
+
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+
+    overscroll-behavior:
+      contain !important;
+
+    scrollbar-gutter:
+      stable !important;
+  }
+
+  .rightRail::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  .rightRail::-webkit-scrollbar-thumb {
+    border-radius: 999px;
+
+    background:
+      rgba(
+        92,
+        119,
+        143,
+        0.28
+      );
+  }
+}
+
+/* CAMPAIGN SEAT SCHEDULED TASK TIMELINE FIX — END */

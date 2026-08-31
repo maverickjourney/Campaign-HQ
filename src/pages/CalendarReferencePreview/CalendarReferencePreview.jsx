@@ -359,8 +359,10 @@ function formatWeekRange(days) {
 function TimelineView({
   days,
   events,
+  tasks,
   now,
   onEventClick,
+  onTaskClick,
   onTaskDeadlineDrop,
 }) {
   const [
@@ -502,6 +504,48 @@ function TimelineView({
                   !event.allDay &&
                   sameDay(event.start, day),
               );
+
+              const dayTasks =
+                (tasks || [])
+                  .filter(
+                    taskIsActive,
+                  )
+                  .map(
+                    (task) => ({
+                      task,
+                      due:
+                        taskDueDate(
+                          task,
+                        ),
+                    }),
+                  )
+                  .filter(
+                    ({
+                      due,
+                    }) => {
+                      if (
+                        !due ||
+                        !sameDay(
+                          due,
+                          day,
+                        )
+                      ) {
+                        return false;
+                      }
+
+                      const decimalHour =
+                        due.getHours() +
+                        due.getMinutes() /
+                          60;
+
+                      return (
+                        decimalHour >=
+                          HOUR_START &&
+                        decimalHour <
+                          HOUR_END
+                      );
+                    },
+                  );
 
               return (
                 <div
@@ -708,6 +752,82 @@ function TimelineView({
                       </button>
                     );
                   })}
+
+                  {dayTasks.map(
+                    ({
+                      task,
+                      due,
+                    }) => {
+                      const dueHour =
+                        due.getHours() +
+                        due.getMinutes() /
+                          60;
+
+                      const top =
+                        (
+                          dueHour -
+                          HOUR_START
+                        ) *
+                        HOUR_HEIGHT;
+
+                      return (
+                        <button
+                          className={
+                            styles.taskDeadlineMarker
+                          }
+                          key={`task-deadline-${task.id}`}
+                          type="button"
+                          style={{
+                            top:
+                              Math.max(
+                                18,
+                                Math.min(
+                                  timelineHeight -
+                                    18,
+                                  top,
+                                ),
+                              ),
+                          }}
+                          title={`${task.title || "Campaign task"} · ${formatTime(
+                            due,
+                          )} deadline`}
+                          onClick={() =>
+                            onTaskClick?.(
+                              task,
+                            )
+                          }
+                        >
+                          <span
+                            className={
+                              styles.taskDeadlineIcon
+                            }
+                          >
+                            <ListChecks
+                              size={12}
+                            />
+                          </span>
+
+                          <span
+                            className={
+                              styles.taskDeadlineCopy
+                            }
+                          >
+                            <small>
+                              {formatTime(
+                                due,
+                              )}
+                              {" · Deadline"}
+                            </small>
+
+                            <strong>
+                              {task.title ||
+                                "Campaign task"}
+                            </strong>
+                          </span>
+                        </button>
+                      );
+                    },
+                  )}
                 </div>
               );
             })}
@@ -1218,9 +1338,8 @@ function AgendaView({
                       />
 
                       <time>
-                        {formatDueLabel(
+                        {formatTime(
                           item.date,
-                          now,
                         )}
                       </time>
 
@@ -5188,8 +5307,16 @@ export default function CalendarReferencePreview() {
             : weekDays
         }
         events={visibleEvents}
+        tasks={focusedTasks}
         now={now}
         onEventClick={setSelectedEvent}
+        onTaskClick={(task) =>
+          window.location.assign(
+            `/tasks?task=${encodeURIComponent(
+              task.id,
+            )}`,
+          )
+        }
         onTaskDeadlineDrop={
           handleTaskDeadlineDrop
         }
