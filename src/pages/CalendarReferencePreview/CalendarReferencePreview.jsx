@@ -3036,6 +3036,72 @@ export default function CalendarReferencePreview() {
         let currentGroup =
           null;
 
+        const getFirstConflictAt =
+          (groupEvents) => {
+            let firstConflictAt =
+              null;
+
+            for (
+              let leftIndex = 0;
+              leftIndex <
+              groupEvents.length;
+              leftIndex += 1
+            ) {
+              const left =
+                groupEvents[
+                  leftIndex
+                ];
+
+              for (
+                let rightIndex =
+                  leftIndex + 1;
+                rightIndex <
+                groupEvents.length;
+                rightIndex += 1
+              ) {
+                const right =
+                  groupEvents[
+                    rightIndex
+                  ];
+
+                if (
+                  !sameDay(
+                    left.start,
+                    right.start,
+                  )
+                ) {
+                  continue;
+                }
+
+                if (
+                  right.start <
+                    left.end &&
+                  right.end >
+                    left.start
+                ) {
+                  const overlapStart =
+                    right.start >
+                    left.start
+                      ? right.start
+                      : left.start;
+
+                  if (
+                    !firstConflictAt ||
+                    overlapStart <
+                      firstConflictAt
+                  ) {
+                    firstConflictAt =
+                      overlapStart;
+                  }
+                }
+              }
+            }
+
+            return (
+              firstConflictAt
+            );
+          };
+
         const finishGroup =
           () => {
             if (
@@ -3045,9 +3111,20 @@ export default function CalendarReferencePreview() {
                 .length >
                 1
             ) {
+              const firstConflictAt =
+                getFirstConflictAt(
+                  currentGroup
+                    .events,
+                );
+
               groups.push(
                 {
                   ...currentGroup,
+
+                  firstConflictAt:
+                    firstConflictAt ||
+                    currentGroup
+                      .startsAt,
 
                   id:
                     currentGroup
@@ -5543,7 +5620,7 @@ export default function CalendarReferencePreview() {
                                   .length
                               }
                               {" "}
-                              events overlap
+                              events in conflict
                             </strong>
 
                             <small>
@@ -5568,17 +5645,16 @@ export default function CalendarReferencePreview() {
                                 },
                               ).format(
                                 conflict
+                                  .firstConflictAt ||
+                                conflict
                                   .date,
                               )}
-                              {" · "}
+                              {" · Conflict starts "}
                               {formatTime(
+                                conflict
+                                  .firstConflictAt ||
                                 conflict
                                   .startsAt,
-                              )}
-                              {" – "}
-                              {formatTime(
-                                conflict
-                                  .endsAt,
                               )}
                             </small>
                           </span>
