@@ -255,8 +255,100 @@ export function useActivityCenter({
               normalizeTaskAlert,
             );
 
+          /*
+           * Deadline updates can arrive through both:
+           *
+           * 1. activity_log as generic "Task updated"
+           * 2. task_alerts as the more useful
+           *    "Task deadline updated: ..."
+           *
+           * Keep the specific deadline alert and suppress only
+           * the matching generic duplicate for the same task
+           * within the same update window.
+           */
+          const deadlineTaskAlerts =
+            normalizedTaskAlerts.filter(
+              (activity) =>
+                activity.entity_type ===
+                  "task" &&
+                String(
+                  activity.title ||
+                    "",
+                )
+                  .trim()
+                  .toLowerCase()
+                  .startsWith(
+                    "task deadline updated",
+                  ),
+            );
+
+          const visibleActivityRows =
+            (activities || []).filter(
+              (activity) => {
+                if (
+                  activity.activity_type !==
+                    "task_updated" ||
+                  activity.entity_type !==
+                    "task" ||
+                  !activity.entity_id
+                ) {
+                  return true;
+                }
+
+                const activityTime =
+                  new Date(
+                    activity.occurred_at,
+                  ).getTime();
+
+                if (
+                  !Number.isFinite(
+                    activityTime,
+                  )
+                ) {
+                  return true;
+                }
+
+                const matchingDeadlineAlert =
+                  deadlineTaskAlerts.some(
+                    (alert) => {
+                      if (
+                        alert.entity_id !==
+                        activity.entity_id
+                      ) {
+                        return false;
+                      }
+
+                      const alertTime =
+                        new Date(
+                          alert.occurred_at,
+                        ).getTime();
+
+                      if (
+                        !Number.isFinite(
+                          alertTime,
+                        )
+                      ) {
+                        return false;
+                      }
+
+                      return (
+                        Math.abs(
+                          alertTime -
+                            activityTime,
+                        ) <=
+                        15000
+                      );
+                    },
+                  );
+
+                return (
+                  !matchingDeadlineAlert
+                );
+              },
+            );
+
           const combinedActivities = [
-            ...(activities || []),
+            ...visibleActivityRows,
             ...normalizedTaskAlerts,
           ]
             .sort(
