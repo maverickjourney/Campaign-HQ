@@ -1002,6 +1002,8 @@ function MonthView({
 function AgendaView({
   events,
   tasks,
+  allTasks,
+  eventTaskLinks,
   now,
   onEventClick,
 }) {
@@ -1029,6 +1031,46 @@ function AgendaView({
       todayStart,
       7,
     );
+
+  const linkedTaskSource =
+    allTasks ||
+    tasks ||
+    [];
+
+  const agendaTaskById =
+    new Map(
+      linkedTaskSource.map(
+        (task) => [
+          task.id,
+          task,
+        ],
+      ),
+    );
+
+  const agendaTaskIdsByEvent =
+    new Map();
+
+  (
+    eventTaskLinks ||
+    []
+  ).forEach(
+    (link) => {
+      const current =
+        agendaTaskIdsByEvent.get(
+          link.event_id,
+        ) ||
+        [];
+
+      current.push(
+        link.task_id,
+      );
+
+      agendaTaskIdsByEvent.set(
+        link.event_id,
+        current,
+      );
+    },
+  );
 
   const bucketForDate =
     (
@@ -1093,34 +1135,91 @@ function AgendaView({
           todayStart,
       )
       .map(
-        (event) => ({
-          id:
-            `event-${event.id}`,
-          source:
-            "event",
-          date:
-            event.start,
-          sortDate:
-            event.start,
-          bucket:
-            bucketForDate(
+        (event) => {
+          const linkedTaskIds =
+            agendaTaskIdsByEvent.get(
+              event.id,
+            ) ||
+            [];
+
+          const linkedTasks =
+            linkedTaskIds
+              .map(
+                (taskId) =>
+                  agendaTaskById.get(
+                    taskId,
+                  ),
+              )
+              .filter(Boolean);
+
+          const openLinkedTasks =
+            linkedTasks.filter(
+              taskIsActive,
+            );
+
+          const preEventWork =
+            openLinkedTasks.filter(
+              (task) => {
+                const due =
+                  taskDueDate(
+                    task,
+                  );
+
+                return (
+                  due &&
+                  due <=
+                    event.start
+                );
+              },
+            );
+
+          const visibleLinkedTasks =
+            openLinkedTasks.length
+              ? openLinkedTasks
+              : linkedTasks;
+
+          return {
+            id:
+              `event-${event.id}`,
+            source:
+              "event",
+            date:
               event.start,
-            ),
-          title:
-            event.title,
-          typeLabel:
-            EVENT_TYPE_LABELS[
-              event.type
-            ] ||
-            "Event",
-          location:
-            event.location,
-          tone:
-            event.tone,
-          allDay:
-            event.allDay,
-          event,
-        }),
+            sortDate:
+              event.start,
+            bucket:
+              bucketForDate(
+                event.start,
+              ),
+            title:
+              event.title,
+            typeLabel:
+              EVENT_TYPE_LABELS[
+                event.type
+              ] ||
+              "Event",
+            location:
+              event.location,
+            tone:
+              event.tone,
+            allDay:
+              event.allDay,
+
+            linkedTasks:
+              visibleLinkedTasks,
+
+            linkedTaskCount:
+              linkedTasks.length,
+
+            openLinkedTaskCount:
+              openLinkedTasks.length,
+
+            preEventWorkCount:
+              preEventWork.length,
+
+            event,
+          };
+        },
       );
 
   const taskItems =
@@ -1450,9 +1549,11 @@ function AgendaView({
 
                 return (
                   <button
-                    className={
-                      styles.agendaEvent
-                    }
+                    className={`${styles.agendaEvent} ${
+                      item.preEventWorkCount
+                        ? styles.agendaEventWorkRisk
+                        : ""
+                    }`}
                     key={
                       item.id
                     }
@@ -1504,6 +1605,113 @@ function AgendaView({
                           item.location
                         }
                       </span>
+
+                      {item.linkedTaskCount ? (
+                        <div
+                          className={
+                            styles.agendaLinkedWork
+                          }
+                        >
+                          <div
+                            className={
+                              styles.agendaLinkedWorkSummary
+                            }
+                          >
+                            {item.openLinkedTaskCount ? (
+                              <span
+                                className={
+                                  styles.agendaLinkedWorkCount
+                                }
+                              >
+                                <ListChecks
+                                  size={13}
+                                />
+
+                                {
+                                  item.openLinkedTaskCount
+                                }
+                                {" "}
+                                open linked
+                                {" "}
+                                task{
+                                  item.openLinkedTaskCount ===
+                                  1
+                                    ? ""
+                                    : "s"
+                                }
+                              </span>
+                            ) : (
+                              <span
+                                className={
+                                  styles.agendaLinkedWorkComplete
+                                }
+                              >
+                                <CheckCircle2
+                                  size={13}
+                                />
+
+                                Linked work complete
+                              </span>
+                            )}
+
+                            {item.preEventWorkCount ? (
+                              <span
+                                className={
+                                  styles.agendaLinkedWorkRisk
+                                }
+                              >
+                                <AlertTriangle
+                                  size={13}
+                                />
+
+                                {
+                                  item.preEventWorkCount
+                                }
+                                {" "}
+                                due before event
+                              </span>
+                            ) : null}
+                          </div>
+
+                          <div
+                            className={
+                              styles.agendaLinkedTaskNames
+                            }
+                          >
+                            {item.linkedTasks
+                              .slice(
+                                0,
+                                2,
+                              )
+                              .map(
+                                (task) => (
+                                  <span
+                                    key={
+                                      task.id
+                                    }
+                                  >
+                                    {task.title ||
+                                      "Campaign task"}
+                                  </span>
+                                ),
+                              )}
+
+                            {item.linkedTasks.length >
+                            2 ? (
+                              <span>
+                                +
+                                {
+                                  item.linkedTasks
+                                    .length -
+                                  2
+                                }
+                                {" "}
+                                more
+                              </span>
+                            ) : null}
+                          </div>
+                        </div>
+                      ) : null}
                     </div>
 
                     <ChevronRight
@@ -5814,6 +6022,10 @@ export default function CalendarReferencePreview() {
         <AgendaView
           events={visibleEvents}
           tasks={focusedTasks}
+          allTasks={storedTasks}
+          eventTaskLinks={
+            eventTaskLinks
+          }
           now={now}
           onEventClick={setSelectedEvent}
         />

@@ -7390,3 +7390,167 @@ button[data-campaign-hq-launcher="floating"] {
 }
 
 /* CAMPAIGN SEAT EVENT LINKED TASKS — END */
+
+
+/* CAMPAIGN SEAT AGENDA LINKED WORK — START */
+
+.agendaEventWorkRisk {
+  border-color:
+    #efc5c9 !important;
+
+  background:
+    linear-gradient(
+      90deg,
+      #fffafa,
+      #ffffff 36%
+    ) !important;
+}
+
+.agendaLinkedWork {
+  display: grid !important;
+
+  gap: 6px !important;
+
+  margin-top:
+    8px !important;
+
+  padding-top:
+    7px !important;
+
+  border-top:
+    1px
+    solid
+    #e2e9ef !important;
+}
+
+.agendaLinkedWorkSummary {
+  display: flex !important;
+
+  flex-wrap: wrap !important;
+
+  align-items: center !important;
+
+  gap: 6px !important;
+}
+
+.agendaLinkedWorkCount,
+.agendaLinkedWorkComplete,
+.agendaLinkedWorkRisk {
+  display: inline-flex !important;
+
+  align-items: center !important;
+
+  gap: 4px !important;
+
+  width: fit-content !important;
+
+  padding:
+    3px
+    7px !important;
+
+  border-radius:
+    999px !important;
+
+  font-size:
+    0.55rem !important;
+
+  font-weight:
+    790 !important;
+
+  line-height:
+    1.1 !important;
+}
+
+.agendaLinkedWorkCount {
+  color:
+    #4b6479 !important;
+
+  background:
+    #edf3f7 !important;
+}
+
+.agendaLinkedWorkComplete {
+  color:
+    #18704e !important;
+
+  background:
+    #eaf8f1 !important;
+}
+
+.agendaLinkedWorkRisk {
+  color:
+    #b32733 !important;
+
+  background:
+    #fff0f1 !important;
+}
+
+.agendaLinkedTaskNames {
+  display: flex !important;
+
+  min-width: 0 !important;
+
+  flex-wrap: wrap !important;
+
+  gap: 5px !important;
+}
+
+.agendaLinkedTaskNames > span {
+  display: inline-block !important;
+
+  max-width:
+    220px !important;
+
+  padding:
+    3px
+    7px !important;
+
+  overflow: hidden !important;
+
+  border:
+    1px
+    solid
+    #e1c980 !important;
+
+  border-radius:
+    7px !important;
+
+  color:
+    #705116 !important;
+
+  background:
+    #fff9e9 !important;
+
+  font-size:
+    0.54rem !important;
+
+  font-weight:
+    720 !important;
+
+  line-height:
+    1.15 !important;
+
+  text-overflow:
+    ellipsis !important;
+
+  white-space:
+    nowrap !important;
+}
+
+@media (max-width: 720px) {
+  .agendaLinkedWorkSummary,
+  .agendaLinkedTaskNames {
+    align-items:
+      flex-start !important;
+
+    flex-direction:
+      column !important;
+  }
+
+  .agendaLinkedTaskNames > span {
+    max-width:
+      100% !important;
+  }
+}
+
+/* CAMPAIGN SEAT AGENDA LINKED WORK — END */
