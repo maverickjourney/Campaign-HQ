@@ -6415,3 +6415,221 @@ button[data-campaign-hq-launcher="floating"] {
 }
 
 /* CAMPAIGN SEAT SCHEDULED TASK TIMELINE FIX — END */
+
+
+/* CAMPAIGN SEAT TASK MARKER READABILITY POLISH — START */
+
+/*
+ * Keep task deadlines visually distinct from events while
+ * giving campaign staff enough room to understand the task.
+ */
+
+.weekModeTimeline
+.taskDeadlineMarker {
+  right: 4px !important;
+  left: 4px !important;
+
+  min-height: 47px !important;
+
+  grid-template-columns:
+    20px
+    minmax(0, 1fr) !important;
+
+  gap: 5px !important;
+
+  padding:
+    5px
+    6px !important;
+
+  overflow: visible !important;
+
+  border-radius: 7px !important;
+}
+
+.weekModeTimeline
+.taskDeadlineIcon {
+  width: 20px !important;
+  height: 20px !important;
+
+  align-self: start !important;
+
+  margin-top: 2px !important;
+}
+
+.weekModeTimeline
+.taskDeadlineCopy {
+  min-width: 0 !important;
+
+  overflow: hidden !important;
+}
+
+.weekModeTimeline
+.taskDeadlineCopy small {
+  display: block !important;
+
+  overflow: hidden !important;
+
+  color: #8a6416 !important;
+
+  font-size: 0.49rem !important;
+  font-weight: 800 !important;
+  line-height: 1.1 !important;
+
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+}
+
+.weekModeTimeline
+.taskDeadlineCopy strong {
+  display: -webkit-box !important;
+
+  margin-top: 3px !important;
+
+  overflow: hidden !important;
+
+  color: #523d10 !important;
+
+  font-size: 0.59rem !important;
+  font-weight: 790 !important;
+  line-height: 1.12 !important;
+
+  white-space: normal !important;
+
+  -webkit-box-orient: vertical !important;
+  -webkit-line-clamp: 2 !important;
+}
+
+.dayModeTimeline
+.taskDeadlineMarker {
+  min-height: 48px !important;
+
+  grid-template-columns:
+    24px
+    minmax(0, 1fr) !important;
+
+  gap: 8px !important;
+
+  padding:
+    7px
+    9px !important;
+}
+
+.dayModeTimeline
+.taskDeadlineCopy small {
+  font-size: 0.57rem !important;
+}
+
+.dayModeTimeline
+.taskDeadlineCopy strong {
+  display: -webkit-box !important;
+
+  overflow: hidden !important;
+
+  font-size: 0.68rem !important;
+  line-height: 1.15 !important;
+
+  white-space: normal !important;
+
+  -webkit-box-orient: vertical !important;
+  -webkit-line-clamp: 2 !important;
+}
+
+/*
+ * The rail is intentionally independent from the time grid.
+ * Make that scrolling behavior visually obvious and ensure
+ * the final card has breathing room.
+ */
+
+@media (min-width: 1181px) {
+  .rightRail {
+    padding:
+      0
+      7px
+      18px
+      0 !important;
+
+    border-radius: 10px !important;
+
+    scrollbar-width: thin !important;
+
+    scrollbar-color:
+      rgba(
+        72,
+        102,
+        128,
+        0.48
+      )
+      rgba(
+        219,
+        229,
+        237,
+        0.42
+      ) !important;
+
+    box-shadow:
+      inset
+      -7px
+      0
+      10px
+      -12px
+      rgba(
+        31,
+        63,
+        91,
+        0.5
+      ) !important;
+  }
+
+  .rightRail::-webkit-scrollbar {
+    width: 8px !important;
+  }
+
+  .rightRail::-webkit-scrollbar-track {
+    border-radius: 999px !important;
+
+    background:
+      rgba(
+        219,
+        229,
+        237,
+        0.42
+      ) !important;
+  }
+
+  .rightRail::-webkit-scrollbar-thumb {
+    min-height: 42px !important;
+
+    border:
+      2px
+      solid
+      transparent !important;
+
+    border-radius: 999px !important;
+
+    background:
+      rgba(
+        72,
+        102,
+        128,
+        0.48
+      ) !important;
+
+    background-clip:
+      padding-box !important;
+  }
+
+  .rightRail::-webkit-scrollbar-thumb:hover {
+    background:
+      rgba(
+        55,
+        84,
+        111,
+        0.68
+      ) !important;
+
+    background-clip:
+      padding-box !important;
+  }
+}
+
+/* CAMPAIGN SEAT TASK MARKER READABILITY POLISH — END */
