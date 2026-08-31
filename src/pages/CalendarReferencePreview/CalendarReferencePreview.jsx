@@ -34,6 +34,10 @@ import {
 } from "../../hooks/useCalendarCommandCenter";
 
 import {
+  useEventTaskLinks,
+} from "../../hooks/useEventTaskLinks";
+
+import {
   getCurrentUser,
   getCurrentWorkspace,
 } from "../../utils/campaignSession";
@@ -2317,6 +2321,25 @@ export default function CalendarReferencePreview() {
         "",
     });
 
+  const {
+    links:
+      eventTaskLinks,
+    isSaving:
+      eventTaskLinksSaving,
+    linkTask:
+      linkTaskToEvent,
+    unlinkTask:
+      unlinkTaskFromEvent,
+  } =
+    useEventTaskLinks({
+      workspaceId:
+        sessionWorkspace?.id ||
+        "",
+      userId:
+        sessionUser?.id ||
+        "",
+    });
+
   const [now, setNow] =
     useState(initialNow);
 
@@ -2377,8 +2400,21 @@ export default function CalendarReferencePreview() {
     setDeadlineEditor,
   ] = useState(null);
 
+  const [
+    taskLinkSelection,
+    setTaskLinkSelection,
+  ] = useState("");
+
   const [selectedEvent, setSelectedEvent] =
     useState(null);
+
+  useEffect(() => {
+    setTaskLinkSelection(
+      "",
+    );
+  }, [
+    selectedEvent,
+  ]);
 
   const [newEventOpen, setNewEventOpen] =
     useState(false);
@@ -5557,6 +5593,206 @@ export default function CalendarReferencePreview() {
       }
     };
 
+  const selectedEventTaskLinks =
+    useMemo(
+      () => {
+        if (
+          !selectedEvent?.id
+        ) {
+          return [];
+        }
+
+        return (
+          eventTaskLinks ||
+          []
+        ).filter(
+          (link) =>
+            link.event_id ===
+            selectedEvent.id,
+        );
+      },
+      [
+        eventTaskLinks,
+        selectedEvent,
+      ],
+    );
+
+  const selectedEventLinkedTasks =
+    useMemo(
+      () =>
+        selectedEventTaskLinks
+          .map(
+            (link) => {
+              const task =
+                (
+                  storedTasks ||
+                  []
+                ).find(
+                  (candidate) =>
+                    candidate.id ===
+                    link.task_id,
+                );
+
+              return task
+                ? {
+                    link,
+                    task,
+                  }
+                : null;
+            },
+          )
+          .filter(Boolean),
+      [
+        selectedEventTaskLinks,
+        storedTasks,
+      ],
+    );
+
+  const selectedEventAvailableTasks =
+    useMemo(
+      () => {
+        const linkedTaskIds =
+          new Set(
+            selectedEventTaskLinks.map(
+              (link) =>
+                link.task_id,
+            ),
+          );
+
+        return (
+          storedTasks ||
+          []
+        )
+          .filter(
+            taskIsActive,
+          )
+          .filter(
+            (task) =>
+              !linkedTaskIds.has(
+                task.id,
+              ),
+          )
+          .sort(
+            (
+              left,
+              right,
+            ) => {
+              const priorityDifference =
+                taskPriorityScore(
+                  right,
+                ) -
+                taskPriorityScore(
+                  left,
+                );
+
+              if (
+                priorityDifference
+              ) {
+                return (
+                  priorityDifference
+                );
+              }
+
+              const leftDue =
+                taskDueDate(
+                  left,
+                );
+
+              const rightDue =
+                taskDueDate(
+                  right,
+                );
+
+              if (
+                leftDue &&
+                rightDue
+              ) {
+                return (
+                  leftDue -
+                  rightDue
+                );
+              }
+
+              if (leftDue) {
+                return -1;
+              }
+
+              if (rightDue) {
+                return 1;
+              }
+
+              return String(
+                left.title ||
+                "",
+              ).localeCompare(
+                String(
+                  right.title ||
+                  "",
+                ),
+              );
+            },
+          );
+      },
+      [
+        selectedEventTaskLinks,
+        storedTasks,
+      ],
+    );
+
+  const handleLinkTaskToSelectedEvent =
+    async () => {
+      if (
+        !selectedEvent?.id ||
+        !taskLinkSelection
+      ) {
+        return;
+      }
+
+      try {
+        await linkTaskToEvent(
+          selectedEvent.id,
+          taskLinkSelection,
+        );
+
+        setTaskLinkSelection(
+          "",
+        );
+      } catch (
+        linkError
+      ) {
+        console.error(
+          "Calendar could not link task:",
+          linkError,
+        );
+
+        window.alert(
+          "Campaign Seat could not link that task to this event.",
+        );
+      }
+    };
+
+  const handleUnlinkTaskFromSelectedEvent =
+    async (
+      linkId,
+    ) => {
+      try {
+        await unlinkTaskFromEvent(
+          linkId,
+        );
+      } catch (
+        unlinkError
+      ) {
+        console.error(
+          "Calendar could not unlink task:",
+          unlinkError,
+        );
+
+        window.alert(
+          "Campaign Seat could not remove that task from this event.",
+        );
+      }
+    };
+
   const renderMainView = () => {
     if (viewMode === "month") {
       return (
@@ -7113,6 +7349,205 @@ export default function CalendarReferencePreview() {
                   </div>
                 </span>
               </div>
+
+              <section
+                className={
+                  styles.eventLinkedTasks
+                }
+              >
+                <header>
+                  <div>
+                    <small>
+                      Event work
+                    </small>
+
+                    <strong>
+                      Linked tasks
+                    </strong>
+                  </div>
+
+                  <span>
+                    {
+                      selectedEventLinkedTasks
+                        .length
+                    }
+                  </span>
+                </header>
+
+                {selectedEventLinkedTasks.length ? (
+                  <div
+                    className={
+                      styles.eventLinkedTaskList
+                    }
+                  >
+                    {selectedEventLinkedTasks.map(
+                      ({
+                        link,
+                        task,
+                      }) => {
+                        const due =
+                          taskDueDate(
+                            task,
+                          );
+
+                        return (
+                          <div
+                            className={
+                              styles.eventLinkedTaskRow
+                            }
+                            key={
+                              link.id
+                            }
+                          >
+                            <button
+                              type="button"
+                              onClick={() =>
+                                window.location.assign(
+                                  `/tasks?task=${encodeURIComponent(
+                                    task.id,
+                                  )}`,
+                                )
+                              }
+                            >
+                              <span
+                                className={
+                                  styles.eventLinkedTaskIcon
+                                }
+                              >
+                                <ListChecks
+                                  size={15}
+                                />
+                              </span>
+
+                              <span>
+                                <strong>
+                                  {task.title ||
+                                    "Campaign task"}
+                                </strong>
+
+                                <small>
+                                  {task.category ||
+                                    "General"}
+
+                                  {due
+                                    ? ` · ${formatDueLabel(
+                                        due,
+                                        now,
+                                      )}`
+                                    : " · No deadline"}
+                                </small>
+                              </span>
+                            </button>
+
+                            <button
+                              className={
+                                styles.eventLinkedTaskRemove
+                              }
+                              type="button"
+                              aria-label={`Remove ${task.title || "task"} from event`}
+                              disabled={
+                                eventTaskLinksSaving
+                              }
+                              onClick={() =>
+                                handleUnlinkTaskFromSelectedEvent(
+                                  link.id,
+                                )
+                              }
+                            >
+                              <X
+                                size={15}
+                              />
+                            </button>
+                          </div>
+                        );
+                      },
+                    )}
+                  </div>
+                ) : (
+                  <p
+                    className={
+                      styles.eventLinkedTaskEmpty
+                    }
+                  >
+                    No tasks are linked
+                    to this event yet.
+                  </p>
+                )}
+
+                {selectedEventAvailableTasks.length ? (
+                  <div
+                    className={
+                      styles.eventTaskLinkControls
+                    }
+                  >
+                    <select
+                      value={
+                        taskLinkSelection
+                      }
+                      disabled={
+                        eventTaskLinksSaving
+                      }
+                      onChange={(
+                        inputEvent,
+                      ) =>
+                        setTaskLinkSelection(
+                          inputEvent
+                            .target
+                            .value,
+                        )
+                      }
+                    >
+                      <option value="">
+                        Link an existing task…
+                      </option>
+
+                      {selectedEventAvailableTasks.map(
+                        (task) => (
+                          <option
+                            key={
+                              task.id
+                            }
+                            value={
+                              task.id
+                            }
+                          >
+                            {task.title ||
+                              "Campaign task"}
+                          </option>
+                        ),
+                      )}
+                    </select>
+
+                    <button
+                      type="button"
+                      disabled={
+                        !taskLinkSelection ||
+                        eventTaskLinksSaving
+                      }
+                      onClick={
+                        handleLinkTaskToSelectedEvent
+                      }
+                    >
+                      <Plus
+                        size={15}
+                      />
+
+                      {eventTaskLinksSaving
+                        ? "Saving…"
+                        : "Link task"}
+                    </button>
+                  </div>
+                ) : (
+                  <small
+                    className={
+                      styles.eventLinkedTaskComplete
+                    }
+                  >
+                    All active tasks are
+                    already linked.
+                  </small>
+                )}
+              </section>
 
               <section
                 className={styles.detailStatus}

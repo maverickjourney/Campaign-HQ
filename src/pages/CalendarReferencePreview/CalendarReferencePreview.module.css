@@ -7035,3 +7035,358 @@ button[data-campaign-hq-launcher="floating"] {
 }
 
 /* CAMPAIGN SEAT EXACT DEADLINE EDITOR — END */
+
+
+/* CAMPAIGN SEAT EVENT LINKED TASKS — START */
+
+.eventLinkedTasks {
+  margin-top: 24px;
+  overflow: hidden;
+
+  border:
+    1px
+    solid
+    #d4e0e9;
+
+  border-radius: 13px;
+
+  background:
+    #f8fbfd;
+}
+
+.eventLinkedTasks > header {
+  display: flex;
+
+  min-height: 51px;
+
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 12px;
+
+  padding:
+    0
+    13px;
+
+  border-bottom:
+    1px
+    solid
+    #dce5ec;
+
+  background:
+    #ffffff;
+}
+
+.eventLinkedTasks > header small,
+.eventLinkedTasks > header strong {
+  display: block;
+}
+
+.eventLinkedTasks > header small {
+  color: #8b6a17;
+
+  font-size: 0.58rem;
+  font-weight: 820;
+
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.eventLinkedTasks > header strong {
+  margin-top: 2px;
+
+  color: #183c5e;
+
+  font-size: 0.78rem;
+}
+
+.eventLinkedTasks > header > span {
+  display: inline-flex;
+
+  min-width: 24px;
+  height: 24px;
+
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 999px;
+
+  color: #48677f;
+
+  background:
+    #edf3f7;
+
+  font-size: 0.61rem;
+  font-weight: 800;
+}
+
+.eventLinkedTaskList {
+  display: grid;
+
+  padding:
+    5px
+    12px;
+}
+
+.eventLinkedTaskRow {
+  display: grid;
+
+  grid-template-columns:
+    minmax(0, 1fr)
+    32px;
+
+  align-items: center;
+
+  gap: 5px;
+
+  border-bottom:
+    1px
+    solid
+    #e1e8ee;
+}
+
+.eventLinkedTaskRow:last-child {
+  border-bottom: 0;
+}
+
+.eventLinkedTaskRow > button:first-child {
+  display: grid;
+
+  min-width: 0;
+  min-height: 52px;
+
+  grid-template-columns:
+    28px
+    minmax(0, 1fr);
+
+  align-items: center;
+
+  gap: 8px;
+
+  padding: 7px 0;
+
+  border: 0;
+
+  color: #244969;
+
+  background: transparent;
+
+  text-align: left;
+
+  cursor: pointer;
+}
+
+.eventLinkedTaskIcon {
+  display: inline-flex;
+
+  width: 27px;
+  height: 27px;
+
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 8px;
+
+  color: #9a690c;
+
+  background:
+    #fff0c8;
+}
+
+.eventLinkedTaskRow strong,
+.eventLinkedTaskRow small {
+  display: block;
+}
+
+.eventLinkedTaskRow strong {
+  overflow: hidden;
+
+  font-size: 0.7rem;
+
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.eventLinkedTaskRow small {
+  margin-top: 3px;
+
+  color: #73899b;
+
+  font-size: 0.58rem;
+}
+
+.eventLinkedTaskRemove {
+  display: inline-flex;
+
+  width: 30px;
+  height: 30px;
+
+  align-items: center;
+  justify-content: center;
+
+  border:
+    1px
+    solid
+    transparent;
+
+  border-radius: 8px;
+
+  color: #9aabb8;
+
+  background: transparent;
+
+  cursor: pointer;
+}
+
+.eventLinkedTaskRemove:hover {
+  border-color:
+    #efcdd0;
+
+  color: #cc2a37;
+
+  background:
+    #fff3f4;
+}
+
+.eventLinkedTaskRemove:disabled {
+  opacity: 0.5;
+
+  cursor: not-allowed;
+}
+
+.eventLinkedTaskEmpty {
+  margin: 0;
+
+  padding:
+    14px
+    13px
+    5px;
+
+  color: #75899b;
+
+  font-size: 0.65rem;
+  line-height: 1.4;
+}
+
+.eventTaskLinkControls {
+  display: grid;
+
+  grid-template-columns:
+    minmax(0, 1fr)
+    auto;
+
+  gap: 7px;
+
+  padding:
+    10px
+    12px
+    12px;
+}
+
+.eventTaskLinkControls select {
+  min-width: 0;
+  min-height: 38px;
+
+  padding:
+    0
+    9px;
+
+  border:
+    1px
+    solid
+    #cddce7;
+
+  border-radius: 9px;
+
+  outline: 0;
+
+  color: #274d6d;
+
+  background:
+    #ffffff;
+
+  font-size: 0.65rem;
+}
+
+.eventTaskLinkControls select:focus {
+  border-color:
+    #d2a347;
+
+  box-shadow:
+    0
+    0
+    0
+    3px
+    rgba(
+      210,
+      163,
+      71,
+      0.12
+    );
+}
+
+.eventTaskLinkControls > button {
+  display: inline-flex;
+
+  min-height: 38px;
+
+  align-items: center;
+  justify-content: center;
+
+  gap: 5px;
+
+  padding:
+    0
+    11px;
+
+  border:
+    1px
+    solid
+    #d09924;
+
+  border-radius: 9px;
+
+  color: #ffffff;
+
+  background:
+    linear-gradient(
+      135deg,
+      #dfa124,
+      #bd7e0c
+    );
+
+  cursor: pointer;
+
+  font-size: 0.64rem;
+  font-weight: 790;
+
+  white-space: nowrap;
+}
+
+.eventTaskLinkControls > button:disabled {
+  opacity: 0.5;
+
+  cursor: not-allowed;
+}
+
+.eventLinkedTaskComplete {
+  display: block;
+
+  padding:
+    10px
+    13px
+    12px;
+
+  color: #73899b;
+
+  font-size: 0.6rem;
+}
+
+@media (max-width: 520px) {
+  .eventTaskLinkControls {
+    grid-template-columns:
+      1fr;
+  }
+}
+
+/* CAMPAIGN SEAT EVENT LINKED TASKS — END */
