@@ -7554,3 +7554,365 @@ button[data-campaign-hq-launcher="floating"] {
 }
 
 /* CAMPAIGN SEAT AGENDA LINKED WORK — END */
+
+
+/* CAMPAIGN SEAT EVENT READINESS — START */
+
+.agendaEventMeta {
+  display: flex !important;
+
+  flex-wrap: wrap !important;
+
+  align-items: center !important;
+
+  gap: 6px !important;
+}
+
+.agendaReadinessBadge {
+  display: inline-flex !important;
+
+  align-items: center !important;
+
+  min-height: 20px !important;
+
+  padding:
+    2px
+    7px !important;
+
+  border-radius:
+    999px !important;
+
+  font-size:
+    0.54rem !important;
+
+  font-weight:
+    820 !important;
+
+  line-height:
+    1 !important;
+}
+
+.readiness_ready {
+  color:
+    #17704d !important;
+
+  border-color:
+    #bfe7d3 !important;
+
+  background:
+    #ebf9f2 !important;
+}
+
+.readiness_risk {
+  color:
+    #b42531 !important;
+
+  border-color:
+    #efc8cc !important;
+
+  background:
+    #fff0f1 !important;
+}
+
+.readiness_blocked {
+  color:
+    #9c202b !important;
+
+  border-color:
+    #e9bfc3 !important;
+
+  background:
+    #fdebed !important;
+}
+
+.readiness_progress {
+  color:
+    #4d5ba4 !important;
+
+  border-color:
+    #d8dcf4 !important;
+
+  background:
+    #f0f1fb !important;
+}
+
+.readiness_unlinked {
+  color:
+    #647a8c !important;
+
+  border-color:
+    #dce5ec !important;
+
+  background:
+    #f3f7fa !important;
+}
+
+.agendaReadinessProgress,
+.agendaLinkedWorkBlocked {
+  display: inline-flex !important;
+
+  align-items: center !important;
+
+  gap: 4px !important;
+
+  width: fit-content !important;
+
+  padding:
+    3px
+    7px !important;
+
+  border-radius:
+    999px !important;
+
+  font-size:
+    0.55rem !important;
+
+  font-weight:
+    790 !important;
+
+  line-height:
+    1.1 !important;
+}
+
+.agendaReadinessProgress {
+  color:
+    #51697c !important;
+
+  background:
+    #eef3f7 !important;
+}
+
+.agendaLinkedWorkBlocked {
+  color:
+    #9c202b !important;
+
+  background:
+    #fdebed !important;
+}
+
+.eventReadinessCard {
+  margin-top:
+    22px;
+
+  padding:
+    13px;
+
+  border:
+    1px
+    solid
+    #d8e2e9;
+
+  border-radius:
+    13px;
+
+  background:
+    #f8fbfd;
+}
+
+.eventReadinessCard > header {
+  display: flex;
+
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 12px;
+}
+
+.eventReadinessCard > header small,
+.eventReadinessCard > header strong {
+  display: block;
+}
+
+.eventReadinessCard > header small {
+  color:
+    #6e8293;
+
+  font-size:
+    0.57rem;
+
+  font-weight:
+    830;
+
+  letter-spacing:
+    0.06em;
+
+  text-transform:
+    uppercase;
+}
+
+.eventReadinessCard > header strong {
+  margin-top:
+    3px;
+
+  font-size:
+    0.88rem;
+}
+
+.eventReadinessCard > header > span {
+  display: inline-flex;
+
+  min-width:
+    38px;
+
+  height:
+    30px;
+
+  align-items: center;
+  justify-content: center;
+
+  border-radius:
+    999px;
+
+  color:
+    #405e75;
+
+  background:
+    rgba(
+      255,
+      255,
+      255,
+      0.72
+    );
+
+  font-size:
+    0.66rem;
+
+  font-weight:
+    820;
+}
+
+.eventReadinessCard > p {
+  margin:
+    10px
+    0
+    0;
+
+  color:
+    #74899a;
+
+  font-size:
+    0.64rem;
+
+  line-height:
+    1.4;
+}
+
+.eventReadinessProgress {
+  display: grid;
+
+  gap: 6px;
+
+  margin-top:
+    12px;
+}
+
+.eventReadinessProgress > i {
+  display: block;
+
+  width: 100%;
+  height: 7px;
+
+  overflow: hidden;
+
+  border-radius:
+    999px;
+
+  background:
+    rgba(
+      90,
+      112,
+      130,
+      0.15
+    );
+}
+
+.eventReadinessProgress > i > span {
+  display: block;
+
+  height: 100%;
+
+  border-radius:
+    inherit;
+
+  background:
+    currentColor;
+
+  transition:
+    width
+    180ms
+    ease;
+}
+
+.eventReadinessProgress > strong {
+  color:
+    inherit;
+
+  font-size:
+    0.62rem;
+}
+
+.eventReadinessMetrics {
+  display: flex;
+
+  flex-wrap: wrap;
+
+  gap: 6px;
+
+  margin-top:
+    11px;
+}
+
+.eventReadinessMetrics > span {
+  display: inline-flex;
+
+  align-items: center;
+
+  gap: 4px;
+
+  padding:
+    4px
+    7px;
+
+  border-radius:
+    999px;
+
+  font-size:
+    0.56rem;
+
+  font-weight:
+    780;
+}
+
+.eventReadinessDanger {
+  color:
+    #a6232e;
+
+  background:
+    #ffecef;
+}
+
+.eventReadinessWarning {
+  color:
+    #8a5d0c;
+
+  background:
+    #fff4d8;
+}
+
+.eventReadinessNeutral {
+  color:
+    #516c80;
+
+  background:
+    #edf3f7;
+}
+
+.eventReadinessSuccess {
+  color:
+    #176d4b;
+
+  background:
+    #e8f7f0;
+}
+
+/* CAMPAIGN SEAT EVENT READINESS — END */

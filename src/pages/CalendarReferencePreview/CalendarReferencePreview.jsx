@@ -147,6 +147,317 @@ function taskIsActive(task) {
   );
 }
 
+function taskIsCompleted(
+  task,
+) {
+  return [
+    "completed",
+    "done",
+  ].includes(
+    String(
+      task?.status ||
+      "",
+    )
+      .trim()
+      .toLowerCase(),
+  );
+}
+
+function buildEventReadiness({
+  event,
+  links,
+  tasks,
+  dependencies,
+  now,
+}) {
+  const linkedTaskIds =
+    (
+      links ||
+      []
+    )
+      .filter(
+        (link) =>
+          link.event_id ===
+          event?.id,
+      )
+      .map(
+        (link) =>
+          link.task_id,
+      );
+
+  const taskById =
+    new Map(
+      (
+        tasks ||
+        []
+      ).map(
+        (task) => [
+          task.id,
+          task,
+        ],
+      ),
+    );
+
+  const linkedTasks =
+    linkedTaskIds
+      .map(
+        (taskId) =>
+          taskById.get(
+            taskId,
+          ),
+      )
+      .filter(Boolean);
+
+  const completedTasks =
+    linkedTasks.filter(
+      taskIsCompleted,
+    );
+
+  const openTasks =
+    linkedTasks.filter(
+      (task) =>
+        taskIsActive(
+          task,
+        ),
+    );
+
+  const openTaskIds =
+    new Set(
+      openTasks.map(
+        (task) =>
+          task.id,
+      ),
+    );
+
+  const blockedTaskIds =
+    new Set();
+
+  (
+    dependencies ||
+    []
+  ).forEach(
+    (dependency) => {
+      if (
+        !openTaskIds.has(
+          dependency.task_id,
+        )
+      ) {
+        return;
+      }
+
+      const prerequisiteComplete =
+        [
+          "completed",
+          "done",
+        ].includes(
+          String(
+            dependency
+              .prerequisite_status ||
+            "",
+          )
+            .trim()
+            .toLowerCase(),
+        );
+
+      if (
+        !prerequisiteComplete
+      ) {
+        blockedTaskIds.add(
+          dependency.task_id,
+        );
+      }
+    },
+  );
+
+  const overdueTasks =
+    openTasks.filter(
+      (task) => {
+        const due =
+          taskDueDate(
+            task,
+          );
+
+        return (
+          due &&
+          due <
+            now
+        );
+      },
+    );
+
+  const dueBeforeEventTasks =
+    openTasks.filter(
+      (task) => {
+        const due =
+          taskDueDate(
+            task,
+          );
+
+        return (
+          due &&
+          due >=
+            now &&
+          due <=
+            event.start
+        );
+      },
+    );
+
+  const unscheduledTasks =
+    openTasks.filter(
+      (task) =>
+        !taskDueDate(
+          task,
+        ),
+    );
+
+  const total =
+    linkedTasks.length;
+
+  const completed =
+    completedTasks.length;
+
+  const open =
+    openTasks.length;
+
+  const blocked =
+    blockedTaskIds.size;
+
+  const overdue =
+    overdueTasks.length;
+
+  const dueBeforeEvent =
+    dueBeforeEventTasks.length;
+
+  const unscheduled =
+    unscheduledTasks.length;
+
+  let key =
+    "unlinked";
+
+  let label =
+    "No linked work";
+
+  if (total) {
+    if (blocked) {
+      key =
+        "blocked";
+
+      label =
+        "Blocked";
+    } else if (
+      overdue ||
+      dueBeforeEvent
+    ) {
+      key =
+        "risk";
+
+      label =
+        "At risk";
+    } else if (open) {
+      key =
+        "progress";
+
+      label =
+        "In progress";
+    } else {
+      key =
+        "ready";
+
+      label =
+        "Ready";
+    }
+  }
+
+  const summaryParts =
+    [];
+
+  if (total) {
+    summaryParts.push(
+      `${completed}/${total} complete`,
+    );
+
+    if (blocked) {
+      summaryParts.push(
+        `${blocked} blocked`,
+      );
+    }
+
+    if (overdue) {
+      summaryParts.push(
+        `${overdue} overdue`,
+      );
+    }
+
+    if (
+      dueBeforeEvent
+    ) {
+      summaryParts.push(
+        `${dueBeforeEvent} due before event`,
+      );
+    }
+
+    if (
+      !blocked &&
+      !overdue &&
+      !dueBeforeEvent &&
+      open
+    ) {
+      summaryParts.push(
+        `${open} open`,
+      );
+    }
+
+    if (
+      unscheduled
+    ) {
+      summaryParts.push(
+        `${unscheduled} unscheduled`,
+      );
+    }
+  } else {
+    summaryParts.push(
+      "No linked tasks",
+    );
+  }
+
+  return {
+    key,
+    label,
+
+    total,
+    completed,
+    open,
+    blocked,
+    overdue,
+    dueBeforeEvent,
+    unscheduled,
+
+    completionPercent:
+      total
+        ? Math.round(
+            (
+              completed /
+              total
+            ) *
+              100,
+          )
+        : 0,
+
+    summary:
+      summaryParts.join(
+        " · ",
+      ),
+
+    linkedTasks,
+
+    displayTasks:
+      openTasks.length
+        ? openTasks
+        : linkedTasks,
+  };
+}
+
 function taskPriorityScore(task) {
   const priority =
     String(
@@ -1002,8 +1313,7 @@ function MonthView({
 function AgendaView({
   events,
   tasks,
-  allTasks,
-  eventTaskLinks,
+  eventReadinessById,
   now,
   onEventClick,
 }) {
@@ -1031,46 +1341,6 @@ function AgendaView({
       todayStart,
       7,
     );
-
-  const linkedTaskSource =
-    allTasks ||
-    tasks ||
-    [];
-
-  const agendaTaskById =
-    new Map(
-      linkedTaskSource.map(
-        (task) => [
-          task.id,
-          task,
-        ],
-      ),
-    );
-
-  const agendaTaskIdsByEvent =
-    new Map();
-
-  (
-    eventTaskLinks ||
-    []
-  ).forEach(
-    (link) => {
-      const current =
-        agendaTaskIdsByEvent.get(
-          link.event_id,
-        ) ||
-        [];
-
-      current.push(
-        link.task_id,
-      );
-
-      agendaTaskIdsByEvent.set(
-        link.event_id,
-        current,
-      );
-    },
-  );
 
   const bucketForDate =
     (
@@ -1136,47 +1406,12 @@ function AgendaView({
       )
       .map(
         (event) => {
-          const linkedTaskIds =
-            agendaTaskIdsByEvent.get(
-              event.id,
-            ) ||
-            [];
-
-          const linkedTasks =
-            linkedTaskIds
-              .map(
-                (taskId) =>
-                  agendaTaskById.get(
-                    taskId,
-                  ),
-              )
-              .filter(Boolean);
-
-          const openLinkedTasks =
-            linkedTasks.filter(
-              taskIsActive,
-            );
-
-          const preEventWork =
-            openLinkedTasks.filter(
-              (task) => {
-                const due =
-                  taskDueDate(
-                    task,
-                  );
-
-                return (
-                  due &&
-                  due <=
-                    event.start
-                );
-              },
-            );
-
-          const visibleLinkedTasks =
-            openLinkedTasks.length
-              ? openLinkedTasks
-              : linkedTasks;
+          const readiness =
+            eventReadinessById
+              ?.get(
+                event.id,
+              ) ||
+            null;
 
           return {
             id:
@@ -1205,17 +1440,34 @@ function AgendaView({
             allDay:
               event.allDay,
 
+            readiness,
+
             linkedTasks:
-              visibleLinkedTasks,
+              readiness
+                ?.displayTasks ||
+              [],
 
             linkedTaskCount:
-              linkedTasks.length,
+              readiness
+                ?.total ||
+              0,
 
             openLinkedTaskCount:
-              openLinkedTasks.length,
+              readiness
+                ?.open ||
+              0,
 
             preEventWorkCount:
-              preEventWork.length,
+              (
+                readiness
+                  ?.overdue ||
+                0
+              ) +
+              (
+                readiness
+                  ?.dueBeforeEvent ||
+                0
+              ),
 
             event,
           };
@@ -1587,15 +1839,37 @@ function AgendaView({
                         }
                       </strong>
 
-                      <small
+                      <div
                         className={
-                          styles.agendaType
+                          styles.agendaEventMeta
                         }
                       >
-                        {
-                          item.typeLabel
-                        }
-                      </small>
+                        <small
+                          className={
+                            styles.agendaType
+                          }
+                        >
+                          {
+                            item.typeLabel
+                          }
+                        </small>
+
+                        {item.readiness ? (
+                          <span
+                            className={`${styles.agendaReadinessBadge} ${
+                              styles[
+                                `readiness_${item.readiness.key}`
+                              ] ||
+                              ""
+                            }`}
+                          >
+                            {
+                              item.readiness
+                                .label
+                            }
+                          </span>
+                        ) : null}
+                      </div>
 
                       <span>
                         <MapPin
@@ -1617,6 +1891,64 @@ function AgendaView({
                               styles.agendaLinkedWorkSummary
                             }
                           >
+                            {item.readiness ? (
+                              <span
+                                className={
+                                  styles.agendaReadinessProgress
+                                }
+                              >
+                                {
+                                  item.readiness
+                                    .completed
+                                }
+                                /
+                                {
+                                  item.readiness
+                                    .total
+                                }
+                                {" "}
+                                complete
+                              </span>
+                            ) : null}
+
+                            {item.readiness?.blocked ? (
+                              <span
+                                className={
+                                  styles.agendaLinkedWorkBlocked
+                                }
+                              >
+                                <AlertTriangle
+                                  size={13}
+                                />
+
+                                {
+                                  item.readiness
+                                    .blocked
+                                }
+                                {" "}
+                                blocked
+                              </span>
+                            ) : null}
+
+                            {item.readiness?.overdue ? (
+                              <span
+                                className={
+                                  styles.agendaLinkedWorkRisk
+                                }
+                              >
+                                <AlertTriangle
+                                  size={13}
+                                />
+
+                                {
+                                  item.readiness
+                                    .overdue
+                                }
+                                {" "}
+                                overdue
+                              </span>
+                            ) : null}
+
                             {item.openLinkedTaskCount ? (
                               <span
                                 className={
@@ -2509,6 +2841,8 @@ export default function CalendarReferencePreview() {
       storedEvents,
     tasks:
       storedTasks,
+    taskDependencies:
+      storedTaskDependencies,
     team:
       storedTeam,
     refresh:
@@ -5801,6 +6135,51 @@ export default function CalendarReferencePreview() {
       }
     };
 
+  const eventReadinessById =
+    useMemo(
+      () =>
+        new Map(
+          (
+            events ||
+            []
+          ).map(
+            (event) => [
+              event.id,
+
+              buildEventReadiness({
+                event,
+
+                links:
+                  eventTaskLinks,
+
+                tasks:
+                  storedTasks,
+
+                dependencies:
+                  storedTaskDependencies,
+
+                now,
+              }),
+            ],
+          ),
+        ),
+      [
+        eventTaskLinks,
+        events,
+        now,
+        storedTaskDependencies,
+        storedTasks,
+      ],
+    );
+
+  const selectedEventReadiness =
+    selectedEvent?.id
+      ? eventReadinessById.get(
+          selectedEvent.id,
+        ) ||
+        null
+      : null;
+
   const selectedEventTaskLinks =
     useMemo(
       () => {
@@ -6022,9 +6401,8 @@ export default function CalendarReferencePreview() {
         <AgendaView
           events={visibleEvents}
           tasks={focusedTasks}
-          allTasks={storedTasks}
-          eventTaskLinks={
-            eventTaskLinks
+          eventReadinessById={
+            eventReadinessById
           }
           now={now}
           onEventClick={setSelectedEvent}
@@ -7561,6 +7939,199 @@ export default function CalendarReferencePreview() {
                   </div>
                 </span>
               </div>
+
+              {selectedEventReadiness ? (
+                <section
+                  className={`${styles.eventReadinessCard} ${
+                    styles[
+                      `readiness_${selectedEventReadiness.key}`
+                    ] ||
+                    ""
+                  }`}
+                >
+                  <header>
+                    <div>
+                      <small>
+                        Event readiness
+                      </small>
+
+                      <strong>
+                        {
+                          selectedEventReadiness
+                            .label
+                        }
+                      </strong>
+                    </div>
+
+                    {selectedEventReadiness.total ? (
+                      <span>
+                        {
+                          selectedEventReadiness
+                            .completionPercent
+                        }
+                        %
+                      </span>
+                    ) : null}
+                  </header>
+
+                  {selectedEventReadiness.total ? (
+                    <div
+                      className={
+                        styles.eventReadinessProgress
+                      }
+                    >
+                      <i>
+                        <span
+                          style={{
+                            width:
+                              `${selectedEventReadiness.completionPercent}%`,
+                          }}
+                        />
+                      </i>
+
+                      <strong>
+                        {
+                          selectedEventReadiness
+                            .completed
+                        }
+                        /
+                        {
+                          selectedEventReadiness
+                            .total
+                        }
+                        {" "}
+                        tasks complete
+                      </strong>
+                    </div>
+                  ) : (
+                    <p>
+                      Link campaign tasks
+                      below to track whether
+                      this event is ready.
+                    </p>
+                  )}
+
+                  {selectedEventReadiness.total ? (
+                    <div
+                      className={
+                        styles.eventReadinessMetrics
+                      }
+                    >
+                      {selectedEventReadiness.blocked ? (
+                        <span
+                          className={
+                            styles.eventReadinessDanger
+                          }
+                        >
+                          <AlertTriangle
+                            size={13}
+                          />
+
+                          {
+                            selectedEventReadiness
+                              .blocked
+                          }
+                          {" "}
+                          blocked
+                        </span>
+                      ) : null}
+
+                      {selectedEventReadiness.overdue ? (
+                        <span
+                          className={
+                            styles.eventReadinessDanger
+                          }
+                        >
+                          <Clock3
+                            size={13}
+                          />
+
+                          {
+                            selectedEventReadiness
+                              .overdue
+                          }
+                          {" "}
+                          overdue
+                        </span>
+                      ) : null}
+
+                      {selectedEventReadiness.dueBeforeEvent ? (
+                        <span
+                          className={
+                            styles.eventReadinessWarning
+                          }
+                        >
+                          <CalendarClock
+                            size={13}
+                          />
+
+                          {
+                            selectedEventReadiness
+                              .dueBeforeEvent
+                          }
+                          {" "}
+                          due before event
+                        </span>
+                      ) : null}
+
+                      {selectedEventReadiness.open &&
+                      !selectedEventReadiness.blocked &&
+                      !selectedEventReadiness.overdue &&
+                      !selectedEventReadiness.dueBeforeEvent ? (
+                        <span
+                          className={
+                            styles.eventReadinessNeutral
+                          }
+                        >
+                          <ListChecks
+                            size={13}
+                          />
+
+                          {
+                            selectedEventReadiness
+                              .open
+                          }
+                          {" "}
+                          open
+                        </span>
+                      ) : null}
+
+                      {selectedEventReadiness.unscheduled ? (
+                        <span
+                          className={
+                            styles.eventReadinessNeutral
+                          }
+                        >
+                          <CalendarClock
+                            size={13}
+                          />
+
+                          {
+                            selectedEventReadiness
+                              .unscheduled
+                          }
+                          {" "}
+                          unscheduled
+                        </span>
+                      ) : null}
+
+                      {!selectedEventReadiness.open ? (
+                        <span
+                          className={
+                            styles.eventReadinessSuccess
+                          }
+                        >
+                          <CheckCircle2
+                            size={13}
+                          />
+
+                          All linked work complete
+                        </span>
+                      ) : null}
+                    </div>
+                  ) : null}
+                </section>
+              ) : null}
 
               <section
                 className={

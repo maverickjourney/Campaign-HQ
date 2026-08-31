@@ -12,6 +12,7 @@ import { supabase } from "../lib/supabase";
 const EMPTY_STATE = {
   events: [],
   tasks: [],
+  taskDependencies: [],
   team: [],
 };
 
@@ -250,6 +251,127 @@ export function useCalendarCommandCenter({
       return data || [];
     }, [workspaceId]);
 
+  const loadTaskDependencies =
+    useCallback(
+      async () => {
+        if (!workspaceId) {
+          return [];
+        }
+
+        const {
+          data,
+          error:
+            dependenciesError,
+        } = await supabase
+          .from(
+            "task_dependencies",
+          )
+          .select(
+            `
+              id,
+              workspace_id,
+              task_id,
+              depends_on_task_id,
+              created_at
+            `,
+          )
+          .eq(
+            "workspace_id",
+            workspaceId,
+          )
+          .order(
+            "created_at",
+            {
+              ascending: true,
+            },
+          );
+
+        if (
+          dependenciesError
+        ) {
+          throw (
+            dependenciesError
+          );
+        }
+
+        const dependencies =
+          data || [];
+
+        const prerequisiteIds = [
+          ...new Set(
+            dependencies.map(
+              (dependency) =>
+                dependency
+                  .depends_on_task_id,
+            ),
+          ),
+        ];
+
+        if (
+          !prerequisiteIds.length
+        ) {
+          return dependencies;
+        }
+
+        const {
+          data:
+            prerequisiteTasks,
+          error:
+            prerequisiteError,
+        } = await supabase
+          .from("tasks")
+          .select(
+            "id,status",
+          )
+          .eq(
+            "workspace_id",
+            workspaceId,
+          )
+          .in(
+            "id",
+            prerequisiteIds,
+          );
+
+        if (
+          prerequisiteError
+        ) {
+          throw (
+            prerequisiteError
+          );
+        }
+
+        const statusByTaskId =
+          new Map(
+            (
+              prerequisiteTasks ||
+              []
+            ).map(
+              (task) => [
+                task.id,
+                task.status ||
+                  "",
+              ],
+            ),
+          );
+
+        return dependencies.map(
+          (dependency) => ({
+            ...dependency,
+
+            prerequisite_status:
+              statusByTaskId.get(
+                dependency
+                  .depends_on_task_id,
+              ) ||
+              "",
+          }),
+        );
+      },
+      [
+        workspaceId,
+      ],
+    );
+
   const loadCalendar =
     useCallback(
       async ({
@@ -271,16 +393,19 @@ export function useCalendarCommandCenter({
           const [
             events,
             tasks,
+            taskDependencies,
             team,
           ] = await Promise.all([
             loadEvents(),
             loadCalendarTasks(),
+            loadTaskDependencies(),
             loadTeam(),
           ]);
 
           setState({
             events,
             tasks,
+            taskDependencies,
             team,
           });
 
@@ -306,6 +431,7 @@ export function useCalendarCommandCenter({
       [
         loadEvents,
         loadCalendarTasks,
+        loadTaskDependencies,
         loadTeam,
         workspaceId,
       ],
@@ -776,6 +902,8 @@ export function useCalendarCommandCenter({
   return {
     events: state.events,
     tasks: state.tasks,
+    taskDependencies:
+      state.taskDependencies,
     team: state.team,
     isLoading,
     isSaving,
