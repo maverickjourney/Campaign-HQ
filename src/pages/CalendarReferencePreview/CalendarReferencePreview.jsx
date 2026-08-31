@@ -361,7 +361,13 @@ function TimelineView({
   events,
   now,
   onEventClick,
+  onTaskDeadlineDrop,
 }) {
+  const [
+    taskDropDayKey,
+    setTaskDropDayKey,
+  ] = useState("");
+
   const hours = Array.from(
     {
       length: HOUR_END - HOUR_START + 1,
@@ -499,8 +505,132 @@ function TimelineView({
 
               return (
                 <div
-                  className={styles.dayColumn}
+                  className={`${styles.dayColumn} ${
+                    taskDropDayKey ===
+                    formatDateKey(
+                      day,
+                    )
+                      ? styles.taskDropDay
+                      : ""
+                  }`}
                   key={`column-${formatDateKey(day)}`}
+                  onDragEnter={(
+                    dragEvent,
+                  ) => {
+                    dragEvent
+                      .preventDefault();
+
+                    setTaskDropDayKey(
+                      formatDateKey(
+                        day,
+                      ),
+                    );
+                  }}
+                  onDragOver={(
+                    dragEvent,
+                  ) => {
+                    dragEvent
+                      .preventDefault();
+
+                    dragEvent
+                      .dataTransfer
+                      .dropEffect =
+                      "move";
+                  }}
+                  onDragLeave={(
+                    dragEvent,
+                  ) => {
+                    if (
+                      dragEvent
+                        .currentTarget
+                        .contains(
+                          dragEvent
+                            .relatedTarget,
+                        )
+                    ) {
+                      return;
+                    }
+
+                    setTaskDropDayKey(
+                      "",
+                    );
+                  }}
+                  onDrop={(
+                    dragEvent,
+                  ) => {
+                    dragEvent
+                      .preventDefault();
+
+                    const taskId =
+                      dragEvent
+                        .dataTransfer
+                        .getData(
+                          "application/x-campaign-seat-task",
+                        ) ||
+                      dragEvent
+                        .dataTransfer
+                        .getData(
+                          "text/plain",
+                        );
+
+                    setTaskDropDayKey(
+                      "",
+                    );
+
+                    if (
+                      !taskId ||
+                      !onTaskDeadlineDrop
+                    ) {
+                      return;
+                    }
+
+                    const rect =
+                      dragEvent
+                        .currentTarget
+                        .getBoundingClientRect();
+
+                    const offsetY =
+                      Math.max(
+                        0,
+                        Math.min(
+                          rect.height,
+                          dragEvent
+                            .clientY -
+                            rect.top,
+                        ),
+                      );
+
+                    const rawMinutes =
+                      HOUR_START *
+                        60 +
+                      (
+                        offsetY /
+                        HOUR_HEIGHT
+                      ) *
+                        60;
+
+                    const snappedMinutes =
+                      Math.max(
+                        HOUR_START *
+                          60,
+                        Math.min(
+                          HOUR_END *
+                            60 -
+                            15,
+                          Math.round(
+                            rawMinutes /
+                              15,
+                          ) *
+                            15,
+                        ),
+                      );
+
+                    onTaskDeadlineDrop(
+                      taskId,
+                      day,
+                      snappedMinutes,
+                    );
+                  }}
                 >
                   {dayEvents.map((event) => {
                     const startHour =
@@ -2006,6 +2136,8 @@ export default function CalendarReferencePreview() {
       refreshCalendar,
     saveEvent:
       saveCalendarEvent,
+    setTaskDeadline:
+      setCalendarTaskDeadline,
     cancelEvent:
       cancelCalendarEvent,
   } =
@@ -2061,6 +2193,16 @@ export default function CalendarReferencePreview() {
   const [
     summaryFocus,
     setSummaryFocus,
+  ] = useState("");
+
+  const [
+    schedulingTaskId,
+    setSchedulingTaskId,
+  ] = useState("");
+
+  const [
+    taskScheduleMessage,
+    setTaskScheduleMessage,
   ] = useState("");
 
   const [selectedEvent, setSelectedEvent] =
@@ -2884,6 +3026,89 @@ export default function CalendarReferencePreview() {
       [storedTasks],
     );
 
+  const unscheduledTasks =
+    useMemo(
+      () =>
+        (
+          storedTasks ||
+          []
+        )
+          .filter(
+            taskIsActive,
+          )
+          .filter(
+            (task) =>
+              !taskDueDate(
+                task,
+              ),
+          )
+          .sort(
+            (
+              left,
+              right,
+            ) => {
+              const userId =
+                sessionUser
+                  ?.id ||
+                "";
+
+              const leftMine =
+                left
+                  .assigned_to ===
+                userId
+                  ? 0
+                  : 1;
+
+              const rightMine =
+                right
+                  .assigned_to ===
+                userId
+                  ? 0
+                  : 1;
+
+              if (
+                leftMine !==
+                rightMine
+              ) {
+                return (
+                  leftMine -
+                  rightMine
+                );
+              }
+
+              const priorityDifference =
+                taskPriorityScore(
+                  right,
+                ) -
+                taskPriorityScore(
+                  left,
+                );
+
+              if (
+                priorityDifference
+              ) {
+                return (
+                  priorityDifference
+                );
+              }
+
+              return String(
+                left.title ||
+                "",
+              ).localeCompare(
+                String(
+                  right.title ||
+                  "",
+                ),
+              );
+            },
+          ),
+      [
+        storedTasks,
+        sessionUser?.id,
+      ],
+    );
+
   const myCalendarTasks =
     useMemo(
       () => {
@@ -3232,6 +3457,97 @@ export default function CalendarReferencePreview() {
         now,
       ],
     );
+
+  const handleTaskDeadlineDrop =
+    async (
+      taskId,
+      day,
+      minuteOfDay,
+    ) => {
+      const task =
+        (
+          storedTasks ||
+          []
+        ).find(
+          (candidate) =>
+            candidate.id ===
+            taskId,
+        );
+
+      if (
+        !task ||
+        !setCalendarTaskDeadline
+      ) {
+        return;
+      }
+
+      const dueDate =
+        new Date(
+          day,
+        );
+
+      dueDate.setHours(
+        Math.floor(
+          minuteOfDay /
+          60,
+        ),
+        minuteOfDay %
+          60,
+        0,
+        0,
+      );
+
+      setSchedulingTaskId(
+        taskId,
+      );
+
+      setTaskScheduleMessage(
+        "",
+      );
+
+      try {
+        await setCalendarTaskDeadline(
+          taskId,
+          dueDate
+            .toISOString(),
+        );
+
+        setTaskScheduleMessage(
+          `${task.title || "Task"} deadline set for ${new Intl.DateTimeFormat(
+            "en-US",
+            {
+              weekday:
+                "short",
+              month:
+                "short",
+              day:
+                "numeric",
+              hour:
+                "numeric",
+              minute:
+                "2-digit",
+            },
+          ).format(
+            dueDate,
+          )}.`,
+        );
+      } catch (
+        scheduleError
+      ) {
+        console.error(
+          "Calendar drag-to-deadline failed:",
+          scheduleError,
+        );
+
+        setTaskScheduleMessage(
+          "The task deadline could not be updated.",
+        );
+      } finally {
+        setSchedulingTaskId(
+          "",
+        );
+      }
+    };
 
   const clearSummaryFocus =
     () => {
@@ -4874,6 +5190,9 @@ export default function CalendarReferencePreview() {
         events={visibleEvents}
         now={now}
         onEventClick={setSelectedEvent}
+        onTaskDeadlineDrop={
+          handleTaskDeadlineDrop
+        }
       />
     );
   };
@@ -5661,6 +5980,198 @@ export default function CalendarReferencePreview() {
                         </button>
                       );
                     },
+                  )}
+                </div>
+              </section>
+            ) : null}
+
+            {(
+              unscheduledTasks.length ||
+              taskScheduleMessage
+            ) ? (
+              <section
+                className={`${styles.railCard} ${styles.unscheduledRailCard}`}
+              >
+                <header>
+                  <strong>
+                    Unscheduled work
+                  </strong>
+
+                  {[
+                    "day",
+                    "week",
+                  ].includes(
+                    viewMode,
+                  ) ? (
+                    <span
+                      className={
+                        styles.unscheduledCount
+                      }
+                    >
+                      {
+                        unscheduledTasks
+                          .length
+                      }
+                    </span>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        clearSummaryFocus();
+
+                        setViewDate(
+                          new Date(),
+                        );
+
+                        setViewMode(
+                          "week",
+                        );
+                      }}
+                    >
+                      Plan
+                    </button>
+                  )}
+                </header>
+
+                {taskScheduleMessage ? (
+                  <div
+                    className={
+                      styles.taskScheduleNotice
+                    }
+                  >
+                    <CheckCircle2
+                      size={15}
+                    />
+
+                    <span>
+                      {
+                        taskScheduleMessage
+                      }
+                    </span>
+                  </div>
+                ) : null}
+
+                <div
+                  className={
+                    styles.unscheduledList
+                  }
+                >
+                  {unscheduledTasks.length ? (
+                    unscheduledTasks
+                      .slice(
+                        0,
+                        5,
+                      )
+                      .map(
+                        (task) => (
+                          <button
+                            key={
+                              task.id
+                            }
+                            className={
+                              schedulingTaskId ===
+                              task.id
+                                ? styles.taskScheduling
+                                : ""
+                            }
+                            type="button"
+                            draggable={
+                              schedulingTaskId !==
+                              task.id
+                            }
+                            onDragStart={(
+                              dragEvent,
+                            ) => {
+                              dragEvent
+                                .dataTransfer
+                                .effectAllowed =
+                                "move";
+
+                              dragEvent
+                                .dataTransfer
+                                .setData(
+                                  "application/x-campaign-seat-task",
+                                  task.id,
+                                );
+
+                              dragEvent
+                                .dataTransfer
+                                .setData(
+                                  "text/plain",
+                                  task.id,
+                                );
+                            }}
+                            onClick={() =>
+                              window.location.assign(
+                                `/tasks?task=${encodeURIComponent(
+                                  task.id,
+                                )}`,
+                              )
+                            }
+                          >
+                            <span
+                              className={
+                                styles.unscheduledIcon
+                              }
+                            >
+                              <CalendarClock
+                                size={15}
+                              />
+                            </span>
+
+                            <span
+                              className={
+                                styles.unscheduledCopy
+                              }
+                            >
+                              <strong>
+                                {task.title ||
+                                  "Campaign task"}
+                              </strong>
+
+                              <small>
+                                {task.category ||
+                                  "General"}
+                                {" · "}
+                                {String(
+                                  task.priority ||
+                                  "normal",
+                                )
+                                  .charAt(
+                                    0,
+                                  )
+                                  .toUpperCase() +
+                                  String(
+                                    task.priority ||
+                                    "normal",
+                                  ).slice(
+                                    1,
+                                  )}
+                              </small>
+
+                              <small>
+                                {[
+                                  "day",
+                                  "week",
+                                ].includes(
+                                  viewMode,
+                                )
+                                  ? "Drag onto the calendar to set deadline"
+                                  : "Open task or choose Plan to schedule"}
+                              </small>
+                            </span>
+                          </button>
+                        ),
+                      )
+                  ) : (
+                    <p
+                      className={
+                        styles.railEmpty
+                      }
+                    >
+                      All active tasks
+                      have deadlines.
+                    </p>
                   )}
                 </div>
               </section>

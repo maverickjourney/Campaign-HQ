@@ -6070,3 +6070,153 @@ button[data-campaign-hq-launcher="floating"] {
 }
 
 /* CAMPAIGN SEAT CALENDAR COMMAND FILTERS — END */
+
+
+/* CAMPAIGN SEAT UNSCHEDULED CALENDAR WORK — START */
+
+.dayColumn {
+  transition:
+    background 140ms ease,
+    box-shadow 140ms ease;
+}
+
+.taskDropDay {
+  background:
+    rgba(
+      239,
+      51,
+      64,
+      0.055
+    ) !important;
+  box-shadow:
+    inset 0 0 0 2px
+    rgba(
+      239,
+      51,
+      64,
+      0.28
+    );
+}
+
+.unscheduledRailCard {
+  border-color:
+    #d6dfe8 !important;
+}
+
+.unscheduledCount {
+  display: inline-flex !important;
+  min-width: 23px;
+  height: 23px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  color: #345a78 !important;
+  background: #edf3f7;
+  font-size: 0.61rem !important;
+  font-weight: 800;
+}
+
+.taskScheduleNotice {
+  display: flex;
+  align-items: flex-start;
+  gap: 7px;
+  margin:
+    10px
+    12px
+    2px;
+  padding:
+    9px
+    10px;
+  border:
+    1px solid
+    #cce7da;
+  border-radius: 9px;
+  color: #19724f;
+  background: #f0faf5;
+  font-size: 0.61rem;
+  line-height: 1.35;
+}
+
+.taskScheduleNotice svg {
+  flex: 0 0 auto;
+  margin-top: 1px;
+}
+
+.unscheduledList {
+  padding:
+    5px
+    13px
+    10px;
+}
+
+.unscheduledList > button {
+  display: grid;
+  width: 100%;
+  grid-template-columns:
+    28px
+    minmax(0, 1fr);
+  align-items: start;
+  gap: 9px;
+  padding:
+    10px
+    0;
+  border: 0;
+  border-bottom:
+    1px solid
+    #e2e9ef;
+  color: #284c6d;
+  background: transparent;
+  text-align: left;
+  cursor: grab;
+}
+
+.unscheduledList > button:last-child {
+  border-bottom: 0;
+}
+
+.unscheduledList > button:active {
+  cursor: grabbing;
+}
+
+.unscheduledIcon {
+  display: inline-flex;
+  width: 26px;
+  height: 26px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  color: #6851c7;
+  background: #f1effd;
+}
+
+.unscheduledCopy {
+  min-width: 0;
+}
+
+.unscheduledCopy strong,
+.unscheduledCopy small {
+  display: block;
+}
+
+.unscheduledCopy strong {
+  overflow: hidden;
+  color: #244767;
+  font-size: 0.7rem;
+  line-height: 1.25;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.unscheduledCopy small {
+  margin-top: 3px;
+  color: #788c9e;
+  font-size: 0.57rem;
+  line-height: 1.25;
+}
+
+.taskScheduling {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+/* CAMPAIGN SEAT UNSCHEDULED CALENDAR WORK — END */

@@ -203,7 +203,7 @@ export function useCalendarCommandCenter({
       return data || [];
     }, [workspaceId]);
 
-  const loadTaskDeadlines =
+  const loadCalendarTasks =
     useCallback(async () => {
       if (!workspaceId) {
         return [];
@@ -225,19 +225,21 @@ export function useCalendarCommandCenter({
             status,
             due_at,
             assigned_to,
-            created_by
+            created_by,
+            created_at,
+            updated_at
           `,
         )
         .eq(
           "workspace_id",
           workspaceId,
         )
-        .not("due_at", "is", null)
         .neq("status", "archived")
         .order(
           "due_at",
           {
             ascending: true,
+            nullsFirst: false,
           },
         );
 
@@ -272,7 +274,7 @@ export function useCalendarCommandCenter({
             team,
           ] = await Promise.all([
             loadEvents(),
-            loadTaskDeadlines(),
+            loadCalendarTasks(),
             loadTeam(),
           ]);
 
@@ -303,7 +305,7 @@ export function useCalendarCommandCenter({
       },
       [
         loadEvents,
-        loadTaskDeadlines,
+        loadCalendarTasks,
         loadTeam,
         workspaceId,
       ],
@@ -640,6 +642,85 @@ export function useCalendarCommandCenter({
     ],
   );
 
+  const setTaskDeadline =
+    useCallback(
+      async (
+        taskId,
+        dueAt,
+      ) => {
+        if (
+          !taskId ||
+          !workspaceId
+        ) {
+          return null;
+        }
+
+        setIsSaving(true);
+        setError("");
+
+        try {
+          const {
+            data,
+            error:
+              taskUpdateError,
+          } = await supabase
+            .from("tasks")
+            .update({
+              due_at:
+                dueAt ||
+                null,
+            })
+            .eq(
+              "id",
+              taskId,
+            )
+            .eq(
+              "workspace_id",
+              workspaceId,
+            )
+            .select()
+            .single();
+
+          if (
+            taskUpdateError
+          ) {
+            throw (
+              taskUpdateError
+            );
+          }
+
+          await loadCalendar();
+
+          return data;
+        } catch (
+          taskUpdateError
+        ) {
+          console.error(
+            "Calendar task deadline could not be updated:",
+            taskUpdateError,
+          );
+
+          setError(
+            taskUpdateError
+              instanceof Error
+              ? taskUpdateError
+                  .message
+              : "The task deadline could not be updated.",
+          );
+
+          throw (
+            taskUpdateError
+          );
+        } finally {
+          setIsSaving(false);
+        }
+      },
+      [
+        loadCalendar,
+        workspaceId,
+      ],
+    );
+
   const cancelEvent = useCallback(
     async (eventId) => {
       setIsSaving(true);
@@ -705,6 +786,7 @@ export function useCalendarCommandCenter({
         showLoading: true,
       }),
     saveEvent,
+    setTaskDeadline,
     cancelEvent,
   };
 }
