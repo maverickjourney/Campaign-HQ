@@ -104,6 +104,51 @@ function normalizeTaskAlert(
   };
 }
 
+function formatDeadlineActivityDetail(
+  value,
+) {
+  if (!value) {
+    return "Deadline removed.";
+  }
+
+  const date =
+    new Date(value);
+
+  if (
+    Number.isNaN(
+      date.getTime(),
+    )
+  ) {
+    return "The task due date was changed.";
+  }
+
+  const dateLabel =
+    new Intl.DateTimeFormat(
+      "en-US",
+      {
+        month: "short",
+        day: "numeric",
+      },
+    ).format(
+      date,
+    );
+
+  const timeLabel =
+    new Intl.DateTimeFormat(
+      "en-US",
+      {
+        hour: "numeric",
+        minute: "2-digit",
+      },
+    ).format(
+      date,
+    );
+
+  return (
+    `Deadline changed to ${dateLabel} at ${timeLabel}.`
+  );
+}
+
 function getActivityErrorMessage(error) {
   const message =
     error?.message ||
@@ -370,8 +415,93 @@ export function useActivityCenter({
               },
             );
 
+          /*
+           * Dragging a deadline and then confirming an exact
+           * minute can create two legitimate deadline updates
+           * a few seconds apart. Treat those as one user action.
+           *
+           * Activity rows arrive newest-first. Keep the newest
+           * task_due_date_changed row and suppress older rows for
+           * the same task when they are within 30 seconds.
+           */
+          const collapsedActivityRows =
+            [];
+
+          const newestDeadlineTimeByTask =
+            new Map();
+
+          [...visibleActivityRows]
+            .sort(
+              (left, right) =>
+                new Date(
+                  right.occurred_at,
+                ).getTime() -
+                new Date(
+                  left.occurred_at,
+                ).getTime(),
+            )
+            .forEach(
+              (activity) => {
+                if (
+                  activity.activity_type !==
+                    "task_due_date_changed" ||
+                  activity.entity_type !==
+                    "task" ||
+                  !activity.entity_id
+                ) {
+                  collapsedActivityRows.push(
+                    activity,
+                  );
+
+                  return;
+                }
+
+                const activityTime =
+                  new Date(
+                    activity.occurred_at,
+                  ).getTime();
+
+                if (
+                  !Number.isFinite(
+                    activityTime,
+                  )
+                ) {
+                  collapsedActivityRows.push(
+                    activity,
+                  );
+
+                  return;
+                }
+
+                const newestTime =
+                  newestDeadlineTimeByTask.get(
+                    activity.entity_id,
+                  );
+
+                if (
+                  Number.isFinite(
+                    newestTime,
+                  ) &&
+                  newestTime -
+                    activityTime <=
+                    30000
+                ) {
+                  return;
+                }
+
+                newestDeadlineTimeByTask.set(
+                  activity.entity_id,
+                  activityTime,
+                );
+
+                collapsedActivityRows.push(
+                  activity,
+                );
+              },
+            );
+
           const combinedActivities = [
-            ...visibleActivityRows,
+            ...collapsedActivityRows,
             ...normalizedTaskAlerts,
           ]
             .sort(
@@ -388,6 +518,26 @@ export function useActivityCenter({
               60,
             );
 
+          const deadlineTaskIds = [
+            ...new Set(
+              combinedActivities
+                .filter(
+                  (activity) =>
+                    activity.activity_type ===
+                      "task_due_date_changed" &&
+                    activity.entity_type ===
+                      "task" &&
+                    Boolean(
+                      activity.entity_id,
+                    ),
+                )
+                .map(
+                  (activity) =>
+                    activity.entity_id,
+                ),
+            ),
+          ];
+
           const actorIds = [
             ...new Set(
               combinedActivities
@@ -402,6 +552,7 @@ export function useActivityCenter({
           const [
             readsResult,
             profilesResult,
+            deadlineTasksResult,
           ] = await Promise.all([
             supabase
               .from(
@@ -432,6 +583,25 @@ export function useActivityCenter({
                   data: [],
                   error: null,
                 }),
+
+            deadlineTaskIds.length
+              ? supabase
+                  .from("tasks")
+                  .select(
+                    "id,title,due_at,updated_at",
+                  )
+                  .eq(
+                    "workspace_id",
+                    workspaceId,
+                  )
+                  .in(
+                    "id",
+                    deadlineTaskIds,
+                  )
+              : Promise.resolve({
+                  data: [],
+                  error: null,
+                }),
           ]);
 
           if (readsResult.error) {
@@ -440,6 +610,14 @@ export function useActivityCenter({
 
           if (profilesResult.error) {
             throw profilesResult.error;
+          }
+
+          if (
+            deadlineTasksResult.error
+          ) {
+            throw (
+              deadlineTasksResult.error
+            );
           }
 
           const profiles =
@@ -455,9 +633,97 @@ export function useActivityCenter({
               ),
             );
 
+          const deadlineTaskMap =
+            new Map(
+              (
+                deadlineTasksResult.data ||
+                []
+              ).map(
+                (task) => [
+                  task.id,
+                  task,
+                ],
+              ),
+            );
+
+          const enrichedActivities =
+            combinedActivities.map(
+              (activity) => {
+                if (
+                  activity.activity_type !==
+                    "task_due_date_changed" ||
+                  !activity.entity_id
+                ) {
+                  return activity;
+                }
+
+                const task =
+                  deadlineTaskMap.get(
+                    activity.entity_id,
+                  );
+
+                if (
+                  !task ||
+                  !task.updated_at
+                ) {
+                  return activity;
+                }
+
+                const activityTime =
+                  new Date(
+                    activity.occurred_at,
+                  ).getTime();
+
+                const taskUpdatedTime =
+                  new Date(
+                    task.updated_at,
+                  ).getTime();
+
+                /*
+                 * Only enrich the row when the current task's
+                 * updated_at proves this activity represents its
+                 * latest deadline state. Historical rows retain
+                 * their original generic detail.
+                 */
+                if (
+                  !Number.isFinite(
+                    activityTime,
+                  ) ||
+                  !Number.isFinite(
+                    taskUpdatedTime,
+                  ) ||
+                  Math.abs(
+                    activityTime -
+                      taskUpdatedTime,
+                  ) >
+                    1000
+                ) {
+                  return activity;
+                }
+
+                return {
+                  ...activity,
+
+                  detail:
+                    formatDeadlineActivityDetail(
+                      task.due_at,
+                    ),
+
+                  metadata: {
+                    ...(activity.metadata ||
+                      {}),
+
+                    deadline_due_at:
+                      task.due_at ||
+                      null,
+                  },
+                };
+              },
+            );
+
           const nextState = {
             activities:
-              combinedActivities,
+              enrichedActivities,
 
             profiles,
 
