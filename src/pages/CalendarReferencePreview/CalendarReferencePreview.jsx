@@ -803,7 +803,7 @@ function TimelineView({
                           }}
                           title={`${task.title || "Campaign task"} · ${formatTime(
                             due,
-                          )} deadline · Drag to reschedule`}
+                          )} deadline · Click for exact time · Drag to reschedule`}
                           onDragStart={(
                             dragEvent,
                           ) => {
@@ -2372,6 +2372,11 @@ export default function CalendarReferencePreview() {
     setTaskScheduleMessage,
   ] = useState("");
 
+  const [
+    deadlineEditor,
+    setDeadlineEditor,
+  ] = useState(null);
+
   const [selectedEvent, setSelectedEvent] =
     useState(null);
 
@@ -3625,6 +3630,231 @@ export default function CalendarReferencePreview() {
       ],
     );
 
+  const openTaskDeadlineEditor =
+    (task) => {
+      const due =
+        taskDueDate(
+          task,
+        );
+
+      if (
+        !task?.id ||
+        !due
+      ) {
+        return;
+      }
+
+      setTaskScheduleMessage(
+        "",
+      );
+
+      setDeadlineEditor({
+        taskId:
+          task.id,
+
+        title:
+          task.title ||
+          "Campaign task",
+
+        date:
+          formatDateKey(
+            due,
+          ),
+
+        time:
+          formatTimeInputValue(
+            due,
+          ),
+
+        originalDueAt:
+          task.due_at ||
+          due.toISOString(),
+
+        moved:
+          false,
+      });
+    };
+
+  const saveExactTaskDeadline =
+    async () => {
+      if (
+        !deadlineEditor ||
+        !setCalendarTaskDeadline
+      ) {
+        return;
+      }
+
+      const [
+        year,
+        month,
+        day,
+      ] =
+        String(
+          deadlineEditor
+            .date ||
+          "",
+        )
+          .split("-")
+          .map(Number);
+
+      const [
+        hour,
+        minute,
+      ] =
+        String(
+          deadlineEditor
+            .time ||
+          "",
+        )
+          .split(":")
+          .map(Number);
+
+      if (
+        !year ||
+        !month ||
+        !day ||
+        !Number.isFinite(
+          hour,
+        ) ||
+        !Number.isFinite(
+          minute,
+        )
+      ) {
+        window.alert(
+          "Choose a valid deadline date and time.",
+        );
+
+        return;
+      }
+
+      const exactDue =
+        new Date(
+          year,
+          month - 1,
+          day,
+          hour,
+          minute,
+          0,
+          0,
+        );
+
+      if (
+        Number.isNaN(
+          exactDue.getTime(),
+        )
+      ) {
+        window.alert(
+          "Choose a valid deadline date and time.",
+        );
+
+        return;
+      }
+
+      setSchedulingTaskId(
+        deadlineEditor
+          .taskId,
+      );
+
+      try {
+        await setCalendarTaskDeadline(
+          deadlineEditor
+            .taskId,
+          exactDue
+            .toISOString(),
+        );
+
+        setTaskScheduleMessage(
+          `${deadlineEditor.title} deadline confirmed for ${new Intl.DateTimeFormat(
+            "en-US",
+            {
+              weekday:
+                "short",
+              month:
+                "short",
+              day:
+                "numeric",
+              hour:
+                "numeric",
+              minute:
+                "2-digit",
+            },
+          ).format(
+            exactDue,
+          )}.`,
+        );
+
+        setDeadlineEditor(
+          null,
+        );
+      } catch (
+        exactTimeError
+      ) {
+        console.error(
+          "Exact task deadline could not be saved:",
+          exactTimeError,
+        );
+
+        window.alert(
+          "Campaign Seat could not save that exact deadline time.",
+        );
+      } finally {
+        setSchedulingTaskId(
+          "",
+        );
+      }
+    };
+
+  const undoTaskDeadlineMove =
+    async () => {
+      if (
+        !deadlineEditor?.moved ||
+        !setCalendarTaskDeadline
+      ) {
+        return;
+      }
+
+      setSchedulingTaskId(
+        deadlineEditor
+          .taskId,
+      );
+
+      try {
+        await setCalendarTaskDeadline(
+          deadlineEditor
+            .taskId,
+          deadlineEditor
+            .originalDueAt ||
+          null,
+        );
+
+        setTaskScheduleMessage(
+          deadlineEditor
+            .originalDueAt
+            ? `${deadlineEditor.title} restored to its previous deadline.`
+            : `${deadlineEditor.title} moved back to Unscheduled work.`,
+        );
+
+        setDeadlineEditor(
+          null,
+        );
+      } catch (
+        undoError
+      ) {
+        console.error(
+          "Task deadline move could not be undone:",
+          undoError,
+        );
+
+        window.alert(
+          "Campaign Seat could not undo that deadline move.",
+        );
+      } finally {
+        setSchedulingTaskId(
+          "",
+        );
+      }
+    };
+
   const handleTaskDeadlineDrop =
     async (
       taskId,
@@ -3647,6 +3877,10 @@ export default function CalendarReferencePreview() {
       ) {
         return;
       }
+
+      const originalDueAt =
+        task.due_at ||
+        null;
 
       const dueDate =
         new Date(
@@ -3679,25 +3913,28 @@ export default function CalendarReferencePreview() {
             .toISOString(),
         );
 
-        setTaskScheduleMessage(
-          `${task.title || "Task"} deadline set for ${new Intl.DateTimeFormat(
-            "en-US",
-            {
-              weekday:
-                "short",
-              month:
-                "short",
-              day:
-                "numeric",
-              hour:
-                "numeric",
-              minute:
-                "2-digit",
-            },
-          ).format(
-            dueDate,
-          )}.`,
-        );
+        setDeadlineEditor({
+          taskId,
+
+          title:
+            task.title ||
+            "Campaign task",
+
+          date:
+            formatDateKey(
+              dueDate,
+            ),
+
+          time:
+            formatTimeInputValue(
+              dueDate,
+            ),
+
+          originalDueAt,
+
+          moved:
+            true,
+        });
       } catch (
         scheduleError
       ) {
@@ -5358,12 +5595,8 @@ export default function CalendarReferencePreview() {
         tasks={focusedTasks}
         now={now}
         onEventClick={setSelectedEvent}
-        onTaskClick={(task) =>
-          window.location.assign(
-            `/tasks?task=${encodeURIComponent(
-              task.id,
-            )}`,
-          )
+        onTaskClick={
+          openTaskDeadlineEditor
         }
         onTaskDeadlineDrop={
           handleTaskDeadlineDrop
@@ -6542,6 +6775,232 @@ export default function CalendarReferencePreview() {
             </section>
           </aside>
         </section>
+
+        {deadlineEditor ? (
+          <section
+            className={
+              styles.deadlineEditorPopover
+            }
+            role="dialog"
+            aria-label="Edit task deadline"
+          >
+            <header
+              className={
+                styles.deadlineEditorHeader
+              }
+            >
+              <span
+                className={
+                  styles.deadlineEditorIcon
+                }
+              >
+                <CalendarClock
+                  size={18}
+                />
+              </span>
+
+              <div>
+                <small>
+                  {deadlineEditor
+                    .moved
+                    ? "Confirm exact deadline"
+                    : "Edit task deadline"}
+                </small>
+
+                <strong>
+                  {
+                    deadlineEditor
+                      .title
+                  }
+                </strong>
+              </div>
+
+              <button
+                type="button"
+                aria-label="Close exact deadline editor"
+                onClick={() =>
+                  setDeadlineEditor(
+                    null,
+                  )
+                }
+              >
+                <X size={17} />
+              </button>
+            </header>
+
+            <div
+              className={
+                styles.deadlineEditorFields
+              }
+            >
+              <label>
+                <span>
+                  Date
+                </span>
+
+                <input
+                  type="date"
+                  value={
+                    deadlineEditor
+                      .date
+                  }
+                  onChange={(
+                    inputEvent,
+                  ) =>
+                    setDeadlineEditor(
+                      (
+                        current,
+                      ) =>
+                        current
+                          ? {
+                              ...current,
+
+                              date:
+                                inputEvent
+                                  .target
+                                  .value,
+                            }
+                          : current,
+                    )
+                  }
+                />
+              </label>
+
+              <label>
+                <span>
+                  Exact time
+                </span>
+
+                <input
+                  type="time"
+                  step="60"
+                  value={
+                    deadlineEditor
+                      .time
+                  }
+                  onChange={(
+                    inputEvent,
+                  ) =>
+                    setDeadlineEditor(
+                      (
+                        current,
+                      ) =>
+                        current
+                          ? {
+                              ...current,
+
+                              time:
+                                inputEvent
+                                  .target
+                                  .value,
+                            }
+                          : current,
+                    )
+                  }
+                />
+              </label>
+            </div>
+
+            <p
+              className={
+                styles.deadlineEditorHint
+              }
+            >
+              Dragging snaps to 15-minute
+              intervals. You can type any
+              exact minute here.
+            </p>
+
+            <div
+              className={
+                styles.deadlineEditorActions
+              }
+            >
+              <button
+                className={
+                  styles.deadlineEditorPrimary
+                }
+                type="button"
+                disabled={
+                  schedulingTaskId ===
+                  deadlineEditor
+                    .taskId
+                }
+                onClick={
+                  saveExactTaskDeadline
+                }
+              >
+                {schedulingTaskId ===
+                deadlineEditor
+                  .taskId
+                  ? "Saving…"
+                  : "Save exact time"}
+              </button>
+
+              <button
+                className={
+                  styles.deadlineEditorSecondary
+                }
+                type="button"
+                disabled={
+                  schedulingTaskId ===
+                  deadlineEditor
+                    .taskId
+                }
+                onClick={() =>
+                  setDeadlineEditor(
+                    null,
+                  )
+                }
+              >
+                {deadlineEditor
+                  .moved
+                  ? "Keep snapped time"
+                  : "Close"}
+              </button>
+            </div>
+
+            <footer
+              className={
+                styles.deadlineEditorFooter
+              }
+            >
+              <button
+                type="button"
+                onClick={() =>
+                  window.location.assign(
+                    `/tasks?task=${encodeURIComponent(
+                      deadlineEditor
+                        .taskId,
+                    )}`,
+                  )
+                }
+              >
+                Open task
+              </button>
+
+              {deadlineEditor
+                .moved ? (
+                <button
+                  className={
+                    styles.deadlineEditorUndo
+                  }
+                  type="button"
+                  disabled={
+                    schedulingTaskId ===
+                    deadlineEditor
+                      .taskId
+                  }
+                  onClick={
+                    undoTaskDeadlineMove
+                  }
+                >
+                  Undo move
+                </button>
+              ) : null}
+            </footer>
+          </section>
+        ) : null}
 
         {selectedEvent && !editEventOpen ? (
           <div

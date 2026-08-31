@@ -6703,3 +6703,335 @@ button[data-campaign-hq-launcher="floating"] {
 }
 
 /* CAMPAIGN SEAT TASK DEADLINE RESCHEDULING — END */
+
+
+/* CAMPAIGN SEAT EXACT DEADLINE EDITOR — START */
+
+.deadlineEditorPopover {
+  position: fixed;
+  z-index: 9500;
+
+  bottom: 24px;
+  left: 50%;
+
+  box-sizing: border-box;
+
+  width:
+    min(
+      390px,
+      calc(100vw - 32px)
+    );
+
+  padding: 15px;
+
+  border:
+    1px
+    solid
+    #d9bf79;
+
+  border-radius: 15px;
+
+  color: #173b5d;
+
+  background:
+    rgba(
+      255,
+      255,
+      255,
+      0.985
+    );
+
+  box-shadow:
+    0 22px 60px
+    rgba(
+      20,
+      47,
+      72,
+      0.22
+    );
+
+  transform:
+    translateX(-50%);
+
+  backdrop-filter:
+    blur(12px);
+}
+
+.deadlineEditorHeader {
+  display: grid;
+
+  grid-template-columns:
+    36px
+    minmax(0, 1fr)
+    32px;
+
+  align-items: center;
+
+  gap: 9px;
+}
+
+.deadlineEditorIcon {
+  display: inline-flex;
+
+  width: 36px;
+  height: 36px;
+
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 10px;
+
+  color: #9c6805;
+
+  background: #fff1c7;
+}
+
+.deadlineEditorHeader div {
+  min-width: 0;
+}
+
+.deadlineEditorHeader small,
+.deadlineEditorHeader strong {
+  display: block;
+}
+
+.deadlineEditorHeader small {
+  color: #9a711d;
+
+  font-size: 0.59rem;
+  font-weight: 830;
+
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.deadlineEditorHeader strong {
+  margin-top: 2px;
+
+  overflow: hidden;
+
+  color: #183c5f;
+
+  font-size: 0.8rem;
+
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.deadlineEditorHeader > button {
+  display: inline-flex;
+
+  width: 32px;
+  height: 32px;
+
+  align-items: center;
+  justify-content: center;
+
+  border:
+    1px
+    solid
+    #d8e2ea;
+
+  border-radius: 9px;
+
+  color: #668096;
+
+  background: #ffffff;
+
+  cursor: pointer;
+}
+
+.deadlineEditorFields {
+  display: grid;
+
+  grid-template-columns:
+    1fr
+    1fr;
+
+  gap: 10px;
+
+  margin-top: 14px;
+}
+
+.deadlineEditorFields label {
+  display: grid;
+
+  gap: 5px;
+}
+
+.deadlineEditorFields label > span {
+  color: #59758d;
+
+  font-size: 0.61rem;
+  font-weight: 760;
+}
+
+.deadlineEditorFields input {
+  box-sizing: border-box;
+
+  width: 100%;
+  min-height: 39px;
+
+  padding:
+    0
+    9px;
+
+  border:
+    1px
+    solid
+    #cbdbe7;
+
+  border-radius: 9px;
+
+  outline: 0;
+
+  color: #173b5d;
+
+  background: #ffffff;
+
+  font-size: 0.72rem;
+}
+
+.deadlineEditorFields input:focus {
+  border-color:
+    #d29a27;
+
+  box-shadow:
+    0
+    0
+    0
+    3px
+    rgba(
+      210,
+      154,
+      39,
+      0.13
+    );
+}
+
+.deadlineEditorHint {
+  margin:
+    10px
+    0
+    0;
+
+  color: #73889a;
+
+  font-size: 0.61rem;
+  line-height: 1.35;
+}
+
+.deadlineEditorActions {
+  display: grid;
+
+  grid-template-columns:
+    1fr
+    1fr;
+
+  gap: 8px;
+
+  margin-top: 13px;
+}
+
+.deadlineEditorActions button {
+  min-height: 39px;
+
+  border-radius: 9px;
+
+  cursor: pointer;
+
+  font-size: 0.68rem;
+  font-weight: 790;
+}
+
+.deadlineEditorActions button:disabled,
+.deadlineEditorFooter button:disabled {
+  opacity: 0.55;
+
+  cursor: not-allowed;
+}
+
+.deadlineEditorPrimary {
+  border:
+    1px
+    solid
+    #d29013;
+
+  color: #ffffff;
+
+  background:
+    linear-gradient(
+      135deg,
+      #d99a22,
+      #b97808
+    );
+}
+
+.deadlineEditorSecondary {
+  border:
+    1px
+    solid
+    #d3dfe8;
+
+  color: #365a78;
+
+  background: #ffffff;
+}
+
+.deadlineEditorFooter {
+  display: flex;
+
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 10px;
+
+  margin-top: 10px;
+
+  padding-top: 10px;
+
+  border-top:
+    1px
+    solid
+    #e3e9ee;
+}
+
+.deadlineEditorFooter button {
+  padding: 0;
+
+  border: 0;
+
+  color: #386482;
+
+  background: transparent;
+
+  cursor: pointer;
+
+  font-size: 0.62rem;
+  font-weight: 760;
+}
+
+.deadlineEditorFooter
+.deadlineEditorUndo {
+  color: #c12c38;
+}
+
+@media (max-width: 720px) {
+  .deadlineEditorPopover {
+    right: 12px;
+    bottom: 12px;
+    left: 12px;
+
+    width: auto;
+
+    transform: none;
+  }
+
+  .deadlineEditorFields,
+  .deadlineEditorActions {
+    grid-template-columns:
+      1fr;
+  }
+}
+
+/* CAMPAIGN SEAT EXACT DEADLINE EDITOR — END */
