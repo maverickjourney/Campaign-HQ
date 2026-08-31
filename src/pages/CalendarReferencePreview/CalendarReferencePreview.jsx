@@ -370,6 +370,11 @@ function TimelineView({
     setTaskDropDayKey,
   ] = useState("");
 
+  const [
+    draggedTaskId,
+    setDraggedTaskId,
+  ] = useState("");
+
   const hours = Array.from(
     {
       length: HOUR_END - HOUR_START + 1,
@@ -621,6 +626,10 @@ function TimelineView({
                       "",
                     );
 
+                    setDraggedTaskId(
+                      "",
+                    );
+
                     if (
                       !taskId ||
                       !onTaskDeadlineDrop
@@ -772,11 +781,15 @@ function TimelineView({
 
                       return (
                         <button
-                          className={
-                            styles.taskDeadlineMarker
-                          }
+                          className={`${styles.taskDeadlineMarker} ${
+                            draggedTaskId ===
+                            task.id
+                              ? styles.taskDeadlineDragging
+                              : ""
+                          }`}
                           key={`task-deadline-${task.id}`}
                           type="button"
+                          draggable
                           style={{
                             top:
                               Math.max(
@@ -790,7 +803,42 @@ function TimelineView({
                           }}
                           title={`${task.title || "Campaign task"} · ${formatTime(
                             due,
-                          )} deadline`}
+                          )} deadline · Drag to reschedule`}
+                          onDragStart={(
+                            dragEvent,
+                          ) => {
+                            dragEvent
+                              .dataTransfer
+                              .effectAllowed =
+                              "move";
+
+                            dragEvent
+                              .dataTransfer
+                              .setData(
+                                "application/x-campaign-seat-task",
+                                task.id,
+                              );
+
+                            dragEvent
+                              .dataTransfer
+                              .setData(
+                                "text/plain",
+                                task.id,
+                              );
+
+                            setDraggedTaskId(
+                              task.id,
+                            );
+                          }}
+                          onDragEnd={() => {
+                            setDraggedTaskId(
+                              "",
+                            );
+
+                            setTaskDropDayKey(
+                              "",
+                            );
+                          }}
                           onClick={() =>
                             onTaskClick?.(
                               task,
