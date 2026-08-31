@@ -256,30 +256,29 @@ export function useActivityCenter({
             );
 
           /*
-           * Deadline updates can arrive through both:
+           * A task deadline update currently produces two
+           * activity_log rows from the same database update:
            *
-           * 1. activity_log as generic "Task updated"
-           * 2. task_alerts as the more useful
-           *    "Task deadline updated: ..."
+           * - task_updated
+           * - task_due_date_changed
            *
-           * Keep the specific deadline alert and suppress only
-           * the matching generic duplicate for the same task
-           * within the same update window.
+           * They share the same task id and occurred_at value.
+           * Prefer the specific deadline activity and suppress
+           * only its matching generic copy.
+           *
+           * task_alerts remain a separate feed and are not
+           * required for this database-activity dedupe.
            */
-          const deadlineTaskAlerts =
-            normalizedTaskAlerts.filter(
+          const deadlineActivityRows =
+            (activities || []).filter(
               (activity) =>
+                activity.activity_type ===
+                  "task_due_date_changed" &&
                 activity.entity_type ===
                   "task" &&
-                String(
-                  activity.title ||
-                    "",
-                )
-                  .trim()
-                  .toLowerCase()
-                  .startsWith(
-                    "task deadline updated",
-                  ),
+                Boolean(
+                  activity.entity_id,
+                ),
             );
 
           const visibleActivityRows =
@@ -316,19 +315,37 @@ export function useActivityCenter({
                     .trim()
                     .toLowerCase();
 
-                const matchingDeadlineAlert =
-                  deadlineTaskAlerts.some(
-                    (alert) => {
+                const matchingDeadlineActivity =
+                  deadlineActivityRows.some(
+                    (deadlineActivity) => {
                       if (
-                        alert.entity_id !==
+                        deadlineActivity.entity_id !==
                         activity.entity_id
                       ) {
                         return false;
                       }
 
-                      const alertTaskTitle =
+                      const deadlineTime =
+                        new Date(
+                          deadlineActivity.occurred_at,
+                        ).getTime();
+
+                      if (
+                        !Number.isFinite(
+                          deadlineTime,
+                        ) ||
+                        Math.abs(
+                          deadlineTime -
+                            activityTime,
+                        ) >
+                          1000
+                      ) {
+                        return false;
+                      }
+
+                      const deadlineTaskTitle =
                         String(
-                          alert.title ||
+                          deadlineActivity.title ||
                             "",
                         )
                           .replace(
@@ -338,40 +355,17 @@ export function useActivityCenter({
                           .trim()
                           .toLowerCase();
 
-                      if (
-                        !genericTaskTitle ||
-                        !alertTaskTitle ||
-                        alertTaskTitle !==
-                          genericTaskTitle
-                      ) {
-                        return false;
-                      }
-
-                      const alertTime =
-                        new Date(
-                          alert.occurred_at,
-                        ).getTime();
-
-                      if (
-                        !Number.isFinite(
-                          alertTime,
-                        )
-                      ) {
-                        return false;
-                      }
-
                       return (
-                        Math.abs(
-                          alertTime -
-                            activityTime,
-                        ) <=
-                        120000
+                        !genericTaskTitle ||
+                        !deadlineTaskTitle ||
+                        genericTaskTitle ===
+                          deadlineTaskTitle
                       );
                     },
                   );
 
                 return (
-                  !matchingDeadlineAlert
+                  !matchingDeadlineActivity
                 );
               },
             );
