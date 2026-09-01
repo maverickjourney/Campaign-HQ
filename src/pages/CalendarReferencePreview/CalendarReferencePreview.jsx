@@ -332,6 +332,194 @@ function buildEventReadiness({
   const unscheduled =
     unscheduledTasks.length;
 
+  const overdueTaskIds =
+    new Set(
+      overdueTasks.map(
+        (task) =>
+          task.id,
+      ),
+    );
+
+  const dueBeforeEventTaskIds =
+    new Set(
+      dueBeforeEventTasks.map(
+        (task) =>
+          task.id,
+      ),
+    );
+
+  const unscheduledTaskIds =
+    new Set(
+      unscheduledTasks.map(
+        (task) =>
+          task.id,
+      ),
+    );
+
+  const actionItems =
+    openTasks
+      .map(
+        (task) => {
+          const blockingDependency =
+            (
+              dependencies ||
+              []
+            ).find(
+              (dependency) => {
+                if (
+                  dependency.task_id !==
+                  task.id
+                ) {
+                  return false;
+                }
+
+                return ![
+                  "completed",
+                  "done",
+                ].includes(
+                  String(
+                    dependency
+                      .prerequisite_status ||
+                    "",
+                  )
+                    .trim()
+                    .toLowerCase(),
+                );
+              },
+            );
+
+          const blockerTask =
+            blockingDependency
+              ? taskById.get(
+                  blockingDependency
+                    .depends_on_task_id,
+                ) ||
+                null
+              : null;
+
+          const due =
+            taskDueDate(
+              task,
+            );
+
+          let issueKey =
+            "open";
+
+          let issueLabel =
+            "Open linked task";
+
+          let rank =
+            4;
+
+          if (
+            blockingDependency
+          ) {
+            issueKey =
+              "blocked";
+
+            issueLabel =
+              blockerTask?.title
+                ? `Blocked by ${blockerTask.title}`
+                : "Blocked by prerequisite";
+
+            rank =
+              0;
+          } else if (
+            overdueTaskIds.has(
+              task.id,
+            )
+          ) {
+            issueKey =
+              "overdue";
+
+            issueLabel =
+              "Deadline passed";
+
+            rank =
+              1;
+          } else if (
+            dueBeforeEventTaskIds.has(
+              task.id,
+            )
+          ) {
+            issueKey =
+              "due_before_event";
+
+            issueLabel =
+              "Due before event";
+
+            rank =
+              2;
+          } else if (
+            unscheduledTaskIds.has(
+              task.id,
+            )
+          ) {
+            issueKey =
+              "unscheduled";
+
+            issueLabel =
+              "No deadline set";
+
+            rank =
+              3;
+          }
+
+          return {
+            task,
+            due,
+            blockerTask,
+            issueKey,
+            issueLabel,
+            rank,
+          };
+        },
+      )
+      .sort(
+        (
+          left,
+          right,
+        ) => {
+          if (
+            left.rank !==
+            right.rank
+          ) {
+            return (
+              left.rank -
+              right.rank
+            );
+          }
+
+          if (
+            left.due &&
+            right.due
+          ) {
+            return (
+              left.due -
+              right.due
+            );
+          }
+
+          if (left.due) {
+            return -1;
+          }
+
+          if (right.due) {
+            return 1;
+          }
+
+          return String(
+            left.task.title ||
+            "",
+          ).localeCompare(
+            String(
+              right.task.title ||
+              "",
+            ),
+          );
+        },
+      );
+
   let key =
     "unlinked";
 
@@ -448,6 +636,8 @@ function buildEventReadiness({
       summaryParts.join(
         " · ",
       ),
+
+    actionItems,
 
     linkedTasks,
 
@@ -4209,11 +4399,33 @@ export default function CalendarReferencePreview() {
     );
 
   const openTaskDeadlineEditor =
-    (task) => {
-      const due =
+    (
+      task,
+      fallbackDate = null,
+    ) => {
+      const storedDue =
         taskDueDate(
           task,
         );
+
+      const fallbackDue =
+        fallbackDate
+          ? new Date(
+              fallbackDate,
+            )
+          : null;
+
+      const validFallbackDue =
+        fallbackDue &&
+        !Number.isNaN(
+          fallbackDue.getTime(),
+        )
+          ? fallbackDue
+          : null;
+
+      const due =
+        storedDue ||
+        validFallbackDue;
 
       if (
         !task?.id ||
@@ -4246,7 +4458,7 @@ export default function CalendarReferencePreview() {
 
         originalDueAt:
           task.due_at ||
-          due.toISOString(),
+          null,
 
         moved:
           false,
@@ -8405,6 +8617,196 @@ export default function CalendarReferencePreview() {
                         </span>
                       ) : null}
                     </div>
+                  ) : null}
+                </section>
+              ) : null}
+
+              {selectedEventReadiness
+                ?.actionItems
+                ?.length ? (
+                <section
+                  className={
+                    styles.eventReadinessActionsCard
+                  }
+                >
+                  <header>
+                    <div>
+                      <small>
+                        Readiness actions
+                      </small>
+
+                      <strong>
+                        What needs attention
+                      </strong>
+                    </div>
+
+                    <span>
+                      {
+                        selectedEventReadiness
+                          .actionItems
+                          .length
+                      }
+                    </span>
+                  </header>
+
+                  <div
+                    className={
+                      styles.eventReadinessActionList
+                    }
+                  >
+                    {selectedEventReadiness
+                      .actionItems
+                      .slice(
+                        0,
+                        5,
+                      )
+                      .map(
+                        ({
+                          task,
+                          due,
+                          blockerTask,
+                          issueKey,
+                          issueLabel,
+                        }) => (
+                          <div
+                            className={`${styles.eventReadinessActionRow} ${
+                              styles[
+                                `eventReadinessAction_${issueKey}`
+                              ] ||
+                              ""
+                            }`}
+                            key={
+                              task.id
+                            }
+                          >
+                            <span
+                              className={
+                                styles.eventReadinessActionIcon
+                              }
+                            >
+                              {[
+                                "blocked",
+                                "overdue",
+                              ].includes(
+                                issueKey,
+                              ) ? (
+                                <AlertTriangle
+                                  size={15}
+                                />
+                              ) : (
+                                <ListChecks
+                                  size={15}
+                                />
+                              )}
+                            </span>
+
+                            <div
+                              className={
+                                styles.eventReadinessActionCopy
+                              }
+                            >
+                              <strong>
+                                {task.title ||
+                                  "Campaign task"}
+                              </strong>
+
+                              <small>
+                                {issueLabel}
+
+                                {due ? (
+                                  <>
+                                    {" · "}
+                                    {formatDueLabel(
+                                      due,
+                                      now,
+                                    )}
+                                    {" "}
+                                    {formatTime(
+                                      due,
+                                    )}
+                                  </>
+                                ) : null}
+                              </small>
+
+                              {blockerTask ? (
+                                <small>
+                                  Prerequisite:{" "}
+                                  {blockerTask.title ||
+                                    "Campaign task"}
+                                </small>
+                              ) : null}
+                            </div>
+
+                            <div
+                              className={
+                                styles.eventReadinessActionButtons
+                              }
+                            >
+                              {blockerTask ? (
+                                <button
+                                  type="button"
+                                  onClick={() =>
+                                    window.location.assign(
+                                      `/tasks?task=${encodeURIComponent(
+                                        blockerTask.id,
+                                      )}`,
+                                    )
+                                  }
+                                >
+                                  Open blocker
+                                </button>
+                              ) : null}
+
+                              <button
+                                type="button"
+                                onClick={() =>
+                                  window.location.assign(
+                                    `/tasks?task=${encodeURIComponent(
+                                      task.id,
+                                    )}`,
+                                  )
+                                }
+                              >
+                                Open task
+                              </button>
+
+                              <button
+                                type="button"
+                                onClick={() =>
+                                  openTaskDeadlineEditor(
+                                    task,
+                                    selectedEvent
+                                      .start,
+                                  )
+                                }
+                              >
+                                {due
+                                  ? "Change deadline"
+                                  : "Set deadline"}
+                              </button>
+                            </div>
+                          </div>
+                        ),
+                      )}
+                  </div>
+
+                  {selectedEventReadiness
+                    .actionItems
+                    .length >
+                  5 ? (
+                    <button
+                      className={
+                        styles.eventReadinessViewTasks
+                      }
+                      type="button"
+                      onClick={() =>
+                        window.location.assign(
+                          "/tasks",
+                        )
+                      }
+                    >
+                      View all linked work
+                    </button>
                   ) : null}
                 </section>
               ) : null}
