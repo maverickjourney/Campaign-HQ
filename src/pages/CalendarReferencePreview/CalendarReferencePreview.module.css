@@ -8289,3 +8289,109 @@ button[data-campaign-hq-launcher="floating"] {
 }
 
 /* CAMPAIGN SEAT EVENT READINESS ACTIONS — END */
+
+
+/* CAMPAIGN SEAT EVENT DEADLINE EDITOR LAYER FIX — START */
+
+/*
+ * Event details use a z-index of 10000.
+ * Deadline editing must sit ABOVE the event drawer when
+ * launched from Event Readiness, otherwise the editor is
+ * hidden behind the event overlay.
+ */
+
+.deadlineEditorPopover {
+  z-index:
+    10250 !important;
+}
+
+/*
+ * When launched from an event, keep the editor in the same
+ * right-side workflow instead of floating in the middle of
+ * the campaign calendar.
+ */
+
+.deadlineEditorFromEvent {
+  top:
+    155px !important;
+
+  right:
+    38px !important;
+
+  bottom:
+    auto !important;
+
+  left:
+    auto !important;
+
+  width:
+    min(
+      390px,
+      calc(100vw - 56px)
+    ) !important;
+
+  max-height:
+    calc(
+      100vh - 190px
+    ) !important;
+
+  overflow-y:
+    auto !important;
+
+  transform:
+    none !important;
+
+  border-color:
+    #d4a64a !important;
+
+  box-shadow:
+    0
+    24px
+    70px
+    rgba(
+      20,
+      46,
+      69,
+      0.3
+    ) !important;
+}
+
+/*
+ * Make it obvious this is a temporary editor layered above
+ * the event, not a separate Calendar screen.
+ */
+
+.deadlineEditorFromEvent
+.deadlineEditorHeader small::after {
+  content:
+    " · Event work";
+}
+
+@media (max-width: 720px) {
+  .deadlineEditorFromEvent {
+    top:
+      auto !important;
+
+    right:
+      12px !important;
+
+    bottom:
+      12px !important;
+
+    left:
+      12px !important;
+
+    width:
+      auto !important;
+
+    max-height:
+      calc(
+        100vh - 24px
+      ) !important;
+
+    transform:
+      none !important;
+  }
+}
+
+/* CAMPAIGN SEAT EVENT DEADLINE EDITOR LAYER FIX — END */

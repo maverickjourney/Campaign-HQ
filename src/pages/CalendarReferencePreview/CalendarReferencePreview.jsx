@@ -4462,6 +4462,11 @@ export default function CalendarReferencePreview() {
 
         moved:
           false,
+
+        eventContext:
+          Boolean(
+            fallbackDate,
+          ),
       });
     };
 
@@ -8092,9 +8097,12 @@ export default function CalendarReferencePreview() {
 
         {deadlineEditor ? (
           <section
-            className={
-              styles.deadlineEditorPopover
-            }
+            className={`${styles.deadlineEditorPopover} ${
+              deadlineEditor
+                .eventContext
+                ? styles.deadlineEditorFromEvent
+                : ""
+            }`}
             role="dialog"
             aria-label="Edit task deadline"
           >
