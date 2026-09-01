@@ -7916,3 +7916,200 @@ button[data-campaign-hq-launcher="floating"] {
 }
 
 /* CAMPAIGN SEAT EVENT READINESS — END */
+
+
+/* CAMPAIGN SEAT EVENT READINESS COMMAND RAIL — START */
+
+.readinessRailCard {
+  border-color:
+    #d8e1e8 !important;
+}
+
+.readinessAttentionCount {
+  display: inline-flex !important;
+
+  min-width: 24px;
+  height: 24px;
+
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 999px;
+
+  color: #ffffff !important;
+
+  background: #e63240;
+
+  font-size: 0.61rem !important;
+  font-weight: 820;
+}
+
+.readinessRailList {
+  display: grid;
+
+  padding:
+    4px
+    12px
+    8px;
+}
+
+.readinessRailList > button {
+  display: grid;
+
+  width: 100%;
+  min-width: 0;
+
+  grid-template-columns:
+    29px
+    minmax(0, 1fr)
+    16px;
+
+  align-items: center;
+
+  gap: 8px;
+
+  padding:
+    10px
+    0;
+
+  border: 0;
+  border-bottom:
+    1px
+    solid
+    #e2e9ef;
+
+  color: #274b69;
+
+  background: transparent;
+
+  text-align: left;
+
+  cursor: pointer;
+}
+
+.readinessRailList > button:last-child {
+  border-bottom: 0;
+}
+
+.readinessRailState {
+  display: inline-flex;
+
+  width: 28px;
+  height: 28px;
+
+  align-items: center;
+  justify-content: center;
+
+  border:
+    1px
+    solid
+    transparent;
+
+  border-radius: 8px;
+}
+
+.readinessRailCopy {
+  min-width: 0;
+}
+
+.readinessRailCopy strong,
+.readinessRailCopy small {
+  display: block;
+}
+
+.readinessRailCopy strong {
+  overflow: hidden;
+
+  color: #244767;
+
+  font-size: 0.68rem;
+  line-height: 1.22;
+
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.readinessRailCopy small {
+  margin-top: 3px;
+
+  color: #788d9f;
+
+  font-size: 0.56rem;
+  line-height: 1.25;
+}
+
+.readinessRailLabel {
+  width: fit-content;
+
+  padding:
+    3px
+    6px;
+
+  border-radius: 6px;
+
+  font-weight: 760;
+}
+
+.readinessRailMore {
+  display: flex !important;
+
+  min-height: 34px;
+
+  grid-template-columns:
+    1fr !important;
+
+  align-items: center !important;
+  justify-content: center;
+
+  border-bottom: 0 !important;
+
+  color: #375f7f !important;
+
+  font-size: 0.59rem !important;
+  font-weight: 770 !important;
+
+  text-align: center !important;
+}
+
+.readinessRailEmpty {
+  display: flex;
+
+  align-items: flex-start;
+
+  gap: 9px;
+
+  padding:
+    14px
+    13px
+    16px;
+
+  color: #287352;
+}
+
+.readinessRailEmpty svg {
+  flex: 0 0 auto;
+
+  margin-top: 1px;
+}
+
+.readinessRailEmpty strong,
+.readinessRailEmpty small {
+  display: block;
+}
+
+.readinessRailEmpty strong {
+  color: #365f78;
+
+  font-size: 0.65rem;
+}
+
+.readinessRailEmpty small {
+  margin-top: 4px;
+
+  color: #7a8f9f;
+
+  font-size: 0.57rem;
+  line-height: 1.35;
+}
+
+/* CAMPAIGN SEAT EVENT READINESS COMMAND RAIL — END */

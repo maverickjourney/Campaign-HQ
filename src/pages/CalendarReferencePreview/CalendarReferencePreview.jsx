@@ -6172,6 +6172,97 @@ export default function CalendarReferencePreview() {
       ],
     );
 
+  const eventReadinessQueue =
+    useMemo(
+      () => {
+        const readinessRank = {
+          blocked: 0,
+          risk: 1,
+          progress: 2,
+          ready: 3,
+          unlinked: 4,
+        };
+
+        return (
+          events ||
+          []
+        )
+          .filter(
+            (event) =>
+              event.end >=
+              now,
+          )
+          .map(
+            (event) => ({
+              event,
+
+              readiness:
+                eventReadinessById.get(
+                  event.id,
+                ) ||
+                null,
+            }),
+          )
+          .filter(
+            ({ readiness }) =>
+              readiness &&
+              readiness.key !==
+                "unlinked",
+          )
+          .sort(
+            (
+              left,
+              right,
+            ) => {
+              const leftRank =
+                readinessRank[
+                  left.readiness
+                    .key
+                ] ??
+                99;
+
+              const rightRank =
+                readinessRank[
+                  right.readiness
+                    .key
+                ] ??
+                99;
+
+              if (
+                leftRank !==
+                rightRank
+              ) {
+                return (
+                  leftRank -
+                  rightRank
+                );
+              }
+
+              return (
+                left.event.start -
+                right.event.start
+              );
+            },
+          );
+      },
+      [
+        eventReadinessById,
+        events,
+        now,
+      ],
+    );
+
+  const eventReadinessAttentionCount =
+    eventReadinessQueue.filter(
+      ({ readiness }) =>
+        [
+          "blocked",
+          "risk",
+        ].includes(
+          readiness.key,
+        ),
+    ).length;
+
   const selectedEventReadiness =
     selectedEvent?.id
       ? eventReadinessById.get(
@@ -7218,6 +7309,191 @@ export default function CalendarReferencePreview() {
                 </div>
               </section>
             ) : null}
+
+            <section
+              className={`${styles.railCard} ${styles.readinessRailCard}`}
+            >
+              <header>
+                <strong>
+                  Event readiness
+                </strong>
+
+                {eventReadinessAttentionCount ? (
+                  <span
+                    className={
+                      styles.readinessAttentionCount
+                    }
+                  >
+                    {
+                      eventReadinessAttentionCount
+                    }
+                  </span>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      clearSummaryFocus();
+
+                      setViewMode(
+                        "agenda",
+                      );
+                    }}
+                  >
+                    View agenda
+                  </button>
+                )}
+              </header>
+
+              {eventReadinessQueue.length ? (
+                <div
+                  className={
+                    styles.readinessRailList
+                  }
+                >
+                  {eventReadinessQueue
+                    .slice(
+                      0,
+                      4,
+                    )
+                    .map(
+                      ({
+                        event,
+                        readiness,
+                      }) => (
+                        <button
+                          key={
+                            event.id
+                          }
+                          type="button"
+                          onClick={() =>
+                            setSelectedEvent(
+                              event,
+                            )
+                          }
+                        >
+                          <span
+                            className={`${styles.readinessRailState} ${
+                              styles[
+                                `readiness_${readiness.key}`
+                              ] ||
+                              ""
+                            }`}
+                          >
+                            {readiness.key ===
+                            "ready" ? (
+                              <CheckCircle2
+                                size={14}
+                              />
+                            ) : (
+                              <AlertTriangle
+                                size={14}
+                              />
+                            )}
+                          </span>
+
+                          <span
+                            className={
+                              styles.readinessRailCopy
+                            }
+                          >
+                            <strong>
+                              {event.title}
+                            </strong>
+
+                            <small>
+                              {new Intl.DateTimeFormat(
+                                "en-US",
+                                {
+                                  month:
+                                    "short",
+                                  day:
+                                    "numeric",
+                                },
+                              ).format(
+                                event.start,
+                              )}
+                              {" · "}
+                              {formatTime(
+                                event.start,
+                              )}
+                            </small>
+
+                            <small
+                              className={`${styles.readinessRailLabel} ${
+                                styles[
+                                  `readiness_${readiness.key}`
+                                ] ||
+                                ""
+                              }`}
+                            >
+                              {
+                                readiness.label
+                              }
+                              {" · "}
+                              {
+                                readiness.summary
+                              }
+                            </small>
+                          </span>
+
+                          <ChevronRight
+                            size={15}
+                          />
+                        </button>
+                      ),
+                    )}
+
+                  {eventReadinessQueue.length >
+                  4 ? (
+                    <button
+                      className={
+                        styles.readinessRailMore
+                      }
+                      type="button"
+                      onClick={() => {
+                        clearSummaryFocus();
+
+                        setViewMode(
+                          "agenda",
+                        );
+                      }}
+                    >
+                      +
+                      {
+                        eventReadinessQueue
+                          .length -
+                        4
+                      }
+                      {" "}
+                      more events
+                    </button>
+                  ) : null}
+                </div>
+              ) : (
+                <div
+                  className={
+                    styles.readinessRailEmpty
+                  }
+                >
+                  <CheckCircle2
+                    size={17}
+                  />
+
+                  <span>
+                    <strong>
+                      No linked event work
+                      needs monitoring.
+                    </strong>
+
+                    <small>
+                      Link tasks to upcoming
+                      events to track readiness
+                      here.
+                    </small>
+                  </span>
+                </div>
+              )}
+            </section>
 
             {(
               unscheduledTasks.length ||
