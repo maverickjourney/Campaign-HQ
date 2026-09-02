@@ -8467,32 +8467,6 @@ button[data-campaign-hq-launcher="floating"] {
     not-allowed;
 }
 
-.eventInlineOpenTask {
-  margin-top:
-    8px;
-
-  padding:
-    0;
-
-  border:
-    0;
-
-  color:
-    #37627f;
-
-  background:
-    transparent;
-
-  cursor:
-    pointer;
-
-  font-size:
-    0.58rem;
-
-  font-weight:
-    770;
-}
-
 @media (max-width: 520px) {
   .eventInlineDeadlineActions {
     grid-template-columns:

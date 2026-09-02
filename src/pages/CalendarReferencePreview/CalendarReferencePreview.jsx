@@ -8996,22 +8996,6 @@ export default function CalendarReferencePreview() {
                     </button>
                   </div>
 
-                  <button
-                    className={
-                      styles.eventInlineOpenTask
-                    }
-                    type="button"
-                    onClick={() =>
-                      window.location.assign(
-                        `/tasks?task=${encodeURIComponent(
-                          deadlineEditor
-                            .taskId,
-                        )}`,
-                      )
-                    }
-                  >
-                    Open full task
-                  </button>
                 </section>
               ) : null}
 
