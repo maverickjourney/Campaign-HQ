@@ -52,6 +52,15 @@ const HOUR_START = 4;
 const HOUR_END = 24;
 const HOUR_HEIGHT = 42;
 
+const PRE_EVENT_TIGHT_BUFFER_HOURS =
+  6;
+
+const PRE_EVENT_TIGHT_BUFFER_MS =
+  PRE_EVENT_TIGHT_BUFFER_HOURS *
+  60 *
+  60 *
+  1000;
+
 const EVENT_TONES = {
   meeting: "blue",
   outreach: "green",
@@ -311,6 +320,39 @@ function buildEventReadiness({
         ),
     );
 
+  const unassignedTasks =
+    openTasks.filter(
+      (task) =>
+        !String(
+          task.assigned_to ||
+          "",
+        ).trim(),
+    );
+
+  const tightTimingTasks =
+    openTasks.filter(
+      (task) => {
+        const due =
+          taskDueDate(
+            task,
+          );
+
+        if (
+          !due ||
+          due < now ||
+          due > event.start
+        ) {
+          return false;
+        }
+
+        return (
+          event.start.getTime() -
+            due.getTime() <=
+          PRE_EVENT_TIGHT_BUFFER_MS
+        );
+      },
+    );
+
   const total =
     linkedTasks.length;
 
@@ -332,6 +374,12 @@ function buildEventReadiness({
   const unscheduled =
     unscheduledTasks.length;
 
+  const unassigned =
+    unassignedTasks.length;
+
+  const tightTiming =
+    tightTimingTasks.length;
+
   const overdueTaskIds =
     new Set(
       overdueTasks.map(
@@ -351,6 +399,22 @@ function buildEventReadiness({
   const unscheduledTaskIds =
     new Set(
       unscheduledTasks.map(
+        (task) =>
+          task.id,
+      ),
+    );
+
+  const unassignedTaskIds =
+    new Set(
+      unassignedTasks.map(
+        (task) =>
+          task.id,
+      ),
+    );
+
+  const tightTimingTaskIds =
+    new Set(
+      tightTimingTasks.map(
         (task) =>
           task.id,
       ),
@@ -520,6 +584,175 @@ function buildEventReadiness({
         },
       );
 
+  const preparationItems =
+    actionItems
+      .map(
+        (item) => {
+          const issueKeys =
+            [];
+
+          const labels =
+            [];
+
+          let rank =
+            99;
+
+          if (
+            item.issueKey ===
+            "blocked"
+          ) {
+            issueKeys.push(
+              "blocked",
+            );
+
+            labels.push(
+              "Blocked",
+            );
+
+            rank =
+              Math.min(
+                rank,
+                0,
+              );
+          }
+
+          if (
+            item.issueKey ===
+            "overdue"
+          ) {
+            issueKeys.push(
+              "overdue",
+            );
+
+            labels.push(
+              "Overdue",
+            );
+
+            rank =
+              Math.min(
+                rank,
+                1,
+              );
+          }
+
+          if (
+            unscheduledTaskIds.has(
+              item.task.id,
+            )
+          ) {
+            issueKeys.push(
+              "no_deadline",
+            );
+
+            labels.push(
+              "No deadline",
+            );
+
+            rank =
+              Math.min(
+                rank,
+                2,
+              );
+          }
+
+          if (
+            unassignedTaskIds.has(
+              item.task.id,
+            )
+          ) {
+            issueKeys.push(
+              "unassigned",
+            );
+
+            labels.push(
+              "Unassigned",
+            );
+
+            rank =
+              Math.min(
+                rank,
+                3,
+              );
+          }
+
+          if (
+            tightTimingTaskIds.has(
+              item.task.id,
+            )
+          ) {
+            issueKeys.push(
+              "tight_timing",
+            );
+
+            labels.push(
+              `Tight timing (<${PRE_EVENT_TIGHT_BUFFER_HOURS}h)`,
+            );
+
+            rank =
+              Math.min(
+                rank,
+                4,
+              );
+          }
+
+          if (
+            !issueKeys.length
+          ) {
+            return null;
+          }
+
+          return {
+            ...item,
+
+            issueKeys,
+            labels,
+            rank,
+
+            preparationLabel:
+              labels.join(
+                " · ",
+              ),
+          };
+        },
+      )
+      .filter(Boolean)
+      .sort(
+        (
+          left,
+          right,
+        ) => {
+          if (
+            left.rank !==
+            right.rank
+          ) {
+            return (
+              left.rank -
+              right.rank
+            );
+          }
+
+          if (
+            left.due &&
+            right.due
+          ) {
+            return (
+              left.due -
+              right.due
+            );
+          }
+
+          return String(
+            left.task.title ||
+            "",
+          ).localeCompare(
+            String(
+              right.task.title ||
+              "",
+            ),
+          );
+        },
+      );
+
   let key =
     "unlinked";
 
@@ -620,6 +853,10 @@ function buildEventReadiness({
     overdue,
     dueBeforeEvent,
     unscheduled,
+    unassigned,
+    tightTiming,
+
+    preparationItems,
 
     completionPercent:
       total
@@ -6480,6 +6717,75 @@ export default function CalendarReferencePreview() {
         ),
     ).length;
 
+  const eventPreparationIssues =
+    useMemo(
+      () => {
+        const horizon =
+          addDays(
+            now,
+            7,
+          );
+
+        return (
+          events ||
+          []
+        )
+          .filter(
+            (event) =>
+              event.start >=
+                now &&
+              event.start <
+                horizon,
+          )
+          .flatMap(
+            (event) => {
+              const readiness =
+                eventReadinessById.get(
+                  event.id,
+                );
+
+              return (
+                readiness
+                  ?.preparationItems ||
+                []
+              ).map(
+                (issue) => ({
+                  event,
+                  readiness,
+                  issue,
+                }),
+              );
+            },
+          )
+          .sort(
+            (
+              left,
+              right,
+            ) => {
+              if (
+                left.issue.rank !==
+                right.issue.rank
+              ) {
+                return (
+                  left.issue.rank -
+                  right.issue.rank
+                );
+              }
+
+              return (
+                left.event.start -
+                right.event.start
+              );
+            },
+          );
+      },
+      [
+        eventReadinessById,
+        events,
+        now,
+      ],
+    );
+
   const selectedEventReadiness =
     selectedEvent?.id
       ? eventReadinessById.get(
@@ -7526,6 +7832,215 @@ export default function CalendarReferencePreview() {
                 </div>
               </section>
             ) : null}
+
+            <section
+              className={`${styles.railCard} ${styles.prepBriefRailCard}`}
+            >
+              <header>
+                <strong>
+                  Prep brief
+                </strong>
+
+                {eventPreparationIssues.length ? (
+                  <span
+                    className={
+                      styles.prepBriefCount
+                    }
+                  >
+                    {
+                      eventPreparationIssues
+                        .length
+                    }
+                  </span>
+                ) : (
+                  <CheckCircle2
+                    className={
+                      styles.prepBriefHealthyIcon
+                    }
+                    size={17}
+                  />
+                )}
+              </header>
+
+              <div
+                className={
+                  styles.prepBriefBody
+                }
+              >
+                <p
+                  className={
+                    styles.prepBriefIntro
+                  }
+                >
+                  What needs attention today
+                </p>
+
+                {eventPreparationIssues.length ? (
+                  <div
+                    className={
+                      styles.prepBriefList
+                    }
+                  >
+                    {eventPreparationIssues
+                      .slice(
+                        0,
+                        4,
+                      )
+                      .map(
+                        ({
+                          event,
+                          issue,
+                        }) => (
+                          <button
+                            key={`${event.id}-${issue.task.id}`}
+                            type="button"
+                            onClick={() =>
+                              setSelectedEvent(
+                                event,
+                              )
+                            }
+                          >
+                            <span
+                              className={`${styles.prepBriefIcon} ${
+                                issue.issueKeys.includes(
+                                  "blocked",
+                                ) ||
+                                issue.issueKeys.includes(
+                                  "overdue",
+                                )
+                                  ? styles.prepBriefDanger
+                                  : issue.issueKeys.includes(
+                                        "tight_timing",
+                                      )
+                                    ? styles.prepBriefWarning
+                                    : styles.prepBriefNeedsSetup
+                              }`}
+                            >
+                              {issue.issueKeys.includes(
+                                "unassigned",
+                              ) ? (
+                                <UsersRound
+                                  size={14}
+                                />
+                              ) : issue.issueKeys.includes(
+                                  "no_deadline",
+                                ) ||
+                                issue.issueKeys.includes(
+                                  "tight_timing",
+                                ) ? (
+                                <CalendarClock
+                                  size={14}
+                                />
+                              ) : (
+                                <AlertTriangle
+                                  size={14}
+                                />
+                              )}
+                            </span>
+
+                            <span
+                              className={
+                                styles.prepBriefCopy
+                              }
+                            >
+                              <strong>
+                                {event.title}
+                              </strong>
+
+                              <small>
+                                {issue.task.title ||
+                                  "Campaign task"}
+                              </small>
+
+                              <small
+                                className={
+                                  styles.prepBriefIssue
+                                }
+                              >
+                                {
+                                  issue.preparationLabel
+                                }
+                              </small>
+
+                              <small>
+                                {new Intl.DateTimeFormat(
+                                  "en-US",
+                                  {
+                                    month:
+                                      "short",
+                                    day:
+                                      "numeric",
+                                  },
+                                ).format(
+                                  event.start,
+                                )}
+                                {" · "}
+                                {formatTime(
+                                  event.start,
+                                )}
+                              </small>
+                            </span>
+
+                            <ChevronRight
+                              size={15}
+                            />
+                          </button>
+                        ),
+                      )}
+
+                    {eventPreparationIssues.length >
+                    4 ? (
+                      <button
+                        className={
+                          styles.prepBriefMore
+                        }
+                        type="button"
+                        onClick={() => {
+                          clearSummaryFocus();
+
+                          setViewMode(
+                            "agenda",
+                          );
+                        }}
+                      >
+                        +
+                        {
+                          eventPreparationIssues
+                            .length -
+                          4
+                        }
+                        {" "}
+                        more prep issues
+                      </button>
+                    ) : null}
+                  </div>
+                ) : (
+                  <div
+                    className={
+                      styles.prepBriefHealthy
+                    }
+                  >
+                    <CheckCircle2
+                      size={17}
+                    />
+
+                    <span>
+                      <strong>
+                        Upcoming event work
+                        looks prepared.
+                      </strong>
+
+                      <small>
+                        No blocked, unassigned,
+                        unscheduled, overdue, or
+                        tight-timing linked tasks
+                        in the next 7 days.
+                      </small>
+                    </span>
+                  </div>
+                )}
+              </div>
+            </section>
 
             <section
               className={`${styles.railCard} ${styles.readinessRailCard}`}

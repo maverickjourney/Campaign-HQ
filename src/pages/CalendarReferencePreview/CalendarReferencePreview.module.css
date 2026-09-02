@@ -8496,3 +8496,237 @@ button[data-campaign-hq-launcher="floating"] {
 }
 
 /* CAMPAIGN SEAT INLINE EVENT DEADLINE EDITOR — END */
+
+
+/* CAMPAIGN SEAT EVENT PREPARATION INTELLIGENCE — START */
+
+.prepBriefRailCard {
+  border-color:
+    #d8e1e8 !important;
+}
+
+.prepBriefCount {
+  display: inline-flex !important;
+
+  min-width: 24px;
+  height: 24px;
+
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 999px;
+
+  color: #ffffff !important;
+  background: #e63240;
+
+  font-size: 0.61rem !important;
+  font-weight: 820;
+}
+
+.prepBriefHealthyIcon {
+  color: #21805c;
+}
+
+.prepBriefBody {
+  padding:
+    0
+    12px
+    8px;
+}
+
+.prepBriefIntro {
+  margin:
+    10px
+    0
+    5px;
+
+  color: #6f8496;
+
+  font-size: 0.57rem;
+  font-weight: 780;
+
+  text-transform: uppercase;
+  letter-spacing: 0.045em;
+}
+
+.prepBriefList {
+  display: grid;
+}
+
+.prepBriefList > button {
+  display: grid;
+
+  width: 100%;
+  min-width: 0;
+
+  grid-template-columns:
+    29px
+    minmax(0, 1fr)
+    16px;
+
+  align-items: center;
+
+  gap: 8px;
+
+  padding:
+    10px
+    0;
+
+  border: 0;
+  border-bottom:
+    1px
+    solid
+    #e2e9ef;
+
+  color: #294c68;
+  background: transparent;
+
+  text-align: left;
+  cursor: pointer;
+}
+
+.prepBriefList > button:last-child {
+  border-bottom: 0;
+}
+
+.prepBriefIcon {
+  display: inline-flex;
+
+  width: 28px;
+  height: 28px;
+
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 8px;
+}
+
+.prepBriefDanger {
+  color: #b52a36;
+  background: #ffedef;
+}
+
+.prepBriefWarning {
+  color: #94620b;
+  background: #fff2d2;
+}
+
+.prepBriefNeedsSetup {
+  color: #6556a5;
+  background: #f0edfb;
+}
+
+.prepBriefCopy {
+  min-width: 0;
+}
+
+.prepBriefCopy strong,
+.prepBriefCopy small {
+  display: block;
+}
+
+.prepBriefCopy strong {
+  overflow: hidden;
+
+  color: #244866;
+
+  font-size: 0.67rem;
+
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.prepBriefCopy small {
+  margin-top: 3px;
+
+  overflow: hidden;
+
+  color: #788d9e;
+
+  font-size: 0.55rem;
+  line-height: 1.25;
+
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.prepBriefCopy
+.prepBriefIssue {
+  width: fit-content;
+
+  padding:
+    3px
+    6px;
+
+  border-radius: 6px;
+
+  color: #8b4d28;
+
+  background: #fff3e7;
+
+  font-weight: 770;
+}
+
+.prepBriefMore {
+  display: flex !important;
+
+  min-height: 34px;
+
+  grid-template-columns:
+    1fr !important;
+
+  align-items: center !important;
+  justify-content: center;
+
+  border-bottom: 0 !important;
+
+  color: #3c6380 !important;
+
+  font-size: 0.58rem !important;
+  font-weight: 770 !important;
+
+  text-align: center !important;
+}
+
+.prepBriefHealthy {
+  display: flex;
+
+  align-items: flex-start;
+
+  gap: 9px;
+
+  padding:
+    10px
+    0
+    7px;
+
+  color: #247956;
+}
+
+.prepBriefHealthy svg {
+  flex: 0 0 auto;
+
+  margin-top: 1px;
+}
+
+.prepBriefHealthy strong,
+.prepBriefHealthy small {
+  display: block;
+}
+
+.prepBriefHealthy strong {
+  color: #365f78;
+
+  font-size: 0.64rem;
+}
+
+.prepBriefHealthy small {
+  margin-top: 4px;
+
+  color: #7a8e9e;
+
+  font-size: 0.55rem;
+  line-height: 1.35;
+}
+
+/* CAMPAIGN SEAT EVENT PREPARATION INTELLIGENCE — END */
