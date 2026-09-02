@@ -8330,7 +8330,7 @@ button[data-campaign-hq-launcher="floating"] {
   display: grid;
 
   grid-template-columns:
-    34px
+    32px
     minmax(0, 1fr)
     30px;
 
@@ -8338,6 +8338,27 @@ button[data-campaign-hq-launcher="floating"] {
 
   gap:
     8px;
+}
+
+.eventInlineDeadlineIcon {
+  display: inline-flex;
+
+  width: 32px;
+  height: 32px;
+
+  align-items: center;
+  justify-content: center;
+
+  border:
+    1px
+    solid
+    #ead59c;
+
+  border-radius: 9px;
+
+  color: #976408;
+
+  background: #fff3cd;
 }
 
 .eventInlineDeadlineEditor > header div {

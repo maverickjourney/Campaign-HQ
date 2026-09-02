@@ -8827,11 +8827,11 @@ export default function CalendarReferencePreview() {
                   <header>
                     <span
                       className={
-                        styles.deadlineEditorIcon
+                        styles.eventInlineDeadlineIcon
                       }
                     >
-                      <CalendarClock
-                        size={17}
+                      <Clock3
+                        size={16}
                       />
                     </span>
 
