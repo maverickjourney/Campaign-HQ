@@ -8291,107 +8291,213 @@ button[data-campaign-hq-launcher="floating"] {
 /* CAMPAIGN SEAT EVENT READINESS ACTIONS — END */
 
 
-/* CAMPAIGN SEAT EVENT DEADLINE EDITOR LAYER FIX — START */
 
-/*
- * Event details use a z-index of 10000.
- * Deadline editing must sit ABOVE the event drawer when
- * launched from Event Readiness, otherwise the editor is
- * hidden behind the event overlay.
- */
 
-.deadlineEditorPopover {
-  z-index:
-    10250 !important;
-}
 
-/*
- * When launched from an event, keep the editor in the same
- * right-side workflow instead of floating in the middle of
- * the campaign calendar.
- */
+/* CAMPAIGN SEAT INLINE EVENT DEADLINE EDITOR — START */
 
-.deadlineEditorFromEvent {
-  top:
-    155px !important;
+.eventInlineDeadlineEditor {
+  margin-top:
+    13px;
 
-  right:
-    38px !important;
+  padding:
+    13px;
 
-  bottom:
-    auto !important;
+  border:
+    1px
+    solid
+    #d7aa4a;
 
-  left:
-    auto !important;
+  border-radius:
+    13px;
 
-  width:
-    min(
-      390px,
-      calc(100vw - 56px)
-    ) !important;
-
-  max-height:
-    calc(
-      100vh - 190px
-    ) !important;
-
-  overflow-y:
-    auto !important;
-
-  transform:
-    none !important;
-
-  border-color:
-    #d4a64a !important;
+  background:
+    #fffaf0;
 
   box-shadow:
     0
-    24px
-    70px
+    8px
+    22px
     rgba(
-      20,
-      46,
-      69,
-      0.3
-    ) !important;
+      88,
+      63,
+      13,
+      0.09
+    );
 }
 
-/*
- * Make it obvious this is a temporary editor layered above
- * the event, not a separate Calendar screen.
- */
+.eventInlineDeadlineEditor > header {
+  display: grid;
 
-.deadlineEditorFromEvent
-.deadlineEditorHeader small::after {
-  content:
-    " · Event work";
+  grid-template-columns:
+    34px
+    minmax(0, 1fr)
+    30px;
+
+  align-items: center;
+
+  gap:
+    8px;
 }
 
-@media (max-width: 720px) {
-  .deadlineEditorFromEvent {
-    top:
-      auto !important;
+.eventInlineDeadlineEditor > header div {
+  min-width: 0;
+}
 
-    right:
-      12px !important;
+.eventInlineDeadlineEditor > header small,
+.eventInlineDeadlineEditor > header strong,
+.eventInlineDeadlineEditor > header span {
+  display: block;
+}
 
-    bottom:
-      12px !important;
+.eventInlineDeadlineEditor > header small {
+  color:
+    #9b6b0e;
 
-    left:
-      12px !important;
+  font-size:
+    0.54rem;
 
-    width:
-      auto !important;
+  font-weight:
+    830;
 
-    max-height:
-      calc(
-        100vh - 24px
-      ) !important;
+  letter-spacing:
+    0.06em;
 
-    transform:
-      none !important;
+  text-transform:
+    uppercase;
+}
+
+.eventInlineDeadlineEditor > header strong {
+  margin-top:
+    2px;
+
+  color:
+    #244866;
+
+  font-size:
+    0.76rem;
+}
+
+.eventInlineDeadlineEditor > header div > span {
+  margin-top:
+    2px;
+
+  overflow:
+    hidden;
+
+  color:
+    #71879a;
+
+  font-size:
+    0.58rem;
+
+  text-overflow:
+    ellipsis;
+
+  white-space:
+    nowrap;
+}
+
+.eventInlineDeadlineEditor > header > button {
+  display: inline-flex;
+
+  width:
+    30px;
+
+  height:
+    30px;
+
+  align-items: center;
+  justify-content: center;
+
+  border:
+    1px
+    solid
+    #ddc992;
+
+  border-radius:
+    8px;
+
+  color:
+    #718497;
+
+  background:
+    #ffffff;
+
+  cursor:
+    pointer;
+}
+
+.eventInlineDeadlineActions {
+  display: grid;
+
+  grid-template-columns:
+    1fr
+    1fr;
+
+  gap:
+    7px;
+
+  margin-top:
+    12px;
+}
+
+.eventInlineDeadlineActions button {
+  min-height:
+    37px;
+
+  border-radius:
+    8px;
+
+  cursor:
+    pointer;
+
+  font-size:
+    0.62rem;
+
+  font-weight:
+    790;
+}
+
+.eventInlineDeadlineActions button:disabled {
+  opacity:
+    0.5;
+
+  cursor:
+    not-allowed;
+}
+
+.eventInlineOpenTask {
+  margin-top:
+    8px;
+
+  padding:
+    0;
+
+  border:
+    0;
+
+  color:
+    #37627f;
+
+  background:
+    transparent;
+
+  cursor:
+    pointer;
+
+  font-size:
+    0.58rem;
+
+  font-weight:
+    770;
+}
+
+@media (max-width: 520px) {
+  .eventInlineDeadlineActions {
+    grid-template-columns:
+      1fr;
   }
 }
 
-/* CAMPAIGN SEAT EVENT DEADLINE EDITOR LAYER FIX — END */
+/* CAMPAIGN SEAT INLINE EVENT DEADLINE EDITOR — END */

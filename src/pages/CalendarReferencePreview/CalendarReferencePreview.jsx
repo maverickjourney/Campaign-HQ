@@ -8095,14 +8095,12 @@ export default function CalendarReferencePreview() {
           </aside>
         </section>
 
-        {deadlineEditor ? (
+        {deadlineEditor &&
+        !deadlineEditor.eventContext ? (
           <section
-            className={`${styles.deadlineEditorPopover} ${
-              deadlineEditor
-                .eventContext
-                ? styles.deadlineEditorFromEvent
-                : ""
-            }`}
+            className={
+              styles.deadlineEditorPopover
+            }
             role="dialog"
             aria-label="Edit task deadline"
           >
@@ -8816,6 +8814,204 @@ export default function CalendarReferencePreview() {
                       View all linked work
                     </button>
                   ) : null}
+                </section>
+              ) : null}
+
+              {deadlineEditor
+                ?.eventContext ? (
+                <section
+                  className={
+                    styles.eventInlineDeadlineEditor
+                  }
+                >
+                  <header>
+                    <span
+                      className={
+                        styles.deadlineEditorIcon
+                      }
+                    >
+                      <CalendarClock
+                        size={17}
+                      />
+                    </span>
+
+                    <div>
+                      <small>
+                        Event work
+                      </small>
+
+                      <strong>
+                        Edit task deadline
+                      </strong>
+
+                      <span>
+                        {
+                          deadlineEditor
+                            .title
+                        }
+                      </span>
+                    </div>
+
+                    <button
+                      type="button"
+                      aria-label="Close deadline editor"
+                      onClick={() =>
+                        setDeadlineEditor(
+                          null,
+                        )
+                      }
+                    >
+                      <X
+                        size={16}
+                      />
+                    </button>
+                  </header>
+
+                  <div
+                    className={
+                      styles.deadlineEditorFields
+                    }
+                  >
+                    <label>
+                      <span>
+                        Date
+                      </span>
+
+                      <input
+                        type="date"
+                        value={
+                          deadlineEditor
+                            .date
+                        }
+                        onChange={(
+                          inputEvent,
+                        ) =>
+                          setDeadlineEditor(
+                            (
+                              current,
+                            ) =>
+                              current
+                                ? {
+                                    ...current,
+
+                                    date:
+                                      inputEvent
+                                        .target
+                                        .value,
+                                  }
+                                : current,
+                          )
+                        }
+                      />
+                    </label>
+
+                    <label>
+                      <span>
+                        Exact time
+                      </span>
+
+                      <input
+                        type="time"
+                        step="60"
+                        value={
+                          deadlineEditor
+                            .time
+                        }
+                        onChange={(
+                          inputEvent,
+                        ) =>
+                          setDeadlineEditor(
+                            (
+                              current,
+                            ) =>
+                              current
+                                ? {
+                                    ...current,
+
+                                    time:
+                                      inputEvent
+                                        .target
+                                        .value,
+                                  }
+                                : current,
+                          )
+                        }
+                      />
+                    </label>
+                  </div>
+
+                  <p
+                    className={
+                      styles.deadlineEditorHint
+                    }
+                  >
+                    Set the exact date and
+                    time this event task
+                    must be finished.
+                  </p>
+
+                  <div
+                    className={
+                      styles.eventInlineDeadlineActions
+                    }
+                  >
+                    <button
+                      className={
+                        styles.deadlineEditorPrimary
+                      }
+                      type="button"
+                      disabled={
+                        schedulingTaskId ===
+                        deadlineEditor
+                          .taskId
+                      }
+                      onClick={
+                        saveExactTaskDeadline
+                      }
+                    >
+                      {schedulingTaskId ===
+                      deadlineEditor
+                        .taskId
+                        ? "Saving…"
+                        : "Save deadline"}
+                    </button>
+
+                    <button
+                      className={
+                        styles.deadlineEditorSecondary
+                      }
+                      type="button"
+                      disabled={
+                        schedulingTaskId ===
+                        deadlineEditor
+                          .taskId
+                      }
+                      onClick={() =>
+                        setDeadlineEditor(
+                          null,
+                        )
+                      }
+                    >
+                      Cancel
+                    </button>
+                  </div>
+
+                  <button
+                    className={
+                      styles.eventInlineOpenTask
+                    }
+                    type="button"
+                    onClick={() =>
+                      window.location.assign(
+                        `/tasks?task=${encodeURIComponent(
+                          deadlineEditor
+                            .taskId,
+                        )}`,
+                      )
+                    }
+                  >
+                    Open full task
+                  </button>
                 </section>
               ) : null}
 
