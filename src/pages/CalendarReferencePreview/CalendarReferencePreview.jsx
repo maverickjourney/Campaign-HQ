@@ -48,9 +48,9 @@ import {
 
 import styles from "./CalendarReferencePreview.module.css";
 
-const HOUR_START = 4;
-const HOUR_END = 24;
-const HOUR_HEIGHT = 42;
+const DEFAULT_HOUR_START = 7;
+const DEFAULT_HOUR_END = 22;
+const HOUR_HEIGHT = 38;
 
 const PRE_EVENT_TIGHT_BUFFER_HOURS =
   6;
@@ -1117,15 +1117,142 @@ function TimelineView({
     setDraggedTaskId,
   ] = useState("");
 
+  const relevantStartHours =
+    [];
+
+  const relevantEndHours =
+    [];
+
+  (events || [])
+    .filter(
+      (event) =>
+        !event.allDay &&
+        days.some(
+          (day) =>
+            sameDay(
+              event.start,
+              day,
+            ),
+        ),
+    )
+    .forEach(
+      (event) => {
+        relevantStartHours.push(
+          event.start.getHours() +
+          event.start.getMinutes() /
+            60,
+        );
+
+        relevantEndHours.push(
+          event.end.getHours() +
+          event.end.getMinutes() /
+            60,
+        );
+      },
+    );
+
+  (tasks || [])
+    .filter(
+      taskIsActive,
+    )
+    .forEach(
+      (task) => {
+        const due =
+          taskDueDate(
+            task,
+          );
+
+        if (
+          !due ||
+          !days.some(
+            (day) =>
+              sameDay(
+                due,
+                day,
+              ),
+          )
+        ) {
+          return;
+        }
+
+        const dueHour =
+          due.getHours() +
+          due.getMinutes() /
+            60;
+
+        relevantStartHours.push(
+          dueHour,
+        );
+
+        relevantEndHours.push(
+          dueHour +
+          0.25,
+        );
+      },
+    );
+
+  const earliestRelevantHour =
+    relevantStartHours.length
+      ? Math.min(
+          ...relevantStartHours,
+        )
+      : null;
+
+  const latestRelevantHour =
+    relevantEndHours.length
+      ? Math.max(
+          ...relevantEndHours,
+        )
+      : null;
+
+  const visibleHourStart =
+    Number.isFinite(
+      earliestRelevantHour,
+    )
+      ? Math.max(
+          0,
+          Math.min(
+            DEFAULT_visibleHourStart,
+            Math.floor(
+              earliestRelevantHour,
+            ) - 1,
+          ),
+        )
+      : DEFAULT_visibleHourStart;
+
+  const visibleHourEnd =
+    Number.isFinite(
+      latestRelevantHour,
+    )
+      ? Math.min(
+          24,
+          Math.max(
+            DEFAULT_visibleHourEnd,
+            Math.ceil(
+              latestRelevantHour,
+            ) + 1,
+          ),
+        )
+      : DEFAULT_visibleHourEnd;
+
   const hours = Array.from(
     {
-      length: HOUR_END - HOUR_START + 1,
+      length:
+        visibleHourEnd -
+        visibleHourStart +
+        1,
     },
-    (_, index) => HOUR_START + index,
+    (_, index) =>
+      visibleHourStart +
+      index,
   );
 
   const timelineHeight =
-    (HOUR_END - HOUR_START) * HOUR_HEIGHT;
+    (
+      visibleHourEnd -
+      visibleHourStart
+    ) *
+    HOUR_HEIGHT;
 
   const currentDayIndex = days.findIndex((day) =>
     sameDay(day, now),
@@ -1136,11 +1263,11 @@ function TimelineView({
 
   const currentLineVisible =
     currentDayIndex >= 0 &&
-    currentDecimalHour >= HOUR_START &&
-    currentDecimalHour <= HOUR_END;
+    currentDecimalHour >= visibleHourStart &&
+    currentDecimalHour <= visibleHourEnd;
 
   const currentLineTop =
-    (currentDecimalHour - HOUR_START) *
+    (currentDecimalHour - visibleHourStart) *
     HOUR_HEIGHT;
 
   return (
@@ -1208,7 +1335,11 @@ function TimelineView({
         <div
           className={styles.timelineBody}
           style={{
-            height: timelineHeight,
+            height:
+              timelineHeight,
+
+            "--calendar-hour-height":
+              `${HOUR_HEIGHT}px`,
           }}
         >
           <div className={styles.timeAxis}>
@@ -1217,7 +1348,7 @@ function TimelineView({
                 key={hour}
                 style={{
                   top:
-                    (hour - HOUR_START) *
+                    (hour - visibleHourStart) *
                     HOUR_HEIGHT,
                 }}
               >
@@ -1287,9 +1418,9 @@ function TimelineView({
 
                       return (
                         decimalHour >=
-                          HOUR_START &&
+                          visibleHourStart &&
                         decimalHour <
-                          HOUR_END
+                          visibleHourEnd
                       );
                     },
                   );
@@ -1396,7 +1527,7 @@ function TimelineView({
                       );
 
                     const rawMinutes =
-                      HOUR_START *
+                      visibleHourStart *
                         60 +
                       (
                         offsetY /
@@ -1406,10 +1537,10 @@ function TimelineView({
 
                     const snappedMinutes =
                       Math.max(
-                        HOUR_START *
+                        visibleHourStart *
                           60,
                         Math.min(
-                          HOUR_END *
+                          visibleHourEnd *
                             60 -
                             15,
                           Math.round(
@@ -1437,7 +1568,7 @@ function TimelineView({
                       60000;
 
                     const top =
-                      (startHour - HOUR_START) *
+                      (startHour - visibleHourStart) *
                       HOUR_HEIGHT;
 
                     const height = Math.max(
@@ -1517,7 +1648,7 @@ function TimelineView({
                       const top =
                         (
                           dueHour -
-                          HOUR_START
+                          visibleHourStart
                         ) *
                         HOUR_HEIGHT;
 
