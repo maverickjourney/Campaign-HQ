@@ -8730,3 +8730,619 @@ button[data-campaign-hq-launcher="floating"] {
 }
 
 /* CAMPAIGN SEAT EVENT PREPARATION INTELLIGENCE — END */
+
+
+/* CAMPAIGN SEAT CALENDAR COMMAND RAIL REORGANIZATION — START */
+
+.todayBriefCard {
+  border-color: #e8d9db;
+}
+
+.commandAttentionCount,
+.commandHealthyCount {
+  display: inline-flex !important;
+
+  min-width: 24px;
+  height: 24px;
+
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 999px;
+
+  font-size: 0.61rem !important;
+  font-weight: 820;
+}
+
+.commandAttentionCount {
+  color: #ffffff !important;
+  background: #e63240;
+}
+
+.commandHealthyCount {
+  color: #237857 !important;
+  background: #eaf7f1;
+}
+
+.commandHeaderHealthy {
+  color: #21805c;
+}
+
+.todayBriefBody {
+  padding:
+    0
+    12px
+    8px;
+}
+
+.commandRailEyebrow {
+  margin:
+    10px
+    0
+    4px;
+
+  color: #728799;
+
+  font-size: 0.55rem;
+  font-weight: 800;
+
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.todayBriefList,
+.commandUpcomingList,
+.readinessCommandList,
+.commandMyWorkList {
+  display: grid;
+}
+
+.todayBriefList > button,
+.commandUpcomingList > button,
+.readinessCommandList > button,
+.commandMyWorkList > button {
+  width: 100%;
+  min-width: 0;
+
+  border: 0;
+
+  background: transparent;
+
+  cursor: pointer;
+  text-align: left;
+}
+
+.todayBriefList > button {
+  display: grid;
+
+  grid-template-columns:
+    29px
+    minmax(0, 1fr)
+    15px;
+
+  align-items: center;
+
+  gap: 8px;
+
+  padding:
+    9px
+    0;
+
+  border-bottom:
+    1px
+    solid
+    #e7edf1;
+}
+
+.todayBriefList > button:last-child {
+  border-bottom: 0;
+}
+
+.todayBriefIcon,
+.commandTaskIcon {
+  display: inline-flex;
+
+  align-items: center;
+  justify-content: center;
+
+  width: 28px;
+  height: 28px;
+
+  border-radius: 8px;
+}
+
+.todayBrief_danger {
+  color: #b72e39;
+  background: #ffedef;
+}
+
+.todayBrief_warning {
+  color: #956308;
+  background: #fff2d2;
+}
+
+.todayBrief_setup {
+  color: #6655a8;
+  background: #f0edfb;
+}
+
+.todayBriefCopy,
+.commandTaskCopy {
+  min-width: 0;
+}
+
+.todayBriefCopy strong,
+.todayBriefCopy small,
+.commandTaskCopy strong,
+.commandTaskCopy small {
+  display: block;
+}
+
+.todayBriefCopy strong,
+.commandTaskCopy strong {
+  overflow: hidden;
+
+  color: #244866;
+
+  font-size: 0.66rem;
+
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.todayBriefCopy small,
+.commandTaskCopy small {
+  margin-top: 2px;
+
+  overflow: hidden;
+
+  color: #7b8e9d;
+
+  font-size: 0.54rem;
+  line-height: 1.25;
+
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.todayBriefCopy
+.todayBriefLabel {
+  width: fit-content;
+
+  margin-top: 4px;
+
+  padding:
+    3px
+    6px;
+
+  border-radius: 6px;
+
+  color: #8a5223;
+
+  background: #fff3e5;
+
+  font-weight: 780;
+}
+
+.commandRailMore {
+  display: flex !important;
+
+  min-height: 32px;
+
+  align-items: center;
+  justify-content: center;
+
+  border: 0 !important;
+
+  color: #3c6580 !important;
+
+  font-size: 0.57rem !important;
+  font-weight: 780 !important;
+
+  text-align: center !important;
+}
+
+.commandRailHealthy {
+  display: flex;
+
+  align-items: flex-start;
+
+  gap: 8px;
+
+  padding:
+    10px
+    12px
+    11px;
+
+  color: #27805c;
+}
+
+.todayBriefBody
+.commandRailHealthy {
+  padding-left: 0;
+  padding-right: 0;
+}
+
+.commandRailHealthy svg {
+  flex: 0 0 auto;
+
+  margin-top: 1px;
+}
+
+.commandRailHealthy strong,
+.commandRailHealthy small {
+  display: block;
+}
+
+.commandRailHealthy strong {
+  color: #365f78;
+
+  font-size: 0.62rem;
+}
+
+.commandRailHealthy small {
+  margin-top: 3px;
+
+  color: #7a8e9d;
+
+  font-size: 0.54rem;
+  line-height: 1.3;
+}
+
+.commandUpcomingList {
+  padding:
+    0
+    12px
+    7px;
+}
+
+.commandUpcomingList > button {
+  display: grid;
+
+  grid-template-columns:
+    7px
+    minmax(0, 1fr)
+    15px;
+
+  align-items: center;
+
+  gap: 8px;
+
+  padding:
+    9px
+    0;
+
+  border-bottom:
+    1px
+    solid
+    #e7edf1;
+}
+
+.commandUpcomingList > button:last-child {
+  border-bottom: 0;
+}
+
+.commandUpcomingList > button > i {
+  width: 7px;
+  height: 7px;
+
+  border-radius: 999px;
+}
+
+.commandUpcomingList strong,
+.commandUpcomingList small {
+  display: block;
+}
+
+.commandUpcomingList strong {
+  color: #244866;
+
+  font-size: 0.64rem;
+}
+
+.commandUpcomingList small {
+  margin-top: 2px;
+
+  color: #7a8e9e;
+
+  font-size: 0.54rem;
+}
+
+.readinessCommandMetrics,
+.myWorkMetrics {
+  display: grid;
+
+  grid-template-columns:
+    repeat(
+      3,
+      minmax(0, 1fr)
+    );
+
+  gap: 7px;
+
+  padding:
+    10px
+    12px;
+}
+
+.readinessCommandMetrics > span,
+.myWorkMetrics > span {
+  padding:
+    8px
+    6px;
+
+  border:
+    1px
+    solid
+    #e4eaef;
+
+  border-radius: 9px;
+
+  background: #f9fbfc;
+
+  text-align: center;
+}
+
+.readinessCommandMetrics strong,
+.readinessCommandMetrics small,
+.myWorkMetrics strong,
+.myWorkMetrics small {
+  display: block;
+}
+
+.readinessCommandMetrics strong,
+.myWorkMetrics strong {
+  color: #294e69;
+
+  font-size: 0.75rem;
+}
+
+.readinessCommandMetrics small,
+.myWorkMetrics small {
+  margin-top: 2px;
+
+  color: #7b8f9f;
+
+  font-size: 0.51rem;
+}
+
+.myWorkMetricDanger strong,
+.myWorkMetricDanger small {
+  color: #c22d3a;
+}
+
+.readinessCommandList {
+  padding:
+    0
+    12px;
+}
+
+.readinessCommandList > button {
+  display: grid;
+
+  grid-template-columns:
+    18px
+    minmax(0, 1fr)
+    14px;
+
+  align-items: center;
+
+  gap: 7px;
+
+  padding:
+    8px
+    0;
+
+  border-top:
+    1px
+    solid
+    #e6ecf1;
+
+  color: #c12e3a;
+}
+
+.readinessCommandList strong,
+.readinessCommandList small {
+  display: block;
+}
+
+.readinessCommandList strong {
+  color: #294d68;
+
+  font-size: 0.61rem;
+}
+
+.readinessCommandList small {
+  margin-top: 2px;
+
+  overflow: hidden;
+
+  color: #7a8d9d;
+
+  font-size: 0.52rem;
+
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.commandRailFooter {
+  display: flex;
+
+  width:
+    calc(
+      100% - 24px
+    );
+
+  align-items: center;
+  justify-content: space-between;
+
+  margin:
+    5px
+    12px
+    9px;
+
+  padding:
+    8px
+    9px;
+
+  border:
+    1px
+    solid
+    #dce5eb;
+
+  border-radius: 8px;
+
+  color: #3b6480;
+  background: #ffffff;
+
+  cursor: pointer;
+
+  font-size: 0.56rem;
+  font-weight: 780;
+}
+
+.commandMyWorkList {
+  padding:
+    0
+    12px
+    8px;
+}
+
+.commandMyWorkList > button {
+  display: grid;
+
+  grid-template-columns:
+    28px
+    minmax(0, 1fr)
+    auto;
+
+  align-items: center;
+
+  gap: 8px;
+
+  padding:
+    9px
+    0;
+
+  border-top:
+    1px
+    solid
+    #e6ecf1;
+}
+
+.commandTaskIcon {
+  color: #426b86;
+  background: #edf4f8;
+}
+
+.commandTaskDue,
+.commandTaskDanger,
+.commandTaskSetup {
+  padding:
+    3px
+    5px;
+
+  border-radius: 6px;
+
+  font-size: 0.51rem;
+  font-weight: 780;
+
+  white-space: nowrap;
+}
+
+.commandTaskDue {
+  color: #557086;
+  background: #eef3f6;
+}
+
+.commandTaskDanger {
+  color: #c22936;
+  background: #ffedef;
+}
+
+.commandTaskSetup {
+  color: #6654a5;
+  background: #f0edfb;
+}
+
+.calendarConnectionStrip {
+  display: flex;
+
+  min-height: 42px;
+
+  align-items: center;
+
+  gap: 8px;
+
+  padding:
+    8px
+    10px;
+
+  border:
+    1px
+    solid
+    #dce5eb;
+
+  border-radius: 10px;
+
+  color: #28795a;
+  background: #f8fbfa;
+}
+
+.calendarConnectionStrip > span {
+  min-width: 0;
+}
+
+.calendarConnectionStrip strong,
+.calendarConnectionStrip small {
+  display: block;
+}
+
+.calendarConnectionStrip strong {
+  color: #365f76;
+
+  font-size: 0.57rem;
+}
+
+.calendarConnectionStrip small {
+  margin-top: 2px;
+
+  overflow: hidden;
+
+  color: #80919e;
+
+  font-size: 0.5rem;
+
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.calendarConnectionStrip > button {
+  display: inline-flex;
+
+  width: 100%;
+
+  align-items: center;
+  justify-content: center;
+
+  gap: 6px;
+
+  padding: 7px;
+
+  border:
+    1px
+    solid
+    #d5e0e7;
+
+  border-radius: 8px;
+
+  color: #365f78;
+  background: #ffffff;
+
+  cursor: pointer;
+
+  font-size: 0.56rem;
+  font-weight: 780;
+}
+
+/* CAMPAIGN SEAT CALENDAR COMMAND RAIL REORGANIZATION — END */

@@ -6786,6 +6786,473 @@ export default function CalendarReferencePreview() {
       ],
     );
 
+  const todayBriefItems =
+    useMemo(
+      () => {
+        const seenKeys =
+          new Set();
+
+        const items =
+          [];
+
+        const pushUnique =
+          (
+            key,
+            item,
+          ) => {
+            if (
+              !key ||
+              seenKeys.has(
+                key,
+              )
+            ) {
+              return;
+            }
+
+            seenKeys.add(
+              key,
+            );
+
+            items.push(
+              item,
+            );
+          };
+
+        eventPreparationIssues.forEach(
+          ({
+            event,
+            issue,
+          }) => {
+            const task =
+              issue.task ||
+              null;
+
+            const key =
+              task?.id
+                ? `task-${task.id}`
+                : `prep-${event.id}-${issue.issueKey}`;
+
+            const severe =
+              (
+                issue.issueKeys ||
+                []
+              ).some(
+                (issueKey) =>
+                  [
+                    "blocked",
+                    "overdue",
+                  ].includes(
+                    issueKey,
+                  ),
+              );
+
+            const warning =
+              (
+                issue.issueKeys ||
+                []
+              ).includes(
+                "tight_timing",
+              );
+
+            pushUnique(
+              key,
+              {
+                id:
+                  `prep-${event.id}-${task?.id || issue.issueKey}`,
+
+                title:
+                  event.title ||
+                  "Campaign event",
+
+                subtitle:
+                  task?.title ||
+                  "Campaign task",
+
+                label:
+                  issue.preparationLabel ||
+                  issue.issueLabel ||
+                  "Needs attention",
+
+                event,
+                task,
+
+                due:
+                  event.start,
+
+                rank:
+                  issue.rank ??
+                  0,
+
+                tone:
+                  severe
+                    ? "danger"
+                    : warning
+                      ? "warning"
+                      : "setup",
+              },
+            );
+          },
+        );
+
+        criticalDeadlines
+          .filter(
+            (item) =>
+              item.urgent,
+          )
+          .forEach(
+            (item) => {
+              const key =
+                item.task?.id
+                  ? `task-${item.task.id}`
+                  : item.event?.id
+                    ? `event-${item.event.id}`
+                    : item.id;
+
+              pushUnique(
+                key,
+                {
+                  id:
+                    `critical-${item.id}`,
+
+                  title:
+                    item.title ||
+                    "Campaign deadline",
+
+                  subtitle:
+                    item.kind ||
+                    "Deadline",
+
+                  label:
+                    item.due <
+                    now
+                      ? "Overdue"
+                      : formatDueLabel(
+                          item.due,
+                          now,
+                        ),
+
+                  event:
+                    item.event ||
+                    null,
+
+                  task:
+                    item.task ||
+                    null,
+
+                  due:
+                    item.due,
+
+                  rank:
+                    1,
+
+                  tone:
+                    "danger",
+                },
+              );
+            },
+          );
+
+        unscheduledTasks.forEach(
+          (task) => {
+            pushUnique(
+              `task-${task.id}`,
+              {
+                id:
+                  `unscheduled-${task.id}`,
+
+                title:
+                  task.title ||
+                  "Campaign task",
+
+                subtitle:
+                  task.category ||
+                  "Campaign task",
+
+                label:
+                  "Needs scheduling",
+
+                event:
+                  null,
+
+                task,
+
+                due:
+                  null,
+
+                rank:
+                  3,
+
+                tone:
+                  "setup",
+              },
+            );
+          },
+        );
+
+        return items
+          .sort(
+            (
+              left,
+              right,
+            ) => {
+              if (
+                left.rank !==
+                right.rank
+              ) {
+                return (
+                  left.rank -
+                  right.rank
+                );
+              }
+
+              if (
+                left.due &&
+                right.due
+              ) {
+                return (
+                  left.due -
+                  right.due
+                );
+              }
+
+              if (
+                left.due
+              ) {
+                return -1;
+              }
+
+              if (
+                right.due
+              ) {
+                return 1;
+              }
+
+              return String(
+                left.title ||
+                "",
+              ).localeCompare(
+                String(
+                  right.title ||
+                  "",
+                ),
+              );
+            },
+          );
+      },
+      [
+        criticalDeadlines,
+        eventPreparationIssues,
+        now,
+        unscheduledTasks,
+      ],
+    );
+
+  const myUnscheduledTasks =
+    useMemo(
+      () =>
+        (
+          unscheduledTasks ||
+          []
+        ).filter(
+          (task) =>
+            task.assigned_to ===
+            sessionUser?.id,
+        ),
+      [
+        sessionUser?.id,
+        unscheduledTasks,
+      ],
+    );
+
+  const myWorkItems =
+    useMemo(
+      () => {
+        const seen =
+          new Set();
+
+        return [
+          ...myCalendarTasks,
+          ...myUnscheduledTasks,
+        ]
+          .filter(
+            (task) => {
+              if (
+                !task?.id ||
+                seen.has(
+                  task.id,
+                )
+              ) {
+                return false;
+              }
+
+              seen.add(
+                task.id,
+              );
+
+              return true;
+            },
+          )
+          .sort(
+            (
+              left,
+              right,
+            ) => {
+              const leftDue =
+                left.dueDate instanceof
+                Date
+                  ? left.dueDate
+                  : taskDueDate(
+                      left,
+                    );
+
+              const rightDue =
+                right.dueDate instanceof
+                Date
+                  ? right.dueDate
+                  : taskDueDate(
+                      right,
+                    );
+
+              if (
+                leftDue &&
+                rightDue
+              ) {
+                return (
+                  leftDue -
+                  rightDue
+                );
+              }
+
+              if (
+                leftDue
+              ) {
+                return -1;
+              }
+
+              if (
+                rightDue
+              ) {
+                return 1;
+              }
+
+              return String(
+                left.title ||
+                "",
+              ).localeCompare(
+                String(
+                  right.title ||
+                  "",
+                ),
+              );
+            },
+          );
+      },
+      [
+        myCalendarTasks,
+        myUnscheduledTasks,
+      ],
+    );
+
+  const myWorkSummary =
+    useMemo(
+      () => {
+        const todayStart =
+          new Date(
+            now.getFullYear(),
+            now.getMonth(),
+            now.getDate(),
+          );
+
+        const tomorrow =
+          addDays(
+            todayStart,
+            1,
+          );
+
+        const overdue =
+          myCalendarTasks.filter(
+            (task) =>
+              task.dueDate <
+              todayStart,
+          ).length;
+
+        const dueToday =
+          myCalendarTasks.filter(
+            (task) =>
+              task.dueDate >=
+                todayStart &&
+              task.dueDate <
+                tomorrow,
+          ).length;
+
+        return {
+          total:
+            myWorkItems.length,
+
+          overdue,
+
+          dueToday,
+
+          needsScheduling:
+            myUnscheduledTasks.length,
+        };
+      },
+      [
+        myCalendarTasks,
+        myUnscheduledTasks,
+        myWorkItems.length,
+        now,
+      ],
+    );
+
+  const eventReadinessSummary =
+    useMemo(
+      () =>
+        eventReadinessQueue.reduce(
+          (
+            summary,
+            { readiness },
+          ) => {
+            if (
+              readiness?.key ===
+              "blocked"
+            ) {
+              summary.blocked +=
+                1;
+            } else if (
+              readiness?.key ===
+              "risk"
+            ) {
+              summary.risk +=
+                1;
+            } else if (
+              readiness?.key ===
+              "ready"
+            ) {
+              summary.ready +=
+                1;
+            } else if (
+              readiness?.key ===
+              "progress"
+            ) {
+              summary.progress +=
+                1;
+            }
+
+            return summary;
+          },
+          {
+            blocked: 0,
+            risk: 0,
+            ready: 0,
+            progress: 0,
+          },
+        ),
+      [
+        eventReadinessQueue,
+      ],
+    );
+
   const selectedEventReadiness =
     selectedEvent?.id
       ? eventReadinessById.get(
@@ -7197,25 +7664,73 @@ export default function CalendarReferencePreview() {
           </button>
 
           <button
-            className={`${styles.summaryCommandCard} ${
-              summaryFocus ===
-              "deadlines"
-                ? styles.summaryCommandActive
-                : ""
-            }`}
-            type="button"
-            aria-pressed={
-              summaryFocus ===
-              "deadlines"
+            className={
+              styles.summaryCommandCard
             }
+            type="button"
             onClick={() =>
-              applySummaryFocus(
-                "deadlines",
-              )
+              document
+                .getElementById(
+                  "calendar-today-brief",
+                )
+                ?.scrollIntoView({
+                  behavior:
+                    "smooth",
+                  block:
+                    "nearest",
+                })
             }
           >
             <span
               className={`${styles.summaryIcon} ${styles.goldIcon}`}
+            >
+              <AlertTriangle
+                size={20}
+              />
+            </span>
+
+            <div>
+              <small>
+                Needs attention
+              </small>
+
+              <strong>
+                {
+                  todayBriefItems
+                    .length
+                }
+              </strong>
+
+              <span>
+                items
+              </span>
+
+              <p>
+                Risk + prep + scheduling
+              </p>
+            </div>
+          </button>
+
+          <button
+            className={
+              styles.summaryCommandCard
+            }
+            type="button"
+            onClick={() =>
+              document
+                .getElementById(
+                  "calendar-my-work",
+                )
+                ?.scrollIntoView({
+                  behavior:
+                    "smooth",
+                  block:
+                    "nearest",
+                })
+            }
+          >
+            <span
+              className={`${styles.summaryIcon} ${styles.greenIcon}`}
             >
               <ListChecks
                 size={20}
@@ -7224,67 +7739,26 @@ export default function CalendarReferencePreview() {
 
             <div>
               <small>
-                Deadlines
+                My work
               </small>
 
               <strong>
-                {summary.deadlines}
+                {
+                  myWorkSummary
+                    .total
+                }
               </strong>
 
               <span>
-                due
+                tasks
               </span>
 
               <p>
-                Next 7 days
+                Assigned to you
               </p>
             </div>
           </button>
 
-          <button
-            className={`${styles.summaryCommandCard} ${
-              summaryFocus ===
-              "meetings"
-                ? styles.summaryCommandActive
-                : ""
-            }`}
-            type="button"
-            aria-pressed={
-              summaryFocus ===
-              "meetings"
-            }
-            onClick={() =>
-              applySummaryFocus(
-                "meetings",
-              )
-            }
-          >
-            <span
-              className={`${styles.summaryIcon} ${styles.greenIcon}`}
-            >
-              <UsersRound
-                size={20}
-              />
-            </span>
-
-            <div>
-              <small>
-                Meetings
-              </small>
-
-              <strong>
-                {summary.meetings}
-              </strong>
-
-              <span>
-                scheduled
-              </span>
-
-              <p>
-                Next 7 days
-              </p>
-            </div>
-          </button>
         </section>
 
         <section className={styles.calendarLayout}>
@@ -7489,317 +7963,327 @@ export default function CalendarReferencePreview() {
           </div>
 
           <aside className={styles.rightRail}>
-            {viewMode !== "agenda" ? (
-              <>
-            <section className={styles.railCard}>
+            <section
+              id="calendar-today-brief"
+              className={`${styles.railCard} ${styles.todayBriefCard}`}
+            >
               <header>
                 <strong>
-                  {formatMonthYear(viewDate)}
+                  Today&apos;s brief
                 </strong>
 
-                <span>
-                  <button
-                    type="button"
-                    aria-label="Previous month"
-                    onClick={() => {
-                      const next =
-                        new Date(viewDate);
-
-                      next.setMonth(
-                        next.getMonth() - 1,
-                      );
-
-                      setViewDate(next);
-                    }}
-                  >
-                    <ChevronLeft size={16} />
-                  </button>
-
-                  <button
-                    type="button"
-                    aria-label="Next month"
-                    onClick={() => {
-                      const next =
-                        new Date(viewDate);
-
-                      next.setMonth(
-                        next.getMonth() + 1,
-                      );
-
-                      setViewDate(next);
-                    }}
-                  >
-                    <ChevronRight size={16} />
-                  </button>
+                <span
+                  className={
+                    todayBriefItems.length
+                      ? styles.commandAttentionCount
+                      : styles.commandHealthyCount
+                  }
+                >
+                  {
+                    todayBriefItems
+                      .length
+                  }
                 </span>
               </header>
 
-              <MiniMonth
-                viewDate={viewDate}
-                now={now}
-                events={events}
-                onDateSelect={(date) => {
-                  setViewDate(date);
-                  setViewMode("day");
-                }}
-              />
-            </section>
-
-            <section className={styles.railCard}>
-              <header>
-                <strong>
-                  Next up
-                </strong>
-
-                <button
-                  type="button"
-                  onClick={() =>
-                    setViewMode(
-                      "agenda",
-                    )
+              <div
+                className={
+                  styles.todayBriefBody
+                }
+              >
+                <p
+                  className={
+                    styles.commandRailEyebrow
                   }
                 >
-                  View all
-                </button>
-              </header>
+                  What needs attention now
+                </p>
 
-              <div className={styles.upcomingList}>
-                {upcomingEvents.length ? (
-                  upcomingEvents.map(
-                    (event) => (
+                {todayBriefItems.length ? (
+                  <div
+                    className={
+                      styles.todayBriefList
+                    }
+                  >
+                    {todayBriefItems
+                      .slice(
+                        0,
+                        4,
+                      )
+                      .map(
+                        (item) => {
+                          const unscheduled =
+                            Boolean(
+                              item.task &&
+                              !taskDueDate(
+                                item.task,
+                              ),
+                            );
+
+                          const canDrag =
+                            unscheduled &&
+                            [
+                              "day",
+                              "week",
+                            ].includes(
+                              viewMode,
+                            ) &&
+                            schedulingTaskId !==
+                              item.task?.id;
+
+                          return (
+                            <button
+                              key={
+                                item.id
+                              }
+                              type="button"
+                              draggable={
+                                canDrag
+                              }
+                              onDragStart={(
+                                dragEvent,
+                              ) => {
+                                if (
+                                  !canDrag ||
+                                  !item.task?.id
+                                ) {
+                                  return;
+                                }
+
+                                dragEvent
+                                  .dataTransfer
+                                  .effectAllowed =
+                                  "move";
+
+                                dragEvent
+                                  .dataTransfer
+                                  .setData(
+                                    "application/x-campaign-seat-task",
+                                    item.task.id,
+                                  );
+
+                                dragEvent
+                                  .dataTransfer
+                                  .setData(
+                                    "text/plain",
+                                    item.task.id,
+                                  );
+                              }}
+                              onClick={() => {
+                                if (
+                                  item.event
+                                ) {
+                                  setSelectedEvent(
+                                    item.event,
+                                  );
+
+                                  return;
+                                }
+
+                                if (
+                                  item.task?.id
+                                ) {
+                                  window.location.assign(
+                                    `/tasks?task=${encodeURIComponent(
+                                      item.task.id,
+                                    )}`,
+                                  );
+                                }
+                              }}
+                            >
+                              <span
+                                className={`${styles.todayBriefIcon} ${
+                                  styles[
+                                    `todayBrief_${item.tone}`
+                                  ] || ""
+                                }`}
+                              >
+                                {item.label.includes(
+                                  "Unassigned",
+                                ) ? (
+                                  <UsersRound
+                                    size={14}
+                                  />
+                                ) : unscheduled ? (
+                                  <CalendarClock
+                                    size={14}
+                                  />
+                                ) : (
+                                  <AlertTriangle
+                                    size={14}
+                                  />
+                                )}
+                              </span>
+
+                              <span
+                                className={
+                                  styles.todayBriefCopy
+                                }
+                              >
+                                <strong>
+                                  {
+                                    item.title
+                                  }
+                                </strong>
+
+                                <small>
+                                  {
+                                    item.subtitle
+                                  }
+                                </small>
+
+                                <small
+                                  className={
+                                    styles.todayBriefLabel
+                                  }
+                                >
+                                  {
+                                    item.label
+                                  }
+                                </small>
+
+                                {item.event ? (
+                                  <small>
+                                    {new Intl.DateTimeFormat(
+                                      "en-US",
+                                      {
+                                        month:
+                                          "short",
+                                        day:
+                                          "numeric",
+                                      },
+                                    ).format(
+                                      item.event
+                                        .start,
+                                    )}
+                                    {" · "}
+                                    {formatTime(
+                                      item.event
+                                        .start,
+                                    )}
+                                  </small>
+                                ) : null}
+                              </span>
+
+                              <ChevronRight
+                                size={15}
+                              />
+                            </button>
+                          );
+                        },
+                      )}
+
+                    {todayBriefItems.length >
+                    4 ? (
                       <button
-                        key={event.id}
-                        type="button"
-                        onClick={() =>
-                          setSelectedEvent(
-                            event,
-                          )
+                        className={
+                          styles.commandRailMore
                         }
+                        type="button"
+                        onClick={() => {
+                          clearSummaryFocus();
+
+                          setViewMode(
+                            "agenda",
+                          );
+                        }}
                       >
-                        <i
-                          className={
-                            styles[
-                              `tone_${event.tone}`
-                            ]
-                          }
-                        />
-
-                        <span>
-                          <strong>
-                            {event.title}
-                          </strong>
-
-                          <small>
-                            {new Intl.DateTimeFormat(
-                              "en-US",
-                              {
-                                month: "short",
-                                day: "numeric",
-                              },
-                            ).format(
-                              event.start,
-                            )}
-                            ,{" "}
-                            {formatTime(
-                              event.start,
-                            )}
-                          </small>
-
-                          <small>
-                            {event.location}
-                          </small>
-                        </span>
+                        Review all
+                        {" "}
+                        {
+                          todayBriefItems
+                            .length
+                        }
                       </button>
-                    ),
-                  )
+                    ) : null}
+                  </div>
                 ) : (
-                  <p>
-                    No upcoming events match
-                    the current filters.
-                  </p>
+                  <div
+                    className={
+                      styles.commandRailHealthy
+                    }
+                  >
+                    <CheckCircle2
+                      size={17}
+                    />
+
+                    <span>
+                      <strong>
+                        Nothing urgent
+                        needs attention.
+                      </strong>
+
+                      <small>
+                        Upcoming calendar
+                        work is in good
+                        shape.
+                      </small>
+                    </span>
+                  </div>
                 )}
               </div>
             </section>
 
-            <section className={styles.railCard}>
+            <section
+              className={`${styles.railCard} ${styles.commandUpcomingCard}`}
+            >
               <header>
                 <strong>
-                  Critical deadlines
+                  Upcoming
                 </strong>
 
                 <button
                   type="button"
-                  onClick={() =>
+                  onClick={() => {
+                    clearSummaryFocus();
+
                     setViewMode(
                       "agenda",
-                    )
-                  }
+                    );
+                  }}
                 >
-                  View all
+                  Agenda
                 </button>
               </header>
 
               <div
                 className={
-                  styles.deadlineList
+                  styles.commandUpcomingList
                 }
               >
-                {criticalDeadlines.length ? (
-                  criticalDeadlines.map(
-                    (item) => (
-                      <button
-                        key={item.id}
-                        type="button"
-                        className={
-                          item.urgent
-                            ? styles.urgentDeadline
-                            : ""
-                        }
-                        onClick={() => {
-                          if (
-                            item.event
-                          ) {
-                            setSelectedEvent(
-                              item.event,
-                            );
-
-                            return;
-                          }
-
-                          window.location.assign(
-                            item.task?.id
-                              ? `/tasks?task=${encodeURIComponent(
-                                  item.task.id,
-                                )}`
-                              : "/tasks",
-                          );
-                        }}
-                      >
-                        <span
-                          className={
-                            styles.deadlineIcon
-                          }
-                        >
-                          <AlertTriangle
-                            size={15}
-                          />
-                        </span>
-
-                        <span>
-                          <strong>
-                            {item.title}
-                          </strong>
-
-                          <small>
-                            {item.kind}
-                            {" · "}
-                            {formatDueLabel(
-                              item.due,
-                              now,
-                            )}
-                          </small>
-                        </span>
-                      </button>
-                    ),
-                  )
-                ) : (
-                  <p
-                    className={
-                      styles.railEmpty
-                    }
-                  >
-                    No critical deadlines
-                    in the next 14 days.
-                  </p>
-                )}
-              </div>
-            </section>
-
-              </>
-            ) : null}
-
-            {viewMode === "agenda" &&
-            scheduleConflicts.length ? (
-              <section
-                className={`${styles.railCard} ${styles.conflictRailCard}`}
-              >
-                <header>
-                  <strong>
-                    Schedule conflicts
-                  </strong>
-
-                  <span
-                    className={
-                      styles.conflictCount
-                    }
-                  >
-                    {
-                      scheduleConflicts
-                        .length
-                    }
-                  </span>
-                </header>
-
-                <div
-                  className={
-                    styles.conflictList
-                  }
-                >
-                  {scheduleConflicts.map(
-                    (conflict) => {
-                      const primaryEvent =
-                        conflict
-                          .events[0];
-
-                      const additionalCount =
-                        conflict
-                          .events
-                          .length -
-                        1;
-
-                      return (
+                {upcomingEvents.length ? (
+                  upcomingEvents
+                    .slice(
+                      0,
+                      2,
+                    )
+                    .map(
+                      (event) => (
                         <button
                           key={
-                            conflict.id
+                            event.id
                           }
                           type="button"
                           onClick={() =>
                             setSelectedEvent(
-                              primaryEvent,
+                              event,
                             )
                           }
                         >
-                          <span
+                          <i
                             className={
-                              styles.conflictIcon
+                              styles[
+                                `tone_${event.tone}`
+                              ]
                             }
-                          >
-                            <AlertTriangle
-                              size={15}
-                            />
-                          </span>
+                          />
 
                           <span>
                             <strong>
                               {
-                                conflict
-                                  .events
-                                  .length
+                                event.title
                               }
-                              {" "}
-                              events in conflict
                             </strong>
-
-                            <small>
-                              {
-                                primaryEvent
-                                  .title
-                              }
-                              {additionalCount >
-                              0
-                                ? ` + ${additionalCount} more`
-                                : ""}
-                            </small>
 
                             <small>
                               {new Intl.DateTimeFormat(
@@ -7811,239 +8295,43 @@ export default function CalendarReferencePreview() {
                                     "numeric",
                                 },
                               ).format(
-                                conflict
-                                  .firstConflictAt ||
-                                conflict
-                                  .date,
+                                event.start,
                               )}
-                              {" · Conflict starts "}
+                              {" · "}
                               {formatTime(
-                                conflict
-                                  .firstConflictAt ||
-                                conflict
-                                  .startsAt,
+                                event.start,
                               )}
                             </small>
-                          </span>
-                        </button>
-                      );
-                    },
-                  )}
-                </div>
-              </section>
-            ) : null}
 
-            <section
-              className={`${styles.railCard} ${styles.prepBriefRailCard}`}
-            >
-              <header>
-                <strong>
-                  Prep brief
-                </strong>
-
-                {eventPreparationIssues.length ? (
-                  <span
-                    className={
-                      styles.prepBriefCount
-                    }
-                  >
-                    {
-                      eventPreparationIssues
-                        .length
-                    }
-                  </span>
-                ) : (
-                  <CheckCircle2
-                    className={
-                      styles.prepBriefHealthyIcon
-                    }
-                    size={17}
-                  />
-                )}
-              </header>
-
-              <div
-                className={
-                  styles.prepBriefBody
-                }
-              >
-                <p
-                  className={
-                    styles.prepBriefIntro
-                  }
-                >
-                  What needs attention today
-                </p>
-
-                {eventPreparationIssues.length ? (
-                  <div
-                    className={
-                      styles.prepBriefList
-                    }
-                  >
-                    {eventPreparationIssues
-                      .slice(
-                        0,
-                        4,
-                      )
-                      .map(
-                        ({
-                          event,
-                          issue,
-                        }) => (
-                          <button
-                            key={`${event.id}-${issue.task.id}`}
-                            type="button"
-                            onClick={() =>
-                              setSelectedEvent(
-                                event,
-                              )
-                            }
-                          >
-                            <span
-                              className={`${styles.prepBriefIcon} ${
-                                issue.issueKeys.includes(
-                                  "blocked",
-                                ) ||
-                                issue.issueKeys.includes(
-                                  "overdue",
-                                )
-                                  ? styles.prepBriefDanger
-                                  : issue.issueKeys.includes(
-                                        "tight_timing",
-                                      )
-                                    ? styles.prepBriefWarning
-                                    : styles.prepBriefNeedsSetup
-                              }`}
-                            >
-                              {issue.issueKeys.includes(
-                                "unassigned",
-                              ) ? (
-                                <UsersRound
-                                  size={14}
-                                />
-                              ) : issue.issueKeys.includes(
-                                  "no_deadline",
-                                ) ||
-                                issue.issueKeys.includes(
-                                  "tight_timing",
-                                ) ? (
-                                <CalendarClock
-                                  size={14}
-                                />
-                              ) : (
-                                <AlertTriangle
-                                  size={14}
-                                />
-                              )}
-                            </span>
-
-                            <span
-                              className={
-                                styles.prepBriefCopy
-                              }
-                            >
-                              <strong>
-                                {event.title}
-                              </strong>
-
+                            {event.location ? (
                               <small>
-                                {issue.task.title ||
-                                  "Campaign task"}
-                              </small>
-
-                              <small
-                                className={
-                                  styles.prepBriefIssue
-                                }
-                              >
                                 {
-                                  issue.preparationLabel
+                                  event.location
                                 }
                               </small>
+                            ) : null}
+                          </span>
 
-                              <small>
-                                {new Intl.DateTimeFormat(
-                                  "en-US",
-                                  {
-                                    month:
-                                      "short",
-                                    day:
-                                      "numeric",
-                                  },
-                                ).format(
-                                  event.start,
-                                )}
-                                {" · "}
-                                {formatTime(
-                                  event.start,
-                                )}
-                              </small>
-                            </span>
-
-                            <ChevronRight
-                              size={15}
-                            />
-                          </button>
-                        ),
-                      )}
-
-                    {eventPreparationIssues.length >
-                    4 ? (
-                      <button
-                        className={
-                          styles.prepBriefMore
-                        }
-                        type="button"
-                        onClick={() => {
-                          clearSummaryFocus();
-
-                          setViewMode(
-                            "agenda",
-                          );
-                        }}
-                      >
-                        +
-                        {
-                          eventPreparationIssues
-                            .length -
-                          4
-                        }
-                        {" "}
-                        more prep issues
-                      </button>
-                    ) : null}
-                  </div>
+                          <ChevronRight
+                            size={14}
+                          />
+                        </button>
+                      ),
+                    )
                 ) : (
-                  <div
+                  <p
                     className={
-                      styles.prepBriefHealthy
+                      styles.railEmpty
                     }
                   >
-                    <CheckCircle2
-                      size={17}
-                    />
-
-                    <span>
-                      <strong>
-                        Upcoming event work
-                        looks prepared.
-                      </strong>
-
-                      <small>
-                        No blocked, unassigned,
-                        unscheduled, overdue, or
-                        tight-timing linked tasks
-                        in the next 7 days.
-                      </small>
-                    </span>
-                  </div>
+                    No upcoming events.
+                  </p>
                 )}
               </div>
             </section>
 
             <section
-              className={`${styles.railCard} ${styles.readinessRailCard}`}
+              className={`${styles.railCard} ${styles.commandReadinessCard}`}
             >
               <header>
                 <strong>
@@ -8053,7 +8341,7 @@ export default function CalendarReferencePreview() {
                 {eventReadinessAttentionCount ? (
                   <span
                     className={
-                      styles.readinessAttentionCount
+                      styles.commandAttentionCount
                     }
                   >
                     {
@@ -8061,31 +8349,91 @@ export default function CalendarReferencePreview() {
                     }
                   </span>
                 ) : (
-                  <button
-                    type="button"
-                    onClick={() => {
-                      clearSummaryFocus();
-
-                      setViewMode(
-                        "agenda",
-                      );
-                    }}
-                  >
-                    View agenda
-                  </button>
+                  <CheckCircle2
+                    className={
+                      styles.commandHeaderHealthy
+                    }
+                    size={17}
+                  />
                 )}
               </header>
 
-              {eventReadinessQueue.length ? (
+              <div
+                className={
+                  styles.readinessCommandMetrics
+                }
+              >
+                <span>
+                  <strong>
+                    {
+                      eventReadinessSummary
+                        .blocked
+                    }
+                  </strong>
+
+                  <small>
+                    Blocked
+                  </small>
+                </span>
+
+                <span>
+                  <strong>
+                    {
+                      eventReadinessSummary
+                        .risk
+                    }
+                  </strong>
+
+                  <small>
+                    At risk
+                  </small>
+                </span>
+
+                <span>
+                  <strong>
+                    {
+                      eventReadinessSummary
+                        .ready +
+                      eventReadinessSummary
+                        .progress
+                    }
+                  </strong>
+
+                  <small>
+                    On track
+                  </small>
+                </span>
+              </div>
+
+              {eventReadinessQueue.some(
+                ({ readiness }) =>
+                  [
+                    "blocked",
+                    "risk",
+                  ].includes(
+                    readiness.key,
+                  ),
+              ) ? (
                 <div
                   className={
-                    styles.readinessRailList
+                    styles.readinessCommandList
                   }
                 >
                   {eventReadinessQueue
+                    .filter(
+                      ({
+                        readiness,
+                      }) =>
+                        [
+                          "blocked",
+                          "risk",
+                        ].includes(
+                          readiness.key,
+                        ),
+                    )
                     .slice(
                       0,
-                      4,
+                      2,
                     )
                     .map(
                       ({
@@ -8103,61 +8451,18 @@ export default function CalendarReferencePreview() {
                             )
                           }
                         >
-                          <span
-                            className={`${styles.readinessRailState} ${
-                              styles[
-                                `readiness_${readiness.key}`
-                              ] ||
-                              ""
-                            }`}
-                          >
-                            {readiness.key ===
-                            "ready" ? (
-                              <CheckCircle2
-                                size={14}
-                              />
-                            ) : (
-                              <AlertTriangle
-                                size={14}
-                              />
-                            )}
-                          </span>
+                          <AlertTriangle
+                            size={14}
+                          />
 
-                          <span
-                            className={
-                              styles.readinessRailCopy
-                            }
-                          >
+                          <span>
                             <strong>
-                              {event.title}
+                              {
+                                event.title
+                              }
                             </strong>
 
                             <small>
-                              {new Intl.DateTimeFormat(
-                                "en-US",
-                                {
-                                  month:
-                                    "short",
-                                  day:
-                                    "numeric",
-                                },
-                              ).format(
-                                event.start,
-                              )}
-                              {" · "}
-                              {formatTime(
-                                event.start,
-                              )}
-                            </small>
-
-                            <small
-                              className={`${styles.readinessRailLabel} ${
-                                styles[
-                                  `readiness_${readiness.key}`
-                                ] ||
-                                ""
-                              }`}
-                            >
                               {
                                 readiness.label
                               }
@@ -8169,161 +8474,196 @@ export default function CalendarReferencePreview() {
                           </span>
 
                           <ChevronRight
-                            size={15}
+                            size={14}
                           />
                         </button>
                       ),
                     )}
-
-                  {eventReadinessQueue.length >
-                  4 ? (
-                    <button
-                      className={
-                        styles.readinessRailMore
-                      }
-                      type="button"
-                      onClick={() => {
-                        clearSummaryFocus();
-
-                        setViewMode(
-                          "agenda",
-                        );
-                      }}
-                    >
-                      +
-                      {
-                        eventReadinessQueue
-                          .length -
-                        4
-                      }
-                      {" "}
-                      more events
-                    </button>
-                  ) : null}
                 </div>
               ) : (
                 <div
                   className={
-                    styles.readinessRailEmpty
+                    styles.commandRailHealthy
                   }
                 >
                   <CheckCircle2
-                    size={17}
+                    size={16}
                   />
 
                   <span>
                     <strong>
-                      No linked event work
-                      needs monitoring.
+                      No linked events
+                      are at risk.
                     </strong>
-
-                    <small>
-                      Link tasks to upcoming
-                      events to track readiness
-                      here.
-                    </small>
                   </span>
                 </div>
               )}
+
+              <button
+                className={
+                  styles.commandRailFooter
+                }
+                type="button"
+                onClick={() => {
+                  clearSummaryFocus();
+
+                  setViewMode(
+                    "agenda",
+                  );
+                }}
+              >
+                View event readiness
+                <ChevronRight
+                  size={14}
+                />
+              </button>
             </section>
 
-            {(
-              unscheduledTasks.length ||
-              taskScheduleMessage
-            ) ? (
-              <section
-                className={`${styles.railCard} ${styles.unscheduledRailCard}`}
-              >
-                <header>
-                  <strong>
-                    Unscheduled work
-                  </strong>
+            <section
+              id="calendar-my-work"
+              className={`${styles.railCard} ${styles.commandMyWorkCard}`}
+            >
+              <header>
+                <strong>
+                  My work
+                </strong>
 
-                  {[
-                    "day",
-                    "week",
-                  ].includes(
-                    viewMode,
-                  ) ? (
-                    <span
-                      className={
-                        styles.unscheduledCount
-                      }
-                    >
-                      {
-                        unscheduledTasks
-                          .length
-                      }
-                    </span>
-                  ) : (
-                    <button
-                      type="button"
-                      onClick={() => {
-                        clearSummaryFocus();
-
-                        setViewDate(
-                          new Date(),
-                        );
-
-                        setViewMode(
-                          "week",
-                        );
-                      }}
-                    >
-                      Plan
-                    </button>
-                  )}
-                </header>
-
-                {taskScheduleMessage ? (
-                  <div
-                    className={
-                      styles.taskScheduleNotice
-                    }
-                  >
-                    <CheckCircle2
-                      size={15}
-                    />
-
-                    <span>
-                      {
-                        taskScheduleMessage
-                      }
-                    </span>
-                  </div>
-                ) : null}
-
-                <div
-                  className={
-                    styles.unscheduledList
+                <button
+                  type="button"
+                  onClick={() =>
+                    window.location.assign(
+                      "/tasks",
+                    )
                   }
                 >
-                  {unscheduledTasks.length ? (
-                    unscheduledTasks
-                      .slice(
-                        0,
-                        5,
-                      )
-                      .map(
-                        (task) => (
+                  View all
+                </button>
+              </header>
+
+              <div
+                className={
+                  styles.myWorkMetrics
+                }
+              >
+                <span
+                  className={
+                    myWorkSummary.overdue
+                      ? styles.myWorkMetricDanger
+                      : ""
+                  }
+                >
+                  <strong>
+                    {
+                      myWorkSummary
+                        .overdue
+                    }
+                  </strong>
+
+                  <small>
+                    Overdue
+                  </small>
+                </span>
+
+                <span>
+                  <strong>
+                    {
+                      myWorkSummary
+                        .dueToday
+                    }
+                  </strong>
+
+                  <small>
+                    Due today
+                  </small>
+                </span>
+
+                <span>
+                  <strong>
+                    {
+                      myWorkSummary
+                        .needsScheduling
+                    }
+                  </strong>
+
+                  <small>
+                    Schedule
+                  </small>
+                </span>
+              </div>
+
+              <div
+                className={
+                  styles.commandMyWorkList
+                }
+              >
+                {myWorkItems.length ? (
+                  myWorkItems
+                    .slice(
+                      0,
+                      3,
+                    )
+                    .map(
+                      (task) => {
+                        const due =
+                          task.dueDate instanceof
+                            Date
+                            ? task.dueDate
+                            : taskDueDate(
+                                task,
+                              );
+
+                        const overdue =
+                          Boolean(
+                            due &&
+                            due <
+                              new Date(
+                                now.getFullYear(),
+                                now.getMonth(),
+                                now.getDate(),
+                              ),
+                          );
+
+                        const dueToday =
+                          Boolean(
+                            due &&
+                            sameDay(
+                              due,
+                              now,
+                            ),
+                          );
+
+                        const unscheduled =
+                          !due;
+
+                        const canDrag =
+                          unscheduled &&
+                          [
+                            "day",
+                            "week",
+                          ].includes(
+                            viewMode,
+                          ) &&
+                          schedulingTaskId !==
+                            task.id;
+
+                        return (
                           <button
                             key={
                               task.id
                             }
-                            className={
-                              schedulingTaskId ===
-                              task.id
-                                ? styles.taskScheduling
-                                : ""
-                            }
                             type="button"
                             draggable={
-                              schedulingTaskId !==
-                              task.id
+                              canDrag
                             }
                             onDragStart={(
                               dragEvent,
                             ) => {
+                              if (
+                                !canDrag
+                              ) {
+                                return;
+                              }
+
                               dragEvent
                                 .dataTransfer
                                 .effectAllowed =
@@ -8353,17 +8693,23 @@ export default function CalendarReferencePreview() {
                           >
                             <span
                               className={
-                                styles.unscheduledIcon
+                                styles.commandTaskIcon
                               }
                             >
-                              <CalendarClock
-                                size={15}
-                              />
+                              {unscheduled ? (
+                                <CalendarClock
+                                  size={14}
+                                />
+                              ) : (
+                                <ListChecks
+                                  size={14}
+                                />
+                              )}
                             </span>
 
                             <span
                               className={
-                                styles.unscheduledCopy
+                                styles.commandTaskCopy
                               }
                             >
                               <strong>
@@ -8373,222 +8719,87 @@ export default function CalendarReferencePreview() {
 
                               <small>
                                 {task.category ||
-                                  "General"}
-                                {" · "}
-                                {String(
-                                  task.priority ||
-                                  "normal",
-                                )
-                                  .charAt(
-                                    0,
-                                  )
-                                  .toUpperCase() +
-                                  String(
-                                    task.priority ||
-                                    "normal",
-                                  ).slice(
-                                    1,
-                                  )}
-                              </small>
-
-                              <small>
-                                {[
-                                  "day",
-                                  "week",
-                                ].includes(
-                                  viewMode,
-                                )
-                                  ? "Drag onto the calendar to set deadline"
-                                  : "Open task or choose Plan to schedule"}
+                                  "Campaign task"}
                               </small>
                             </span>
-                          </button>
-                        ),
-                      )
-                  ) : (
-                    <p
-                      className={
-                        styles.railEmpty
-                      }
-                    >
-                      All active tasks
-                      have deadlines.
-                    </p>
-                  )}
-                </div>
-              </section>
-            ) : null}
 
-            <section className={styles.railCard}>
-              <header>
-                <strong>
-                  My tasks
-                </strong>
-
-                <button
-                  type="button"
-                  onClick={() =>
-                    window.location.assign(
-                      "/tasks",
-                    )
-                  }
-                >
-                  View all
-                </button>
-              </header>
-
-              <div
-                className={
-                  styles.liveTaskList
-                }
-              >
-                {myCalendarTasks.length ? (
-                  myCalendarTasks.map(
-                    (task) => {
-                      const overdue =
-                        task.dueDate <
-                        new Date(
-                          now.getFullYear(),
-                          now.getMonth(),
-                          now.getDate(),
-                        );
-
-                      const urgent =
-                        overdue ||
-                        taskPriorityScore(
-                          task,
-                        ) >= 3;
-
-                      return (
-                        <button
-                          key={task.id}
-                          type="button"
-                          onClick={() =>
-                            window.location.assign(
-                              `/tasks?task=${encodeURIComponent(
-                                task.id,
-                              )}`,
-                            )
-                          }
-                        >
-                          <span
-                            className={
-                              styles.taskRailIcon
-                            }
-                          >
-                            <ListChecks
-                              size={15}
-                            />
-                          </span>
-
-                          <span
-                            className={
-                              styles.taskRailCopy
-                            }
-                          >
-                            <strong>
-                              {task.title ||
-                                "Campaign task"}
-                            </strong>
-
-                            <small>
-                              {task.category ||
-                                "Campaign task"}
+                            <small
+                              className={
+                                overdue
+                                  ? styles.commandTaskDanger
+                                  : unscheduled
+                                    ? styles.commandTaskSetup
+                                    : styles.commandTaskDue
+                              }
+                            >
+                              {overdue
+                                ? "Overdue"
+                                : unscheduled
+                                  ? "Schedule"
+                                  : dueToday
+                                    ? "Today"
+                                    : formatDueLabel(
+                                        due,
+                                        now,
+                                      )}
                             </small>
-                          </span>
-
-                          <small
-                            className={
-                              urgent
-                                ? styles.taskDueUrgent
-                                : styles.taskDue
-                            }
-                          >
-                            {formatDueLabel(
-                              task.dueDate,
-                              now,
-                            )}
-                          </small>
-                        </button>
-                      );
-                    },
-                  )
+                          </button>
+                        );
+                      },
+                    )
                 ) : (
                   <p
                     className={
                       styles.railEmpty
                     }
                   >
-                    No upcoming tasks
-                    are assigned to you.
+                    No upcoming work
+                    is assigned to you.
                   </p>
                 )}
               </div>
             </section>
 
-            <section className={styles.railCard}>
-              <header>
-                <strong>
-                  Calendar connection
-                </strong>
-              </header>
-
+            <div
+              className={
+                styles.calendarConnectionStrip
+              }
+            >
               {calendarConnectionLoading ? (
-                <div
-                  className={
-                    styles.calendarConnectionStatus
-                  }
-                >
+                <>
                   <RefreshCw
                     className={
                       styles.spinning
                     }
-                    size={17}
+                    size={15}
                   />
 
-                  <div>
-                    <strong>
-                      Checking calendar…
-                    </strong>
-
-                    <span>
-                      Verifying provider connection
-                    </span>
-                  </div>
-                </div>
+                  <span>
+                    Checking calendar…
+                  </span>
+                </>
               ) : calendarConnected ? (
-                <div
-                  className={
-                    styles.calendarConnectionStatus
-                  }
-                >
+                <>
                   <CheckCircle2
-                    size={18}
+                    size={15}
                   />
 
-                  <div>
+                  <span>
                     <strong>
-                      {calendarProviderLabel} connected
+                      {
+                        calendarProviderLabel
+                      } connected
                     </strong>
-
-                    <span>
-                      {calendarConnection
-                        ?.display_email ||
-                        "Connected campaign calendar"}
-                    </span>
 
                     <small>
                       {calendarLastSyncLabel
-                        ? `Last synced ${calendarLastSyncLabel}`
-                        : "Connected · Ready to sync"}
+                        ? `Synced ${calendarLastSyncLabel}`
+                        : "Ready to sync"}
                     </small>
-                  </div>
-                </div>
+                  </span>
+                </>
               ) : (
                 <button
-                  className={
-                    styles.connectButton
-                  }
                   type="button"
                   onClick={
                     handleConnectCalendar
@@ -8598,15 +8809,15 @@ export default function CalendarReferencePreview() {
                   }
                 >
                   <CalendarDays
-                    size={17}
+                    size={15}
                   />
 
                   {calendarConnecting
-                    ? "Connecting calendar…"
+                    ? "Connecting…"
                     : "Connect calendar"}
                 </button>
               )}
-            </section>
+            </div>
           </aside>
         </section>
 
