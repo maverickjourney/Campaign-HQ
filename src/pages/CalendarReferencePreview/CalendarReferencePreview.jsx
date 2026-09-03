@@ -1212,13 +1212,13 @@ function TimelineView({
       ? Math.max(
           0,
           Math.min(
-            DEFAULT_visibleHourStart,
+            DEFAULT_HOUR_START,
             Math.floor(
               earliestRelevantHour,
             ) - 1,
           ),
         )
-      : DEFAULT_visibleHourStart;
+      : DEFAULT_HOUR_START;
 
   const visibleHourEnd =
     Number.isFinite(
@@ -1227,13 +1227,13 @@ function TimelineView({
       ? Math.min(
           24,
           Math.max(
-            DEFAULT_visibleHourEnd,
+            DEFAULT_HOUR_END,
             Math.ceil(
               latestRelevantHour,
             ) + 1,
           ),
         )
-      : DEFAULT_visibleHourEnd;
+      : DEFAULT_HOUR_END;
 
   const hours = Array.from(
     {
