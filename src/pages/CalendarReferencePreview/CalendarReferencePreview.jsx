@@ -1271,7 +1271,15 @@ function TimelineView({
     HOUR_HEIGHT;
 
   return (
-    <div className={styles.timelineShell}>
+    <div
+      className={styles.timelineShell}
+      data-visible-hour-start={
+        visibleHourStart
+      }
+      data-visible-hour-end={
+        visibleHourEnd
+      }
+    >
       <div
         className={`${styles.timelineCanvas} ${
           days.length === 1
@@ -3447,7 +3455,20 @@ export default function CalendarReferencePreview() {
     useState(initialNow);
 
   const [viewMode, setViewMode] =
-    useState("week");
+    useState(
+      () => {
+        const compactScreen =
+          typeof window !==
+            "undefined" &&
+          window.matchMedia(
+            "(max-width: 720px)",
+          ).matches;
+
+        return compactScreen
+          ? "day"
+          : "week";
+      },
+    );
 
   const [
     events,
@@ -3868,11 +3889,39 @@ export default function CalendarReferencePreview() {
         hour * 60 +
         minute;
 
+      const visibleHourStart =
+        Number(
+          shell.dataset
+            .visibleHourStart,
+        );
+
+      const visibleHourEnd =
+        Number(
+          shell.dataset
+            .visibleHourEnd,
+        );
+
+      const resolvedHourStart =
+        Number.isFinite(
+          visibleHourStart,
+        )
+          ? visibleHourStart
+          : DEFAULT_HOUR_START;
+
+      const resolvedHourEnd =
+        Number.isFinite(
+          visibleHourEnd,
+        )
+          ? visibleHourEnd
+          : DEFAULT_HOUR_END;
+
       const startMinutes =
-        HOUR_START * 60;
+        resolvedHourStart *
+        60;
 
       const endMinutes =
-        HOUR_END * 60;
+        resolvedHourEnd *
+        60;
 
       const visibleMinutes =
         Math.max(
@@ -4290,7 +4339,7 @@ export default function CalendarReferencePreview() {
         .filter(
           (event) =>
             !event.allDay &&
-            event.start >= now,
+            event.end > now,
         )
         .sort(
           (left, right) =>
@@ -8416,23 +8465,40 @@ export default function CalendarReferencePreview() {
                               }
                             </strong>
 
-                            <small>
-                              {new Intl.DateTimeFormat(
-                                "en-US",
-                                {
-                                  month:
-                                    "short",
-                                  day:
-                                    "numeric",
-                                },
-                              ).format(
-                                event.start,
-                              )}
-                              {" · "}
-                              {formatTime(
-                                event.start,
-                              )}
-                            </small>
+                            {event.start <=
+                              now &&
+                            event.end >
+                              now ? (
+                              <small
+                                className={
+                                  styles.happeningNow
+                                }
+                              >
+                                Happening now
+                                {" · until "}
+                                {formatTime(
+                                  event.end,
+                                )}
+                              </small>
+                            ) : (
+                              <small>
+                                {new Intl.DateTimeFormat(
+                                  "en-US",
+                                  {
+                                    month:
+                                      "short",
+                                    day:
+                                      "numeric",
+                                  },
+                                ).format(
+                                  event.start,
+                                )}
+                                {" · "}
+                                {formatTime(
+                                  event.start,
+                                )}
+                              </small>
+                            )}
 
                             {event.location ? (
                               <small>
