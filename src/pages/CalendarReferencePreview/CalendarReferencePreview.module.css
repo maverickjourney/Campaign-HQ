@@ -10385,3 +10385,66 @@ button[data-campaign-hq-launcher="floating"] {
 }
 
 /* CAMPAIGN SEAT MOBILE COMMAND GRID FIX — END */
+
+
+/* CAMPAIGN SEAT FINAL MOBILE 2X2 GRID — START */
+
+/*
+ * Explicit placement beats older last-child / span rules.
+ *
+ * Row 1:
+ * Today | Next 7 days
+ *
+ * Row 2:
+ * Needs attention | My work
+ */
+@media (min-width: 341px) and (max-width: 820px) {
+  .summaryGrid {
+    grid-template-columns:
+      repeat(
+        2,
+        minmax(0, 1fr)
+      ) !important;
+  }
+
+  .summaryGrid > button:nth-child(1) {
+    grid-column:
+      1 / 2 !important;
+
+    grid-row:
+      1 !important;
+  }
+
+  .summaryGrid > button:nth-child(2) {
+    grid-column:
+      2 / 3 !important;
+
+    grid-row:
+      1 !important;
+  }
+
+  .summaryGrid > button:nth-child(3) {
+    grid-column:
+      1 / 2 !important;
+
+    grid-row:
+      2 !important;
+  }
+
+  .summaryGrid > button:nth-child(4),
+  .summaryGrid > button:last-child {
+    grid-column:
+      2 / 3 !important;
+
+    grid-row:
+      2 !important;
+
+    width:
+      100% !important;
+
+    max-width:
+      none !important;
+  }
+}
+
+/* CAMPAIGN SEAT FINAL MOBILE 2X2 GRID — END */
