@@ -7496,6 +7496,878 @@ const [
       : recommendedSpotlightShortcutKeys;
 
 
+  /* =========================================================
+   * HQ CROSS-CAMPAIGN COMMAND BRIEF
+   *
+   * Converts existing live operational signals into one
+   * ranked queue. This does not invent new campaign data.
+   * ========================================================= */
+
+  const hqBriefNow =
+    headerNow.getTime();
+
+  const hqBriefTodayKey =
+    getEasternDateKey(
+      headerNow,
+    );
+
+  const hqBriefTimestamp =
+    (value) => {
+      if (!value) {
+        return null;
+      }
+
+      const timestamp =
+        new Date(
+          value,
+        ).getTime();
+
+      return Number.isFinite(
+        timestamp,
+      )
+        ? timestamp
+        : null;
+    };
+
+  const hqBriefIsDueToday =
+    (value) =>
+      Boolean(
+        value &&
+        getEasternDateKey(
+          value,
+        ) ===
+          hqBriefTodayKey,
+      );
+
+  const hqBriefCandidates =
+    [];
+
+  const pushHqBriefItem =
+    ({
+      id,
+      title,
+      detail,
+      category,
+      status,
+      route,
+      rank = 4,
+      tone = "info",
+      icon = AlertCircle,
+      dueToday = false,
+      followup = false,
+    }) => {
+      const normalizedTitle =
+        String(
+          title ||
+          "",
+        )
+          .trim()
+          .replace(
+            /\s+/g,
+            " ",
+          );
+
+      if (!normalizedTitle) {
+        return;
+      }
+
+      hqBriefCandidates.push({
+        id:
+          id ||
+          `${route}-${normalizedTitle}`,
+
+        title:
+          normalizedTitle,
+
+        detail:
+          String(
+            detail ||
+            "",
+          )
+            .trim()
+            .replace(
+              /\s+/g,
+              " ",
+            ),
+
+        category:
+          category ||
+          "Campaign",
+
+        status:
+          status ||
+          "Needs review",
+
+        route:
+          route ||
+          "/dashboard",
+
+        rank,
+        tone,
+        icon,
+        dueToday,
+        followup,
+      });
+    };
+
+  /*
+   * Risk radar gets first priority because it already requires
+   * evidence beyond a keyword match.
+   */
+  campaignRiskQueue
+    .slice(
+      0,
+      5,
+    )
+    .forEach(
+      (risk) => {
+        pushHqBriefItem({
+          id:
+            `hq-${risk.id}`,
+
+          title:
+            risk.title,
+
+          detail:
+            risk.detail,
+
+          category:
+            risk.category ||
+            "Risk",
+
+          status:
+            campaignRiskDueLabel(
+              risk,
+            ),
+
+          route:
+            risk.route,
+
+          rank:
+            risk.severity ===
+            "critical"
+              ? 0
+              : risk.severity ===
+                  "high"
+                ? 1
+                : 3,
+
+          tone:
+            risk.severity ===
+            "critical"
+              ? "danger"
+              : "warning",
+
+          icon:
+            ShieldCheck,
+
+          dueToday:
+            hqBriefIsDueToday(
+              risk.dueAt,
+            ),
+        });
+      },
+    );
+
+  /*
+   * Decisions requiring campaign action.
+   */
+  decisionActionApprovals
+    .slice(
+      0,
+      5,
+    )
+    .forEach(
+      (approval) => {
+        const dueTime =
+          hqBriefTimestamp(
+            approval.due_at,
+          );
+
+        const overdue =
+          dueTime !==
+            null &&
+          dueTime <
+            hqBriefNow;
+
+        const dueToday =
+          hqBriefIsDueToday(
+            approval.due_at,
+          );
+
+        const changesRequested =
+          String(
+            approval.status ||
+            "",
+          ).toLowerCase() ===
+          "changes_requested";
+
+        pushHqBriefItem({
+          id:
+            `hq-approval-${approval.id}`,
+
+          title:
+            approval.title ||
+            "Campaign approval",
+
+          detail:
+            approval.review_notes ||
+            approval.description ||
+            "Campaign decision is awaiting review.",
+
+          category:
+            "Decision",
+
+          status:
+            changesRequested
+              ? "Changes requested"
+              : overdue
+                ? "Overdue"
+                : dueToday
+                  ? "Due today"
+                  : "Awaiting review",
+
+          route:
+            "/approvals",
+
+          rank:
+            overdue
+              ? 0
+              : changesRequested ||
+                  dueToday
+                ? 1
+                : 3,
+
+          tone:
+            overdue
+              ? "danger"
+              : changesRequested ||
+                  dueToday
+                ? "warning"
+                : "info",
+
+          icon:
+            FileCheck2,
+
+          dueToday,
+        });
+      },
+    );
+
+  /*
+   * Task execution: only items with a real attention signal.
+   */
+  openTasks
+    .filter(
+      (task) => {
+        const dueTime =
+          hqBriefTimestamp(
+            task.due_at,
+          );
+
+        const priority =
+          String(
+            task.priority ||
+            "",
+          ).toLowerCase();
+
+        return (
+          (
+            dueTime !==
+              null &&
+            (
+              dueTime <
+                hqBriefNow ||
+              hqBriefIsDueToday(
+                task.due_at,
+              )
+            )
+          ) ||
+          [
+            "urgent",
+            "critical",
+            "high",
+          ].includes(
+            priority,
+          ) ||
+          !task.assigned_to
+        );
+      },
+    )
+    .slice(
+      0,
+      8,
+    )
+    .forEach(
+      (task) => {
+        const dueTime =
+          hqBriefTimestamp(
+            task.due_at,
+          );
+
+        const overdue =
+          dueTime !==
+            null &&
+          dueTime <
+            hqBriefNow;
+
+        const dueToday =
+          hqBriefIsDueToday(
+            task.due_at,
+          );
+
+        const priority =
+          String(
+            task.priority ||
+            "",
+          ).toLowerCase();
+
+        const urgent =
+          [
+            "urgent",
+            "critical",
+          ].includes(
+            priority,
+          );
+
+        const unassigned =
+          !task.assigned_to;
+
+        const statusParts =
+          [];
+
+        if (overdue) {
+          statusParts.push(
+            "Overdue",
+          );
+        } else if (dueToday) {
+          statusParts.push(
+            "Due today",
+          );
+        } else if (urgent) {
+          statusParts.push(
+            "Urgent",
+          );
+        } else if (
+          priority ===
+          "high"
+        ) {
+          statusParts.push(
+            "High priority",
+          );
+        }
+
+        if (unassigned) {
+          statusParts.push(
+            "Unassigned",
+          );
+        }
+
+        pushHqBriefItem({
+          id:
+            `hq-task-${task.id}`,
+
+          title:
+            task.title ||
+            "Campaign task",
+
+          detail:
+            task.description ||
+            task.category ||
+            "Campaign work requires attention.",
+
+          category:
+            "Task",
+
+          status:
+            statusParts.join(
+              " · ",
+            ) ||
+            "Needs review",
+
+          route:
+            `/tasks?task=${encodeURIComponent(
+              task.id,
+            )}`,
+
+          rank:
+            overdue ||
+            urgent
+              ? 0
+              : dueToday ||
+                  priority ===
+                    "high"
+                ? 1
+                : unassigned
+                  ? 2
+                  : 3,
+
+          tone:
+            overdue ||
+            urgent
+              ? "danger"
+              : dueToday ||
+                  priority ===
+                    "high"
+                ? "warning"
+                : "setup",
+
+          icon:
+            CheckCircle2,
+
+          dueToday,
+        });
+      },
+    );
+
+  /*
+   * Actionable inbox conversations.
+   */
+  dashboardActionableConversations
+    .slice(
+      0,
+      4,
+    )
+    .forEach(
+      (
+        conversation,
+        index,
+      ) => {
+        const sender =
+          conversation.sender ||
+          conversation.email ||
+          "Campaign contact";
+
+        pushHqBriefItem({
+          id:
+            `hq-message-${conversation.id || index}`,
+
+          title:
+            conversation.subject ||
+            `Message from ${sender}`,
+
+          detail:
+            conversation.preview ||
+            conversation.snippet ||
+            sender,
+
+          category:
+            "Inbox",
+
+          status:
+            conversation.priority
+              ? "High priority"
+              : conversation.needsResponse
+                ? "Reply needed"
+                : "Needs review",
+
+          route:
+            "/inbox",
+
+          rank:
+            conversation.priority
+              ? 1
+              : 2,
+
+          tone:
+            conversation.priority
+              ? "warning"
+              : "info",
+
+          icon:
+            Mail,
+
+          followup:
+            Boolean(
+              conversation.needsResponse,
+            ),
+        });
+      },
+    );
+
+  /*
+   * Relationship follow-ups due now/today.
+   */
+  relationshipFollowupQueue
+    .filter(
+      (item) =>
+        relationshipIsOverdue(
+          item,
+        ) ||
+        relationshipIsDueToday(
+          item,
+        ),
+    )
+    .slice(
+      0,
+      4,
+    )
+    .forEach(
+      (item) => {
+        const overdue =
+          relationshipIsOverdue(
+            item,
+          );
+
+        const dueToday =
+          relationshipIsDueToday(
+            item,
+          );
+
+        pushHqBriefItem({
+          id:
+            `hq-relationship-${item.id}`,
+
+          title:
+            item.title ||
+            "Campaign contact",
+
+          detail:
+            item.detail ||
+            `${item.relationshipType || "Contact"} · ${item.channel || "Follow up"}`,
+
+          category:
+            "Relationship",
+
+          status:
+            overdue
+              ? "Follow-up overdue"
+              : "Follow up today",
+
+          route:
+            item.route ||
+            "/contacts",
+
+          rank:
+            overdue
+              ? 1
+              : 2,
+
+          tone:
+            overdue
+              ? "warning"
+              : "info",
+
+          icon:
+            PhoneCall,
+
+          dueToday,
+          followup:
+            true,
+        });
+      },
+    );
+
+  /*
+   * Public/stakeholder commitments.
+   */
+  commitmentQueue
+    .filter(
+      (record) =>
+        commitmentIsOverdue(
+          record,
+        ) ||
+        commitmentIsAtRisk(
+          record,
+        ),
+    )
+    .slice(
+      0,
+      4,
+    )
+    .forEach(
+      (record) => {
+        const overdue =
+          commitmentIsOverdue(
+            record,
+          );
+
+        pushHqBriefItem({
+          id:
+            `hq-commitment-${record.id}`,
+
+          title:
+            record.title ||
+            "Campaign commitment",
+
+          detail:
+            record.stakeholder ||
+            "Campaign stakeholder",
+
+          category:
+            "Commitment",
+
+          status:
+            overdue
+              ? "Commitment overdue"
+              : "At risk",
+
+          route:
+            "/commitments",
+
+          rank:
+            overdue
+              ? 0
+              : 1,
+
+          tone:
+            overdue
+              ? "danger"
+              : "warning",
+
+          icon:
+            Target,
+
+          dueToday:
+            hqBriefIsDueToday(
+              record.due_at,
+            ),
+
+          followup:
+            true,
+        });
+      },
+    );
+
+  /*
+   * Things blocked on outside people/vendors/decisions.
+   */
+  waitingOnQueue
+    .filter(
+      (record) =>
+        waitingOnIsOverdue(
+          record,
+        ) ||
+        waitingOnNeedsFollowup(
+          record,
+        ),
+    )
+    .slice(
+      0,
+      4,
+    )
+    .forEach(
+      (record) => {
+        const overdue =
+          waitingOnIsOverdue(
+            record,
+          );
+
+        pushHqBriefItem({
+          id:
+            `hq-waiting-${record.id}`,
+
+          title:
+            record.title ||
+            "Waiting on follow-up",
+
+          detail:
+            record.waitingSource ||
+            record.description ||
+            "Campaign work is blocked.",
+
+          category:
+            "Waiting on",
+
+          status:
+            overdue
+              ? "Overdue"
+              : "Follow-up needed",
+
+          route:
+            "/waiting-on",
+
+          rank:
+            overdue
+              ? 1
+              : 2,
+
+          tone:
+            overdue
+              ? "warning"
+              : "setup",
+
+          icon:
+            Clock3,
+
+          dueToday:
+            hqBriefIsDueToday(
+              record.due_at,
+            ),
+
+          followup:
+            true,
+        });
+      },
+    );
+
+  /*
+   * Event operations issues already detected by HQ.
+   */
+  eventOperationsAttentionQueue
+    .slice(
+      0,
+      3,
+    )
+    .forEach(
+      (event) => {
+        const locationMissing =
+          eventOperationsLocationMissing(
+            event,
+          );
+
+        const atCapacity =
+          eventOperationsCapacityRatio(
+            event,
+          ) >=
+          1;
+
+        pushHqBriefItem({
+          id:
+            `hq-event-${event.id}`,
+
+          title:
+            event.title ||
+            "Campaign event",
+
+          detail:
+            [
+              formatEventOperationsDate(
+                event.starts_at,
+              ),
+              event.location ||
+                "Location pending",
+            ]
+              .filter(Boolean)
+              .join(
+                " · ",
+              ),
+
+          category:
+            "Event",
+
+          status:
+            locationMissing
+              ? "Location needed"
+              : atCapacity
+                ? "At capacity"
+                : "Near capacity",
+
+          route:
+            "/calendar",
+
+          rank:
+            locationMissing ||
+            atCapacity
+              ? 1
+              : 2,
+
+          tone:
+            locationMissing ||
+            atCapacity
+              ? "warning"
+              : "info",
+
+          icon:
+            CalendarDays,
+
+          dueToday:
+            hqBriefIsDueToday(
+              event.starts_at,
+            ),
+        });
+      },
+    );
+
+  const hqCommandBriefItems =
+    hqBriefCandidates
+      .sort(
+        (
+          left,
+          right,
+        ) => {
+          if (
+            left.rank !==
+            right.rank
+          ) {
+            return (
+              left.rank -
+              right.rank
+            );
+          }
+
+          return String(
+            left.title ||
+            "",
+          ).localeCompare(
+            String(
+              right.title ||
+              "",
+            ),
+          );
+        },
+      )
+      .filter(
+        (
+          item,
+          index,
+          items,
+        ) => {
+          const key =
+            `${String(
+              item.route ||
+              "",
+            ).split("?")[0]}|${String(
+              item.title ||
+              "",
+            )
+              .trim()
+              .toLowerCase()}`;
+
+          return (
+            items.findIndex(
+              (candidate) =>
+                `${String(
+                  candidate.route ||
+                  "",
+                ).split("?")[0]}|${String(
+                  candidate.title ||
+                  "",
+                )
+                  .trim()
+                  .toLowerCase()}` ===
+                key,
+            ) ===
+            index
+          );
+        },
+      );
+
+  const hqCommandBriefCriticalCount =
+    hqCommandBriefItems.filter(
+      (item) =>
+        item.rank ===
+        0,
+    ).length;
+
+  const hqCommandBriefTodayCount =
+    hqCommandBriefItems.filter(
+      (item) =>
+        item.dueToday,
+    ).length;
+
+  const hqCommandBriefFollowupCount =
+    hqCommandBriefItems.filter(
+      (item) =>
+        item.followup,
+    ).length;
+
+  const hqCommandBriefTop =
+    hqCommandBriefItems[
+      0
+    ] ||
+    null;
+
   // SAFE LIVE SCHEDULE SYNC — START
   useEffect(() => {
     let intervalId = 0;
@@ -8080,6 +8952,261 @@ const [
               <span>{error}</span>
             </div>
           )}
+
+          <section
+            className={
+              styles.hqCommandBrief
+            }
+            aria-label="Campaign command brief"
+          >
+            <header
+              className={
+                styles.hqCommandBriefHeader
+              }
+            >
+              <div
+                className={
+                  styles.hqCommandBriefTitle
+                }
+              >
+                <span>
+                  <Sparkles
+                    size={15}
+                  />
+                  Campaign command brief
+                </span>
+
+                <h1>
+                  What needs attention now
+                </h1>
+
+                <p>
+                  Campaign Seat is ranking live work,
+                  decisions, risks and follow-ups across
+                  the campaign.
+                </p>
+              </div>
+
+              <div
+                className={
+                  styles.hqCommandBriefMetrics
+                }
+                aria-label="Command brief summary"
+              >
+                <span
+                  className={
+                    hqCommandBriefCriticalCount
+                      ? styles.hqBriefMetricDanger
+                      : ""
+                  }
+                >
+                  <strong>
+                    {
+                      hqCommandBriefCriticalCount
+                    }
+                  </strong>
+
+                  <small>
+                    Critical
+                  </small>
+                </span>
+
+                <span>
+                  <strong>
+                    {
+                      hqCommandBriefTodayCount
+                    }
+                  </strong>
+
+                  <small>
+                    Due today
+                  </small>
+                </span>
+
+                <span>
+                  <strong>
+                    {
+                      hqCommandBriefFollowupCount
+                    }
+                  </strong>
+
+                  <small>
+                    Follow-ups
+                  </small>
+                </span>
+
+                <span>
+                  <strong>
+                    {
+                      todayScheduleEvents
+                        .length
+                    }
+                  </strong>
+
+                  <small>
+                    Events today
+                  </small>
+                </span>
+              </div>
+            </header>
+
+            {hqCommandBriefItems.length ? (
+              <div
+                className={
+                  styles.hqCommandBriefList
+                }
+              >
+                {hqCommandBriefItems
+                  .slice(
+                    0,
+                    6,
+                  )
+                  .map(
+                    (item) => {
+                      const BriefIcon =
+                        item.icon ||
+                        AlertCircle;
+
+                      return (
+                        <button
+                          key={
+                            item.id
+                          }
+                          className={
+                            styles[
+                              `hqBrief_${item.tone}`
+                            ] ||
+                            ""
+                          }
+                          type="button"
+                          onClick={() =>
+                            navigate(
+                              item.route,
+                            )
+                          }
+                        >
+                          <span
+                            className={
+                              styles.hqCommandBriefIcon
+                            }
+                          >
+                            <BriefIcon
+                              size={16}
+                            />
+                          </span>
+
+                          <span
+                            className={
+                              styles.hqCommandBriefCopy
+                            }
+                          >
+                            <small>
+                              {
+                                item.category
+                              }
+                            </small>
+
+                            <strong>
+                              {
+                                item.title
+                              }
+                            </strong>
+
+                            {item.detail ? (
+                              <p>
+                                {
+                                  item.detail
+                                }
+                              </p>
+                            ) : null}
+                          </span>
+
+                          <span
+                            className={
+                              styles.hqCommandBriefStatus
+                            }
+                          >
+                            {
+                              item.status
+                            }
+                          </span>
+
+                          <ArrowRight
+                            size={15}
+                          />
+                        </button>
+                      );
+                    },
+                  )}
+              </div>
+            ) : (
+              <div
+                className={
+                  styles.hqCommandBriefClear
+                }
+              >
+                <CheckCircle2
+                  size={19}
+                />
+
+                <span>
+                  <strong>
+                    No urgent campaign work is
+                    currently surfaced.
+                  </strong>
+
+                  <small>
+                    HQ will continue watching live
+                    tasks, approvals, commitments,
+                    inbox activity and campaign risk.
+                  </small>
+                </span>
+              </div>
+            )}
+
+            <footer
+              className={
+                styles.hqCommandBriefFooter
+              }
+            >
+              <span>
+                {hqCommandBriefItems.length
+                  ? `${hqCommandBriefItems.length} campaign ${
+                      hqCommandBriefItems.length ===
+                      1
+                        ? "item needs"
+                        : "items need"
+                    } attention`
+                  : "Campaign attention queue is clear"}
+              </span>
+
+              <div>
+                <small>
+                  Updated{" "}
+                  {formatRelative(
+                    lastUpdated ||
+                    headerNow,
+                  )}
+                </small>
+
+                {hqCommandBriefTop ? (
+                  <button
+                    type="button"
+                    onClick={() =>
+                      navigate(
+                        hqCommandBriefTop.route,
+                      )
+                    }
+                  >
+                    Open top priority
+                    <ArrowRight
+                      size={14}
+                    />
+                  </button>
+                ) : null}
+              </div>
+            </footer>
+          </section>
 
           <section className={styles.heroGrid}>
 <article
