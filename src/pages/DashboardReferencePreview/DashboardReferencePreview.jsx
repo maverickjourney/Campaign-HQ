@@ -7755,170 +7755,12 @@ const [
     );
 
   /*
-   * Task execution: only items with a real attention signal.
+   * Task execution intentionally lives in Today's Execution.
+   *
+   * The leadership Command Brief only receives task-related
+   * items when they qualify as true campaign risk through
+   * campaignRiskQueue.
    */
-  openTasks
-    .filter(
-      (task) => {
-        const dueTime =
-          hqBriefTimestamp(
-            task.due_at,
-          );
-
-        const priority =
-          String(
-            task.priority ||
-            "",
-          ).toLowerCase();
-
-        return (
-          (
-            dueTime !==
-              null &&
-            (
-              dueTime <
-                hqBriefNow ||
-              hqBriefIsDueToday(
-                task.due_at,
-              )
-            )
-          ) ||
-          [
-            "urgent",
-            "critical",
-            "high",
-          ].includes(
-            priority,
-          ) ||
-          !task.assigned_to
-        );
-      },
-    )
-    .slice(
-      0,
-      8,
-    )
-    .forEach(
-      (task) => {
-        const dueTime =
-          hqBriefTimestamp(
-            task.due_at,
-          );
-
-        const overdue =
-          dueTime !==
-            null &&
-          dueTime <
-            hqBriefNow;
-
-        const dueToday =
-          hqBriefIsDueToday(
-            task.due_at,
-          );
-
-        const priority =
-          String(
-            task.priority ||
-            "",
-          ).toLowerCase();
-
-        const urgent =
-          [
-            "urgent",
-            "critical",
-          ].includes(
-            priority,
-          );
-
-        const unassigned =
-          !task.assigned_to;
-
-        const statusParts =
-          [];
-
-        if (overdue) {
-          statusParts.push(
-            "Overdue",
-          );
-        } else if (dueToday) {
-          statusParts.push(
-            "Due today",
-          );
-        } else if (urgent) {
-          statusParts.push(
-            "Urgent",
-          );
-        } else if (
-          priority ===
-          "high"
-        ) {
-          statusParts.push(
-            "High priority",
-          );
-        }
-
-        if (unassigned) {
-          statusParts.push(
-            "Unassigned",
-          );
-        }
-
-        pushHqBriefItem({
-          id:
-            `hq-task-${task.id}`,
-
-          title:
-            task.title ||
-            "Campaign task",
-
-          detail:
-            task.description ||
-            task.category ||
-            "Campaign work requires attention.",
-
-          category:
-            "Task",
-
-          status:
-            statusParts.join(
-              " · ",
-            ) ||
-            "Needs review",
-
-          route:
-            `/tasks?task=${encodeURIComponent(
-              task.id,
-            )}`,
-
-          rank:
-            overdue ||
-            urgent
-              ? 0
-              : dueToday ||
-                  priority ===
-                    "high"
-                ? 1
-                : unassigned
-                  ? 2
-                  : 3,
-
-          tone:
-            overdue ||
-            urgent
-              ? "danger"
-              : dueToday ||
-                  priority ===
-                    "high"
-                ? "warning"
-                : "setup",
-
-          icon:
-            CheckCircle2,
-
-          dueToday,
-        });
-      },
-    );
 
   /*
    * Actionable inbox conversations.
@@ -8343,7 +8185,7 @@ const [
         },
       );
 
-  const hqCommandBriefCriticalCount =
+  const hqCommandBriefImmediateCount =
     hqCommandBriefItems.filter(
       (item) =>
         item.rank ===
@@ -8981,9 +8823,9 @@ const [
                 </h1>
 
                 <p>
-                  Campaign Seat is ranking live work,
-                  decisions, risks and follow-ups across
-                  the campaign.
+                  Campaign Seat is ranking leadership-level
+                  risks, decisions, commitments and follow-ups
+                  across the campaign.
                 </p>
               </div>
 
@@ -8995,19 +8837,19 @@ const [
               >
                 <span
                   className={
-                    hqCommandBriefCriticalCount
+                    hqCommandBriefImmediateCount
                       ? styles.hqBriefMetricDanger
                       : ""
                   }
                 >
                   <strong>
                     {
-                      hqCommandBriefCriticalCount
+                      hqCommandBriefImmediateCount
                     }
                   </strong>
 
                   <small>
-                    Critical
+                    Immediate
                   </small>
                 </span>
 
@@ -9031,7 +8873,7 @@ const [
                   </strong>
 
                   <small>
-                    Follow-ups
+                    Follow-ups now
                   </small>
                 </span>
 
@@ -9151,14 +8993,14 @@ const [
 
                 <span>
                   <strong>
-                    No urgent campaign work is
-                    currently surfaced.
+                    No leadership-level campaign issues
+                    need attention right now.
                   </strong>
 
                   <small>
-                    HQ will continue watching live
-                    tasks, approvals, commitments,
-                    inbox activity and campaign risk.
+                    HQ will continue watching campaign
+                    risk, decisions, commitments,
+                    follow-ups and event operations.
                   </small>
                 </span>
               </div>
@@ -9212,68 +9054,122 @@ const [
 <article
               className={`${styles.compactCard} ${styles.heroPriorityCard}`}
               tabIndex={0}
-              aria-label="Today’s campaign priorities"
+              aria-label="Today’s campaign execution"
             >
               <div className={styles.cardHeading}>
                 <span>
-                  <Flag size={15} />
-                  Today&apos;s priorities
+                  <CheckCircle2 size={15} />
+                  Today&apos;s execution
                 </span>
 
                 <button
                   type="button"
                   onClick={() => navigate("/tasks")}
                 >
-                  View all
+                  Open task board
                 </button>
               </div>
 
-              <div className={styles.priorityList}>
-                {displayedPriorities.map((task) => {
-                  const tone =
-                    getPriorityTone(task.priority);
-
-                  const PriorityIcon =
-                    task.icon || CheckCircle2;
-
-                  return (
-                    <button
-                      key={task.id}
-                      type="button"
-                      onClick={() =>
-                        navigate("/tasks")
-                      }
-                    >
-                      <span
-                        className={`${styles.priorityIcon} ${
-                          styles[tone]
-                        }`}
-                      >
-                        <PriorityIcon size={14} />
-                      </span>
-
-                      <span className={styles.priorityCopy}>
-                        <strong>{task.title}</strong>
-                        <small>
-                          {task.detail ||
-                            task.description ||
-                            task.category ||
-                            "Campaign task"}
-                        </small>
-                      </span>
-
-                      <span
-                        className={`${styles.priorityBadge} ${
-                          styles[tone]
-                        }`}
-                      >
-                        {task.priority || "Normal"}
-                      </span>
-                    </button>
-                  );
-                })}
+              <div className={styles.taskExecutionMetric}>
+                <strong>{taskExecutionQueue.length}</strong>
+                <span>
+                  {taskExecutionQueue.length === 1
+                    ? "Open task"
+                    : "Open tasks"}
+                </span>
               </div>
 
+              <div
+                className={styles.taskExecutionStats}
+                aria-label="Today&apos;s task execution summary"
+              >
+                <span className={styles.taskExecutionStat}>
+                  <strong>{taskExecutionOverdueCount}</strong>
+                  <span>Overdue</span>
+                </span>
+
+                <span className={styles.taskExecutionStat}>
+                  <strong>{taskExecutionDueTodayCount}</strong>
+                  <span>Due today</span>
+                </span>
+
+                <span className={styles.taskExecutionStat}>
+                  <strong>{taskExecutionInProgressCount}</strong>
+                  <span>In progress</span>
+                </span>
+              </div>
+
+              {taskExecutionPrimary ? (
+                <>
+                  <button
+                    type="button"
+                    className={styles.taskExecutionNext}
+                    onClick={() => navigate("/tasks")}
+                  >
+                    <span className={styles.taskExecutionNextIcon}>
+                      <CheckCircle2 size={17} />
+                    </span>
+
+                    <span className={styles.taskExecutionNextCopy}>
+                      <small>
+                        Next task
+                        {" · "}
+                        {taskExecutionPriority}
+                        {" · "}
+                        {taskExecutionCategory}
+                      </small>
+
+                      <strong>
+                        {taskExecutionPrimary.title || "Campaign task"}
+                      </strong>
+
+                      <span>
+                        {taskExecutionPrimary.detail ||
+                          taskExecutionPrimary.description ||
+                          "Campaign work needs attention."}
+                      </span>
+
+                      <em
+                        data-tone={
+                          taskExecutionIsOverdue(
+                            taskExecutionPrimary,
+                          )
+                            ? "danger"
+                            : taskExecutionIsDueToday(
+                                taskExecutionPrimary,
+                              )
+                              ? "today"
+                              : "normal"
+                        }
+                      >
+                        {taskExecutionTiming}
+                      </em>
+                    </span>
+
+                    <ArrowRight size={15} />
+                  </button>
+
+                  {taskExecutionRemainingCount > 0 ? (
+                    <div className={styles.taskExecutionMore}>
+                      {taskExecutionRemainingCount} more{" "}
+                      {taskExecutionRemainingCount === 1
+                        ? "open task"
+                        : "open tasks"}
+                    </div>
+                  ) : null}
+                </>
+              ) : (
+                <div className={styles.taskExecutionEmpty}>
+                  <CheckCircle2 size={19} />
+
+                  <span>
+                    <strong>Task board clear</strong>
+                    <small>
+                      No open campaign tasks currently need execution.
+                    </small>
+                  </span>
+                </div>
+              )}
             </article>
             <div className={styles.centerHeroStack}>
               <article
