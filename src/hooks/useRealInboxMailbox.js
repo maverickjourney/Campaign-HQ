@@ -2587,7 +2587,7 @@ return transformed;
                   next,
                   {
                     authoritativeForMs:
-                      20000,
+                      180000,
                   },
                 );
               }
