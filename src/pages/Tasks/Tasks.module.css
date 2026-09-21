@@ -3206,17 +3206,46 @@ input:disabled {
  * Tablet: 3 x 2.
  * Phone: 2 x 3 with secondary copy removed.
  */
-@media (max-width: 1320px) {
+/*
+ * Laptop command strip:
+ * Keep all six metrics in one row and remove secondary copy
+ * before falling back to multi-row tablet layouts.
+ */
+@media (max-width: 1320px) and (min-width: 981px) {
   .summaryGrid {
     grid-template-columns:
       repeat(
-        3,
+        6,
         minmax(0, 1fr)
       );
+    gap: 7px;
+  }
+
+  .summaryCard {
+    min-height: 66px;
+    grid-template-areas:
+      "metric icon";
+    padding: 9px 10px;
+  }
+
+  .summaryCard p {
+    display: none;
+  }
+
+  .summaryCard span {
+    font-size: 8px;
+    white-space: normal;
+  }
+
+  .summaryCard strong {
+    font-size: 20px;
   }
 }
 
-@media (max-width: 900px) {
+/*
+ * Narrow tablet / small laptop.
+ */
+@media (max-width: 980px) {
   .pageHeader {
     display: grid;
   }
@@ -3228,14 +3257,25 @@ input:disabled {
   .summaryGrid {
     grid-template-columns:
       repeat(
-        2,
+        3,
         minmax(0, 1fr)
       );
     gap: 8px;
   }
+
+  .summaryCard {
+    min-height: 70px;
+  }
+
+  .summaryCard p {
+    display: none;
+  }
 }
 
-@media (max-width: 560px) {
+/*
+ * Phone / narrow tablet.
+ */
+@media (max-width: 700px) {
   .summaryGrid {
     grid-template-columns:
       repeat(
