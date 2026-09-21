@@ -1852,15 +1852,15 @@ input:disabled {
   height: 41px;
 }
 
-/* Keep task cards readable when only one or two exist. */
+/* Keep task cards readable while using the available workspace. */
 
 .taskGrid {
   grid-template-columns:
     repeat(
-      auto-fill,
-      minmax(300px, 370px)
+      auto-fit,
+      minmax(300px, 1fr)
     );
-  justify-content: start;
+  justify-content: stretch;
   gap: 13px;
 }
 
