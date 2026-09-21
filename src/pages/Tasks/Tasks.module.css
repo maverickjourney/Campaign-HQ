@@ -8242,3 +8242,96 @@ button {
     min-height: 42px;
   }
 }
+
+
+/* ============================================================
+   CAMPAIGN SEAT — COMPACT TASK COMMAND HEADER
+   ============================================================ */
+
+/*
+ * Tasks is an execution workspace, so the actual work should
+ * begin as high on the screen as practical.
+ */
+.main {
+  padding-top: 18px;
+}
+
+.pageHeader {
+  min-height: 0;
+  align-items: flex-end;
+  gap: 18px;
+  margin-bottom: 10px;
+  padding-top: 0;
+}
+
+.pageHeader > div:first-child {
+  max-width: none;
+}
+
+.eyebrow {
+  margin-bottom: 3px;
+  font-size: 9.5px;
+  line-height: 1.1;
+}
+
+.pageHeader h1 {
+  font-size: clamp(29px, 2.25vw, 36px);
+  line-height: 1;
+}
+
+.headerActions {
+  align-items: center;
+  padding-top: 0;
+}
+
+.headerActions button {
+  min-height: 40px;
+}
+
+/*
+ * The JSX no longer renders these elements.
+ * Keep defensive rules so older cached markup cannot create
+ * additional vertical space during a hot reload.
+ */
+.pageHeader p,
+.liveStatus {
+  display: none;
+}
+
+@media (max-width: 900px) {
+  .main {
+    padding-top: 14px;
+  }
+
+  .pageHeader {
+    display: grid;
+    grid-template-columns: 1fr;
+    align-items: stretch;
+    gap: 10px;
+    margin-bottom: 9px;
+  }
+
+  .headerActions {
+    width: 100%;
+    display: grid;
+    grid-template-columns:
+      minmax(0, 1fr)
+      minmax(0, 1fr);
+    gap: 8px;
+  }
+
+  .headerActions button {
+    width: 100%;
+    min-height: 44px;
+  }
+}
+
+@media (max-width: 420px) {
+  .pageHeader h1 {
+    font-size: 29px;
+  }
+
+  .headerActions {
+    grid-template-columns: 1fr 1fr;
+  }
+}

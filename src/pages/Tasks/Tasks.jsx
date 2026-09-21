@@ -4570,25 +4570,6 @@ const canCreateTasks =
               <h1>
                 Task Command Center
               </h1>
-
-              <p>
-                Assign campaign work, manage deadlines,
-                surface risk and keep every responsibility
-                accountable in one place.
-              </p>
-
-              <div className={styles.liveStatus}>
-                <span />
-                {isLoading
-                  ? "Synchronizing campaign tasks…"
-                  : error
-                    ? error
-                    : lastUpdated
-                      ? `Live · updated ${formatRelativeTime(
-                          lastUpdated,
-                        )}`
-                      : "Live campaign task data"}
-              </div>
             </div>
 
             <div className={styles.headerActions}>
