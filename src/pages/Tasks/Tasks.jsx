@@ -931,10 +931,10 @@ function TaskCard({
           >
             {task.visibility ===
             "workspace"
-              ? "Team"
+              ? "Team visible"
               : task.visibility ===
                   "admin_only"
-                ? "Leadership"
+                ? "Leadership only"
                 : "Private"}
           </span>
         </div>
@@ -5050,7 +5050,13 @@ const canCreateTasks =
                 {filteredTasks.length === 1
                   ? "task"
                   : "tasks"}
+                {assigneeFilter === "mine"
+                  ? " assigned to you"
+                  : assigneeFilter === "unassigned"
+                    ? " unassigned"
+                    : ""}
               </strong>
+
               <span>
                 Ordered by urgency, priority and
                 deadline
@@ -5098,6 +5104,44 @@ const canCreateTasks =
               </button>
             )}
           </section>
+
+          {assigneeFilter === "mine" &&
+          unassignedTasks.length > 0 ? (
+            <section
+              className={styles.taskScopeNotice}
+              aria-label="Tasks outside the current owner view"
+            >
+              <div>
+                <AlertTriangle size={15} />
+
+                <span>
+                  <strong>
+                    {unassignedTasks.length}{" "}
+                    {unassignedTasks.length === 1
+                      ? "unassigned task is"
+                      : "unassigned tasks are"}{" "}
+                    outside this view
+                  </strong>
+
+                  <small>
+                    Showing work assigned to you.
+                  </small>
+                </span>
+              </div>
+
+              <button
+                type="button"
+                onClick={() =>
+                  applySummaryFilter(
+                    "unassigned",
+                  )
+                }
+              >
+                Show unassigned
+                <ChevronRight size={14} />
+              </button>
+            </section>
+          ) : null}
 
           {isCampaignLeadership &&
           selectedTaskIds.length > 0 ? (
