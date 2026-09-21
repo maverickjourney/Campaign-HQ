@@ -4826,6 +4826,9 @@ input:disabled {
 
 /*
  * Six useful command metrics.
+ *
+ * Keep this final override intentionally compact because it
+ * wins the cascade over earlier Task Command Center styles.
  */
 .summaryGrid {
   grid-template-columns:
@@ -4834,31 +4837,38 @@ input:disabled {
       minmax(0, 1fr)
     ) !important;
 
-  gap: 10px !important;
+  gap: 7px !important;
+  margin-bottom: 10px !important;
 }
 
 .summaryCard {
-  min-height: 118px !important;
+  min-height: 66px !important;
   padding:
-    16px 15px
-    15px !important;
+    9px 11px !important;
+  border-radius: 11px !important;
+  grid-template-areas:
+    "metric icon" !important;
 }
 
 .summaryCard span {
   overflow: visible !important;
-  font-size: 10.5px !important;
-  line-height: 1.25 !important;
+  font-size: 8.5px !important;
+  line-height: 1.15 !important;
   white-space: normal !important;
 }
 
 .summaryCard strong {
-  font-size: 25px !important;
+  font-size: 21px !important;
+  line-height: 1 !important;
 }
 
 .summaryCard p {
-  max-width: none !important;
-  font-size: 10.5px !important;
-  line-height: 1.4 !important;
+  display: none !important;
+}
+
+.summaryCard > svg {
+  width: 15px !important;
+  height: 15px !important;
 }
 
 /*
@@ -5004,7 +5014,15 @@ input:disabled {
   font-size: 10.5px !important;
 }
 
-@media (max-width: 1399px) {
+/*
+ * Responsive Task summary density.
+ *
+ * Desktop/laptop: 6 x 1
+ * Tablet: 3 x 2
+ * Phone: 2 x 3
+ * Very narrow phone: 1 x 6
+ */
+@media (max-width: 1050px) {
   .summaryGrid {
     grid-template-columns:
       repeat(
@@ -5014,7 +5032,7 @@ input:disabled {
   }
 }
 
-@media (max-width: 800px) {
+@media (max-width: 700px) {
   .summaryGrid {
     grid-template-columns:
       repeat(
@@ -5023,13 +5041,17 @@ input:disabled {
       ) !important;
   }
 
+  .summaryCard {
+    min-height: 62px !important;
+  }
+
   .taskReminderExactFields {
     grid-template-columns:
       1fr;
   }
 }
 
-@media (max-width: 520px) {
+@media (max-width: 340px) {
   .summaryGrid {
     grid-template-columns:
       1fr !important;
