@@ -2935,32 +2935,34 @@ input:disabled {
 }
 
 /*
- * Five operational metrics should read as one command strip,
- * not five oversized dashboard panels.
+ * Six operational metrics should read as one compact command strip.
+ * Desktop: 6 x 1
+ * Tablet: 3 x 2
+ * Phone: 2 x 3
  */
 .summaryGrid {
   grid-template-columns:
     repeat(
-      5,
+      6,
       minmax(0, 1fr)
     );
-  gap: 10px;
-  margin-bottom: 14px;
+  gap: 8px;
+  margin-bottom: 10px;
 }
 
 .summaryCard {
   min-width: 0;
-  min-height: 108px;
+  min-height: 78px;
   display: grid;
   grid-template-columns:
     minmax(0, 1fr) auto;
   grid-template-areas:
     "metric icon"
-    "copy icon";
+    "copy copy";
   align-items: center;
-  gap: 7px 10px;
-  padding: 15px 15px 14px;
-  border-radius: 14px;
+  gap: 4px 8px;
+  padding: 10px 11px 9px;
+  border-radius: 12px;
 }
 
 .summaryCard > div {
@@ -2969,16 +2971,16 @@ input:disabled {
   display: flex;
   align-items: baseline;
   justify-content: space-between;
-  gap: 8px;
+  gap: 6px;
 }
 
 .summaryCard span {
   overflow: hidden;
   color: #71879a;
-  font-size: 9.5px;
+  font-size: 8.5px;
   font-weight: 800;
-  line-height: 1.2;
-  letter-spacing: 0.04em;
+  line-height: 1.15;
+  letter-spacing: 0.035em;
   text-overflow: ellipsis;
   text-transform: uppercase;
   white-space: nowrap;
@@ -2986,33 +2988,36 @@ input:disabled {
 
 .summaryCard strong {
   flex: 0 0 auto;
-  font-size: 24px;
+  font-size: 21px;
   line-height: 1;
 }
 
 .summaryCard > svg {
   grid-area: icon;
   position: static;
-  width: 18px;
-  height: 18px;
-  opacity: 0.66;
+  width: 16px;
+  height: 16px;
+  opacity: 0.62;
 }
 
 .summaryCard::after {
-  width: 58px;
-  height: 58px;
-  right: -17px;
-  bottom: -20px;
-  opacity: 0.65;
+  width: 46px;
+  height: 46px;
+  right: -15px;
+  bottom: -18px;
+  opacity: 0.5;
 }
 
 .summaryCard p {
   grid-area: copy;
-  max-width: 155px;
+  max-width: none;
   margin: 0;
+  overflow: hidden;
   color: #8598a8;
-  font-size: 9.5px;
-  line-height: 1.35;
+  font-size: 8.5px;
+  line-height: 1.2;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 /*
@@ -3196,6 +3201,10 @@ input:disabled {
 
 /*
  * Responsive command strip.
+ *
+ * Desktop: six metrics in one row.
+ * Tablet: 3 x 2.
+ * Phone: 2 x 3 with secondary copy removed.
  */
 @media (max-width: 1320px) {
   .summaryGrid {
@@ -3222,16 +3231,44 @@ input:disabled {
         2,
         minmax(0, 1fr)
       );
+    gap: 8px;
   }
 }
 
 @media (max-width: 560px) {
   .summaryGrid {
-    grid-template-columns: 1fr;
+    grid-template-columns:
+      repeat(
+        2,
+        minmax(0, 1fr)
+      );
+    gap: 7px;
+    margin-bottom: 9px;
   }
 
   .summaryCard {
-    min-height: 92px;
+    min-height: 64px;
+    grid-template-areas:
+      "metric icon";
+    padding: 9px 10px;
+  }
+
+  .summaryCard p {
+    display: none;
+  }
+
+  .summaryCard span {
+    font-size: 8px;
+    white-space: normal;
+  }
+
+  .summaryCard strong {
+    font-size: 20px;
+  }
+
+  .summaryCard > svg {
+    width: 15px;
+    height: 15px;
   }
 }
 
