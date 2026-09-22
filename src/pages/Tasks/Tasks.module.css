@@ -8335,3 +8335,52 @@ button {
     grid-template-columns: 1fr 1fr;
   }
 }
+
+
+/* ============================================================
+   CAMPAIGN SEAT — MOBILE TASK DOCUMENT SCROLL
+   ============================================================ */
+
+/*
+ * Desktop keeps the controlled application workspace.
+ *
+ * On phone/tablet portrait, use the browser's native vertical
+ * document scroll instead of nesting the entire Tasks page inside
+ * a fixed 100dvh overflow container.
+ *
+ * This prevents the task list / Operations content below the
+ * filters from becoming unreachable on mobile browsers.
+ */
+@media (max-width: 850px) {
+  .app {
+    height: auto !important;
+    min-height: 100dvh !important;
+    overflow-x: hidden !important;
+    overflow-y: visible !important;
+  }
+
+  .workspace {
+    height: auto !important;
+    min-height: 100dvh !important;
+    max-height: none !important;
+    overflow-x: hidden !important;
+    overflow-y: visible !important;
+  }
+
+  .main {
+    height: auto !important;
+    max-height: none !important;
+    min-height: auto !important;
+    flex: 0 0 auto !important;
+
+    overflow-x: hidden !important;
+    overflow-y: visible !important;
+
+    overscroll-behavior-y: auto !important;
+    -webkit-overflow-scrolling: auto;
+
+    touch-action: pan-y;
+
+    padding-bottom: 34px !important;
+  }
+}
