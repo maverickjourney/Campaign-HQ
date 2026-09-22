@@ -1498,14 +1498,7 @@ export default function CommitmentsReferencePreview() {
 
             <h1>Commitments</h1>
 
-            <p>
-              Track every promise made by the candidate and campaign—and make sure it is delivered.
-            </p>
 
-            <small className={styles.updated}>
-              <span />
-              {updatedLabel}
-            </small>
           </div>
 
           <div className={styles.headerActions}>
@@ -1776,7 +1769,7 @@ export default function CommitmentsReferencePreview() {
                 <thead>
                   <tr>
                     <th>Commitment</th>
-                    <th>Stakeholder</th>
+                    <th>Promised to</th>
                     <th>Owner</th>
                     <th>Promise date</th>
                     <th>Health</th>
@@ -1805,9 +1798,19 @@ export default function CommitmentsReferencePreview() {
                         <strong>
                           No commitments match this view
                         </strong>
+
                         <span>
-                          Adjust the filters or create a new campaign commitment.
+                          Commitments track promises made to people and organizations.
                         </span>
+
+                        <button
+                          className={styles.emptyCreateButton}
+                          type="button"
+                          onClick={openCreateModal}
+                        >
+                          <Plus size={15} />
+                          Create commitment
+                        </button>
                       </td>
                     </tr>
                   ) : (
@@ -2027,7 +2030,7 @@ export default function CommitmentsReferencePreview() {
                   <div>
                     <span>
                       <UsersRound size={15} />
-                      Stakeholder
+                      Promised to
                     </span>
 
                     <strong>
@@ -2293,7 +2296,7 @@ export default function CommitmentsReferencePreview() {
               </label>
 
               <label className={styles.fullField}>
-                <span>Stakeholder</span>
+                <span>Promised to</span>
 
                 <input
                   name="stakeholder"

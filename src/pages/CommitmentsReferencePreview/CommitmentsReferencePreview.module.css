@@ -3304,3 +3304,369 @@
 }
 
 /* CAMPAIGN SEAT COMMITMENTS 851-900 BRIDGE — END */
+
+
+/* ============================================================
+   CAMPAIGN SEAT — COMMITMENTS ACCOUNTABILITY COMMAND CENTER
+   ============================================================ */
+
+/*
+ * Commitments is an accountability workspace:
+ * promise -> promised to -> owner -> deadline -> health.
+ *
+ * Keep the command surface compact so the accountability
+ * table begins high in the viewport.
+ */
+
+.page {
+  padding-top: 18px !important;
+}
+
+.pageHeader {
+  display: grid !important;
+  grid-template-columns:
+    minmax(245px, 0.65fr)
+    minmax(560px, 1.35fr) !important;
+
+  align-items: end !important;
+  gap: 18px !important;
+
+  width: 100% !important;
+  max-width: none !important;
+
+  margin-bottom: 10px !important;
+}
+
+.pageHeader > :first-child {
+  width: auto !important;
+  min-width: 0 !important;
+  max-width: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+.eyebrow {
+  margin-bottom: 3px !important;
+  font-size: 9.5px !important;
+  line-height: 1.1 !important;
+}
+
+.pageHeader h1 {
+  margin: 0 !important;
+  font-size:
+    clamp(
+      30px,
+      2.4vw,
+      38px
+    ) !important;
+  line-height: 1 !important;
+}
+
+.pageHeader p,
+.updated {
+  display: none !important;
+}
+
+.headerActions {
+  box-sizing: border-box !important;
+
+  display: grid !important;
+  grid-template-columns:
+    minmax(220px, 1fr)
+    auto
+    auto !important;
+
+  width: 100% !important;
+  min-width: 0 !important;
+  max-width: none !important;
+
+  align-items: center !important;
+  gap: 8px !important;
+
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+.searchBox {
+  box-sizing: border-box !important;
+
+  width: 100% !important;
+  min-width: 0 !important;
+  max-width: none !important;
+
+  height: 40px !important;
+
+  flex: none !important;
+
+  padding: 0 11px !important;
+  border-radius: 10px !important;
+}
+
+.secondaryButton,
+.primaryButton {
+  min-height: 40px !important;
+  height: 40px !important;
+
+  padding:
+    0 13px !important;
+
+  border-radius:
+    10px !important;
+
+  font-size:
+    11px !important;
+}
+
+/*
+ * Five accountability metrics — one compact desktop strip.
+ */
+
+.summaryGrid {
+  grid-template-columns:
+    repeat(
+      5,
+      minmax(0, 1fr)
+    ) !important;
+
+  gap: 7px !important;
+  margin-bottom: 10px !important;
+}
+
+.summaryCard {
+  min-height: 70px !important;
+
+  gap: 9px !important;
+
+  padding:
+    9px 11px !important;
+
+  border-radius:
+    11px !important;
+}
+
+.summaryIcon {
+  width: 34px !important;
+  height: 34px !important;
+  min-width: 34px !important;
+
+  border-radius:
+    10px !important;
+}
+
+.summaryIcon svg {
+  width: 17px !important;
+  height: 17px !important;
+}
+
+.summaryCopy small {
+  font-size:
+    9px !important;
+}
+
+.summaryCopy strong {
+  margin:
+    2px 0 !important;
+
+  font-size:
+    20px !important;
+}
+
+.summaryCopy em {
+  font-size:
+    8.5px !important;
+
+  line-height:
+    1.2 !important;
+}
+
+/*
+ * Pull the actual accountability workspace upward.
+ */
+
+.commitmentsWorkspace {
+  gap: 10px !important;
+}
+
+.tabs {
+  min-height: 48px !important;
+}
+
+.tabs button {
+  padding:
+    0 15px !important;
+
+  font-size:
+    11px !important;
+}
+
+.tableActions {
+  min-height: 47px !important;
+
+  padding:
+    7px 13px !important;
+}
+
+.resultsLine {
+  min-height: 39px !important;
+
+  padding:
+    0 14px !important;
+}
+
+.commitmentRow td {
+  height: 64px !important;
+}
+
+/*
+ * Empty states should help the user start using Commitments,
+ * not leave a large dead table.
+ */
+
+.emptyCell {
+  height: 220px !important;
+}
+
+.emptyCreateButton {
+  display: inline-flex !important;
+
+  min-height: 38px;
+
+  align-items: center;
+  justify-content: center;
+
+  gap: 6px;
+
+  margin:
+    13px auto 0 !important;
+
+  padding:
+    0 13px;
+
+  border:
+    1px solid #e52738;
+
+  border-radius:
+    9px;
+
+  color:
+    #ffffff;
+
+  background:
+    #e52738;
+
+  font-size:
+    10.5px;
+
+  font-weight:
+    850;
+
+  cursor:
+    pointer;
+}
+
+/*
+ * Narrow laptop / tablet.
+ */
+
+@media (max-width: 1100px) {
+  .pageHeader {
+    grid-template-columns:
+      1fr !important;
+
+    align-items:
+      stretch !important;
+
+    gap:
+      10px !important;
+  }
+
+  .headerActions {
+    grid-template-columns:
+      minmax(0, 1fr)
+      auto
+      auto !important;
+  }
+
+  .summaryGrid {
+    grid-template-columns:
+      repeat(
+        3,
+        minmax(0, 1fr)
+      ) !important;
+  }
+}
+
+/*
+ * Phone / tablet portrait.
+ */
+
+@media (max-width: 700px) {
+  .page {
+    padding-top:
+      14px !important;
+  }
+
+  .headerActions {
+    grid-template-columns:
+      minmax(0, 1fr)
+      minmax(0, 1fr) !important;
+  }
+
+  .searchBox {
+    grid-column:
+      1 / -1 !important;
+
+    height:
+      44px !important;
+  }
+
+  .secondaryButton,
+  .primaryButton {
+    width:
+      100% !important;
+
+    min-height:
+      44px !important;
+
+    height:
+      44px !important;
+  }
+
+  .summaryGrid {
+    grid-template-columns:
+      repeat(
+        2,
+        minmax(0, 1fr)
+      ) !important;
+
+    gap:
+      7px !important;
+  }
+
+  .summaryCard {
+    min-height:
+      64px !important;
+  }
+
+  .summaryCard:nth-child(5) {
+    grid-column:
+      1 / -1 !important;
+  }
+
+  .summaryCopy em {
+    display:
+      none !important;
+  }
+}
+
+@media (max-width: 340px) {
+  .summaryGrid {
+    grid-template-columns:
+      1fr !important;
+  }
+
+  .summaryCard:nth-child(5) {
+    grid-column:
+      auto !important;
+  }
+}
