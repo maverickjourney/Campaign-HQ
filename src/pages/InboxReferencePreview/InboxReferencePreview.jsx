@@ -11965,16 +11965,21 @@ type="button"
                   </select>
                 </label>
 
-                <span
+                <div
                   className={
-                    styles.inboxWorkflowMenuAction
+                    styles.inboxWorkflowSecondaryActions
                   }
                 >
-                  <button
-                    className={[
-                      styles.inboxWorkflowMenuTrigger,
+                  <span
+                    className={
+                      styles.inboxWorkflowMenuAction
+                    }
+                  >
+                    <button
+                      className={[
+                        styles.inboxWorkflowMenuTrigger,
 
-                      selectedInboxSnoozed
+                        selectedInboxSnoozed
                         ? styles.inboxWorkflowMenuTriggerActive
                         : "",
                     ]
@@ -11983,6 +11988,11 @@ type="button"
                     type="button"
                     aria-expanded={
                       inboxSnoozeMenuOpen
+                    }
+                    aria-label={
+                      selectedInboxSnoozeLabel
+                        ? `Snoozed until ${selectedInboxSnoozeLabel}`
+                        : "Snooze conversation"
                     }
                     title={
                       selectedInboxSnoozeLabel
@@ -12121,6 +12131,11 @@ type="button"
                     type="button"
                     aria-expanded={
                       inboxFollowUpMenuOpen
+                    }
+                    aria-label={
+                      selectedInboxFollowUpLabel
+                        ? `Follow up ${selectedInboxFollowUpLabel}`
+                        : "Set follow-up"
                     }
                     title={
                       selectedInboxFollowUpLabel
@@ -12303,6 +12318,7 @@ type="button"
                     ? "Open Task"
                     : "Create Task"}
                 </button>
+                </div>
 
                 {inboxWorkflowError ? (
                   <span
