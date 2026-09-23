@@ -30757,3 +30757,891 @@ button[aria-label] {
 
 
 /* CAMPAIGN SEAT WORKFLOW + HOVER V29 — END */
+
+/* CAMPAIGN SEAT COMPACT COMMAND BAR V30 — START */
+
+
+/* ============================================================
+   CONVERSATION COMMAND BAR
+
+   Desktop:
+   Owner | Status | Snooze | Follow Up | VIP | Create Task
+
+   No giant form fields.
+   No disconnected second toolbar.
+   ============================================================ */
+
+.inboxWorkflowActionBar {
+  display:
+    flex !important;
+
+  width:
+    100% !important;
+
+  min-width:
+    0 !important;
+
+  min-height:
+    52px !important;
+
+  align-items:
+    center !important;
+
+  flex-wrap:
+    nowrap !important;
+
+  gap:
+    7px !important;
+
+  padding:
+    7px
+    10px !important;
+
+  background:
+    #fbfcfd !important;
+}
+
+
+/* Hide old identity panel */
+
+.inboxWorkflowActionIdentity {
+  display:
+    none !important;
+}
+
+
+/* ============================================================
+   OWNER + STATUS
+   ============================================================ */
+
+.inboxWorkflowAssign,
+.inboxWorkflowStatusSelect {
+  display:
+    flex !important;
+
+  min-width:
+    0 !important;
+
+  max-width:
+    none !important;
+
+  flex:
+    0
+    1
+    auto !important;
+
+  align-items:
+    center !important;
+
+  gap:
+    6px !important;
+
+  margin:
+    0 !important;
+}
+
+
+.inboxWorkflowAssign {
+  width:
+    218px !important;
+
+  flex-basis:
+    218px !important;
+}
+
+
+.inboxWorkflowStatusSelect {
+  width:
+    190px !important;
+
+  flex-basis:
+    190px !important;
+}
+
+
+.inboxWorkflowAssign
+> span,
+
+.inboxWorkflowStatusSelect
+> span {
+  position:
+    static !important;
+
+  width:
+    auto !important;
+
+  height:
+    auto !important;
+
+  min-width:
+    max-content !important;
+
+  margin:
+    0 !important;
+
+  padding:
+    0 !important;
+
+  overflow:
+    visible !important;
+
+  clip:
+    auto !important;
+
+  color:
+    #70869a !important;
+
+  font-size:
+    10px !important;
+
+  font-weight:
+    850 !important;
+
+  line-height:
+    1 !important;
+
+  white-space:
+    nowrap !important;
+}
+
+
+.inboxWorkflowAssign
+select,
+
+.inboxWorkflowStatusSelect
+select {
+  box-sizing:
+    border-box !important;
+
+  width:
+    100% !important;
+
+  min-width:
+    0 !important;
+
+  height:
+    36px !important;
+
+  min-height:
+    36px !important;
+
+  padding:
+    0
+    28px
+    0
+    10px !important;
+
+  border:
+    1px solid
+    #d1dee8 !important;
+
+  border-radius:
+    8px !important;
+
+  color:
+    #345d7b !important;
+
+  background:
+    #ffffff !important;
+
+  font-size:
+    12px !important;
+
+  font-weight:
+    780 !important;
+
+  cursor:
+    pointer !important;
+
+  outline:
+    none !important;
+
+  transition:
+    border-color
+    120ms
+    ease,
+    background-color
+    120ms
+    ease,
+    box-shadow
+    120ms
+    ease !important;
+}
+
+
+/* ============================================================
+   SECONDARY ACTIONS
+   ============================================================ */
+
+.inboxWorkflowSecondaryActions {
+  display:
+    flex !important;
+
+  width:
+    auto !important;
+
+  min-width:
+    0 !important;
+
+  flex:
+    1
+    1
+    auto !important;
+
+  align-items:
+    center !important;
+
+  justify-content:
+    flex-end !important;
+
+  flex-wrap:
+    nowrap !important;
+
+  gap:
+    5px !important;
+
+  margin:
+    0 !important;
+
+  padding:
+    0 !important;
+}
+
+
+.inboxWorkflowSecondaryActions
+.inboxWorkflowMenuAction,
+
+.inboxWorkflowSecondaryActions
+.inboxWorkflowVipButton,
+
+.inboxWorkflowSecondaryActions
+.inboxWorkflowTaskButton {
+  grid-column:
+    auto !important;
+
+  grid-row:
+    auto !important;
+
+  flex:
+    0
+    0
+    auto !important;
+
+  margin:
+    0 !important;
+}
+
+
+.inboxWorkflowSecondaryActions
+.inboxWorkflowMenuTrigger,
+
+.inboxWorkflowSecondaryActions
+.inboxWorkflowVipButton,
+
+.inboxWorkflowSecondaryActions
+.inboxWorkflowTaskButton {
+  box-sizing:
+    border-box !important;
+
+  height:
+    36px !important;
+
+  min-height:
+    36px !important;
+
+  width:
+    auto !important;
+
+  justify-content:
+    center !important;
+
+  gap:
+    5px !important;
+
+  padding:
+    0
+    9px !important;
+
+  border-radius:
+    8px !important;
+
+  font-size:
+    12px !important;
+
+  font-weight:
+    780 !important;
+
+  white-space:
+    nowrap !important;
+
+  cursor:
+    pointer !important;
+}
+
+
+.inboxWorkflowSecondaryActions
+.inboxWorkflowMenuAction:first-child
+.inboxWorkflowMenuTrigger {
+  min-width:
+    84px !important;
+}
+
+
+.inboxWorkflowSecondaryActions
+.inboxWorkflowMenuAction:nth-child(2)
+.inboxWorkflowMenuTrigger {
+  min-width:
+    101px !important;
+}
+
+
+.inboxWorkflowSecondaryActions
+.inboxWorkflowVipButton {
+  min-width:
+    61px !important;
+
+  font-size:
+    12px !important;
+}
+
+
+.inboxWorkflowSecondaryActions
+.inboxWorkflowTaskButton {
+  min-width:
+    112px !important;
+}
+
+
+/* ============================================================
+   EXPANDED MODE
+
+   Do NOT change ordering or spacing just because
+   the email is expanded.
+   ============================================================ */
+
+.threadPanelExpanded
+.inboxWorkflowActionBar {
+  display:
+    flex !important;
+
+  align-items:
+    center !important;
+
+  flex-wrap:
+    nowrap !important;
+
+  gap:
+    8px !important;
+
+  padding:
+    8px
+    14px !important;
+}
+
+
+.threadPanelExpanded
+.inboxWorkflowAssign {
+  width:
+    230px !important;
+
+  flex:
+    0
+    0
+    230px !important;
+}
+
+
+.threadPanelExpanded
+.inboxWorkflowStatusSelect {
+  width:
+    205px !important;
+
+  flex:
+    0
+    0
+    205px !important;
+}
+
+
+.threadPanelExpanded
+.inboxWorkflowSecondaryActions {
+  flex:
+    1
+    1
+    auto !important;
+
+  justify-content:
+    flex-end !important;
+}
+
+
+/* ============================================================
+   PANE GETS NARROW:
+   controlled wrap into two rows.
+   ============================================================ */
+
+@container inbox-thread (max-width: 840px) {
+
+  .inboxWorkflowActionBar {
+    display:
+      grid !important;
+
+    grid-template-columns:
+      minmax(
+        0,
+        1fr
+      )
+      minmax(
+        0,
+        1fr
+      ) !important;
+
+    grid-template-areas:
+      "owner status"
+      "actions actions" !important;
+
+    gap:
+      7px !important;
+  }
+
+
+  .inboxWorkflowAssign {
+    grid-area:
+      owner !important;
+
+    width:
+      100% !important;
+
+    max-width:
+      none !important;
+
+    flex:
+      none !important;
+  }
+
+
+  .inboxWorkflowStatusSelect {
+    grid-area:
+      status !important;
+
+    width:
+      100% !important;
+
+    max-width:
+      none !important;
+
+    flex:
+      none !important;
+  }
+
+
+  .inboxWorkflowSecondaryActions {
+    grid-area:
+      actions !important;
+
+    width:
+      100% !important;
+
+    justify-content:
+      flex-start !important;
+  }
+}
+
+
+/* ============================================================
+   VERY NARROW
+   ============================================================ */
+
+@container inbox-thread (max-width: 540px) {
+
+  .inboxWorkflowActionBar {
+    grid-template-columns:
+      minmax(
+        0,
+        1fr
+      ) !important;
+
+    grid-template-areas:
+      "owner"
+      "status"
+      "actions" !important;
+  }
+
+
+  .inboxWorkflowSecondaryActions {
+    flex-wrap:
+      wrap !important;
+  }
+}
+
+
+/* ============================================================
+   HOVER — ALWAYS ACTIVE
+
+   Do not depend on browser pointer/trackpad media reporting.
+   ============================================================ */
+
+.threadHeaderActions
+> button:not(:disabled),
+
+.threadHeaderActions
+> span
+> button:not(:disabled),
+
+.inboxWorkflowSecondaryActions
+button:not(:disabled),
+
+.inboxMailboxQuickButton:not(:disabled),
+
+.inboxMailboxTrigger:not(:disabled),
+
+.inboxSourceTrigger:not(:disabled),
+
+.inboxEmailAccountTrigger:not(:disabled),
+
+.inboxTagTrigger:not(:disabled),
+
+.quickTaskButton:not(:disabled),
+
+.reminderButton:not(:disabled) {
+  cursor:
+    pointer !important;
+
+  transition:
+    color
+    120ms
+    ease,
+    background-color
+    120ms
+    ease,
+    border-color
+    120ms
+    ease,
+    box-shadow
+    120ms
+    ease,
+    transform
+    120ms
+    ease !important;
+}
+
+
+.threadHeaderActions
+> button:hover:not(:disabled),
+
+.threadHeaderActions
+> span
+> button:hover:not(:disabled),
+
+.inboxWorkflowSecondaryActions
+button:hover:not(:disabled),
+
+.inboxMailboxQuickButton:hover:not(:disabled),
+
+.inboxMailboxTrigger:hover:not(:disabled),
+
+.inboxSourceTrigger:hover:not(:disabled),
+
+.inboxEmailAccountTrigger:hover:not(:disabled),
+
+.inboxTagTrigger:hover:not(:disabled),
+
+.quickTaskButton:hover:not(:disabled),
+
+.reminderButton:hover:not(:disabled) {
+  border-color:
+    #79a3c3 !important;
+
+  color:
+    #174f79 !important;
+
+  background:
+    #eaf3fa !important;
+
+  box-shadow:
+    0
+    5px
+    15px
+    rgba(
+      24,
+      73,
+      111,
+      0.15
+    ) !important;
+
+  transform:
+    translateY(
+      -1px
+    ) !important;
+}
+
+
+/* Delete stays red */
+
+.threadHeaderActions
+.mailboxActionDanger:hover:not(:disabled) {
+  border-color:
+    #e87e88 !important;
+
+  color:
+    #c82635 !important;
+
+  background:
+    #fff0f1 !important;
+}
+
+
+/* Owner + status */
+
+.inboxWorkflowAssign
+select:hover:not(:disabled),
+
+.inboxWorkflowStatusSelect
+select:hover:not(:disabled) {
+  border-color:
+    #75a1c1 !important;
+
+  background:
+    #f6faff !important;
+
+  box-shadow:
+    0
+    0
+    0
+    3px
+    rgba(
+      59,
+      120,
+      166,
+      0.11
+    ) !important;
+}
+
+
+/* ============================================================
+   TOOLTIP SYSTEM
+
+   Icon buttons show their aria-label on hover.
+   ============================================================ */
+
+.threadHeader {
+  position:
+    relative !important;
+
+  z-index:
+    200 !important;
+
+  overflow:
+    visible !important;
+}
+
+
+.threadHeaderActions {
+  position:
+    relative !important;
+
+  z-index:
+    250 !important;
+
+  overflow:
+    visible !important;
+}
+
+
+.threadHeaderActions
+button[aria-label] {
+  position:
+    relative !important;
+
+  overflow:
+    visible !important;
+}
+
+
+.threadHeaderActions
+button[aria-label]::after {
+  position:
+    absolute !important;
+
+  z-index:
+    99999 !important;
+
+  top:
+    calc(
+      100% +
+      8px
+    ) !important;
+
+  left:
+    50% !important;
+
+  width:
+    max-content !important;
+
+  max-width:
+    220px !important;
+
+  padding:
+    6px
+    9px !important;
+
+  border-radius:
+    7px !important;
+
+  color:
+    #ffffff !important;
+
+  background:
+    #163f61 !important;
+
+  box-shadow:
+    0
+    8px
+    24px
+    rgba(
+      12,
+      38,
+      59,
+      0.25
+    ) !important;
+
+  content:
+    attr(
+      aria-label
+    ) !important;
+
+  font-size:
+    11px !important;
+
+  font-weight:
+    750 !important;
+
+  line-height:
+    1.2 !important;
+
+  opacity:
+    0 !important;
+
+  pointer-events:
+    none !important;
+
+  white-space:
+    nowrap !important;
+
+  visibility:
+    hidden !important;
+
+  transform:
+    translate(
+      -50%,
+      -3px
+    ) !important;
+
+  transition:
+    opacity
+    90ms
+    ease,
+    transform
+    90ms
+    ease !important;
+}
+
+
+.threadHeaderActions
+button[aria-label]:hover::after {
+  opacity:
+    1 !important;
+
+  visibility:
+    visible !important;
+
+  transform:
+    translate(
+      -50%,
+      0
+    ) !important;
+}
+
+
+/* Last icon tooltip stays inside pane */
+
+.threadHeaderActions
+button[aria-label]:last-child::after {
+  right:
+    0 !important;
+
+  left:
+    auto !important;
+
+  transform:
+    translate(
+      0,
+      -3px
+    ) !important;
+}
+
+
+.threadHeaderActions
+button[aria-label]:last-child:hover::after {
+  transform:
+    translate(
+      0,
+      0
+    ) !important;
+}
+
+
+/* ============================================================
+   WORKFLOW BUTTON TOOLTIP
+   ============================================================ */
+
+.inboxWorkflowSecondaryActions
+.inboxWorkflowMenuAction {
+  position:
+    relative !important;
+
+  overflow:
+    visible !important;
+}
+
+
+.inboxWorkflowSecondaryActions
+button[aria-label] {
+  position:
+    relative !important;
+
+  overflow:
+    visible !important;
+}
+
+
+/* ============================================================
+   FOCUS
+   ============================================================ */
+
+.threadHeaderActions
+button:focus-visible,
+
+.inboxWorkflowSecondaryActions
+button:focus-visible,
+
+.inboxWorkflowAssign
+select:focus-visible,
+
+.inboxWorkflowStatusSelect
+select:focus-visible {
+  outline:
+    3px solid
+    rgba(
+      48,
+      117,
+      172,
+      0.22
+    ) !important;
+
+  outline-offset:
+    2px !important;
+}
+
+
+/* CAMPAIGN SEAT COMPACT COMMAND BAR V30 — END */
