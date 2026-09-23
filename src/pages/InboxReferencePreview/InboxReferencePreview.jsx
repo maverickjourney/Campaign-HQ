@@ -3590,8 +3590,6 @@ export default function InboxReferencePreview() {
     "inbox",
     "drafts",
     "sent",
-    "trash",
-    "junk",
   ];
 
   const mailboxQuickItems =
@@ -10151,8 +10149,9 @@ export default function InboxReferencePreview() {
                       {item.label}
                     </span>
 
-                    {item.count !==
-                    null ? (
+                    {Number(
+                      item.count,
+                    ) > 0 ? (
                       <strong>
                         {item.count}
                       </strong>
@@ -10189,6 +10188,10 @@ export default function InboxReferencePreview() {
                 );
 
                 setSourceMenuOpen(
+                  false,
+                );
+
+                setEmailAccountMenuOpen(
                   false,
                 );
 
@@ -10604,6 +10607,10 @@ export default function InboxReferencePreview() {
                   false,
                 );
 
+                setEmailAccountMenuOpen(
+                  false,
+                );
+
                 setTagMenuOpen(
                   false,
                 );
@@ -10786,6 +10793,10 @@ export default function InboxReferencePreview() {
                   setEmailAccountMenuOpen(
                     (current) =>
                       !current,
+                  );
+
+                  setMailboxMenuOpen(
+                    false,
                   );
 
                   setSourceMenuOpen(
@@ -11010,6 +11021,10 @@ export default function InboxReferencePreview() {
                 setSourceMenuOpen(
                   false,
                 );
+
+                setEmailAccountMenuOpen(
+                  false,
+                );
               }}
             >
               <Filter
@@ -11077,7 +11092,10 @@ export default function InboxReferencePreview() {
           </div>
 
           {(
-            activeChannel !== "all" ||
+            (
+              activeChannel !== "all" &&
+              activeChannel !== "email"
+            ) ||
             selectedAccountKeys.length ||
             activeTag
           ) ? (
@@ -11101,6 +11119,14 @@ export default function InboxReferencePreview() {
 
                 setActiveFilter(
                   "",
+                );
+
+                setMailboxMenuOpen(
+                  false,
+                );
+
+                setEmailAccountMenuOpen(
+                  false,
                 );
 
                 setSourceMenuOpen(
@@ -11967,65 +11993,46 @@ type="button"
                   </select>
                 </label>
 
-                <div
+                <label
                   className={
-                    styles.inboxWorkflowStatusButtons
+                    styles.inboxWorkflowStatusSelect
                   }
                 >
-                  <button
-                    className={
-                      selectedInboxWorkflowStatus ===
-                        "needs_reply"
-                        ? styles.inboxWorkflowActionActive
-                        : ""
-                    }
-                    type="button"
-                    aria-pressed={
-                      selectedInboxWorkflowStatus ===
-                      "needs_reply"
-                    }
-                    disabled={
-                      Boolean(
-                        inboxWorkflowActionBusy,
-                      )
-                    }
-                    onClick={() =>
-                      handleInboxWorkflowStatus(
-                        "needs_reply",
-                      )
-                    }
-                  >
-                    <Inbox size={14} />
-                    Needs Reply
-                  </button>
+                  <span>
+                    Status
+                  </span>
 
-                  <button
-                    className={
-                      selectedInboxWorkflowStatus ===
-                        "waiting_on"
-                        ? styles.inboxWorkflowActionActive
-                        : ""
-                    }
-                    type="button"
-                    aria-pressed={
-                      selectedInboxWorkflowStatus ===
-                      "waiting_on"
+                  <select
+                    value={
+                      selectedInboxWorkflowStatus ||
+                      "open"
                     }
                     disabled={
                       Boolean(
                         inboxWorkflowActionBusy,
                       )
                     }
-                    onClick={() =>
+                    onChange={(
+                      event,
+                    ) =>
                       handleInboxWorkflowStatus(
-                        "waiting_on",
+                        event.target.value,
                       )
                     }
                   >
-                    <Clock3 size={14} />
-                    Waiting On
-                  </button>
-                </div>
+                    <option value="open">
+                      Open
+                    </option>
+
+                    <option value="needs_reply">
+                      Needs Reply
+                    </option>
+
+                    <option value="waiting_on">
+                      Waiting On
+                    </option>
+                  </select>
+                </label>
 
                 <span
                   className={
