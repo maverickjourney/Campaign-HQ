@@ -3886,7 +3886,7 @@ export default function InboxReferencePreview() {
   const accountButtonLabel =
     selectedAccountKeys.length ===
       0
-      ? "All Accounts"
+      ? "Accounts"
       : selectedAccountKeys.length ===
           1
         ? (
@@ -9671,79 +9671,7 @@ export default function InboxReferencePreview() {
           >
             <h1>Inbox</h1>
 
-            <div
-              className={
-                styles.headerMetrics
-              }
-              aria-label="Inbox status"
-            >
-              {summaryMetrics
-              .filter(
-                (metric) =>
-                  metric.id ===
-                  "unread",
-              )
-              .map(
-                (metric) => {
-                  const Icon =
-                    metric.icon;
-
-                  const compactLabel =
-                    metric.id ===
-                    "unread"
-                      ? "Unread"
-                      : metric.id ===
-                          "needs-response"
-                        ? "Needs Reply"
-                        : "High Priority";
-
-                  return (
-                    <button
-                      key={metric.id}
-                      className={[
-                        styles.headerMetricButton,
-
-                        activeFilter ===
-                          metric.id
-                          ? styles.headerMetricButtonActive
-                          : "",
-                      ]
-                        .filter(Boolean)
-                        .join(" ")}
-                      type="button"
-                      aria-pressed={
-                        activeFilter ===
-                        metric.id
-                      }
-                      onClick={() => {
-                        setActiveFilter(
-                          activeFilter ===
-                            metric.id
-                            ? ""
-                            : metric.id,
-                        );
-
-                        setActiveChannel(
-                          "all",
-                        );
-                      }}
-                    >
-                      <Icon
-                        size={14}
-                      />
-
-                      <strong>
-                        {metric.value}
-                      </strong>
-
-                      <span>
-                        {compactLabel}
-                      </span>
-                    </button>
-                  );
-                },
-              )}
-            </div>
+            
 
             {liveMailboxEnabled ? (
               <button
@@ -10636,7 +10564,10 @@ export default function InboxReferencePreview() {
 
                     <span>
                       {
-                        activeDefinition.label
+                        activeDefinition.id ===
+                        "all"
+                          ? "Messages"
+                          : activeDefinition.label
                       }
                     </span>
 
@@ -11033,7 +10964,7 @@ export default function InboxReferencePreview() {
 
               <span>
                 {activeTag ||
-                  "All Tags"}
+                  "Tags"}
               </span>
 
               <ChevronDown
