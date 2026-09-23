@@ -31645,3 +31645,196 @@ select:focus-visible {
 
 
 /* CAMPAIGN SEAT COMPACT COMMAND BAR V30 — END */
+
+/* CAMPAIGN SEAT HEADER ACTION SCROLL FIX V31 — START */
+
+
+/*
+ * The email action icons must NEVER become a horizontal
+ * scrolling region on desktop.
+ */
+
+.threadPanel:not(.newMessageModal)
+.threadHeader {
+  height:
+    auto !important;
+
+  max-height:
+    none !important;
+
+  overflow:
+    visible !important;
+}
+
+
+.threadPanel:not(.newMessageModal)
+.threadHeaderActions {
+  display:
+    flex !important;
+
+  width:
+    auto !important;
+
+  max-width:
+    100% !important;
+
+  min-width:
+    0 !important;
+
+  flex:
+    0
+    1
+    auto !important;
+
+  align-items:
+    center !important;
+
+  justify-content:
+    flex-end !important;
+
+  flex-wrap:
+    wrap !important;
+
+  gap:
+    5px !important;
+
+  overflow:
+    visible !important;
+
+  overflow-x:
+    visible !important;
+
+  overflow-y:
+    visible !important;
+
+  scrollbar-width:
+    none !important;
+}
+
+
+.threadPanel:not(.newMessageModal)
+.threadHeaderActions::-webkit-scrollbar {
+  display:
+    none !important;
+}
+
+
+/*
+ * When the reading pane gets tighter, put the action row
+ * underneath the sender instead of creating a scroll strip.
+ */
+
+@container inbox-thread (max-width: 930px) {
+
+  .threadPanel:not(.newMessageModal)
+  .threadHeader {
+    display:
+      grid !important;
+
+    grid-template-columns:
+      minmax(
+        0,
+        1fr
+      ) !important;
+
+    grid-template-rows:
+      auto
+      auto !important;
+
+    align-items:
+      center !important;
+
+    gap:
+      7px !important;
+
+    min-height:
+      auto !important;
+
+    padding:
+      9px
+      10px !important;
+
+    overflow:
+      visible !important;
+  }
+
+
+  .threadPanel:not(.newMessageModal)
+  .threadHeaderActions {
+    width:
+      100% !important;
+
+    max-width:
+      100% !important;
+
+    justify-content:
+      flex-end !important;
+
+    flex-wrap:
+      wrap !important;
+
+    overflow:
+      visible !important;
+
+    overflow-x:
+      visible !important;
+
+    overflow-y:
+      visible !important;
+  }
+}
+
+
+/*
+ * Slightly smaller icon controls in the split-pane view,
+ * so all actions fit naturally without scrolling.
+ */
+
+@container inbox-thread (max-width: 760px) {
+
+  .threadHeaderActions
+  > button,
+
+  .threadHeaderActions
+  > span
+  > button {
+    width:
+      34px !important;
+
+    min-width:
+      34px !important;
+
+    height:
+      34px !important;
+
+    min-height:
+      34px !important;
+
+    flex:
+      0
+      0
+      34px !important;
+  }
+
+
+  .threadHeaderActions {
+    gap:
+      4px !important;
+  }
+}
+
+
+/*
+ * Preserve tooltip overflow.
+ */
+
+.threadHeader,
+.threadHeaderActions,
+.threadHeaderActions
+button[aria-label] {
+  overflow:
+    visible !important;
+}
+
+
+/* CAMPAIGN SEAT HEADER ACTION SCROLL FIX V31 — END */
