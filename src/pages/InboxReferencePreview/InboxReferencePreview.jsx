@@ -9829,6 +9829,8 @@ export default function InboxReferencePreview() {
             <button
               className={styles.quickTaskButton}
               type="button"
+              aria-label="Create quick task"
+              title="Create quick task"
               onClick={openQuickTask}
             >
               <ListTodo size={18} />
@@ -9840,6 +9842,7 @@ export default function InboxReferencePreview() {
                 styles.reminderButton
               }
               type="button"
+              aria-label="Create reminder"
               onClick={
                 openQuickReminder
               }
@@ -12297,6 +12300,16 @@ type="button"
                     .filter(Boolean)
                     .join(" ")}
                   type="button"
+                  aria-label={
+                    selectedInboxWorkflow?.is_vip
+                      ? "Remove VIP status"
+                      : "Mark conversation VIP"
+                  }
+                  title={
+                    selectedInboxWorkflow?.is_vip
+                      ? "Remove VIP status"
+                      : "Mark conversation VIP"
+                  }
                   aria-pressed={
                     selectedInboxWorkflow?.is_vip ===
                     true
@@ -12326,6 +12339,16 @@ type="button"
                     styles.inboxWorkflowTaskButton
                   }
                   type="button"
+                  aria-label={
+                    selectedInboxWorkflow?.linked_task_id
+                      ? "Open linked task"
+                      : "Create task from conversation"
+                  }
+                  title={
+                    selectedInboxWorkflow?.linked_task_id
+                      ? "Open linked task"
+                      : "Create task from conversation"
+                  }
                   disabled={
                     Boolean(
                       inboxWorkflowActionBusy,

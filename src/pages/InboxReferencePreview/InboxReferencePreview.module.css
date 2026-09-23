@@ -28631,3 +28631,661 @@ pre {
 }
 
 /* CAMPAIGN SEAT — INLINE REPLY READING PRIORITY V4 — END */
+
+/* INBOX BETA CLARITY PASS V26 — START */
+
+/*
+ * Goal:
+ *
+ * Keep the Inbox powerful without showing every control
+ * at full visual weight.
+ *
+ * Prevent mailbox controls from colliding.
+ *
+ * Make the selected-conversation workflow respond to
+ * the actual conversation pane width instead of the
+ * full browser viewport.
+ */
+
+
+/* ============================================================
+   PAGE HEADER
+   Search + compose remain primary.
+   Quick Task / Reminder become compact utilities.
+   ============================================================ */
+
+@media (min-width: 901px) {
+
+  .pageHeader {
+    min-width:
+      0 !important;
+
+    gap:
+      8px !important;
+
+    overflow:
+      visible !important;
+  }
+
+
+  .pageActions {
+    min-width:
+      0 !important;
+
+    gap:
+      6px !important;
+  }
+
+
+  .globalSearch {
+    flex:
+      1
+      1
+      420px !important;
+
+    width:
+      auto !important;
+
+    min-width:
+      220px !important;
+
+    max-width:
+      none !important;
+  }
+
+
+  .quickTaskButton,
+  .reminderButton {
+    flex:
+      0
+      0
+      42px !important;
+
+    width:
+      42px !important;
+
+    min-width:
+      42px !important;
+
+    height:
+      42px !important;
+
+    min-height:
+      42px !important;
+
+    justify-content:
+      center !important;
+
+    gap:
+      0 !important;
+
+    padding:
+      0 !important;
+
+    border-radius:
+      10px !important;
+
+    font-size:
+      0 !important;
+  }
+
+
+  .quickTaskButton svg,
+  .reminderButton svg {
+    width:
+      18px !important;
+
+    height:
+      18px !important;
+
+    margin:
+      0 !important;
+  }
+
+
+  .newMessageButton {
+    min-height:
+      42px !important;
+
+    padding:
+      0
+      15px !important;
+  }
+}
+
+
+@media
+  (min-width: 901px)
+  and
+  (max-width: 1250px) {
+
+  .globalSearch {
+    flex-basis:
+      260px !important;
+
+    min-width:
+      180px !important;
+  }
+}
+
+
+/* ============================================================
+   COMMAND QUEUE
+   Preserve workflow intelligence.
+   Remove extra dashboard-card visual weight.
+   ============================================================ */
+
+.inboxCommandBar {
+  min-height:
+    0 !important;
+
+  gap:
+    6px !important;
+
+  margin:
+    0
+    0
+    6px !important;
+
+  padding:
+    0 !important;
+
+  border:
+    0 !important;
+
+  border-radius:
+    0 !important;
+
+  background:
+    transparent !important;
+
+  box-shadow:
+    none !important;
+}
+
+
+.inboxCommandBarLabel {
+  display:
+    none !important;
+}
+
+
+.inboxCommandMetrics {
+  flex:
+    1
+    1
+    auto !important;
+
+  min-width:
+    0 !important;
+
+  gap:
+    5px !important;
+
+  padding:
+    0
+    1px !important;
+}
+
+
+.inboxCommandMetrics button {
+  min-height:
+    34px !important;
+
+  height:
+    34px !important;
+
+  gap:
+    6px !important;
+
+  padding:
+    0
+    9px !important;
+
+  border-radius:
+    999px !important;
+
+  font-size:
+    12px !important;
+}
+
+
+.inboxCommandMetrics button strong {
+  min-width:
+    20px !important;
+
+  height:
+    20px !important;
+
+  font-size:
+    11px !important;
+}
+
+
+.inboxCommandClear {
+  min-height:
+    34px !important;
+}
+
+
+/* ============================================================
+   MAILBOX BAR
+   Mailbox shortcuts receive flexible space.
+   Folders / account / tags remain fixed utilities.
+   No overlapping.
+   ============================================================ */
+
+.inboxSourceToolbar {
+  min-width:
+    0 !important;
+
+  gap:
+    5px !important;
+
+  padding:
+    4px
+    5px !important;
+
+  overflow:
+    visible !important;
+}
+
+
+.inboxMailboxQuickBar {
+  flex:
+    1
+    1
+    auto !important;
+
+  min-width:
+    0 !important;
+
+  overflow-x:
+    auto !important;
+
+  overscroll-behavior-x:
+    contain;
+
+  scrollbar-width:
+    none;
+}
+
+
+.inboxMailboxQuickBar::-webkit-scrollbar {
+  display:
+    none;
+}
+
+
+.inboxMailboxQuickButton {
+  flex:
+    0
+    0
+    auto !important;
+
+  min-height:
+    36px !important;
+
+  height:
+    36px !important;
+
+  padding:
+    0
+    9px !important;
+}
+
+
+.inboxMailboxPicker,
+.inboxSourcePicker,
+.inboxEmailAccountPicker,
+.inboxTagPicker {
+  flex:
+    0
+    0
+    auto !important;
+
+  min-width:
+    0 !important;
+}
+
+
+.inboxMailboxTrigger,
+.inboxSourceTrigger,
+.inboxEmailAccountTrigger,
+.inboxTagTrigger {
+  min-height:
+    36px !important;
+
+  height:
+    36px !important;
+
+  white-space:
+    nowrap !important;
+}
+
+
+.emailAccountTriggerLabel {
+  max-width:
+    145px !important;
+}
+
+
+/* ============================================================
+   THREAD HEADER
+   Action icons have their own safe horizontal lane.
+   They cannot collide with sender identity.
+   ============================================================ */
+
+.threadHeader {
+  min-width:
+    0 !important;
+
+  gap:
+    10px !important;
+}
+
+
+.threadHeaderActions {
+  flex:
+    0
+    1
+    auto !important;
+
+  min-width:
+    0 !important;
+
+  overflow-x:
+    auto !important;
+
+  overscroll-behavior-x:
+    contain;
+
+  scrollbar-width:
+    none;
+}
+
+
+.threadHeaderActions::-webkit-scrollbar {
+  display:
+    none;
+}
+
+
+/* ============================================================
+   CONVERSATION PANE RESPONSIVENESS
+   Use the RIGHT PANE width instead of browser width.
+   ============================================================ */
+
+.threadPanel {
+  container-type:
+    inline-size;
+
+  container-name:
+    inbox-thread;
+}
+
+
+/*
+ * VIP is a compact secondary action.
+ */
+
+.inboxWorkflowVipButton {
+  flex:
+    0
+    0
+    40px !important;
+
+  width:
+    40px !important;
+
+  min-width:
+    40px !important;
+
+  justify-content:
+    center !important;
+
+  gap:
+    0 !important;
+
+  padding:
+    0 !important;
+
+  font-size:
+    0 !important;
+}
+
+
+.inboxWorkflowVipButton svg {
+  width:
+    15px !important;
+
+  height:
+    15px !important;
+}
+
+
+/*
+ * Typical split-pane desktop.
+ *
+ * The old rules looked at the whole browser width.
+ * This looks at the actual conversation pane instead.
+ */
+
+@container inbox-thread (max-width: 1180px) {
+
+  .inboxWorkflowActionBar {
+    display:
+      flex !important;
+
+    min-width:
+      0 !important;
+
+    min-height:
+      auto !important;
+
+    align-items:
+      center !important;
+
+    flex-wrap:
+      wrap !important;
+
+    gap:
+      6px !important;
+
+    padding:
+      7px
+      9px !important;
+  }
+
+
+  .inboxWorkflowActionIdentity {
+    display:
+      none !important;
+  }
+
+
+  .inboxWorkflowAssign {
+    flex:
+      1
+      1
+      180px !important;
+
+    width:
+      auto !important;
+
+    min-width:
+      160px !important;
+
+    max-width:
+      260px !important;
+  }
+
+
+  .inboxWorkflowStatusButtons,
+  .inboxWorkflowMenuAction,
+  .inboxWorkflowVipButton,
+  .inboxWorkflowTaskButton {
+    grid-column:
+      auto !important;
+
+    grid-row:
+      auto !important;
+  }
+
+
+  .inboxWorkflowTaskButton {
+    margin-left:
+      0 !important;
+  }
+
+
+  /*
+   * Snooze becomes an icon utility first.
+   * Follow Up remains visible because it is higher-value.
+   */
+
+  .inboxWorkflowStatusButtons
+  + .inboxWorkflowMenuAction
+  .inboxWorkflowMenuTrigger {
+    width:
+      40px !important;
+
+    min-width:
+      40px !important;
+
+    justify-content:
+      center !important;
+
+    gap:
+      0 !important;
+
+    padding:
+      0 !important;
+
+    font-size:
+      0 !important;
+  }
+
+
+  .inboxWorkflowStatusButtons
+  + .inboxWorkflowMenuAction
+  .inboxWorkflowMenuTrigger
+  svg:last-child {
+    display:
+      none !important;
+  }
+}
+
+
+/*
+ * Smaller conversation pane.
+ */
+
+@container inbox-thread (max-width: 820px) {
+
+  .inboxWorkflowAssign {
+    flex:
+      1
+      1
+      100% !important;
+
+    width:
+      100% !important;
+
+    max-width:
+      none !important;
+  }
+
+
+  .inboxWorkflowStatusButtons {
+    display:
+      grid !important;
+
+    flex:
+      1
+      1
+      100% !important;
+
+    width:
+      100% !important;
+
+    grid-template-columns:
+      1fr
+      1fr !important;
+  }
+
+
+  .inboxWorkflowStatusButtons button {
+    justify-content:
+      center !important;
+  }
+
+
+  .inboxWorkflowMenuAction,
+  .inboxWorkflowTaskButton {
+    flex:
+      1
+      1
+      auto !important;
+  }
+
+
+  .inboxWorkflowMenuTrigger,
+  .inboxWorkflowTaskButton {
+    justify-content:
+      center !important;
+  }
+}
+
+
+/*
+ * Very narrow pane / mobile conversation view.
+ */
+
+@container inbox-thread (max-width: 620px) {
+
+  .inboxWorkflowMenuAction,
+  .inboxWorkflowVipButton,
+  .inboxWorkflowTaskButton {
+    flex:
+      1
+      1
+      100% !important;
+
+    width:
+      100% !important;
+
+    max-width:
+      none !important;
+  }
+
+
+  .inboxWorkflowVipButton {
+    font-size:
+      13px !important;
+
+    gap:
+      6px !important;
+  }
+
+
+  .threadTabs {
+    gap:
+      18px !important;
+
+    overflow-x:
+      auto !important;
+
+    scrollbar-width:
+      none;
+  }
+
+
+  .threadTabs::-webkit-scrollbar {
+    display:
+      none;
+  }
+}
+
+
+/* INBOX BETA CLARITY PASS V26 — END */
