@@ -3934,6 +3934,16 @@ export default function InboxReferencePreview() {
   ] = useState(false);
 
   const [
+    replyDiscardConfirmOpen,
+    setReplyDiscardConfirmOpen,
+  ] = useState(false);
+
+  const [
+    replyOriginalCollapsed,
+    setReplyOriginalCollapsed,
+  ] = useState(false);
+
+  const [
     replySendState,
     setReplySendState,
   ] = useState("idle");
@@ -6436,6 +6446,18 @@ export default function InboxReferencePreview() {
         "idle",
       );
 
+      setReplyDiscardConfirmOpen(
+        false,
+      );
+
+      setReplyOriginalCollapsed(
+        false,
+      );
+
+      setReplyRichHtml(
+        "",
+      );
+
       setReplyComposerOpen(
         true,
       );
@@ -6459,7 +6481,83 @@ export default function InboxReferencePreview() {
       );
     };
 
-  const cancelInlineReply =
+  const replyDefaultSubject =
+    () => {
+      const currentSubject =
+        String(
+          selectedConversation
+            ?.subject ||
+          "",
+        ).trim();
+
+      if (
+        replyChannel ===
+        "email"
+      ) {
+        return /^re:/i.test(
+          currentSubject,
+        )
+          ? currentSubject
+          : `Re: ${
+              currentSubject ||
+              "(No subject)"
+            }`;
+      }
+
+      return (
+        currentSubject ||
+        "Campaign Seat conversation"
+      );
+    };
+
+
+  const replyDraftHasChanges =
+    () => {
+      const richText =
+        String(
+          replyRichHtml ||
+          "",
+        )
+          .replace(
+            /<br\s*\/?>/gi,
+            " ",
+          )
+          .replace(
+            /<[^>]+>/g,
+            " ",
+          )
+          .replace(
+            /&nbsp;/gi,
+            " ",
+          )
+          .replace(
+            /\s+/g,
+            " ",
+          )
+          .trim();
+
+      const subjectChanged =
+        replyChannel ===
+          "email" &&
+        String(
+          replySubject ||
+          "",
+        ).trim() !==
+          replyDefaultSubject();
+
+      return Boolean(
+        String(
+          replyText ||
+          "",
+        ).trim() ||
+        richText ||
+        pendingAttachments.length ||
+        subjectChanged,
+      );
+    };
+
+
+  const discardInlineReply =
     () => {
       setReplySendState(
         "idle",
@@ -6481,6 +6579,10 @@ export default function InboxReferencePreview() {
         "",
       );
 
+      setReplyRichHtml(
+        "",
+      );
+
       setPendingAttachments(
         [],
       );
@@ -6488,7 +6590,32 @@ export default function InboxReferencePreview() {
       setAttachmentError(
         "",
       );
+
+      setReplyDiscardConfirmOpen(
+        false,
+      );
+
+      setReplyOriginalCollapsed(
+        false,
+      );
     };
+
+
+  const cancelInlineReply =
+    () => {
+      if (
+        replyDraftHasChanges()
+      ) {
+        setReplyDiscardConfirmOpen(
+          true,
+        );
+
+        return;
+      }
+
+      discardInlineReply();
+    };
+
 
   const forwardSelectedMessage =
     () => {
@@ -11476,6 +11603,13 @@ type="button"
               !newMessageMode
                 ? styles.threadPanelExpanded
                 : "",
+
+              threadExpanded &&
+              replyComposerOpen &&
+              replyOriginalCollapsed &&
+              !newMessageMode
+                ? styles.threadPanelReplyOriginalCollapsed
+                : "",
             ]
               .filter(Boolean)
               .join(" ")}
@@ -14312,17 +14446,45 @@ type="button"
                         : "Reply"}
                     </strong>
 
-                    <button
-                      type="button"
-                      onClick={
-                        cancelInlineReply
+                    <div
+                      className={
+                        styles.inlineReplyTopbarActions
                       }
                     >
-                      <X
-                        size={14}
-                      />
-                      Cancel
-                    </button>
+                      {threadExpanded ? (
+                        <button
+                          type="button"
+                          className={
+                            styles.replyOriginalToggle
+                          }
+                          aria-pressed={
+                            replyOriginalCollapsed
+                          }
+                          onClick={() =>
+                            setReplyOriginalCollapsed(
+                              (current) =>
+                                !current,
+                            )
+                          }
+                        >
+                          {replyOriginalCollapsed
+                            ? "Show Original"
+                            : "Collapse Original"}
+                        </button>
+                      ) : null}
+
+                      <button
+                        type="button"
+                        onClick={
+                          cancelInlineReply
+                        }
+                      >
+                        <X
+                          size={14}
+                        />
+                        Cancel
+                      </button>
+                    </div>
                   </div>
                 ) : null}
 
@@ -15204,6 +15366,96 @@ type="button"
             ) : null}
           </article>
         </section>
+
+        {replyDiscardConfirmOpen ? (
+          <div
+            className={
+              styles.modalOverlay
+            }
+            role="presentation"
+            onMouseDown={(
+              event,
+            ) => {
+              if (
+                event.target ===
+                event.currentTarget
+              ) {
+                setReplyDiscardConfirmOpen(
+                  false,
+                );
+              }
+            }}
+          >
+            <section
+              className={
+                styles.replyDiscardModal
+              }
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="reply-discard-title"
+              aria-describedby="reply-discard-description"
+            >
+              <header>
+                <div>
+                  <small>
+                    Unsaved reply
+                  </small>
+
+                  <h2
+                    id="reply-discard-title"
+                  >
+                    Discard this reply?
+                  </h2>
+                </div>
+
+                <button
+                  type="button"
+                  aria-label="Keep editing"
+                  onClick={() =>
+                    setReplyDiscardConfirmOpen(
+                      false,
+                    )
+                  }
+                >
+                  <X
+                    size={18}
+                  />
+                </button>
+              </header>
+
+              <p
+                id="reply-discard-description"
+              >
+                Your received email will stay in the Inbox. Only this unsent reply draft will be discarded.
+              </p>
+
+              <footer>
+                <button
+                  type="button"
+                  onClick={() =>
+                    setReplyDiscardConfirmOpen(
+                      false,
+                    )
+                  }
+                >
+                  Keep Editing
+                </button>
+
+                <button
+                  type="button"
+                  className={
+                    styles.replyDiscardDanger
+                  }
+                  onClick={
+                    discardInlineReply
+                  }
+                >
+                  Discard Draft
+                </button>
+              </footer>
+            </section>
+          </div>
+        ) : null}
 
         {externalHandoffOpen &&
         pendingExternalHandoff ? (
