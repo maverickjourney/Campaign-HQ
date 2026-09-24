@@ -9,25 +9,56 @@ import {
 } from "../lib/supabase";
 
 
+const SIGNATURE_IMAGE_BUCKET =
+  "campaign-email-signatures";
+
+const MAX_SIGNATURE_IMAGE_BYTES =
+  2 * 1024 * 1024;
+
+const SIGNATURE_IMAGE_TYPES =
+  new Set([
+    "image/png",
+    "image/jpeg",
+  ]);
+
+
 const EMPTY_SIGNATURE = {
   workspace_id:
     "",
+
   signature_name:
     "Campaign signature",
+
   signature_text:
     "",
+
+  signature_mode:
+    "text",
+
+  signature_image_path:
+    null,
+
+  signature_image_url:
+    "",
+
   enabled:
     false,
+
   include_on_new:
     true,
+
   include_on_reply:
     true,
+
   created_at:
     null,
+
   created_by:
     null,
+
   updated_at:
     null,
+
   updated_by:
     null,
 };
@@ -55,6 +86,78 @@ function errorMessage(
 }
 
 
+function normalizeSignatureMode(
+  value,
+) {
+  return value ===
+    "image"
+    ? "image"
+    : "text";
+}
+
+
+function signatureImageExtension(
+  file,
+) {
+  return file?.type ===
+    "image/png"
+    ? "png"
+    : "jpg";
+}
+
+
+function withSignatureImageUrl(
+  row,
+) {
+  if (!row) {
+    return row;
+  }
+
+  const path =
+    clean(
+      row.signature_image_path,
+    );
+
+  let publicUrl =
+    "";
+
+  if (path) {
+    const {
+      data,
+    } =
+      supabase
+        .storage
+        .from(
+          SIGNATURE_IMAGE_BUCKET,
+        )
+        .getPublicUrl(
+          path,
+        );
+
+    publicUrl =
+      clean(
+        data?.publicUrl,
+      );
+  }
+
+  return {
+    ...row,
+
+    signature_mode:
+      normalizeSignatureMode(
+        row.signature_mode,
+      ),
+
+    signature_image_path:
+      path ||
+      null,
+
+    signature_image_url:
+      publicUrl,
+  };
+}
+
+
 export function
 useWorkspaceEmailSignature({
   workspaceId,
@@ -64,8 +167,10 @@ useWorkspaceEmailSignature({
     setSignature,
   ] = useState({
     ...EMPTY_SIGNATURE,
+
     workspace_id:
-      workspaceId || "",
+      workspaceId ||
+      "",
   });
 
   const [
@@ -97,6 +202,7 @@ useWorkspaceEmailSignature({
         ) {
           setSignature({
             ...EMPTY_SIGNATURE,
+
             workspace_id:
               "",
           });
@@ -131,6 +237,8 @@ useWorkspaceEmailSignature({
                   workspace_id,
                   signature_name,
                   signature_text,
+                  signature_mode,
+                  signature_image_path,
                   enabled,
                   include_on_new,
                   include_on_reply,
@@ -152,36 +260,47 @@ useWorkspaceEmailSignature({
             throw queryError;
           }
 
-          if (
-            data
-          ) {
+          if (data) {
+            const normalized =
+              withSignatureImageUrl(
+                data,
+              );
+
             setSignature(
-              data,
+              normalized,
             );
 
             setExists(
               true,
             );
-          } else {
-            setSignature({
-              ...EMPTY_SIGNATURE,
-              workspace_id:
-                workspaceId,
-            });
 
-            setExists(
-              false,
+            setError(
+              "",
             );
+
+            return normalized;
           }
+
+          const empty = {
+            ...EMPTY_SIGNATURE,
+
+            workspace_id:
+              workspaceId,
+          };
+
+          setSignature(
+            empty,
+          );
+
+          setExists(
+            false,
+          );
 
           setError(
             "",
           );
 
-          return (
-            data ||
-            null
-          );
+          return null;
         } catch (
           loadError
         ) {
@@ -229,8 +348,20 @@ useWorkspaceEmailSignature({
       async ({
         signatureName,
         signatureText,
+
+        signatureMode =
+          "text",
+
+        signatureImageFile =
+          null,
+
+        removeSignatureImage =
+          false,
+
         enabled,
+
         includeOnNew,
+
         includeOnReply,
       }) => {
         if (
@@ -249,7 +380,8 @@ useWorkspaceEmailSignature({
 
         const normalizedText =
           String(
-            signatureText || "",
+            signatureText ||
+              "",
           )
             .replace(
               /\r\n/g,
@@ -260,6 +392,24 @@ useWorkspaceEmailSignature({
               "\n",
             )
             .trim();
+
+        const normalizedMode =
+          normalizeSignatureMode(
+            signatureMode,
+          );
+
+        const existingImagePath =
+          clean(
+            signature
+              ?.signature_image_path,
+          );
+
+        const imageFile =
+          signatureImageFile &&
+          typeof signatureImageFile ===
+            "object"
+            ? signatureImageFile
+            : null;
 
         if (
           normalizedName.length >
@@ -279,12 +429,55 @@ useWorkspaceEmailSignature({
           );
         }
 
+        if (imageFile) {
+          if (
+            !SIGNATURE_IMAGE_TYPES.has(
+              imageFile.type,
+            )
+          ) {
+            throw new Error(
+              "Upload a PNG or JPG signature image.",
+            );
+          }
+
+          if (
+            imageFile.size >
+            MAX_SIGNATURE_IMAGE_BYTES
+          ) {
+            throw new Error(
+              "Signature images can be up to 2 MB.",
+            );
+          }
+        }
+
+        const imageWillExist =
+          Boolean(
+            imageFile ||
+            (
+              !removeSignatureImage &&
+              existingImagePath
+            ),
+          );
+
         if (
           enabled &&
+          normalizedMode ===
+            "text" &&
           !normalizedText
         ) {
           throw new Error(
-            "Enter signature text before enabling the signature.",
+            "Enter signature text before enabling the text signature.",
+          );
+        }
+
+        if (
+          enabled &&
+          normalizedMode ===
+            "image" &&
+          !imageWillExist
+        ) {
+          throw new Error(
+            "Upload a signature image before enabling the image signature.",
           );
         }
 
@@ -296,7 +489,75 @@ useWorkspaceEmailSignature({
           "",
         );
 
+        let uploadedImagePath =
+          "";
+
         try {
+          let nextImagePath =
+            removeSignatureImage
+              ? ""
+              : existingImagePath;
+
+          if (imageFile) {
+            const token =
+              globalThis
+                .crypto
+                ?.randomUUID
+                ?.() ||
+              (
+                `${Date.now()}-` +
+                Math.random()
+                  .toString(36)
+                  .slice(2)
+              );
+
+            const extension =
+              signatureImageExtension(
+                imageFile,
+              );
+
+            uploadedImagePath =
+              (
+                `${workspaceId}/` +
+                `${Date.now()}-` +
+                `${token}.` +
+                extension
+              );
+
+            const {
+              error:
+                uploadError,
+            } =
+              await supabase
+                .storage
+                .from(
+                  SIGNATURE_IMAGE_BUCKET,
+                )
+                .upload(
+                  uploadedImagePath,
+                  imageFile,
+                  {
+                    cacheControl:
+                      "31536000",
+
+                    contentType:
+                      imageFile.type,
+
+                    upsert:
+                      false,
+                  },
+                );
+
+            if (
+              uploadError
+            ) {
+              throw uploadError;
+            }
+
+            nextImagePath =
+              uploadedImagePath;
+          }
+
           const payload = {
             workspace_id:
               workspaceId,
@@ -306,6 +567,13 @@ useWorkspaceEmailSignature({
 
             signature_text:
               normalizedText,
+
+            signature_mode:
+              normalizedMode,
+
+            signature_image_path:
+              nextImagePath ||
+              null,
 
             enabled:
               Boolean(
@@ -344,6 +612,8 @@ useWorkspaceEmailSignature({
                   workspace_id,
                   signature_name,
                   signature_text,
+                  signature_mode,
+                  signature_image_path,
                   enabled,
                   include_on_new,
                   include_on_reply,
@@ -361,18 +631,66 @@ useWorkspaceEmailSignature({
             throw saveError;
           }
 
+          const normalized =
+            withSignatureImageUrl(
+              data,
+            );
+
           setSignature(
-            data,
+            normalized,
           );
 
           setExists(
             true,
           );
 
-          return data;
+          /*
+           * Unique upload paths prevent stale cached signatures.
+           * Old asset cleanup should never block the save.
+           */
+          if (
+            existingImagePath &&
+            existingImagePath !==
+              nextImagePath &&
+            (
+              imageFile ||
+              removeSignatureImage
+            )
+          ) {
+            void supabase
+              .storage
+              .from(
+                SIGNATURE_IMAGE_BUCKET,
+              )
+              .remove([
+                existingImagePath,
+              ]);
+          }
+
+          return normalized;
         } catch (
           saveFailure
         ) {
+          /*
+           * Avoid orphaned uploads if the database write fails.
+           */
+          if (
+            uploadedImagePath
+          ) {
+            try {
+              await supabase
+                .storage
+                .from(
+                  SIGNATURE_IMAGE_BUCKET,
+                )
+                .remove([
+                  uploadedImagePath,
+                ]);
+            } catch {
+              // Best-effort cleanup only.
+            }
+          }
+
           const message =
             errorMessage(
               saveFailure,
@@ -385,10 +703,6 @@ useWorkspaceEmailSignature({
 
           throw new Error(
             message,
-            {
-              cause:
-                saveFailure,
-            },
           );
         } finally {
           setIsSaving(
@@ -397,6 +711,9 @@ useWorkspaceEmailSignature({
         }
       },
       [
+        signature
+          ?.signature_image_path,
+
         workspaceId,
       ],
     );

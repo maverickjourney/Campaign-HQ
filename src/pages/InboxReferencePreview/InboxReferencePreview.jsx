@@ -229,14 +229,64 @@ const EMPTY_CONTACT_FORM = {
   smsConsent: false,
 };
 
+function escapeEmailHtml(
+  value,
+) {
+  return String(
+    value || "",
+  )
+    .replaceAll(
+      "&",
+      "&amp;",
+    )
+    .replaceAll(
+      "<",
+      "&lt;",
+    )
+    .replaceAll(
+      ">",
+      "&gt;",
+    );
+}
+
+
+function escapeEmailHtmlAttribute(
+  value,
+) {
+  return escapeEmailHtml(
+    value,
+  )
+    .replaceAll(
+      '"',
+      "&quot;",
+    )
+    .replaceAll(
+      "'",
+      "&#39;",
+    );
+}
+
+
 function buildOutboundEmailBody({
   message,
+
   signatureText,
+
+  signatureMode =
+    "text",
+
+  signatureImageUrl =
+    "",
+
+  signatureName =
+    "Campaign signature",
+
   includeSignature,
 }) {
-  const body =
+  const bodyText =
     String(
-      message || "",
+      message ||
+        "",
     )
       .replace(
         /\r\n/g,
@@ -250,7 +300,8 @@ function buildOutboundEmailBody({
 
   const signature =
     String(
-      signatureText || "",
+      signatureText ||
+        "",
     )
       .replace(
         /\r\n/g,
@@ -262,14 +313,70 @@ function buildOutboundEmailBody({
       )
       .trim();
 
+  const imageUrl =
+    String(
+      signatureImageUrl ||
+        "",
+    ).trim();
+
+  if (
+    includeSignature &&
+    signatureMode ===
+      "image" &&
+    imageUrl
+  ) {
+    const messageHtml =
+      escapeEmailHtml(
+        bodyText,
+      ).replace(
+        /\n/g,
+        "<br />",
+      );
+
+    const safeUrl =
+      escapeEmailHtmlAttribute(
+        imageUrl,
+      );
+
+    const safeAlt =
+      escapeEmailHtmlAttribute(
+        signatureName ||
+          "Campaign email signature",
+      );
+
+    return {
+      body:
+        `<div>${messageHtml}</div>` +
+        `<div style="margin-top:16px;">` +
+        `<img src="${safeUrl}" alt="${safeAlt}" ` +
+        `style="display:block;max-width:520px;width:auto;height:auto;border:0;" />` +
+        `</div>`,
+
+      isPlaintext:
+        false,
+    };
+  }
+
   if (
     !includeSignature ||
     !signature
   ) {
-    return body;
+    return {
+      body:
+        bodyText,
+
+      isPlaintext:
+        true,
+    };
   }
 
-  return `${body}\n\n--\n${signature}`;
+  return {
+    body:
+      `${bodyText}\n\n--\n${signature}`,
+
+    isPlaintext:
+      true,
+  };
 }
 
 
@@ -4627,15 +4734,40 @@ export default function InboxReferencePreview() {
         ).trim()
       : defaultCampaignSignatureText;
 
+  const configuredSignatureMode =
+    signatureExists &&
+    workspaceEmailSignature
+      ?.signature_mode ===
+      "image"
+      ? "image"
+      : "text";
+
+  const configuredSignatureImageUrl =
+    signatureExists
+      ? String(
+          workspaceEmailSignature
+            ?.signature_image_url ||
+          "",
+        ).trim()
+      : "";
+
+  const signatureHasContent =
+    configuredSignatureMode ===
+      "image"
+      ? Boolean(
+          configuredSignatureImageUrl,
+        )
+      : Boolean(
+          configuredSignatureText,
+        );
+
   const signatureEnabled =
     signatureExists
       ? (
           workspaceEmailSignature
             ?.enabled ===
             true &&
-          Boolean(
-            configuredSignatureText,
-          )
+          signatureHasContent
         )
       : Boolean(
           configuredSignatureText,
@@ -7530,6 +7662,30 @@ export default function InboxReferencePreview() {
           ...pendingAttachments,
         ];
 
+        const outboundEmail =
+          buildOutboundEmailBody({
+            message:
+              replyText,
+
+            signatureText:
+              configuredSignatureText,
+
+            signatureMode:
+              configuredSignatureMode,
+
+            signatureImageUrl:
+              configuredSignatureImageUrl,
+
+            signatureName:
+              workspaceEmailSignature
+                ?.signature_name ||
+              "Campaign signature",
+
+            includeSignature:
+              includeSignature &&
+              signatureEnabled,
+          });
+
         const sendResult =
           await replyMailboxEmail({
             replyToMessageId:
@@ -7539,15 +7695,11 @@ export default function InboxReferencePreview() {
               replySubject.trim(),
 
             body:
-              buildOutboundEmailBody({
-                message:
-                  replyText,
-                signatureText:
-                  configuredSignatureText,
-                includeSignature:
-                  includeSignature &&
-                  signatureEnabled,
-              }),
+              outboundEmail.body,
+
+            isPlaintext:
+              outboundEmail
+                .isPlaintext,
 
             replyAll:
               replyAllEnabled,
@@ -8294,12 +8446,37 @@ export default function InboxReferencePreview() {
           ...pendingAttachments,
         ];
 
+        const outboundEmail =
+          buildOutboundEmailBody({
+            message:
+              replyText,
+
+            signatureText:
+              configuredSignatureText,
+
+            signatureMode:
+              configuredSignatureMode,
+
+            signatureImageUrl:
+              configuredSignatureImageUrl,
+
+            signatureName:
+              workspaceEmailSignature
+                ?.signature_name ||
+              "Campaign signature",
+
+            includeSignature:
+              includeSignature &&
+              signatureEnabled,
+          });
+
         const sendResult =
           await sendMailboxEmail({
             to: [
               {
                 name:
                   recipientName,
+
                 email:
                   recipientEmail,
               },
@@ -8319,15 +8496,11 @@ export default function InboxReferencePreview() {
               newSubject.trim(),
 
             body:
-              buildOutboundEmailBody({
-                message:
-                  replyText,
-                signatureText:
-                  configuredSignatureText,
-                includeSignature:
-                  includeSignature &&
-                  signatureEnabled,
-              }),
+              outboundEmail.body,
+
+            isPlaintext:
+              outboundEmail
+                .isPlaintext,
 
             attachments:
               sentAttachmentFiles,
@@ -15060,11 +15233,29 @@ type="button"
                           }
                         </small>
 
-                        <pre>
-                          {
-                            configuredSignatureText
-                          }
-                        </pre>
+                        {configuredSignatureMode ===
+                          "image" &&
+                        configuredSignatureImageUrl ? (
+                          <img
+                            className={
+                              styles.composerSignatureImage
+                            }
+                            src={
+                              configuredSignatureImageUrl
+                            }
+                            alt={
+                              workspaceEmailSignature
+                                ?.signature_name ||
+                              "Campaign email signature"
+                            }
+                          />
+                        ) : (
+                          <pre>
+                            {
+                              configuredSignatureText
+                            }
+                          </pre>
+                        )}
                       </div>
                     ) : null}
 

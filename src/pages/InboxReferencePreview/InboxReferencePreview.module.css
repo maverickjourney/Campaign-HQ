@@ -36653,3 +36653,37 @@ button {
 
 
 /* CAMPAIGN SEAT SPLIT REPLY V37 — END */
+
+
+/* CAMPAIGN SEAT COMPOSER SIGNATURE IMAGE V38.1 — START */
+
+.composerSignatureImage {
+  display: block !important;
+  width: auto !important;
+  max-width: min(100%, 520px) !important;
+  max-height: 120px !important;
+  object-fit: contain !important;
+  object-position: left center !important;
+}
+
+.threadPanelExpanded.threadPanelReplying
+.composerSignature {
+  max-height: 150px !important;
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+}
+
+.threadPanelExpanded.threadPanelReplying
+.composerSignature > div {
+  max-height: 108px !important;
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+}
+
+@media (max-width: 820px) {
+  .composerSignatureImage {
+    max-height: 90px !important;
+  }
+}
+
+/* CAMPAIGN SEAT COMPOSER SIGNATURE IMAGE V38.1 — END */

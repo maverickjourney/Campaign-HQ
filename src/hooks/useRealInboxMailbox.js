@@ -4003,6 +4003,7 @@ return transformed;
         bcc = [],
         subject,
         body,
+        isPlaintext = true,
         attachments = [],
       }) =>
         invokeSend({
@@ -4014,6 +4015,7 @@ return transformed;
           bcc,
           subject,
           body,
+          isPlaintext,
           attachments,
         }),
       [
@@ -4027,6 +4029,7 @@ return transformed;
         replyToMessageId,
         subject,
         body,
+        isPlaintext = true,
         replyAll = false,
         attachments = [],
       }) =>
@@ -4037,6 +4040,7 @@ return transformed;
           replyToMessageId,
           subject,
           body,
+          isPlaintext,
           replyAll,
           attachments,
         }),

@@ -580,6 +580,16 @@ Deno.serve(
         body.idempotencyKey,
       );
 
+    /*
+     * Plain text remains the default.
+     * Campaign Seat opts into HTML only when needed.
+     */
+    const messageIsPlaintext =
+      body.isPlaintext ===
+        false
+        ? false
+        : true;
+
     if (
       !workspaceId
     ) {
@@ -917,7 +927,7 @@ Deno.serve(
           messageBody,
 
         is_plaintext:
-          true,
+          messageIsPlaintext,
       };
     } else {
       const replyToMessageId =
@@ -1131,7 +1141,7 @@ Deno.serve(
           messageBody,
 
         is_plaintext:
-          true,
+          messageIsPlaintext,
       };
     }
 

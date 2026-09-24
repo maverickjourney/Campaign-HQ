@@ -7,10 +7,12 @@ import {
   ArrowRight,
   CheckCircle2,
   ContactRound,
+  ImageUp,
   LoaderCircle,
   Mail,
   PenLine,
   ShieldCheck,
+  Trash2,
   TriangleAlert,
   RefreshCw,
 } from "lucide-react";
@@ -95,6 +97,33 @@ export default function EmailContactsOnboarding({
   ] = useState("");
 
   const [
+    signatureMode,
+    setSignatureMode,
+  ] = useState(
+    "text",
+  );
+
+  const [
+    signatureImageFile,
+    setSignatureImageFile,
+  ] = useState(null);
+
+  const [
+    signatureImagePreview,
+    setSignatureImagePreview,
+  ] = useState("");
+
+  const [
+    signatureImageRemoved,
+    setSignatureImageRemoved,
+  ] = useState(false);
+
+  const [
+    signatureImageError,
+    setSignatureImageError,
+  ] = useState("");
+
+  const [
     signatureEnabled,
     setSignatureEnabled,
   ] = useState(false);
@@ -127,6 +156,26 @@ export default function EmailContactsOnboarding({
       "",
     );
 
+    setSignatureMode(
+      emailSignature
+        ?.signature_mode ===
+        "image"
+        ? "image"
+        : "text",
+    );
+
+    setSignatureImageFile(
+      null,
+    );
+
+    setSignatureImageRemoved(
+      false,
+    );
+
+    setSignatureImageError(
+      "",
+    );
+
     setSignatureEnabled(
       emailSignature
         ?.enabled ===
@@ -147,6 +196,49 @@ export default function EmailContactsOnboarding({
   }, [
     emailSignature,
   ]);
+
+
+  useEffect(() => {
+    if (
+      !signatureImageFile
+    ) {
+      setSignatureImagePreview(
+        "",
+      );
+
+      return undefined;
+    }
+
+    const objectUrl =
+      URL.createObjectURL(
+        signatureImageFile,
+      );
+
+    setSignatureImagePreview(
+      objectUrl,
+    );
+
+    return () => {
+      URL.revokeObjectURL(
+        objectUrl,
+      );
+    };
+  }, [
+    signatureImageFile,
+  ]);
+
+
+  const activeSignatureImageUrl =
+    signatureImagePreview ||
+    (
+      !signatureImageRemoved
+        ? (
+            emailSignature
+              ?.signature_image_url ||
+            ""
+          )
+        : ""
+    );
 
 
   const productionProviderWritesEnabled =
@@ -232,6 +324,102 @@ export default function EmailContactsOnboarding({
       ?.status ===
       "in_progress";
 
+  const handleSignatureImageSelection =
+    (
+      event,
+    ) => {
+      const file =
+        event.target
+          .files?.[0] ||
+        null;
+
+      event.target.value =
+        "";
+
+      if (!file) {
+        return;
+      }
+
+      setSignatureSaved(
+        "",
+      );
+
+      setSignatureImageError(
+        "",
+      );
+
+      if (
+        ![
+          "image/png",
+          "image/jpeg",
+        ].includes(
+          file.type,
+        )
+      ) {
+        setSignatureImageError(
+          "Upload a PNG or JPG signature image.",
+        );
+
+        return;
+      }
+
+      if (
+        file.size >
+        2 * 1024 * 1024
+      ) {
+        setSignatureImageError(
+          "Signature images can be up to 2 MB.",
+        );
+
+        return;
+      }
+
+      setSignatureImageFile(
+        file,
+      );
+
+      setSignatureImageRemoved(
+        false,
+      );
+
+      setSignatureMode(
+        "image",
+      );
+    };
+
+
+  const handleRemoveSignatureImage =
+    () => {
+      setSignatureImageFile(
+        null,
+      );
+
+      setSignatureImageRemoved(
+        true,
+      );
+
+      setSignatureImageError(
+        "",
+      );
+
+      setSignatureMode(
+        "text",
+      );
+
+      if (
+        !signatureText.trim()
+      ) {
+        setSignatureEnabled(
+          false,
+        );
+      }
+
+      setSignatureSaved(
+        "",
+      );
+    };
+
+
   const handleSaveSignature =
     async (
       event,
@@ -242,20 +430,50 @@ export default function EmailContactsOnboarding({
         "",
       );
 
+      setSignatureImageError(
+        "",
+      );
+
       try {
         await saveSignature({
           signatureName,
+
           signatureText,
+
+          signatureMode,
+
+          signatureImageFile:
+            signatureMode ===
+              "image"
+              ? signatureImageFile
+              : null,
+
+          removeSignatureImage:
+            signatureImageRemoved,
+
           enabled:
             signatureEnabled,
+
           includeOnNew:
             signatureOnNew,
+
           includeOnReply:
             signatureOnReply,
         });
 
+        setSignatureImageFile(
+          null,
+        );
+
+        setSignatureImageRemoved(
+          false,
+        );
+
         setSignatureSaved(
-          "Email signature saved.",
+          signatureMode ===
+            "image"
+            ? "Uploaded email signature saved."
+            : "Text email signature saved.",
         );
       } catch {
         // Protected hook error
@@ -639,14 +857,83 @@ export default function EmailContactsOnboarding({
                 </strong>
 
                 <span>
-                  Set the campaign signature
-                  that appears on outbound
-                  mailbox email. Team members
-                  see the same saved signature
+                  Use a basic text signature
+                  or upload an existing designed
+                  PNG/JPG signature. Team members
+                  see the same campaign signature
                   across devices.
                 </span>
               </div>
             </header>
+
+            <div
+              className={
+                styles.signatureModeSelector
+              }
+              aria-label="Signature type"
+            >
+              <button
+                type="button"
+                data-active={
+                  signatureMode ===
+                  "text"
+                }
+                onClick={() => {
+                  setSignatureMode(
+                    "text",
+                  );
+
+                  setSignatureSaved(
+                    "",
+                  );
+                }}
+              >
+                <PenLine
+                  size={18}
+                />
+
+                <span>
+                  <strong>
+                    Basic text
+                  </strong>
+
+                  <small>
+                    Type a clean campaign email signature.
+                  </small>
+                </span>
+              </button>
+
+              <button
+                type="button"
+                data-active={
+                  signatureMode ===
+                  "image"
+                }
+                onClick={() => {
+                  setSignatureMode(
+                    "image",
+                  );
+
+                  setSignatureSaved(
+                    "",
+                  );
+                }}
+              >
+                <ImageUp
+                  size={18}
+                />
+
+                <span>
+                  <strong>
+                    Uploaded image
+                  </strong>
+
+                  <small>
+                    Use an existing designed signature.
+                  </small>
+                </span>
+              </button>
+            </div>
 
             <div
               className={
@@ -679,41 +966,158 @@ export default function EmailContactsOnboarding({
                 />
               </label>
 
-              <label
-                className={
-                  styles.signatureBodyField
-                }
-              >
-                <span>
-                  Signature
-                </span>
-
-                <textarea
-                  value={
-                    signatureText
+              {signatureMode ===
+                "text" ? (
+                <label
+                  className={
+                    styles.signatureBodyField
                   }
-                  maxLength={10000}
-                  rows={7}
-                  onChange={(
-                    event,
-                  ) => {
-                    setSignatureText(
-                      event.target
-                        .value,
-                    );
+                >
+                  <span>
+                    Signature
+                  </span>
 
-                    setSignatureSaved(
-                      "",
-                    );
-                  }}
-                  placeholder={
-                    `Example:
+                  <textarea
+                    value={
+                      signatureText
+                    }
+                    maxLength={10000}
+                    rows={7}
+                    onChange={(
+                      event,
+                    ) => {
+                      setSignatureText(
+                        event.target
+                          .value,
+                      );
+
+                      setSignatureSaved(
+                        "",
+                      );
+                    }}
+                    placeholder={
+                      `Example:
 Chris Herrerias
 Campaign Team
 Elizabeth Accomando for Palm Beach County Commission · District 6`
+                    }
+                  />
+                </label>
+              ) : (
+                <div
+                  className={
+                    styles.signatureImageField
                   }
-                />
-              </label>
+                >
+                  <span>
+                    Signature image
+                  </span>
+
+                  {activeSignatureImageUrl ? (
+                    <div
+                      className={
+                        styles.signatureImageCanvas
+                      }
+                    >
+                      <img
+                        src={
+                          activeSignatureImageUrl
+                        }
+                        alt={
+                          signatureName ||
+                          "Campaign email signature"
+                        }
+                      />
+                    </div>
+                  ) : (
+                    <div
+                      className={
+                        styles.signatureImageEmpty
+                      }
+                    >
+                      <ImageUp
+                        size={26}
+                      />
+
+                      <strong>
+                        Upload your email signature
+                      </strong>
+
+                      <small>
+                        PNG or JPG · up to 2 MB
+                      </small>
+                    </div>
+                  )}
+
+                  <div
+                    className={
+                      styles.signatureImageActions
+                    }
+                  >
+                    <label
+                      className={
+                        styles.signatureImageUpload
+                      }
+                    >
+                      <ImageUp
+                        size={16}
+                      />
+
+                      {activeSignatureImageUrl
+                        ? "Replace image"
+                        : "Upload image"}
+
+                      <input
+                        type="file"
+                        accept="image/png,image/jpeg"
+                        onChange={
+                          handleSignatureImageSelection
+                        }
+                      />
+                    </label>
+
+                    {activeSignatureImageUrl ? (
+                      <button
+                        type="button"
+                        className={
+                          styles.signatureImageRemove
+                        }
+                        onClick={
+                          handleRemoveSignatureImage
+                        }
+                      >
+                        <Trash2
+                          size={15}
+                        />
+
+                        Remove
+                      </button>
+                    ) : null}
+                  </div>
+
+                  <small
+                    className={
+                      styles.signatureImageHelp
+                    }
+                  >
+                    Best results: transparent PNG or JPG,
+                    approximately 300–600 px wide.
+                  </small>
+
+                  {signatureImageError ? (
+                    <div
+                      className={
+                        styles.signatureImageError
+                      }
+                      role="alert"
+                    >
+                      {
+                        signatureImageError
+                      }
+                    </div>
+                  ) : null}
+                </div>
+              )}
             </div>
 
             <div
@@ -825,8 +1229,9 @@ Elizabeth Accomando for Palm Beach County Commission · District 6`
               </label>
             </div>
 
-            {signatureText
-              .trim() ? (
+            {signatureMode ===
+              "text" &&
+            signatureText.trim() ? (
               <div
                 className={
                   styles.signaturePreview
@@ -841,6 +1246,29 @@ Elizabeth Accomando for Palm Beach County Commission · District 6`
                     signatureText
                   }
                 </pre>
+              </div>
+            ) : signatureMode ===
+                "image" &&
+              activeSignatureImageUrl ? (
+              <div
+                className={[
+                  styles.signaturePreview,
+                  styles.signatureImagePreview,
+                ].join(" ")}
+              >
+                <small>
+                  Email preview
+                </small>
+
+                <img
+                  src={
+                    activeSignatureImageUrl
+                  }
+                  alt={
+                    signatureName ||
+                    "Campaign email signature"
+                  }
+                />
               </div>
             ) : null}
 
@@ -874,7 +1302,12 @@ Elizabeth Accomando for Palm Beach County Commission · District 6`
                 {signatureLoading
                   ? "Loading signature…"
                   : signatureEnabled
-                    ? "Signature is enabled."
+                    ? `Signature is enabled · ${
+                        signatureMode ===
+                          "image"
+                          ? "Uploaded image"
+                          : "Basic text"
+                      }.`
                     : "Signature is currently disabled."}
               </span>
 
