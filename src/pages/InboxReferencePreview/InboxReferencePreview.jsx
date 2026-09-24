@@ -4088,6 +4088,55 @@ export default function InboxReferencePreview() {
     setReplySendState,
   ] = useState("idle");
 
+  /*
+   * V41 HARD SEND LOCK
+   *
+   * React state alone is not synchronous enough to protect
+   * against a rapid second click.
+   *
+   * This ref locks immediately before the network request.
+   */
+  const emailSendLockRef =
+    useRef(false);
+
+  const [
+    expandedSentMessageIds,
+    setExpandedSentMessageIds,
+  ] = useState(
+    () =>
+      new Set(),
+  );
+
+  const toggleSentMessageExpanded =
+    (
+      messageId,
+    ) => {
+      setExpandedSentMessageIds(
+        (current) => {
+          const next =
+            new Set(
+              current,
+            );
+
+          if (
+            next.has(
+              messageId,
+            )
+          ) {
+            next.delete(
+              messageId,
+            );
+          } else {
+            next.add(
+              messageId,
+            );
+          }
+
+          return next;
+        },
+      );
+    };
+
 
   const [
     includeSignature,
@@ -5411,6 +5460,49 @@ export default function InboxReferencePreview() {
 
     const filtered = accountScopedConversations.filter(
       (conversation) => {
+        /*
+         * V41 INBOUND-FIRST INBOX
+         *
+         * New outbound-only email belongs in Sent.
+         *
+         * Once the other person replies, that same thread has
+         * an inbound message and can legitimately appear in
+         * Inbox as a normal conversation.
+         */
+        if (
+          activeMailboxKind ===
+            "inbox" &&
+          conversation.channel ===
+            "email"
+        ) {
+          const hasInboundEmail =
+            Number(
+              conversation
+                .latestReceivedOrder ||
+              0,
+            ) >
+              0 ||
+            (
+              Array.isArray(
+                conversation.messages,
+              ) &&
+              conversation
+                .messages
+                .some(
+                  (message) =>
+                    message
+                      ?.direction ===
+                    "inbound",
+                )
+            );
+
+          if (
+            !hasInboundEmail
+          ) {
+            return false;
+          }
+        }
+
         const workflow =
           inboxWorkflowByKey.get(
             inboxWorkflowKey(
@@ -5625,6 +5717,7 @@ export default function InboxReferencePreview() {
     );
   }, [
     activeChannel,
+    activeMailboxKind,
     activeCommandFilter,
     activeFilter,
     activeTag,
@@ -7669,6 +7762,23 @@ export default function InboxReferencePreview() {
         return;
       }
 
+      if (
+        emailSendLockRef
+          .current ||
+        replySendState ===
+          "sending" ||
+        replySendState ===
+          "sent"
+      ) {
+        return;
+      }
+
+      /*
+       * Lock synchronously BEFORE React rerenders.
+       */
+      emailSendLockRef.current =
+        true;
+
       setReplySendState(
         "sending",
       );
@@ -7817,8 +7927,11 @@ export default function InboxReferencePreview() {
             setReplySendState(
               "idle",
             );
+
+            emailSendLockRef.current =
+              false;
           },
-          1400,
+          650,
         );
 
 
@@ -7950,6 +8063,9 @@ export default function InboxReferencePreview() {
           }
         )();
       } catch (sendError) {
+        emailSendLockRef.current =
+          false;
+
         setReplySendState(
           "idle",
         );
@@ -8537,6 +8653,24 @@ export default function InboxReferencePreview() {
       replyChannel === "email" &&
       liveMailboxEnabled
     ) {
+      if (
+        emailSendLockRef
+          .current ||
+        replySendState ===
+          "sending" ||
+        replySendState ===
+          "sent"
+      ) {
+        return;
+      }
+
+      emailSendLockRef.current =
+        true;
+
+      setReplySendState(
+        "sending",
+      );
+
       try {
         const sentAttachmentFiles = [
           ...pendingAttachments,
@@ -8609,6 +8743,15 @@ export default function InboxReferencePreview() {
               sentAttachmentFiles,
           });
 
+        /*
+         * Provider has confirmed the send.
+         * From this point forward the send button must NEVER
+         * be allowed to send the message again.
+         */
+        setReplySendState(
+          "sent",
+        );
+
         let attachmentArchiveWarning =
           "";
 
@@ -8669,6 +8812,14 @@ export default function InboxReferencePreview() {
         setContactQuery("");
         setSelectedContactId("");
         setNewMessageMode(false);
+
+        emailSendLockRef.current =
+          false;
+
+        setReplySendState(
+          "idle",
+        );
+
         setActiveThreadTab(
           "conversation",
         );
@@ -8678,17 +8829,47 @@ export default function InboxReferencePreview() {
             attachmentArchiveWarning,
         );
 
-        const nextMailbox =
-          await refreshMailbox();
+        /*
+         * Sending succeeded already.
+         *
+         * Mailbox reconciliation must never turn a successful
+         * send into an apparent failure that tempts the user
+         * to press Send again.
+         */
+        void (
+          async () => {
+            try {
+              const nextMailbox =
+                await refreshMailbox({
+                  showLoading:
+                    false,
+                });
 
-        if (
-          nextMailbox?.[0]?.id
-        ) {
-          setSelectedId(
-            nextMailbox[0].id,
-          );
-        }
+              if (
+                nextMailbox?.[0]?.id
+              ) {
+                setSelectedId(
+                  nextMailbox[0].id,
+                );
+              }
+            } catch (
+              refreshError
+            ) {
+              console.warn(
+                "Email sent successfully; mailbox refresh is still pending:",
+                refreshError,
+              );
+            }
+          }
+        )();
       } catch (sendError) {
+        emailSendLockRef.current =
+          false;
+
+        setReplySendState(
+          "idle",
+        );
+
         setToast(
           sendError?.message ||
           "Campaign Seat could not send this email.",
@@ -13361,6 +13542,22 @@ type="button"
                         "email"
                           ? styles.emailMessage
                           : "",
+
+                        activeMailboxKind ===
+                          "inbox" &&
+                        message.direction ===
+                          "outbound" &&
+                        String(
+                          message.channel ||
+                          "",
+                        ).toLowerCase() ===
+                          "email" &&
+                        !expandedSentMessageIds
+                          .has(
+                            message.id,
+                          )
+                          ? styles.sentMessageCollapsed
+                          : "",
                       ]
                         .filter(Boolean)
                         .join(" ")}
@@ -13378,6 +13575,55 @@ type="button"
                           <time>
                             {message.time}
                           </time>
+
+                          {activeMailboxKind ===
+                            "inbox" &&
+                          message.direction ===
+                            "outbound" &&
+                          String(
+                            message.channel ||
+                            "",
+                          ).toLowerCase() ===
+                            "email" ? (
+                            <button
+                              type="button"
+                              className={[
+                                styles.sentReplyToggle,
+
+                                expandedSentMessageIds
+                                  .has(
+                                    message.id,
+                                  )
+                                  ? styles.sentReplyToggleExpanded
+                                  : "",
+                              ]
+                                .filter(
+                                  Boolean,
+                                )
+                                .join(
+                                  " ",
+                                )}
+                              aria-expanded={
+                                expandedSentMessageIds
+                                  .has(
+                                    message.id,
+                                  )
+                              }
+                              onClick={() =>
+                                toggleSentMessageExpanded(
+                                  message.id,
+                                )
+                              }
+                            >
+                              <span>
+                                Your reply
+                              </span>
+
+                              <ChevronDown
+                                size={15}
+                              />
+                            </button>
+                          ) : null}
                         </header>
 
                         {String(
@@ -15572,7 +15818,6 @@ type="button"
                     className={[
                       styles.sendButton,
 
-                      !newMessageMode &&
                       replyChannel ===
                         "email" &&
                       replySendState ===
@@ -15584,7 +15829,12 @@ type="button"
                       .join(" ")}
                     type="button"
                     disabled={
-                      !newMessageMode &&
+                      replyChannel ===
+                        "email" &&
+                      replySendState !==
+                        "idle"
+                    }
+                    aria-busy={
                       replyChannel ===
                         "email" &&
                       replySendState ===
@@ -15596,13 +15846,22 @@ type="button"
                         : sendReply
                     }
                   >
-                    {!newMessageMode &&
-                    replyChannel ===
+                    {replyChannel ===
                       "email" &&
                     replySendState ===
                       "sent" ? (
                       <CheckCircle2
                         size={17}
+                      />
+                    ) : replyChannel ===
+                        "email" &&
+                      replySendState ===
+                        "sending" ? (
+                      <LoaderCircle
+                        size={17}
+                        className={
+                          styles.sendButtonSpinner
+                        }
                       />
                     ) : (
                       <Send
@@ -15610,17 +15869,15 @@ type="button"
                       />
                     )}
 
-                    {!newMessageMode &&
-                    replyChannel ===
+                    {replyChannel ===
                       "email" &&
                     replySendState ===
                       "sending"
                       ? "Sending…"
-                      : !newMessageMode &&
-                          replyChannel ===
-                            "email" &&
-                          replySendState ===
-                            "sent"
+                      : replyChannel ===
+                          "email" &&
+                        replySendState ===
+                          "sent"
                         ? "Email Sent"
                         : newMessageMode
                       ? replyChannel === "text"

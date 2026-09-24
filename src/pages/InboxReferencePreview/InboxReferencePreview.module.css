@@ -36687,3 +36687,163 @@ button {
 }
 
 /* CAMPAIGN SEAT COMPOSER SIGNATURE IMAGE V38.1 — END */
+
+
+/* CAMPAIGN SEAT SEND LOCK + THREADING V41 — START */
+
+.sendButton:disabled {
+  cursor: not-allowed !important;
+  opacity: 0.82 !important;
+}
+
+.sendButtonSpinner {
+  animation:
+    campaignSeatSendSpin
+    0.8s
+    linear
+    infinite;
+}
+
+@keyframes campaignSeatSendSpin {
+  to {
+    transform:
+      rotate(360deg);
+  }
+}
+
+
+/* ------------------------------------------------------------
+   SENT REPLIES INSIDE INBOX THREADS
+
+   The received email remains the primary message.
+   Campaign replies collapse into compact dropdown rows.
+   ------------------------------------------------------------ */
+
+.sentMessageCollapsed {
+  margin-bottom:
+    8px !important;
+}
+
+.sentMessageCollapsed
+> div {
+  border-color:
+    #dbe6ed !important;
+
+  background:
+    #f8fafc !important;
+
+  box-shadow:
+    none !important;
+}
+
+.sentMessageCollapsed
+> div
+> header {
+  min-height:
+    42px !important;
+
+  border-bottom:
+    0 !important;
+}
+
+.sentMessageCollapsed
+> div
+> .emailEnvelopeMeta,
+
+.sentMessageCollapsed
+> div
+> .emailSubjectRow,
+
+.sentMessageCollapsed
+> div
+> .plainEmailBody,
+
+.sentMessageCollapsed
+> div
+> .richEmail,
+
+.sentMessageCollapsed
+> div
+> .messageAttachments {
+  display:
+    none !important;
+}
+
+.sentReplyToggle {
+  display:
+    inline-flex;
+
+  min-height:
+    30px;
+
+  align-items:
+    center;
+
+  gap:
+    5px;
+
+  margin-left:
+    auto;
+
+  padding:
+    0
+    8px;
+
+  border:
+    1px solid
+    #d2e0e9;
+
+  border-radius:
+    7px;
+
+  color:
+    #496b83;
+
+  background:
+    #ffffff;
+
+  font:
+    inherit;
+
+  font-size:
+    0.68rem;
+
+  font-weight:
+    780;
+
+  cursor:
+    pointer;
+}
+
+.sentReplyToggle:hover {
+  border-color:
+    #9db7c9;
+
+  background:
+    #f4f8fb;
+}
+
+.sentReplyToggle svg {
+  transition:
+    transform
+    160ms
+    ease;
+}
+
+.sentReplyToggleExpanded svg {
+  transform:
+    rotate(180deg);
+}
+
+
+@media (max-width: 700px) {
+  .sentReplyToggle {
+    min-height:
+      34px;
+
+    font-size:
+      0.72rem;
+  }
+}
+
+/* CAMPAIGN SEAT SEND LOCK + THREADING V41 — END */
