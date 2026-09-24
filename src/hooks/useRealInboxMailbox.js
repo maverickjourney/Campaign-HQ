@@ -4004,6 +4004,7 @@ return transformed;
         subject,
         body,
         isPlaintext = true,
+        signatureImagePath = "",
         attachments = [],
       }) =>
         invokeSend({
@@ -4016,6 +4017,7 @@ return transformed;
           subject,
           body,
           isPlaintext,
+          signatureImagePath,
           attachments,
         }),
       [
@@ -4030,6 +4032,7 @@ return transformed;
         subject,
         body,
         isPlaintext = true,
+        signatureImagePath = "",
         replyAll = false,
         attachments = [],
       }) =>
@@ -4041,6 +4044,7 @@ return transformed;
           subject,
           body,
           isPlaintext,
+          signatureImagePath,
           replyAll,
           attachments,
         }),

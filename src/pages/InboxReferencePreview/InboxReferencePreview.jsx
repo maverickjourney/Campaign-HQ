@@ -275,6 +275,9 @@ function buildOutboundEmailBody({
   signatureMode =
     "text",
 
+  signatureImagePath =
+    "",
+
   signatureImageUrl =
     "",
 
@@ -313,6 +316,12 @@ function buildOutboundEmailBody({
       )
       .trim();
 
+  const imagePath =
+    String(
+      signatureImagePath ||
+        "",
+    ).trim();
+
   const imageUrl =
     String(
       signatureImageUrl ||
@@ -323,7 +332,10 @@ function buildOutboundEmailBody({
     includeSignature &&
     signatureMode ===
       "image" &&
-    imageUrl
+    (
+      imagePath ||
+      imageUrl
+    )
   ) {
     const messageHtml =
       escapeEmailHtml(
@@ -333,27 +345,42 @@ function buildOutboundEmailBody({
         "<br />",
       );
 
-    const safeUrl =
-      escapeEmailHtmlAttribute(
-        imageUrl,
-      );
-
     const safeAlt =
       escapeEmailHtmlAttribute(
         signatureName ||
           "Campaign email signature",
       );
 
+    /*
+     * V40:
+     *
+     * If Campaign Seat knows the saved Storage path,
+     * the v30 mail sender embeds it as a real inline
+     * email attachment using this CID.
+     *
+     * The edge function falls back to the hosted image
+     * URL for large attachment sends.
+     */
+    const imageSource =
+      imagePath
+        ? "cid:campaignseatsignature"
+        : escapeEmailHtmlAttribute(
+            imageUrl,
+          );
+
     return {
       body:
         `<div>${messageHtml}</div>` +
         `<div style="margin-top:16px;">` +
-        `<img src="${safeUrl}" alt="${safeAlt}" ` +
+        `<img src="${imageSource}" alt="${safeAlt}" ` +
         `style="display:block;max-width:520px;width:auto;height:auto;border:0;" />` +
         `</div>`,
 
       isPlaintext:
         false,
+
+      signatureImagePath:
+        imagePath,
     };
   }
 
@@ -367,6 +394,9 @@ function buildOutboundEmailBody({
 
       isPlaintext:
         true,
+
+      signatureImagePath:
+        "",
     };
   }
 
@@ -376,6 +406,9 @@ function buildOutboundEmailBody({
 
     isPlaintext:
       true,
+
+    signatureImagePath:
+      "",
   };
 }
 
@@ -4751,6 +4784,15 @@ export default function InboxReferencePreview() {
         ).trim()
       : "";
 
+  const configuredSignatureImagePath =
+    signatureExists
+      ? String(
+          workspaceEmailSignature
+            ?.signature_image_path ||
+          "",
+        ).trim()
+      : "";
+
   const signatureHasContent =
     configuredSignatureMode ===
       "image"
@@ -7720,6 +7762,9 @@ export default function InboxReferencePreview() {
             signatureMode:
               configuredSignatureMode,
 
+            signatureImagePath:
+              configuredSignatureImagePath,
+
             signatureImageUrl:
               configuredSignatureImageUrl,
 
@@ -7747,6 +7792,10 @@ export default function InboxReferencePreview() {
             isPlaintext:
               outboundEmail
                 .isPlaintext,
+
+            signatureImagePath:
+              outboundEmail
+                .signatureImagePath,
 
             replyAll:
               replyAllEnabled,
@@ -8504,6 +8553,9 @@ export default function InboxReferencePreview() {
             signatureMode:
               configuredSignatureMode,
 
+            signatureImagePath:
+              configuredSignatureImagePath,
+
             signatureImageUrl:
               configuredSignatureImageUrl,
 
@@ -8548,6 +8600,10 @@ export default function InboxReferencePreview() {
             isPlaintext:
               outboundEmail
                 .isPlaintext,
+
+            signatureImagePath:
+              outboundEmail
+                .signatureImagePath,
 
             attachments:
               sentAttachmentFiles,
