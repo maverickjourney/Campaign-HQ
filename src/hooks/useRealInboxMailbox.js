@@ -2655,23 +2655,127 @@ return transformed;
       async (
         threadIdOrConversationId,
       ) => {
-        const result =
-          await updateThread(
+        const providerThreadId =
+          clean(
             threadIdOrConversationId,
-            {
-              unread:
-                true,
-            },
-            {
-              refreshAfter:
-                true,
-            },
+          ).replace(
+            THREAD_PREFIX,
+            "",
           );
 
-        return result;
+        if (
+          !enabled ||
+          !providerThreadId
+        ) {
+          return null;
+        }
+
+        const currentConversation =
+          conversationsRef
+            .current
+            .find(
+              (conversation) =>
+                conversation
+                  .providerThreadId ===
+                providerThreadId,
+            ) ||
+          null;
+
+        const wasUnread =
+          Boolean(
+            currentConversation
+              ?.unread,
+          );
+
+        if (!wasUnread) {
+          setConversations(
+            (current) =>
+              current.map(
+                (conversation) =>
+                  conversation
+                    .providerThreadId ===
+                  providerThreadId
+                    ? {
+                        ...conversation,
+
+                        unread:
+                          true,
+
+                        unreadCount:
+                          Math.max(
+                            1,
+                            Number(
+                              conversation
+                                .unreadCount ||
+                              0,
+                            ),
+                          ),
+                      }
+                    : conversation,
+              ),
+          );
+
+          setInboxUnreadCount(
+            (current) => {
+              const next =
+                Number.isFinite(
+                  current,
+                )
+                  ? current + 1
+                  : current;
+
+              if (
+                Number.isFinite(
+                  next,
+                )
+              ) {
+                publishInboxUnreadCount(
+                  workspaceId,
+                  next,
+                  {
+                    authoritativeForMs:
+                      180000,
+                  },
+                );
+              }
+
+              return next;
+            },
+          );
+        }
+
+        try {
+          const result =
+            await updateThread(
+              providerThreadId,
+              {
+                unread:
+                  true,
+              },
+            );
+
+          void refresh({
+            showLoading:
+              false,
+          });
+
+          return result;
+        } catch (
+          updateError
+        ) {
+          await refresh({
+            showLoading:
+              false,
+          });
+
+          throw updateError;
+        }
       },
       [
+        enabled,
+        refresh,
         updateThread,
+        workspaceId,
       ],
     );
 
@@ -2682,21 +2786,73 @@ return transformed;
         threadIdOrConversationId,
         starred,
       ) => {
-        return updateThread(
-          threadIdOrConversationId,
-          {
-            starred:
-              Boolean(
-                starred,
-              ),
-          },
-          {
-            refreshAfter:
-              true,
-          },
+        const providerThreadId =
+          clean(
+            threadIdOrConversationId,
+          ).replace(
+            THREAD_PREFIX,
+            "",
+          );
+
+        if (
+          !enabled ||
+          !providerThreadId
+        ) {
+          return null;
+        }
+
+        const nextStarred =
+          Boolean(
+            starred,
+          );
+
+        setConversations(
+          (current) =>
+            current.map(
+              (conversation) =>
+                conversation
+                  .providerThreadId ===
+                providerThreadId
+                  ? {
+                      ...conversation,
+
+                      priority:
+                        nextStarred,
+                    }
+                  : conversation,
+            ),
         );
+
+        try {
+          const result =
+            await updateThread(
+              providerThreadId,
+              {
+                starred:
+                  nextStarred,
+              },
+            );
+
+          void refresh({
+            showLoading:
+              false,
+          });
+
+          return result;
+        } catch (
+          updateError
+        ) {
+          await refresh({
+            showLoading:
+              false,
+          });
+
+          throw updateError;
+        }
       },
       [
+        enabled,
+        refresh,
         updateThread,
       ],
     );
@@ -2815,7 +2971,22 @@ return transformed;
           });
 
 
-        await refresh({
+        /*
+         * Remove it from Campaign Seat immediately once the
+         * provider confirms deletion, then refresh quietly.
+         */
+
+        setConversations(
+          (current) =>
+            current.filter(
+              (conversation) =>
+                conversation
+                  .providerThreadId !==
+                providerThreadId,
+            ),
+        );
+
+        void refresh({
           showLoading:
             false,
         });
@@ -3220,95 +3391,123 @@ return transformed;
         }
 
 
-        let updated =
-          0;
+        /*
+         * Move all messages belonging to this thread together
+         * rather than waiting for each provider request one at
+         * a time.
+         */
 
+        const updateJobs =
+          matchingMessages
+            .map(
+              (
+                message,
+              ) => {
+                let nextFolders;
 
-        for (
-          const message
-          of matchingMessages
-        ) {
-          let nextFolders;
+                if (
+                  accountProvider ===
+                  "microsoft"
+                ) {
+                  if (
+                    !destinationFolderId
+                  ) {
+                    throw new Error(
+                      "Microsoft requires a destination folder.",
+                    );
+                  }
 
+                  nextFolders = [
+                    destinationFolderId,
+                  ];
+                } else {
+                  nextFolders =
+                    Array.from(
+                      new Set(
+                        (
+                          message
+                            .folderIds ||
+                          []
+                        )
+                          .filter(
+                            (
+                              folderId,
+                            ) =>
+                              folderId !==
+                              sourceFolderId,
+                          )
+                          .concat(
+                            destinationFolderId
+                              ? [
+                                  destinationFolderId,
+                                ]
+                              : [],
+                          ),
+                      ),
+                    );
+                }
 
-          if (
-            accountProvider ===
-            "microsoft"
-          ) {
-            if (
-              !destinationFolderId
-            ) {
-              throw new Error(
-                "Microsoft requires a destination folder.",
-              );
-            }
-
-            nextFolders = [
-              destinationFolderId,
-            ];
-          } else {
-            nextFolders =
-              Array.from(
-                new Set(
-                  (
-                    message
-                      .folderIds ||
-                    []
-                  )
-                    .filter(
-                      (folderId) =>
-                        folderId !==
-                        sourceFolderId,
-                    )
-                    .concat(
-                      destinationFolderId
-                        ? [
-                            destinationFolderId,
-                          ]
-                        : [],
+                const currentFolders =
+                  Array.from(
+                    new Set(
+                      message
+                        .folderIds ||
+                      [],
                     ),
-                ),
-              );
-          }
+                  );
 
+                if (
+                  JSON.stringify(
+                    currentFolders,
+                  ) ===
+                  JSON.stringify(
+                    nextFolders,
+                  )
+                ) {
+                  return null;
+                }
 
-          const currentFolders =
-            Array.from(
-              new Set(
-                message
-                  .folderIds ||
-                [],
-              ),
+                return updateMessage(
+                  message
+                    .providerMessageId,
+                  {
+                    folders:
+                      nextFolders,
+                  },
+                ).then(
+                  () => 1,
+                );
+              },
+            )
+            .filter(
+              Boolean,
             );
 
-
-          if (
-            JSON.stringify(
-              currentFolders,
-            ) ===
-            JSON.stringify(
-              nextFolders,
-            )
-          ) {
-            continue;
-          }
-
-
-          await updateMessage(
-            message
-              .providerMessageId,
-            {
-              folders:
-                nextFolders,
-            },
+        const updateResults =
+          await Promise.all(
+            updateJobs,
           );
 
-          updated +=
-            1;
-        }
+        const updated =
+          updateResults.reduce(
+            (
+              total,
+              value,
+            ) =>
+              total +
+              Number(
+                value ||
+                0,
+              ),
+            0,
+          );
 
+        /*
+         * Outlook already accepted the move.
+         * Refresh mailbox truth quietly afterward.
+         */
 
-        await refresh({
+        void refresh({
           showLoading:
             false,
         });

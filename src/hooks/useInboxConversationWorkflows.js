@@ -636,26 +636,121 @@ export function useInboxConversationWorkflows({
             userId,
         };
 
-        const {
-          data,
-          error:
-            saveError,
-        } =
-          await supabase
-            .from(
-              "inbox_conversation_workflows",
-            )
-            .upsert(
-              payload,
-              {
-                onConflict:
-                  "workspace_id,conversation_key",
-              },
-            )
-            .select()
-            .single();
+        const optimisticNow =
+          new Date().toISOString();
 
-        if (saveError) {
+        const optimisticRow = {
+          ...(
+            existing ||
+            {}
+          ),
+
+          ...payload,
+
+          id:
+            existing?.id ||
+            `optimistic:${conversationKey}`,
+
+          created_at:
+            existing?.created_at ||
+            optimisticNow,
+
+          updated_at:
+            optimisticNow,
+
+          _optimistic:
+            true,
+        };
+
+        /*
+         * CAMPAIGN SEAT OPTIMISTIC WORKFLOW V35B
+         *
+         * Update Campaign Seat immediately while Supabase
+         * confirms the save in the background.
+         */
+
+        setRows(
+          (current) => {
+            const found =
+              current.some(
+                (row) =>
+                  row
+                    .conversation_key ===
+                  conversationKey,
+              );
+
+            if (!found) {
+              return [
+                optimisticRow,
+                ...current,
+              ];
+            }
+
+            return current.map(
+              (row) =>
+                row
+                  .conversation_key ===
+                conversationKey
+                  ? optimisticRow
+                  : row,
+            );
+          },
+        );
+
+        let data;
+
+        try {
+          const result =
+            await supabase
+              .from(
+                "inbox_conversation_workflows",
+              )
+              .upsert(
+                payload,
+                {
+                  onConflict:
+                    "workspace_id,conversation_key",
+                },
+              )
+              .select()
+              .single();
+
+          if (result.error) {
+            throw result.error;
+          }
+
+          data =
+            result.data;
+        } catch (
+          saveError
+        ) {
+          /*
+           * Roll back the optimistic state if Supabase rejects
+           * the real save.
+           */
+
+          setRows(
+            (current) => {
+              if (existing) {
+                return current.map(
+                  (row) =>
+                    row
+                      .conversation_key ===
+                    conversationKey
+                      ? existing
+                      : row,
+                );
+              }
+
+              return current.filter(
+                (row) =>
+                  row
+                    .conversation_key !==
+                  conversationKey,
+              );
+            },
+          );
+
           throw saveError;
         }
 

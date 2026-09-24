@@ -8487,38 +8487,43 @@ export default function InboxReferencePreview() {
             },
           );
 
-        try {
-          await logInboxActivity(
-            selectedConversation,
-            {
-              eventType:
-                `workflow:${actionKey}`,
+        /*
+         * The action is already saved.
+         * Audit logging must not delay the interface.
+         */
 
-              eventLabel:
-                inboxActivityEventLabel(
-                  actionKey,
-                  updates,
-                ),
+        void logInboxActivity(
+          selectedConversation,
+          {
+            eventType:
+              `workflow:${actionKey}`,
 
-              eventDetail:
-                successMessage,
-
-              metadata: {
-                action_key:
-                  actionKey,
-
+            eventLabel:
+              inboxActivityEventLabel(
+                actionKey,
                 updates,
-              },
+              ),
+
+            eventDetail:
+              successMessage,
+
+            metadata: {
+              action_key:
+                actionKey,
+
+              updates,
             },
-          );
-        } catch (
-          activityError
-        ) {
-          console.warn(
-            "Inbox workflow activity could not be recorded:",
+          },
+        ).catch(
+          (
             activityError,
-          );
-        }
+          ) => {
+            console.warn(
+              "Inbox workflow activity could not be recorded:",
+              activityError,
+            );
+          },
+        );
 
         setToast(
           successMessage,
@@ -8776,25 +8781,22 @@ export default function InboxReferencePreview() {
                     preset,
                   );
 
-      const saved =
-        await runInboxWorkflowAction(
-          "snooze",
-          {
-            snoozed_until:
-              snoozedUntil,
-          },
-          snoozedUntil
-            ? `Conversation snoozed until ${inboxWorkflowScheduleLabel(
-                snoozedUntil,
-              )}.`
-            : "Conversation snooze cleared.",
-        );
+      setInboxSnoozeMenuOpen(
+        false,
+      );
 
-      if (saved) {
-        setInboxSnoozeMenuOpen(
-          false,
-        );
-      }
+      await runInboxWorkflowAction(
+        "snooze",
+        {
+          snoozed_until:
+            snoozedUntil,
+        },
+        snoozedUntil
+          ? `Conversation snoozed until ${inboxWorkflowScheduleLabel(
+              snoozedUntil,
+            )}.`
+          : "Conversation snooze cleared.",
+      );
     };
 
 
@@ -8809,6 +8811,10 @@ export default function InboxReferencePreview() {
           : inboxWorkflowPresetIso(
               preset,
             );
+
+      setInboxFollowUpMenuOpen(
+        false,
+      );
 
       const saved =
         await runInboxWorkflowAction(
@@ -8827,10 +8833,6 @@ export default function InboxReferencePreview() {
       if (!saved) {
         return;
       }
-
-      setInboxFollowUpMenuOpen(
-        false,
-      );
 
       if (
         selectedInboxWorkflow
@@ -9047,35 +9049,35 @@ export default function InboxReferencePreview() {
             "folder",
           )
         ) {
-          try {
-            await logInboxActivity(
-              selectedConversation,
-              {
-                eventType:
-                  `mailbox:${actionKey}`,
+          void logInboxActivity(
+            selectedConversation,
+            {
+              eventType:
+                `mailbox:${actionKey}`,
 
-                eventLabel:
-                  inboxMailboxActivityLabel(
-                    actionKey,
-                  ),
+              eventLabel:
+                inboxMailboxActivityLabel(
+                  actionKey,
+                ),
 
-                eventDetail:
-                  successMessage,
+              eventDetail:
+                successMessage,
 
-                metadata: {
-                  action_key:
-                    actionKey,
-                },
+              metadata: {
+                action_key:
+                  actionKey,
               },
-            );
-          } catch (
-            activityError
-          ) {
-            console.warn(
-              "Mailbox activity could not be recorded:",
+            },
+          ).catch(
+            (
               activityError,
-            );
-          }
+            ) => {
+              console.warn(
+                "Mailbox activity could not be recorded:",
+                activityError,
+              );
+            },
+          );
         }
 
         setToast(
@@ -9173,8 +9175,8 @@ export default function InboxReferencePreview() {
 
       void runMailboxAction(
         "archive",
-        () =>
-          archiveMailboxThreadMessages(
+        async () => {
+          await archiveMailboxThreadMessages(
             selectedConversation
               .providerThreadId,
             {
@@ -9186,7 +9188,16 @@ export default function InboxReferencePreview() {
                   ?.id ||
                 "",
             },
-          ),
+          );
+
+          setSelectedId(
+            "",
+          );
+
+          setMobileConversationActive(
+            false,
+          );
+        },
         "Conversation archived in the connected mailbox.",
       );
     };
@@ -9207,8 +9218,8 @@ export default function InboxReferencePreview() {
 
       void runMailboxAction(
         `move:${targetItem.id}`,
-        () =>
-          moveMailboxThreadMessages({
+        async () => {
+          await moveMailboxThreadMessages({
             threadIdOrConversationId:
               selectedConversation
                 .providerThreadId,
@@ -9218,7 +9229,16 @@ export default function InboxReferencePreview() {
 
             targetFolderId:
               targetItem.id,
-          }),
+          });
+
+          setSelectedId(
+            "",
+          );
+
+          setMobileConversationActive(
+            false,
+          );
+        },
         `Moved to ${targetItem.label} in the connected mailbox.`,
       );
     };

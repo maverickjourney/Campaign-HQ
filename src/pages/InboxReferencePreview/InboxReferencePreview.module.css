@@ -34606,3 +34606,817 @@ button:hover {
 
 
 /* CAMPAIGN SEAT FINAL MOBILE INBOX V34 — END */
+
+/* CAMPAIGN SEAT EXPANDED FOCUS READER V35B — START */
+
+
+/*
+ * Expanded Inbox should feel like an intentional email reader,
+ * not a giant stretched card.
+ */
+
+@media (min-width: 821px) {
+
+  .threadPanelExpanded:not(.newMessageModal) {
+    box-sizing:
+      border-box !important;
+
+    position:
+      fixed !important;
+
+    z-index:
+      2147483450 !important;
+
+    top:
+      18px !important;
+
+    right:
+      auto !important;
+
+    bottom:
+      18px !important;
+
+    left:
+      50% !important;
+
+    width:
+      min(
+        1420px,
+        calc(
+          100vw -
+          36px
+        )
+      ) !important;
+
+    max-width:
+      1420px !important;
+
+    height:
+      calc(
+        100dvh -
+        36px
+      ) !important;
+
+    min-height:
+      0 !important;
+
+    max-height:
+      calc(
+        100dvh -
+        36px
+      ) !important;
+
+    transform:
+      translateX(
+        -50%
+      ) !important;
+
+    display:
+      flex !important;
+
+    flex-direction:
+      column !important;
+
+    overflow:
+      hidden !important;
+
+    border:
+      1px solid
+      #cad8e3 !important;
+
+    border-radius:
+      18px !important;
+
+    background:
+      #f4f7fa !important;
+
+    box-shadow:
+      0
+      30px
+      100px
+      rgba(
+        5,
+        28,
+        48,
+        0.28
+      ) !important;
+  }
+
+
+  /* HEADER */
+
+  .threadPanelExpanded
+  .threadHeader {
+    box-sizing:
+      border-box !important;
+
+    position:
+      relative !important;
+
+    z-index:
+      30 !important;
+
+    min-height:
+      72px !important;
+
+    flex:
+      0
+      0
+      auto !important;
+
+    gap:
+      16px !important;
+
+    padding:
+      11px
+      16px !important;
+
+    overflow:
+      visible !important;
+
+    border-bottom:
+      1px solid
+      #dce6ed !important;
+
+    background:
+      #ffffff !important;
+  }
+
+
+  .threadPanelExpanded
+  .threadHeader
+  > div:not(.threadHeaderActions) {
+    min-width:
+      0 !important;
+
+    flex:
+      1
+      1
+      auto !important;
+  }
+
+
+  .threadPanelExpanded
+  .threadHeaderActions {
+    width:
+      auto !important;
+
+    min-width:
+      0 !important;
+
+    flex:
+      0
+      1
+      auto !important;
+
+    justify-content:
+      flex-end !important;
+
+    flex-wrap:
+      nowrap !important;
+
+    overflow:
+      visible !important;
+  }
+
+
+  .threadPanelExpanded
+  .threadHeaderActions
+  > button,
+
+  .threadPanelExpanded
+  .threadHeaderActions
+  > span
+  > button {
+    width:
+      42px !important;
+
+    min-width:
+      42px !important;
+
+    height:
+      42px !important;
+
+    min-height:
+      42px !important;
+  }
+
+
+  /* WORKFLOW BAR */
+
+  .threadPanelExpanded
+  .inboxWorkflowActionBar {
+    box-sizing:
+      border-box !important;
+
+    flex:
+      0
+      0
+      auto !important;
+
+    padding:
+      8px
+      16px !important;
+
+    border-bottom:
+      1px solid
+      #dde6ed !important;
+
+    background:
+      #ffffff !important;
+  }
+
+
+  /* TABS */
+
+  .threadPanelExpanded
+  .threadTabs {
+    flex:
+      0
+      0
+      auto !important;
+
+    padding:
+      0
+      18px !important;
+
+    border-bottom:
+      1px solid
+      #e0e8ee !important;
+
+    background:
+      #ffffff !important;
+  }
+
+
+  /* READER */
+
+  .threadPanelExpanded
+  .threadBody {
+    box-sizing:
+      border-box !important;
+
+    min-width:
+      0 !important;
+
+    min-height:
+      0 !important;
+
+    max-height:
+      none !important;
+
+    flex:
+      1
+      1
+      auto !important;
+
+    padding:
+      20px
+      24px !important;
+
+    overflow-x:
+      hidden !important;
+
+    overflow-y:
+      auto !important;
+
+    background:
+      #f4f7fa !important;
+
+    scrollbar-gutter:
+      stable !important;
+  }
+
+
+  .threadPanelExpanded
+  .inboundMessage.emailMessage,
+
+  .threadPanelExpanded
+  .outboundMessage.emailMessage,
+
+  .threadPanelExpanded
+  .richMessage {
+    box-sizing:
+      border-box !important;
+
+    width:
+      min(
+        1120px,
+        100%
+      ) !important;
+
+    max-width:
+      1120px !important;
+
+    margin-right:
+      auto !important;
+
+    margin-left:
+      auto !important;
+  }
+
+
+  .threadPanelExpanded
+  .richMessage
+  > div,
+
+  .threadPanelExpanded
+  .richEmailFrame {
+    box-sizing:
+      border-box !important;
+
+    width:
+      100% !important;
+
+    max-width:
+      100% !important;
+
+    margin-right:
+      auto !important;
+
+    margin-left:
+      auto !important;
+  }
+
+
+  /*
+   * EXPANDED REPLY
+   *
+   * While writing, hide duplicate workflow/tabs so the source
+   * email and the complete Outlook-style composer both fit.
+   */
+
+  .threadPanelExpanded.threadPanelReplying
+  .inboxWorkflowActionBar,
+
+  .threadPanelExpanded.threadPanelReplying
+  .threadTabs {
+    display:
+      none !important;
+  }
+
+
+  .threadPanelExpanded.threadPanelReplying
+  .threadBody {
+    min-height:
+      190px !important;
+
+    max-height:
+      39dvh !important;
+
+    flex:
+      1
+      1
+      auto !important;
+
+    padding:
+      14px
+      22px !important;
+
+    overflow-y:
+      auto !important;
+  }
+
+
+  .threadPanelExpanded.threadPanelReplying
+  .replyComposer {
+    box-sizing:
+      border-box !important;
+
+    position:
+      relative !important;
+
+    display:
+      flex !important;
+
+    width:
+      100% !important;
+
+    min-width:
+      0 !important;
+
+    min-height:
+      410px !important;
+
+    max-height:
+      54dvh !important;
+
+    flex:
+      0
+      0
+      auto !important;
+
+    flex-direction:
+      column !important;
+
+    gap:
+      8px !important;
+
+    padding:
+      10px
+      18px
+      12px !important;
+
+    overflow-x:
+      hidden !important;
+
+    overflow-y:
+      auto !important;
+
+    border-top:
+      1px solid
+      #cfdde7 !important;
+
+    background:
+      #ffffff !important;
+
+    scrollbar-gutter:
+      stable !important;
+  }
+
+
+  .threadPanelExpanded.threadPanelReplying
+  .inlineReplyTopbar {
+    min-height:
+      38px !important;
+
+    flex:
+      0
+      0
+      auto !important;
+
+    margin:
+      0 !important;
+
+    padding:
+      0
+      0
+      8px !important;
+  }
+
+
+  /*
+   * TO + SUBJECT MUST ALWAYS BE VISIBLE.
+   */
+
+  .threadPanelExpanded.threadPanelReplying
+  .replyAddressing {
+    display:
+      grid !important;
+
+    width:
+      100% !important;
+
+    min-width:
+      0 !important;
+
+    flex:
+      0
+      0
+      auto !important;
+
+    overflow:
+      hidden !important;
+  }
+
+
+  .threadPanelExpanded.threadPanelReplying
+  .replyAddressing
+  > div {
+    display:
+      grid !important;
+
+    grid-template-columns:
+      78px
+      minmax(
+        0,
+        1fr
+      ) !important;
+
+    min-height:
+      40px !important;
+
+    align-items:
+      center !important;
+
+    padding:
+      0
+      12px !important;
+  }
+
+
+  .threadPanelExpanded.threadPanelReplying
+  .replySubjectInput {
+    box-sizing:
+      border-box !important;
+
+    width:
+      100% !important;
+
+    min-width:
+      0 !important;
+
+    height:
+      34px !important;
+  }
+
+
+  /*
+   * FULL WRITING CANVAS.
+   */
+
+  .threadPanelExpanded.threadPanelReplying
+  .richComposerShell {
+    display:
+      flex !important;
+
+    width:
+      100% !important;
+
+    min-width:
+      0 !important;
+
+    min-height:
+      190px !important;
+
+    max-height:
+      none !important;
+
+    flex:
+      1
+      1
+      auto !important;
+
+    flex-direction:
+      column !important;
+
+    overflow:
+      hidden !important;
+  }
+
+
+  .threadPanelExpanded.threadPanelReplying
+  .richComposerToolbar {
+    min-height:
+      44px !important;
+
+    flex:
+      0
+      0
+      44px !important;
+
+    overflow-x:
+      auto !important;
+
+    overflow-y:
+      hidden !important;
+  }
+
+
+  .threadPanelExpanded.threadPanelReplying
+  .richComposerEditor {
+    box-sizing:
+      border-box !important;
+
+    width:
+      100% !important;
+
+    min-width:
+      0 !important;
+
+    min-height:
+      140px !important;
+
+    max-height:
+      220px !important;
+
+    flex:
+      1
+      1
+      auto !important;
+
+    padding:
+      13px
+      15px !important;
+
+    overflow-y:
+      auto !important;
+
+    font-size:
+      14px !important;
+
+    line-height:
+      1.55 !important;
+  }
+
+
+  /*
+   * SIGNATURE MUST NOT VANISH.
+   */
+
+  .threadPanelExpanded.threadPanelReplying
+  .composerSignature {
+    box-sizing:
+      border-box !important;
+
+    display:
+      grid !important;
+
+    width:
+      100% !important;
+
+    min-width:
+      0 !important;
+
+    min-height:
+      0 !important;
+
+    max-height:
+      92px !important;
+
+    flex:
+      0
+      0
+      auto !important;
+
+    margin:
+      0 !important;
+
+    padding:
+      7px
+      9px !important;
+
+    overflow-x:
+      hidden !important;
+
+    overflow-y:
+      auto !important;
+  }
+
+
+  /*
+   * ATTACH / REPLY ALL / EMAIL / SEND ALWAYS REACHABLE.
+   */
+
+  .threadPanelExpanded.threadPanelReplying
+  .composerFooter {
+    box-sizing:
+      border-box !important;
+
+    position:
+      sticky !important;
+
+    z-index:
+      50 !important;
+
+    bottom:
+      0 !important;
+
+    display:
+      flex !important;
+
+    width:
+      100% !important;
+
+    min-width:
+      0 !important;
+
+    min-height:
+      54px !important;
+
+    max-height:
+      none !important;
+
+    flex:
+      0
+      0
+      auto !important;
+
+    align-items:
+      center !important;
+
+    justify-content:
+      space-between !important;
+
+    gap:
+      8px !important;
+
+    margin:
+      0 !important;
+
+    padding:
+      8px
+      0
+      2px !important;
+
+    overflow:
+      visible !important;
+
+    border-top:
+      1px solid
+      #e0e8ee !important;
+
+    background:
+      #ffffff !important;
+  }
+
+
+  .threadPanelExpanded.threadPanelReplying
+  .replyOptions {
+    display:
+      flex !important;
+
+    min-width:
+      0 !important;
+
+    align-items:
+      center !important;
+
+    flex-wrap:
+      wrap !important;
+
+    gap:
+      6px !important;
+  }
+
+
+  .threadPanelExpanded.threadPanelReplying
+  .sendButton {
+    min-width:
+      145px !important;
+
+    min-height:
+      42px !important;
+
+    flex:
+      0
+      0
+      auto !important;
+
+    justify-content:
+      center !important;
+  }
+}
+
+
+/*
+ * Short laptop screens.
+ */
+
+@media
+  (min-width: 821px)
+  and
+  (max-height: 780px) {
+
+  .threadPanelExpanded.threadPanelReplying
+  .threadBody {
+    min-height:
+      150px !important;
+
+    max-height:
+      31dvh !important;
+  }
+
+
+  .threadPanelExpanded.threadPanelReplying
+  .replyComposer {
+    min-height:
+      345px !important;
+
+    max-height:
+      61dvh !important;
+  }
+
+
+  .threadPanelExpanded.threadPanelReplying
+  .richComposerEditor {
+    min-height:
+      105px !important;
+
+    max-height:
+      150px !important;
+  }
+}
+
+
+/*
+ * Clear action feedback while a provider request is active.
+ */
+
+.threadHeaderActions
+button:disabled,
+
+.inboxWorkflowActionBar
+button:disabled,
+
+.inboxWorkflowActionBar
+select:disabled {
+  cursor:
+    wait !important;
+
+  opacity:
+    0.64 !important;
+}
+
+
+/* CAMPAIGN SEAT EXPANDED FOCUS READER V35B — END */
