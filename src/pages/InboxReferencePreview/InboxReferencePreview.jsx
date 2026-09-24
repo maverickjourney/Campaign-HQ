@@ -3916,6 +3916,11 @@ export default function InboxReferencePreview() {
   const [replyText, setReplyText] = useState("");
 
   const [
+    replySubject,
+    setReplySubject,
+  ] = useState("");
+
+  const [
     replyRichHtml,
     setReplyRichHtml,
   ] = useState("");
@@ -6388,6 +6393,32 @@ export default function InboxReferencePreview() {
         nextReplyChannel,
       );
 
+      const currentSubject =
+        String(
+          selectedConversation
+            ?.subject ||
+          "",
+        ).trim();
+
+      setReplySubject(
+        nextReplyChannel ===
+          "email"
+          ? (
+              /^re:/i.test(
+                currentSubject,
+              )
+                ? currentSubject
+                : `Re: ${
+                    currentSubject ||
+                    "(No subject)"
+                  }`
+            )
+          : (
+              currentSubject ||
+              "Campaign Seat conversation"
+            ),
+      );
+
       setReplyAllThreadId(
         replyAll &&
         selectedConversation
@@ -6443,6 +6474,10 @@ export default function InboxReferencePreview() {
       );
 
       setReplyText(
+        "",
+      );
+
+      setReplySubject(
         "",
       );
 
@@ -7267,6 +7302,16 @@ export default function InboxReferencePreview() {
       liveMailboxEnabled
     ) {
       if (
+        !replySubject.trim()
+      ) {
+        setToast(
+          "Enter an email subject before sending.",
+        );
+
+        return;
+      }
+
+      if (
         !selectedConversation
           ?.providerThreadId
       ) {
@@ -7364,7 +7409,7 @@ export default function InboxReferencePreview() {
               replySource.providerMessageId,
 
             subject:
-              selectedConversation.subject,
+              replySubject.trim(),
 
             body:
               buildOutboundEmailBody({
@@ -7434,9 +7479,7 @@ export default function InboxReferencePreview() {
                       "email",
 
                     subject:
-                      selectedConversation
-                        .subject ||
-                      "",
+                      replySubject.trim(),
                   },
                 },
 
@@ -7453,9 +7496,7 @@ export default function InboxReferencePreview() {
 
                         metadata: {
                           subject:
-                            selectedConversation
-                              .subject ||
-                            "",
+                            replySubject.trim(),
                         },
                       },
                     ]
@@ -7494,6 +7535,7 @@ export default function InboxReferencePreview() {
         }
 
         setReplyText("");
+        setReplySubject("");
         setReplyAllThreadId("");
         setPendingAttachments([]);
         setAttachmentError("");
@@ -14320,29 +14362,37 @@ type="button"
                         Subject
                       </span>
 
-                      <strong>
-                        {replyChannel ===
-                        "email"
-                          ? (
-                              /^re:/i.test(
-                                selectedConversation
-                                  ?.subject ||
-                                "",
-                              )
-                                ? selectedConversation
-                                    ?.subject
-                                : `Re: ${
-                                    selectedConversation
-                                      ?.subject ||
-                                    "(No subject)"
-                                  }`
+                      {replyChannel ===
+                      "email" ? (
+                        <input
+                          className={
+                            styles.replySubjectInput
+                          }
+                          type="text"
+                          value={
+                            replySubject
+                          }
+                          maxLength={998}
+                          aria-label="Reply subject"
+                          autoComplete="off"
+                          spellCheck="true"
+                          onChange={(
+                            event,
+                          ) =>
+                            setReplySubject(
+                              event.target.value,
                             )
-                          : (
-                              selectedConversation
-                                ?.subject ||
-                              "Campaign Seat conversation"
-                            )}
-                      </strong>
+                          }
+                        />
+                      ) : (
+                        <strong>
+                          {
+                            selectedConversation
+                              ?.subject ||
+                            "Campaign Seat conversation"
+                          }
+                        </strong>
+                      )}
                     </div>
                   </section>
                 ) : null}
