@@ -4792,6 +4792,53 @@ export default function InboxReferencePreview() {
     );
 
 
+  /*
+   * The composer can open before the saved signature
+   * finishes loading.
+   *
+   * Once the saved signature arrives, automatically apply
+   * the workspace default to the already-open email.
+   */
+  useEffect(() => {
+    if (
+      signatureLoading ||
+      replyChannel !==
+        "email" ||
+      !liveMailboxEnabled ||
+      !signatureEnabled
+    ) {
+      return;
+    }
+
+    if (
+      newMessageMode
+    ) {
+      setIncludeSignature(
+        defaultSignatureOnNew,
+      );
+
+      return;
+    }
+
+    if (
+      replyComposerOpen
+    ) {
+      setIncludeSignature(
+        defaultSignatureOnReply,
+      );
+    }
+  }, [
+    defaultSignatureOnNew,
+    defaultSignatureOnReply,
+    liveMailboxEnabled,
+    newMessageMode,
+    replyChannel,
+    replyComposerOpen,
+    signatureEnabled,
+    signatureLoading,
+  ]);
+
+
   const contacts = useMemo(() => {
     const savedContacts =
       Array.isArray(liveContacts)
@@ -15285,31 +15332,23 @@ type="button"
 
                 <div className={styles.composerFooter}>
                   <div className={styles.replyOptions}>
-                    {(newMessageMode ||
-                    replyChannel === "dashboard" ||
-                    replyChannel === "text" ||
-                    replyChannel === "whatsapp" ||
-                    (
-                      replyChannel === "email" &&
-                      liveMailboxEnabled
-                    )) ? (
-                      <button
-                        type="button"
-                        className={
-                          styles.compactAttachButton
-                        }
-                        onClick={
-                          openComposerAttachmentPicker
-                        }
-                      >
-                        <Paperclip
-                          size={15}
-                        />
-                        {newMessageMode
-                          ? "Attach files"
-                          : "Attach"}
-                      </button>
-                    ) : null}
+                    <button
+                      type="button"
+                      className={
+                        styles.compactAttachButton
+                      }
+                      title="Attach photos or files"
+                      aria-label="Attach photos or files"
+                      onClick={
+                        openComposerAttachmentPicker
+                      }
+                    >
+                      <Paperclip
+                        size={15}
+                      />
+
+                      Attach files & photos
+                    </button>
 
                     {!newMessageMode &&
                     replyChannel === "email" &&

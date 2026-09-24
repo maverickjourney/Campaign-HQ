@@ -385,6 +385,22 @@ export default function EmailContactsOnboarding({
       setSignatureMode(
         "image",
       );
+
+      /*
+       * Uploading a signature means the campaign intends
+       * to use it unless they explicitly turn it off later.
+       */
+      setSignatureEnabled(
+        true,
+      );
+
+      setSignatureOnNew(
+        true,
+      );
+
+      setSignatureOnReply(
+        true,
+      );
     };
 
 
@@ -913,6 +929,22 @@ export default function EmailContactsOnboarding({
                   setSignatureMode(
                     "image",
                   );
+
+                  if (
+                    activeSignatureImageUrl
+                  ) {
+                    setSignatureEnabled(
+                      true,
+                    );
+
+                    setSignatureOnNew(
+                      true,
+                    );
+
+                    setSignatureOnReply(
+                      true,
+                    );
+                  }
 
                   setSignatureSaved(
                     "",
