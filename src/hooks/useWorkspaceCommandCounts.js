@@ -81,9 +81,24 @@ function inboxUnreadFromFolders(
       },
     );
 
+  const rawCount =
+    inbox?.unread_count;
+
+  /*
+   * Do not convert a missing provider count into zero.
+   * Number(null) === 0, but null means "unavailable".
+   */
+  if (
+    rawCount === null ||
+    rawCount === undefined ||
+    rawCount === ""
+  ) {
+    return null;
+  }
+
   const count =
     Number(
-      inbox?.unread_count,
+      rawCount,
     );
 
   return (

@@ -1363,6 +1363,20 @@ function findInboxFolder(
 function mailboxCount(
   value,
 ) {
+  /*
+   * Provider folder counts are optional.
+   *
+   * Number(null) is 0 in JavaScript, which incorrectly turns
+   * an unavailable unread count into "zero unread".
+   */
+  if (
+    value === null ||
+    value === undefined ||
+    value === ""
+  ) {
+    return null;
+  }
+
   const numeric =
     Number(value);
 
@@ -1878,6 +1892,9 @@ export function useRealInboxMailbox({
           let refreshProvider =
             "";
 
+          let providerInboxUnreadCount =
+            null;
+
           try {
             const folderResult =
               await invokeMailbox({
@@ -1913,19 +1930,19 @@ export function useRealInboxMailbox({
               ),
             );
 
-            const nextInboxUnreadCount =
+            providerInboxUnreadCount =
               mailboxCount(
                 inboxFolder
                   ?.unread_count,
               );
 
             setInboxUnreadCount(
-              nextInboxUnreadCount,
+              providerInboxUnreadCount,
             );
 
             publishInboxUnreadCount(
               workspaceId,
-              nextInboxUnreadCount,
+              providerInboxUnreadCount,
             );
 
             if (
@@ -2218,6 +2235,54 @@ return transformed;
                   right.order -
                   left.order,
               );
+
+          /*
+           * Some connected mailbox providers do not supply a
+           * trustworthy folder unread total.
+           *
+           * When Campaign Seat is actually viewing Inbox, the
+           * loaded thread state is direct evidence. Never allow a
+           * missing or stale zero folder total to contradict
+           * threads that are visibly unread.
+           */
+          const viewingInbox =
+            !requestedFolderId ||
+            Boolean(
+              inboxId &&
+              targetFolderId ===
+                inboxId,
+            );
+
+          if (viewingInbox) {
+            const loadedUnreadCount =
+              next.filter(
+                (conversation) =>
+                  conversation.unread,
+              ).length;
+
+            const reconciledUnreadCount =
+              providerInboxUnreadCount ===
+              null
+                ? loadedUnreadCount
+                : Math.max(
+                    providerInboxUnreadCount,
+                    loadedUnreadCount,
+                  );
+
+            setInboxUnreadCount(
+              reconciledUnreadCount,
+            );
+
+            publishInboxUnreadCount(
+              workspaceId,
+              reconciledUnreadCount,
+              {
+                authoritativeForMs:
+                  180000,
+              },
+            );
+          }
+
 
           setConversations(
             (current) => {
