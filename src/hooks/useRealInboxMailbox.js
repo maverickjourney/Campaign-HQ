@@ -3310,6 +3310,225 @@ return transformed;
     );
 
 
+  /*
+   * V45 — EXACT THREAD DEEP LINK
+   *
+   * Contacts can reference a real provider thread that is not
+   * currently present in the active Inbox folder. Fetch the
+   * thread directly, hydrate its messages, and add it to the
+   * mailbox state so Campaign Seat can open it reliably.
+   */
+  const ensureThread =
+    useCallback(
+      async (
+        threadIdOrConversationId,
+      ) => {
+        const providerThreadId =
+          clean(
+            threadIdOrConversationId,
+          ).replace(
+            THREAD_PREFIX,
+            "",
+          );
+
+        if (
+          !enabled ||
+          !providerThreadId
+        ) {
+          return null;
+        }
+
+        const existing =
+          conversationsRef
+            .current
+            .find(
+              (conversation) =>
+                conversation
+                  .providerThreadId ===
+                providerThreadId,
+            ) ||
+          null;
+
+        if (existing) {
+          return (
+            await loadThread(
+              providerThreadId,
+            )
+          ) || existing;
+        }
+
+        const threadResult =
+          await invokeMailbox({
+            action:
+              "get_thread",
+
+            threadId:
+              providerThreadId,
+          });
+
+        const rawThread =
+          threadResult
+            ?.data &&
+          typeof threadResult.data ===
+            "object"
+            ? threadResult.data
+            : null;
+
+        if (!rawThread) {
+          throw new Error(
+            "Campaign Seat could not load this email conversation.",
+          );
+        }
+
+        const mailboxEmail =
+          clean(
+            threadResult
+              ?.connectedEmail,
+          ) ||
+          connectedEmailRef
+            .current;
+
+        if (
+          mailboxEmail &&
+          mailboxEmail !==
+            connectedEmailRef.current
+        ) {
+          connectedEmailRef.current =
+            mailboxEmail;
+
+          setConnectedEmail(
+            mailboxEmail,
+          );
+        }
+
+        if (
+          threadResult
+            ?.accountProvider
+        ) {
+          setAccountProvider(
+            threadResult
+              .accountProvider,
+          );
+        }
+
+        const baseConversation =
+          transformThread({
+            thread:
+              rawThread,
+
+            connectedEmail:
+              mailboxEmail,
+          });
+
+        const messageResult =
+          await invokeMailbox({
+            action:
+              "list_thread_messages",
+
+            threadId:
+              providerThreadId,
+          });
+
+        const messages =
+          (
+            Array.isArray(
+              messageResult?.data,
+            )
+              ? messageResult.data
+              : []
+          )
+            .map(
+              (message) =>
+                transformMessage({
+                  message,
+
+                  connectedEmail:
+                    mailboxEmail ||
+                    messageResult
+                      ?.connectedEmail,
+                }),
+            )
+            .sort(
+              (
+                left,
+                right,
+              ) =>
+                right.order -
+                left.order,
+            );
+
+        const hydrated = {
+          ...baseConversation,
+
+          messages:
+            messages.length
+              ? messages
+              : baseConversation
+                  .messages,
+
+          files:
+            messages.flatMap(
+              (message) =>
+                message
+                  .attachments ||
+                [],
+            ),
+
+          mailboxHydrated:
+            true,
+        };
+
+        const hydrationKey =
+          `${workspaceId}:${providerThreadId}`;
+
+        const hydratedVersion =
+          clean(
+            messages[0]
+              ?.providerMessageId ||
+            hydrated
+              .latestProviderMessageId,
+          );
+
+        if (hydratedVersion) {
+          hydratedThreadVersionsRef
+            .current
+            .set(
+              hydrationKey,
+              hydratedVersion,
+            );
+        }
+
+        setConversations(
+          (current) => {
+            const next = [
+              hydrated,
+
+              ...current.filter(
+                (conversation) =>
+                  conversation
+                    .providerThreadId !==
+                  providerThreadId,
+              ),
+            ];
+
+            conversationsRef.current =
+              next;
+
+            return next;
+          },
+        );
+
+        return hydrated;
+      },
+      [
+        enabled,
+        invokeMailbox,
+        loadThread,
+        workspaceId,
+      ],
+    );
+
+
   const moveThreadMessages =
     useCallback(
       async ({
@@ -4229,6 +4448,7 @@ return transformed;
 
     refresh,
     loadThread,
+    ensureThread,
     markThreadRead,
     markThreadUnread,
     setThreadStarred,

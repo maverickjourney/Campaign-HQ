@@ -49,6 +49,10 @@ import {
 } from "../../hooks/useContactEmailHistory";
 
 import {
+  useContactOperationsContext,
+} from "../../hooks/useContactOperationsContext";
+
+import {
   useTeamAccessCommandCenter,
 } from "../../hooks/useTeamAccessCommandCenter";
 
@@ -650,6 +654,70 @@ function emailDirectionLabel(
 }
 
 
+function formatOperationalStatus(
+  value,
+) {
+  const labels = {
+    open:
+      "Open",
+
+    needs_reply:
+      "Needs Reply",
+
+    waiting_on:
+      "Waiting On",
+
+    done:
+      "Done",
+
+    closed:
+      "Closed",
+  };
+
+  return (
+    labels[value] ||
+    String(
+      value ||
+      "Open",
+    )
+      .replaceAll(
+        "_",
+        " ",
+      )
+      .replace(
+        /\b\w/g,
+        (
+          character,
+        ) =>
+          character
+            .toUpperCase(),
+      )
+  );
+}
+
+
+function formatTaskStatus(
+  value,
+) {
+  return String(
+    value ||
+      "open",
+  )
+    .replaceAll(
+      "_",
+      " ",
+    )
+    .replace(
+      /\b\w/g,
+      (
+        character,
+      ) =>
+        character
+          .toUpperCase(),
+    );
+}
+
+
 function activityItems(contact, sessionItems = []) {
   const storedItems = Array.isArray(contact.demo_activity)
     ? contact.demo_activity
@@ -1202,6 +1270,302 @@ export default function ContactsReferencePreview() {
   const latestContactEmailThread =
     selectedContactEmailThreads[0] ||
     null;
+
+  const selectedContactThreadIds =
+    useMemo(
+      () =>
+        selectedContactEmailThreads
+          .map(
+            (thread) =>
+              thread
+                .providerThreadId,
+          )
+          .filter(
+            Boolean,
+          ),
+      [
+        selectedContactEmailThreads,
+      ],
+    );
+
+  const {
+    workflowByThread:
+      contactWorkflowByThread,
+
+    taskById:
+      contactTaskById,
+
+    isLoading:
+      contactOperationsLoading,
+
+    error:
+      contactOperationsError,
+  } = useContactOperationsContext({
+    workspaceId:
+      workspace.id,
+
+    threadIds:
+      selectedContactThreadIds,
+
+    enabled:
+      !demoMode &&
+      Boolean(
+        selectedContactThreadIds.length,
+      ),
+  });
+
+  const latestInboundEmailThread =
+    useMemo(
+      () =>
+        selectedContactEmailThreads.find(
+          (thread) =>
+            thread.direction ===
+            "inbound",
+        ) ||
+        null,
+      [
+        selectedContactEmailThreads,
+      ],
+    );
+
+  const latestOutboundEmailThread =
+    useMemo(
+      () =>
+        selectedContactEmailThreads.find(
+          (thread) =>
+            thread.direction ===
+            "outbound",
+        ) ||
+        null,
+      [
+        selectedContactEmailThreads,
+      ],
+    );
+
+  const latestContactWorkflow =
+    useMemo(
+      () =>
+        selectedContactEmailThreads
+          .map(
+            (thread) =>
+              contactWorkflowByThread.get(
+                thread
+                  .providerThreadId,
+              ),
+          )
+          .find(
+            Boolean,
+          ) ||
+        null,
+      [
+        contactWorkflowByThread,
+        selectedContactEmailThreads,
+      ],
+    );
+
+  const linkedContactTasks =
+    useMemo(
+      () => {
+        const unique =
+          new Map();
+
+        selectedContactEmailThreads
+          .map(
+            (thread) =>
+              contactWorkflowByThread.get(
+                thread
+                  .providerThreadId,
+              ),
+          )
+          .filter(
+            Boolean,
+          )
+          .forEach(
+            (workflow) => {
+              const task =
+                workflow
+                  ?.linked_task_id
+                  ? contactTaskById.get(
+                      workflow
+                        .linked_task_id,
+                    )
+                  : null;
+
+              if (
+                task?.id
+              ) {
+                unique.set(
+                  task.id,
+                  task,
+                );
+              }
+            },
+          );
+
+        return Array.from(
+          unique.values(),
+        );
+      },
+      [
+        contactTaskById,
+        contactWorkflowByThread,
+        selectedContactEmailThreads,
+      ],
+    );
+
+  const activeLinkedContactTasks =
+    linkedContactTasks.filter(
+      (task) =>
+        ![
+          "completed",
+          "archived",
+          "done",
+          "closed",
+        ].includes(
+          String(
+            task.status ||
+            "",
+          ).toLowerCase(),
+        ),
+    );
+
+  const contactNeedsReplyCount =
+    selectedContactEmailThreads.filter(
+      (thread) => {
+        const workflow =
+          contactWorkflowByThread.get(
+            thread.providerThreadId,
+          );
+
+        const status =
+          workflow
+            ?.workflow_status ||
+          (
+            thread.direction ===
+              "inbound"
+              ? "needs_reply"
+              : thread.direction ===
+                  "outbound"
+                ? "waiting_on"
+                : "open"
+          );
+
+        const snoozed =
+          Boolean(
+            workflow
+              ?.snoozed_until &&
+            new Date(
+              workflow
+                .snoozed_until,
+            ).getTime() >
+              Date.now(),
+          );
+
+        return (
+          status ===
+            "needs_reply" &&
+          !snoozed
+        );
+      },
+    ).length;
+
+  const relationshipWorkflowStatus =
+    latestContactWorkflow
+      ?.workflow_status ||
+    (
+      latestContactEmailThread
+        ?.direction ===
+        "inbound"
+        ? "needs_reply"
+        : latestContactEmailThread
+            ?.direction ===
+            "outbound"
+          ? "waiting_on"
+          : "open"
+    );
+
+  const relationshipOwnerId =
+    latestContactWorkflow
+      ?.assigned_to ||
+    selectedContact
+      ?.assigned_to ||
+    "";
+
+  const relationshipOwnerName =
+    memberMap.get(
+      relationshipOwnerId,
+    )
+      ?.fullName ||
+    "Unassigned";
+
+  const relationshipFollowUpAt =
+    latestContactWorkflow
+      ?.follow_up_at ||
+    selectedContact
+      ?.next_follow_up_at ||
+    null;
+
+  const workflowForEmailThread =
+    (thread) =>
+      contactWorkflowByThread.get(
+        thread
+          ?.providerThreadId,
+      ) ||
+      null;
+
+  const taskForEmailThread =
+    (thread) => {
+      const workflow =
+        workflowForEmailThread(
+          thread,
+        );
+
+      return workflow
+        ?.linked_task_id
+        ? contactTaskById.get(
+            workflow
+              .linked_task_id,
+          ) ||
+            null
+        : null;
+    };
+
+  const statusForEmailThread =
+    (thread) =>
+      workflowForEmailThread(
+        thread,
+      )
+        ?.workflow_status ||
+      (
+        thread?.direction ===
+          "inbound"
+          ? "needs_reply"
+          : thread?.direction ===
+              "outbound"
+            ? "waiting_on"
+            : "open"
+      );
+
+  const ownerForEmailThread =
+    (thread) => {
+      const ownerId =
+        workflowForEmailThread(
+          thread,
+        )
+          ?.assigned_to ||
+        selectedContact
+          ?.assigned_to ||
+        "";
+
+      return (
+        memberMap.get(
+          ownerId,
+        )
+          ?.fullName ||
+        "Unassigned"
+      );
+    };
+
   const selectedSet = useMemo(() => new Set(selectedIds), [selectedIds]);
   const allVisibleSelected = Boolean(filteredContacts.length) && filteredContacts.every((contact) => selectedSet.has(contact.id));
   const selectedContacts = contacts.filter((contact) => selectedSet.has(contact.id));
@@ -1261,6 +1625,31 @@ export default function ContactsReferencePreview() {
     setTagFilter("all");
     setStatusFilter("all");
   };
+
+  const openContactEmailThread =
+    (
+      thread,
+    ) => {
+      const providerThreadId =
+        String(
+          thread
+            ?.providerThreadId ||
+          "",
+        ).trim();
+
+      if (
+        !providerThreadId
+      ) {
+        return;
+      }
+
+      window.location.assign(
+        `/inbox?thread_id=${encodeURIComponent(
+          providerThreadId,
+        )}`,
+      );
+    };
+
 
   const openContactDetails = (
     contactId,
@@ -2153,6 +2542,205 @@ export default function ContactsReferencePreview() {
                   <button type="button" onClick={() => openEdit(selectedContact)}>Update follow-up</button>
                 </section>
 
+                <section
+                  data-detail-section="overview"
+                  className={
+                    styles.crmCommandCenter
+                  }
+                >
+                  <header>
+                    <div>
+                      <span>
+                        Relationship operations
+                      </span>
+
+                      <h3>
+                        CRM Command Center
+                      </h3>
+                    </div>
+
+                    <small>
+                      {demoMode
+                        ? "Preview"
+                        : contactOperationsLoading
+                          ? "Syncing…"
+                          : "Live"}
+                    </small>
+                  </header>
+
+                  {contactOperationsError ? (
+                    <div
+                      className={
+                        styles.crmCommandError
+                      }
+                    >
+                      <AlertTriangle
+                        size={15}
+                      />
+
+                      {
+                        contactOperationsError
+                      }
+                    </div>
+                  ) : null}
+
+                  <div
+                    className={
+                      styles.crmCommandGrid
+                    }
+                  >
+                    <article>
+                      <span>
+                        Owner
+                      </span>
+
+                      <strong>
+                        {
+                          relationshipOwnerName
+                        }
+                      </strong>
+
+                      <small>
+                        {latestContactWorkflow
+                          ?.assigned_to
+                          ? "Inbox conversation owner"
+                          : "Contact owner"}
+                      </small>
+                    </article>
+
+                    <article>
+                      <span>
+                        Inbox status
+                      </span>
+
+                      <strong>
+                        {contactNeedsReplyCount
+                          ? `${contactNeedsReplyCount} Needs Reply`
+                          : formatOperationalStatus(
+                              relationshipWorkflowStatus,
+                            )}
+                      </strong>
+
+                      <small>
+                        Across this contact's email threads
+                      </small>
+                    </article>
+
+                    <article>
+                      <span>
+                        Follow-up
+                      </span>
+
+                      <strong>
+                        {
+                          formatDateTime(
+                            relationshipFollowUpAt,
+                          ).date
+                        }
+                      </strong>
+
+                      <small>
+                        {formatDateTime(
+                          relationshipFollowUpAt,
+                        ).time ||
+                          "No time scheduled"}
+                      </small>
+                    </article>
+
+                    <article>
+                      <span>
+                        Linked tasks
+                      </span>
+
+                      <strong>
+                        {
+                          activeLinkedContactTasks.length
+                        }
+                      </strong>
+
+                      <small>
+                        {activeLinkedContactTasks[0]
+                          ?.title ||
+                          "No active linked tasks"}
+                      </small>
+                    </article>
+
+                    <article>
+                      <span>
+                        Last received
+                      </span>
+
+                      <strong>
+                        {latestInboundEmailThread
+                          ? formatEmailHistoryTime(
+                              latestInboundEmailThread
+                                .occurredAt,
+                            )
+                          : "None found"}
+                      </strong>
+
+                      <small>
+                        Incoming email
+                      </small>
+                    </article>
+
+                    <article>
+                      <span>
+                        Last sent
+                      </span>
+
+                      <strong>
+                        {latestOutboundEmailThread
+                          ? formatEmailHistoryTime(
+                              latestOutboundEmailThread
+                                .occurredAt,
+                            )
+                          : "None found"}
+                      </strong>
+
+                      <small>
+                        Campaign email
+                      </small>
+                    </article>
+                  </div>
+
+                  <div
+                    className={
+                      styles.crmCommandActions
+                    }
+                  >
+                    {latestContactEmailThread ? (
+                      <button
+                        type="button"
+                        onClick={() =>
+                          openContactEmailThread(
+                            latestContactEmailThread,
+                          )
+                        }
+                      >
+                        <Mail size={15} />
+                        Open latest email
+                      </button>
+                    ) : null}
+
+                    {activeLinkedContactTasks.length ? (
+                      <button
+                        type="button"
+                        onClick={() =>
+                          window.location.assign(
+                            "/tasks",
+                          )
+                        }
+                      >
+                        <CheckCircle2
+                          size={15}
+                        />
+                        Open Tasks
+                      </button>
+                    ) : null}
+                  </div>
+                </section>
+
                 <section data-detail-section="overview" className={styles.detailSection}>
                   <header><h3>Contact Information</h3><button type="button" onClick={() => openEdit(selectedContact)}>Edit</button></header>
                   <div className={styles.infoRows}>
@@ -2403,6 +2991,78 @@ export default function ContactsReferencePreview() {
                                   ) ||
                                   "Email conversation"}
                               </small>
+
+                              <div
+                                className={
+                                  styles.emailHistoryOperations
+                                }
+                              >
+                                <span>
+                                  {formatOperationalStatus(
+                                    statusForEmailThread(
+                                      thread,
+                                    ),
+                                  )}
+                                </span>
+
+                                <span>
+                                  Owner:{" "}
+                                  {ownerForEmailThread(
+                                    thread,
+                                  )}
+                                </span>
+
+                                {workflowForEmailThread(
+                                  thread,
+                                )?.follow_up_at ? (
+                                  <span>
+                                    Follow-up:{" "}
+                                    {
+                                      formatDateTime(
+                                        workflowForEmailThread(
+                                          thread,
+                                        ).follow_up_at,
+                                      ).date
+                                    }
+                                  </span>
+                                ) : null}
+
+                                {taskForEmailThread(
+                                  thread,
+                                ) ? (
+                                  <span>
+                                    Task:{" "}
+                                    {
+                                      taskForEmailThread(
+                                        thread,
+                                      ).title
+                                    }{" "}
+                                    ·{" "}
+                                    {formatTaskStatus(
+                                      taskForEmailThread(
+                                        thread,
+                                      ).status,
+                                    )}
+                                  </span>
+                                ) : null}
+                              </div>
+
+                              <div
+                                className={
+                                  styles.emailHistoryActions
+                                }
+                              >
+                                <button
+                                  type="button"
+                                  onClick={() =>
+                                    openContactEmailThread(
+                                      thread,
+                                    )
+                                  }
+                                >
+                                  Open in Inbox
+                                </button>
+                              </div>
                             </div>
                           </article>
                         ),

@@ -4995,3 +4995,547 @@ button:disabled {
 
 
 /* CAMPAIGN SEAT REAL CONTACT EMAIL HISTORY V44 — END */
+
+
+/* CAMPAIGN SEAT CONTACT CRM COMMAND CENTER V45 — START */
+
+
+/* ------------------------------------------------------------
+   CRM COMMAND CENTER
+   ------------------------------------------------------------ */
+
+.crmCommandCenter {
+  margin:
+    0;
+
+  padding:
+    14px
+    16px;
+
+  border-top:
+    1px solid
+    #e2e9ef;
+
+  background:
+    linear-gradient(
+      145deg,
+      #f6fafd,
+      #ffffff
+    );
+}
+
+
+.crmCommandCenter
+> header {
+  display:
+    flex;
+
+  align-items:
+    flex-start;
+
+  justify-content:
+    space-between;
+
+  gap:
+    12px;
+
+  margin-bottom:
+    11px;
+}
+
+
+.crmCommandCenter
+> header
+span,
+.crmCommandCenter
+> header
+h3 {
+  display:
+    block;
+}
+
+
+.crmCommandCenter
+> header
+span {
+  color:
+    #8296a8;
+
+  font-size:
+    0.54rem;
+
+  font-weight:
+    820;
+
+  letter-spacing:
+    0.06em;
+
+  text-transform:
+    uppercase;
+}
+
+
+.crmCommandCenter
+> header
+h3 {
+  margin:
+    4px
+    0
+    0;
+
+  color:
+    #183e61;
+
+  font-size:
+    0.78rem;
+}
+
+
+.crmCommandCenter
+> header
+> small {
+  display:
+    inline-flex;
+
+  min-height:
+    24px;
+
+  align-items:
+    center;
+
+  padding:
+    0
+    8px;
+
+  border:
+    1px solid
+    #cfe0eb;
+
+  border-radius:
+    999px;
+
+  color:
+    #53748e;
+
+  background:
+    #ffffff;
+
+  font-size:
+    0.52rem;
+
+  font-weight:
+    800;
+}
+
+
+.crmCommandError {
+  display:
+    flex;
+
+  align-items:
+    center;
+
+  gap:
+    7px;
+
+  margin-bottom:
+    10px;
+
+  padding:
+    8px
+    9px;
+
+  border:
+    1px solid
+    #efc7cb;
+
+  border-radius:
+    8px;
+
+  color:
+    #a32b36;
+
+  background:
+    #fff5f6;
+
+  font-size:
+    0.58rem;
+}
+
+
+.crmCommandGrid {
+  display:
+    grid;
+
+  grid-template-columns:
+    repeat(
+      2,
+      minmax(
+        0,
+        1fr
+      )
+    );
+
+  gap:
+    8px;
+}
+
+
+.crmCommandGrid
+article {
+  min-width:
+    0;
+
+  padding:
+    10px;
+
+  border:
+    1px solid
+    #d9e5ed;
+
+  border-radius:
+    10px;
+
+  background:
+    #ffffff;
+}
+
+
+.crmCommandGrid
+article
+span,
+.crmCommandGrid
+article
+strong,
+.crmCommandGrid
+article
+small {
+  display:
+    block;
+}
+
+
+.crmCommandGrid
+article
+span {
+  color:
+    #8497a8;
+
+  font-size:
+    0.52rem;
+
+  font-weight:
+    820;
+
+  letter-spacing:
+    0.04em;
+
+  text-transform:
+    uppercase;
+}
+
+
+.crmCommandGrid
+article
+strong {
+  margin-top:
+    5px;
+
+  overflow:
+    hidden;
+
+  color:
+    #294f70;
+
+  font-size:
+    0.66rem;
+
+  line-height:
+    1.35;
+
+  text-overflow:
+    ellipsis;
+
+  white-space:
+    nowrap;
+}
+
+
+.crmCommandGrid
+article
+small {
+  margin-top:
+    4px;
+
+  overflow:
+    hidden;
+
+  color:
+    #8799a8;
+
+  font-size:
+    0.54rem;
+
+  line-height:
+    1.35;
+
+  text-overflow:
+    ellipsis;
+
+  white-space:
+    nowrap;
+}
+
+
+.crmCommandActions {
+  display:
+    flex;
+
+  flex-wrap:
+    wrap;
+
+  gap:
+    7px;
+
+  margin-top:
+    10px;
+}
+
+
+.crmCommandActions
+button {
+  display:
+    inline-flex;
+
+  min-height:
+    34px;
+
+  align-items:
+    center;
+
+  justify-content:
+    center;
+
+  gap:
+    6px;
+
+  padding:
+    0
+    10px;
+
+  border:
+    1px solid
+    #bfd6e6;
+
+  border-radius:
+    8px;
+
+  color:
+    #2c668f;
+
+  background:
+    #ffffff;
+
+  font-size:
+    0.59rem;
+
+  font-weight:
+    820;
+
+  cursor:
+    pointer;
+}
+
+
+/* ------------------------------------------------------------
+   PER-THREAD WORKFLOW CONTEXT
+   ------------------------------------------------------------ */
+
+.emailHistoryOperations {
+  display:
+    flex;
+
+  flex-wrap:
+    wrap;
+
+  gap:
+    5px;
+
+  margin-top:
+    8px;
+}
+
+
+.emailHistoryOperations
+span {
+  display:
+    inline-flex;
+
+  min-height:
+    23px;
+
+  max-width:
+    100%;
+
+  align-items:
+    center;
+
+  padding:
+    0
+    7px;
+
+  overflow:
+    hidden;
+
+  border:
+    1px solid
+    #d4e1e9;
+
+  border-radius:
+    999px;
+
+  color:
+    #5e788d;
+
+  background:
+    #f6f9fb;
+
+  font-size:
+    0.51rem;
+
+  font-weight:
+    760;
+
+  text-overflow:
+    ellipsis;
+
+  white-space:
+    nowrap;
+}
+
+
+.emailHistoryActions {
+  display:
+    flex;
+
+  justify-content:
+    flex-end;
+
+  margin-top:
+    8px;
+}
+
+
+.emailHistoryActions
+button {
+  min-height:
+    31px;
+
+  padding:
+    0
+    10px;
+
+  border:
+    1px solid
+    #bdd5e5;
+
+  border-radius:
+    8px;
+
+  color:
+    #2d6994;
+
+  background:
+    #ffffff;
+
+  font-size:
+    0.56rem;
+
+  font-weight:
+    830;
+
+  cursor:
+    pointer;
+}
+
+
+.emailHistoryActions
+button:hover,
+.crmCommandActions
+button:hover {
+  border-color:
+    #92bbd5;
+
+  background:
+    #f2f8fc;
+}
+
+
+/* ------------------------------------------------------------
+   EXPANDED CONTACT PROFILE
+   ------------------------------------------------------------ */
+
+.detailsPanelExpanded
+.crmCommandGrid {
+  grid-template-columns:
+    repeat(
+      3,
+      minmax(
+        0,
+        1fr
+      )
+    );
+}
+
+
+/* ------------------------------------------------------------
+   MOBILE
+   ------------------------------------------------------------ */
+
+@media (max-width: 760px) {
+  .crmCommandGrid,
+  .detailsPanelExpanded
+  .crmCommandGrid {
+    grid-template-columns:
+      1fr;
+  }
+
+  .crmCommandActions {
+    flex-direction:
+      column;
+  }
+
+  .crmCommandActions
+  button,
+  .emailHistoryActions
+  button {
+    width:
+      100%;
+  }
+
+  .emailHistoryOperations {
+    align-items:
+      stretch;
+
+    flex-direction:
+      column;
+  }
+
+  .emailHistoryOperations
+  span {
+    width:
+      100%;
+
+    box-sizing:
+      border-box;
+
+    border-radius:
+      7px;
+
+    white-space:
+      normal;
+  }
+}
+
+
+/* CAMPAIGN SEAT CONTACT CRM COMMAND CENTER V45 — END */

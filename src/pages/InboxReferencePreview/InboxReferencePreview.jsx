@@ -3028,6 +3028,7 @@ export default function InboxReferencePreview() {
     error: mailboxError,
     refresh: refreshMailbox,
     loadThread: loadMailboxThread,
+    ensureThread: ensureMailboxThread,
     markThreadRead: markMailboxThreadRead,
     markThreadUnread: markMailboxThreadUnread,
     setThreadStarred: setMailboxThreadStarred,
@@ -4180,6 +4181,12 @@ export default function InboxReferencePreview() {
    */
   const contactComposeHandledRef =
     useRef(false);
+
+  /*
+   * V45 exact-thread deep link state.
+   */
+  const threadDeepLinkHandledRef =
+    useRef("");
 
   const [replyAllThreadId, setReplyAllThreadId] =
     useState("");
@@ -5493,7 +5500,9 @@ export default function InboxReferencePreview() {
           activeMailboxKind ===
             "inbox" &&
           conversation.channel ===
-            "email"
+            "email" &&
+          conversation.id !==
+            selectedId
         ) {
           const hasInboundEmail =
             Number(
@@ -5744,6 +5753,7 @@ export default function InboxReferencePreview() {
     accountScopedConversations,
     inboxWorkflowByKey,
     query,
+    selectedId,
     sortDirection,
   ]);
 
@@ -6523,6 +6533,171 @@ export default function InboxReferencePreview() {
     );
   }, [
     defaultSignatureOnNew,
+  ]);
+
+
+  /*
+   * V45 CONTACTS → EXACT INBOX THREAD
+   *
+   * A contact profile may point to an Inbox thread, Sent-only
+   * thread, archived thread, or another provider folder.
+   *
+   * ensureMailboxThread fetches it directly if necessary.
+   */
+  useEffect(() => {
+    if (
+      !liveMailboxEnabled ||
+      typeof window ===
+        "undefined"
+    ) {
+      return undefined;
+    }
+
+    const params =
+      new URLSearchParams(
+        window.location.search,
+      );
+
+    const providerThreadId =
+      String(
+        params.get(
+          "thread_id",
+        ) ||
+        "",
+      ).trim();
+
+    if (
+      !providerThreadId ||
+      threadDeepLinkHandledRef
+        .current ===
+        providerThreadId
+    ) {
+      return undefined;
+    }
+
+    threadDeepLinkHandledRef.current =
+      providerThreadId;
+
+    let cancelled =
+      false;
+
+    void (
+      async () => {
+        try {
+          const conversation =
+            await ensureMailboxThread(
+              providerThreadId,
+            );
+
+          if (
+            cancelled ||
+            !conversation
+          ) {
+            return;
+          }
+
+          /*
+           * Clear UI filters that could hide the exact thread
+           * the user explicitly chose from Contacts.
+           */
+          setSelectedAccountKeys(
+            [],
+          );
+
+          setActiveChannel(
+            "email",
+          );
+
+          setActiveFilter(
+            "all",
+          );
+
+          setActiveTag(
+            "all",
+          );
+
+          setActiveCommandFilter(
+            "all",
+          );
+
+          setQuery(
+            "",
+          );
+
+          setNewMessageMode(
+            false,
+          );
+
+          setReplyComposerOpen(
+            false,
+          );
+
+          setReplyAllThreadId(
+            "",
+          );
+
+          setReplyText(
+            "",
+          );
+
+          setThreadExpanded(
+            false,
+          );
+
+          setActiveThreadTab(
+            "conversation",
+          );
+
+          setSelectedId(
+            conversation.id,
+          );
+
+          params.delete(
+            "thread_id",
+          );
+
+          const remaining =
+            params.toString();
+
+          window.history.replaceState(
+            window.history.state,
+            "",
+            `${
+              window.location.pathname
+            }${
+              remaining
+                ? `?${remaining}`
+                : ""
+            }${
+              window.location.hash ||
+              ""
+            }`,
+          );
+        } catch (
+          threadError
+        ) {
+          if (cancelled) {
+            return;
+          }
+
+          threadDeepLinkHandledRef.current =
+            "";
+
+          setToast(
+            threadError?.message ||
+            "Campaign Seat could not open this email conversation.",
+          );
+        }
+      }
+    )();
+
+    return () => {
+      cancelled =
+        true;
+    };
+  }, [
+    ensureMailboxThread,
+    liveMailboxEnabled,
   ]);
 
 
