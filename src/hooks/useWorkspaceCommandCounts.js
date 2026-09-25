@@ -13,6 +13,7 @@ import {
 const EMPTY_COUNTS = {
   inbox: 0,
   tasks: 0,
+  commitments: 0,
   waiting_on: 0,
   approvals: 0,
 };
@@ -404,6 +405,7 @@ export function useWorkspaceCommandCounts(
         try {
           const [
             tasksResult,
+            commitmentsResult,
             waitingResult,
             approvalsResult,
           ] =
@@ -426,6 +428,34 @@ export function useWorkspaceCommandCounts(
                   [
                     "open",
                     "in_progress",
+                  ],
+                ),
+
+
+              supabase
+                .from("tasks")
+                .select(
+                  "id",
+                  {
+                    count: "exact",
+                    head: true,
+                  },
+                )
+                .eq(
+                  "workspace_id",
+                  workspaceId,
+                )
+                .in(
+                  "status",
+                  [
+                    "open",
+                    "in_progress",
+                  ],
+                )
+                .contains(
+                  "tags",
+                  [
+                    "commitment",
                   ],
                 ),
 
@@ -486,6 +516,7 @@ export function useWorkspaceCommandCounts(
           const failed =
             [
               tasksResult,
+              commitmentsResult,
               waitingResult,
               approvalsResult,
             ].find(
@@ -505,6 +536,10 @@ export function useWorkspaceCommandCounts(
 
               tasks:
                 tasksResult.count ||
+                0,
+
+              commitments:
+                commitmentsResult.count ||
                 0,
 
               waiting_on:
