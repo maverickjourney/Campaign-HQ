@@ -4482,3 +4482,516 @@
 }
 
 /* CAMPAIGN SEAT CONTACTS COMPACT PHONE CARDS — END */
+
+
+/* CAMPAIGN SEAT REAL CONTACT EMAIL HISTORY V44 — START */
+
+
+/* ------------------------------------------------------------
+   THREE-POINT CONTACT COMMUNICATION SUMMARY
+   ------------------------------------------------------------ */
+
+.contactMethodSummary {
+  grid-template-columns:
+    repeat(
+      3,
+      minmax(
+        0,
+        1fr
+      )
+    ) !important;
+}
+
+
+/* ------------------------------------------------------------
+   REAL EMAIL HISTORY
+   ------------------------------------------------------------ */
+
+.emailHistoryHeader {
+  align-items:
+    flex-start !important;
+}
+
+.emailHistoryHeader
+> div {
+  min-width:
+    0;
+}
+
+.emailHistoryHeader h3,
+.emailHistoryHeader small {
+  display:
+    block;
+}
+
+.emailHistoryHeader small {
+  margin-top:
+    4px;
+
+  overflow:
+    hidden;
+
+  color:
+    #8195a7;
+
+  font-size:
+    0.57rem;
+
+  line-height:
+    1.35;
+
+  text-overflow:
+    ellipsis;
+
+  white-space:
+    nowrap;
+}
+
+.emailHistoryHeader
+button:disabled {
+  cursor:
+    wait;
+
+  opacity:
+    0.58;
+}
+
+
+.emailHistoryLoading {
+  display:
+    flex;
+
+  min-height:
+    74px;
+
+  align-items:
+    center;
+
+  justify-content:
+    center;
+
+  gap:
+    8px;
+
+  padding:
+    14px;
+
+  border:
+    1px
+    dashed
+    #cadbe7;
+
+  border-radius:
+    10px;
+
+  color:
+    #70889c;
+
+  background:
+    #f8fbfd;
+
+  font-size:
+    0.63rem;
+
+  font-weight:
+    720;
+}
+
+.emailHistoryLoading svg {
+  animation:
+    contactHistorySpin
+    0.85s
+    linear
+    infinite;
+}
+
+@keyframes contactHistorySpin {
+  to {
+    transform:
+      rotate(
+        360deg
+      );
+  }
+}
+
+
+.emailHistoryError {
+  display:
+    grid;
+
+  grid-template-columns:
+    auto
+    minmax(
+      0,
+      1fr
+    )
+    auto;
+
+  align-items:
+    center;
+
+  gap:
+    8px;
+
+  padding:
+    10px;
+
+  border:
+    1px
+    solid
+    #efc3c8;
+
+  border-radius:
+    10px;
+
+  color:
+    #9f2733;
+
+  background:
+    #fff5f6;
+
+  font-size:
+    0.61rem;
+
+  line-height:
+    1.45;
+}
+
+.emailHistoryError button {
+  min-height:
+    30px;
+
+  padding:
+    0
+    9px;
+
+  border:
+    1px
+    solid
+    #e2afb5;
+
+  border-radius:
+    7px;
+
+  color:
+    #a12733;
+
+  background:
+    #ffffff;
+
+  font-size:
+    0.58rem;
+
+  font-weight:
+    800;
+
+  cursor:
+    pointer;
+}
+
+
+.emailHistoryList {
+  display:
+    grid;
+
+  gap:
+    8px;
+}
+
+
+.emailHistoryItem {
+  display:
+    grid;
+
+  grid-template-columns:
+    34px
+    minmax(
+      0,
+      1fr
+    );
+
+  align-items:
+    start;
+
+  gap:
+    9px;
+
+  padding:
+    10px;
+
+  border:
+    1px
+    solid
+    #dae5ed;
+
+  border-radius:
+    11px;
+
+  background:
+    #fbfdfe;
+}
+
+
+.emailHistoryUnread {
+  border-color:
+    #b8d6e9;
+
+  background:
+    #f4faff;
+
+  box-shadow:
+    inset
+    3px
+    0
+    0
+    #2e74a7;
+}
+
+
+.emailHistoryIcon {
+  display:
+    grid;
+
+  width:
+    32px;
+
+  height:
+    32px;
+
+  place-items:
+    center;
+
+  border-radius:
+    9px;
+
+  color:
+    #316f9d;
+
+  background:
+    #e9f4fb;
+}
+
+
+.emailHistoryCopy {
+  min-width:
+    0;
+}
+
+
+.emailHistoryMeta {
+  display:
+    flex;
+
+  align-items:
+    center;
+
+  justify-content:
+    space-between;
+
+  gap:
+    8px;
+
+  margin-bottom:
+    5px;
+}
+
+
+.emailHistoryMeta time {
+  flex:
+    0
+    0
+    auto;
+
+  color:
+    #899baa;
+
+  font-size:
+    0.55rem;
+
+  white-space:
+    nowrap;
+}
+
+
+.emailDirectionBadge {
+  display:
+    inline-flex;
+
+  min-height:
+    22px;
+
+  align-items:
+    center;
+
+  padding:
+    0
+    7px;
+
+  border-radius:
+    999px;
+
+  color:
+    #58738a;
+
+  background:
+    #eef3f7;
+
+  font-size:
+    0.52rem;
+
+  font-weight:
+    840;
+
+  letter-spacing:
+    0.02em;
+
+  text-transform:
+    uppercase;
+}
+
+
+.emailDirectionInbound {
+  color:
+    #226a91;
+
+  background:
+    #e6f3fb;
+}
+
+
+.emailDirectionOutbound {
+  color:
+    #49677e;
+
+  background:
+    #edf1f4;
+}
+
+
+.emailHistoryCopy
+> strong {
+  display:
+    block;
+
+  overflow:
+    hidden;
+
+  color:
+    #284f70;
+
+  font-size:
+    0.65rem;
+
+  line-height:
+    1.35;
+
+  text-overflow:
+    ellipsis;
+
+  white-space:
+    nowrap;
+}
+
+
+.emailHistoryCopy
+> p {
+  display:
+    -webkit-box;
+
+  margin:
+    5px
+    0
+    0;
+
+  overflow:
+    hidden;
+
+  color:
+    #667f93;
+
+  font-size:
+    0.6rem;
+
+  line-height:
+    1.45;
+
+  -webkit-box-orient:
+    vertical;
+
+  -webkit-line-clamp:
+    2;
+}
+
+
+.emailHistoryCopy
+> small {
+  display:
+    block;
+
+  margin-top:
+    6px;
+
+  color:
+    #899aa9;
+
+  font-size:
+    0.54rem;
+
+  line-height:
+    1.35;
+}
+
+
+/* Expanded contact view has room for richer history. */
+
+.detailsPanelExpanded
+.emailHistoryList {
+  grid-template-columns:
+    repeat(
+      2,
+      minmax(
+        0,
+        1fr
+      )
+    );
+}
+
+
+/* ------------------------------------------------------------
+   RESPONSIVE
+   ------------------------------------------------------------ */
+
+@media (max-width: 760px) {
+  .contactMethodSummary {
+    grid-template-columns:
+      1fr !important;
+  }
+
+  .detailsPanelExpanded
+  .emailHistoryList {
+    grid-template-columns:
+      1fr;
+  }
+
+  .emailHistoryError {
+    grid-template-columns:
+      auto
+      minmax(
+        0,
+        1fr
+      );
+  }
+
+  .emailHistoryError
+  button {
+    grid-column:
+      1 /
+      -1;
+
+    width:
+      100%;
+  }
+}
+
+
+/* CAMPAIGN SEAT REAL CONTACT EMAIL HISTORY V44 — END */

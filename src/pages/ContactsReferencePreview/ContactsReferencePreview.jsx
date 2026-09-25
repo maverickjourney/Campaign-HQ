@@ -45,6 +45,10 @@ import {
 } from "../../hooks/useContactsCommandCenter";
 
 import {
+  useContactEmailHistory,
+} from "../../hooks/useContactEmailHistory";
+
+import {
   useTeamAccessCommandCenter,
 } from "../../hooks/useTeamAccessCommandCenter";
 
@@ -575,6 +579,77 @@ function buildDemoContacts(user, workspace) {
   });
 }
 
+function formatEmailHistoryTime(
+  value,
+) {
+  if (
+    !value
+  ) {
+    return "Date unavailable";
+  }
+
+  const date =
+    new Date(
+      value,
+    );
+
+  if (
+    Number.isNaN(
+      date.getTime(),
+    )
+  ) {
+    return "Date unavailable";
+  }
+
+  return new Intl.DateTimeFormat(
+    "en-US",
+    {
+      month:
+        "short",
+
+      day:
+        "numeric",
+
+      year:
+        date.getFullYear() !==
+        new Date()
+          .getFullYear()
+          ? "numeric"
+          : undefined,
+
+      hour:
+        "numeric",
+
+      minute:
+        "2-digit",
+    },
+  ).format(
+    date,
+  );
+}
+
+
+function emailDirectionLabel(
+  value,
+) {
+  if (
+    value ===
+    "inbound"
+  ) {
+    return "Received";
+  }
+
+  if (
+    value ===
+    "outbound"
+  ) {
+    return "Sent";
+  }
+
+  return "Email";
+}
+
+
 function activityItems(contact, sessionItems = []) {
   const storedItems = Array.isArray(contact.demo_activity)
     ? contact.demo_activity
@@ -1083,6 +1158,50 @@ export default function ContactsReferencePreview() {
   const selectedContactSessionActivity = selectedContact
     ? sessionActivityByContact[selectedContact.id] || []
     : [];
+
+  /*
+   * V44 — ONE PERSON → ONE COMMUNICATION STORY
+   *
+   * Query real mailbox threads by the selected contact's
+   * email address. No folder is supplied, so the existing
+   * Nylas mailbox endpoint searches across the mailbox instead
+   * of limiting Contacts to Inbox or Sent.
+   */
+  const {
+    threads:
+      selectedContactEmailThreads,
+
+    isLoading:
+      contactEmailHistoryLoading,
+
+    error:
+      contactEmailHistoryError,
+
+    connectedEmail:
+      contactHistoryMailbox,
+
+    refresh:
+      refreshContactEmailHistory,
+  } = useContactEmailHistory({
+    workspaceId:
+      workspace.id,
+
+    email:
+      selectedContact
+        ?.email ||
+      "",
+
+    enabled:
+      !demoMode &&
+      Boolean(
+        selectedContact
+          ?.email,
+      ),
+  });
+
+  const latestContactEmailThread =
+    selectedContactEmailThreads[0] ||
+    null;
   const selectedSet = useMemo(() => new Set(selectedIds), [selectedIds]);
   const allVisibleSelected = Boolean(filteredContacts.length) && filteredContacts.every((contact) => selectedSet.has(contact.id));
   const selectedContacts = contacts.filter((contact) => selectedSet.has(contact.id));
@@ -1982,10 +2101,36 @@ export default function ContactsReferencePreview() {
                 <div>
                   <span>Last contacted through</span>
                   <strong>
-                    {lastChannelLabel(
-                      selectedContact,
-                      selectedContactSessionActivity,
-                    )}
+                    {latestContactEmailThread
+                      ? `Email · ${emailDirectionLabel(
+                          latestContactEmailThread.direction,
+                        )}`
+                      : lastChannelLabel(
+                          selectedContact,
+                          selectedContactSessionActivity,
+                        )}
+                  </strong>
+                </div>
+
+                <div>
+                  <span>Email history</span>
+
+                  <strong>
+                    {!selectedContact.email
+                      ? "No email address"
+                      : demoMode
+                        ? "Preview activity"
+                        : contactEmailHistoryLoading
+                          ? "Loading…"
+                          : contactEmailHistoryError
+                            ? "Needs attention"
+                            : selectedContactEmailThreads.length
+                              ? `${selectedContactEmailThreads.length} thread${
+                                  selectedContactEmailThreads.length === 1
+                                    ? ""
+                                    : "s"
+                                }`
+                              : "No threads found"}
                   </strong>
                 </div>
               </div>
@@ -2048,8 +2193,234 @@ export default function ContactsReferencePreview() {
                   )}
                 </section>
 
+                <section
+                  data-detail-section="activity"
+                  className={styles.detailSection}
+                >
+                  <header
+                    className={
+                      styles.emailHistoryHeader
+                    }
+                  >
+                    <div>
+                      <h3>
+                        Email Conversations
+                      </h3>
+
+                      <small>
+                        {contactHistoryMailbox
+                          ? `Connected mailbox: ${contactHistoryMailbox}`
+                          : "Across the connected campaign mailbox"}
+                      </small>
+                    </div>
+
+                    {!demoMode &&
+                    selectedContact.email ? (
+                      <button
+                        type="button"
+                        onClick={() =>
+                          refreshContactEmailHistory()
+                        }
+                        disabled={
+                          contactEmailHistoryLoading
+                        }
+                      >
+                        {contactEmailHistoryLoading
+                          ? "Refreshing…"
+                          : "Refresh"}
+                      </button>
+                    ) : null}
+                  </header>
+
+                  {!selectedContact.email ? (
+                    <p
+                      className={
+                        styles.emptySection
+                      }
+                    >
+                      Add an email address to this contact to connect their mailbox history.
+                    </p>
+                  ) : demoMode ? (
+                    <p
+                      className={
+                        styles.emptySection
+                      }
+                    >
+                      Demo contacts use preview activity. Live contacts connect to the real campaign mailbox.
+                    </p>
+                  ) : contactEmailHistoryLoading &&
+                    !selectedContactEmailThreads.length ? (
+                    <div
+                      className={
+                        styles.emailHistoryLoading
+                      }
+                    >
+                      <RefreshCw
+                        size={16}
+                      />
+
+                      Loading real email history…
+                    </div>
+                  ) : contactEmailHistoryError ? (
+                    <div
+                      className={
+                        styles.emailHistoryError
+                      }
+                      role="alert"
+                    >
+                      <AlertTriangle
+                        size={16}
+                      />
+
+                      <span>
+                        {
+                          contactEmailHistoryError
+                        }
+                      </span>
+
+                      <button
+                        type="button"
+                        onClick={() =>
+                          refreshContactEmailHistory()
+                        }
+                      >
+                        Try again
+                      </button>
+                    </div>
+                  ) : selectedContactEmailThreads.length ? (
+                    <div
+                      className={
+                        styles.emailHistoryList
+                      }
+                    >
+                      {selectedContactEmailThreads.map(
+                        (
+                          thread,
+                        ) => (
+                          <article
+                            key={
+                              thread.id
+                            }
+                            className={[
+                              styles.emailHistoryItem,
+
+                              thread.unread
+                                ? styles.emailHistoryUnread
+                                : "",
+                            ]
+                              .filter(
+                                Boolean,
+                              )
+                              .join(
+                                " ",
+                              )}
+                          >
+                            <div
+                              className={
+                                styles.emailHistoryIcon
+                              }
+                            >
+                              <Mail
+                                size={16}
+                              />
+                            </div>
+
+                            <div
+                              className={
+                                styles.emailHistoryCopy
+                              }
+                            >
+                              <div
+                                className={
+                                  styles.emailHistoryMeta
+                                }
+                              >
+                                <span
+                                  className={[
+                                    styles.emailDirectionBadge,
+
+                                    thread.direction ===
+                                      "inbound"
+                                      ? styles.emailDirectionInbound
+                                      : thread.direction ===
+                                          "outbound"
+                                        ? styles.emailDirectionOutbound
+                                        : "",
+                                  ]
+                                    .filter(
+                                      Boolean,
+                                    )
+                                    .join(
+                                      " ",
+                                    )}
+                                >
+                                  {emailDirectionLabel(
+                                    thread.direction,
+                                  )}
+                                </span>
+
+                                <time>
+                                  {formatEmailHistoryTime(
+                                    thread.occurredAt,
+                                  )}
+                                </time>
+                              </div>
+
+                              <strong>
+                                {
+                                  thread.subject
+                                }
+                              </strong>
+
+                              <p>
+                                {thread.preview ||
+                                  "No message preview available."}
+                              </p>
+
+                              <small>
+                                {[
+                                  thread.messageCount
+                                    ? `${thread.messageCount} message${
+                                        thread.messageCount === 1
+                                          ? ""
+                                          : "s"
+                                      }`
+                                    : "",
+
+                                  thread.hasAttachments
+                                    ? "Has attachments"
+                                    : "",
+
+                                  thread.unread
+                                    ? "Unread"
+                                    : "",
+                                ]
+                                  .filter(
+                                    Boolean,
+                                  )
+                                  .join(
+                                    " · ",
+                                  ) ||
+                                  "Email conversation"}
+                              </small>
+                            </div>
+                          </article>
+                        ),
+                      )}
+                    </div>
+                  ) : (
+                    <p
+                      className={
+                        styles.emptySection
+                      }
+                    >
+                      No email conversations were found for {selectedContact.email}.
+                    </p>
+                  )}
+                </section>
+
                 <section data-detail-section="activity" className={styles.detailSection}>
-                  <header><h3>Activity</h3></header>
+                  <header><h3>Campaign Activity</h3></header>
                   <div className={styles.timeline}>
                     {activityItems(
                       selectedContact,
