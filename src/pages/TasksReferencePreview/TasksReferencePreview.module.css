@@ -3951,3 +3951,215 @@
 }
 
 /* CAMPAIGN SEAT TASKS TABLET ROWS — END */
+
+/* CAMPAIGN SEAT V46 TASKS EXECUTIVE POLISH — START */
+
+/*
+ * V46 is layout-only.
+ *
+ * Goals:
+ * - Keep Task Details actions available without allowing the
+ *   Archive action area to dominate the drawer.
+ * - Improve short-window usability.
+ * - Keep Create/Edit task actions visible while reducing wasted
+ *   vertical space.
+ * - Preserve all task behavior and persistence.
+ */
+
+/* =========================================================
+   TASK DETAILS FOOTER
+   ========================================================= */
+
+.detailsFooter {
+  grid-template-columns:
+    minmax(0, 1fr)
+    auto !important;
+
+  align-items: center !important;
+
+  gap: 8px !important;
+
+  padding:
+    9px
+    14px !important;
+
+  background:
+    rgba(
+      255,
+      255,
+      255,
+      0.98
+    ) !important;
+
+  box-shadow:
+    0
+    -8px
+    22px
+    rgba(
+      18,
+      55,
+      86,
+      0.035
+    ) !important;
+}
+
+.detailsFooter button {
+  width: auto !important;
+
+  min-height: 36px !important;
+
+  padding:
+    0
+    12px !important;
+
+  border-radius: 9px !important;
+}
+
+.detailsFooter > button:first-child {
+  justify-self: start !important;
+}
+
+.detailsFooter > button:first-child:not(.primaryDetailButton) {
+  border-color: #ecd4d7 !important;
+
+  color: #a43a44 !important;
+
+  background: #ffffff !important;
+}
+
+.detailsFooter .primaryDetailButton {
+  justify-self: end !important;
+
+  min-width: 132px !important;
+}
+
+/* =========================================================
+   TASK DETAILS VIEWPORT FIT
+   ========================================================= */
+
+@media (min-width: 1181px) {
+  .detailsPanel {
+    min-height: 0 !important;
+
+    max-height:
+      calc(
+        100dvh -
+        116px
+      ) !important;
+  }
+}
+
+@media
+  (min-width: 1181px)
+  and
+  (max-height: 820px) {
+
+  .detailsHeader {
+    min-height: 56px !important;
+
+    padding:
+      0
+      14px !important;
+  }
+
+  .detailsTitle {
+    padding:
+      14px
+      16px
+      12px !important;
+  }
+
+  .detailsTitle h2 {
+    margin-top: 11px !important;
+  }
+
+  .detailFields {
+    padding:
+      3px
+      16px !important;
+  }
+
+  .detailFields > div {
+    min-height: 43px !important;
+  }
+
+  .detailsFooter {
+    padding:
+      8px
+      12px !important;
+  }
+}
+
+/* =========================================================
+   CREATE / EDIT TASK MODAL
+   ========================================================= */
+
+.taskModal {
+  max-height:
+    calc(
+      100dvh -
+      28px
+    ) !important;
+}
+
+@media
+  (min-width: 701px)
+  and
+  (max-height: 820px) {
+
+  .modalLayer {
+    padding: 12px !important;
+  }
+
+  .taskModal {
+    max-height:
+      calc(
+        100dvh -
+        24px
+      ) !important;
+  }
+
+  .taskModal > header {
+    min-height: 62px !important;
+
+    padding:
+      0
+      18px !important;
+  }
+
+  .taskForm {
+    gap:
+      10px
+      14px !important;
+
+    padding:
+      14px
+      18px
+      0 !important;
+  }
+
+  .taskForm input,
+  .taskForm select {
+    height: 39px !important;
+  }
+
+  .taskForm textarea {
+    min-height: 72px !important;
+    max-height: 112px !important;
+  }
+
+  .taskForm > footer {
+    min-height: 58px !important;
+
+    margin:
+      2px
+      -18px
+      0 !important;
+
+    padding:
+      9px
+      18px !important;
+  }
+}
+
+/* CAMPAIGN SEAT V46 TASKS EXECUTIVE POLISH — END */
