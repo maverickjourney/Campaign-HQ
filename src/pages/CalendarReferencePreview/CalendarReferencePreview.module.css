@@ -10653,3 +10653,222 @@ button[data-campaign-hq-launcher="floating"] {
 }
 
 /* CAMPAIGN SEAT V46 CALENDAR EXECUTIVE POLISH — END */
+
+
+/* CAMPAIGN SEAT V51 RICH EVENT CREATION */
+
+.createEventModal {
+  width: min(760px, 100%);
+  max-height: calc(100vh - 36px);
+  overflow-y: auto;
+}
+
+.createEventModal > header {
+  align-items: flex-start;
+}
+
+.createEventSubtitle {
+  max-width: 560px;
+  margin: 7px 0 0;
+  color: #70879b;
+  font-size: 0.76rem;
+  line-height: 1.45;
+}
+
+.createEventSection {
+  display: grid;
+  gap: 14px;
+  padding: 17px 0;
+  border-top: 1px solid #e4edf4;
+}
+
+.createEventSection:first-of-type {
+  padding-top: 0;
+  border-top: 0;
+}
+
+.createEventSection > label {
+  display: grid;
+  gap: 7px;
+  color: #294e70;
+  font-size: 0.76rem;
+  font-weight: 750;
+}
+
+.createEventModal textarea {
+  width: 100%;
+  min-height: 104px;
+  resize: vertical;
+  padding: 11px 12px;
+  border: 1px solid #cbdbe8;
+  border-radius: 10px;
+  outline: 0;
+  color: #173c5e;
+  background: #ffffff;
+  font: inherit;
+  line-height: 1.45;
+}
+
+.createEventModal textarea:focus {
+  border-color: #ef3340;
+  box-shadow: 0 0 0 3px rgba(239, 51, 64, 0.1);
+}
+
+.createSectionHeading {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  color: #315a7c;
+}
+
+.createSectionHeading > div {
+  display: grid;
+  gap: 2px;
+}
+
+.createSectionHeading strong {
+  color: #183f62;
+  font-size: 0.82rem;
+}
+
+.createSectionHeading span {
+  color: #758b9f;
+  font-size: 0.7rem;
+  line-height: 1.4;
+}
+
+.createProviderHint {
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+  padding: 11px 12px;
+  border: 1px solid #cde8da;
+  border-radius: 10px;
+  color: #257450;
+  background: #f0faf5;
+  font-size: 0.72rem;
+  line-height: 1.4;
+}
+
+.createGuestComposer {
+  display: grid;
+  grid-template-columns:
+    minmax(0, 0.8fr)
+    minmax(0, 1.2fr)
+    auto;
+  gap: 9px;
+}
+
+.createGuestComposer button {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 0 14px;
+  border: 1px solid #c9dbea;
+  border-radius: 10px;
+  color: #234f72;
+  background: #ffffff;
+  cursor: pointer;
+  font-weight: 750;
+}
+
+.createGuestList {
+  display: grid;
+  gap: 7px;
+}
+
+.createGuestChip {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 9px 11px;
+  border: 1px solid #dce7ef;
+  border-radius: 10px;
+  background: #f8fbfd;
+}
+
+.createGuestChip > span {
+  display: grid;
+  min-width: 0;
+  gap: 2px;
+}
+
+.createGuestChip strong,
+.createGuestChip small {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.createGuestChip strong {
+  color: #234d6f;
+  font-size: 0.74rem;
+}
+
+.createGuestChip small {
+  color: #7b8fa1;
+  font-size: 0.66rem;
+}
+
+.createGuestChip button {
+  display: inline-flex;
+  width: 30px;
+  height: 30px;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #d9e4ec;
+  border-radius: 8px;
+  color: #667f95;
+  background: #ffffff;
+  cursor: pointer;
+}
+
+.createEventCheck {
+  display: flex !important;
+  grid-template-columns: none !important;
+  align-items: center;
+  gap: 9px !important;
+  font-weight: 650 !important;
+}
+
+.createEventCheck input {
+  width: 17px !important;
+  min-height: 17px !important;
+  height: 17px;
+  flex: 0 0 auto;
+  margin: 0;
+  padding: 0;
+  accent-color: #e62c39;
+}
+
+.detailMeetingLink {
+  display: inline-flex;
+  margin-top: 4px;
+  color: #176ca4;
+  font-size: 0.82rem;
+  font-weight: 780;
+  text-decoration: none;
+}
+
+.detailMeetingLink:hover {
+  text-decoration: underline;
+}
+
+@media (max-width: 720px) {
+  .createEventModal {
+    max-height: calc(100vh - 16px);
+  }
+
+  .createGuestComposer {
+    grid-template-columns: 1fr;
+  }
+
+  .createGuestComposer button {
+    width: 100%;
+  }
+}

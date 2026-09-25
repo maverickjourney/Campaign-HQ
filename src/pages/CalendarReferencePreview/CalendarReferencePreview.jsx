@@ -3715,6 +3715,27 @@ export default function CalendarReferencePreview() {
       end: "11:00",
       location: "Campaign HQ",
       type: "meeting",
+
+      description:
+        "",
+
+      participants:
+        [],
+
+      conferenceMode:
+        "none",
+
+      meetingLink:
+        "",
+
+      recurrenceMode:
+        "none",
+
+      reminder:
+        "30",
+
+      notifyParticipants:
+        true,
     });
 
   const [
@@ -5402,53 +5423,136 @@ export default function CalendarReferencePreview() {
       }
     };
 
+  const addNewEventGuest =
+    () => {
+      const email =
+        String(
+          guestDraft ||
+          "",
+        )
+          .trim()
+          .toLowerCase();
+
+      const name =
+        String(
+          guestNameDraft ||
+          "",
+        ).trim();
+
+      if (
+        !email ||
+        !email.includes("@")
+      ) {
+        return;
+      }
+
+      setEventForm(
+        (current) => {
+          const exists =
+            current
+              .participants
+              .some(
+                (participant) =>
+                  String(
+                    participant
+                      ?.email ||
+                    "",
+                  )
+                    .trim()
+                    .toLowerCase() ===
+                  email,
+              );
+
+          if (exists) {
+            return current;
+          }
+
+          return {
+            ...current,
+
+            participants: [
+              ...current.participants,
+
+              {
+                email,
+
+                ...(name
+                  ? {
+                      name,
+                    }
+                  : {}),
+              },
+            ],
+          };
+        },
+      );
+
+      setGuestDraft("");
+      setGuestNameDraft("");
+    };
+
+
+  const removeNewEventGuest =
+    (
+      email,
+    ) => {
+      setEventForm(
+        (current) => ({
+          ...current,
+
+          participants:
+            current
+              .participants
+              .filter(
+                (participant) =>
+                  String(
+                    participant
+                      ?.email ||
+                    "",
+                  )
+                    .trim()
+                    .toLowerCase() !==
+                  String(
+                    email ||
+                    "",
+                  )
+                    .trim()
+                    .toLowerCase(),
+              ),
+        }),
+      );
+    };
+
+
   const saveEvent =
     async (
       submitEvent,
     ) => {
       submitEvent.preventDefault();
 
-      const form =
-        submitEvent.currentTarget;
+      const workspaceId =
+        sessionWorkspace?.id ||
+        "";
 
-      const formData =
-        new FormData(form);
+      if (!workspaceId) {
+        window.alert(
+          "Campaign Seat could not resolve the current campaign workspace.",
+        );
+
+        return;
+      }
 
       const submittedTitle =
         String(
-          formData.get("title") ||
-            "",
+          eventForm.title ||
+          "",
         ).trim();
 
       const submittedDate =
         String(
-          formData.get("date") ||
-            "",
+          eventForm.date ||
+          "",
         );
-
-      const submittedType =
-        String(
-          formData.get("type") ||
-            "meeting",
-        );
-
-      const submittedStart =
-        String(
-          formData.get("start") ||
-            "10:00",
-        );
-
-      const submittedEnd =
-        String(
-          formData.get("end") ||
-            "11:00",
-        );
-
-      const submittedLocation =
-        String(
-          formData.get("location") ||
-            "",
-        ).trim();
 
       const [
         year,
@@ -5463,7 +5567,10 @@ export default function CalendarReferencePreview() {
         startHour,
         startMinute,
       ] =
-        submittedStart
+        String(
+          eventForm.start ||
+          "10:00",
+        )
           .split(":")
           .map(Number);
 
@@ -5471,7 +5578,10 @@ export default function CalendarReferencePreview() {
         endHour,
         endMinute,
       ] =
-        submittedEnd
+        String(
+          eventForm.end ||
+          "11:00",
+        )
           .split(":")
           .map(Number);
 
@@ -5488,7 +5598,9 @@ export default function CalendarReferencePreview() {
       if (
         dateParts.some(
           (value) =>
-            !Number.isFinite(value),
+            !Number.isFinite(
+              value,
+            ),
         )
       ) {
         return;
@@ -5524,6 +5636,165 @@ export default function CalendarReferencePreview() {
               60,
             );
 
+      const recurrenceRules =
+        recurrenceRulesFromMode(
+          eventForm
+            .recurrenceMode,
+          [],
+        );
+
+      let reminders =
+        {};
+
+      if (
+        eventForm.reminder ===
+        "default"
+      ) {
+        reminders = {
+          use_default:
+            true,
+        };
+      } else if (
+        eventForm.reminder !==
+        "none"
+      ) {
+        const reminderMinutes =
+          Number(
+            eventForm.reminder,
+          );
+
+        if (
+          Number.isFinite(
+            reminderMinutes,
+          ) &&
+          reminderMinutes >=
+            0
+        ) {
+          reminders = {
+            use_default:
+              false,
+
+            overrides: [
+              {
+                reminder_minutes:
+                  reminderMinutes,
+
+                reminder_method:
+                  "popup",
+              },
+            ],
+          };
+        }
+      }
+
+      let conferencing =
+        {};
+
+      if (
+        eventForm
+          .conferenceMode ===
+          "auto" &&
+        calendarConnected &&
+        [
+          "google",
+          "microsoft",
+        ].includes(
+          calendarProvider,
+        )
+      ) {
+        conferencing = {
+          provider:
+            calendarProvider ===
+            "microsoft"
+              ? "Microsoft Teams"
+              : "Google Meet",
+
+          autocreate:
+            {},
+        };
+      }
+
+      if (
+        eventForm
+          .conferenceMode ===
+          "link"
+      ) {
+        const meetingLink =
+          String(
+            eventForm
+              .meetingLink ||
+            "",
+          ).trim();
+
+        if (!meetingLink) {
+          window.alert(
+            "Paste the meeting link you want to attach.",
+          );
+
+          return;
+        }
+
+        let parsedMeetingLink;
+
+        try {
+          parsedMeetingLink =
+            new URL(
+              meetingLink,
+            );
+        } catch {
+          window.alert(
+            "Enter a full meeting link beginning with http:// or https://.",
+          );
+
+          return;
+        }
+
+        if (
+          ![
+            "http:",
+            "https:",
+          ].includes(
+            parsedMeetingLink
+              .protocol,
+          )
+        ) {
+          window.alert(
+            "Enter a web meeting link beginning with http:// or https://.",
+          );
+
+          return;
+        }
+
+        const lowerLink =
+          meetingLink
+            .toLowerCase();
+
+        const manualProvider =
+          lowerLink.includes(
+            "zoom.us",
+          )
+            ? "Zoom"
+            : lowerLink.includes(
+                "meet.google.com",
+              )
+              ? "Google Meet"
+              : lowerLink.includes(
+                  "teams.microsoft.com",
+                )
+                ? "Microsoft Teams"
+                : "Custom";
+
+        conferencing = {
+          provider:
+            manualProvider,
+
+          details: {
+            url:
+              meetingLink,
+          },
+        };
+      }
+
       try {
         const savedEvent =
           await saveCalendarEvent({
@@ -5531,21 +5802,68 @@ export default function CalendarReferencePreview() {
               title:
                 submittedTitle ||
                 "New campaign event",
-              description: "",
+
+              description:
+                eventForm
+                  .description ||
+                "",
+
               eventType:
-                submittedType,
+                eventForm.type,
+
               location:
-                submittedLocation ||
-                "Location pending",
+                String(
+                  eventForm.location ||
+                  "",
+                ).trim(),
+
               startsAt:
                 start.toISOString(),
+
               endsAt:
                 end.toISOString(),
+
               status:
                 "scheduled",
-              capacity: "",
+
+              capacity:
+                "",
+
               rsvpCount:
                 "0",
+
+              eventTimezone:
+                Intl
+                  .DateTimeFormat()
+                  .resolvedOptions()
+                  .timeZone ||
+                "America/New_York",
+
+              participants:
+                eventForm
+                  .participants,
+
+              recurrenceRules,
+
+              reminders,
+
+              busy:
+                true,
+
+              visibility:
+                "default",
+
+              conferencing,
+
+              hideParticipants:
+                false,
+
+              notifyParticipants:
+                eventForm
+                  .notifyParticipants,
+
+              isAllDay:
+                false,
             },
           });
 
@@ -5559,10 +5877,6 @@ export default function CalendarReferencePreview() {
           calendarConnected &&
           savedEvent?.id
         ) {
-          const workspaceId =
-            sessionWorkspace?.id ||
-            "";
-
           try {
             const {
               data:
@@ -5577,6 +5891,7 @@ export default function CalendarReferencePreview() {
                   {
                     body: {
                       workspaceId,
+
                       eventId:
                         savedEvent.id,
                     },
@@ -5586,14 +5901,15 @@ export default function CalendarReferencePreview() {
             if (
               providerError ||
               providerData
-                ?.success !== true
+                ?.success !==
+                true
             ) {
               throw new Error(
                 providerData
                   ?.error ||
                 providerError
                   ?.message ||
-                "The event was saved in Campaign Seat, but could not be added to Google Calendar.",
+                `The event was saved in Campaign Seat, but could not be added to ${calendarProviderLabel}.`,
               );
             }
 
@@ -5604,19 +5920,84 @@ export default function CalendarReferencePreview() {
                 providerData.event;
             }
 
+            /*
+             * The deployed provider-update function already
+             * supports guests, recurrence, reminders and
+             * conferencing. Run it immediately after provider
+             * creation so new events receive the same rich
+             * behavior as edited events without deploying a
+             * new backend function.
+             */
+            const providerLinked =
+              finalSavedEvent
+                ?.source_provider ===
+                "nylas" &&
+              Boolean(
+                finalSavedEvent
+                  ?.external_event_id,
+              ) &&
+              Boolean(
+                finalSavedEvent
+                  ?.external_calendar_id,
+              );
+
+            if (providerLinked) {
+              const {
+                data:
+                  updateData,
+                error:
+                  updateError,
+              } =
+                await supabase
+                  .functions
+                  .invoke(
+                    "nylas-calendar-event-update",
+                    {
+                      body: {
+                        workspaceId,
+
+                        eventId:
+                          savedEvent.id,
+                      },
+                    },
+                  );
+
+              if (
+                updateError ||
+                updateData
+                  ?.success !==
+                  true
+              ) {
+                throw new Error(
+                  updateData
+                    ?.error ||
+                  updateError
+                    ?.message ||
+                  `The event was created, but its guests or meeting details could not be added to ${calendarProviderLabel}.`,
+                );
+              }
+
+              if (
+                updateData?.event
+              ) {
+                finalSavedEvent =
+                  updateData.event;
+              }
+            }
+
             await refreshCalendar();
           } catch (
             providerWriteError
           ) {
             console.error(
-              "Calendar provider event creation failed",
+              "Calendar provider event creation/update failed",
               providerWriteError,
             );
 
             providerWriteWarning =
               providerWriteError
                 ?.message ||
-              "The event was saved in Campaign Seat, but could not be added to Google Calendar.";
+              `The event was saved in Campaign Seat, but ${calendarProviderLabel} could not be fully updated.`;
           }
         }
 
@@ -5635,6 +6016,9 @@ export default function CalendarReferencePreview() {
           false,
         );
 
+        setGuestDraft("");
+        setGuestNameDraft("");
+
         if (
           providerWriteWarning
         ) {
@@ -5644,23 +6028,61 @@ export default function CalendarReferencePreview() {
         }
 
         setEventForm({
-          title: "",
+          title:
+            "",
+
           date:
             submittedDate,
+
           start:
             "10:00",
+
           end:
             "11:00",
+
           location:
             "Campaign HQ",
+
           type:
             "meeting",
+
+          description:
+            "",
+
+          participants:
+            [],
+
+          conferenceMode:
+            "none",
+
+          meetingLink:
+            "",
+
+          recurrenceMode:
+            "none",
+
+          reminder:
+            "30",
+
+          notifyParticipants:
+            true,
         });
-      } catch {
-        // The calendar hook exposes
-        // the protected save error.
+      } catch (
+        createError
+      ) {
+        console.error(
+          "Campaign Seat event creation failed",
+          createError,
+        );
+
+        window.alert(
+          createError
+            ?.message ||
+          "The event could not be created.",
+        );
       }
     };
+
 
   const openEditSelectedEvent =
     () => {
@@ -7738,9 +8160,25 @@ export default function CalendarReferencePreview() {
             <button
               className={styles.primaryButton}
               type="button"
-              onClick={() =>
-                setNewEventOpen(true)
-              }
+              onClick={() => {
+                setGuestDraft("");
+                setGuestNameDraft("");
+
+                setEventForm(
+                  (current) => ({
+                    ...current,
+
+                    date:
+                      formatDateKey(
+                        viewDate,
+                      ),
+                  }),
+                );
+
+                setNewEventOpen(
+                  true,
+                );
+              }}
             >
               <Plus size={19} />
               New event
@@ -9334,10 +9772,47 @@ export default function CalendarReferencePreview() {
                   <div>
                     <small>Location</small>
                     <strong>
-                      {selectedEvent.location}
+                      {selectedEvent.location ||
+                        "No location"}
                     </strong>
                   </div>
                 </span>
+
+                {selectedEvent
+                  .conferencing
+                  ?.details
+                  ?.url ? (
+                  <span>
+                    <Video size={18} />
+
+                    <div>
+                      <small>
+                        Video meeting
+                      </small>
+
+                      <a
+                        className={
+                          styles.detailMeetingLink
+                        }
+                        href={
+                          selectedEvent
+                            .conferencing
+                            .details
+                            .url
+                        }
+                        target="_blank"
+                        rel="noreferrer"
+                      >
+                        Join {
+                          selectedEvent
+                            .conferencing
+                            ?.provider ||
+                          "meeting"
+                        }
+                      </a>
+                    </div>
+                  </span>
+                ) : null}
 
                 <span>
                   <UsersRound size={18} />
@@ -11922,115 +12397,384 @@ export default function CalendarReferencePreview() {
                 event.target ===
                 event.currentTarget
               ) {
-                setNewEventOpen(false);
+                setNewEventOpen(
+                  false,
+                );
+
+                setGuestDraft("");
+                setGuestNameDraft("");
               }
             }}
           >
             <form
-              className={styles.eventModal}
+              className={`${styles.eventModal} ${styles.createEventModal}`}
               onSubmit={saveEvent}
             >
               <header>
                 <div>
-                  <span className={styles.eyebrow}>
+                  <span
+                    className={
+                      styles.eyebrow
+                    }
+                  >
                     Campaign calendar
                   </span>
 
-                  <h2>Create event</h2>
+                  <h2>
+                    Create event
+                  </h2>
+
+                  <p
+                    className={
+                      styles.createEventSubtitle
+                    }
+                  >
+                    Schedule the event and add
+                    guests, reminders, and a
+                    meeting link in one step.
+                  </p>
                 </div>
 
                 <button
                   type="button"
                   aria-label="Close create event"
-                  onClick={() =>
-                    setNewEventOpen(false)
-                  }
+                  onClick={() => {
+                    setNewEventOpen(
+                      false,
+                    );
+
+                    setGuestDraft("");
+                    setGuestNameDraft("");
+                  }}
                 >
                   <X size={20} />
                 </button>
               </header>
 
-              <label>
-                Event name
-                <input
-                  required
-                  name="title"
-                  type="text"
-                  value={eventForm.title}
-                  placeholder="Enter event name"
-                  onChange={(event) =>
-                    setEventForm(
-                      (current) => ({
-                        ...current,
-                        title:
-                          event.target.value,
-                      }),
-                    )
-                  }
-                />
-              </label>
-
-              <div className={styles.formGrid}>
+              <section
+                className={
+                  styles.createEventSection
+                }
+              >
                 <label>
-                  Date
+                  <span>
+                    Event name
+                  </span>
+
                   <input
-                    name="date"
-                    type="date"
-                    value={eventForm.date}
+                    required
+                    type="text"
+                    value={
+                      eventForm.title
+                    }
+                    placeholder="Enter event name"
                     onChange={(event) =>
                       setEventForm(
                         (current) => ({
                           ...current,
-                          date:
-                            event.target.value,
+
+                          title:
+                            event
+                              .target
+                              .value,
                         }),
                       )
                     }
                   />
                 </label>
 
+                <div
+                  className={
+                    styles.formGrid
+                  }
+                >
+                  <label>
+                    <span>
+                      Date
+                    </span>
+
+                    <input
+                      type="date"
+                      value={
+                        eventForm.date
+                      }
+                      onChange={(event) =>
+                        setEventForm(
+                          (current) => ({
+                            ...current,
+
+                            date:
+                              event
+                                .target
+                                .value,
+                          }),
+                        )
+                      }
+                    />
+                  </label>
+
+                  <label>
+                    <span>
+                      Type
+                    </span>
+
+                    <select
+                      value={
+                        eventForm.type
+                      }
+                      onChange={(event) =>
+                        setEventForm(
+                          (current) => ({
+                            ...current,
+
+                            type:
+                              event
+                                .target
+                                .value,
+                          }),
+                        )
+                      }
+                    >
+                      {Object.entries(
+                        EVENT_TYPE_LABELS,
+                      ).map(
+                        (
+                          [
+                            value,
+                            label,
+                          ],
+                        ) => (
+                          <option
+                            key={
+                              value
+                            }
+                            value={
+                              value
+                            }
+                          >
+                            {label}
+                          </option>
+                        ),
+                      )}
+                    </select>
+                  </label>
+
+                  <label>
+                    <span>
+                      Start
+                    </span>
+
+                    <input
+                      type="time"
+                      value={
+                        eventForm.start
+                      }
+                      onChange={(event) =>
+                        setEventForm(
+                          (current) => ({
+                            ...current,
+
+                            start:
+                              event
+                                .target
+                                .value,
+                          }),
+                        )
+                      }
+                    />
+                  </label>
+
+                  <label>
+                    <span>
+                      End
+                    </span>
+
+                    <input
+                      type="time"
+                      value={
+                        eventForm.end
+                      }
+                      onChange={(event) =>
+                        setEventForm(
+                          (current) => ({
+                            ...current,
+
+                            end:
+                              event
+                                .target
+                                .value,
+                          }),
+                        )
+                      }
+                    />
+                  </label>
+                </div>
+              </section>
+
+              <section
+                className={
+                  styles.createEventSection
+                }
+              >
+                <div
+                  className={
+                    styles.createSectionHeading
+                  }
+                >
+                  <Video size={19} />
+
+                  <div>
+                    <strong>
+                      Video meeting
+                    </strong>
+
+                    <span>
+                      Use your connected calendar
+                      or paste any meeting link.
+                    </span>
+                  </div>
+                </div>
+
                 <label>
-                  Type
+                  <span>
+                    Conferencing
+                  </span>
+
                   <select
-                    name="type"
-                    value={eventForm.type}
+                    value={
+                      eventForm
+                        .conferenceMode
+                    }
                     onChange={(event) =>
                       setEventForm(
                         (current) => ({
                           ...current,
-                          type:
-                            event.target.value,
+
+                          conferenceMode:
+                            event
+                              .target
+                              .value,
+
+                          meetingLink:
+                            event
+                              .target
+                              .value ===
+                            "link"
+                              ? current
+                                  .meetingLink
+                              : "",
                         }),
                       )
                     }
                   >
-                    {Object.entries(
-                      EVENT_TYPE_LABELS,
-                    ).map(
-                      ([value, label]) => (
-                        <option
-                          key={value}
-                          value={value}
-                        >
-                          {label}
-                        </option>
-                      ),
-                    )}
+                    <option value="none">
+                      No video meeting
+                    </option>
+
+                    {calendarConnected &&
+                    [
+                      "google",
+                      "microsoft",
+                    ].includes(
+                      calendarProvider,
+                    ) ? (
+                      <option value="auto">
+                        {calendarProvider ===
+                        "microsoft"
+                          ? "Add Microsoft Teams meeting"
+                          : "Add Google Meet"}
+                      </option>
+                    ) : null}
+
+                    <option value="link">
+                      Paste a meeting link
+                    </option>
                   </select>
                 </label>
 
+                {eventForm
+                  .conferenceMode ===
+                "link" ? (
+                  <label>
+                    <span>
+                      Meeting link
+                    </span>
+
+                    <input
+                      type="url"
+                      value={
+                        eventForm
+                          .meetingLink
+                      }
+                      placeholder="https://zoom.us/... or another meeting URL"
+                      onChange={(event) =>
+                        setEventForm(
+                          (current) => ({
+                            ...current,
+
+                            meetingLink:
+                              event
+                                .target
+                                .value,
+                          }),
+                        )
+                      }
+                    />
+                  </label>
+                ) : null}
+
+                {eventForm
+                  .conferenceMode ===
+                  "auto" ? (
+                  <div
+                    className={
+                      styles.createProviderHint
+                    }
+                  >
+                    <CheckCircle2
+                      size={16}
+                    />
+
+                    <span>
+                      Campaign Seat will create
+                      {
+                        calendarProvider ===
+                        "microsoft"
+                          ? " a Microsoft Teams link"
+                          : " a Google Meet link"
+                      }
+                      {" "}and attach it to the
+                      event automatically.
+                    </span>
+                  </div>
+                ) : null}
+              </section>
+
+              <section
+                className={
+                  styles.createEventSection
+                }
+              >
                 <label>
-                  Start
+                  <span>
+                    Location
+                  </span>
+
                   <input
-                    name="start"
-                    type="time"
-                    value={eventForm.start}
+                    type="text"
+                    value={
+                      eventForm.location
+                    }
+                    placeholder="Campaign HQ, address, field office…"
                     onChange={(event) =>
                       setEventForm(
                         (current) => ({
                           ...current,
-                          start:
-                            event.target.value,
+
+                          location:
+                            event
+                              .target
+                              .value,
                         }),
                       )
                     }
@@ -12038,67 +12782,374 @@ export default function CalendarReferencePreview() {
                 </label>
 
                 <label>
-                  End
-                  <input
-                    name="end"
-                    type="time"
-                    value={eventForm.end}
+                  <span>
+                    Description or notes
+                  </span>
+
+                  <textarea
+                    rows={4}
+                    value={
+                      eventForm
+                        .description
+                    }
+                    placeholder="Agenda, talking points, parking instructions, preparation notes…"
                     onChange={(event) =>
                       setEventForm(
                         (current) => ({
                           ...current,
-                          end:
-                            event.target.value,
+
+                          description:
+                            event
+                              .target
+                              .value,
                         }),
                       )
                     }
                   />
                 </label>
-              </div>
+              </section>
 
-              <label>
-                Location or meeting link
-                <input
-                  name="location"
-                  type="text"
-                  value={eventForm.location}
-                  placeholder="Campaign HQ, Zoom, address…"
-                  onChange={(event) =>
-                    setEventForm(
-                      (current) => ({
-                        ...current,
-                        location:
-                          event.target.value,
-                      }),
-                    )
+              <section
+                className={
+                  styles.createEventSection
+                }
+              >
+                <div
+                  className={
+                    styles.createSectionHeading
                   }
-                />
-              </label>
+                >
+                  <UsersRound
+                    size={19}
+                  />
 
-              <div className={styles.modalNotice}>
-                <Video size={18} />
+                  <div>
+                    <strong>
+                      Guests
+                    </strong>
 
-                <span>
-                  Calendar connections and
-                  virtual meeting links can be
-                  attached after the event is
-                  created.
-                </span>
-              </div>
+                    <span>
+                      Invite campaign staff or
+                      outside attendees.
+                    </span>
+                  </div>
+                </div>
+
+                <div
+                  className={
+                    styles.createGuestComposer
+                  }
+                >
+                  <input
+                    type="text"
+                    value={
+                      guestNameDraft
+                    }
+                    placeholder="Guest name (optional)"
+                    onChange={(event) =>
+                      setGuestNameDraft(
+                        event
+                          .target
+                          .value,
+                      )
+                    }
+                  />
+
+                  <input
+                    type="email"
+                    value={
+                      guestDraft
+                    }
+                    placeholder="Email address"
+                    onChange={(event) =>
+                      setGuestDraft(
+                        event
+                          .target
+                          .value,
+                      )
+                    }
+                    onKeyDown={(event) => {
+                      if (
+                        event.key ===
+                        "Enter"
+                      ) {
+                        event.preventDefault();
+
+                        addNewEventGuest();
+                      }
+                    }}
+                  />
+
+                  <button
+                    type="button"
+                    onClick={
+                      addNewEventGuest
+                    }
+                  >
+                    <Plus size={16} />
+                    Add
+                  </button>
+                </div>
+
+                {eventForm
+                  .participants
+                  .length ? (
+                  <div
+                    className={
+                      styles.createGuestList
+                    }
+                  >
+                    {eventForm
+                      .participants
+                      .map(
+                        (
+                          participant,
+                        ) => (
+                          <div
+                            className={
+                              styles.createGuestChip
+                            }
+                            key={
+                              participant
+                                .email
+                            }
+                          >
+                            <span>
+                              <strong>
+                                {
+                                  participant
+                                    .name ||
+                                  participant
+                                    .email
+                                }
+                              </strong>
+
+                              {participant
+                                .name ? (
+                                <small>
+                                  {
+                                    participant
+                                      .email
+                                  }
+                                </small>
+                              ) : null}
+                            </span>
+
+                            <button
+                              type="button"
+                              aria-label={`Remove ${participant.email}`}
+                              onClick={() =>
+                                removeNewEventGuest(
+                                  participant
+                                    .email,
+                                )
+                              }
+                            >
+                              <X
+                                size={14}
+                              />
+                            </button>
+                          </div>
+                        ),
+                      )}
+                  </div>
+                ) : null}
+
+                <label
+                  className={
+                    styles.createEventCheck
+                  }
+                >
+                  <input
+                    type="checkbox"
+                    checked={
+                      eventForm
+                        .notifyParticipants
+                    }
+                    onChange={(event) =>
+                      setEventForm(
+                        (current) => ({
+                          ...current,
+
+                          notifyParticipants:
+                            event
+                              .target
+                              .checked,
+                        }),
+                      )
+                    }
+                  />
+
+                  <span>
+                    Email guests about the event
+                  </span>
+                </label>
+              </section>
+
+              <section
+                className={
+                  styles.createEventSection
+                }
+              >
+                <div
+                  className={
+                    styles.formGrid
+                  }
+                >
+                  <label>
+                    <span>
+                      Repeat
+                    </span>
+
+                    <select
+                      value={
+                        eventForm
+                          .recurrenceMode
+                      }
+                      onChange={(event) =>
+                        setEventForm(
+                          (current) => ({
+                            ...current,
+
+                            recurrenceMode:
+                              event
+                                .target
+                                .value,
+                          }),
+                        )
+                      }
+                    >
+                      <option value="none">
+                        Does not repeat
+                      </option>
+
+                      <option value="daily">
+                        Daily
+                      </option>
+
+                      <option value="weekly">
+                        Weekly
+                      </option>
+
+                      <option value="monthly">
+                        Monthly
+                      </option>
+                    </select>
+                  </label>
+
+                  <label>
+                    <span>
+                      Reminder
+                    </span>
+
+                    <select
+                      value={
+                        eventForm.reminder
+                      }
+                      onChange={(event) =>
+                        setEventForm(
+                          (current) => ({
+                            ...current,
+
+                            reminder:
+                              event
+                                .target
+                                .value,
+                          }),
+                        )
+                      }
+                    >
+                      <option value="none">
+                        No reminder
+                      </option>
+
+                      <option value="10">
+                        10 minutes before
+                      </option>
+
+                      <option value="30">
+                        30 minutes before
+                      </option>
+
+                      <option value="60">
+                        1 hour before
+                      </option>
+
+                      <option value="1440">
+                        1 day before
+                      </option>
+
+                      <option value="default">
+                        Calendar default
+                      </option>
+                    </select>
+                  </label>
+                </div>
+              </section>
+
+              {calendarConnected ? (
+                <div
+                  className={
+                    styles.modalNotice
+                  }
+                >
+                  <CheckCircle2
+                    size={18}
+                  />
+
+                  <span>
+                    This event will sync to
+                    {" "}
+                    <strong>
+                      {
+                        calendarProviderLabel
+                      }
+                    </strong>
+                    {calendarConnection
+                      ?.display_email
+                      ? ` · ${calendarConnection.display_email}`
+                      : ""}
+                    .
+                  </span>
+                </div>
+              ) : (
+                <div
+                  className={
+                    styles.modalNotice
+                  }
+                >
+                  <CalendarDays
+                    size={18}
+                  />
+
+                  <span>
+                    This event will be saved to
+                    Campaign Seat. Connect a
+                    calendar to sync it externally.
+                  </span>
+                </div>
+              )}
 
               <footer>
                 <button
                   type="button"
-                  onClick={() =>
-                    setNewEventOpen(false)
-                  }
+                  onClick={() => {
+                    setNewEventOpen(
+                      false,
+                    );
+
+                    setGuestDraft("");
+                    setGuestNameDraft("");
+                  }}
                 >
                   Cancel
                 </button>
 
-                <button type="submit">
+                <button
+                  type="submit"
+                >
                   <Check size={18} />
-                  Add to calendar
+                  Create event
                 </button>
               </footer>
             </form>
