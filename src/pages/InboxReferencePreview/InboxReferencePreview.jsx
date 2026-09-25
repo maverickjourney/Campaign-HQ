@@ -4181,6 +4181,17 @@ export default function InboxReferencePreview() {
   const [newRecipient, setNewRecipient] =
     useState("");
 
+  /*
+   * V42 MULTI-TO
+   *
+   * Primary email recipients are independent from Cc/Bcc.
+   * Each item becomes an Outlook-style removable recipient chip.
+   */
+  const [
+    newEmailRecipients,
+    setNewEmailRecipients,
+  ] = useState([]);
+
   const [newSubject, setNewSubject] =
     useState("");
 
@@ -6142,6 +6153,7 @@ export default function InboxReferencePreview() {
     setPendingAttachments([]);
     setAttachmentError("");
     setNewRecipient("");
+    setNewEmailRecipients([]);
     setNewSubject("");
     setNewCc("");
     setNewBcc("");
@@ -6154,25 +6166,267 @@ export default function InboxReferencePreview() {
     setActiveThreadTab("conversation");
   };
 
-  const selectContact = (contact) => {
-    const name = contactName(contact);
+  const addEmailRecipients =
+    (
+      recipients,
+    ) => {
+      const normalized =
+        (
+          Array.isArray(
+            recipients,
+          )
+            ? recipients
+            : []
+        )
+          .map(
+            (recipient) => {
+              const email =
+                String(
+                  recipient
+                    ?.email ||
+                  "",
+                ).trim();
 
-    setSelectedContactId(contact.id);
-    setContactQuery(name);
+              const name =
+                String(
+                  recipient
+                    ?.name ||
+                  "",
+                ).trim();
+
+              return {
+                id:
+                  recipient
+                    ?.id ||
+                  email
+                    .toLowerCase(),
+
+                name:
+                  name ||
+                  email,
+
+                email,
+              };
+            },
+          )
+          .filter(
+            (recipient) =>
+              /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+                .test(
+                  recipient.email,
+                ),
+          );
+
+      if (
+        !normalized.length
+      ) {
+        return false;
+      }
+
+      setNewEmailRecipients(
+        (current) => {
+          const next = [
+            ...current,
+          ];
+
+          const existing =
+            new Set(
+              current.map(
+                (recipient) =>
+                  String(
+                    recipient.email ||
+                    "",
+                  )
+                    .trim()
+                    .toLowerCase(),
+              ),
+            );
+
+          normalized.forEach(
+            (recipient) => {
+              const key =
+                recipient.email
+                  .toLowerCase();
+
+              if (
+                !existing.has(
+                  key,
+                )
+              ) {
+                existing.add(
+                  key,
+                );
+
+                next.push(
+                  recipient,
+                );
+              }
+            },
+          );
+
+          return next;
+        },
+      );
+
+      return true;
+    };
+
+
+  const commitEmailRecipientInput =
+    (
+      value =
+        contactQuery,
+    ) => {
+      const parsed =
+        parseComposerRecipients(
+          value,
+        );
+
+      const added =
+        addEmailRecipients(
+          parsed,
+        );
+
+      if (
+        added
+      ) {
+        setContactQuery(
+          "",
+        );
+
+        setNewRecipient(
+          "",
+        );
+
+        setSelectedContactId(
+          "",
+        );
+      }
+
+      return added;
+    };
+
+
+  const removeEmailRecipient =
+    (
+      email,
+    ) => {
+      const normalized =
+        String(
+          email ||
+          "",
+        )
+          .trim()
+          .toLowerCase();
+
+      setNewEmailRecipients(
+        (current) =>
+          current.filter(
+            (recipient) =>
+              String(
+                recipient.email ||
+                "",
+              )
+                .trim()
+                .toLowerCase() !==
+              normalized,
+          ),
+      );
+    };
+
+
+  const selectContact = (contact) => {
+    const name =
+      contactName(
+        contact,
+      );
+
+    /*
+     * Email allows multiple To recipients.
+     * Selecting a contact adds a chip instead of replacing
+     * an already-selected recipient.
+     */
+    if (
+      replyChannel ===
+        "email" &&
+      liveMailboxEnabled
+    ) {
+      const email =
+        String(
+          contact
+            ?.email ||
+          "",
+        ).trim();
+
+      if (
+        !email
+      ) {
+        setToast(
+          `${name} does not have an email address saved.`,
+        );
+
+        return;
+      }
+
+      addEmailRecipients([
+        {
+          id:
+            contact.id ||
+            email,
+
+          name,
+
+          email,
+        },
+      ]);
+
+      setSelectedContactId(
+        "",
+      );
+
+      setContactQuery(
+        "",
+      );
+
+      setNewRecipient(
+        "",
+      );
+
+      setContactCreateMode(
+        false,
+      );
+
+      setContactFormError(
+        "",
+      );
+
+      return;
+    }
+
+    setSelectedContactId(
+      contact.id,
+    );
+
+    setContactQuery(
+      name,
+    );
+
     setNewRecipient(
       contact.email ||
         contact.phone ||
         name,
     );
-    setContactCreateMode(false);
-    setContactFormError("");
+
+    setContactCreateMode(
+      false,
+    );
+
+    setContactFormError(
+      "",
+    );
 
     /*
-     * Preserve the message channel the user already selected.
-     *
-     * Choosing a contact should populate the recipient only.
-     * It must not switch Dashboard, Text, or WhatsApp back
-     * to Email just because the contact also has an email.
+     * Preserve the channel for Dashboard/Text/WhatsApp.
      */
   };
 
@@ -8031,8 +8285,8 @@ export default function InboxReferencePreview() {
         setToast(
           (
             replyAllEnabled
-              ? "Email Reply All sent from the connected campaign mailbox."
-              : "Email reply sent from the connected campaign mailbox."
+              ? "Connected mailbox accepted Reply All for delivery."
+              : "Connected mailbox accepted the reply for delivery."
           ) +
           attachmentArchiveWarning,
         );
@@ -8472,19 +8726,119 @@ export default function InboxReferencePreview() {
     };
 
   const sendNewMessage = async () => {
+    const typedEmailRecipients =
+      replyChannel ===
+        "email"
+        ? parseComposerRecipients(
+            contactQuery,
+          )
+            .map(
+              (recipient) => ({
+                name:
+                  recipient.email,
+
+                email:
+                  String(
+                    recipient.email ||
+                    "",
+                  ).trim(),
+              }),
+            )
+            .filter(
+              (recipient) =>
+                /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+                  .test(
+                    recipient.email,
+                  ),
+            )
+        : [];
+
+    const emailRecipients =
+      [
+        ...newEmailRecipients,
+        ...typedEmailRecipients,
+      ].reduce(
+        (
+          recipients,
+          recipient,
+        ) => {
+          const email =
+            String(
+              recipient
+                ?.email ||
+              "",
+            ).trim();
+
+          const key =
+            email.toLowerCase();
+
+          if (
+            !email ||
+            recipients.some(
+              (item) =>
+                item.email
+                  .toLowerCase() ===
+                key,
+            )
+          ) {
+            return recipients;
+          }
+
+          recipients.push({
+            name:
+              String(
+                recipient
+                  ?.name ||
+                email,
+              ).trim() ||
+              email,
+
+            email,
+          });
+
+          return recipients;
+        },
+        [],
+      );
+
+    const primaryEmailRecipient =
+      emailRecipients[0] ||
+      null;
+
     const recipientName =
-      selectedContact
-        ? contactName(selectedContact)
-        : contactQuery.trim() ||
-          newRecipient.trim();
+      replyChannel ===
+        "email"
+        ? (
+            primaryEmailRecipient
+              ?.name ||
+            primaryEmailRecipient
+              ?.email ||
+            ""
+          )
+        : selectedContact
+          ? contactName(
+              selectedContact,
+            )
+          : contactQuery.trim() ||
+            newRecipient.trim();
 
     const recipientEmail =
-      selectedContact?.email ||
-      (
-        newRecipient.includes("@")
-          ? newRecipient.trim()
-          : ""
-      );
+      replyChannel ===
+        "email"
+        ? (
+            primaryEmailRecipient
+              ?.email ||
+            ""
+          )
+        : selectedContact
+            ?.email ||
+          (
+            newRecipient
+              .includes("@")
+              ? newRecipient
+                  .trim()
+              : ""
+          );
 
     const recipientPhone =
       selectedContact?.phone ||
@@ -8705,15 +9059,18 @@ export default function InboxReferencePreview() {
 
         const sendResult =
           await sendMailboxEmail({
-            to: [
-              {
-                name:
-                  recipientName,
+            to:
+              emailRecipients.map(
+                (
+                  recipient,
+                ) => ({
+                  name:
+                    recipient.name,
 
-                email:
-                  recipientEmail,
-              },
-            ],
+                  email:
+                    recipient.email,
+                }),
+              ),
 
             cc:
               parseComposerRecipients(
@@ -8805,6 +9162,7 @@ export default function InboxReferencePreview() {
 
         setReplyText("");
         setNewRecipient("");
+        setNewEmailRecipients([]);
         setNewSubject("");
         setNewCc("");
         setNewBcc("");
@@ -8825,7 +9183,7 @@ export default function InboxReferencePreview() {
         );
 
         setToast(
-          "Email sent from the connected campaign mailbox." +
+          "Connected mailbox accepted the email for delivery." +
             attachmentArchiveWarning,
         );
 
@@ -13034,7 +13392,10 @@ type="button"
                     {replyChannel === "dashboard" &&
                     liveMailboxEnabled
                       ? "Related contact (optional)"
-                      : "Recipient"}
+                      : replyChannel === "email" &&
+                          liveMailboxEnabled
+                        ? "To"
+                        : "Recipient"}
                   </span>
 
                   <div className={styles.contactSearchControl}>
@@ -13046,16 +13407,62 @@ type="button"
                         setContactQuery(
                           event.target.value,
                         );
+
                         setNewRecipient(
                           event.target.value,
                         );
-                        setSelectedContactId("");
+
+                        setSelectedContactId(
+                          "",
+                        );
+                      }}
+                      onKeyDown={(event) => {
+                        if (
+                          replyChannel ===
+                            "email" &&
+                          liveMailboxEnabled &&
+                          (
+                            event.key ===
+                              "Enter" ||
+                            event.key ===
+                              "," ||
+                            event.key ===
+                              ";"
+                          )
+                        ) {
+                          const added =
+                            commitEmailRecipientInput(
+                              event.currentTarget
+                                .value,
+                            );
+
+                          if (
+                            added
+                          ) {
+                            event.preventDefault();
+                          }
+                        }
+                      }}
+                      onBlur={(event) => {
+                        if (
+                          replyChannel ===
+                            "email" &&
+                          liveMailboxEnabled
+                        ) {
+                          commitEmailRecipientInput(
+                            event.currentTarget
+                              .value,
+                          );
+                        }
                       }}
                       placeholder={
                         replyChannel === "dashboard" &&
                         liveMailboxEnabled
                           ? "Optional: relate this conversation to a campaign contact"
-                          : "Search campaign contacts"
+                          : replyChannel === "email" &&
+                              liveMailboxEnabled
+                            ? "Search contacts or type an email, then press Enter"
+                            : "Search campaign contacts"
                       }
                       autoComplete="off"
                     />
@@ -13073,6 +13480,66 @@ type="button"
                       New contact
                     </button>
                   </div>
+
+                  {replyChannel ===
+                    "email" &&
+                  liveMailboxEnabled &&
+                  newEmailRecipients.length ? (
+                    <div
+                      className={
+                        styles.toRecipientChips
+                      }
+                    >
+                      {newEmailRecipients.map(
+                        (
+                          recipient,
+                        ) => (
+                          <span
+                            key={
+                              recipient.email
+                            }
+                            className={
+                              styles.toRecipientChip
+                            }
+                          >
+                            <span>
+                              {recipient.name &&
+                              recipient.name !==
+                                recipient.email ? (
+                                <strong>
+                                  {
+                                    recipient.name
+                                  }
+                                </strong>
+                              ) : null}
+
+                              <small>
+                                {
+                                  recipient.email
+                                }
+                              </small>
+                            </span>
+
+                            <button
+                              type="button"
+                              aria-label={
+                                `Remove ${recipient.email}`
+                              }
+                              onClick={() =>
+                                removeEmailRecipient(
+                                  recipient.email,
+                                )
+                              }
+                            >
+                              <X
+                                size={13}
+                              />
+                            </button>
+                          </span>
+                        ),
+                      )}
+                    </div>
+                  ) : null}
 
                   {selectedContact ? (
                     <div className={styles.selectedContactCard}>
@@ -13197,22 +13664,40 @@ type="button"
                     </div>
                   ) : null}
 
-                  {contactCreateMode ? (
-                    <>
-                      <button
-                        className={styles.newContactScrim}
-                        type="button"
-                        tabIndex={-1}
-                        aria-label="Close new contact form"
-                        onClick={() =>
-                          setContactCreateMode(false)
-                        }
-                      />
-
-                      <form
-                        className={styles.newContactForm}
-                      onSubmit={handleCreateContact}
-                    >
+                  {contactCreateMode &&
+                  typeof document !==
+                    "undefined"
+                    ? createPortal(
+                        <div
+                          className={
+                            styles.newContactOverlay
+                          }
+                          role="presentation"
+                          onMouseDown={(
+                            event,
+                          ) => {
+                            if (
+                              event.target ===
+                                event.currentTarget &&
+                              !contactsSaving
+                            ) {
+                              setContactCreateMode(
+                                false,
+                              );
+                            }
+                          }}
+                        >
+                          <form
+                            className={
+                              styles.newContactForm
+                            }
+                            role="dialog"
+                            aria-modal="true"
+                            aria-label="Add campaign contact"
+                            onSubmit={
+                              handleCreateContact
+                            }
+                          >
                       <header>
                         <div>
                           <strong>
@@ -13380,9 +13865,11 @@ type="button"
                             : "Add contact"}
                         </button>
                       </footer>
-                      </form>
-                    </>
-                  ) : null}
+                          </form>
+                        </div>,
+                        document.body,
+                      )
+                    : null}
                 </div>
 
                 {replyChannel === "email" &&
