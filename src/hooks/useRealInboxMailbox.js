@@ -1074,6 +1074,62 @@ function transformMessage({
   };
 }
 
+function emailLooksAutomated({
+  email,
+  sender,
+  subject,
+  preview,
+}) {
+  const normalizedAddress =
+    normalizedEmail(
+      email,
+    );
+
+  const localPart =
+    normalizedAddress
+      .split("@")[0] ||
+    "";
+
+  /*
+   * Deliberately conservative machine-mail signals.
+   * Human inbound mail should continue to become Needs Reply.
+   */
+  if (
+    /^(?:no[-_.]?reply|noreply|do[-_.]?not[-_.]?reply|donotreply|mailer[-_.]?daemon|postmaster|office365alerts)$/i
+      .test(
+        localPart,
+      )
+  ) {
+    return true;
+  }
+
+  const content =
+    [
+      sender,
+      email,
+      subject,
+      preview,
+    ]
+      .filter(Boolean)
+      .join(" ")
+      .toLowerCase();
+
+  return [
+    "office365alerts@microsoft.com",
+    "microsoft 365 message center",
+    "informational-severity alert",
+    "weekly digest: microsoft",
+    "automatic reply:",
+    "out of office:",
+  ].some(
+    (signal) =>
+      content.includes(
+        signal,
+      ),
+  );
+}
+
+
 function transformThread({
   thread,
   connectedEmail,
@@ -1111,12 +1167,51 @@ function transformThread({
       connectedEmail,
     );
 
-  const needsResponse =
+  const subject =
+    clean(
+      thread.subject ||
+      latest.subject,
+    ) ||
+    "(No subject)";
+
+  const preview =
+    stripHtml(
+      thread.snippet ||
+      latest.snippet ||
+      latest.body,
+    )
+      .slice(
+        0,
+        180,
+      );
+
+  const inboundFromExternal =
     Boolean(
       latestFrom?.email &&
       latestFrom.email !==
         own,
     );
+
+  const automatedEmail =
+    inboundFromExternal &&
+    emailLooksAutomated({
+      email:
+        latestFrom?.email ||
+        person.email ||
+        "",
+
+      sender:
+        latestFrom?.name ||
+        person.name ||
+        "",
+
+      subject,
+      preview,
+    });
+
+  const needsResponse =
+    inboundFromExternal &&
+    !automatedEmail;
 
   const latestReceivedOrder =
     thread
@@ -1146,7 +1241,7 @@ function transformThread({
     latestCommunicationOrder <=
       0
       ? (
-          needsResponse
+          inboundFromExternal
             ? "inbound"
             : ""
         )
@@ -1216,23 +1311,9 @@ function transformThread({
     channel:
       "email",
 
-    subject:
-      clean(
-        thread.subject ||
-        latest.subject,
-      ) ||
-      "(No subject)",
+    subject,
 
-    preview:
-      stripHtml(
-        thread.snippet ||
-        latest.snippet ||
-        latest.body,
-      )
-        .slice(
-          0,
-          180,
-        ),
+    preview,
 
     time:
       relativeTime(
@@ -1260,6 +1341,8 @@ function transformThread({
       ),
 
     needsResponse,
+
+    automatedEmail,
 
     latestReceivedOrder,
 
@@ -2260,12 +2343,116 @@ return transformed;
                   conversation.unread,
               ).length;
 
+            let exactUnreadCount =
+              providerInboxUnreadCount;
+
+            /*
+             * If the folder omits unread_count, ask the mailbox
+             * directly for unread Inbox threads and paginate.
+             */
+            if (
+              exactUnreadCount ===
+                null &&
+              inboxId
+            ) {
+              let unreadPageToken =
+                "";
+
+              let unreadThreadCount =
+                0;
+
+              const seenUnreadIds =
+                new Set();
+
+              for (
+                let unreadPageIndex = 0;
+                unreadPageIndex < 100;
+                unreadPageIndex += 1
+              ) {
+                const unreadPage =
+                  await invokeMailbox({
+                    action:
+                      "list_threads",
+
+                    limit:
+                      pageSize,
+
+                    folderId:
+                      inboxId,
+
+                    unread:
+                      true,
+
+                    ...(unreadPageToken
+                      ? {
+                          pageToken:
+                            unreadPageToken,
+                        }
+                      : {}),
+                  });
+
+                const unreadRows =
+                  Array.isArray(
+                    unreadPage.data,
+                  )
+                    ? unreadPage.data
+                    : [];
+
+                unreadRows.forEach(
+                  (thread) => {
+                    const id =
+                      clean(
+                        thread?.id,
+                      );
+
+                    if (
+                      id &&
+                      seenUnreadIds.has(
+                        id,
+                      )
+                    ) {
+                      return;
+                    }
+
+                    if (id) {
+                      seenUnreadIds.add(
+                        id,
+                      );
+                    }
+
+                    unreadThreadCount +=
+                      1;
+                  },
+                );
+
+                const nextUnreadCursor =
+                  clean(
+                    unreadPage
+                      .nextCursor,
+                  );
+
+                if (
+                  !nextUnreadCursor ||
+                  unreadRows.length ===
+                    0
+                ) {
+                  break;
+                }
+
+                unreadPageToken =
+                  nextUnreadCursor;
+              }
+
+              exactUnreadCount =
+                unreadThreadCount;
+            }
+
             const reconciledUnreadCount =
-              providerInboxUnreadCount ===
+              exactUnreadCount ===
               null
                 ? loadedUnreadCount
                 : Math.max(
-                    providerInboxUnreadCount,
+                    exactUnreadCount,
                     loadedUnreadCount,
                   );
 

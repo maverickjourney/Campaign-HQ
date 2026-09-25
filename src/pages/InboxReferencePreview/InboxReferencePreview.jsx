@@ -3229,23 +3229,72 @@ export default function InboxReferencePreview() {
                 0
               : 0;
 
+          const automaticStatusAt =
+            existing
+              ?.metadata
+              ?.status_automated_at
+              ? Date.parse(
+                  existing
+                    .metadata
+                    .status_automated_at,
+                ) ||
+                0
+              : 0;
+
+          const statusSource =
+            String(
+              existing
+                ?.metadata
+                ?.status_source ||
+              "",
+            )
+              .trim()
+              .toLowerCase();
+
+          /*
+           * Previously machine-generated status may be corrected.
+           * A later human status change remains protected.
+           */
+          const machineOwnedStatus =
+            statusSource ===
+              "automatic" &&
+            automaticStatusAt >
+              0 &&
+            Math.abs(
+              workflowUpdatedAt -
+              automaticStatusAt,
+            ) <
+              15000;
+
           if (
             existing &&
             signal.order <=
-              workflowUpdatedAt
+              workflowUpdatedAt &&
+            !machineOwnedStatus
           ) {
             continue;
           }
 
-          const desiredStatus =
-            signal.direction ===
-              "inbound"
-              ? "needs_reply"
-              : "waiting_on";
-
-          const wakeFromSnooze =
+          const automatedInbound =
+            channel ===
+              "email" &&
             signal.direction ===
               "inbound" &&
+            conversation
+              ?.automatedEmail ===
+              true;
+
+          const desiredStatus =
+            signal.direction ===
+              "outbound"
+              ? "waiting_on"
+              : automatedInbound
+                ? "open"
+                : "needs_reply";
+
+          const wakeFromSnooze =
+            desiredStatus ===
+              "needs_reply" &&
             Boolean(
               existing
                 ?.snoozed_until,
@@ -3322,7 +3371,10 @@ export default function InboxReferencePreview() {
                     desiredStatus ===
                       "needs_reply"
                       ? "Needs Reply automatically set"
-                      : "Waiting On automatically set",
+                      : desiredStatus ===
+                          "waiting_on"
+                        ? "Waiting On automatically set"
+                        : "Informational email recognized",
 
                   eventDetail:
                     desiredStatus ===
@@ -3332,7 +3384,10 @@ export default function InboxReferencePreview() {
                             ? "A new message arrived. Campaign Seat woke the conversation and marked it Needs Reply."
                             : "A new message arrived from the contact, so Campaign Seat marked the conversation Needs Reply."
                         )
-                      : "The campaign was the latest sender, so Campaign Seat marked the conversation Waiting On.",
+                      : desiredStatus ===
+                          "waiting_on"
+                        ? "The campaign was the latest sender, so Campaign Seat marked the conversation Waiting On."
+                        : "Campaign Seat recognized this inbound email as automated or informational, so it does not require a campaign reply.",
 
                   actorUserId:
                     null,
@@ -10231,6 +10286,15 @@ export default function InboxReferencePreview() {
 
           snoozed_until:
             null,
+
+          metadata: {
+            status_source:
+              "manual",
+
+            status_manual_at:
+              new Date()
+                .toISOString(),
+          },
         },
         `Conversation marked ${label}.`,
       );

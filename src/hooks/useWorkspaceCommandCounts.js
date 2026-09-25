@@ -115,6 +115,63 @@ function inboxUnreadFromFolders(
 }
 
 
+function inboxFolderIdFromFolders(
+  folders,
+) {
+  const rows =
+    Array.isArray(
+      folders,
+    )
+      ? folders
+      : [];
+
+  const inbox =
+    rows.find(
+      (folder) => {
+        const values = [
+          folder?.id,
+          folder?.name,
+          folder?.display_name,
+          folder?.system_folder,
+          ...(
+            Array.isArray(
+              folder?.attributes,
+            )
+              ? folder.attributes
+              : []
+          ),
+        ]
+          .map(
+            (value) =>
+              String(
+                value ||
+                "",
+              )
+                .trim()
+                .toLowerCase(),
+          )
+          .filter(Boolean);
+
+        return values.some(
+          (value) =>
+            value ===
+              "inbox" ||
+            value ===
+              "\\inbox" ||
+            value.endsWith(
+              "/inbox",
+            ),
+        );
+      },
+    );
+
+  return String(
+    inbox?.id ||
+    "",
+  ).trim();
+}
+
+
 export function useWorkspaceCommandCounts(
   workspaceId,
 ) {
@@ -293,10 +350,145 @@ export function useWorkspaceCommandCounts(
             return;
           }
 
-          const unread =
+          let unread =
             inboxUnreadFromFolders(
               data?.data,
             );
+
+          /*
+           * Outside the Inbox page, the workspace shell still
+           * needs a trustworthy unread badge. If folder metadata
+           * has no unread total, count unread Inbox threads.
+           */
+          if (
+            unread ===
+              null
+          ) {
+            const inboxFolderId =
+              inboxFolderIdFromFolders(
+                data?.data,
+              );
+
+            if (inboxFolderId) {
+              let pageToken =
+                "";
+
+              let exactUnread =
+                0;
+
+              const seenThreadIds =
+                new Set();
+
+              for (
+                let pageIndex = 0;
+                pageIndex < 100;
+                pageIndex += 1
+              ) {
+                const {
+                  data:
+                    unreadResult,
+
+                  error:
+                    unreadError,
+                } =
+                  await supabase
+                    .functions
+                    .invoke(
+                      "nylas-mailbox",
+                      {
+                        body: {
+                          workspaceId,
+
+                          action:
+                            "list_threads",
+
+                          folderId:
+                            inboxFolderId,
+
+                          unread:
+                            true,
+
+                          limit:
+                            20,
+
+                          ...(pageToken
+                            ? {
+                                pageToken,
+                              }
+                            : {}),
+                        },
+                      },
+                    );
+
+                if (
+                  unreadError ||
+                  unreadResult
+                    ?.success !==
+                    true
+                ) {
+                  unread =
+                    null;
+                  break;
+                }
+
+                const rows =
+                  Array.isArray(
+                    unreadResult
+                      ?.data,
+                  )
+                    ? unreadResult.data
+                    : [];
+
+                rows.forEach(
+                  (thread) => {
+                    const threadId =
+                      String(
+                        thread?.id ||
+                        "",
+                      ).trim();
+
+                    if (
+                      threadId &&
+                      seenThreadIds.has(
+                        threadId,
+                      )
+                    ) {
+                      return;
+                    }
+
+                    if (threadId) {
+                      seenThreadIds.add(
+                        threadId,
+                      );
+                    }
+
+                    exactUnread +=
+                      1;
+                  },
+                );
+
+                const nextCursor =
+                  String(
+                    unreadResult
+                      ?.nextCursor ||
+                    "",
+                  ).trim();
+
+                if (
+                  !nextCursor ||
+                  rows.length ===
+                    0
+                ) {
+                  unread =
+                    exactUnread;
+                  break;
+                }
+
+                pageToken =
+                  nextCursor;
+              }
+            }
+          }
 
           if (
             unread !==
