@@ -12,6 +12,7 @@ import {
 
 const EMPTY_COUNTS = {
   inbox: 0,
+  calendar: 0,
   tasks: 0,
   commitments: 0,
   waiting_on: 0,
@@ -403,8 +404,41 @@ export function useWorkspaceCommandCounts(
 
 
         try {
+          /*
+           * Match the Calendar page's own definition of Today:
+           * events starting today + active Tasks due today.
+           *
+           * These boundaries intentionally use browser-local time,
+           * the same calendar-day logic used by CalendarReferencePreview.
+           */
+          const now =
+            new Date();
+
+          const todayStart =
+            new Date(
+              now.getFullYear(),
+              now.getMonth(),
+              now.getDate(),
+            );
+
+          const tomorrowStart =
+            new Date(
+              now.getFullYear(),
+              now.getMonth(),
+              now.getDate() + 1,
+            );
+
+          const todayStartIso =
+            todayStart.toISOString();
+
+          const tomorrowStartIso =
+            tomorrowStart.toISOString();
+
+
           const [
             tasksResult,
+            calendarEventsResult,
+            calendarTasksResult,
             commitmentsResult,
             waitingResult,
             approvalsResult,
@@ -429,6 +463,59 @@ export function useWorkspaceCommandCounts(
                     "open",
                     "in_progress",
                   ],
+                ),
+
+
+              supabase
+                .from("events")
+                .select(
+                  "id",
+                  {
+                    count: "exact",
+                    head: true,
+                  },
+                )
+                .eq(
+                  "workspace_id",
+                  workspaceId,
+                )
+                .neq(
+                  "status",
+                  "cancelled",
+                )
+                .gte(
+                  "starts_at",
+                  todayStartIso,
+                )
+                .lt(
+                  "starts_at",
+                  tomorrowStartIso,
+                ),
+
+
+              /*
+               * Fetch today's task statuses rather than forcing the
+               * sidebar to assume only open/in_progress are active.
+               *
+               * Calendar itself treats anything except completed,
+               * done, cancelled or archived as active.
+               */
+              supabase
+                .from("tasks")
+                .select(
+                  "id, status",
+                )
+                .eq(
+                  "workspace_id",
+                  workspaceId,
+                )
+                .gte(
+                  "due_at",
+                  todayStartIso,
+                )
+                .lt(
+                  "due_at",
+                  tomorrowStartIso,
                 ),
 
 
@@ -516,6 +603,8 @@ export function useWorkspaceCommandCounts(
           const failed =
             [
               tasksResult,
+              calendarEventsResult,
+              calendarTasksResult,
               commitmentsResult,
               waitingResult,
               approvalsResult,
@@ -537,6 +626,33 @@ export function useWorkspaceCommandCounts(
               tasks:
                 tasksResult.count ||
                 0,
+
+              calendar:
+                (
+                  calendarEventsResult.count ||
+                  0
+                ) +
+                (
+                  (
+                    calendarTasksResult.data ||
+                    []
+                  ).filter(
+                    (task) =>
+                      ![
+                        "completed",
+                        "done",
+                        "cancelled",
+                        "archived",
+                      ].includes(
+                        String(
+                          task?.status ||
+                          "",
+                        )
+                          .trim()
+                          .toLowerCase(),
+                      ),
+                  ).length
+                ),
 
               commitments:
                 commitmentsResult.count ||
@@ -567,8 +683,18 @@ export function useWorkspaceCommandCounts(
            * Never substitute demonstration numbers if live
            * data is unavailable.
            */
+          /*
+           * A Tasks / Calendar / Approval query failure must never
+           * erase a trustworthy connected-mailbox unread count.
+           */
           setCounts(
-            EMPTY_COUNTS,
+            (current) => ({
+              ...EMPTY_COUNTS,
+
+              inbox:
+                current.inbox ||
+                0,
+            }),
           );
 
           setError(
@@ -654,6 +780,28 @@ export function useWorkspaceCommandCounts(
           );
         };
 
+      /*
+       * CustomEvent synchronizes the current tab.
+       * The storage event keeps every other open Campaign Seat
+       * tab on the same unread count immediately.
+       */
+      const handleInboxStorage =
+        (event) => {
+          if (
+            event.key !==
+              `campaign-seat:inbox-unread:${workspaceId}` ||
+            event.newValue ===
+              null
+          ) {
+            return;
+          }
+
+          setInboxCount(
+            event.newValue,
+          );
+        };
+
+
       const handleVisibility =
         () => {
           if (
@@ -662,17 +810,24 @@ export function useWorkspaceCommandCounts(
               "visible"
           ) {
             void loadInboxUnread();
+            void loadCounts();
           }
         };
 
       const handleFocus =
         () => {
           void loadInboxUnread();
+          void loadCounts();
         };
 
       window.addEventListener(
         "campaign-seat-inbox-unread-count",
         handleInboxUnread,
+      );
+
+      window.addEventListener(
+        "storage",
+        handleInboxStorage,
       );
 
       document.addEventListener(
@@ -705,6 +860,11 @@ export function useWorkspaceCommandCounts(
           handleInboxUnread,
         );
 
+        window.removeEventListener(
+          "storage",
+          handleInboxStorage,
+        );
+
         document.removeEventListener(
           "visibilitychange",
           handleVisibility,
@@ -717,6 +877,7 @@ export function useWorkspaceCommandCounts(
       };
     },
     [
+      loadCounts,
       loadInboxUnread,
       setInboxCount,
       workspaceId,
@@ -744,6 +905,7 @@ export function useWorkspaceCommandCounts(
     [
       "tasks",
       "approvals",
+      "events",
     ].forEach(
       (table) => {
         channel =

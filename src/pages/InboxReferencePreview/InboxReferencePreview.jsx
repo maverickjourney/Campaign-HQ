@@ -5225,14 +5225,43 @@ export default function InboxReferencePreview() {
               metric.id ===
               "needs-response"
             ) {
+              /*
+               * Campaign workflow truth wins over a provider
+               * snapshot that may still reflect the previous
+               * inbound message for a moment after replying.
+               */
               value =
                 metricScopeConversations
                   .filter(
                     (
                       conversation,
-                    ) =>
-                      conversation
-                        .needsResponse,
+                    ) => {
+                      const workflow =
+                        inboxWorkflowByKey.get(
+                          inboxWorkflowKey(
+                            conversation,
+                          ),
+                        ) ||
+                        null;
+
+                      const status =
+                        workflow
+                          ?.workflow_status ||
+                        (
+                          conversation
+                            .needsResponse
+                            ? "needs_reply"
+                            : "open"
+                        );
+
+                      return (
+                        status ===
+                          "needs_reply" &&
+                        !inboxWorkflowIsSnoozed(
+                          workflow,
+                        )
+                      );
+                    },
                   )
                   .length;
             } else if (
@@ -5259,6 +5288,7 @@ export default function InboxReferencePreview() {
         ),
       [
         activeChannel,
+        inboxWorkflowByKey,
         metricScopeConversations,
         providerInboxUnreadCount,
         selectedAccountKeys.length,
@@ -5689,7 +5719,11 @@ export default function InboxReferencePreview() {
 
         if (
           activeFilter === "needs-response" &&
-          !conversation.needsResponse
+          (
+            commandSnoozed ||
+            commandStatus !==
+              "needs_reply"
+          )
         ) {
           return false;
         }
@@ -5872,9 +5906,28 @@ export default function InboxReferencePreview() {
 
   const getFilterCount = (filterId) => {
     if (filterId === "unread") {
-      return conversations.filter(
-        (conversation) => conversation.unread,
-      ).length;
+      /*
+       * The connected provider is authoritative for Inbox unread.
+       * When the user scopes specific mailbox accounts, use the
+       * visible conversation set instead.
+       */
+      if (
+        !selectedAccountKeys.length &&
+        providerInboxUnreadCount !==
+          null
+      ) {
+        return (
+          providerInboxUnreadCount +
+          sourceNonEmailUnreadCount
+        );
+      }
+
+      return accountScopedConversations
+        .filter(
+          (conversation) =>
+            conversation.unread,
+        )
+        .length;
     }
 
     if (filterId === "priority") {
@@ -5885,10 +5938,37 @@ export default function InboxReferencePreview() {
     }
 
     if (filterId === "needs-response") {
-      return conversations.filter(
-        (conversation) =>
-          conversation.needsResponse,
-      ).length;
+      return accountScopedConversations
+        .filter(
+          (conversation) => {
+            const workflow =
+              inboxWorkflowByKey.get(
+                inboxWorkflowKey(
+                  conversation,
+                ),
+              ) ||
+              null;
+
+            const status =
+              workflow
+                ?.workflow_status ||
+              (
+                conversation
+                  .needsResponse
+                  ? "needs_reply"
+                  : "open"
+              );
+
+            return (
+              status ===
+                "needs_reply" &&
+              !inboxWorkflowIsSnoozed(
+                workflow,
+              )
+            );
+          },
+        )
+        .length;
     }
 
     if (filterId === "mentions") {
@@ -8533,6 +8613,101 @@ export default function InboxReferencePreview() {
             attachments:
               sentAttachmentFiles,
           });
+
+
+        /*
+         * Once the connected mailbox accepts the campaign reply,
+         * Campaign Seat knows the campaign is now the latest actor.
+         *
+         * Update workflow truth immediately instead of leaving
+         * Needs Reply visible while provider thread metadata catches up.
+         */
+        try {
+          const statusSignalOrder =
+            Date.now();
+
+          await upsertInboxWorkflow(
+            selectedConversation,
+            {
+              workflow_status:
+                "waiting_on",
+
+              snoozed_until:
+                null,
+
+              metadata: {
+                status_source:
+                  "reply_send",
+
+                status_signal_direction:
+                  "outbound",
+
+                status_signal_order:
+                  statusSignalOrder,
+
+                status_signal_source:
+                  "campaign_seat_reply",
+
+                status_automated_at:
+                  new Date()
+                    .toISOString(),
+              },
+            },
+          );
+
+          try {
+            await logInboxActivity(
+              selectedConversation,
+              {
+                eventType:
+                  "workflow:auto-status",
+
+                eventLabel:
+                  "Waiting On automatically set",
+
+                eventDetail:
+                  "The campaign replied, so Campaign Seat moved this conversation to Waiting On.",
+
+                metadata: {
+                  automated:
+                    true,
+
+                  workflow_status:
+                    "waiting_on",
+
+                  signal_direction:
+                    "outbound",
+
+                  signal_order:
+                    statusSignalOrder,
+
+                  signal_source:
+                    "campaign_seat_reply",
+                },
+              },
+            );
+          } catch (
+            activityError
+          ) {
+            console.warn(
+              "Reply status activity could not be recorded:",
+              activityError,
+            );
+          }
+        } catch (
+          workflowError
+        ) {
+          /*
+           * Email delivery was already accepted.
+           * A CRM persistence issue must never turn a successful
+           * email send into a false send failure.
+           */
+          console.warn(
+            "Email reply sent, but Inbox workflow reconciliation is pending:",
+            workflowError,
+          );
+        }
+
 
         setReplySendState(
           "sent",
