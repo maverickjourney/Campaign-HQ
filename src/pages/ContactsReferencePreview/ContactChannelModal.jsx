@@ -24,7 +24,7 @@ const CHANNELS = [
   {
     id: "email",
     label: "Email",
-    description: "Compose an email in the device email application.",
+    description: "Compose and send through the connected Campaign Seat Inbox.",
   },
   {
     id: "text",
@@ -202,8 +202,60 @@ export default function ContactChannelModal({
     }
 
     if (channel === "email") {
-      window.location.href =
-        `mailto:${contact.email}?subject=${encodedSubject}&body=${encodedMessage}`;
+      /*
+       * V43 CONTACTS → INBOX
+       *
+       * Email should stay inside Campaign Seat.
+       * Carry the contact, subject and drafted message into
+       * the real New Message composer.
+       */
+      const params =
+        new URLSearchParams({
+          compose:
+            "contact-email",
+
+          contact_id:
+            String(
+              contact.id ||
+              "",
+            ),
+
+          contact_name:
+            String(
+              contact.full_name ||
+              "",
+            ),
+
+          contact_email:
+            String(
+              contact.email ||
+              "",
+            ),
+        });
+
+      if (
+        subject.trim()
+      ) {
+        params.set(
+          "subject",
+          subject.trim(),
+        );
+      }
+
+      if (
+        message.trim()
+      ) {
+        params.set(
+          "body",
+          message.trim(),
+        );
+      }
+
+      window.location.assign(
+        `/inbox?${params.toString()}`,
+      );
+
+      return;
     }
 
     if (channel === "text") {
@@ -560,7 +612,9 @@ export default function ContactChannelModal({
 
               {channel === "campaign_seat"
                 ? "Open Communications"
-                : `Open ${selectedChannel.label}`}
+                : channel === "email"
+                  ? "Compose in Inbox"
+                  : `Open ${selectedChannel.label}`}
             </button>
           )}
         </footer>

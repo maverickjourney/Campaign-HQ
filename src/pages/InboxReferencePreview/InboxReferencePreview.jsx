@@ -4172,6 +4172,15 @@ export default function InboxReferencePreview() {
   const attachmentInputRef =
     useRef(null);
 
+  /*
+   * V43 CONTACT COMPOSE HANDOFF
+   *
+   * Prevent a Contacts → Inbox compose URL from reopening
+   * the composer on subsequent rerenders.
+   */
+  const contactComposeHandledRef =
+    useRef(false);
+
   const [replyAllThreadId, setReplyAllThreadId] =
     useState("");
 
@@ -6333,6 +6342,188 @@ export default function InboxReferencePreview() {
           ),
       );
     };
+
+
+  /*
+   * CONTACTS → INBOX
+   *
+   * Example:
+   *
+   * /inbox?compose=contact-email
+   *   &contact_id=...
+   *   &contact_name=...
+   *   &contact_email=...
+   *   &subject=...
+   *   &body=...
+   *
+   * The URL is cleaned immediately after it is consumed so a
+   * refresh does not accidentally reopen or resend anything.
+   */
+  useEffect(() => {
+    if (
+      contactComposeHandledRef
+        .current ||
+      typeof window ===
+        "undefined"
+    ) {
+      return;
+    }
+
+    const params =
+      new URLSearchParams(
+        window.location.search,
+      );
+
+    if (
+      params.get(
+        "compose",
+      ) !==
+        "contact-email"
+    ) {
+      return;
+    }
+
+    const email =
+      String(
+        params.get(
+          "contact_email",
+        ) ||
+        "",
+      ).trim();
+
+    if (
+      !/^[^\s@]+@[^\s@]+\.[^\s@]+$/
+        .test(
+          email,
+        )
+    ) {
+      return;
+    }
+
+    const name =
+      String(
+        params.get(
+          "contact_name",
+        ) ||
+        email,
+      ).trim();
+
+    const contactId =
+      String(
+        params.get(
+          "contact_id",
+        ) ||
+        email,
+      ).trim();
+
+    const subject =
+      String(
+        params.get(
+          "subject",
+        ) ||
+        "",
+      );
+
+    const body =
+      String(
+        params.get(
+          "body",
+        ) ||
+        "",
+      );
+
+    contactComposeHandledRef.current =
+      true;
+
+    /*
+     * Reset the composer exactly as if New Message was clicked,
+     * then apply the contact-specific values.
+     */
+    openNewMessage();
+
+    setReplyChannel(
+      "email",
+    );
+
+    setNewEmailRecipients([
+      {
+        id:
+          contactId ||
+          email.toLowerCase(),
+
+        name:
+          name ||
+          email,
+
+        email,
+      },
+    ]);
+
+    setContactQuery(
+      "",
+    );
+
+    setNewRecipient(
+      "",
+    );
+
+    setSelectedContactId(
+      "",
+    );
+
+    setNewSubject(
+      subject,
+    );
+
+    setReplyText(
+      body,
+    );
+
+    setReplyRichHtml(
+      "",
+    );
+
+    /*
+     * Remove only the handoff parameters.
+     * Preserve any unrelated Inbox query parameters.
+     */
+    [
+      "compose",
+      "contact_id",
+      "contact_name",
+      "contact_email",
+      "subject",
+      "body",
+    ].forEach(
+      (key) =>
+        params.delete(
+          key,
+        ),
+    );
+
+    const remaining =
+      params.toString();
+
+    const cleanUrl =
+      `${
+        window.location.pathname
+      }${
+        remaining
+          ? `?${remaining}`
+          : ""
+      }${
+        window.location.hash ||
+        ""
+      }`;
+
+    window.history.replaceState(
+      window.history.state,
+      "",
+      cleanUrl,
+    );
+  }, [
+    defaultSignatureOnNew,
+  ]);
 
 
   const selectContact = (contact) => {
