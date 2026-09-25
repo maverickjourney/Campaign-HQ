@@ -3540,6 +3540,11 @@ export default function CalendarReferencePreview() {
   const [newEventOpen, setNewEventOpen] =
     useState(false);
 
+  const [
+    newEventSaving,
+    setNewEventSaving,
+  ] = useState(false);
+
   const [syncing, setSyncing] =
     useState(false);
 
@@ -3590,44 +3595,77 @@ export default function CalendarReferencePreview() {
           true,
         );
 
+        /*
+         * Resolve the exact integration used by provider writes.
+         * A workspace can have historical/duplicate connected rows,
+         * so simply taking the newest connected_at row can disagree
+         * with get_calendar_runtime_connection().
+         */
         const {
-          data,
-          error,
+          data:
+            runtimeData,
+          error:
+            runtimeError,
         } =
           await supabase
-            .from(
-              "workspace_integrations",
-            )
-            .select(
-              "id,status,display_email,settings,last_sync_at,last_success_at,connected_at",
-            )
-            .eq(
-              "workspace_id",
-              workspaceId,
-            )
-            .eq(
-              "provider",
-              "nylas",
-            )
-            .eq(
-              "integration_type",
-              "calendar",
-            )
-            .eq(
-              "status",
-              "connected",
-            )
-            .order(
-              "connected_at",
+            .rpc(
+              "get_calendar_runtime_connection",
               {
-                ascending:
-                  false,
+                target_workspace_id:
+                  workspaceId,
               },
-            )
-            .limit(
-              1,
-            )
-            .maybeSingle();
+            );
+
+        const runtime =
+          Array.isArray(
+            runtimeData,
+          )
+            ? runtimeData[0]
+            : runtimeData;
+
+        let data =
+          null;
+
+        let error =
+          runtimeError;
+
+        if (
+          !error &&
+          runtime
+            ?.integration_id
+        ) {
+          const integrationResult =
+            await supabase
+              .from(
+                "workspace_integrations",
+              )
+              .select(
+                "id,status,display_email,settings,last_sync_at,last_success_at,connected_at",
+              )
+              .eq(
+                "id",
+                runtime
+                  .integration_id,
+              )
+              .eq(
+                "workspace_id",
+                workspaceId,
+              )
+              .eq(
+                "status",
+                "connected",
+              )
+              .maybeSingle();
+
+          data =
+            integrationResult
+              .data ||
+            null;
+
+          error =
+            integrationResult
+              .error;
+        }
 
         if (!active) {
           return;
@@ -3737,6 +3775,50 @@ export default function CalendarReferencePreview() {
       notifyParticipants:
         true,
     });
+
+  useEffect(() => {
+    if (
+      calendarProvider !==
+      "microsoft"
+    ) {
+      return;
+    }
+
+    /*
+     * Microsoft calendar events use the provider's reminder
+     * behavior here. The currently deployed Nylas write path
+     * cannot send Google-style reminder_method to Microsoft.
+     *
+     * Microsoft also requires participant notifications when
+     * attendees are part of the provider event.
+     */
+    setEventForm(
+      (current) => {
+        if (
+          current.reminder ===
+            "default" &&
+          current
+            .notifyParticipants ===
+            true
+        ) {
+          return current;
+        }
+
+        return {
+          ...current,
+
+          reminder:
+            "default",
+
+          notifyParticipants:
+            true,
+        };
+      },
+    );
+  }, [
+    calendarProvider,
+  ]);
+
 
   const [
     editEventOpen,
@@ -5530,6 +5612,12 @@ export default function CalendarReferencePreview() {
     ) => {
       submitEvent.preventDefault();
 
+      if (
+        newEventSaving
+      ) {
+        return;
+      }
+
       const workspaceId =
         sessionWorkspace?.id ||
         "";
@@ -5646,44 +5734,56 @@ export default function CalendarReferencePreview() {
       let reminders =
         {};
 
+      /*
+       * The deployed provider writer currently emits
+       * reminder_method for reminder overrides. Microsoft/EWS
+       * reject that field, so Microsoft uses its provider
+       * reminder defaults until the backend writer gets its
+       * provider-specific reminder upgrade.
+       */
       if (
-        eventForm.reminder ===
-        "default"
+        calendarProvider !==
+        "microsoft"
       ) {
-        reminders = {
-          use_default:
-            true,
-        };
-      } else if (
-        eventForm.reminder !==
-        "none"
-      ) {
-        const reminderMinutes =
-          Number(
-            eventForm.reminder,
-          );
-
         if (
-          Number.isFinite(
-            reminderMinutes,
-          ) &&
-          reminderMinutes >=
-            0
+          eventForm.reminder ===
+          "default"
         ) {
           reminders = {
             use_default:
-              false,
-
-            overrides: [
-              {
-                reminder_minutes:
-                  reminderMinutes,
-
-                reminder_method:
-                  "popup",
-              },
-            ],
+              true,
           };
+        } else if (
+          eventForm.reminder !==
+          "none"
+        ) {
+          const reminderMinutes =
+            Number(
+              eventForm.reminder,
+            );
+
+          if (
+            Number.isFinite(
+              reminderMinutes,
+            ) &&
+            reminderMinutes >=
+              0
+          ) {
+            reminders = {
+              use_default:
+                false,
+
+              overrides: [
+                {
+                  reminder_minutes:
+                    reminderMinutes,
+
+                  reminder_method:
+                    "popup",
+                },
+              ],
+            };
+          }
         }
       }
 
@@ -5773,7 +5873,7 @@ export default function CalendarReferencePreview() {
           lowerLink.includes(
             "zoom.us",
           )
-            ? "Zoom"
+            ? "Zoom Meeting"
             : lowerLink.includes(
                 "meet.google.com",
               )
@@ -5782,7 +5882,11 @@ export default function CalendarReferencePreview() {
                   "teams.microsoft.com",
                 )
                 ? "Microsoft Teams"
-                : "Custom";
+                : lowerLink.includes(
+                    "webex.com",
+                  )
+                  ? "WebEx"
+                  : "Custom";
 
         conferencing = {
           provider:
@@ -5794,6 +5898,10 @@ export default function CalendarReferencePreview() {
           },
         };
       }
+
+      setNewEventSaving(
+        true,
+      );
 
       try {
         const savedEvent =
@@ -5859,8 +5967,11 @@ export default function CalendarReferencePreview() {
                 false,
 
               notifyParticipants:
-                eventForm
-                  .notifyParticipants,
+                calendarProvider ===
+                "microsoft"
+                  ? true
+                  : eventForm
+                      .notifyParticipants,
 
               isAllDay:
                 false,
@@ -6062,7 +6173,10 @@ export default function CalendarReferencePreview() {
             "none",
 
           reminder:
-            "30",
+            calendarProvider ===
+            "microsoft"
+              ? "default"
+              : "30",
 
           notifyParticipants:
             true,
@@ -6079,6 +6193,10 @@ export default function CalendarReferencePreview() {
           createError
             ?.message ||
           "The event could not be created.",
+        );
+      } finally {
+        setNewEventSaving(
+          false,
         );
       }
     };
@@ -12963,8 +13081,15 @@ export default function CalendarReferencePreview() {
                   <input
                     type="checkbox"
                     checked={
-                      eventForm
-                        .notifyParticipants
+                      calendarProvider ===
+                      "microsoft"
+                        ? true
+                        : eventForm
+                            .notifyParticipants
+                    }
+                    disabled={
+                      calendarProvider ===
+                      "microsoft"
                     }
                     onChange={(event) =>
                       setEventForm(
@@ -12981,7 +13106,10 @@ export default function CalendarReferencePreview() {
                   />
 
                   <span>
-                    Email guests about the event
+                    {calendarProvider ===
+                    "microsoft"
+                      ? "Microsoft Calendar sends guest updates"
+                      : "Email guests about the event"}
                   </span>
                 </label>
               </section>
@@ -13059,29 +13187,38 @@ export default function CalendarReferencePreview() {
                         )
                       }
                     >
-                      <option value="none">
-                        No reminder
-                      </option>
+                      {calendarProvider ===
+                      "microsoft" ? (
+                        <option value="default">
+                          Microsoft Calendar default
+                        </option>
+                      ) : (
+                        <>
+                          <option value="none">
+                            No reminder
+                          </option>
 
-                      <option value="10">
-                        10 minutes before
-                      </option>
+                          <option value="10">
+                            10 minutes before
+                          </option>
 
-                      <option value="30">
-                        30 minutes before
-                      </option>
+                          <option value="30">
+                            30 minutes before
+                          </option>
 
-                      <option value="60">
-                        1 hour before
-                      </option>
+                          <option value="60">
+                            1 hour before
+                          </option>
 
-                      <option value="1440">
-                        1 day before
-                      </option>
+                          <option value="1440">
+                            1 day before
+                          </option>
 
-                      <option value="default">
-                        Calendar default
-                      </option>
+                          <option value="default">
+                            Calendar default
+                          </option>
+                        </>
+                      )}
                     </select>
                   </label>
                 </div>
@@ -13133,6 +13270,9 @@ export default function CalendarReferencePreview() {
               <footer>
                 <button
                   type="button"
+                  disabled={
+                    newEventSaving
+                  }
                   onClick={() => {
                     setNewEventOpen(
                       false,
@@ -13147,9 +13287,15 @@ export default function CalendarReferencePreview() {
 
                 <button
                   type="submit"
+                  disabled={
+                    newEventSaving
+                  }
                 >
                   <Check size={18} />
-                  Create event
+
+                  {newEventSaving
+                    ? "Creating…"
+                    : "Create event"}
                 </button>
               </footer>
             </form>
