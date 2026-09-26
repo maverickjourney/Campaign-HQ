@@ -45,6 +45,10 @@ import {
 } from "../../hooks/useApprovalsCommandCenter";
 
 import {
+  useApprovalTaskLinks,
+} from "../../hooks/useApprovalTaskLinks";
+
+import {
   getCampaignExperience,
   getCurrentUser,
   getCurrentWorkspace,
@@ -68,6 +72,56 @@ const OPEN_STATUSES = [
   "pending",
   "changes_requested",
 ];
+
+const TASK_STATUS_LABELS = {
+  open: "To do",
+  in_progress: "In progress",
+  completed: "Completed",
+  archived: "Archived",
+};
+
+function isActiveLinkedTask(
+  task,
+) {
+  return ![
+    "completed",
+    "archived",
+  ].includes(
+    String(
+      task?.status ||
+      "",
+    ),
+  );
+}
+
+function formatLinkedTaskDue(
+  value,
+) {
+  if (!value) {
+    return "No deadline";
+  }
+
+  const date =
+    new Date(value);
+
+  if (
+    Number.isNaN(
+      date.getTime(),
+    )
+  ) {
+    return "No deadline";
+  }
+
+  return new Intl.DateTimeFormat(
+    "en-US",
+    {
+      month: "short",
+      day: "numeric",
+      hour: "numeric",
+      minute: "2-digit",
+    },
+  ).format(date);
+}
 
 const TYPE_OPTIONS = [
   {
@@ -639,6 +693,11 @@ export default function ApprovalsReferencePreview() {
     setActionError,
   ] = useState("");
 
+  const [
+    taskLinkSelection,
+    setTaskLinkSelection,
+  ] = useState("");
+
   /*
    * DOCUMENT_APPROVAL_HANDOFF_V582
    *
@@ -775,6 +834,30 @@ export default function ApprovalsReferencePreview() {
     ? demoApprovals
     : command.approvals;
 
+  const {
+    links:
+      approvalTaskLinks,
+    tasks:
+      approvalLinkTasks,
+    isSaving:
+      approvalTaskLinksSaving,
+    error:
+      approvalTaskLinksError,
+    linkTask:
+      linkTaskToApproval,
+    unlinkTask:
+      unlinkTaskFromApproval,
+  } =
+    useApprovalTaskLinks({
+      workspaceId:
+        demoMode
+          ? ""
+          : workspace.id,
+
+      userId:
+        user.id,
+    });
+
   /*
    * DOCUMENT_REVERSE_APPROVAL_LINK_V584
    *
@@ -856,7 +939,8 @@ export default function ApprovalsReferencePreview() {
     demoMode
       ? actionError
       : actionError ||
-        command.error;
+        command.error ||
+        approvalTaskLinksError;
 
   const referenceTime =
     demoMode
@@ -871,6 +955,194 @@ export default function ApprovalsReferencePreview() {
         approval.id ===
         selectedApprovalId,
     ) || null;
+
+  useEffect(() => {
+    setTaskLinkSelection("");
+  }, [
+    selectedApprovalId,
+  ]);
+
+  const linkedApprovalTaskRows =
+    useMemo(
+      () => {
+        if (
+          !selectedApproval?.id
+        ) {
+          return [];
+        }
+
+        const taskById =
+          new Map(
+            (
+              approvalLinkTasks ||
+              []
+            ).map(
+              (task) => [
+                task.id,
+                task,
+              ],
+            ),
+          );
+
+        return (
+          approvalTaskLinks ||
+          []
+        )
+          .filter(
+            (link) =>
+              link.approval_id ===
+              selectedApproval.id,
+          )
+          .map(
+            (link) => ({
+              ...link,
+
+              task:
+                taskById.get(
+                  link.task_id,
+                ) ||
+                null,
+            }),
+          )
+          .filter(
+            (row) =>
+              row.task,
+          );
+      },
+      [
+        approvalLinkTasks,
+        approvalTaskLinks,
+        selectedApproval?.id,
+      ],
+    );
+
+  const linkedApprovalTaskIds =
+    useMemo(
+      () =>
+        new Set(
+          linkedApprovalTaskRows.map(
+            (row) =>
+              row.task_id,
+          ),
+        ),
+      [
+        linkedApprovalTaskRows,
+      ],
+    );
+
+  const availableApprovalTasks =
+    useMemo(
+      () =>
+        (
+          approvalLinkTasks ||
+          []
+        )
+          .filter(
+            isActiveLinkedTask,
+          )
+          .filter(
+            (task) =>
+              !linkedApprovalTaskIds.has(
+                task.id,
+              ),
+          )
+          .sort(
+            (
+              left,
+              right,
+            ) => {
+              if (
+                left.due_at &&
+                right.due_at
+              ) {
+                return (
+                  new Date(
+                    left.due_at,
+                  ).getTime() -
+                  new Date(
+                    right.due_at,
+                  ).getTime()
+                );
+              }
+
+              if (left.due_at) {
+                return -1;
+              }
+
+              if (right.due_at) {
+                return 1;
+              }
+
+              return String(
+                left.title ||
+                "",
+              ).localeCompare(
+                String(
+                  right.title ||
+                  "",
+                ),
+              );
+            },
+          ),
+      [
+        approvalLinkTasks,
+        linkedApprovalTaskIds,
+      ],
+    );
+
+  const handleLinkApprovalTask =
+    async () => {
+      if (
+        !selectedApproval?.id ||
+        !taskLinkSelection
+      ) {
+        return;
+      }
+
+      setActionError("");
+
+      try {
+        await linkTaskToApproval(
+          selectedApproval.id,
+          taskLinkSelection,
+        );
+
+        setTaskLinkSelection(
+          "",
+        );
+      } catch (
+        linkError
+      ) {
+        setActionError(
+          linkError?.message ||
+            "The task could not be linked to this approval.",
+        );
+      }
+    };
+
+  const handleUnlinkApprovalTask =
+    async (
+      linkId,
+    ) => {
+      if (!linkId) {
+        return;
+      }
+
+      setActionError("");
+
+      try {
+        await unlinkTaskFromApproval(
+          linkId,
+        );
+      } catch (
+        unlinkError
+      ) {
+        setActionError(
+          unlinkError?.message ||
+            "The task could not be removed from this approval.",
+        );
+      }
+    };
 
   const openCount =
     approvals.filter(
@@ -2891,31 +3163,226 @@ export default function ApprovalsReferencePreview() {
                     />
                   </button>
 
-                  <button
-                    type="button"
-                    onClick={() =>
-                      navigate("/tasks")
+                  <div
+                    className={
+                      styles.approvalTaskLinks
                     }
                   >
-                    <FileCheck2
-                      size={20}
-                    />
+                    <div
+                      className={
+                        styles.approvalTaskLinksHeader
+                      }
+                    >
+                      <div>
+                        <strong>
+                          Linked tasks
+                        </strong>
 
-                    <span>
-                      <strong>
-                        Tasks
-                      </strong>
+                        <small>
+                          Execution work tied
+                          directly to this
+                          decision.
+                        </small>
+                      </div>
 
-                      <small>
-                        Open campaign
-                        execution work
-                      </small>
-                    </span>
+                      <span>
+                        {
+                          linkedApprovalTaskRows.length
+                        }
+                      </span>
+                    </div>
 
-                    <ArrowUpRight
-                      size={18}
-                    />
-                  </button>
+                    {linkedApprovalTaskRows.length ? (
+                      <div
+                        className={
+                          styles.approvalTaskList
+                        }
+                      >
+                        {linkedApprovalTaskRows.map(
+                          (row) => (
+                            <article
+                              key={
+                                row.id
+                              }
+                              className={
+                                styles.approvalTaskCard
+                              }
+                            >
+                              <button
+                                type="button"
+                                className={
+                                  styles.approvalTaskOpen
+                                }
+                                onClick={() =>
+                                  navigate(
+                                    `/tasks?task=${encodeURIComponent(
+                                      row.task.id,
+                                    )}`,
+                                  )
+                                }
+                              >
+                                <FileCheck2
+                                  size={18}
+                                />
+
+                                <span>
+                                  <strong>
+                                    {
+                                      row.task.title
+                                    }
+                                  </strong>
+
+                                  <small>
+                                    {TASK_STATUS_LABELS[
+                                      row.task.status
+                                    ] ||
+                                      "To do"}
+
+                                    <em>
+                                      {
+                                        formatLinkedTaskDue(
+                                          row.task.due_at,
+                                        )
+                                      }
+                                    </em>
+                                  </small>
+                                </span>
+
+                                <ArrowUpRight
+                                  size={16}
+                                />
+                              </button>
+
+                              {leadershipAccess && (
+                                <button
+                                  className={
+                                    styles.approvalTaskUnlink
+                                  }
+                                  type="button"
+                                  title="Remove task link"
+                                  aria-label={`Remove ${row.task.title} from this approval`}
+                                  disabled={
+                                    approvalTaskLinksSaving
+                                  }
+                                  onClick={() =>
+                                    handleUnlinkApprovalTask(
+                                      row.id,
+                                    )
+                                  }
+                                >
+                                  <X
+                                    size={15}
+                                  />
+                                </button>
+                              )}
+                            </article>
+                          ),
+                        )}
+                      </div>
+                    ) : (
+                      <div
+                        className={
+                          styles.approvalTaskEmpty
+                        }
+                      >
+                        <FileCheck2
+                          size={20}
+                        />
+
+                        <span>
+                          <strong>
+                            No linked tasks yet
+                          </strong>
+
+                          <small>
+                            Connect campaign
+                            execution work to
+                            this approval.
+                          </small>
+                        </span>
+                      </div>
+                    )}
+
+                    {leadershipAccess && (
+                      <div
+                        className={
+                          styles.approvalTaskComposer
+                        }
+                      >
+                        <select
+                          value={
+                            taskLinkSelection
+                          }
+                          disabled={
+                            approvalTaskLinksSaving ||
+                            !availableApprovalTasks.length
+                          }
+                          onChange={(event) =>
+                            setTaskLinkSelection(
+                              event.target.value,
+                            )
+                          }
+                        >
+                          <option value="">
+                            {availableApprovalTasks.length
+                              ? "Choose an active task…"
+                              : "No active tasks available"}
+                          </option>
+
+                          {availableApprovalTasks.map(
+                            (task) => (
+                              <option
+                                key={
+                                  task.id
+                                }
+                                value={
+                                  task.id
+                                }
+                              >
+                                {task.title}
+                              </option>
+                            ),
+                          )}
+                        </select>
+
+                        <button
+                          type="button"
+                          disabled={
+                            approvalTaskLinksSaving ||
+                            !taskLinkSelection
+                          }
+                          onClick={
+                            handleLinkApprovalTask
+                          }
+                        >
+                          <Plus
+                            size={15}
+                          />
+                          Link task
+                        </button>
+                      </div>
+                    )}
+
+                    <button
+                      className={
+                        styles.approvalTaskBrowse
+                      }
+                      type="button"
+                      onClick={() =>
+                        navigate(
+                          "/tasks",
+                        )
+                      }
+                    >
+                      <span>
+                        Browse all tasks
+                      </span>
+
+                      <ArrowUpRight
+                        size={16}
+                      />
+                    </button>
+                  </div>
                 </section>
               )}
             </div>

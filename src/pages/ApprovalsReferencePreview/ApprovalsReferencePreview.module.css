@@ -3771,3 +3771,232 @@ label > span {
     margin-top: 3px;
   }
 }
+
+
+/* CAMPAIGN SEAT V59 APPROVAL TASK LINKS */
+
+.approvalTaskLinks {
+  display: grid;
+  gap: 10px;
+  padding: 12px;
+  border: 1px solid #d0e0e9;
+  border-radius: 12px;
+  background: #fbfdfe;
+}
+
+.approvalTaskLinksHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.approvalTaskLinksHeader > div {
+  display: grid;
+  gap: 3px;
+}
+
+.approvalTaskLinksHeader strong {
+  color: #245270;
+  font-size: 0.72rem;
+}
+
+.approvalTaskLinksHeader small {
+  color: #8198aa;
+  font-size: 0.62rem;
+}
+
+.approvalTaskLinksHeader > span {
+  display: grid;
+  min-width: 28px;
+  height: 28px;
+  place-items: center;
+  border-radius: 999px;
+  color: #2b6f9b;
+  background: #eaf5fb;
+  font-size: 0.64rem;
+  font-weight: 900;
+}
+
+.approvalTaskList {
+  display: grid;
+  gap: 7px;
+}
+
+.approvalTaskCard {
+  position: relative;
+  display: grid;
+  grid-template-columns:
+    minmax(0, 1fr)
+    auto;
+  overflow: hidden;
+  border: 1px solid #d5e4ed;
+  border-radius: 10px;
+  background: #fff;
+}
+
+.approvalTaskOpen {
+  display: grid;
+  width: 100%;
+  min-width: 0;
+  min-height: 58px;
+  grid-template-columns:
+    30px
+    minmax(0, 1fr)
+    auto;
+  align-items: center;
+  gap: 9px;
+  padding: 9px 10px;
+  border: 0;
+  color: #2f78a7;
+  background: transparent;
+  text-align: left;
+}
+
+.approvalTaskOpen > span {
+  display: grid;
+  min-width: 0;
+  gap: 4px;
+}
+
+.approvalTaskOpen strong {
+  overflow: hidden;
+  color: #245270;
+  font-size: 0.68rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.approvalTaskOpen small {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  color: #7890a3;
+  font-size: 0.59rem;
+}
+
+.approvalTaskOpen small em {
+  color: #9aaab6;
+  font-style: normal;
+}
+
+.approvalTaskOpen:hover {
+  background: #f6fbfe;
+}
+
+.approvalTaskUnlink {
+  display: grid;
+  width: 36px;
+  min-width: 36px;
+  place-items: center;
+  border: 0;
+  border-left: 1px solid #e0eaf0;
+  color: #9a6270;
+  background: #fff;
+}
+
+.approvalTaskUnlink:hover {
+  color: #be2e3b;
+  background: #fff6f7;
+}
+
+.approvalTaskUnlink:disabled {
+  cursor: wait;
+  opacity: 0.45;
+}
+
+.approvalTaskEmpty {
+  display: flex;
+  min-height: 62px;
+  align-items: center;
+  gap: 10px;
+  padding: 11px;
+  border: 1px dashed #cbdde8;
+  border-radius: 10px;
+  color: #5d849e;
+  background: #fff;
+}
+
+.approvalTaskEmpty > span {
+  display: grid;
+  gap: 3px;
+}
+
+.approvalTaskEmpty strong {
+  color: #416982;
+  font-size: 0.67rem;
+}
+
+.approvalTaskEmpty small {
+  color: #8ba0af;
+  font-size: 0.6rem;
+}
+
+.approvalTaskComposer {
+  display: grid;
+  grid-template-columns:
+    minmax(0, 1fr)
+    auto;
+  gap: 8px;
+}
+
+.approvalTaskComposer select {
+  min-width: 0;
+  min-height: 38px;
+  padding: 0 10px;
+  border: 1px solid #cfdfe9;
+  border-radius: 9px;
+  outline: 0;
+  color: #365f7a;
+  background: #fff;
+  font: inherit;
+  font-size: 0.65rem;
+}
+
+.approvalTaskComposer > button {
+  display: inline-flex;
+  min-height: 38px;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  padding: 0 11px;
+  border: 1px solid #efc79e;
+  border-radius: 9px;
+  color: #805717;
+  background: #f9d99b;
+  font: inherit;
+  font-size: 0.63rem;
+  font-weight: 850;
+}
+
+.approvalTaskComposer > button:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+
+.approvalTaskBrowse {
+  display: flex;
+  min-height: 34px;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 3px;
+  border: 0;
+  color: #4380a8;
+  background: transparent;
+  font: inherit;
+  font-size: 0.62rem;
+  font-weight: 800;
+}
+
+@media (max-width: 560px) {
+  .approvalTaskComposer {
+    grid-template-columns:
+      1fr;
+  }
+
+  .approvalTaskComposer > button {
+    width: 100%;
+  }
+}
