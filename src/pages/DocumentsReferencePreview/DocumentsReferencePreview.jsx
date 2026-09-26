@@ -270,6 +270,31 @@ const APPROVAL_TYPE_LABELS = {
   volunteer: "Volunteer / field",
 };
 
+const OPEN_DOCUMENT_APPROVAL_STATUSES = [
+  "draft",
+  "pending",
+  "changes_requested",
+];
+
+function getOpenLinkedApproval(
+  file,
+) {
+  return (
+    file?.linked_records ||
+    []
+  ).find(
+    (record) =>
+      record &&
+      typeof record ===
+        "object" &&
+      record.kind ===
+        "approval" &&
+      OPEN_DOCUMENT_APPROVAL_STATUSES.includes(
+        record.status,
+      ),
+  ) || null;
+}
+
 function linkedRecordSearchValues(
   record,
 ) {
@@ -985,6 +1010,23 @@ export default function DocumentsReferencePreview() {
   const requestDocumentApproval =
     (file) => {
       if (!file?.id) {
+        return;
+      }
+
+      const existingApproval =
+        getOpenLinkedApproval(
+          file,
+        );
+
+      if (
+        existingApproval?.id
+      ) {
+        navigate(
+          `/approvals?approval=${encodeURIComponent(
+            existingApproval.id,
+          )}`,
+        );
+
         return;
       }
 
@@ -1910,7 +1952,12 @@ export default function DocumentsReferencePreview() {
                     <FileCheck2
                       size={17}
                     />
-                    Request approval
+
+                    {getOpenLinkedApproval(
+                      selectedFile,
+                    )
+                      ? "Open approval"
+                      : "Request approval"}
                   </button>
                 )}
               </div>

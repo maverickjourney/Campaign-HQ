@@ -12,10 +12,26 @@ const EMPTY_STATE = {
   team: [],
 };
 
+const OPEN_DOCUMENT_APPROVAL_STATUSES = [
+  "draft",
+  "pending",
+  "changes_requested",
+];
+
 function getApprovalsErrorMessage(error) {
   const message =
     error?.message ||
     "Campaign approvals could not be loaded.";
+
+  if (
+    String(message)
+      .toLowerCase()
+      .includes(
+        "open approval already exists for this document",
+      )
+  ) {
+    return "This document already has an open approval. Open the existing request instead.";
+  }
 
   if (
     error?.code === "42P01" ||
@@ -484,6 +500,80 @@ export function useApprovalsCommandCenter({
 
         try {
           let result;
+
+          if (
+            !id &&
+            sourceFileId &&
+            OPEN_DOCUMENT_APPROVAL_STATUSES.includes(
+              payload.status,
+            )
+          ) {
+            const {
+              data:
+                existingApproval,
+              error:
+                existingApprovalError,
+            } =
+              await supabase
+                .from(
+                  "approvals",
+                )
+                .select(
+                  `
+                    id,
+                    workspace_id,
+                    title,
+                    description,
+                    approval_type,
+                    status,
+                    due_at,
+                    submitted_by,
+                    assigned_to,
+                    reviewed_by,
+                    reviewed_at,
+                    review_notes,
+                    source_file_id,
+                    is_sample,
+                    created_at,
+                    updated_at
+                  `,
+                )
+                .eq(
+                  "workspace_id",
+                  workspaceId,
+                )
+                .eq(
+                  "source_file_id",
+                  sourceFileId,
+                )
+                .in(
+                  "status",
+                  OPEN_DOCUMENT_APPROVAL_STATUSES,
+                )
+                .order(
+                  "updated_at",
+                  {
+                    ascending:
+                      false,
+                  },
+                )
+                .limit(1)
+                .maybeSingle();
+
+            if (
+              existingApprovalError
+            ) {
+              throw existingApprovalError;
+            }
+
+            if (
+              existingApproval?.id
+            ) {
+              await loadApprovals();
+
+              return existingApproval;
+            }
+          }
 
           if (id) {
             result = await supabase
