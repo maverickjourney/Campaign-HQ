@@ -6053,98 +6053,85 @@ export default function CalendarReferencePreview() {
             },
           });
 
-        let finalSavedEvent =
-          savedEvent;
+        const normalizedSavedEvent =
+          normalizeStoredEvent(
+            savedEvent,
+          );
 
-        let providerWriteWarning =
-          "";
+        const automaticConference =
+          eventForm
+            .conferenceMode ===
+            "auto" &&
+          calendarConnected;
+
+        const pendingProviderLabel =
+          automaticConference
+            ? (
+                calendarProvider ===
+                "microsoft"
+                  ? "Creating Microsoft Teams link…"
+                  : "Creating Google Meet link…"
+              )
+            : `Syncing to ${calendarProviderLabel}…`;
+
+        /*
+         * The Campaign Seat event already exists at this point.
+         * Show it immediately and let the provider finish in
+         * the background.
+         */
+        if (normalizedSavedEvent) {
+          setSelectedEvent({
+            ...normalizedSavedEvent,
+
+            providerSyncState:
+              calendarConnected
+                ? "pending"
+                : "local",
+
+            providerSyncLabel:
+              calendarConnected
+                ? pendingProviderLabel
+                : "",
+          });
+        }
+
+        setNewEventOpen(
+          false,
+        );
+
+        setGuestDraft("");
+        setGuestNameDraft("");
+
+        /*
+         * Release the create UI immediately after the local row
+         * is saved. Microsoft can take several more seconds to
+         * provision a Teams meeting, but the user no longer has
+         * to wait in the modal.
+         */
+        setNewEventSaving(
+          false,
+        );
 
         if (
           calendarConnected &&
           savedEvent?.id
         ) {
-          try {
-            const {
-              data:
-                providerData,
-              error:
-                providerError,
-            } =
-              await supabase
-                .functions
-                .invoke(
-                  "nylas-calendar-event-create",
-                  {
-                    body: {
-                      workspaceId,
+          void (
+            async () => {
+              let finalProviderEvent =
+                savedEvent;
 
-                      eventId:
-                        savedEvent.id,
-                    },
-                  },
-                );
-
-            if (
-              providerError ||
-              providerData
-                ?.success !==
-                true
-            ) {
-              throw new Error(
-                providerData
-                  ?.error ||
-                providerError
-                  ?.message ||
-                `The event was saved in Campaign Seat, but could not be added to ${calendarProviderLabel}.`,
-              );
-            }
-
-            if (
-              providerData?.event
-            ) {
-              finalSavedEvent =
-                providerData.event;
-            }
-
-            const richCreate =
-              providerData
-                ?.richCreate ===
-                true;
-
-            /*
-             * Backward compatibility:
-             * Until the upgraded create function is deployed,
-             * keep using the existing second update call.
-             *
-             * Once richCreate=true is returned, creation is
-             * complete in one provider request and this entire
-             * second network round trip disappears.
-             */
-            if (!richCreate) {
-              const providerLinked =
-                finalSavedEvent
-                  ?.source_provider ===
-                  "nylas" &&
-                Boolean(
-                  finalSavedEvent
-                    ?.external_event_id,
-                ) &&
-                Boolean(
-                  finalSavedEvent
-                    ?.external_calendar_id,
-                );
-
-              if (providerLinked) {
+              try {
                 const {
                   data:
-                    updateData,
+                    providerData,
                   error:
-                    updateError,
+                    providerError,
                 } =
                   await supabase
                     .functions
                     .invoke(
-                      "nylas-calendar-event-update",
+                      "nylas-calendar-event-create",
                       {
                         body: {
                           workspaceId,
@@ -6156,77 +6143,150 @@ export default function CalendarReferencePreview() {
                     );
 
                 if (
-                  updateError ||
-                  updateData
+                  providerError ||
+                  providerData
                     ?.success !==
                     true
                 ) {
                   throw new Error(
-                    updateData
+                    providerData
                       ?.error ||
-                    updateError
+                    providerError
                       ?.message ||
-                    `The event was created, but its guests or meeting details could not be added to ${calendarProviderLabel}.`,
+                    `The event was saved in Campaign Seat, but could not be added to ${calendarProviderLabel}.`,
                   );
                 }
 
                 if (
-                  updateData?.event
+                  providerData?.event
                 ) {
-                  finalSavedEvent =
-                    updateData.event;
+                  finalProviderEvent =
+                    providerData.event;
                 }
+
+                const richCreate =
+                  providerData
+                    ?.richCreate ===
+                    true;
+
+                /*
+                 * Keep compatibility if an older backend version
+                 * is ever restored. This second update also runs
+                 * in the background, so it never blocks the UI.
+                 */
+                if (!richCreate) {
+                  const providerLinked =
+                    finalProviderEvent
+                      ?.source_provider ===
+                      "nylas" &&
+                    Boolean(
+                      finalProviderEvent
+                        ?.external_event_id,
+                    ) &&
+                    Boolean(
+                      finalProviderEvent
+                        ?.external_calendar_id,
+                    );
+
+                  if (providerLinked) {
+                    const {
+                      data:
+                        updateData,
+                      error:
+                        updateError,
+                    } =
+                      await supabase
+                        .functions
+                        .invoke(
+                          "nylas-calendar-event-update",
+                          {
+                            body: {
+                              workspaceId,
+
+                              eventId:
+                                savedEvent.id,
+                            },
+                          },
+                        );
+
+                    if (
+                      updateError ||
+                      updateData
+                        ?.success !==
+                        true
+                    ) {
+                      throw new Error(
+                        updateData
+                          ?.error ||
+                        updateError
+                          ?.message ||
+                        `The event was created, but its guests or meeting details could not be added to ${calendarProviderLabel}.`,
+                      );
+                    }
+
+                    if (
+                      updateData?.event
+                    ) {
+                      finalProviderEvent =
+                        updateData.event;
+                    }
+                  }
+                }
+
+                const normalizedProviderEvent =
+                  normalizeStoredEvent(
+                    finalProviderEvent,
+                  );
+
+                if (
+                  normalizedProviderEvent
+                ) {
+                  setSelectedEvent(
+                    (current) =>
+                      current?.id ===
+                      savedEvent.id
+                        ? normalizedProviderEvent
+                        : current,
+                  );
+                }
+
+                void refreshCalendar();
+              } catch (
+                providerWriteError
+              ) {
+                console.error(
+                  "Calendar provider background creation failed",
+                  providerWriteError,
+                );
+
+                const providerErrorMessage =
+                  providerWriteError
+                    ?.message ||
+                  `${calendarProviderLabel} did not finish syncing this event.`;
+
+                setSelectedEvent(
+                  (current) =>
+                    current?.id ===
+                    savedEvent.id
+                      ? {
+                          ...current,
+
+                          providerSyncState:
+                            "error",
+
+                          providerSyncLabel:
+                            "Calendar sync needs attention",
+
+                          providerSyncError:
+                            providerErrorMessage,
+                        }
+                      : current,
+                );
+
+                void refreshCalendar();
               }
-
-              await refreshCalendar();
-            } else {
-              /*
-               * saveCalendarEvent already inserted the local
-               * event into the command center. Reconcile provider
-               * changes in the background instead of making the
-               * person wait for a full Calendar refresh.
-               */
-              void refreshCalendar();
             }
-          } catch (
-            providerWriteError
-          ) {
-            console.error(
-              "Calendar provider event creation/update failed",
-              providerWriteError,
-            );
-
-            providerWriteWarning =
-              providerWriteError
-                ?.message ||
-              `The event was saved in Campaign Seat, but ${calendarProviderLabel} could not be fully updated.`;
-          }
-        }
-
-        const normalizedEvent =
-          normalizeStoredEvent(
-            finalSavedEvent,
-          );
-
-        if (normalizedEvent) {
-          setSelectedEvent(
-            normalizedEvent,
-          );
-        }
-
-        setNewEventOpen(
-          false,
-        );
-
-        setGuestDraft("");
-        setGuestNameDraft("");
-
-        if (
-          providerWriteWarning
-        ) {
-          window.alert(
-            providerWriteWarning,
-          );
+          )();
         }
 
         setEventForm({
@@ -9986,6 +10046,74 @@ export default function CalendarReferencePreview() {
                     </strong>
                   </div>
                 </span>
+
+                {selectedEvent
+                  .providerSyncState ===
+                "pending" ? (
+                  <span
+                    className={
+                      styles.providerSyncPending
+                    }
+                  >
+                    <RefreshCw
+                      size={18}
+                    />
+
+                    <div>
+                      <small>
+                        Calendar sync
+                      </small>
+
+                      <strong>
+                        {selectedEvent
+                          .providerSyncLabel ||
+                          "Finishing calendar sync…"}
+                      </strong>
+
+                      <p>
+                        You can keep working.
+                        Campaign Seat will update
+                        this event automatically.
+                      </p>
+                    </div>
+                  </span>
+                ) : null}
+
+                {selectedEvent
+                  .providerSyncState ===
+                  "error" ||
+                selectedEvent
+                  .syncMetadata
+                  ?.provider_write_status ===
+                  "failed" ? (
+                  <span
+                    className={
+                      styles.providerSyncError
+                    }
+                  >
+                    <AlertTriangle
+                      size={18}
+                    />
+
+                    <div>
+                      <small>
+                        Calendar sync
+                      </small>
+
+                      <strong>
+                        {selectedEvent
+                          .providerSyncLabel ||
+                          "Calendar sync needs attention"}
+                      </strong>
+
+                      <p>
+                        {selectedEvent
+                          .providerSyncError ||
+                          "The event is saved in Campaign Seat, but the connected calendar did not finish syncing."}
+                      </p>
+                    </div>
+                  </span>
+                ) : null}
 
                 {selectedEvent
                   .conferencing

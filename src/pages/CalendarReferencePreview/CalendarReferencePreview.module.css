@@ -10872,3 +10872,54 @@ button[data-campaign-hq-launcher="floating"] {
     width: 100%;
   }
 }
+
+
+/* CAMPAIGN SEAT V55 OPTIMISTIC CALENDAR CREATION */
+
+.providerSyncPending,
+.providerSyncError {
+  padding: 12px;
+  border-radius: 12px;
+}
+
+.providerSyncPending {
+  border: 1px solid #cfe0ed;
+  color: #2f6489;
+  background: #f3f8fb;
+}
+
+.providerSyncPending > svg {
+  animation:
+    campaignSeatCalendarSyncSpin
+    0.9s
+    linear
+    infinite;
+}
+
+.providerSyncPending strong {
+  color: #23587d;
+}
+
+.providerSyncPending p {
+  color: #69849a;
+}
+
+.providerSyncError {
+  border: 1px solid #f0c7ca;
+  color: #bb2d38;
+  background: #fff5f5;
+}
+
+.providerSyncError strong {
+  color: #a92731;
+}
+
+.providerSyncError p {
+  color: #8e5a60;
+}
+
+@keyframes campaignSeatCalendarSyncSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}

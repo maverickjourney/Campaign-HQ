@@ -741,9 +741,89 @@ export function useCalendarCommandCenter({
           throw result.error;
         }
 
-        await loadCalendar();
+        const savedEvent =
+          result.data;
 
-        return result.data;
+        /*
+         * Optimistically reconcile the saved row into the
+         * command-center state instead of waiting for a full
+         * Calendar / Tasks / Team reload before returning.
+         *
+         * Realtime will still perform the normal reconciliation
+         * after the database change.
+         */
+        setState(
+          (current) => {
+            const currentEvents =
+              Array.isArray(
+                current.events,
+              )
+                ? current.events
+                : [];
+
+            const alreadyExists =
+              currentEvents.some(
+                (event) =>
+                  event.id ===
+                  savedEvent.id,
+              );
+
+            const nextEvents =
+              alreadyExists
+                ? currentEvents.map(
+                    (event) =>
+                      event.id ===
+                      savedEvent.id
+                        ? savedEvent
+                        : event,
+                  )
+                : [
+                    ...currentEvents,
+                    savedEvent,
+                  ];
+
+            nextEvents.sort(
+              (
+                left,
+                right,
+              ) => {
+                const leftTime =
+                  Date.parse(
+                    left
+                      ?.starts_at ||
+                    "",
+                  ) ||
+                  0;
+
+                const rightTime =
+                  Date.parse(
+                    right
+                      ?.starts_at ||
+                    "",
+                  ) ||
+                  0;
+
+                return (
+                  leftTime -
+                  rightTime
+                );
+              },
+            );
+
+            return {
+              ...current,
+
+              events:
+                nextEvents,
+            };
+          },
+        );
+
+        setLastUpdated(
+          new Date(),
+        );
+
+        return savedEvent;
       } catch (saveError) {
         console.error(
           "Calendar event could not be saved:",
