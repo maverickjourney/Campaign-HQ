@@ -1,3 +1,4 @@
+import React from "react";
 import {
   BrowserRouter,
   Navigate,
@@ -58,6 +59,106 @@ import SeatOnboardingContinue from "./pages/SeatOnboarding/SeatOnboardingContinu
 
 
 
+
+import PublicCampaignSeat from "./pages/PublicCampaignSeat/PublicCampaignSeat";
+
+
+class PublicWebsiteErrorBoundary extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = { error: null };
+  }
+
+  static getDerivedStateFromError(error) {
+    return { error };
+  }
+
+  componentDidCatch(error, info) {
+    console.error(
+      "Campaign Seat public website render error:",
+      error,
+      info,
+    );
+  }
+
+  render() {
+    if (this.state.error) {
+      const error = this.state.error;
+
+      return (
+        <div
+          style={{
+            minHeight: "100vh",
+            padding: "48px",
+            color: "#111827",
+            background: "#ffffff",
+            fontFamily: "Arial, sans-serif",
+          }}
+        >
+          <div
+            style={{
+              maxWidth: "920px",
+              margin: "0 auto",
+            }}
+          >
+            <div
+              style={{
+                color: "#b91c1c",
+                fontSize: "12px",
+                fontWeight: 800,
+                letterSpacing: "0.12em",
+              }}
+            >
+              CAMPAIGN SEAT PUBLIC WEBSITE — RUNTIME ERROR
+            </div>
+
+            <h1
+              style={{
+                marginTop: "14px",
+                fontSize: "34px",
+              }}
+            >
+              The public page hit a render error.
+            </h1>
+
+            <p
+              style={{
+                color: "#475569",
+                lineHeight: 1.6,
+              }}
+            >
+              Screenshot the error below and send it back.
+              This diagnostic is local only.
+            </p>
+
+            <pre
+              style={{
+                overflowX: "auto",
+                marginTop: "24px",
+                padding: "22px",
+                border: "1px solid #fecaca",
+                borderRadius: "12px",
+                color: "#7f1d1d",
+                background: "#fff7f7",
+                whiteSpace: "pre-wrap",
+                wordBreak: "break-word",
+                lineHeight: 1.55,
+              }}
+            >
+              {String(
+                error?.stack ||
+                error?.message ||
+                error,
+              )}
+            </pre>
+          </div>
+        </div>
+      );
+    }
+
+    return this.props.children;
+  }
+}
 
 const LEADERSHIP_EXPERIENCES = [
   "owner",
@@ -127,9 +228,31 @@ export default function Router() {
     hostname ===
       "app.campaignseat.com";
 
+  const isPublicWebsiteHostname =
+    hostname ===
+      "campaignseat.com" ||
+    hostname ===
+      "www.campaignseat.com";
+
   const isLocalDevelopmentHostname =
     hostname === "127.0.0.1" ||
     hostname === "localhost";
+
+  const isPublicWebsitePreviewPath =
+    isLocalDevelopmentHostname &&
+    (
+      window.location.pathname ===
+        "/public-preview" ||
+      window.location.pathname.startsWith(
+        "/sms-consent",
+      ) ||
+      window.location.pathname.startsWith(
+        "/privacy",
+      ) ||
+      window.location.pathname.startsWith(
+        "/terms",
+      )
+    );
 
   /*
    * CAMPAIGN SEAT HOSTNAME SEPARATION
@@ -146,6 +269,89 @@ export default function Router() {
    * Local development keeps /admin routes available on
    * 127.0.0.1 and localhost.
    */
+  if (
+    isPublicWebsiteHostname ||
+    isPublicWebsitePreviewPath
+  ) {
+    const localPublicPreview =
+      isLocalDevelopmentHostname;
+
+    return (
+      <BrowserRouter>
+        <Routes>
+          <Route
+            path="/"
+            element={
+              <PublicWebsiteErrorBoundary>
+<PublicCampaignSeat
+                  page="home"
+                />
+              </PublicWebsiteErrorBoundary>
+            }
+          />
+
+          <Route
+            path="/public-preview"
+            element={
+              <PublicWebsiteErrorBoundary>
+<PublicCampaignSeat
+                  page="home"
+                />
+              </PublicWebsiteErrorBoundary>
+            }
+          />
+
+          <Route
+            path="/sms-consent/*"
+            element={
+              <PublicWebsiteErrorBoundary>
+<PublicCampaignSeat
+                  page="sms-consent"
+                />
+              </PublicWebsiteErrorBoundary>
+            }
+          />
+
+          <Route
+            path="/privacy/*"
+            element={
+              <PublicWebsiteErrorBoundary>
+<PublicCampaignSeat
+                  page="privacy"
+                />
+              </PublicWebsiteErrorBoundary>
+            }
+          />
+
+          <Route
+            path="/terms/*"
+            element={
+              <PublicWebsiteErrorBoundary>
+<PublicCampaignSeat
+                  page="terms"
+                />
+              </PublicWebsiteErrorBoundary>
+            }
+          />
+
+          <Route
+            path="*"
+            element={
+              <Navigate
+                to={
+                  localPublicPreview
+                    ? "/public-preview"
+                    : "/"
+                }
+                replace
+              />
+            }
+          />
+        </Routes>
+      </BrowserRouter>
+    );
+  }
+
   if (isPlatformAdminHostname) {
     return (
       <BrowserRouter>
