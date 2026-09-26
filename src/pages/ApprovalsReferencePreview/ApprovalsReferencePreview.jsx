@@ -45,9 +45,9 @@ import {
 } from "../../hooks/useApprovalsCommandCenter";
 
 import {
+  getCampaignExperience,
   getCurrentUser,
   getCurrentWorkspace,
-  getRoleLabel,
 } from "../../utils/campaignSession";
 
 import styles from "./ApprovalsReferencePreview.module.css";
@@ -541,7 +541,9 @@ export default function ApprovalsReferencePreview() {
   const user = getCurrentUser();
   const workspace =
     getCurrentWorkspace();
-  const roleLabel = getRoleLabel();
+
+  const campaignExperience =
+    getCampaignExperience();
 
   const demoMode =
     new URLSearchParams(
@@ -549,9 +551,9 @@ export default function ApprovalsReferencePreview() {
     ).get("approvals-demo") === "1";
 
   const leadershipAccess =
-    /candidate|consultant|manager|owner/i.test(
-      roleLabel,
-    );
+    campaignExperience
+      .showLeadership ===
+    true;
 
   const [
     demoApprovals,
@@ -637,6 +639,60 @@ export default function ApprovalsReferencePreview() {
     setActionError,
   ] = useState("");
 
+  /*
+   * DOCUMENT_APPROVAL_HANDOFF_V582
+   *
+   * Keep the source-document query alive while the create
+   * modal is open. Clearing it in the same effect that opens
+   * the modal can cause the route transition to remount the
+   * approvals surface before the editor state is committed.
+   */
+  const clearDocumentHandoffParams =
+    () => {
+      const cleaned =
+        new URLSearchParams(
+          location.search,
+        );
+
+      const handoffKeys = [
+        "new",
+        "source",
+        "sourceFileId",
+        "sourceFileName",
+        "sourceFileCategory",
+      ];
+
+      const hasHandoff =
+        handoffKeys.some(
+          (key) =>
+            cleaned.has(key),
+        );
+
+      if (!hasHandoff) {
+        return;
+      }
+
+      handoffKeys.forEach(
+        (key) =>
+          cleaned.delete(key),
+      );
+
+      navigate(
+        {
+          pathname:
+            location.pathname,
+
+          search:
+            cleaned.toString()
+              ? `?${cleaned.toString()}`
+              : "",
+        },
+        {
+          replace: true,
+        },
+      );
+    };
+
   useEffect(() => {
     const params =
       new URLSearchParams(
@@ -702,42 +758,9 @@ export default function ApprovalsReferencePreview() {
 
     setActionError("");
     setEditorOpen(true);
-
-    const cleaned =
-      new URLSearchParams(
-        location.search,
-      );
-
-    [
-      "new",
-      "source",
-      "sourceFileId",
-      "sourceFileName",
-      "sourceFileCategory",
-    ].forEach(
-      (key) =>
-        cleaned.delete(key),
-    );
-
-    navigate(
-      {
-        pathname:
-          location.pathname,
-
-        search:
-          cleaned.toString()
-            ? `?${cleaned.toString()}`
-            : "",
-      },
-      {
-        replace: true,
-      },
-    );
   }, [
     leadershipAccess,
-    location.pathname,
     location.search,
-    navigate,
   ]);
 
   const command =
@@ -1114,6 +1137,7 @@ export default function ApprovalsReferencePreview() {
       }
 
       if (editorOpen) {
+        clearDocumentHandoffParams();
         setEditorOpen(false);
         return;
       }
@@ -1137,6 +1161,9 @@ export default function ApprovalsReferencePreview() {
     };
   }, [
     editorOpen,
+    location.pathname,
+    location.search,
+    navigate,
     reviewOpen,
     selectedApprovalId,
   ]);
@@ -1259,6 +1286,7 @@ export default function ApprovalsReferencePreview() {
       return;
     }
 
+    clearDocumentHandoffParams();
     setEditorOpen(false);
     setActionError("");
   };
@@ -1410,6 +1438,7 @@ export default function ApprovalsReferencePreview() {
             );
         }
 
+        clearDocumentHandoffParams();
         setEditorOpen(false);
         setForm(EMPTY_FORM);
 
