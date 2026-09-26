@@ -3596,76 +3596,151 @@ export default function CalendarReferencePreview() {
         );
 
         /*
-         * Resolve the exact integration used by provider writes.
-         * A workspace can have historical/duplicate connected rows,
-         * so simply taking the newest connected_at row can disagree
-         * with get_calendar_runtime_connection().
+         * The service-only runtime RPC cannot be called from the
+         * authenticated browser. Mirror its public selection rule
+         * using rows the current workspace member can already read:
+         *
+         * 1. highest settings.runtime_priority
+         * 2. newest connected_at
+         * 3. lowest integration id
+         *
+         * This keeps the UI aligned with provider writes while
+         * preserving the service-only credential boundary.
          */
         const {
           data:
-            runtimeData,
-          error:
-            runtimeError,
+            integrationRows,
+          error,
         } =
           await supabase
-            .rpc(
-              "get_calendar_runtime_connection",
-              {
-                target_workspace_id:
-                  workspaceId,
-              },
+            .from(
+              "workspace_integrations",
+            )
+            .select(
+              "id,status,display_email,settings,capabilities,last_sync_at,last_success_at,connected_at",
+            )
+            .eq(
+              "workspace_id",
+              workspaceId,
+            )
+            .eq(
+              "provider",
+              "nylas",
+            )
+            .eq(
+              "integration_type",
+              "calendar",
+            )
+            .eq(
+              "status",
+              "connected",
             );
 
-        const runtime =
+        const candidates =
           Array.isArray(
-            runtimeData,
+            integrationRows,
           )
-            ? runtimeData[0]
-            : runtimeData;
+            ? integrationRows
+                .filter(
+                  (integration) =>
+                    integration
+                      ?.capabilities
+                      ?.write !==
+                      false,
+                )
+                .sort(
+                  (
+                    left,
+                    right,
+                  ) => {
+                    const leftPriority =
+                      /^\d+$/.test(
+                        String(
+                          left
+                            ?.settings
+                            ?.runtime_priority ||
+                          "",
+                        ),
+                      )
+                        ? Number(
+                            left
+                              .settings
+                              .runtime_priority,
+                          )
+                        : 0;
 
-        let data =
+                    const rightPriority =
+                      /^\d+$/.test(
+                        String(
+                          right
+                            ?.settings
+                            ?.runtime_priority ||
+                          "",
+                        ),
+                      )
+                        ? Number(
+                            right
+                              .settings
+                              .runtime_priority,
+                          )
+                        : 0;
+
+                    if (
+                      rightPriority !==
+                      leftPriority
+                    ) {
+                      return (
+                        rightPriority -
+                        leftPriority
+                      );
+                    }
+
+                    const leftConnectedAt =
+                      left
+                        ?.connected_at
+                        ? Date.parse(
+                            left
+                              .connected_at,
+                          ) ||
+                          0
+                        : 0;
+
+                    const rightConnectedAt =
+                      right
+                        ?.connected_at
+                        ? Date.parse(
+                            right
+                              .connected_at,
+                          ) ||
+                          0
+                        : 0;
+
+                    if (
+                      rightConnectedAt !==
+                      leftConnectedAt
+                    ) {
+                      return (
+                        rightConnectedAt -
+                        leftConnectedAt
+                      );
+                    }
+
+                    return String(
+                      left?.id ||
+                      "",
+                    ).localeCompare(
+                      String(
+                        right?.id ||
+                        "",
+                      ),
+                    );
+                  },
+                )
+            : [];
+
+        const data =
+          candidates[0] ||
           null;
-
-        let error =
-          runtimeError;
-
-        if (
-          !error &&
-          runtime
-            ?.integration_id
-        ) {
-          const integrationResult =
-            await supabase
-              .from(
-                "workspace_integrations",
-              )
-              .select(
-                "id,status,display_email,settings,last_sync_at,last_success_at,connected_at",
-              )
-              .eq(
-                "id",
-                runtime
-                  .integration_id,
-              )
-              .eq(
-                "workspace_id",
-                workspaceId,
-              )
-              .eq(
-                "status",
-                "connected",
-              )
-              .maybeSingle();
-
-          data =
-            integrationResult
-              .data ||
-            null;
-
-          error =
-            integrationResult
-              .error;
-        }
 
         if (!active) {
           return;
