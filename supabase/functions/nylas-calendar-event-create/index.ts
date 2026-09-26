@@ -1334,6 +1334,16 @@ Deno.serve(
           source_provider:
             "nylas",
 
+          /*
+           * Provider-created events must use the same
+           * integration-scoped identity as workspace sync.
+           * Without this field, the later multi-account sync
+           * treats this event as a separate legacy identity
+           * and can import a duplicate row.
+           */
+          source_integration_id:
+            runtime.integration_id,
+
           external_calendar_id:
             providerCalendarId,
 
@@ -1376,6 +1386,15 @@ Deno.serve(
 
             provider:
               "nylas",
+
+            account_provider:
+              accountProvider,
+
+            source_integration_id:
+              runtime.integration_id,
+
+            calendar_id:
+              providerCalendarId,
 
             provider_write_status:
               "synced",
@@ -1441,4 +1460,4 @@ Deno.serve(
       },
     );
   },
-);
+);\n
