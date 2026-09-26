@@ -138,6 +138,9 @@ const EMPTY_FORM = {
   status: "pending",
   dueAt: "",
   assignedTo: "",
+  sourceFileId: "",
+  sourceFileName: "",
+  sourceFileCategory: "",
 };
 
 const EMPTY_REVIEW = {
@@ -448,6 +451,69 @@ function toIsoValue(value) {
   return date.toISOString();
 }
 
+function approvalTypeForDocumentCategory(
+  category,
+) {
+  const normalized =
+    String(
+      category ||
+      "",
+    )
+      .trim()
+      .toLowerCase();
+
+  if (
+    normalized.includes(
+      "compliance",
+    )
+  ) {
+    return "compliance";
+  }
+
+  if (
+    /creative|design/.test(
+      normalized,
+    )
+  ) {
+    return "design";
+  }
+
+  if (
+    normalized.includes(
+      "event",
+    )
+  ) {
+    return "event";
+  }
+
+  if (
+    /finance|fundrais/.test(
+      normalized,
+    )
+  ) {
+    return "finance";
+  }
+
+  if (
+    /volunteer|field/.test(
+      normalized,
+    )
+  ) {
+    return "volunteer";
+  }
+
+  if (
+    /communication|mail|media|press/.test(
+      normalized,
+    )
+  ) {
+    return "communications";
+  }
+
+  return "general";
+}
+
+
 function isOpenApproval(approval) {
   return OPEN_STATUSES.includes(
     approval.status,
@@ -570,6 +636,109 @@ export default function ApprovalsReferencePreview() {
     actionError,
     setActionError,
   ] = useState("");
+
+  useEffect(() => {
+    const params =
+      new URLSearchParams(
+        location.search,
+      );
+
+    if (
+      params.get("new") !==
+        "1" ||
+      params.get("source") !==
+        "document"
+    ) {
+      return;
+    }
+
+    if (!leadershipAccess) {
+      setActionError(
+        "Your campaign role does not allow creating approval requests.",
+      );
+      return;
+    }
+
+    const sourceFileId =
+      params.get(
+        "sourceFileId",
+      ) ||
+      "";
+
+    const sourceFileName =
+      params.get(
+        "sourceFileName",
+      ) ||
+      "Campaign document";
+
+    const sourceFileCategory =
+      params.get(
+        "sourceFileCategory",
+      ) ||
+      "";
+
+    if (!sourceFileId) {
+      return;
+    }
+
+    setForm({
+      ...EMPTY_FORM,
+
+      title:
+        `Review ${sourceFileName}`,
+
+      description:
+        `Review the linked campaign document "${sourceFileName}" and record the campaign decision.`,
+
+      approvalType:
+        approvalTypeForDocumentCategory(
+          sourceFileCategory,
+        ),
+
+      sourceFileId,
+      sourceFileName,
+      sourceFileCategory,
+    });
+
+    setActionError("");
+    setEditorOpen(true);
+
+    const cleaned =
+      new URLSearchParams(
+        location.search,
+      );
+
+    [
+      "new",
+      "source",
+      "sourceFileId",
+      "sourceFileName",
+      "sourceFileCategory",
+    ].forEach(
+      (key) =>
+        cleaned.delete(key),
+    );
+
+    navigate(
+      {
+        pathname:
+          location.pathname,
+
+        search:
+          cleaned.toString()
+            ? `?${cleaned.toString()}`
+            : "",
+      },
+      {
+        replace: true,
+      },
+    );
+  }, [
+    leadershipAccess,
+    location.pathname,
+    location.search,
+    navigate,
+  ]);
 
   const command =
     useApprovalsCommandCenter({
@@ -1067,6 +1236,16 @@ export default function ApprovalsReferencePreview() {
           assignedTo:
             approval.assigned_to ||
             "",
+
+          sourceFileId:
+            approval.source_file_id ||
+            "",
+
+          sourceFileName:
+            "",
+
+          sourceFileCategory:
+            "",
         });
       } else {
         setForm(EMPTY_FORM);
@@ -1127,6 +1306,10 @@ export default function ApprovalsReferencePreview() {
         assignedTo:
           form.assignedTo ||
           null,
+
+        sourceFileId:
+          form.sourceFileId ||
+          null,
       };
 
       try {
@@ -1156,6 +1339,9 @@ export default function ApprovalsReferencePreview() {
                 payload.dueAt,
               assigned_to:
                 payload.assignedTo,
+              source_file_id:
+                payload.sourceFileId ||
+                null,
               reviewed_by: null,
               reviewed_at: null,
               review_notes: null,
@@ -1194,6 +1380,9 @@ export default function ApprovalsReferencePreview() {
                 user.id,
               assigned_to:
                 payload.assignedTo,
+              source_file_id:
+                payload.sourceFileId ||
+                null,
               reviewed_by: null,
               reviewed_at: null,
               review_notes: null,
@@ -2571,7 +2760,15 @@ export default function ApprovalsReferencePreview() {
                   <button
                     type="button"
                     onClick={() =>
-                      navigate("/files")
+                      navigate(
+                        selectedApproval
+                          .source_file_id
+                          ? `/documents?file=${encodeURIComponent(
+                              selectedApproval
+                                .source_file_id,
+                            )}`
+                          : "/documents",
+                      )
                     }
                   >
                     <FolderKanban
@@ -2580,13 +2777,17 @@ export default function ApprovalsReferencePreview() {
 
                     <span>
                       <strong>
-                        Documents
+                        {selectedApproval
+                          .source_file_id
+                          ? "Linked document"
+                          : "Documents"}
                       </strong>
 
                       <small>
-                        Review source
-                        materials and final
-                        files
+                        {selectedApproval
+                          .source_file_id
+                          ? "Open the campaign file tied to this decision"
+                          : "Review source materials and final files"}
                       </small>
                     </span>
 
@@ -2864,6 +3065,43 @@ export default function ApprovalsReferencePreview() {
                   }
                 />
               </label>
+
+              {form.sourceFileId && (
+                <div
+                  className={
+                    styles.fullField
+                  }
+                >
+                  <span>
+                    Linked document
+                  </span>
+
+                  <button
+                    className={
+                      styles.secondaryButton
+                    }
+                    type="button"
+                    onClick={() =>
+                      navigate(
+                        `/documents?file=${encodeURIComponent(
+                          form.sourceFileId,
+                        )}`,
+                      )
+                    }
+                  >
+                    <FolderKanban
+                      size={17}
+                    />
+
+                    {form.sourceFileName ||
+                      "Open campaign document"}
+
+                    <ArrowUpRight
+                      size={16}
+                    />
+                  </button>
+                </div>
+              )}
 
               <label
                 className={

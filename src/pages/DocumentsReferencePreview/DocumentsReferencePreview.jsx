@@ -11,6 +11,7 @@ import {
   Download,
   Eye,
   FileArchive,
+  FileCheck2,
   FileImage,
   FileSpreadsheet,
   FileText,
@@ -27,7 +28,10 @@ import {
   UploadCloud,
   X,
 } from "lucide-react";
-import { useLocation } from "react-router-dom";
+import {
+  useLocation,
+  useNavigate,
+} from "react-router-dom";
 
 import {
   CampaignWorkspaceShell,
@@ -39,6 +43,7 @@ import {
 import {
   getCurrentUser,
   getCurrentWorkspace,
+  getRoleLabel,
 } from "../../utils/campaignSession";
 
 import styles from "./DocumentsReferencePreview.module.css";
@@ -386,8 +391,15 @@ function isRecent(file) {
 
 export default function DocumentsReferencePreview() {
   const location = useLocation();
+  const navigate = useNavigate();
   const workspace = getCurrentWorkspace();
   const user = getCurrentUser();
+  const roleLabel = getRoleLabel();
+
+  const leadershipAccess =
+    /candidate|consultant|manager|owner/i.test(
+      roleLabel,
+    );
 
   const demoMode =
     new URLSearchParams(
@@ -465,6 +477,35 @@ export default function DocumentsReferencePreview() {
   const files = demoMode
     ? demoFiles
     : liveFiles;
+
+  useEffect(() => {
+    const requestedFileId =
+      new URLSearchParams(
+        location.search,
+      ).get("file");
+
+    if (
+      !requestedFileId ||
+      !files.some(
+        (file) =>
+          file.id ===
+          requestedFileId,
+      )
+    ) {
+      return;
+    }
+
+    setSelectedFileId(
+      requestedFileId,
+    );
+
+    setDetailsTab(
+      "overview",
+    );
+  }, [
+    files,
+    location.search,
+  ]);
 
   // DOCUMENTS_FOCUS_MODE_V3_EXACT
   useEffect(() => {
@@ -835,6 +876,35 @@ export default function DocumentsReferencePreview() {
     setDetailsTab("overview");
     setDetailsExpanded(false);
   };
+
+  const requestDocumentApproval =
+    (file) => {
+      if (!file?.id) {
+        return;
+      }
+
+      const params =
+        new URLSearchParams({
+          new: "1",
+          source: "document",
+          sourceFileId:
+            String(file.id),
+          sourceFileName:
+            String(
+              file.file_name ||
+              "Campaign document",
+            ),
+          sourceFileCategory:
+            String(
+              file.category ||
+              "",
+            ),
+        });
+
+      navigate(
+        `/approvals?${params.toString()}`,
+      );
+    };
 
   const clearFilters = () => {
     setSearch("");
@@ -1721,6 +1791,22 @@ export default function DocumentsReferencePreview() {
                   <Download size={17} />
                   Download
                 </button>
+
+                {leadershipAccess && (
+                  <button
+                    type="button"
+                    onClick={() =>
+                      requestDocumentApproval(
+                        selectedFile,
+                      )
+                    }
+                  >
+                    <FileCheck2
+                      size={17}
+                    />
+                    Request approval
+                  </button>
+                )}
               </div>
 
               <nav className={styles.detailsTabs}>

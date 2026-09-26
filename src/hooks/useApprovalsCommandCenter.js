@@ -36,6 +36,112 @@ function getApprovalsErrorMessage(error) {
   return message;
 }
 
+async function loadWorkspaceApprovals(
+  workspaceId,
+) {
+  const richSelect =
+    `
+      id,
+      workspace_id,
+      title,
+      description,
+      approval_type,
+      status,
+      due_at,
+      submitted_by,
+      assigned_to,
+      reviewed_by,
+      reviewed_at,
+      review_notes,
+      source_file_id,
+      is_sample,
+      created_at,
+      updated_at
+    `;
+
+  const legacySelect =
+    `
+      id,
+      workspace_id,
+      title,
+      description,
+      approval_type,
+      status,
+      due_at,
+      submitted_by,
+      assigned_to,
+      reviewed_by,
+      reviewed_at,
+      review_notes,
+      is_sample,
+      created_at,
+      updated_at
+    `;
+
+  let result =
+    await supabase
+      .from("approvals")
+      .select(richSelect)
+      .eq(
+        "workspace_id",
+        workspaceId,
+      )
+      .order(
+        "due_at",
+        {
+          ascending: true,
+          nullsFirst: false,
+        },
+      )
+      .order(
+        "updated_at",
+        {
+          ascending: false,
+        },
+      );
+
+  if (
+    result.error &&
+    (
+      result.error.code ===
+        "42703" ||
+      String(
+        result.error.message ||
+        "",
+      ).includes(
+        "source_file_id",
+      )
+    )
+  ) {
+    result =
+      await supabase
+        .from("approvals")
+        .select(
+          legacySelect,
+        )
+        .eq(
+          "workspace_id",
+          workspaceId,
+        )
+        .order(
+          "due_at",
+          {
+            ascending: true,
+            nullsFirst: false,
+          },
+        )
+        .order(
+          "updated_at",
+          {
+            ascending: false,
+          },
+        );
+  }
+
+  return result;
+}
+
+
 async function loadWorkspaceTeam(workspaceId) {
   const {
     data: memberships,
@@ -188,44 +294,9 @@ export function useApprovalsCommandCenter({
             approvalsResult,
             team,
           ] = await Promise.all([
-            supabase
-              .from("approvals")
-              .select(
-                `
-                  id,
-                  workspace_id,
-                  title,
-                  description,
-                  approval_type,
-                  status,
-                  due_at,
-                  submitted_by,
-                  assigned_to,
-                  reviewed_by,
-                  reviewed_at,
-                  review_notes,
-                  is_sample,
-                  created_at,
-                  updated_at
-                `,
-              )
-              .eq(
-                "workspace_id",
-                workspaceId,
-              )
-              .order(
-                "due_at",
-                {
-                  ascending: true,
-                  nullsFirst: false,
-                },
-              )
-              .order(
-                "updated_at",
-                {
-                  ascending: false,
-                },
-              ),
+            loadWorkspaceApprovals(
+              workspaceId,
+            ),
             loadWorkspaceTeam(
               workspaceId,
             ),
@@ -357,6 +428,7 @@ export function useApprovalsCommandCenter({
         status,
         dueAt,
         assignedTo,
+        sourceFileId,
       }) => {
         if (
           !workspaceId ||
@@ -398,6 +470,13 @@ export function useApprovalsCommandCenter({
           assigned_to:
             assignedTo ||
             null,
+
+          ...(sourceFileId
+            ? {
+                source_file_id:
+                  sourceFileId,
+              }
+            : {}),
         };
 
         setIsSaving(true);
