@@ -775,6 +775,43 @@ export default function ApprovalsReferencePreview() {
     ? demoApprovals
     : command.approvals;
 
+  /*
+   * DOCUMENT_REVERSE_APPROVAL_LINK_V584
+   *
+   * Documents can deep-link back to the exact approval
+   * record that references the selected campaign file.
+   */
+  useEffect(() => {
+    const requestedApprovalId =
+      new URLSearchParams(
+        location.search,
+      ).get("approval");
+
+    if (
+      !requestedApprovalId ||
+      !approvals.some(
+        (approval) =>
+          approval.id ===
+          requestedApprovalId,
+      )
+    ) {
+      return;
+    }
+
+    setDrawerTab(
+      "overview",
+    );
+
+    setExpanded(false);
+
+    setSelectedApprovalId(
+      requestedApprovalId,
+    );
+  }, [
+    approvals,
+    location.search,
+  ]);
+
   const team = useMemo(() => {
     const source = demoMode
       ? buildDemoTeam(user)

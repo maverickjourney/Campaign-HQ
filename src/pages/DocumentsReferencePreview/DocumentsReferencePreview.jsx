@@ -6,6 +6,7 @@ import {
 } from "react";
 import {
   AlertTriangle,
+  ArrowUpRight,
   CheckCircle2,
   Clock3,
   Download,
@@ -249,6 +250,50 @@ const TYPE_LABELS = {
   archive: "Archive",
   other: "Other",
 };
+
+const APPROVAL_STATUS_LABELS = {
+  draft: "Draft",
+  pending: "Pending review",
+  changes_requested:
+    "Changes requested",
+  approved: "Approved",
+  rejected: "Rejected",
+};
+
+const APPROVAL_TYPE_LABELS = {
+  general: "General",
+  compliance: "Compliance",
+  communications: "Communications",
+  design: "Creative / design",
+  event: "Event",
+  finance: "Finance",
+  volunteer: "Volunteer / field",
+};
+
+function linkedRecordSearchValues(
+  record,
+) {
+  if (
+    typeof record ===
+    "string"
+  ) {
+    return [record];
+  }
+
+  if (!record) {
+    return [];
+  }
+
+  return [
+    record.title,
+    APPROVAL_STATUS_LABELS[
+      record.status
+    ],
+    APPROVAL_TYPE_LABELS[
+      record.approval_type
+    ],
+  ].filter(Boolean);
+}
 
 function fileType(file) {
   const mimeType = String(
@@ -814,7 +859,10 @@ export default function DocumentsReferencePreview() {
           TYPE_LABELS[type],
           file.description,
           file.version,
-          ...(file.linked_records || []),
+          ...(file.linked_records || [])
+            .flatMap(
+              linkedRecordSearchValues,
+            ),
         ]
           .filter(Boolean)
           .join(" ")
@@ -2066,18 +2114,112 @@ export default function DocumentsReferencePreview() {
                         className={styles.linkedRecordList}
                       >
                         {selectedFile.linked_records.map(
-                          (record) => (
-                            <article key={record}>
-                              <FolderKanban size={17} />
+                          (
+                            record,
+                            index,
+                          ) => {
+                            const isApproval =
+                              record &&
+                              typeof record ===
+                                "object" &&
+                              record.kind ===
+                                "approval";
 
-                              <div>
-                                <strong>{record}</strong>
-                                <small>
-                                  Linked campaign record
-                                </small>
-                              </div>
-                            </article>
-                          ),
+                            if (
+                              !isApproval
+                            ) {
+                              return (
+                                <article
+                                  key={`${String(
+                                    record,
+                                  )}-${index}`}
+                                >
+                                  <FolderKanban
+                                    size={17}
+                                  />
+
+                                  <div>
+                                    <strong>
+                                      {String(
+                                        record,
+                                      )}
+                                    </strong>
+
+                                    <small>
+                                      Linked campaign
+                                      record
+                                    </small>
+                                  </div>
+                                </article>
+                              );
+                            }
+
+                            return (
+                              <button
+                                className={
+                                  styles.linkedApprovalCard
+                                }
+                                type="button"
+                                key={
+                                  record.id
+                                }
+                                onClick={() =>
+                                  navigate(
+                                    `/approvals?approval=${encodeURIComponent(
+                                      record.id,
+                                    )}`,
+                                  )
+                                }
+                              >
+                                <span
+                                  className={
+                                    styles.linkedApprovalIcon
+                                  }
+                                >
+                                  <FileCheck2
+                                    size={18}
+                                  />
+                                </span>
+
+                                <span
+                                  className={
+                                    styles.linkedApprovalCopy
+                                  }
+                                >
+                                  <strong>
+                                    {record.title ||
+                                      "Campaign approval"}
+                                  </strong>
+
+                                  <small>
+                                    <span
+                                      data-status={
+                                        record.status ||
+                                        "pending"
+                                      }
+                                    >
+                                      {APPROVAL_STATUS_LABELS[
+                                        record.status
+                                      ] ||
+                                        "Pending review"}
+                                    </span>
+
+                                    <em>
+                                      {APPROVAL_TYPE_LABELS[
+                                        record
+                                          .approval_type
+                                      ] ||
+                                        "General"}
+                                    </em>
+                                  </small>
+                                </span>
+
+                                <ArrowUpRight
+                                  size={17}
+                                />
+                              </button>
+                            );
+                          },
                         )}
                       </div>
                     ) : (

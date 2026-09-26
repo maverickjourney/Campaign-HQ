@@ -3870,3 +3870,151 @@
   border-color: #e9aeb6;
   background: #fff1f3;
 }
+
+
+/* CAMPAIGN SEAT V58.4 DOCUMENT APPROVAL LINKS */
+
+.linkedRecordList
+.linkedApprovalCard {
+  display: grid;
+  width: 100%;
+  min-width: 0;
+  min-height: 72px;
+  grid-template-columns:
+    38px
+    minmax(0, 1fr)
+    auto;
+  align-items: center;
+  gap: 11px;
+  padding: 11px 12px;
+  border: 1px solid #d4e4ee;
+  border-radius: 12px;
+  color: #2a719f;
+  background: #fff;
+  text-align: left;
+  cursor: pointer;
+  transition:
+    border-color 140ms ease,
+    background 140ms ease,
+    box-shadow 140ms ease,
+    transform 140ms ease;
+}
+
+.linkedRecordList
+.linkedApprovalCard:hover {
+  border-color: #9ec8e0;
+  background: #f7fbfe;
+  box-shadow:
+    0 6px 17px
+    rgba(35, 84, 119, 0.06);
+  transform: translateY(-1px);
+}
+
+.linkedRecordList
+.linkedApprovalCard:focus-visible {
+  outline: 3px solid
+    rgba(49, 144, 202, 0.14);
+  outline-offset: 2px;
+}
+
+.linkedApprovalIcon {
+  display: grid;
+  width: 38px;
+  height: 38px;
+  place-items: center;
+  border-radius: 10px;
+  color: #257ab2;
+  background: #eaf5fb;
+}
+
+.linkedApprovalCopy {
+  display: grid;
+  min-width: 0;
+  gap: 5px;
+}
+
+.linkedApprovalCopy strong {
+  overflow: hidden;
+  color: #204f72;
+  font-size: 12px;
+  font-weight: 800;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.linkedApprovalCopy small {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.linkedApprovalCopy small span {
+  display: inline-flex;
+  min-height: 22px;
+  align-items: center;
+  padding: 0 8px;
+  border-radius: 999px;
+  color: #8d6116;
+  background: #fff2d8;
+  font-size: 9px;
+  font-weight: 800;
+}
+
+.linkedApprovalCopy
+small span[data-status="approved"] {
+  color: #167553;
+  background: #e8f8f1;
+}
+
+.linkedApprovalCopy
+small span[data-status="changes_requested"] {
+  color: #a85d0f;
+  background: #fff0df;
+}
+
+.linkedApprovalCopy
+small span[data-status="rejected"] {
+  color: #a82d38;
+  background: #fff0f2;
+}
+
+.linkedApprovalCopy
+small span[data-status="draft"] {
+  color: #59748a;
+  background: #eef4f7;
+}
+
+.linkedApprovalCopy small em {
+  overflow: hidden;
+  color: #8196a8;
+  font-size: 9px;
+  font-style: normal;
+  font-weight: 700;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.linkedApprovalCard > svg {
+  flex: 0 0 auto;
+  color: #2b78a7;
+}
+
+@media (max-width: 560px) {
+  .linkedRecordList
+  .linkedApprovalCard {
+    grid-template-columns:
+      34px
+      minmax(0, 1fr)
+      auto;
+    min-height: 66px;
+    gap: 9px;
+    padding: 10px;
+  }
+
+  .linkedApprovalIcon {
+    width: 34px;
+    height: 34px;
+  }
+}

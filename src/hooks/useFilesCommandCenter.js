@@ -55,21 +55,142 @@ export function useFilesCommandCenter({ workspaceId, userId }) {
       setError("");
 
       try {
-        const { data, error: filesError } = await supabase
-          .from("campaign_files")
-          .select(
-            "id, workspace_id, file_name, storage_path, mime_type, size_bytes, category, uploaded_by, created_at",
-          )
-          .eq("workspace_id", workspaceId)
-          .order("created_at", { ascending: false });
+        const [
+          filesResult,
+          approvalsResult,
+        ] = await Promise.all([
+          supabase
+            .from("campaign_files")
+            .select(
+              "id, workspace_id, file_name, storage_path, mime_type, size_bytes, category, uploaded_by, created_at",
+            )
+            .eq(
+              "workspace_id",
+              workspaceId,
+            )
+            .order(
+              "created_at",
+              {
+                ascending: false,
+              },
+            ),
 
-        if (filesError) throw filesError;
+          supabase
+            .from("approvals")
+            .select(
+              "id, title, status, approval_type, source_file_id, due_at, updated_at",
+            )
+            .eq(
+              "workspace_id",
+              workspaceId,
+            )
+            .not(
+              "source_file_id",
+              "is",
+              null,
+            )
+            .order(
+              "updated_at",
+              {
+                ascending: false,
+              },
+            ),
+        ]);
 
-        const refreshedAt = new Date();
-        setFiles(data || []);
-        setLastUpdated(refreshedAt);
-        setLoadedAtMs(refreshedAt.getTime());
-        return data || [];
+        if (filesResult.error) {
+          throw filesResult.error;
+        }
+
+        if (approvalsResult.error) {
+          throw approvalsResult.error;
+        }
+
+        const approvalsByFile =
+          new Map();
+
+        (
+          approvalsResult.data ||
+          []
+        ).forEach(
+          (approval) => {
+            if (
+              !approval
+                ?.source_file_id
+            ) {
+              return;
+            }
+
+            const current =
+              approvalsByFile.get(
+                approval
+                  .source_file_id,
+              ) ||
+              [];
+
+            current.push({
+              kind:
+                "approval",
+
+              id:
+                approval.id,
+
+              title:
+                approval.title,
+
+              status:
+                approval.status,
+
+              approval_type:
+                approval
+                  .approval_type,
+
+              due_at:
+                approval.due_at,
+
+              updated_at:
+                approval.updated_at,
+            });
+
+            approvalsByFile.set(
+              approval
+                .source_file_id,
+              current,
+            );
+          },
+        );
+
+        const linkedFiles =
+          (
+            filesResult.data ||
+            []
+          ).map(
+            (file) => ({
+              ...file,
+
+              linked_records:
+                approvalsByFile.get(
+                  file.id,
+                ) ||
+                [],
+            }),
+          );
+
+        const refreshedAt =
+          new Date();
+
+        setFiles(
+          linkedFiles,
+        );
+
+        setLastUpdated(
+          refreshedAt,
+        );
+
+        setLoadedAtMs(
+          refreshedAt.getTime(),
+        );
+
+        return linkedFiles;
       } catch (loadError) {
         setError(getFilesErrorMessage(loadError));
         return [];
