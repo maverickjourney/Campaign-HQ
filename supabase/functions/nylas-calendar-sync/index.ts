@@ -629,6 +629,13 @@ Deno.serve(
         ? runtimeData[0]
         : runtimeData;
 
+    const integrationId =
+      String(
+        runtime
+          ?.integration_id ||
+        "",
+      ).trim();
+
     const grantId =
       String(
         runtime
@@ -636,7 +643,17 @@ Deno.serve(
         "",
       ).trim();
 
+    const accountProvider =
+      String(
+        runtime
+          ?.account_provider ||
+        "",
+      )
+        .trim()
+        .toLowerCase();
+
     if (
+      !integrationId ||
       !grantId ||
       runtime
         ?.read_ready !==
@@ -912,10 +929,13 @@ Deno.serve(
             upsertError,
         } =
           await adminClient.rpc(
-            "upsert_nylas_calendar_event",
+            "upsert_nylas_calendar_event_from_integration",
             {
               target_workspace_id:
                 workspaceId,
+
+              target_source_integration_id:
+                integrationId,
 
               target_external_calendar_id:
                 externalCalendarId,
@@ -976,6 +996,12 @@ Deno.serve(
                 provider:
                   "nylas",
 
+                account_provider:
+                  accountProvider,
+
+                source_integration_id:
+                  integrationId,
+
                 calendar_id:
                   externalCalendarId,
 
@@ -1020,10 +1046,13 @@ Deno.serve(
           completeError,
       } =
         await adminClient.rpc(
-          "complete_nylas_calendar_sync",
+          "complete_nylas_calendar_integration_sync",
           {
             target_workspace_id:
               workspaceId,
+
+            target_source_integration_id:
+              integrationId,
 
             target_calendar_id:
               calendarId,
@@ -1053,6 +1082,11 @@ Deno.serve(
         {
           success:
             true,
+
+          integrationId,
+
+          provider:
+            accountProvider,
 
           calendar: {
             id:

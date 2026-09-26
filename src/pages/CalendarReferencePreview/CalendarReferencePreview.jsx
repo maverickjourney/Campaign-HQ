@@ -5560,8 +5560,17 @@ export default function CalendarReferencePreview() {
 
         await refreshCalendar();
 
+        const syncedProviderLabel =
+          data?.provider ===
+          "microsoft"
+            ? "Microsoft Calendar"
+            : data?.provider ===
+              "google"
+              ? "Google Calendar"
+              : calendarProviderLabel;
+
         window.alert(
-          `Google Calendar sync complete. ${data.importedCount ?? 0} event${data.importedCount === 1 ? "" : "s"} synced${data.skippedCount ? ` · ${data.skippedCount} skipped` : ""}.`,
+          `${syncedProviderLabel} sync complete. ${data.importedCount ?? 0} event${data.importedCount === 1 ? "" : "s"} synced${data.skippedCount ? ` · ${data.skippedCount} skipped` : ""}.`,
         );
       } catch (
         syncError
