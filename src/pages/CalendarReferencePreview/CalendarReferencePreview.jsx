@@ -6106,72 +6106,88 @@ export default function CalendarReferencePreview() {
                 providerData.event;
             }
 
+            const richCreate =
+              providerData
+                ?.richCreate ===
+                true;
+
             /*
-             * The deployed provider-update function already
-             * supports guests, recurrence, reminders and
-             * conferencing. Run it immediately after provider
-             * creation so new events receive the same rich
-             * behavior as edited events without deploying a
-             * new backend function.
+             * Backward compatibility:
+             * Until the upgraded create function is deployed,
+             * keep using the existing second update call.
+             *
+             * Once richCreate=true is returned, creation is
+             * complete in one provider request and this entire
+             * second network round trip disappears.
              */
-            const providerLinked =
-              finalSavedEvent
-                ?.source_provider ===
-                "nylas" &&
-              Boolean(
+            if (!richCreate) {
+              const providerLinked =
                 finalSavedEvent
-                  ?.external_event_id,
-              ) &&
-              Boolean(
-                finalSavedEvent
-                  ?.external_calendar_id,
-              );
-
-            if (providerLinked) {
-              const {
-                data:
-                  updateData,
-                error:
-                  updateError,
-              } =
-                await supabase
-                  .functions
-                  .invoke(
-                    "nylas-calendar-event-update",
-                    {
-                      body: {
-                        workspaceId,
-
-                        eventId:
-                          savedEvent.id,
-                      },
-                    },
-                  );
-
-              if (
-                updateError ||
-                updateData
-                  ?.success !==
-                  true
-              ) {
-                throw new Error(
-                  updateData
-                    ?.error ||
-                  updateError
-                    ?.message ||
-                  `The event was created, but its guests or meeting details could not be added to ${calendarProviderLabel}.`,
+                  ?.source_provider ===
+                  "nylas" &&
+                Boolean(
+                  finalSavedEvent
+                    ?.external_event_id,
+                ) &&
+                Boolean(
+                  finalSavedEvent
+                    ?.external_calendar_id,
                 );
+
+              if (providerLinked) {
+                const {
+                  data:
+                    updateData,
+                  error:
+                    updateError,
+                } =
+                  await supabase
+                    .functions
+                    .invoke(
+                      "nylas-calendar-event-update",
+                      {
+                        body: {
+                          workspaceId,
+
+                          eventId:
+                            savedEvent.id,
+                        },
+                      },
+                    );
+
+                if (
+                  updateError ||
+                  updateData
+                    ?.success !==
+                    true
+                ) {
+                  throw new Error(
+                    updateData
+                      ?.error ||
+                    updateError
+                      ?.message ||
+                    `The event was created, but its guests or meeting details could not be added to ${calendarProviderLabel}.`,
+                  );
+                }
+
+                if (
+                  updateData?.event
+                ) {
+                  finalSavedEvent =
+                    updateData.event;
+                }
               }
 
-              if (
-                updateData?.event
-              ) {
-                finalSavedEvent =
-                  updateData.event;
-              }
+              await refreshCalendar();
+            } else {
+              /*
+               * saveCalendarEvent already inserted the local
+               * event into the command center. Reconcile provider
+               * changes in the background instead of making the
+               * person wait for a full Calendar refresh.
+               */
+              void refreshCalendar();
             }
-
-            await refreshCalendar();
           } catch (
             providerWriteError
           ) {

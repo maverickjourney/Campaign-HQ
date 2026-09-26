@@ -111,6 +111,322 @@ function unixToIso(
   ).toISOString();
 }
 
+function sanitizeParticipants(
+  value: unknown,
+) {
+  if (
+    !Array.isArray(
+      value,
+    )
+  ) {
+    return [];
+  }
+
+  return value
+    .map(
+      (
+        participant:
+          Record<
+            string,
+            unknown
+          >,
+      ) => {
+        const email =
+          String(
+            participant
+              ?.email ||
+            "",
+          )
+            .trim()
+            .toLowerCase();
+
+        if (
+          !email ||
+          !email.includes(
+            "@",
+          )
+        ) {
+          return null;
+        }
+
+        const clean:
+          Record<
+            string,
+            string
+          > = {
+            email,
+          };
+
+        const name =
+          String(
+            participant
+              ?.name ||
+            "",
+          ).trim();
+
+        if (name) {
+          clean.name =
+            name.slice(
+              0,
+              255,
+            );
+        }
+
+        const comment =
+          String(
+            participant
+              ?.comment ||
+            "",
+          ).trim();
+
+        if (comment) {
+          clean.comment =
+            comment.slice(
+              0,
+              1000,
+            );
+        }
+
+        return clean;
+      },
+    )
+    .filter(Boolean);
+}
+
+
+function sanitizeRecurrence(
+  value: unknown,
+) {
+  if (
+    !Array.isArray(
+      value,
+    )
+  ) {
+    return [];
+  }
+
+  return value
+    .map(
+      (item) =>
+        String(
+          item ||
+          "",
+        ).trim(),
+    )
+    .filter(
+      (item) =>
+        item.startsWith(
+          "RRULE:",
+        ) ||
+        item.startsWith(
+          "EXDATE:",
+        ),
+    )
+    .slice(
+      0,
+      50,
+    );
+}
+
+
+function sanitizeReminders(
+  value: unknown,
+) {
+  if (
+    !value ||
+    typeof value !==
+      "object"
+  ) {
+    return {};
+  }
+
+  const reminders =
+    value as
+      Record<
+        string,
+        unknown
+      >;
+
+  if (
+    reminders.use_default ===
+    true
+  ) {
+    return {
+      use_default:
+        true,
+    };
+  }
+
+  const overrides =
+    Array.isArray(
+      reminders.overrides,
+    )
+      ? reminders
+          .overrides
+          .map(
+            (
+              reminder:
+                Record<
+                  string,
+                  unknown
+                >,
+            ) => {
+              const minutes =
+                Number(
+                  reminder
+                    ?.reminder_minutes,
+                );
+
+              const method =
+                String(
+                  reminder
+                    ?.reminder_method ||
+                  "popup",
+                )
+                  .trim()
+                  .toLowerCase();
+
+              if (
+                !Number.isFinite(
+                  minutes,
+                ) ||
+                minutes < 0
+              ) {
+                return null;
+              }
+
+              if (
+                ![
+                  "popup",
+                  "email",
+                ].includes(
+                  method,
+                )
+              ) {
+                return null;
+              }
+
+              return {
+                reminder_minutes:
+                  Math.round(
+                    minutes,
+                  ),
+
+                reminder_method:
+                  method,
+              };
+            },
+          )
+          .filter(Boolean)
+          .slice(
+            0,
+            5,
+          )
+      : [];
+
+  if (
+    overrides.length ===
+    0
+  ) {
+    return {};
+  }
+
+  return {
+    use_default:
+      false,
+
+    overrides,
+  };
+}
+
+
+function sanitizeConferencing(
+  value: unknown,
+) {
+  if (
+    !value ||
+    typeof value !==
+      "object"
+  ) {
+    return {};
+  }
+
+  const conference =
+    value as
+      Record<
+        string,
+        unknown
+      >;
+
+  const provider =
+    String(
+      conference.provider ||
+      "",
+    ).trim();
+
+  if (!provider) {
+    return {};
+  }
+
+  if (
+    conference.autocreate &&
+    typeof conference.autocreate ===
+      "object"
+  ) {
+    if (
+      ![
+        "Google Meet",
+        "Microsoft Teams",
+      ].includes(
+        provider,
+      )
+    ) {
+      return {};
+    }
+
+    return {
+      provider,
+
+      autocreate:
+        {},
+    };
+  }
+
+  if (
+    conference.details &&
+    typeof conference.details ===
+      "object"
+  ) {
+    const details =
+      conference.details as
+        Record<
+          string,
+          unknown
+        >;
+
+    const url =
+      String(
+        details.url ||
+        "",
+      ).trim();
+
+    if (!url) {
+      return {};
+    }
+
+    return {
+      provider,
+
+      details: {
+        url,
+      },
+    };
+  }
+
+  return {};
+}
+
+
 async function deleteCreatedProviderEvent(
   baseUri: string,
   apiKey: string,
@@ -498,7 +814,7 @@ Deno.serve(
           "events",
         )
         .select(
-          "id,workspace_id,title,description,location,starts_at,ends_at,status,source_provider,external_calendar_id,external_event_id,sync_metadata",
+          "id,workspace_id,title,description,location,starts_at,ends_at,status,event_timezone,participants,recurrence_rules,reminders,busy,visibility,conferencing,hide_participants,notify_participants,source_provider,external_calendar_id,external_event_id,sync_metadata",
         )
         .eq(
           "id",
@@ -626,6 +942,17 @@ Deno.serve(
       );
     }
 
+    const accountProvider =
+      String(
+        integration
+          ?.settings
+          ?.account_provider ||
+        "",
+      )
+        .trim()
+        .toLowerCase();
+
+
     const configuredCalendarId =
       String(
         integration
@@ -637,6 +964,155 @@ Deno.serve(
     const requestedCalendarId =
       configuredCalendarId ||
       "primary";
+
+    const timezone =
+      String(
+        localEvent
+          .event_timezone ||
+        "America/New_York",
+      ).trim();
+
+    const providerBody:
+      Record<
+        string,
+        unknown
+      > = {
+      title:
+        String(
+          localEvent.title ||
+          "Campaign Seat event",
+        ).slice(
+          0,
+          1024,
+        ),
+
+      description:
+        String(
+          localEvent.description ||
+          "",
+        ),
+
+      location:
+        String(
+          localEvent.location ||
+          "",
+        ).slice(
+          0,
+          255,
+        ),
+
+      busy:
+        localEvent.busy !==
+        false,
+
+      hide_participants:
+        localEvent
+          .hide_participants ===
+        true,
+
+      participants:
+        sanitizeParticipants(
+          localEvent.participants,
+        ),
+
+      when: {
+        start_time:
+          startTime,
+
+        end_time:
+          endTime,
+
+        start_timezone:
+          timezone,
+
+        end_timezone:
+          timezone,
+      },
+    };
+
+    const sanitizedRecurrence =
+      sanitizeRecurrence(
+        localEvent
+          .recurrence_rules,
+      );
+
+    if (
+      sanitizedRecurrence.length >
+      0
+    ) {
+      providerBody.recurrence =
+        sanitizedRecurrence;
+    }
+
+    /*
+     * Microsoft rejected reminder_method in the V51 test.
+     * The current create form intentionally uses Microsoft
+     * provider defaults, so omit reminder payloads entirely
+     * for Microsoft until its dedicated reminder editor ships.
+     */
+    if (
+      accountProvider !==
+      "microsoft"
+    ) {
+      const sanitizedReminders =
+        sanitizeReminders(
+          localEvent.reminders,
+        );
+
+      if (
+        Object.keys(
+          sanitizedReminders,
+        ).length >
+        0
+      ) {
+        providerBody.reminders =
+          sanitizedReminders;
+      }
+    }
+
+    const sanitizedConferencing =
+      sanitizeConferencing(
+        localEvent.conferencing,
+      );
+
+    if (
+      Object.keys(
+        sanitizedConferencing,
+      ).length >
+      0
+    ) {
+      providerBody.conferencing =
+        sanitizedConferencing;
+    }
+
+    const visibility =
+      String(
+        localEvent.visibility ||
+        "",
+      )
+        .trim()
+        .toLowerCase();
+
+    if (
+      [
+        "public",
+        "private",
+      ].includes(
+        visibility,
+      )
+    ) {
+      providerBody.visibility =
+        visibility;
+    } else if (
+      visibility ===
+        "default" &&
+      accountProvider ===
+        "google"
+    ) {
+      providerBody.visibility =
+        "default";
+    }
+
 
     const baseUri =
       nylasApiUri.replace(
@@ -654,6 +1130,21 @@ Deno.serve(
       .set(
         "calendar_id",
         requestedCalendarId,
+      );
+
+
+    createUrl
+      .searchParams
+      .set(
+        "notify_participants",
+        accountProvider ===
+        "microsoft"
+          ? "true"
+          : localEvent
+              .notify_participants !==
+            false
+            ? "true"
+            : "false",
       );
 
     let providerResponse:
@@ -679,30 +1170,9 @@ Deno.serve(
             },
 
             body:
-              JSON.stringify({
-                title:
-                  localEvent.title ||
-                  "Campaign Seat event",
-
-                description:
-                  localEvent.description ||
-                  "",
-
-                location:
-                  localEvent.location ||
-                  "",
-
-                busy:
-                  true,
-
-                when: {
-                  start_time:
-                    startTime,
-
-                  end_time:
-                    endTime,
-                },
-              }),
+              JSON.stringify(
+                providerBody,
+              ),
           },
         );
     } catch {
@@ -782,7 +1252,7 @@ Deno.serve(
         502,
         {
           error:
-            `The Campaign Seat event was saved, but Google Calendar creation failed (${providerResponse.status}).`,
+            `The Campaign Seat event was saved, but connected Calendar creation failed (${providerResponse.status}).`,
         },
       );
     }
@@ -803,7 +1273,7 @@ Deno.serve(
         502,
         {
           error:
-            "Google Calendar created the event but returned an invalid response.",
+            "The connected Calendar created the event but returned an invalid response.",
         },
       );
     }
@@ -845,7 +1315,7 @@ Deno.serve(
         502,
         {
           error:
-            "Google Calendar created the event but Campaign Seat did not receive its provider ID.",
+            "The connected Calendar created the event but Campaign Seat did not receive its provider ID.",
         },
       );
     }
@@ -883,6 +1353,19 @@ Deno.serve(
               providerEvent
                 .updated_at,
             ),
+
+          conferencing:
+            (
+              providerEvent
+                .conferencing &&
+              typeof providerEvent
+                .conferencing ===
+                "object"
+            )
+              ? providerEvent
+                  .conferencing
+              : localEvent
+                  .conferencing,
 
           sync_metadata: {
             ...(
@@ -930,7 +1413,7 @@ Deno.serve(
         500,
         {
           error:
-            "Google Calendar created the event, but Campaign Seat could not link it safely. The provider event was rolled back.",
+            "The connected Calendar created the event, but Campaign Seat could not link it safely. The provider event was rolled back.",
         },
       );
     }
@@ -944,6 +1427,9 @@ Deno.serve(
 
         alreadySynced:
           false,
+
+        richCreate:
+          true,
 
         providerEventId,
 
