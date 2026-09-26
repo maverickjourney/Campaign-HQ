@@ -3638,3 +3638,136 @@ label > span {
 }
 
 /* CAMPAIGN SEAT APPROVALS MOBILE DETAILS — END */
+
+
+/* CAMPAIGN SEAT V58.3 APPROVAL MODAL POLISH */
+
+/*
+ * Keep the document handoff visually subordinate to the
+ * editable approval fields:
+ *
+ * - compact linked-file control
+ * - aligned label / control baseline
+ * - predictable filename truncation
+ * - cleaner rhythm into Review brief
+ */
+
+.linkedDocumentField {
+  display: grid;
+  grid-template-columns:
+    126px
+    minmax(0, 1fr);
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+  padding: 2px 0 1px;
+}
+
+.linkedDocumentLabel {
+  color: #5f7a90;
+  font-size: 0.67rem;
+  font-weight: 850;
+  line-height: 1.2;
+}
+
+.linkedDocumentButton {
+  width: fit-content;
+  max-width: min(100%, 330px);
+  min-height: 40px;
+  justify-self: start;
+  gap: 8px;
+  padding: 0 12px;
+  border-color: #c8dce9;
+  border-radius: 10px;
+  color: #225f8d;
+  background: #fafdff;
+  box-shadow:
+    0 3px 10px
+    rgba(33, 83, 119, 0.035);
+  font-size: 0.72rem;
+  line-height: 1;
+  transition:
+    border-color 140ms ease,
+    background 140ms ease,
+    box-shadow 140ms ease,
+    transform 140ms ease;
+}
+
+.linkedDocumentButton:hover {
+  border-color: #9fc7df;
+  background: #f3f9fd;
+  box-shadow:
+    0 5px 14px
+    rgba(33, 83, 119, 0.07);
+  transform: translateY(-1px);
+}
+
+.linkedDocumentButton:focus-visible {
+  outline: 3px solid
+    rgba(49, 144, 202, 0.14);
+  outline-offset: 2px;
+}
+
+.linkedDocumentButton > svg {
+  flex: 0 0 auto;
+}
+
+.linkedDocumentName {
+  min-width: 0;
+  overflow: hidden;
+  color: #194f78;
+  font-weight: 850;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/*
+ * The full-width Review brief follows the linked document,
+ * so give it a small but deliberate separation without
+ * creating the oversized whitespace seen in the first pass.
+ */
+.linkedDocumentField + .fullField {
+  margin-top: 2px;
+}
+
+/*
+ * Slightly tighten the modal's vertical rhythm while
+ * preserving the existing two-column desktop structure.
+ */
+.approvalForm {
+  row-gap: 12px;
+}
+
+.modalFooter {
+  margin-top: 1px;
+  padding-top: 5px;
+}
+
+@media (max-width: 620px) {
+  .linkedDocumentField {
+    grid-template-columns: 1fr;
+    gap: 6px;
+    padding-top: 1px;
+  }
+
+  .linkedDocumentButton {
+    width: 100%;
+    max-width: none;
+    justify-content: flex-start;
+  }
+
+  .linkedDocumentButton
+  .linkedDocumentName {
+    flex: 1;
+    text-align: left;
+  }
+
+  .linkedDocumentButton
+  > svg:last-child {
+    margin-left: auto;
+  }
+
+  .linkedDocumentField + .fullField {
+    margin-top: 3px;
+  }
+}

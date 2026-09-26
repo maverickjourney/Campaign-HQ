@@ -3097,19 +3097,23 @@ export default function ApprovalsReferencePreview() {
 
               {form.sourceFileId && (
                 <div
-                  className={
-                    styles.fullField
-                  }
+                  className={`${styles.fullField} ${styles.linkedDocumentField}`}
                 >
-                  <span>
+                  <span
+                    className={
+                      styles.linkedDocumentLabel
+                    }
+                  >
                     Linked document
                   </span>
 
                   <button
-                    className={
-                      styles.secondaryButton
-                    }
+                    className={`${styles.secondaryButton} ${styles.linkedDocumentButton}`}
                     type="button"
+                    title={
+                      form.sourceFileName ||
+                      "Open campaign document"
+                    }
                     onClick={() =>
                       navigate(
                         `/documents?file=${encodeURIComponent(
@@ -3119,14 +3123,20 @@ export default function ApprovalsReferencePreview() {
                     }
                   >
                     <FolderKanban
-                      size={17}
+                      size={16}
                     />
 
-                    {form.sourceFileName ||
-                      "Open campaign document"}
+                    <span
+                      className={
+                        styles.linkedDocumentName
+                      }
+                    >
+                      {form.sourceFileName ||
+                        "Open campaign document"}
+                    </span>
 
                     <ArrowUpRight
-                      size={16}
+                      size={15}
                     />
                   </button>
                 </div>
