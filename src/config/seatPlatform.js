@@ -71,7 +71,7 @@ export const SEAT_CORE_MODULES = Object.freeze([
   {
     key: "documents",
     label: "Documents",
-    route: "/files",
+    route: "/documents",
     group: "core",
   },
   {

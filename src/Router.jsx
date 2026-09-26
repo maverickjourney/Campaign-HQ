@@ -813,6 +813,15 @@ export default function Router() {
         />
 
         <Route
+          path="/documents"
+          element={
+            <ProtectedRoute allowedExperiences={LEADERSHIP_EXPERIENCES}>
+              <DocumentsReferencePreview />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
           path="/documents-preview"
           element={
             <ProtectedRoute allowedExperiences={LEADERSHIP_EXPERIENCES}>

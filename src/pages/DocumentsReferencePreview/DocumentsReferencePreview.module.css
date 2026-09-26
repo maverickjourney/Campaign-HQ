@@ -3854,3 +3854,19 @@
     padding-left: 13px !important;
   }
 }
+
+
+/* CAMPAIGN SEAT V58.1 DOCUMENT APPROVAL CTA */
+
+.detailsActions button[data-request-approval="true"] {
+  grid-column: 1 / -1;
+  min-height: 44px;
+  border-color: #efc8cd;
+  background: #fff7f8;
+  color: #c22638;
+}
+
+.detailsActions button[data-request-approval="true"]:hover {
+  border-color: #e9aeb6;
+  background: #fff1f3;
+}

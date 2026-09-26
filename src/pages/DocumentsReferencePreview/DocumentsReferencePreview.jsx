@@ -41,9 +41,9 @@ import {
   useFilesCommandCenter,
 } from "../../hooks/useFilesCommandCenter";
 import {
+  getCampaignExperience,
   getCurrentUser,
   getCurrentWorkspace,
-  getRoleLabel,
 } from "../../utils/campaignSession";
 
 import styles from "./DocumentsReferencePreview.module.css";
@@ -394,12 +394,14 @@ export default function DocumentsReferencePreview() {
   const navigate = useNavigate();
   const workspace = getCurrentWorkspace();
   const user = getCurrentUser();
-  const roleLabel = getRoleLabel();
+
+  const campaignExperience =
+    getCampaignExperience();
 
   const leadershipAccess =
-    /candidate|consultant|manager|owner/i.test(
-      roleLabel,
-    );
+    campaignExperience
+      .showLeadership ===
+    true;
 
   const demoMode =
     new URLSearchParams(
@@ -477,6 +479,42 @@ export default function DocumentsReferencePreview() {
   const files = demoMode
     ? demoFiles
     : liveFiles;
+
+  /*
+   * /files is retained as a compatibility route for old
+   * activity links and bookmarks. Always canonicalize the
+   * visible product URL to /documents while preserving the
+   * exact selected-file query string.
+   */
+  useEffect(() => {
+    if (
+      location.pathname !==
+      "/files"
+    ) {
+      return;
+    }
+
+    navigate(
+      {
+        pathname:
+          "/documents",
+
+        search:
+          location.search,
+
+        hash:
+          location.hash,
+      },
+      {
+        replace: true,
+      },
+    );
+  }, [
+    location.hash,
+    location.pathname,
+    location.search,
+    navigate,
+  ]);
 
   useEffect(() => {
     const requestedFileId =
@@ -869,12 +907,31 @@ export default function DocumentsReferencePreview() {
     setSelectedFileId(fileId);
     setDetailsTab("overview");
     setDetailsExpanded(false);
+
+    navigate(
+      {
+        pathname:
+          "/documents",
+
+        search:
+          `?file=${encodeURIComponent(
+            fileId,
+          )}`,
+      },
+    );
   };
 
   const closeFileDetails = () => {
     setSelectedFileId("");
     setDetailsTab("overview");
     setDetailsExpanded(false);
+
+    navigate(
+      "/documents",
+      {
+        replace: true,
+      },
+    );
   };
 
   const requestDocumentApproval =
@@ -1795,6 +1852,7 @@ export default function DocumentsReferencePreview() {
                 {leadershipAccess && (
                   <button
                     type="button"
+                    data-request-approval="true"
                     onClick={() =>
                       requestDocumentApproval(
                         selectedFile,
