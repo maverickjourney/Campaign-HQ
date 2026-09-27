@@ -1072,25 +1072,28 @@ const canCreateTasks =
 
   const [sidebarOpen, setSidebarOpen] =
     useState(false);
+
   const [selectedTaskId, setSelectedTaskId] =
     useState(
       getRequestedTaskId,
     );
 
-  useEffect(() => {
-    if (
-      !getRequestedTaskId()
-    ) {
-      return;
-    }
-
-    /*
-     * Calendar may deep-link directly into a task.
-     * The task drawer keeps the selected ID after
-     * the query parameter is cleaned from the URL.
-     */
+  /*
+   * TASK_DEEP_LINK_V591
+   *
+   * Keep ?task=<id> in the browser URL while the task
+   * drawer is open.
+   *
+   * Clearing the query during the initial mount can lose
+   * the selected task when React development mode remounts
+   * the component. The query is now cleared only when the
+   * user explicitly closes the task drawer.
+   */
+  const closeTaskDetails = () => {
+    setSelectedTaskId("");
     clearRequestedTaskId();
-  }, []);
+  };
+
   const [viewMode, setViewMode] = useState("list");
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] =
@@ -5891,7 +5894,7 @@ const canCreateTasks =
           <button
             className={styles.drawerOverlay}
             type="button"
-            onClick={() => setSelectedTaskId("")}
+            onClick={closeTaskDetails}
             aria-label="Close task details"
           />
 
@@ -5904,8 +5907,8 @@ const canCreateTasks =
 
               <button
                 type="button"
-                onClick={() =>
-                  setSelectedTaskId("")
+                onClick={
+                  closeTaskDetails
                 }
               >
                 <X size={21} />
