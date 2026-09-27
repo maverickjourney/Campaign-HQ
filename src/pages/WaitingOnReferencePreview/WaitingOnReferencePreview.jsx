@@ -1352,6 +1352,17 @@ export default function WaitingOnReferencePreview() {
     ],
   );
 
+  /*
+   * WAITING_COUNT_TRUTH_V601
+   *
+   * The table, results line, and footer all describe the
+   * same filtered Waiting On view. Raw `records.length`
+   * includes resolved records that may not be visible here,
+   * so it must not be presented as this view's denominator.
+   */
+  const visibleWaitingCount =
+    visibleRecords.length;
+
   const selectedRecord =
     records.find(
       (record) =>
@@ -2384,11 +2395,11 @@ export default function WaitingOnReferencePreview() {
             <div className={styles.resultsLine}>
               <div>
                 <strong>
-                  {visibleRecords.length}
+                  {visibleWaitingCount}
                 </strong>
 
                 <span>
-                  {visibleRecords.length ===
+                  {visibleWaitingCount ===
                   1
                     ? "waiting item"
                     : "waiting items"}
@@ -2584,8 +2595,13 @@ export default function WaitingOnReferencePreview() {
 
             <footer className={styles.tableFooter}>
               <span>
-                Showing {visibleRecords.length} of{" "}
-                {records.length} waiting items
+                Showing{" "}
+                {visibleWaitingCount}{" "}
+                {visibleWaitingCount ===
+                1
+                  ? "waiting item"
+                  : "waiting items"}{" "}
+                in this view
               </span>
 
               <span>
