@@ -49,6 +49,10 @@ import {
 } from "../../hooks/useApprovalTaskLinks";
 
 import {
+  useApprovalDecisionHistory,
+} from "../../hooks/useApprovalDecisionHistory";
+
+import {
   getCampaignExperience,
   getCurrentUser,
   getCurrentWorkspace,
@@ -955,6 +959,27 @@ export default function ApprovalsReferencePreview() {
         approval.id ===
         selectedApprovalId,
     ) || null;
+
+  const {
+    history:
+      approvalDecisionHistory,
+    isLoading:
+      approvalDecisionHistoryLoading,
+    error:
+      approvalDecisionHistoryError,
+  } =
+    useApprovalDecisionHistory({
+      workspaceId:
+        demoMode
+          ? ""
+          : workspace.id,
+
+      approvalId:
+        demoMode
+          ? ""
+          : selectedApproval?.id ||
+            "",
+    });
 
   useEffect(() => {
     setTaskLinkSelection("");
@@ -2992,6 +3017,13 @@ export default function ApprovalsReferencePreview() {
                     styles.timeline
                   }
                 >
+                  {/*
+                   * APPROVAL_DECISION_HISTORY_V61
+                   *
+                   * Request creation remains anchored to the
+                   * approval row. Every later status transition
+                   * comes from the immutable decision ledger.
+                   */}
                   <article>
                     <i />
 
@@ -3016,60 +3048,165 @@ export default function ApprovalsReferencePreview() {
                     </div>
                   </article>
 
-                  <article>
-                    <i />
+                  {approvalDecisionHistoryLoading && (
+                    <article>
+                      <i />
 
-                    <div>
-                      <strong>
-                        Review owner
-                        assigned
-                      </strong>
+                      <div>
+                        <strong>
+                          Loading decision history
+                        </strong>
 
-                      <p>
-                        {getPersonName(
-                          selectedApproval.assigned_to,
-                          team,
-                        )}
-                      </p>
+                        <p>
+                          Retrieving the preserved
+                          approval timeline.
+                        </p>
 
-                      <span>
-                        {formatDateTime(
-                          selectedApproval.updated_at,
-                        )}
-                      </span>
-                    </div>
-                  </article>
+                        <span>
+                          Loading…
+                        </span>
+                      </div>
+                    </article>
+                  )}
 
-                  <article>
-                    <i />
+                  {!approvalDecisionHistoryLoading &&
+                    approvalDecisionHistoryError && (
+                      <article>
+                        <i />
 
-                    <div>
-                      <strong>
-                        {selectedApproval.reviewed_at
-                          ? getStatusMeta(
-                              selectedApproval.status,
-                            ).label
-                          : "Decision pending"}
-                      </strong>
+                        <div>
+                          <strong>
+                            Decision history unavailable
+                          </strong>
 
-                      <p>
-                        {selectedApproval.reviewed_at
-                          ? `Reviewed by ${getPersonName(
+                          <p>
+                            {
+                              approvalDecisionHistoryError
+                            }
+                          </p>
+
+                          <span>
+                            Current approval state
+                            remains available.
+                          </span>
+                        </div>
+                      </article>
+                    )}
+
+                  {!approvalDecisionHistoryLoading &&
+                    !approvalDecisionHistoryError &&
+                    approvalDecisionHistory.map(
+                      (event) => (
+                        <article
+                          key={
+                            event.id
+                          }
+                        >
+                          <i />
+
+                          <div>
+                            <strong>
+                              {
+                                getStatusMeta(
+                                  event.to_status,
+                                ).label
+                              }
+                            </strong>
+
+                            <p>
+                              {event.decision_notes ||
+                                (
+                                  event.from_status
+                                    ? `Status changed from ${
+                                        getStatusMeta(
+                                          event.from_status,
+                                        ).label
+                                      } to ${
+                                        getStatusMeta(
+                                          event.to_status,
+                                        ).label
+                                      }.`
+                                    : `Status changed to ${
+                                        getStatusMeta(
+                                          event.to_status,
+                                        ).label
+                                      }.`
+                                )}
+                            </p>
+
+                            <span>
+                              {getPersonName(
+                                event.actor_user_id,
+                                team,
+                              )}
+                              {" · "}
+                              {formatDateTime(
+                                event.occurred_at,
+                              )}
+                            </span>
+                          </div>
+                        </article>
+                      ),
+                    )}
+
+                  {!approvalDecisionHistoryLoading &&
+                    !approvalDecisionHistoryError &&
+                    !approvalDecisionHistory.length &&
+                    selectedApproval.reviewed_at && (
+                      <article>
+                        <i />
+
+                        <div>
+                          <strong>
+                            {
+                              getStatusMeta(
+                                selectedApproval.status,
+                              ).label
+                            }
+                          </strong>
+
+                          <p>
+                            {selectedApproval.review_notes ||
+                              "Decision recorded before the approval history ledger was enabled."}
+                          </p>
+
+                          <span>
+                            {getPersonName(
                               selectedApproval.reviewed_by,
                               team,
-                            )}`
-                          : "No final decision has been recorded."}
-                      </p>
-
-                      <span>
-                        {selectedApproval.reviewed_at
-                          ? formatDateTime(
+                            )}
+                            {" · "}
+                            {formatDateTime(
                               selectedApproval.reviewed_at,
-                            )
-                          : "Awaiting review"}
-                      </span>
-                    </div>
-                  </article>
+                            )}
+                          </span>
+                        </div>
+                      </article>
+                    )}
+
+                  {!approvalDecisionHistoryLoading &&
+                    !approvalDecisionHistoryError &&
+                    !approvalDecisionHistory.length &&
+                    !selectedApproval.reviewed_at && (
+                      <article>
+                        <i />
+
+                        <div>
+                          <strong>
+                            Decision pending
+                          </strong>
+
+                          <p>
+                            No review decision has
+                            been recorded yet.
+                          </p>
+
+                          <span>
+                            Awaiting review
+                          </span>
+                        </div>
+                      </article>
+                    )}
                 </section>
               )}
 
