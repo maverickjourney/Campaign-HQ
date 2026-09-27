@@ -78,7 +78,7 @@ export function useFilesCommandCenter({ workspaceId, userId }) {
           supabase
             .from("approvals")
             .select(
-              "id, title, status, approval_type, source_file_id, due_at, updated_at",
+              "id, title, status, approval_type, source_file_id, due_at, assigned_to, submitted_by, reviewed_by, reviewed_at, review_notes, updated_at",
             )
             .eq(
               "workspace_id",
@@ -147,6 +147,21 @@ export function useFilesCommandCenter({ workspaceId, userId }) {
               due_at:
                 approval.due_at,
 
+              assigned_to:
+                approval.assigned_to,
+
+              submitted_by:
+                approval.submitted_by,
+
+              reviewed_by:
+                approval.reviewed_by,
+
+              reviewed_at:
+                approval.reviewed_at,
+
+              review_notes:
+                approval.review_notes,
+
               updated_at:
                 approval.updated_at,
             });
@@ -208,6 +223,66 @@ export function useFilesCommandCenter({ workspaceId, userId }) {
 
     return () => window.clearTimeout(timeoutId);
   }, [loadFiles]);
+
+  /*
+   * DOCUMENT_APPROVAL_REALTIME_V62
+   *
+   * Approval decisions should flow back to the source
+   * document without requiring a manual Documents refresh.
+   */
+  useEffect(() => {
+    if (!workspaceId) {
+      return undefined;
+    }
+
+    let refreshTimer = null;
+
+    const scheduleRefresh =
+      () => {
+        window.clearTimeout(
+          refreshTimer,
+        );
+
+        refreshTimer =
+          window.setTimeout(
+            () => {
+              loadFiles();
+            },
+            180,
+          );
+      };
+
+    const channel =
+      supabase
+        .channel(
+          `document-approvals-${workspaceId}`,
+        )
+        .on(
+          "postgres_changes",
+          {
+            event: "*",
+            schema: "public",
+            table: "approvals",
+            filter:
+              `workspace_id=eq.${workspaceId}`,
+          },
+          scheduleRefresh,
+        )
+        .subscribe();
+
+    return () => {
+      window.clearTimeout(
+        refreshTimer,
+      );
+
+      supabase.removeChannel(
+        channel,
+      );
+    };
+  }, [
+    loadFiles,
+    workspaceId,
+  ]);
 
   const uploadFiles = useCallback(
     async (selectedFiles, category) => {

@@ -4018,3 +4018,210 @@ small span[data-status="draft"] {
     height: 34px;
   }
 }
+
+
+/* =========================================================
+   DOCUMENT APPROVAL OUTCOME V62
+   ========================================================= */
+
+.approvalOutcomePanel {
+  display: grid;
+  gap: 11px;
+  padding: 16px 18px;
+  border-bottom: 1px solid #d7e5ef;
+  background: #fbfdff;
+}
+
+.approvalOutcomePanel > header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.approvalOutcomePanel > header > div {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+
+.approvalOutcomePanel > header small {
+  color: #7c94aa;
+  font-size: 9px;
+  font-weight: 850;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.approvalOutcomePanel h3 {
+  margin: 0;
+  color: #12395e;
+  font-size: 15px;
+}
+
+.approvalOutcomePanel > header > span {
+  display: inline-flex;
+  align-items: center;
+  min-height: 28px;
+  flex: 0 0 auto;
+  padding: 0 10px;
+  border-radius: 999px;
+  background: #eef4f8;
+  color: #486c88;
+  font-size: 10px;
+  font-weight: 800;
+}
+
+.approvalOutcomePanel
+> header
+> span[data-status="approved"] {
+  background: #e6f7ee;
+  color: #197653;
+}
+
+.approvalOutcomePanel
+> header
+> span[data-status="changes_requested"] {
+  background: #fff1d8;
+  color: #9b6410;
+}
+
+.approvalOutcomePanel
+> header
+> span[data-status="rejected"] {
+  background: #fdebed;
+  color: #b72e3c;
+}
+
+.approvalOutcomePanel
+> header
+> span[data-status="pending"],
+.approvalOutcomePanel
+> header
+> span[data-status="draft"] {
+  background: #edf4fa;
+  color: #3d698a;
+}
+
+.approvalOutcomePanel > p {
+  margin: 0;
+  color: #587793;
+  font-size: 11px;
+  line-height: 1.55;
+}
+
+.approvalOutcomeMeta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px 13px;
+  color: #8196a9;
+  font-size: 10px;
+}
+
+.approvalOutcomePanel > button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  justify-self: start;
+  gap: 7px;
+  min-height: 36px;
+  padding: 0 12px;
+  border: 1px solid #c8ddec;
+  border-radius: 9px;
+  background: #ffffff;
+  color: #246895;
+  font: inherit;
+  font-size: 11px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.approvalOutstanding {
+  display: grid;
+  grid-template-columns:
+    auto
+    minmax(0, 1fr)
+    auto;
+  align-items: center;
+  gap: 9px;
+  padding: 10px;
+  border: 1px solid #efd8a5;
+  border-radius: 10px;
+  background: #fff9ec;
+  color: #9a6b16;
+}
+
+.approvalOutstanding > svg {
+  flex: 0 0 auto;
+}
+
+.approvalOutstanding > span {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+.approvalOutstanding strong {
+  color: #7f5711;
+  font-size: 10px;
+}
+
+.approvalOutstanding small {
+  color: #9a7b43;
+  font-size: 9px;
+  line-height: 1.4;
+}
+
+.approvalOutstanding > button {
+  min-height: 32px;
+  padding: 0 10px;
+  border: 1px solid #e5ca91;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #876018;
+  font: inherit;
+  font-size: 9px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+/*
+ * Expanded Overview keeps the secure preview on the left
+ * while approval truth, file metadata, and description form
+ * a clean right-hand review column.
+ */
+.detailsPanelExpanded
+.overviewWorkspace {
+  grid-template-areas:
+    "preview approval"
+    "preview metadata"
+    "preview description" !important;
+}
+
+.detailsPanelExpanded
+.overviewWorkspace
+.approvalOutcomePanel {
+  grid-area: approval;
+  align-self: start;
+}
+
+@media (max-width: 980px) {
+  .detailsPanelExpanded
+  .overviewWorkspace {
+    display: block !important;
+    min-height: 0 !important;
+  }
+}
+
+@media (max-width: 650px) {
+  .approvalOutstanding {
+    grid-template-columns:
+      auto
+      minmax(0, 1fr);
+  }
+
+  .approvalOutstanding > button {
+    grid-column: 1 / -1;
+    width: 100%;
+  }
+}

@@ -276,23 +276,55 @@ const OPEN_DOCUMENT_APPROVAL_STATUSES = [
   "changes_requested",
 ];
 
-function getOpenLinkedApproval(
+function getLinkedApprovals(
   file,
 ) {
   return (
     file?.linked_records ||
     []
-  ).find(
+  ).filter(
     (record) =>
       record &&
       typeof record ===
         "object" &&
       record.kind ===
-        "approval" &&
+        "approval",
+  );
+}
+
+function getLatestLinkedApproval(
+  file,
+) {
+  return (
+    getLinkedApprovals(
+      file,
+    )[0] ||
+    null
+  );
+}
+
+function getOpenLinkedApprovals(
+  file,
+) {
+  return getLinkedApprovals(
+    file,
+  ).filter(
+    (record) =>
       OPEN_DOCUMENT_APPROVAL_STATUSES.includes(
         record.status,
       ),
-  ) || null;
+  );
+}
+
+function getOpenLinkedApproval(
+  file,
+) {
+  return (
+    getOpenLinkedApprovals(
+      file,
+    )[0] ||
+    null
+  );
 }
 
 function linkedRecordSearchValues(
@@ -942,6 +974,35 @@ export default function DocumentsReferencePreview() {
         file.id === selectedFileId,
     ) || null;
 
+  /*
+   * DOCUMENT_APPROVAL_OUTCOME_V62
+   *
+   * Linked approvals arrive newest-first from the Files
+   * command center. The newest record is the latest approval
+   * activity, while open approvals are tracked separately so
+   * legacy duplicate QA rows remain visible and truthful.
+   */
+  const selectedFileLatestApproval =
+    getLatestLinkedApproval(
+      selectedFile,
+    );
+
+  const selectedFileOpenApprovals =
+    getOpenLinkedApprovals(
+      selectedFile,
+    );
+
+  const selectedFileOtherOpenApprovals =
+    selectedFileOpenApprovals.filter(
+      (approval) =>
+        approval.id !==
+        selectedFileLatestApproval?.id,
+    );
+
+  const selectedFilePrimaryOpenApproval =
+    selectedFileOpenApprovals[0] ||
+    null;
+
   const recentCount =
     files.filter(isRecent).length;
 
@@ -975,6 +1036,35 @@ export default function DocumentsReferencePreview() {
 
     return "Campaign team";
   };
+
+  const approvalPersonName =
+    (approval) => {
+      const personId =
+        approval?.reviewed_by ||
+        approval?.assigned_to ||
+        "";
+
+      if (
+        personId &&
+        personId === user.id
+      ) {
+        return user.name;
+      }
+
+      if (
+        approval?.reviewed_by
+      ) {
+        return "Campaign reviewer";
+      }
+
+      if (
+        approval?.assigned_to
+      ) {
+        return "Assigned reviewer";
+      }
+
+      return "Campaign leadership";
+    };
 
   const openFileDetails = (fileId) => {
     setSelectedFileId(fileId);
@@ -1953,11 +2043,11 @@ export default function DocumentsReferencePreview() {
                       size={17}
                     />
 
-                    {getOpenLinkedApproval(
-                      selectedFile,
-                    )
+                    {selectedFilePrimaryOpenApproval
                       ? "Open approval"
-                      : "Request approval"}
+                      : selectedFileLatestApproval
+                        ? "Request another approval"
+                        : "Request approval"}
                   </button>
                 )}
               </div>
@@ -2071,6 +2161,155 @@ export default function DocumentsReferencePreview() {
                         Open secure preview
                       </button>
                     </section>
+
+                    {selectedFileLatestApproval && (
+                      <section
+                        className={
+                          styles.approvalOutcomePanel
+                        }
+                        data-status={
+                          selectedFileLatestApproval.status ||
+                          "pending"
+                        }
+                      >
+                        <header>
+                          <div>
+                            <small>
+                              Latest approval activity
+                            </small>
+
+                            <h3>
+                              {APPROVAL_STATUS_LABELS[
+                                selectedFileLatestApproval.status
+                              ] ||
+                                "Pending review"}
+                            </h3>
+                          </div>
+
+                          <span
+                            data-status={
+                              selectedFileLatestApproval.status ||
+                              "pending"
+                            }
+                          >
+                            {APPROVAL_STATUS_LABELS[
+                              selectedFileLatestApproval.status
+                            ] ||
+                              "Pending review"}
+                          </span>
+                        </header>
+
+                        <p>
+                          {selectedFileLatestApproval.review_notes ||
+                            (
+                              selectedFileLatestApproval.status ===
+                              "approved"
+                                ? "This campaign document was approved."
+                                : selectedFileLatestApproval.status ===
+                                    "rejected"
+                                  ? "This campaign document was rejected."
+                                  : selectedFileLatestApproval.status ===
+                                      "changes_requested"
+                                    ? "Changes were requested before this document can be approved."
+                                    : "This document is awaiting a campaign review decision."
+                            )}
+                        </p>
+
+                        <div
+                          className={
+                            styles.approvalOutcomeMeta
+                          }
+                        >
+                          <span>
+                            {selectedFileLatestApproval.reviewed_at
+                              ? `Reviewed by ${approvalPersonName(
+                                  selectedFileLatestApproval,
+                                )}`
+                              : `Review owner: ${approvalPersonName(
+                                  selectedFileLatestApproval,
+                                )}`}
+                          </span>
+
+                          <span>
+                            {selectedFileLatestApproval.reviewed_at
+                              ? formatDateTime(
+                                  selectedFileLatestApproval.reviewed_at,
+                                )
+                              : selectedFileLatestApproval.due_at
+                                ? `Due ${formatDateTime(
+                                    selectedFileLatestApproval.due_at,
+                                  )}`
+                                : "No decision recorded yet"}
+                          </span>
+                        </div>
+
+                        <button
+                          type="button"
+                          onClick={() =>
+                            navigate(
+                              `/approvals?approval=${encodeURIComponent(
+                                selectedFileLatestApproval.id,
+                              )}`,
+                            )
+                          }
+                        >
+                          <ArrowUpRight
+                            size={16}
+                          />
+
+                          {selectedFileLatestApproval.reviewed_at
+                            ? "Open decision"
+                            : "Open review"}
+                        </button>
+
+                        {selectedFileOtherOpenApprovals.length >
+                          0 && (
+                          <div
+                            className={
+                              styles.approvalOutstanding
+                            }
+                          >
+                            <AlertTriangle
+                              size={17}
+                            />
+
+                            <span>
+                              <strong>
+                                {
+                                  selectedFileOtherOpenApprovals.length
+                                }{" "}
+                                additional review
+                                {selectedFileOtherOpenApprovals.length ===
+                                1
+                                  ? ""
+                                  : "s"}{" "}
+                                remain open
+                              </strong>
+
+                              <small>
+                                This document still has
+                                legacy or follow-up approval
+                                work in motion.
+                              </small>
+                            </span>
+
+                            <button
+                              type="button"
+                              onClick={() =>
+                                navigate(
+                                  `/approvals?approval=${encodeURIComponent(
+                                    selectedFileOtherOpenApprovals[0]
+                                      .id,
+                                  )}`,
+                                )
+                              }
+                            >
+                              Open active review
+                            </button>
+                          </div>
+                        )}
+                      </section>
+                    )}
 
                     <section className={styles.metadata}>
                       <h3>File information</h3>
