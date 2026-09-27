@@ -130,6 +130,41 @@ const EMPTY_FORM = {
   dueTime: "17:00",
 };
 
+function getRequestedWaitingRecordKey(
+  search,
+) {
+  const params =
+    new URLSearchParams(
+      search ||
+        (
+          typeof window !==
+          "undefined"
+            ? window.location.search
+            : ""
+        ),
+    );
+
+  const approvalId =
+    params.get(
+      "approval",
+    );
+
+  if (approvalId) {
+    return `approval:${approvalId}`;
+  }
+
+  const taskId =
+    params.get(
+      "task",
+    );
+
+  if (taskId) {
+    return `task:${taskId}`;
+  }
+
+  return "";
+}
+
 const DEMO_TASK_BLUEPRINTS = [
   {
     title: "Receive corrected precinct map from elections office",
@@ -833,7 +868,12 @@ export default function WaitingOnReferencePreview() {
   const [
     selectedRecordKey,
     setSelectedRecordKey,
-  ] = useState("");
+  ] = useState(
+    () =>
+      getRequestedWaitingRecordKey(
+        location.search,
+      ),
+  );
 
   const [modalMode, setModalMode] =
     useState("");
@@ -1319,6 +1359,143 @@ export default function WaitingOnReferencePreview() {
         selectedRecordKey,
     ) || null;
 
+  /*
+   * WAITING_ON_DEEP_LINK_V60
+   *
+   * Keep the selected approval/task in the URL while its
+   * Waiting On details are open. This makes approval
+   * follow-through directly addressable and prevents the
+   * same dev-remount issue already fixed on Tasks.
+   */
+  const openWaitingRecord =
+    useCallback(
+      (record) => {
+        if (
+          !record?.id ||
+          !record?.kind
+        ) {
+          return;
+        }
+
+        setSelectedRecordKey(
+          record.key,
+        );
+
+        const params =
+          new URLSearchParams(
+            location.search,
+          );
+
+        params.delete(
+          "approval",
+        );
+
+        params.delete(
+          "task",
+        );
+
+        params.set(
+          record.kind ===
+            "approval"
+            ? "approval"
+            : "task",
+          record.id,
+        );
+
+        navigate(
+          {
+            pathname:
+              location.pathname,
+
+            search:
+              `?${params.toString()}`,
+          },
+          {
+            replace: true,
+          },
+        );
+      },
+      [
+        location.pathname,
+        location.search,
+        navigate,
+      ],
+    );
+
+  const closeWaitingDetails =
+    useCallback(
+      () => {
+        setSelectedRecordKey(
+          "",
+        );
+
+        const params =
+          new URLSearchParams(
+            location.search,
+          );
+
+        const hadDeepLink =
+          params.has(
+            "approval",
+          ) ||
+          params.has(
+            "task",
+          );
+
+        if (!hadDeepLink) {
+          return;
+        }
+
+        params.delete(
+          "approval",
+        );
+
+        params.delete(
+          "task",
+        );
+
+        navigate(
+          {
+            pathname:
+              location.pathname,
+
+            search:
+              params.toString()
+                ? `?${params.toString()}`
+                : "",
+          },
+          {
+            replace: true,
+          },
+        );
+      },
+      [
+        location.pathname,
+        location.search,
+        navigate,
+      ],
+    );
+
+  useEffect(() => {
+    const requestedKey =
+      getRequestedWaitingRecordKey(
+        location.search,
+      );
+
+    if (
+      requestedKey &&
+      requestedKey !==
+        selectedRecordKey
+    ) {
+      setSelectedRecordKey(
+        requestedKey,
+      );
+    }
+  }, [
+    location.search,
+    selectedRecordKey,
+  ]);
+
   const loading =
     !demoMode &&
     (
@@ -1376,7 +1553,7 @@ export default function WaitingOnReferencePreview() {
     setTypeFilter("all");
     setOwnerFilter("all");
     setSortMode("due");
-    setSelectedRecordKey("");
+    closeWaitingDetails();
   };
 
   const chooseSummary = (key) => {
@@ -1390,7 +1567,7 @@ export default function WaitingOnReferencePreview() {
     setTypeFilter("all");
     setOwnerFilter("all");
     setSortMode("due");
-    setSelectedRecordKey("");
+    closeWaitingDetails();
   };
 
   const clearFilters = () => {
@@ -1421,7 +1598,11 @@ export default function WaitingOnReferencePreview() {
     if (
       record.kind !== "task"
     ) {
-      navigate("/approvals");
+      navigate(
+        `/approvals?approval=${encodeURIComponent(
+          record.id,
+        )}`,
+      );
       return;
     }
 
@@ -1699,7 +1880,11 @@ export default function WaitingOnReferencePreview() {
       if (
         record.kind !== "task"
       ) {
-        navigate("/approvals");
+        navigate(
+          `/approvals?approval=${encodeURIComponent(
+            record.id,
+          )}`,
+        );
         return;
       }
 
@@ -1769,7 +1954,11 @@ export default function WaitingOnReferencePreview() {
       if (
         record.kind !== "task"
       ) {
-        navigate("/approvals");
+        navigate(
+          `/approvals?approval=${encodeURIComponent(
+            record.id,
+          )}`,
+        );
         return;
       }
 
@@ -1837,7 +2026,7 @@ export default function WaitingOnReferencePreview() {
     };
 
   const handleRefresh = () => {
-    setSelectedRecordKey("");
+    closeWaitingDetails();
 
     if (demoMode) {
       setDemoTasks(
@@ -2287,8 +2476,8 @@ export default function WaitingOnReferencePreview() {
                                 : ""
                             }`}
                             onClick={() =>
-                              setSelectedRecordKey(
-                                record.key,
+                              openWaitingRecord(
+                                record,
                               )
                             }
                           >
@@ -2296,11 +2485,13 @@ export default function WaitingOnReferencePreview() {
                               <button
                                 className={styles.waitingName}
                                 type="button"
-                                onClick={() =>
-                                  setSelectedRecordKey(
-                                    record.key,
-                                  )
-                                }
+                                onClick={(event) => {
+                                  event.stopPropagation();
+
+                                  openWaitingRecord(
+                                    record,
+                                  );
+                                }}
                               >
                                 <strong>
                                   {record.title}
@@ -2421,10 +2612,8 @@ export default function WaitingOnReferencePreview() {
 
                 <button
                   type="button"
-                  onClick={() =>
-                    setSelectedRecordKey(
-                      "",
-                    )
+                  onClick={
+                    closeWaitingDetails
                   }
                   aria-label="Close Waiting On details"
                 >
@@ -2651,12 +2840,14 @@ export default function WaitingOnReferencePreview() {
                     type="button"
                     onClick={() =>
                       navigate(
-                        "/approvals",
+                        `/approvals?approval=${encodeURIComponent(
+                          selectedRecord.id,
+                        )}`,
                       )
                     }
                   >
                     <ExternalLink size={16} />
-                    Open Approvals
+                    Open approval
                   </button>
                 ) : (
                   <>

@@ -3138,7 +3138,9 @@ export default function ApprovalsReferencePreview() {
                     type="button"
                     onClick={() =>
                       navigate(
-                        "/waiting-on",
+                        `/waiting-on?approval=${encodeURIComponent(
+                          selectedApproval.id,
+                        )}`,
                       )
                     }
                   >
@@ -3152,9 +3154,9 @@ export default function ApprovalsReferencePreview() {
                       </strong>
 
                       <small>
-                        Check blocked
-                        responses and
-                        dependencies
+                        Open this decision
+                        in campaign
+                        follow-through
                       </small>
                     </span>
 
