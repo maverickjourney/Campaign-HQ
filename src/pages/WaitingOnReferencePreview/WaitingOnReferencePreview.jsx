@@ -331,6 +331,48 @@ function recordIsResolved(record) {
   return record.resolved;
 }
 
+/*
+ * WAITING_RESOLVED_HISTORY_V64
+ *
+ * Resolved history keeps the exact source outcome rather than
+ * flattening every completed record into a generic "Resolved".
+ */
+function resolvedStatusLabel(record) {
+  if (!record?.resolved) {
+    return "";
+  }
+
+  if (record.kind === "approval") {
+    if (record.status === "approved") {
+      return "Approved";
+    }
+
+    if (record.status === "rejected") {
+      return "Rejected";
+    }
+
+    return "Decision recorded";
+  }
+
+  if (record.status === "archived") {
+    return "Archived";
+  }
+
+  return "Resolved";
+}
+
+function resolvedStatusTone(record) {
+  if (record?.status === "rejected") {
+    return "rejected";
+  }
+
+  if (record?.status === "approved") {
+    return "approved";
+  }
+
+  return "resolved";
+}
+
 function dueTimestamp(record) {
   if (!record.dueAt) {
     return Number.POSITIVE_INFINITY;
@@ -754,6 +796,15 @@ function normalizeTaskRecord(
       task.tags || [],
     resolved:
       taskIsResolved(task),
+    resolvedAt:
+      task.completed_at ||
+      (
+        task.status === "archived"
+          ? task.updated_at
+          : null
+      ),
+    resolvedById: "",
+    sourceFileId: "",
     raw: task,
   };
 }
@@ -806,6 +857,17 @@ function normalizeApprovalRecord(
       approval.updated_at,
     tags: [],
     resolved,
+    resolvedAt:
+      resolved
+        ? (
+            approval.reviewed_at ||
+            approval.updated_at
+          )
+        : null,
+    resolvedById:
+      approval.reviewed_by || "",
+    sourceFileId:
+      approval.source_file_id || "",
     reviewNotes:
       approval.review_notes || "",
     raw: approval,
@@ -1316,6 +1378,25 @@ export default function WaitingOnReferencePreview() {
           }
 
           if (
+            sortMode === "resolved"
+          ) {
+            return (
+              new Date(
+                right.resolvedAt ||
+                  right.updatedAt ||
+                  right.createdAt ||
+                  0,
+              ).getTime() -
+              new Date(
+                left.resolvedAt ||
+                  left.updatedAt ||
+                  left.createdAt ||
+                  0,
+              ).getTime()
+            );
+          }
+
+          if (
             sortMode === "updated"
           ) {
             return (
@@ -1369,6 +1450,14 @@ export default function WaitingOnReferencePreview() {
         record.key ===
         selectedRecordKey,
     ) || null;
+
+  const selectedResolutionDate =
+    selectedRecord?.resolved
+      ? formatDateTime(
+          selectedRecord.resolvedAt ||
+          selectedRecord.updatedAt,
+        )
+      : null;
 
   /*
    * WAITING_ON_DEEP_LINK_V60
@@ -1563,7 +1652,11 @@ export default function WaitingOnReferencePreview() {
     setSearch("");
     setTypeFilter("all");
     setOwnerFilter("all");
-    setSortMode("due");
+    setSortMode(
+      tab === "resolved"
+        ? "resolved"
+        : "due",
+    );
     closeWaitingDetails();
   };
 
@@ -1577,7 +1670,11 @@ export default function WaitingOnReferencePreview() {
     setSearch("");
     setTypeFilter("all");
     setOwnerFilter("all");
-    setSortMode("due");
+    setSortMode(
+      key === "resolved"
+        ? "resolved"
+        : "due",
+    );
     closeWaitingDetails();
   };
 
@@ -1585,7 +1682,11 @@ export default function WaitingOnReferencePreview() {
     setSearch("");
     setTypeFilter("all");
     setOwnerFilter("all");
-    setSortMode("due");
+    setSortMode(
+      activeTab === "resolved"
+        ? "resolved"
+        : "due",
+    );
 
     setSummaryFilter(
       activeTab === "resolved"
@@ -2133,7 +2234,12 @@ export default function WaitingOnReferencePreview() {
     Boolean(search) ||
     typeFilter !== "all" ||
     ownerFilter !== "all" ||
-    sortMode !== "due" ||
+    sortMode !==
+      (
+        activeTab === "resolved"
+          ? "resolved"
+          : "due"
+      ) ||
     ![
       "all",
       "resolved",
@@ -2378,6 +2484,13 @@ export default function WaitingOnReferencePreview() {
                       )
                     }
                   >
+                    {activeTab ===
+                      "resolved" && (
+                      <option value="resolved">
+                        Resolution date
+                      </option>
+                    )}
+
                     <option value="due">
                       Expected response
                     </option>
@@ -2423,7 +2536,12 @@ export default function WaitingOnReferencePreview() {
                     <th>Waiting on</th>
                     <th>Person or group</th>
                     <th>Owner</th>
-                    <th>Expected response</th>
+                    <th>
+                      {activeTab ===
+                      "resolved"
+                        ? "Resolved"
+                        : "Expected response"}
+                    </th>
                     <th>Health</th>
                     <th>Type</th>
                   </tr>
@@ -2461,7 +2579,12 @@ export default function WaitingOnReferencePreview() {
                       (record) => {
                         const due =
                           formatDateTime(
-                            record.dueAt,
+                            record.resolved
+                              ? (
+                                  record.resolvedAt ||
+                                  record.updatedAt
+                                )
+                              : record.dueAt,
                           );
 
                         const health =
@@ -2619,10 +2742,17 @@ export default function WaitingOnReferencePreview() {
                   </span>
 
                   <strong>
-                    {selectedRecord.kind ===
-                    "approval"
-                      ? "Approval dependency"
-                      : "Campaign dependency"}
+                    {selectedRecord.resolved
+                      ? (
+                          selectedRecord.kind ===
+                          "approval"
+                            ? "Resolved approval"
+                            : "Resolved dependency"
+                        )
+                      : selectedRecord.kind ===
+                          "approval"
+                        ? "Approval dependency"
+                        : "Campaign dependency"}
                   </strong>
                 </div>
 
@@ -2640,32 +2770,67 @@ export default function WaitingOnReferencePreview() {
               <div className={styles.detailsBody}>
                 <section className={styles.detailsTitle}>
                   <div className={styles.detailTitleLine}>
-                    <span
-                      className={`${styles.priorityBadge} ${
-                        styles[
-                          selectedRecord.priority ||
-                          "normal"
-                        ]
-                      }`}
-                    >
-                      {
-                        (
-                          PRIORITIES[
-                            selectedRecord.priority
-                          ] ||
-                          PRIORITIES.normal
-                        ).label
-                      }{" "}
-                      priority
-                    </span>
+                    {selectedRecord.resolved ? (
+                      <span
+                        className={
+                          styles.resolutionBadge
+                        }
+                        data-status={
+                          resolvedStatusTone(
+                            selectedRecord,
+                          )
+                        }
+                      >
+                        <CheckCircle2
+                          size={14}
+                        />
+
+                        {resolvedStatusLabel(
+                          selectedRecord,
+                        )}
+                      </span>
+                    ) : (
+                      <span
+                        className={`${styles.priorityBadge} ${
+                          styles[
+                            selectedRecord.priority ||
+                            "normal"
+                          ]
+                        }`}
+                      >
+                        {
+                          (
+                            PRIORITIES[
+                              selectedRecord.priority
+                            ] ||
+                            PRIORITIES.normal
+                          ).label
+                        }{" "}
+                        priority
+                      </span>
+                    )}
 
                     <button
                       type="button"
-                      onClick={() =>
+                      onClick={() => {
+                        if (
+                          selectedRecord.kind ===
+                            "task" &&
+                          selectedRecord.resolved
+                        ) {
+                          navigate(
+                            `/tasks?task=${encodeURIComponent(
+                              selectedRecord.id,
+                            )}`,
+                          );
+
+                          return;
+                        }
+
                         openEditModal(
                           selectedRecord,
-                        )
-                      }
+                        );
+                      }}
                       disabled={saving}
                     >
                       {selectedRecord.kind ===
@@ -2673,6 +2838,11 @@ export default function WaitingOnReferencePreview() {
                         <>
                           <ExternalLink size={15} />
                           Open approval
+                        </>
+                      ) : selectedRecord.resolved ? (
+                        <>
+                          <ExternalLink size={15} />
+                          Open task
                         </>
                       ) : (
                         <>
@@ -2720,12 +2890,24 @@ export default function WaitingOnReferencePreview() {
 
                   <div>
                     <span>
-                      <CalendarClock size={15} />
-                      Expected response
+                      {selectedRecord.resolved ? (
+                        <CheckCircle2
+                          size={15}
+                        />
+                      ) : (
+                        <CalendarClock
+                          size={15}
+                        />
+                      )}
+
+                      {selectedRecord.resolved
+                        ? "Resolved"
+                        : "Expected response"}
                     </span>
 
                     <strong
                       className={
+                        !selectedRecord.resolved &&
                         isOverdue(
                           selectedRecord,
                           referenceTime,
@@ -2734,17 +2916,35 @@ export default function WaitingOnReferencePreview() {
                           : ""
                       }
                     >
-                      {
-                        formatDateTime(
-                          selectedRecord.dueAt,
-                        ).date
-                      }{" "}
-                      ·{" "}
-                      {
-                        formatDateTime(
-                          selectedRecord.dueAt,
-                        ).time
-                      }
+                      {selectedRecord.resolved
+                        ? (
+                            <>
+                              {
+                                selectedResolutionDate
+                                  ?.date
+                              }{" "}
+                              ·{" "}
+                              {
+                                selectedResolutionDate
+                                  ?.time
+                              }
+                            </>
+                          )
+                        : (
+                            <>
+                              {
+                                formatDateTime(
+                                  selectedRecord.dueAt,
+                                ).date
+                              }{" "}
+                              ·{" "}
+                              {
+                                formatDateTime(
+                                  selectedRecord.dueAt,
+                                ).time
+                              }
+                            </>
+                          )}
                     </strong>
                   </div>
 
@@ -2754,8 +2954,14 @@ export default function WaitingOnReferencePreview() {
                       Status
                     </span>
 
-                    {selectedRecord.kind ===
-                    "task" ? (
+                    {selectedRecord.resolved ? (
+                      <strong>
+                        {resolvedStatusLabel(
+                          selectedRecord,
+                        )}
+                      </strong>
+                    ) : selectedRecord.kind ===
+                      "task" ? (
                       <select
                         value={
                           selectedRecord.status ||
@@ -2787,13 +2993,26 @@ export default function WaitingOnReferencePreview() {
                           : selectedRecord.status ===
                               "pending"
                             ? "Pending review"
-                            : selectedRecord.status ===
-                                "draft"
-                              ? "Draft"
-                              : "Resolved"}
+                            : "Draft"}
                       </strong>
                     )}
                   </div>
+
+                  {selectedRecord.resolved &&
+                    selectedRecord.resolvedById && (
+                    <div>
+                      <span>
+                        <UserRound size={15} />
+                        Decision by
+                      </span>
+
+                      <strong>
+                        {personName(
+                          selectedRecord.resolvedById,
+                        )}
+                      </strong>
+                    </div>
+                  )}
 
                   <div>
                     <span>
@@ -2824,7 +3043,10 @@ export default function WaitingOnReferencePreview() {
                 {selectedRecord.reviewNotes && (
                   <section className={styles.notesBlock}>
                     <strong>
-                      Review notes
+                      {selectedRecord.kind ===
+                      "approval"
+                        ? "Decision notes"
+                        : "Review notes"}
                     </strong>
 
                     <p>
@@ -2833,38 +3055,113 @@ export default function WaitingOnReferencePreview() {
                   </section>
                 )}
 
-                <section className={styles.followUpBlock}>
-                  <Clock3 size={22} />
+                {selectedRecord.resolved ? (
+                  <section
+                    className={
+                      styles.resolvedHistoryBlock
+                    }
+                  >
+                    <CheckCircle2
+                      size={22}
+                    />
 
-                  <div>
-                    <strong>
-                      Follow-through standard
-                    </strong>
+                    <div>
+                      <strong>
+                        Preserved resolved history
+                      </strong>
 
-                    <p>
-                      Record each follow-up, update the expected response date when it changes, and resolve the item only after the campaign receives what it needs.
-                    </p>
-                  </div>
-                </section>
+                      <p>
+                        This record remains available for campaign accountability but no longer counts as active Waiting On work. Opening its source does not reactivate it.
+                      </p>
+                    </div>
+                  </section>
+                ) : (
+                  <section className={styles.followUpBlock}>
+                    <Clock3 size={22} />
+
+                    <div>
+                      <strong>
+                        Follow-through standard
+                      </strong>
+
+                      <p>
+                        Record each follow-up, update the expected response date when it changes, and resolve the item only after the campaign receives what it needs.
+                      </p>
+                    </div>
+                  </section>
+                )}
               </div>
 
               <footer className={styles.detailsFooter}>
                 {selectedRecord.kind ===
                 "approval" ? (
-                  <button
-                    className={styles.fullPrimaryButton}
-                    type="button"
-                    onClick={() =>
-                      navigate(
-                        `/approvals?approval=${encodeURIComponent(
-                          selectedRecord.id,
-                        )}`,
-                      )
-                    }
-                  >
-                    <ExternalLink size={16} />
-                    Open approval
-                  </button>
+                  <>
+                    {selectedRecord.sourceFileId && (
+                      <button
+                        type="button"
+                        onClick={() =>
+                          navigate(
+                            `/documents?file=${encodeURIComponent(
+                              selectedRecord.sourceFileId,
+                            )}`,
+                          )
+                        }
+                      >
+                        <ExternalLink size={16} />
+                        Open document
+                      </button>
+                    )}
+
+                    <button
+                      className={
+                        selectedRecord.sourceFileId
+                          ? styles.primaryDetailButton
+                          : styles.fullPrimaryButton
+                      }
+                      type="button"
+                      onClick={() =>
+                        navigate(
+                          `/approvals?approval=${encodeURIComponent(
+                            selectedRecord.id,
+                          )}`,
+                        )
+                      }
+                    >
+                      <ExternalLink size={16} />
+                      Open approval
+                    </button>
+                  </>
+                ) : selectedRecord.resolved ? (
+                  <>
+                    <button
+                      type="button"
+                      onClick={() =>
+                        navigate(
+                          `/tasks?task=${encodeURIComponent(
+                            selectedRecord.id,
+                          )}`,
+                        )
+                      }
+                    >
+                      <ExternalLink size={16} />
+                      Open task
+                    </button>
+
+                    <button
+                      className={styles.primaryDetailButton}
+                      type="button"
+                      disabled={saving}
+                      onClick={() =>
+                        updateWaitingStatus(
+                          selectedRecord,
+                          "open",
+                        )
+                      }
+                    >
+                      <RefreshCw size={16} />
+                      Reopen dependency
+                    </button>
+                  </>
                 ) : (
                   <>
                     <button
@@ -2887,17 +3184,12 @@ export default function WaitingOnReferencePreview() {
                       onClick={() =>
                         updateWaitingStatus(
                           selectedRecord,
-                          selectedRecord.resolved
-                            ? "open"
-                            : "completed",
+                          "completed",
                         )
                       }
                     >
                       <CheckCircle2 size={16} />
-
-                      {selectedRecord.resolved
-                        ? "Reopen"
-                        : "Mark resolved"}
+                      Mark resolved
                     </button>
                   </>
                 )}

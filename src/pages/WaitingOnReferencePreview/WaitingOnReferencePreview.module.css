@@ -3243,3 +3243,82 @@
 }
 
 /* CAMPAIGN SEAT WAITING ON FINAL RESPONSIVE — END */
+
+
+/* =========================================================
+   WAITING RESOLVED HISTORY V64
+   ========================================================= */
+
+.resolutionBadge {
+  display: inline-flex;
+  min-height: 29px;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 0 10px;
+  border-radius: 999px;
+  font-size: 0.61rem;
+  font-weight: 830;
+  white-space: nowrap;
+}
+
+.resolutionBadge[data-status="approved"],
+.resolutionBadge[data-status="resolved"] {
+  color: #16734e;
+  background: #eaf8f1;
+  box-shadow:
+    inset
+    0
+    0
+    0
+    1px
+    #bee5d2;
+}
+
+.resolutionBadge[data-status="rejected"] {
+  color: #b92c3a;
+  background: #fff0f2;
+  box-shadow:
+    inset
+    0
+    0
+    0
+    1px
+    #efc4ca;
+}
+
+.resolvedHistoryBlock {
+  display: flex;
+  align-items: flex-start;
+  gap: 11px;
+  margin: 15px;
+  padding: 14px;
+  border: 1px solid #cbe5d8;
+  border-radius: 12px;
+  color: #2b7b5c;
+  background: #f4fbf7;
+}
+
+.resolvedHistoryBlock svg {
+  flex: 0 0 auto;
+}
+
+.resolvedHistoryBlock strong {
+  display: block;
+  color: #1f684d;
+  font-size: 0.69rem;
+}
+
+.resolvedHistoryBlock p {
+  margin: 5px 0 0;
+  color: #648878;
+  font-size: 0.64rem;
+  line-height: 1.5;
+}
+
+@media (max-width: 620px) {
+  .resolutionBadge {
+    min-height: 27px;
+    padding: 0 8px;
+  }
+}
