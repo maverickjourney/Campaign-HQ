@@ -2230,6 +2230,14 @@ export default function WaitingOnReferencePreview() {
           )}`
         : "Ready";
 
+
+  /*
+   * WAITING_RESOLVED_COPY_V641
+   *
+   * The Resolved view uses historical/outcome language rather
+   * than describing completed records as active waiting work.
+   */
+
   const showClearFilters =
     Boolean(search) ||
     typeFilter !== "all" ||
@@ -2279,7 +2287,11 @@ export default function WaitingOnReferencePreview() {
                   );
                   setSummaryFilter("");
                 }}
-                placeholder="Search waiting items…"
+                placeholder={
+                  activeTab === "resolved"
+                    ? "Search resolved history…"
+                    : "Search waiting items…"
+                }
               />
             </label>
 
@@ -2433,7 +2445,9 @@ export default function WaitingOnReferencePreview() {
                     }}
                   >
                     <option value="all">
-                      All waiting types
+                      {activeTab === "resolved"
+                        ? "All record types"
+                        : "All waiting types"}
                     </option>
                     <option value="task">
                       Dependencies
@@ -2512,10 +2526,19 @@ export default function WaitingOnReferencePreview() {
                 </strong>
 
                 <span>
-                  {visibleWaitingCount ===
-                  1
-                    ? "waiting item"
-                    : "waiting items"}
+                  {activeTab === "resolved"
+                    ? (
+                        visibleWaitingCount ===
+                        1
+                          ? "resolved item"
+                          : "resolved items"
+                      )
+                    : (
+                        visibleWaitingCount ===
+                        1
+                          ? "waiting item"
+                          : "waiting items"
+                      )}
                 </span>
               </div>
 
@@ -2542,7 +2565,11 @@ export default function WaitingOnReferencePreview() {
                         ? "Resolved"
                         : "Expected response"}
                     </th>
-                    <th>Health</th>
+                    <th>
+                      {activeTab === "resolved"
+                        ? "Outcome"
+                        : "Health"}
+                    </th>
                     <th>Type</th>
                   </tr>
                 </thead>
@@ -2566,11 +2593,15 @@ export default function WaitingOnReferencePreview() {
                         <Hourglass size={28} />
 
                         <strong>
-                          Nothing is waiting in this view
+                          {activeTab === "resolved"
+                            ? "No resolved items in this view"
+                            : "Nothing is waiting in this view"}
                         </strong>
 
                         <span>
-                          Adjust the filters or add a campaign dependency.
+                          {activeTab === "resolved"
+                            ? "Adjust the filters to review preserved dependency history."
+                            : "Adjust the filters or add a campaign dependency."}
                         </span>
                       </td>
                     </tr>
@@ -2692,7 +2723,12 @@ export default function WaitingOnReferencePreview() {
                                 }`}
                               >
                                 <CircleDot size={11} />
-                                {health.label}
+
+                                {record.resolved
+                                  ? resolvedStatusLabel(
+                                      record,
+                                    )
+                                  : health.label}
                               </span>
                             </td>
 
@@ -2720,10 +2756,19 @@ export default function WaitingOnReferencePreview() {
               <span>
                 Showing{" "}
                 {visibleWaitingCount}{" "}
-                {visibleWaitingCount ===
-                1
-                  ? "waiting item"
-                  : "waiting items"}{" "}
+                {activeTab === "resolved"
+                  ? (
+                      visibleWaitingCount ===
+                      1
+                        ? "resolved item"
+                        : "resolved items"
+                    )
+                  : (
+                      visibleWaitingCount ===
+                      1
+                        ? "waiting item"
+                        : "waiting items"
+                    )}{" "}
                 in this view
               </span>
 
