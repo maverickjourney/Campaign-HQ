@@ -2231,6 +2231,14 @@ export default function WaitingOnReferencePreview() {
         : "Ready";
 
 
+
+  /*
+   * WAITING_RESOLVED_SEMANTICS_V642
+   *
+   * Historical records use resolved-state language while active
+   * Waiting On views preserve their existing operational copy.
+   */
+
   /*
    * WAITING_RESOLVED_COPY_V641
    *
@@ -2556,7 +2564,11 @@ export default function WaitingOnReferencePreview() {
               <table className={styles.waitingTable}>
                 <thead>
                   <tr>
-                    <th>Waiting on</th>
+                    <th>
+                      {activeTab === "resolved"
+                        ? "Resolved item"
+                        : "Waiting on"}
+                    </th>
                     <th>Person or group</th>
                     <th>Owner</th>
                     <th>
@@ -2783,7 +2795,9 @@ export default function WaitingOnReferencePreview() {
               <header className={styles.detailsHeader}>
                 <div>
                   <span>
-                    Waiting On details
+                    {selectedRecord.resolved
+                      ? "Resolved history"
+                      : "Waiting On details"}
                   </span>
 
                   <strong>
@@ -2806,7 +2820,11 @@ export default function WaitingOnReferencePreview() {
                   onClick={
                     closeWaitingDetails
                   }
-                  aria-label="Close Waiting On details"
+                  aria-label={
+                    selectedRecord.resolved
+                      ? "Close resolved history"
+                      : "Close Waiting On details"
+                  }
                 >
                   <X size={19} />
                 </button>
@@ -2912,7 +2930,9 @@ export default function WaitingOnReferencePreview() {
                   <div>
                     <span>
                       <UsersRound size={15} />
-                      Waiting for
+                      {selectedRecord.resolved
+                        ? "Was waiting for"
+                        : "Waiting for"}
                     </span>
 
                     <strong>
