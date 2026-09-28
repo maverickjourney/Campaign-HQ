@@ -1596,6 +1596,88 @@ export default function WaitingOnReferencePreview() {
     selectedRecordKey,
   ]);
 
+  /*
+   * WAITING_DEEP_LINK_VIEW_ALIGNMENT_V643
+   *
+   * A directly addressed record should open inside the view
+   * that actually contains it. Resolved history therefore
+   * lands on Resolved, while active work lands on All waiting.
+   *
+   * This runs after live data identifies the selected record,
+   * so a cold deep link remains correct even when the drawer
+   * key is available before its record has loaded.
+   */
+  useEffect(() => {
+    const requestedKey =
+      getRequestedWaitingRecordKey(
+        location.search,
+      );
+
+    if (
+      !requestedKey ||
+      !selectedRecord ||
+      selectedRecord.key !==
+        requestedKey
+    ) {
+      return;
+    }
+
+    const showResolved =
+      Boolean(
+        selectedRecord.resolved,
+      );
+
+    const nextTab =
+      showResolved
+        ? "resolved"
+        : "all";
+
+    const nextSummary =
+      showResolved
+        ? "resolved"
+        : "all";
+
+    const nextSort =
+      showResolved
+        ? "resolved"
+        : "due";
+
+    if (activeTab !== nextTab) {
+      setActiveTab(
+        nextTab,
+      );
+    }
+
+    if (
+      summaryFilter !==
+      nextSummary
+    ) {
+      setSummaryFilter(
+        nextSummary,
+      );
+    }
+
+    if (sortMode !== nextSort) {
+      setSortMode(
+        nextSort,
+      );
+    }
+
+    /*
+     * Remove unrelated filters so the selected deep-linked
+     * record is also visible in the background table.
+     */
+    setSearch("");
+    setTypeFilter("all");
+    setOwnerFilter("all");
+  }, [
+    activeTab,
+    location.search,
+    selectedRecord,
+    sortMode,
+    summaryFilter,
+  ]);
+
   const loading =
     !demoMode &&
     (
