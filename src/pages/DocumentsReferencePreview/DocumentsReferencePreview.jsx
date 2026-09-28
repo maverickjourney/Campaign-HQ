@@ -1003,6 +1003,48 @@ export default function DocumentsReferencePreview() {
     selectedFileOpenApprovals[0] ||
     null;
 
+  /*
+   * DOCUMENT_DUPLICATE_APPROVAL_CLEANUP_V63
+   *
+   * Never guess that arbitrary review work is a duplicate.
+   * The cleanup shortcut appears only when:
+   * - the newest approval is already terminal;
+   * - the extra request is only Draft/Pending;
+   * - it has no decision-history events;
+   * - and it carries the same approval title.
+   */
+  const selectedFileDuplicateCleanupCandidates =
+    selectedFileOtherOpenApprovals.filter(
+      (approval) =>
+        [
+          "approved",
+          "rejected",
+        ].includes(
+          selectedFileLatestApproval
+            ?.status,
+        ) &&
+        [
+          "draft",
+          "pending",
+        ].includes(
+          approval.status,
+        ) &&
+        !(
+          approval
+            .decision_history ||
+          []
+        ).length &&
+        String(
+          approval.title ||
+          "",
+        ) ===
+          String(
+            selectedFileLatestApproval
+              ?.title ||
+              "",
+          ),
+    );
+
   const recentCount =
     files.filter(isRecent).length;
 
@@ -1065,6 +1107,264 @@ export default function DocumentsReferencePreview() {
 
       return "Campaign leadership";
     };
+
+  const selectedFileActivity =
+    useMemo(() => {
+      if (!selectedFile) {
+        return [];
+      }
+
+      if (
+        demoMode &&
+        Array.isArray(
+          selectedFile.activity,
+        ) &&
+        selectedFile
+          .activity.length
+      ) {
+        return selectedFile.activity.map(
+          (entry, index) => ({
+            id:
+              `demo-${index}`,
+
+            title:
+              String(entry),
+
+            note:
+              "Campaign document activity",
+
+            meta:
+              "",
+
+            status:
+              "activity",
+
+            occurredAt:
+              selectedFile.created_at,
+          }),
+        );
+      }
+
+      const events = [];
+
+      const displayPerson =
+        (personId) => {
+          if (
+            personId &&
+            personId === user.id
+          ) {
+            return user.name;
+          }
+
+          if (personId) {
+            return "Campaign reviewer";
+          }
+
+          return "Campaign team";
+        };
+
+      const uploadOwner =
+        (
+          selectedFile.uploaded_by ===
+            user.id ||
+          selectedFile.uploaded_by ===
+            "current-user"
+        )
+          ? user.name
+          : "Campaign team";
+
+      events.push({
+        id:
+          `upload-${selectedFile.id}`,
+
+        title:
+          "Document uploaded",
+
+        note:
+          `Added to ${
+            selectedFile.category ||
+            "Uncategorized"
+          }.`,
+
+        meta:
+          `${uploadOwner} · ${formatDateTime(
+            selectedFile.created_at,
+          )}`,
+
+        status:
+          "uploaded",
+
+        occurredAt:
+          selectedFile.created_at,
+
+        approvalId:
+          "",
+      });
+
+      getLinkedApprovals(
+        selectedFile,
+      ).forEach(
+        (approval) => {
+          const requestTime =
+            approval.created_at ||
+            approval.updated_at;
+
+          events.push({
+            id:
+              `approval-request-${approval.id}`,
+
+            title:
+              "Approval requested",
+
+            note:
+              approval.title ||
+              "Campaign approval",
+
+            meta:
+              `${displayPerson(
+                approval.submitted_by,
+              )} · ${formatDateTime(
+                requestTime,
+              )}`,
+
+            status:
+              "pending",
+
+            occurredAt:
+              requestTime,
+
+            approvalId:
+              approval.id,
+          });
+
+          const history =
+            Array.isArray(
+              approval
+                .decision_history,
+            )
+              ? approval
+                  .decision_history
+              : [];
+
+          history.forEach(
+            (historyEvent) => {
+              const status =
+                historyEvent.to_status ||
+                "pending";
+
+              events.push({
+                id:
+                  `approval-history-${historyEvent.id}`,
+
+                title:
+                  APPROVAL_STATUS_LABELS[
+                    status
+                  ] ||
+                  "Approval updated",
+
+                note:
+                  historyEvent.decision_notes ||
+                  (
+                    historyEvent.from_status
+                      ? `Status changed from ${
+                          APPROVAL_STATUS_LABELS[
+                            historyEvent
+                              .from_status
+                          ] ||
+                          historyEvent
+                            .from_status
+                        } to ${
+                          APPROVAL_STATUS_LABELS[
+                            status
+                          ] ||
+                          status
+                        }.`
+                      : `Status changed to ${
+                          APPROVAL_STATUS_LABELS[
+                            status
+                          ] ||
+                          status
+                        }.`
+                  ),
+
+                meta:
+                  `${displayPerson(
+                    historyEvent.actor_user_id,
+                  )} · ${formatDateTime(
+                    historyEvent.occurred_at,
+                  )}`,
+
+                status,
+
+                occurredAt:
+                  historyEvent.occurred_at,
+
+                approvalId:
+                  approval.id,
+              });
+            },
+          );
+
+          /*
+           * Older reviewed approvals can pre-date V61.
+           * Preserve their current decision in Activity when
+           * no immutable ledger row exists.
+           */
+          if (
+            !history.length &&
+            approval.reviewed_at
+          ) {
+            events.push({
+              id:
+                `approval-fallback-${approval.id}`,
+
+              title:
+                APPROVAL_STATUS_LABELS[
+                  approval.status
+                ] ||
+                "Approval updated",
+
+              note:
+                approval.review_notes ||
+                "Decision recorded before detailed approval history was enabled.",
+
+              meta:
+                `${displayPerson(
+                  approval.reviewed_by,
+                )} · ${formatDateTime(
+                  approval.reviewed_at,
+                )}`,
+
+              status:
+                approval.status,
+
+              occurredAt:
+                approval.reviewed_at,
+
+              approvalId:
+                approval.id,
+            });
+          }
+        },
+      );
+
+      return events.sort(
+        (left, right) =>
+          new Date(
+            right.occurredAt ||
+            0,
+          ).getTime() -
+          new Date(
+            left.occurredAt ||
+            0,
+          ).getTime(),
+      );
+    }, [
+      demoMode,
+      selectedFile,
+      user.id,
+      user.name,
+    ]);
 
   const openFileDetails = (fileId) => {
     setSelectedFileId(fileId);
@@ -1141,6 +1441,70 @@ export default function DocumentsReferencePreview() {
       navigate(
         `/approvals?${params.toString()}`,
       );
+    };
+
+  const removeDuplicateDocumentApproval =
+    async (approval) => {
+      if (
+        demoMode ||
+        !leadershipAccess ||
+        !approval?.id
+      ) {
+        return;
+      }
+
+      const cleanupAllowed =
+        selectedFileDuplicateCleanupCandidates.some(
+          (candidate) =>
+            candidate.id ===
+            approval.id,
+        );
+
+      if (!cleanupAllowed) {
+        window.alert(
+          "Campaign Seat did not identify this review as a safe duplicate. Open the approval and resolve it normally instead.",
+        );
+        return;
+      }
+
+      const confirmed =
+        window.confirm(
+          `Remove the extra open approval "${approval.title}"?\n\nThis deletes only the unused duplicate request. The completed approval decision and its preserved history remain intact.`,
+        );
+
+      if (!confirmed) {
+        return;
+      }
+
+      try {
+        const removeLinkedApproval =
+          filesCommandCenter
+            .removeLinkedApproval;
+
+        if (
+          typeof removeLinkedApproval !==
+          "function"
+        ) {
+          throw new Error(
+            "Duplicate-review cleanup is unavailable.",
+          );
+        }
+
+        await removeLinkedApproval(
+          approval.id,
+        );
+
+        setToast(
+          "Extra duplicate approval removed. The completed decision and history were preserved.",
+        );
+      } catch (
+        cleanupError
+      ) {
+        window.alert(
+          cleanupError?.message ||
+            "The extra approval could not be removed.",
+        );
+      }
     };
 
   const clearFilters = () => {
@@ -2293,19 +2657,44 @@ export default function DocumentsReferencePreview() {
                               </small>
                             </span>
 
-                            <button
-                              type="button"
-                              onClick={() =>
-                                navigate(
-                                  `/approvals?approval=${encodeURIComponent(
-                                    selectedFileOtherOpenApprovals[0]
-                                      .id,
-                                  )}`,
-                                )
+                            <div
+                              className={
+                                styles.approvalOutstandingActions
                               }
                             >
-                              Open active review
-                            </button>
+                              <button
+                                type="button"
+                                onClick={() =>
+                                  navigate(
+                                    `/approvals?approval=${encodeURIComponent(
+                                      selectedFileOtherOpenApprovals[0]
+                                        .id,
+                                    )}`,
+                                  )
+                                }
+                              >
+                                Open active review
+                              </button>
+
+                              {leadershipAccess &&
+                                selectedFileDuplicateCleanupCandidates.length >
+                                  0 && (
+                                <button
+                                  type="button"
+                                  data-danger="true"
+                                  disabled={
+                                    isSaving
+                                  }
+                                  onClick={() =>
+                                    removeDuplicateDocumentApproval(
+                                      selectedFileDuplicateCleanupCandidates[0],
+                                    )
+                                  }
+                                >
+                                  Remove duplicate
+                                </button>
+                              )}
+                            </div>
                           </div>
                         )}
                       </section>
@@ -2537,8 +2926,9 @@ export default function DocumentsReferencePreview() {
                       <div>
                         <h3>Document activity</h3>
                         <p>
-                          Review the available history for
-                          this campaign file.
+                          Follow the source file from upload
+                          through every campaign approval
+                          decision.
                         </p>
                       </div>
                     </header>
@@ -2546,24 +2936,82 @@ export default function DocumentsReferencePreview() {
                     <div
                       className={styles.activityTimeline}
                     >
-                      {(selectedFile.activity || [
-                        `Uploaded ${formatDateTime(
-                          selectedFile.created_at,
-                        )}`,
-                      ]).map((entry, index) => (
-                        <article key={`${entry}-${index}`}>
-                          <span>
-                            <Clock3 size={15} />
-                          </span>
+                      {selectedFileActivity.map(
+                        (entry) => (
+                          <article
+                            key={entry.id}
+                            data-status={
+                              entry.status ||
+                              "activity"
+                            }
+                          >
+                            <span>
+                              {entry.status ===
+                              "approved" ? (
+                                <CheckCircle2
+                                  size={15}
+                                />
+                              ) : entry.status ===
+                                "changes_requested" ? (
+                                <AlertTriangle
+                                  size={15}
+                                />
+                              ) : entry.status ===
+                                "rejected" ? (
+                                <X
+                                  size={15}
+                                />
+                              ) : entry.approvalId ? (
+                                <FileCheck2
+                                  size={15}
+                                />
+                              ) : (
+                                <Clock3
+                                  size={15}
+                                />
+                              )}
+                            </span>
 
-                          <div>
-                            <strong>{entry}</strong>
-                            <small>
-                              Campaign document activity
-                            </small>
-                          </div>
-                        </article>
-                      ))}
+                            <div>
+                              <strong>
+                                {entry.title}
+                              </strong>
+
+                              {entry.note && (
+                                <p>
+                                  {entry.note}
+                                </p>
+                              )}
+
+                              <footer>
+                                <small>
+                                  {entry.meta ||
+                                    "Campaign document activity"}
+                                </small>
+
+                                {entry.approvalId && (
+                                  <button
+                                    type="button"
+                                    onClick={() =>
+                                      navigate(
+                                        `/approvals?approval=${encodeURIComponent(
+                                          entry.approvalId,
+                                        )}`,
+                                      )
+                                    }
+                                  >
+                                    Open approval
+
+                                    <ArrowUpRight
+                                      size={13}
+                                    />
+                                  </button>
+                                )}
+                              </footer>
+                            </div>
+                          </article>
+                        ),
+                      )}
                     </div>
                   </section>
                 )}

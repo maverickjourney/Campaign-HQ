@@ -78,7 +78,7 @@ export function useFilesCommandCenter({ workspaceId, userId }) {
           supabase
             .from("approvals")
             .select(
-              "id, title, status, approval_type, source_file_id, due_at, assigned_to, submitted_by, reviewed_by, reviewed_at, review_notes, updated_at",
+              "id, title, status, approval_type, source_file_id, due_at, assigned_to, submitted_by, reviewed_by, reviewed_at, review_notes, created_at, updated_at",
             )
             .eq(
               "workspace_id",
@@ -104,6 +104,108 @@ export function useFilesCommandCenter({ workspaceId, userId }) {
         if (approvalsResult.error) {
           throw approvalsResult.error;
         }
+
+        /*
+         * DOCUMENT_APPROVAL_ACTIVITY_V63
+         *
+         * V61 introduced the immutable decision ledger.
+         * Documents consumes it directly so Activity can show
+         * each decision instead of only the current snapshot.
+         */
+        let approvalHistoryRows = [];
+
+        const {
+          data:
+            approvalHistoryData,
+          error:
+            approvalHistoryError,
+        } =
+          await supabase
+            .from(
+              "approval_decision_history",
+            )
+            .select(
+              `
+                id,
+                workspace_id,
+                approval_id,
+                from_status,
+                to_status,
+                decision_notes,
+                actor_user_id,
+                occurred_at,
+                created_at
+              `,
+            )
+            .eq(
+              "workspace_id",
+              workspaceId,
+            )
+            .order(
+              "occurred_at",
+              {
+                ascending: true,
+              },
+            );
+
+        const historyTableMissing =
+          approvalHistoryError &&
+          (
+            approvalHistoryError.code ===
+              "42P01" ||
+            approvalHistoryError.code ===
+              "PGRST205" ||
+            String(
+              approvalHistoryError.message ||
+              "",
+            ).includes(
+              "approval_decision_history",
+            )
+          );
+
+        if (
+          approvalHistoryError &&
+          !historyTableMissing
+        ) {
+          throw approvalHistoryError;
+        }
+
+        if (!approvalHistoryError) {
+          approvalHistoryRows =
+            approvalHistoryData ||
+            [];
+        }
+
+        const historyByApproval =
+          new Map();
+
+        approvalHistoryRows.forEach(
+          (historyRow) => {
+            if (
+              !historyRow
+                ?.approval_id
+            ) {
+              return;
+            }
+
+            const current =
+              historyByApproval.get(
+                historyRow
+                  .approval_id,
+              ) ||
+              [];
+
+            current.push(
+              historyRow,
+            );
+
+            historyByApproval.set(
+              historyRow
+                .approval_id,
+              current,
+            );
+          },
+        );
 
         const approvalsByFile =
           new Map();
@@ -162,8 +264,17 @@ export function useFilesCommandCenter({ workspaceId, userId }) {
               review_notes:
                 approval.review_notes,
 
+              created_at:
+                approval.created_at,
+
               updated_at:
                 approval.updated_at,
+
+              decision_history:
+                historyByApproval.get(
+                  approval.id,
+                ) ||
+                [],
             });
 
             approvalsByFile.set(
@@ -263,6 +374,18 @@ export function useFilesCommandCenter({ workspaceId, userId }) {
             event: "*",
             schema: "public",
             table: "approvals",
+            filter:
+              `workspace_id=eq.${workspaceId}`,
+          },
+          scheduleRefresh,
+        )
+        .on(
+          "postgres_changes",
+          {
+            event: "*",
+            schema: "public",
+            table:
+              "approval_decision_history",
             filter:
               `workspace_id=eq.${workspaceId}`,
           },
@@ -386,6 +509,63 @@ export function useFilesCommandCenter({ workspaceId, userId }) {
     }
   }, []);
 
+  const removeLinkedApproval =
+    useCallback(
+      async (approvalId) => {
+        if (
+          !workspaceId ||
+          !approvalId
+        ) {
+          return false;
+        }
+
+        setIsSaving(true);
+        setError("");
+
+        try {
+          const {
+            error:
+              deleteError,
+          } =
+            await supabase
+              .from("approvals")
+              .delete()
+              .eq(
+                "id",
+                approvalId,
+              )
+              .eq(
+                "workspace_id",
+                workspaceId,
+              );
+
+          if (deleteError) {
+            throw deleteError;
+          }
+
+          await loadFiles();
+
+          return true;
+        } catch (
+          deleteError
+        ) {
+          setError(
+            getFilesErrorMessage(
+              deleteError,
+            ),
+          );
+
+          throw deleteError;
+        } finally {
+          setIsSaving(false);
+        }
+      },
+      [
+        loadFiles,
+        workspaceId,
+      ],
+    );
+
   return {
     files,
     isLoading,
@@ -396,5 +576,6 @@ export function useFilesCommandCenter({ workspaceId, userId }) {
     refresh: () => loadFiles({ showLoading: true }),
     uploadFiles,
     openFile,
+    removeLinkedApproval,
   };
 }
