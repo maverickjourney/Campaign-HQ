@@ -28,6 +28,7 @@ import {
 
 import {
   useLocation,
+  useNavigate,
 } from "react-router-dom";
 
 import {
@@ -566,6 +567,18 @@ function metadataTags(
 
 export default function CommitmentsReferencePreview() {
   const location = useLocation();
+  const navigate = useNavigate();
+
+  const requestedCommitmentId =
+    useMemo(
+      () =>
+        new URLSearchParams(
+          location.search,
+        )
+          .get("commitment")
+          ?.trim() || "",
+      [location.search],
+    );
 
   const user = getCurrentUser();
   const workspace =
@@ -610,6 +623,74 @@ export default function CommitmentsReferencePreview() {
     selectedCommitmentId,
     setSelectedCommitmentId,
   ] = useState("");
+
+  /*
+   * COMMITMENT_DEEP_LINK_V65
+   *
+   * The URL is the durable address of the open commitment.
+   * Existing query parameters, including demo mode, survive.
+   */
+  const setCommitmentRoute = useCallback(
+    (commitmentId) => {
+      const params =
+        new URLSearchParams(
+          location.search,
+        );
+
+      if (commitmentId) {
+        params.set(
+          "commitment",
+          commitmentId,
+        );
+      } else {
+        params.delete("commitment");
+      }
+
+      const nextSearch =
+        params.toString();
+
+      navigate(
+        {
+          pathname:
+            location.pathname,
+          search:
+            nextSearch
+              ? `?${nextSearch}`
+              : "",
+        },
+        {
+          replace: true,
+        },
+      );
+    },
+    [
+      location.pathname,
+      location.search,
+      navigate,
+    ],
+  );
+
+  const openCommitmentDetails =
+    useCallback(
+      (commitmentId) => {
+        if (!commitmentId) {
+          return;
+        }
+
+        setCommitmentRoute(
+          commitmentId,
+        );
+      },
+      [setCommitmentRoute],
+    );
+
+  const closeCommitmentDetails =
+    useCallback(
+      () => {
+        setCommitmentRoute("");
+      },
+      [setCommitmentRoute],
+    );
 
   const [modalMode, setModalMode] =
     useState("");
@@ -1001,11 +1082,131 @@ export default function CommitmentsReferencePreview() {
   );
 
   const selectedCommitment =
-    visibleCommitments.find(
+    commitments.find(
       (record) =>
         record.id ===
         selectedCommitmentId,
     ) || null;
+
+  /*
+   * Restore an exact commitment from the URL once the task
+   * collection is available.
+   */
+  useEffect(() => {
+    if (!requestedCommitmentId) {
+      if (selectedCommitmentId) {
+        setSelectedCommitmentId("");
+      }
+
+      return;
+    }
+
+    const requestedExists =
+      commitments.some(
+        (record) =>
+          record.id ===
+          requestedCommitmentId,
+      );
+
+    if (
+      requestedExists &&
+      selectedCommitmentId !==
+        requestedCommitmentId
+    ) {
+      setSelectedCommitmentId(
+        requestedCommitmentId,
+      );
+    }
+  }, [
+    commitments,
+    requestedCommitmentId,
+    selectedCommitmentId,
+  ]);
+
+  /*
+   * A directly addressed fulfilled commitment should land in
+   * the Fulfilled workspace. Active commitments land in the
+   * normal active workspace so the row and drawer agree.
+   */
+  useEffect(() => {
+    if (
+      !requestedCommitmentId ||
+      !selectedCommitment
+    ) {
+      return;
+    }
+
+    if (
+      selectedCommitment.status ===
+      "completed"
+    ) {
+      if (
+        activeTab !==
+        "fulfilled"
+      ) {
+        setActiveTab(
+          "fulfilled",
+        );
+      }
+
+      if (
+        statusFilter !==
+        "completed"
+      ) {
+        setStatusFilter(
+          "completed",
+        );
+      }
+
+      if (
+        summaryFilter !==
+        "fulfilled"
+      ) {
+        setSummaryFilter(
+          "fulfilled",
+        );
+      }
+
+      setSearch("");
+      setOwnerFilter("all");
+      setSortMode("due");
+
+      return;
+    }
+
+    if (isActive(selectedCommitment)) {
+      if (activeTab !== "all") {
+        setActiveTab("all");
+      }
+
+      if (
+        statusFilter !==
+        "active"
+      ) {
+        setStatusFilter(
+          "active",
+        );
+      }
+
+      if (
+        summaryFilter !== "all"
+      ) {
+        setSummaryFilter(
+          "all",
+        );
+      }
+
+      setSearch("");
+      setOwnerFilter("all");
+      setSortMode("due");
+    }
+  }, [
+    activeTab,
+    requestedCommitmentId,
+    selectedCommitment,
+    statusFilter,
+    summaryFilter,
+  ]);
 
   useEffect(() => {
     if (
@@ -1039,7 +1240,7 @@ export default function CommitmentsReferencePreview() {
 
   const chooseTab = (tab) => {
     setActiveTab(tab);
-    setSelectedCommitmentId("");
+    closeCommitmentDetails();
     setSearch("");
     setOwnerFilter("all");
     setSortMode("due");
@@ -1054,7 +1255,7 @@ export default function CommitmentsReferencePreview() {
   };
 
   const chooseSummary = (key) => {
-    setSelectedCommitmentId("");
+    closeCommitmentDetails();
     setSearch("");
     setOwnerFilter("all");
     setSortMode("due");
@@ -1087,6 +1288,8 @@ export default function CommitmentsReferencePreview() {
   };
 
   const openCreateModal = () => {
+    closeCommitmentDetails();
+
     setFormData({
       ...EMPTY_FORM,
       assignedTo:
@@ -1308,7 +1511,7 @@ export default function CommitmentsReferencePreview() {
             ],
           );
 
-          setSelectedCommitmentId(
+          openCommitmentDetails(
             id,
           );
         }
@@ -1325,7 +1528,7 @@ export default function CommitmentsReferencePreview() {
           await createTask(payload);
 
         if (created?.id) {
-          setSelectedCommitmentId(
+          openCommitmentDetails(
             created.id,
           );
         }
@@ -1393,7 +1596,7 @@ export default function CommitmentsReferencePreview() {
     };
 
   const handleRefresh = () => {
-    setSelectedCommitmentId("");
+    closeCommitmentDetails();
 
     if (demoMode) {
       setDemoCommitments(
@@ -1844,7 +2047,7 @@ export default function CommitmentsReferencePreview() {
                                 : ""
                             }`}
                             onClick={() =>
-                              setSelectedCommitmentId(
+                              openCommitmentDetails(
                                 record.id,
                               )
                             }
@@ -1969,10 +2172,8 @@ export default function CommitmentsReferencePreview() {
 
                 <button
                   type="button"
-                  onClick={() =>
-                    setSelectedCommitmentId(
-                      "",
-                    )
+                  onClick={
+                    closeCommitmentDetails
                   }
                   aria-label="Close commitment details"
                 >
