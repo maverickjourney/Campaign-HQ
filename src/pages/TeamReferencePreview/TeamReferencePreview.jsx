@@ -595,6 +595,17 @@ export default function TeamReferencePreview() {
   const location = useLocation();
   const navigate = useNavigate();
 
+  const requestedMemberId =
+    useMemo(
+      () =>
+        new URLSearchParams(
+          location.search,
+        )
+          .get("member")
+          ?.trim() || "",
+      [location.search],
+    );
+
   const workspace = getCurrentWorkspace();
   const roleLabel = getRoleLabel();
 
@@ -701,6 +712,51 @@ export default function TeamReferencePreview() {
     selectedMemberId,
     setSelectedMemberId,
   ] = useState("");
+
+  /*
+   * TEAM_MEMBER_DEEP_LINK_V66
+   *
+   * Keep the exact member address in the URL while preserving
+   * unrelated state such as team-demo=1.
+   */
+  const setMemberRoute =
+    (memberId) => {
+      const params =
+        new URLSearchParams(
+          location.search,
+        );
+
+      if (memberId) {
+        params.set(
+          "member",
+          memberId,
+        );
+      } else {
+        params.delete("member");
+      }
+
+      const nextSearch =
+        params.toString();
+
+      navigate(
+        {
+          pathname:
+            location.pathname,
+          search:
+            nextSearch
+              ? `?${nextSearch}`
+              : "",
+        },
+        {
+          replace: true,
+        },
+      );
+    };
+
+  const closeMemberDetails =
+    () => {
+      setMemberRoute("");
+    };
 
   const [
     drawerTab,
@@ -948,6 +1004,66 @@ export default function TeamReferencePreview() {
         selectedMemberId,
     ) || null;
 
+  /*
+   * A directly addressed member opens in Campaign Team with
+   * filters adjusted so the selected person remains visible.
+   * Inactive records land in the inactive-access view.
+   */
+  useEffect(() => {
+    if (!requestedMemberId) {
+      if (selectedMemberId) {
+        setSelectedMemberId("");
+      }
+
+      return;
+    }
+
+    const requestedMember =
+      members.find(
+        (member) =>
+          member.membershipId ===
+          requestedMemberId,
+      );
+
+    if (
+      !requestedMember ||
+      selectedMemberId ===
+        requestedMemberId
+    ) {
+      return;
+    }
+
+    setDrawerTab("overview");
+    setDrawerExpanded(false);
+
+    setActiveView("people");
+    setSearch("");
+    setRoleFilter("all");
+
+    if (
+      requestedMember.status ===
+      "inactive"
+    ) {
+      setSummaryFilter(
+        "inactive",
+      );
+      setStatusFilter(
+        "inactive",
+      );
+    } else {
+      setSummaryFilter("all");
+      setStatusFilter("all");
+    }
+
+    setSelectedMemberId(
+      requestedMemberId,
+    );
+  }, [
+    members,
+    requestedMemberId,
+    selectedMemberId,
+  ]);
+
   const selectedMemberAudit =
     selectedMember
       ? memberAudit(selectedMember)
@@ -1081,7 +1197,8 @@ export default function TeamReferencePreview() {
     (member) => {
       setDrawerTab("overview");
       setDrawerExpanded(false);
-      setSelectedMemberId(
+
+      setMemberRoute(
         member.membershipId,
       );
     };
@@ -1657,6 +1774,8 @@ export default function TeamReferencePreview() {
                 }
                 type="button"
                 onClick={() => {
+                  closeMemberDetails();
+
                   setSummaryFilter(
                     key,
                   );
@@ -1716,6 +1835,8 @@ export default function TeamReferencePreview() {
                   }
                   type="button"
                   onClick={() => {
+                    closeMemberDetails();
+
                     setActiveView(
                       key,
                     );
@@ -2792,10 +2913,8 @@ export default function TeamReferencePreview() {
               styles.drawerBackdrop
             }
             type="button"
-            onClick={() =>
-              setSelectedMemberId(
-                "",
-              )
+            onClick={
+              closeMemberDetails
             }
             aria-label="Close member details"
           />
@@ -2871,10 +2990,8 @@ export default function TeamReferencePreview() {
 
                 <button
                   type="button"
-                  onClick={() =>
-                    setSelectedMemberId(
-                      "",
-                    )
+                  onClick={
+                    closeMemberDetails
                   }
                   aria-label="Close"
                 >
