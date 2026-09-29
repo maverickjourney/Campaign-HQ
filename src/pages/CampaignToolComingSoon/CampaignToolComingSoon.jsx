@@ -32,6 +32,8 @@ import {
   CampaignWorkspaceShell,
 } from "../../components/CampaignWorkspaceShell/CampaignWorkspaceShell";
 
+import FundraisingReferencePreview from "../FundraisingReferencePreview/FundraisingReferencePreview";
+
 import styles from "./CampaignToolComingSoon.module.css";
 
 const GENERIC_TOOL_CONFIG = {
@@ -3039,7 +3041,7 @@ export default function CampaignToolComingSoon({
   toolKey,
 }) {
   if (toolKey === "fundraising") {
-    return <FundraisingPreview />;
+    return <FundraisingReferencePreview />;
   }
 
   if (toolKey === "events") {
