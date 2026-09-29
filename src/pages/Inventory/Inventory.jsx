@@ -11,6 +11,7 @@ import {
   ArrowDownToLine,
   BookmarkPlus,
   Boxes,
+  ChevronRight,
   CircleDollarSign,
   ImagePlus,
   PackageOpen,
@@ -21,6 +22,7 @@ import {
   Search,
   Send,
   Undo2,
+  X,
 } from "lucide-react";
 
 import {
@@ -75,6 +77,243 @@ const MOVEMENT_LABELS = {
   adjustment: "Adjusted",
 };
 
+
+
+const DEMO_INVENTORY_ITEMS = [
+  {
+    id: "demo-inventory-1",
+    workspace_id:
+      "demo-workspace",
+    item_name:
+      "18×24 Yard Signs — Herrerias",
+    sku: "SIGN-18X24-D6",
+    category: "yard_signs",
+    quantity_on_hand: 420,
+    quantity_reserved: 120,
+    quantity_available: 300,
+    reorder_point: 150,
+    unit_cost: 3.85,
+    storage_location:
+      "Campaign HQ · Rack A",
+    vendor_name:
+      "Victory Signs",
+    description:
+      "Standard double-sided campaign yard signs with wire stakes for District 6 field deployment.",
+    image_file_id: null,
+    status: "active",
+    metadata: {
+      purchase_order: {
+        number: "PO-2026-1042",
+        status: "received",
+        order_date:
+          "2026-09-10",
+        expected_delivery_date:
+          "2026-09-18",
+      },
+    },
+    updated_at:
+      "2026-09-28T19:42:00-04:00",
+  },
+  {
+    id: "demo-inventory-2",
+    workspace_id:
+      "demo-workspace",
+    item_name:
+      "Palm Cards — District 6",
+    sku: "PALM-D6-2026",
+    category: "palm_cards",
+    quantity_on_hand: 2400,
+    quantity_reserved: 600,
+    quantity_available: 1800,
+    reorder_point: 750,
+    unit_cost: 0.11,
+    storage_location:
+      "Campaign HQ · Shelf B",
+    vendor_name:
+      "Suncoast Print",
+    description:
+      "Candidate palm cards used for canvassing, volunteer packets and voter-contact events.",
+    image_file_id: null,
+    status: "active",
+    metadata: {
+      purchase_order: {
+        number: "PO-2026-1061",
+        status: "received",
+        order_date:
+          "2026-09-16",
+        expected_delivery_date:
+          "2026-09-22",
+      },
+    },
+    updated_at:
+      "2026-09-28T20:18:00-04:00",
+  },
+  {
+    id: "demo-inventory-3",
+    workspace_id:
+      "demo-workspace",
+    item_name:
+      "Volunteer T-Shirts — Navy",
+    sku: "SHIRT-NAVY-VOL",
+    category: "shirts",
+    quantity_on_hand: 84,
+    quantity_reserved: 36,
+    quantity_available: 48,
+    reorder_point: 40,
+    unit_cost: 8.75,
+    storage_location:
+      "Campaign HQ · Closet 2",
+    vendor_name:
+      "Palm Beach Apparel",
+    description:
+      "Campaign volunteer shirts used for canvassing, events and visibility operations.",
+    image_file_id: null,
+    status: "active",
+    metadata: {
+      purchase_order: {
+        number: "PO-2026-1038",
+        status: "received",
+        order_date:
+          "2026-09-07",
+        expected_delivery_date:
+          "2026-09-15",
+      },
+    },
+    updated_at:
+      "2026-09-27T17:25:00-04:00",
+  },
+  {
+    id: "demo-inventory-4",
+    workspace_id:
+      "demo-workspace",
+    item_name:
+      "Early Vote Door Hangers",
+    sku: "DOOR-EV-2026",
+    category: "door_hangers",
+    quantity_on_hand: 180,
+    quantity_reserved: 0,
+    quantity_available: 180,
+    reorder_point: 250,
+    unit_cost: 0.19,
+    storage_location:
+      "Campaign HQ · Shelf C",
+    vendor_name:
+      "Suncoast Print",
+    description:
+      "Early-vote reminder door hangers staged for upcoming field deployment.",
+    image_file_id: null,
+    status: "active",
+    metadata: {
+      purchase_order: {
+        number: "PO-2026-1074",
+        status: "in_production",
+        order_date:
+          "2026-09-26",
+        expected_delivery_date:
+          "2026-10-01",
+      },
+    },
+    updated_at:
+      "2026-09-28T18:05:00-04:00",
+  },
+  {
+    id: "demo-inventory-5",
+    workspace_id:
+      "demo-workspace",
+    item_name:
+      "Event Table Banners",
+    sku: "BANNER-TABLE-01",
+    category: "banners",
+    quantity_on_hand: 8,
+    quantity_reserved: 2,
+    quantity_available: 6,
+    reorder_point: 3,
+    unit_cost: 42,
+    storage_location:
+      "Campaign HQ · Event Storage",
+    vendor_name:
+      "Victory Signs",
+    description:
+      "Reusable branded table banners for campaign events, forums and volunteer check-in stations.",
+    image_file_id: null,
+    status: "active",
+    metadata: {
+      purchase_order: {
+        number: "PO-2026-1019",
+        status: "received",
+        order_date:
+          "2026-08-29",
+        expected_delivery_date:
+          "2026-09-05",
+      },
+    },
+    updated_at:
+      "2026-09-25T15:10:00-04:00",
+  },
+];
+
+const DEMO_INVENTORY_MOVEMENTS = [
+  {
+    id: "demo-movement-1",
+    workspace_id:
+      "demo-workspace",
+    inventory_item_id:
+      "demo-inventory-2",
+    movement_type:
+      "distributed",
+    on_hand_delta: -400,
+    reserved_delta: -400,
+    note:
+      "Canvassing packet distribution.",
+    created_at:
+      "2026-09-28T19:30:00-04:00",
+  },
+  {
+    id: "demo-movement-2",
+    workspace_id:
+      "demo-workspace",
+    inventory_item_id:
+      "demo-inventory-1",
+    movement_type:
+      "reserved",
+    on_hand_delta: 0,
+    reserved_delta: 120,
+    note:
+      "Reserved for weekend canvassing launch.",
+    created_at:
+      "2026-09-28T16:20:00-04:00",
+  },
+  {
+    id: "demo-movement-3",
+    workspace_id:
+      "demo-workspace",
+    inventory_item_id:
+      "demo-inventory-3",
+    movement_type:
+      "distributed",
+    on_hand_delta: -18,
+    reserved_delta: 0,
+    note:
+      "Volunteer orientation shirts.",
+    created_at:
+      "2026-09-27T18:10:00-04:00",
+  },
+  {
+    id: "demo-movement-4",
+    workspace_id:
+      "demo-workspace",
+    inventory_item_id:
+      "demo-inventory-4",
+    movement_type:
+      "received",
+    on_hand_delta: 180,
+    reserved_delta: 0,
+    note:
+      "Partial print run received.",
+    created_at:
+      "2026-09-27T14:45:00-04:00",
+  },
+];
 
 const PURCHASE_ORDER_STATUSES = [
   ["not_ordered", "Not ordered"],
@@ -210,6 +449,13 @@ export default function Inventory() {
   const workspaceId =
     workspace?.id || "";
 
+  const demoMode =
+    new URLSearchParams(
+      window.location.search,
+    ).get(
+      "inventory-demo",
+    ) === "1";
+
   const {
     uploadFiles,
     isSaving:
@@ -224,6 +470,16 @@ export default function Inventory() {
     items,
     setItems,
   ] = useState([]);
+
+  const [
+    selectedItemId,
+    setSelectedItemId,
+  ] = useState(
+    () =>
+      new URLSearchParams(
+        window.location.search,
+      ).get("item") || "",
+  );
 
   const [
     imageUrls,
@@ -320,6 +576,40 @@ export default function Inventory() {
   const loadInventory =
     useCallback(
       async () => {
+      if (demoMode) {
+        setError("");
+        setLoading(false);
+        setImageUrls({});
+
+        setItems(
+          DEMO_INVENTORY_ITEMS.map(
+            (item) => ({
+              ...item,
+              metadata: {
+                ...(item.metadata || {}),
+                purchase_order: {
+                  ...(
+                    item.metadata
+                      ?.purchase_order ||
+                    {}
+                  ),
+                },
+              },
+            }),
+          ),
+        );
+
+        setMovements(
+          DEMO_INVENTORY_MOVEMENTS.map(
+            (movement) => ({
+              ...movement,
+            }),
+          ),
+        );
+
+        return;
+      }
+
       if (!workspaceId) {
         setItems([]);
         setMovements([]);
@@ -513,7 +803,7 @@ export default function Inventory() {
         setLoading(false);
       }
           },
-      [workspaceId],
+      [workspaceId, demoMode],
     );
 
 
@@ -671,6 +961,131 @@ export default function Inventory() {
         ),
       [items],
     );
+
+
+  const selectedItem =
+    useMemo(
+      () =>
+        selectedItemId
+          ? itemById.get(
+              selectedItemId,
+            ) || null
+          : null,
+      [
+        itemById,
+        selectedItemId,
+      ],
+    );
+
+  const syncItemQuery =
+    useCallback(
+      (
+        nextItemId,
+      ) => {
+        const url =
+          new URL(
+            window.location.href,
+          );
+
+        if (nextItemId) {
+          url.searchParams.set(
+            "item",
+            nextItemId,
+          );
+        } else {
+          url.searchParams.delete(
+            "item",
+          );
+        }
+
+        window.history.replaceState(
+          {},
+          "",
+          `${url.pathname}${url.search}${url.hash}`,
+        );
+      },
+      [],
+    );
+
+  const openItemDetails =
+    useCallback(
+      (item) => {
+        if (!item?.id) {
+          return;
+        }
+
+        setSelectedItemId(
+          item.id,
+        );
+
+        syncItemQuery(
+          item.id,
+        );
+      },
+      [syncItemQuery],
+    );
+
+  const closeItemDetails =
+    useCallback(
+      () => {
+        setSelectedItemId("");
+        syncItemQuery("");
+      },
+      [syncItemQuery],
+    );
+
+  useEffect(() => {
+    const handlePopState =
+      () => {
+        setSelectedItemId(
+          new URLSearchParams(
+            window.location.search,
+          ).get("item") || "",
+        );
+      };
+
+    window.addEventListener(
+      "popstate",
+      handlePopState,
+    );
+
+    return () => {
+      window.removeEventListener(
+        "popstate",
+        handlePopState,
+      );
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!selectedItem) {
+      return;
+    }
+
+    const visible =
+      filteredItems.some(
+        (item) =>
+          item.id ===
+          selectedItem.id,
+      );
+
+    if (visible) {
+      return;
+    }
+
+    setSearchTerm("");
+    setCategory("all");
+
+    setStatusFilter(
+      selectedItem.status ===
+        "archived"
+        ? "archived"
+        : "active",
+    );
+  }, [
+    selectedItem,
+    filteredItems,
+  ]);
 
   const resetItemEditor =
     () => {
@@ -911,6 +1326,191 @@ export default function Inventory() {
       setSavingItem(true);
       setError("");
 
+
+      if (demoMode) {
+        const itemId =
+          editingItem?.id ||
+          `demo-inventory-${Date.now()}`;
+
+        const existing =
+          editingItem || {};
+
+        const onHand =
+          editingItem
+            ? Number(
+                existing.quantity_on_hand ||
+                  0,
+              )
+            : Number(
+                itemForm
+                  .quantity_on_hand ||
+                  0,
+              );
+
+        const reserved =
+          editingItem
+            ? Number(
+                existing.quantity_reserved ||
+                  0,
+              )
+            : Number(
+                itemForm
+                  .quantity_reserved ||
+                  0,
+              );
+
+        const purchaseOrder = {
+          number:
+            itemForm
+              .purchase_order_number
+              .trim() ||
+            null,
+
+          status:
+            itemForm
+              .purchase_order_status ||
+            "not_ordered",
+
+          order_date:
+            itemForm
+              .purchase_order_date ||
+            null,
+
+          expected_delivery_date:
+            itemForm
+              .expected_delivery_date ||
+            null,
+        };
+
+        const nextItem = {
+          ...existing,
+
+          id: itemId,
+
+          workspace_id:
+            existing.workspace_id ||
+            workspaceId ||
+            "demo-workspace",
+
+          item_name:
+            itemForm
+              .item_name
+              .trim(),
+
+          sku:
+            itemForm.sku.trim() ||
+            null,
+
+          category:
+            itemForm.category,
+
+          quantity_on_hand:
+            onHand,
+
+          quantity_reserved:
+            reserved,
+
+          quantity_available:
+            Math.max(
+              0,
+              onHand - reserved,
+            ),
+
+          reorder_point:
+            Number(
+              itemForm.reorder_point ||
+                0,
+            ),
+
+          unit_cost:
+            itemForm.unit_cost ===
+            ""
+              ? null
+              : Number(
+                  itemForm.unit_cost,
+                ),
+
+          storage_location:
+            itemForm
+              .storage_location
+              .trim() ||
+            null,
+
+          vendor_name:
+            itemForm
+              .vendor_name
+              .trim() ||
+            null,
+
+          description:
+            itemForm
+              .description
+              .trim() ||
+            null,
+
+          image_file_id:
+            null,
+
+          status:
+            existing.status ||
+            "active",
+
+          metadata: {
+            ...(
+              existing.metadata ||
+              {}
+            ),
+            purchase_order:
+              purchaseOrder,
+          },
+
+          updated_at:
+            new Date()
+              .toISOString(),
+        };
+
+        setItems(
+          (current) =>
+            editingItem
+              ? current.map(
+                  (item) =>
+                    item.id ===
+                    itemId
+                      ? nextItem
+                      : item,
+                )
+              : [
+                  ...current,
+                  nextItem,
+                ],
+        );
+
+        setImageUrls(
+          (current) => {
+            const next = {
+              ...current,
+            };
+
+            if (
+              itemImagePreview
+            ) {
+              next[itemId] =
+                itemImagePreview;
+            } else if (
+              removeItemImage
+            ) {
+              delete next[itemId];
+            }
+
+            return next;
+          },
+        );
+
+        resetItemEditor();
+        setSavingItem(false);
+        return;
+      }
+
       try {
         let imageFileId =
           editingItem
@@ -1115,6 +1715,29 @@ export default function Inventory() {
 
       setError("");
 
+
+      if (demoMode) {
+        setItems(
+          (current) =>
+            current.map(
+              (currentItem) =>
+                currentItem.id ===
+                item.id
+                  ? {
+                      ...currentItem,
+                      status:
+                        nextStatus,
+                      updated_at:
+                        new Date()
+                          .toISOString(),
+                    }
+                  : currentItem,
+            ),
+        );
+
+        return;
+      }
+
       try {
         const {
           error:
@@ -1256,6 +1879,103 @@ export default function Inventory() {
       ) {
         reservedDelta =
           -quantity;
+      }
+
+
+      if (demoMode) {
+        const createdAt =
+          new Date()
+            .toISOString();
+
+        setItems(
+          (current) =>
+            current.map(
+              (item) => {
+                if (
+                  item.id !==
+                  adjustment.item.id
+                ) {
+                  return item;
+                }
+
+                const nextOnHand =
+                  Math.max(
+                    0,
+                    Number(
+                      item.quantity_on_hand ||
+                        0,
+                    ) +
+                      onHandDelta,
+                  );
+
+                const nextReserved =
+                  Math.max(
+                    0,
+                    Math.min(
+                      nextOnHand,
+                      Number(
+                        item.quantity_reserved ||
+                          0,
+                      ) +
+                        reservedDelta,
+                    ),
+                  );
+
+                return {
+                  ...item,
+
+                  quantity_on_hand:
+                    nextOnHand,
+
+                  quantity_reserved:
+                    nextReserved,
+
+                  quantity_available:
+                    Math.max(
+                      0,
+                      nextOnHand -
+                        nextReserved,
+                    ),
+
+                  updated_at:
+                    createdAt,
+                };
+              },
+            ),
+        );
+
+        setMovements(
+          (current) => [
+            {
+              id:
+                `demo-movement-${Date.now()}`,
+              workspace_id:
+                workspaceId ||
+                "demo-workspace",
+              inventory_item_id:
+                adjustment.item.id,
+              movement_type:
+                movementType,
+              on_hand_delta:
+                onHandDelta,
+              reserved_delta:
+                reservedDelta,
+              note:
+                adjustmentNote
+                  .trim() ||
+                null,
+              created_at:
+                createdAt,
+            },
+            ...current,
+          ].slice(
+            0,
+            20,
+          ),
+        );
+
+        closeAdjustment();
+        return;
       }
 
       setSavingAdjustment(
@@ -1528,6 +2248,17 @@ export default function Inventory() {
                                 ? "true"
                                 : "false"
                             }
+                            data-selected={
+                              selectedItemId ===
+                              item.id
+                                ? "true"
+                                : "false"
+                            }
+                            onClick={() =>
+                              openItemDetails(
+                                item,
+                              )
+                            }
                           >
                             <td>
                               <div
@@ -1659,7 +2390,27 @@ export default function Inventory() {
                                 className={
                                   styles.rowActions
                                 }
+                                onClick={(
+                                  event,
+                                ) =>
+                                  event.stopPropagation()
+                                }
                               >
+                                <button
+                                  type="button"
+                                  title="Open details"
+                                  aria-label={`Open ${item.item_name}`}
+                                  onClick={() =>
+                                    openItemDetails(
+                                      item,
+                                    )
+                                  }
+                                >
+                                  <ChevronRight
+                                    size={15}
+                                  />
+                                </button>
+
                                 <button
                                   type="button"
                                   title="Edit item"
@@ -1787,6 +2538,17 @@ export default function Inventory() {
                           low
                             ? "true"
                             : "false"
+                        }
+                        data-selected={
+                          selectedItemId ===
+                          item.id
+                            ? "true"
+                            : "false"
+                        }
+                        onClick={() =>
+                          openItemDetails(
+                            item,
+                          )
                         }
                       >
                         <header>
@@ -1935,7 +2697,26 @@ export default function Inventory() {
                           className={
                             styles.mobileActions
                           }
+                          onClick={(
+                            event,
+                          ) =>
+                            event.stopPropagation()
+                          }
                         >
+                          <button
+                            type="button"
+                            onClick={() =>
+                              openItemDetails(
+                                item,
+                              )
+                            }
+                          >
+                            <ChevronRight
+                              size={16}
+                            />
+                            Details
+                          </button>
+
                           <button
                             type="button"
                             onClick={() =>
@@ -2150,6 +2931,433 @@ export default function Inventory() {
           )}
         </SeatPageSection>
       </SeatPage>
+
+
+      {selectedItem ? (
+        <div
+          className={
+            styles.detailBackdrop
+          }
+          role="presentation"
+          onMouseDown={(
+            event,
+          ) => {
+            if (
+              event.target ===
+              event.currentTarget
+            ) {
+              closeItemDetails();
+            }
+          }}
+        >
+          <aside
+            className={
+              styles.detailDrawer
+            }
+            role="dialog"
+            aria-modal="true"
+            aria-label={`${selectedItem.item_name} inventory details`}
+          >
+            <header
+              className={
+                styles.detailHeader
+              }
+            >
+              <div
+                className={
+                  styles.detailIdentity
+                }
+              >
+                <span
+                  className={
+                    styles.detailIcon
+                  }
+                >
+                  <PackageOpen
+                    size={22}
+                  />
+                </span>
+
+                <div>
+                  <span>
+                    Inventory details
+                  </span>
+
+                  <h2>
+                    {
+                      selectedItem.item_name
+                    }
+                  </h2>
+
+                  <p>
+                    {categoryLabel(
+                      selectedItem.category,
+                    )}
+                    {" · "}
+                    {selectedItem.status ===
+                    "archived"
+                      ? "Archived"
+                      : "Active"}
+                  </p>
+                </div>
+              </div>
+
+              <button
+                className={
+                  styles.detailClose
+                }
+                type="button"
+                aria-label="Close inventory details"
+                onClick={
+                  closeItemDetails
+                }
+              >
+                <X size={21} />
+              </button>
+            </header>
+
+            <div
+              className={
+                styles.detailBody
+              }
+            >
+              {demoMode ? (
+                <div
+                  className={
+                    styles.demoNotice
+                  }
+                >
+                  Local inventory preview
+                </div>
+              ) : null}
+
+              <div
+                className={
+                  styles.detailMetricGrid
+                }
+              >
+                <article>
+                  <span>
+                    On hand
+                  </span>
+                  <strong>
+                    {
+                      selectedItem.quantity_on_hand
+                    }
+                  </strong>
+                </article>
+
+                <article>
+                  <span>
+                    Reserved
+                  </span>
+                  <strong>
+                    {
+                      selectedItem.quantity_reserved
+                    }
+                  </strong>
+                </article>
+
+                <article>
+                  <span>
+                    Available
+                  </span>
+                  <strong>
+                    {
+                      selectedItem.quantity_available
+                    }
+                  </strong>
+                </article>
+
+                <article>
+                  <span>
+                    Reorder point
+                  </span>
+                  <strong>
+                    {
+                      selectedItem.reorder_point
+                    }
+                  </strong>
+                </article>
+              </div>
+
+              <section
+                className={
+                  styles.detailSection
+                }
+              >
+                <div
+                  className={
+                    styles.detailSectionHeading
+                  }
+                >
+                  <div>
+                    <span>
+                      Asset record
+                    </span>
+                    <h3>
+                      Inventory information
+                    </h3>
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={() =>
+                      openEdit(
+                        selectedItem,
+                      )
+                    }
+                  >
+                    <Pencil
+                      size={15}
+                    />
+                    Edit
+                  </button>
+                </div>
+
+                <dl
+                  className={
+                    styles.detailFacts
+                  }
+                >
+                  <div>
+                    <dt>SKU</dt>
+                    <dd>
+                      {selectedItem.sku ||
+                        "Not set"}
+                    </dd>
+                  </div>
+
+                  <div>
+                    <dt>Location</dt>
+                    <dd>
+                      {selectedItem.storage_location ||
+                        "Not set"}
+                    </dd>
+                  </div>
+
+                  <div>
+                    <dt>Vendor</dt>
+                    <dd>
+                      {selectedItem.vendor_name ||
+                        "Not set"}
+                    </dd>
+                  </div>
+
+                  <div>
+                    <dt>Unit cost</dt>
+                    <dd>
+                      {selectedItem.unit_cost ==
+                      null
+                        ? "Not set"
+                        : formatCurrency(
+                            selectedItem.unit_cost,
+                          )}
+                    </dd>
+                  </div>
+
+                  <div>
+                    <dt>
+                      Inventory value
+                    </dt>
+                    <dd>
+                      {formatCurrency(
+                        Number(
+                          selectedItem.quantity_on_hand ||
+                            0,
+                        ) *
+                          Number(
+                            selectedItem.unit_cost ||
+                              0,
+                          ),
+                      )}
+                    </dd>
+                  </div>
+
+                  <div>
+                    <dt>
+                      Purchase order
+                    </dt>
+                    <dd>
+                      {purchaseOrderFor(
+                        selectedItem,
+                      ).number ||
+                        "Not set"}
+                    </dd>
+                  </div>
+
+                  <div>
+                    <dt>PO status</dt>
+                    <dd>
+                      {purchaseOrderStatusLabel(
+                        purchaseOrderFor(
+                          selectedItem,
+                        ).status,
+                      )}
+                    </dd>
+                  </div>
+
+                  <div>
+                    <dt>Updated</dt>
+                    <dd>
+                      {formatDateTime(
+                        selectedItem.updated_at,
+                      )}
+                    </dd>
+                  </div>
+                </dl>
+              </section>
+
+              {selectedItem.description ? (
+                <section
+                  className={
+                    styles.detailSection
+                  }
+                >
+                  <div
+                    className={
+                      styles.detailSectionHeading
+                    }
+                  >
+                    <div>
+                      <span>
+                        Notes
+                      </span>
+                      <h3>
+                        Description
+                      </h3>
+                    </div>
+                  </div>
+
+                  <p
+                    className={
+                      styles.detailDescription
+                    }
+                  >
+                    {
+                      selectedItem.description
+                    }
+                  </p>
+                </section>
+              ) : null}
+
+              {selectedItem.status ===
+              "active" ? (
+                <section
+                  className={
+                    styles.detailSection
+                  }
+                >
+                  <div
+                    className={
+                      styles.detailSectionHeading
+                    }
+                  >
+                    <div>
+                      <span>
+                        Inventory movement
+                      </span>
+                      <h3>
+                        Update quantities
+                      </h3>
+                    </div>
+                  </div>
+
+                  <div
+                    className={
+                      styles.detailActions
+                    }
+                  >
+                    {ACTIONS.map(
+                      (action) => {
+                        const Icon =
+                          action.icon;
+
+                        return (
+                          <button
+                            key={
+                              action.key
+                            }
+                            type="button"
+                            onClick={() =>
+                              openAdjustment(
+                                selectedItem,
+                                action.key,
+                              )
+                            }
+                          >
+                            <Icon
+                              size={16}
+                            />
+                            {
+                              action.label
+                            }
+                          </button>
+                        );
+                      },
+                    )}
+                  </div>
+                </section>
+              ) : null}
+            </div>
+
+            <footer
+              className={
+                styles.detailFooter
+              }
+            >
+              <button
+                type="button"
+                onClick={() =>
+                  openEdit(
+                    selectedItem,
+                  )
+                }
+              >
+                <Pencil
+                  size={16}
+                />
+                Edit item
+              </button>
+
+              <button
+                type="button"
+                data-danger={
+                  selectedItem.status ===
+                  "active"
+                    ? "true"
+                    : "false"
+                }
+                onClick={() =>
+                  void setItemStatus(
+                    selectedItem,
+                    selectedItem.status ===
+                    "archived"
+                      ? "active"
+                      : "archived",
+                  )
+                }
+              >
+                {selectedItem.status ===
+                "archived" ? (
+                  <RefreshCw
+                    size={16}
+                  />
+                ) : (
+                  <Archive
+                    size={16}
+                  />
+                )}
+
+                {selectedItem.status ===
+                "archived"
+                  ? "Restore item"
+                  : "Archive item"}
+              </button>
+            </footer>
+          </aside>
+        </div>
+      ) : null}
 
       {addOpen ? (
         <div
