@@ -90,6 +90,99 @@ const TABS = [
   },
 ];
 
+const VOLUNTEER_VIEW_IDS = new Set(
+  TABS.map((tab) => tab.id),
+);
+
+const VOLUNTEER_ACTIVITY_TAB_IDS = new Set([
+  "overview",
+  "doors",
+  "work",
+  "signs",
+]);
+
+function readVolunteerNavigationFromUrl() {
+  if (typeof window === "undefined") {
+    return {
+      view: "overview",
+      volunteerId: null,
+      activityTab: "overview",
+    };
+  }
+
+  const params = new URLSearchParams(
+    window.location.search,
+  );
+
+  const volunteerId =
+    params.get("volunteer") || null;
+
+  const requestedView =
+    params.get("view") || "";
+
+  const requestedActivityTab =
+    params.get("volunteer-tab") || "";
+
+  return {
+    view: volunteerId
+      ? "roster"
+      : VOLUNTEER_VIEW_IDS.has(requestedView)
+        ? requestedView
+        : "overview",
+
+    volunteerId,
+
+    activityTab:
+      VOLUNTEER_ACTIVITY_TAB_IDS.has(
+        requestedActivityTab,
+      )
+        ? requestedActivityTab
+        : "overview",
+  };
+}
+
+function buildVolunteerNavigationUrl({
+  view = "overview",
+  volunteerId = null,
+  activityTab = "overview",
+}) {
+  const url = new URL(window.location.href);
+
+  if (view && view !== "overview") {
+    url.searchParams.set("view", view);
+  } else {
+    url.searchParams.delete("view");
+  }
+
+  if (volunteerId) {
+    url.searchParams.set(
+      "volunteer",
+      volunteerId,
+    );
+
+    if (
+      activityTab &&
+      activityTab !== "overview"
+    ) {
+      url.searchParams.set(
+        "volunteer-tab",
+        activityTab,
+      );
+    } else {
+      url.searchParams.delete(
+        "volunteer-tab",
+      );
+    }
+  } else {
+    url.searchParams.delete("volunteer");
+    url.searchParams.delete(
+      "volunteer-tab",
+    );
+  }
+
+  return `${url.pathname}${url.search}${url.hash}`;
+}
+
 const INITIAL_VOLUNTEERS = [
   {
     id: "elizabeth",
@@ -1080,17 +1173,30 @@ function PhotoCountButton({
 
 export default function VolunteersReferencePreview() {
   const [activeTab, setActiveTab] =
-    useState("overview");
+    useState(
+      () =>
+        readVolunteerNavigationFromUrl().view,
+    );
 
   const [modal, setModal] = useState(null);
   const [mapOpen, setMapOpen] = useState(false);
   const [photoViewer, setPhotoViewer] =
     useState(null);
   const [volunteerActivityOpen, setVolunteerActivityOpen] =
-    useState(false);
+    useState(
+      () =>
+        Boolean(
+          readVolunteerNavigationFromUrl()
+            .volunteerId,
+        ),
+    );
 
   const [volunteerActivityTab, setVolunteerActivityTab] =
-    useState("overview");
+    useState(
+      () =>
+        readVolunteerNavigationFromUrl()
+          .activityTab,
+    );
 
 
   const [volunteers, setVolunteers] = useState(
@@ -1160,7 +1266,11 @@ export default function VolunteersReferencePreview() {
     useState(EMPTY_VOLUNTEER);
 
   const [selectedVolunteerId, setSelectedVolunteerId] =
-    useState("elizabeth");
+    useState(
+      () =>
+        readVolunteerNavigationFromUrl()
+          .volunteerId || "elizabeth",
+    );
 
   const [rosterQuery, setRosterQuery] =
     useState("");
@@ -1198,6 +1308,78 @@ export default function VolunteersReferencePreview() {
   useEffect(() => {
     saveSessionList("issues", issues);
   }, [issues]);
+
+  useEffect(() => {
+    const syncVolunteerNavigationFromUrl = () => {
+      const navigation =
+        readVolunteerNavigationFromUrl();
+
+      const matchedVolunteer =
+        navigation.volunteerId
+          ? volunteers.find(
+              (volunteer) =>
+                volunteer.id ===
+                navigation.volunteerId,
+            )
+          : null;
+
+      if (matchedVolunteer) {
+        setActiveTab("roster");
+        setSelectedVolunteerId(
+          matchedVolunteer.id,
+        );
+        setVolunteerActivityTab(
+          navigation.activityTab,
+        );
+        setVolunteerActivityOpen(true);
+      } else {
+        setActiveTab(navigation.view);
+        setVolunteerActivityTab("overview");
+        setVolunteerActivityOpen(false);
+      }
+
+      const canonicalUrl =
+        buildVolunteerNavigationUrl({
+          view: matchedVolunteer
+            ? "roster"
+            : navigation.view,
+          volunteerId:
+            matchedVolunteer?.id || null,
+          activityTab: matchedVolunteer
+            ? navigation.activityTab
+            : "overview",
+        });
+
+      const currentUrl =
+        `${window.location.pathname}` +
+        `${window.location.search}` +
+        `${window.location.hash}`;
+
+      if (canonicalUrl !== currentUrl) {
+        window.history.replaceState(
+          {
+            ...(window.history.state || {}),
+          },
+          "",
+          canonicalUrl,
+        );
+      }
+    };
+
+    syncVolunteerNavigationFromUrl();
+
+    window.addEventListener(
+      "popstate",
+      syncVolunteerNavigationFromUrl,
+    );
+
+    return () => {
+      window.removeEventListener(
+        "popstate",
+        syncVolunteerNavigationFromUrl,
+      );
+    };
+  }, [volunteers]);
 
   const selectedVolunteer = useMemo(
     () =>
@@ -1520,10 +1702,127 @@ export default function VolunteersReferencePreview() {
       ]),
   ).size;
 
+  const applyVolunteerNavigation = ({
+    view = "overview",
+    volunteerId = null,
+    activityTab = "overview",
+    replace = false,
+  }) => {
+    const nextView = volunteerId
+      ? "roster"
+      : VOLUNTEER_VIEW_IDS.has(view)
+        ? view
+        : "overview";
+
+    const nextActivityTab =
+      VOLUNTEER_ACTIVITY_TAB_IDS.has(
+        activityTab,
+      )
+        ? activityTab
+        : "overview";
+
+    const nextUrl =
+      buildVolunteerNavigationUrl({
+        view: nextView,
+        volunteerId,
+        activityTab: nextActivityTab,
+      });
+
+    const currentHistoryState =
+      window.history.state || {};
+
+    const method = replace
+      ? "replaceState"
+      : "pushState";
+
+    window.history[method](
+      {
+        ...currentHistoryState,
+        campaignSeatVolunteerNavigation:
+          true,
+        campaignSeatVolunteerDetailPush:
+          volunteerId
+            ? replace
+              ? Boolean(
+                  currentHistoryState
+                    .campaignSeatVolunteerDetailPush,
+                )
+              : true
+            : false,
+        volunteerView: nextView,
+        volunteerId,
+        volunteerActivityTab:
+          nextActivityTab,
+      },
+      "",
+      nextUrl,
+    );
+
+    setActiveTab(nextView);
+
+    if (volunteerId) {
+      setSelectedVolunteerId(volunteerId);
+      setVolunteerActivityTab(
+        nextActivityTab,
+      );
+      setVolunteerActivityOpen(true);
+    } else {
+      setVolunteerActivityTab("overview");
+      setVolunteerActivityOpen(false);
+    }
+  };
+
+  const selectVolunteerView = (view) => {
+    applyVolunteerNavigation({
+      view,
+    });
+  };
+
   const openVolunteerActivity = (volunteerId) => {
-    setSelectedVolunteerId(volunteerId);
-    setVolunteerActivityTab("overview");
-    setVolunteerActivityOpen(true);
+    if (
+      !volunteers.some(
+        (volunteer) =>
+          volunteer.id === volunteerId,
+      )
+    ) {
+      return;
+    }
+
+    applyVolunteerNavigation({
+      view: "roster",
+      volunteerId,
+      activityTab: "overview",
+    });
+  };
+
+  const selectVolunteerActivityTab = (
+    activityTab,
+  ) => {
+    if (!selectedVolunteerId) {
+      return;
+    }
+
+    applyVolunteerNavigation({
+      view: "roster",
+      volunteerId: selectedVolunteerId,
+      activityTab,
+      replace: true,
+    });
+  };
+
+  const closeVolunteerActivity = () => {
+    if (
+      window.history.state
+        ?.campaignSeatVolunteerDetailPush
+    ) {
+      window.history.back();
+      return;
+    }
+
+    applyVolunteerNavigation({
+      view: "roster",
+      replace: true,
+    });
   };
 
   const openMap = () => {
@@ -1578,7 +1877,7 @@ export default function VolunteersReferencePreview() {
 
     setRouteForm(EMPTY_ROUTE);
     setModal(null);
-    setActiveTab("routes");
+    selectVolunteerView("routes");
   };
 
   const addDoorLog = (event) => {
@@ -1608,7 +1907,7 @@ export default function VolunteersReferencePreview() {
 
     setDoorForm(EMPTY_DOOR);
     setModal(null);
-    setActiveTab("doors");
+    selectVolunteerView("doors");
   };
 
   const addYardSign = (event) => {
@@ -1639,7 +1938,7 @@ export default function VolunteersReferencePreview() {
 
     setSignForm(EMPTY_SIGN);
     setModal(null);
-    setActiveTab("signs");
+    selectVolunteerView("signs");
   };
 
   const addAssignment = (event) => {
@@ -1674,7 +1973,7 @@ export default function VolunteersReferencePreview() {
 
     setAssignmentForm(EMPTY_ASSIGNMENT);
     setModal(null);
-    setActiveTab("assignments");
+    selectVolunteerView("assignments");
   };
 
   const addIssue = (event) => {
@@ -1697,7 +1996,7 @@ export default function VolunteersReferencePreview() {
 
     setIssueForm(EMPTY_ISSUE);
     setModal(null);
-    setActiveTab("activity");
+    selectVolunteerView("activity");
   };
 
   const addVolunteer = (event) => {
@@ -1727,7 +2026,7 @@ export default function VolunteersReferencePreview() {
     setSelectedVolunteerId(volunteer.id);
     setVolunteerForm(EMPTY_VOLUNTEER);
     setModal(null);
-    setActiveTab("roster");
+    selectVolunteerView("roster");
   };
 
   const markSelectedComplete = () => {
@@ -1984,7 +2283,7 @@ export default function VolunteersReferencePreview() {
                 className={styles.textButton}
                 type="button"
                 onClick={() =>
-                  setActiveTab("routes")
+                  selectVolunteerView("routes")
                 }
               >
                 View all
@@ -2937,7 +3236,7 @@ export default function VolunteersReferencePreview() {
               <button
                 className={styles.secondaryAction}
                 type="button"
-                onClick={() => setActiveTab("roster")}
+                onClick={() => selectVolunteerView("roster")}
               >
                 <Users size={17} />
                 See All Volunteers
@@ -2987,7 +3286,7 @@ export default function VolunteersReferencePreview() {
                     activeTab === tab.id
                   }
                   onClick={() =>
-                    setActiveTab(tab.id)
+                    selectVolunteerView(tab.id)
                   }
                 >
                   <Icon size={16} />
@@ -3036,9 +3335,7 @@ export default function VolunteersReferencePreview() {
             eyebrow="Volunteer activity profile"
             icon={Users}
             wide
-            onClose={() =>
-              setVolunteerActivityOpen(false)
-            }
+            onClose={closeVolunteerActivity}
           >
             <div className={styles.volunteerActivityProfile}>
               <section className={styles.activityProfileHero}>
@@ -3113,7 +3410,7 @@ export default function VolunteersReferencePreview() {
                         volunteerActivityTab === id
                       }
                       onClick={() =>
-                        setVolunteerActivityTab(id)
+                        selectVolunteerActivityTab(id)
                       }
                     >
                       <Icon size={16} />
