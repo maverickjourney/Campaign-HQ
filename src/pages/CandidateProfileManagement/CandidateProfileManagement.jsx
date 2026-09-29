@@ -663,7 +663,7 @@ export default function CandidateProfileManagement() {
                         )
                       }
                       maxLength={4000}
-                      rows={7}
+                      rows={4}
                       placeholder="Candidate background, community roots, experience and campaign biography."
                     />
 
@@ -1287,9 +1287,14 @@ export default function CandidateProfileManagement() {
             </div>
 
             <footer
-              className={
-                styles.saveBar
-              }
+              className={[
+                styles.saveBar,
+                hasChanges
+                  ? styles.saveBarSticky
+                  : "",
+              ]
+                .filter(Boolean)
+                .join(" ")}
             >
               <div>
                 <strong>
