@@ -21,6 +21,7 @@ import {
 } from "lucide-react";
 
 import {
+  useEffect,
   useMemo,
   useState,
 } from "react";
@@ -197,11 +198,106 @@ function initialsFor(name) {
     .join("") || "DN";
 }
 
+
+const FUNDRAISING_VIEWS = new Set([
+  "overview",
+  "contributions",
+  "donors",
+  "goals",
+]);
+
+function fundraisingKey(value) {
+  return String(value || "")
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+}
+
+function readFundraisingLocation() {
+  if (typeof window === "undefined") {
+    return {
+      view: "overview",
+      detail: null,
+    };
+  }
+
+  const url = new URL(window.location.href);
+
+  const contributionId =
+    url.searchParams.get("contribution");
+
+  const donorId =
+    url.searchParams.get("donor");
+
+  const pledgeId =
+    url.searchParams.get("pledge");
+
+  let detail = null;
+  let detailView = "";
+
+  if (contributionId) {
+    detail = {
+      type: "contribution",
+      id: contributionId,
+    };
+    detailView = "contributions";
+  } else if (donorId) {
+    detail = {
+      type: "donor",
+      id: donorId,
+    };
+    detailView = "donors";
+  } else if (pledgeId) {
+    detail = {
+      type: "pledge",
+      id: pledgeId,
+    };
+    detailView = "goals";
+  }
+
+  const requestedView =
+    url.searchParams.get("fundraising-view");
+
+  const view = detailView ||
+    (
+      FUNDRAISING_VIEWS.has(requestedView)
+        ? requestedView
+        : "overview"
+    );
+
+  return {
+    view,
+    detail,
+  };
+}
+
+function handleInteractiveKey(event, action) {
+  if (
+    event.key !== "Enter" &&
+    event.key !== " "
+  ) {
+    return;
+  }
+
+  event.preventDefault();
+  action();
+}
+
 export default function FundraisingReferencePreview() {
   const [
     activeView,
     setActiveView,
-  ] = useState("overview");
+  ] = useState(
+    () => readFundraisingLocation().view,
+  );
+
+  const [
+    detailState,
+    setDetailState,
+  ] = useState(
+    () => readFundraisingLocation().detail,
+  );
 
   const [
     contributions,
@@ -232,6 +328,124 @@ export default function FundraisingReferencePreview() {
     activityMessage,
     setActivityMessage,
   ] = useState("");
+
+  const applyFundraisingLocation = (
+    nextView,
+    nextDetail = null,
+    {
+      replace = false,
+    } = {},
+  ) => {
+    const url = new URL(window.location.href);
+
+    url.searchParams.set(
+      "fundraising-view",
+      nextView,
+    );
+
+    url.searchParams.delete("contribution");
+    url.searchParams.delete("donor");
+    url.searchParams.delete("pledge");
+
+    if (nextDetail?.type && nextDetail?.id) {
+      url.searchParams.set(
+        nextDetail.type,
+        nextDetail.id,
+      );
+    }
+
+    const nextUrl =
+      `${url.pathname}${url.search}${url.hash}`;
+
+    window.history[
+      replace
+        ? "replaceState"
+        : "pushState"
+    ](
+      {},
+      "",
+      nextUrl,
+    );
+
+    setActiveView(nextView);
+    setDetailState(nextDetail);
+  };
+
+  const navigateView = (nextView) => {
+    applyFundraisingLocation(
+      nextView,
+      null,
+    );
+  };
+
+  const openContribution = (contribution) => {
+    applyFundraisingLocation(
+      "contributions",
+      {
+        type: "contribution",
+        id: contribution.id,
+      },
+    );
+  };
+
+  const openDonor = (donorOrName) => {
+    const donorName =
+      typeof donorOrName === "string"
+        ? donorOrName
+        : donorOrName?.name;
+
+    applyFundraisingLocation(
+      "donors",
+      {
+        type: "donor",
+        id: fundraisingKey(donorName),
+      },
+    );
+  };
+
+  const openPledge = (pledge) => {
+    applyFundraisingLocation(
+      "goals",
+      {
+        type: "pledge",
+        id: fundraisingKey(pledge?.donor),
+      },
+    );
+  };
+
+  const closeDetail = () => {
+    applyFundraisingLocation(
+      activeView,
+      null,
+      {
+        replace: true,
+      },
+    );
+  };
+
+  useEffect(() => {
+    const syncFromBrowserHistory = () => {
+      const next =
+        readFundraisingLocation();
+
+      setActiveView(next.view);
+      setDetailState(next.detail);
+      setContributionModalOpen(false);
+    };
+
+    window.addEventListener(
+      "popstate",
+      syncFromBrowserHistory,
+    );
+
+    return () => {
+      window.removeEventListener(
+        "popstate",
+        syncFromBrowserHistory,
+      );
+    };
+  }, []);
+
 
   const addedTotal = useMemo(
     () =>
@@ -276,6 +490,33 @@ export default function FundraisingReferencePreview() {
     searchTerm,
   ]);
 
+
+  const selectedContribution =
+    detailState?.type === "contribution"
+      ? contributions.find(
+          (contribution) =>
+            contribution.id === detailState.id,
+        ) || null
+      : null;
+
+  const selectedDonor =
+    detailState?.type === "donor"
+      ? DONORS.find(
+          (donor) =>
+            fundraisingKey(donor.name) ===
+            detailState.id,
+        ) || null
+      : null;
+
+  const selectedPledge =
+    detailState?.type === "pledge"
+      ? PLEDGES.find(
+          (pledge) =>
+            fundraisingKey(pledge.donor) ===
+            detailState.id,
+        ) || null
+      : null;
+
   const handleRecordContribution = (event) => {
     event.preventDefault();
 
@@ -312,6 +553,8 @@ export default function FundraisingReferencePreview() {
 
     setContributionModalOpen(false);
 
+    openContribution(newContribution);
+
     setActivityMessage(
       `${money(amount)} contribution from ${donor} recorded in this browser preview.`,
     );
@@ -322,6 +565,7 @@ export default function FundraisingReferencePreview() {
       <main
         className={styles.main}
         data-fundraising-command-center="true"
+        data-fundraising-deep-links="true"
       >
         <div className={styles.canvas}>
           <section className={styles.hero}>
@@ -396,7 +640,7 @@ export default function FundraisingReferencePreview() {
                   : ""
               }
               onClick={() =>
-                setActiveView("overview")
+                navigateView("overview")
               }
             >
               <span className={styles.metricIcon}>
@@ -420,7 +664,7 @@ export default function FundraisingReferencePreview() {
                   : ""
               }
               onClick={() =>
-                setActiveView("contributions")
+                navigateView("contributions")
               }
             >
               <span className={styles.metricIcon}>
@@ -442,7 +686,7 @@ export default function FundraisingReferencePreview() {
                   : ""
               }
               onClick={() =>
-                setActiveView("donors")
+                navigateView("donors")
               }
             >
               <span className={styles.metricIcon}>
@@ -464,7 +708,7 @@ export default function FundraisingReferencePreview() {
                   : ""
               }
               onClick={() =>
-                setActiveView("goals")
+                navigateView("goals")
               }
             >
               <span className={styles.metricIcon}>
@@ -493,7 +737,7 @@ export default function FundraisingReferencePreview() {
                       : ""
                   }
                   onClick={() =>
-                    setActiveView("overview")
+                    navigateView("overview")
                   }
                 >
                   Overview
@@ -507,7 +751,7 @@ export default function FundraisingReferencePreview() {
                       : ""
                   }
                   onClick={() =>
-                    setActiveView("contributions")
+                    navigateView("contributions")
                   }
                 >
                   Contributions
@@ -521,7 +765,7 @@ export default function FundraisingReferencePreview() {
                       : ""
                   }
                   onClick={() =>
-                    setActiveView("donors")
+                    navigateView("donors")
                   }
                 >
                   Donors
@@ -535,7 +779,7 @@ export default function FundraisingReferencePreview() {
                       : ""
                   }
                   onClick={() =>
-                    setActiveView("goals")
+                    navigateView("goals")
                   }
                 >
                   Goals &amp; pledges
@@ -614,7 +858,13 @@ export default function FundraisingReferencePreview() {
                     title="Recent contributions"
                     subtitle="Latest contribution activity across the campaign."
                     onViewAll={() =>
-                      setActiveView("contributions")
+                      navigateView("contributions")
+                    }
+                    onSelect={openContribution}
+                    selectedId={
+                      detailState?.type === "contribution"
+                        ? detailState.id
+                        : ""
                     }
                   />
                 </>
@@ -658,6 +908,12 @@ export default function FundraisingReferencePreview() {
 
                   <ContributionRows
                     contributions={visibleContributions}
+                    onSelect={openContribution}
+                    selectedId={
+                      detailState?.type === "contribution"
+                        ? detailState.id
+                        : ""
+                    }
                   />
                 </section>
               ) : null}
@@ -697,7 +953,27 @@ export default function FundraisingReferencePreview() {
                     </div>
 
                     {DONORS.map((donor) => (
-                      <article key={donor.name}>
+                      <article
+                        key={donor.name}
+                        role="button"
+                        tabIndex={0}
+                        className={
+                          detailState?.type === "donor" &&
+                          detailState.id ===
+                            fundraisingKey(donor.name)
+                            ? styles.rowSelected
+                            : styles.clickableRow
+                        }
+                        onClick={() =>
+                          openDonor(donor)
+                        }
+                        onKeyDown={(event) =>
+                          handleInteractiveKey(
+                            event,
+                            () => openDonor(donor),
+                          )
+                        }
+                      >
                         <div className={styles.personCell}>
                           <span>{donor.initials}</span>
 
@@ -775,7 +1051,27 @@ export default function FundraisingReferencePreview() {
                       </div>
 
                       {PLEDGES.map((pledge) => (
-                        <article key={pledge.donor}>
+                        <article
+                          key={pledge.donor}
+                          role="button"
+                          tabIndex={0}
+                          className={
+                            detailState?.type === "pledge" &&
+                            detailState.id ===
+                              fundraisingKey(pledge.donor)
+                              ? styles.rowSelected
+                              : styles.clickableRow
+                          }
+                          onClick={() =>
+                            openPledge(pledge)
+                          }
+                          onKeyDown={(event) =>
+                            handleInteractiveKey(
+                              event,
+                              () => openPledge(pledge),
+                            )
+                          }
+                        >
                           <strong>{pledge.donor}</strong>
                           <b>{pledge.amount}</b>
                           <span>{pledge.due}</span>
@@ -805,7 +1101,12 @@ export default function FundraisingReferencePreview() {
                   </div>
                 </header>
 
-                <button type="button">
+                <button
+                  type="button"
+                  onClick={() =>
+                    navigateView("goals")
+                  }
+                >
                   <div>
                     <strong>3 pledges need follow-up</strong>
                     <span>Next due Oct 2</span>
@@ -814,7 +1115,12 @@ export default function FundraisingReferencePreview() {
                   <em>3</em>
                 </button>
 
-                <button type="button">
+                <button
+                  type="button"
+                  onClick={() =>
+                    navigateView("donors")
+                  }
+                >
                   <div>
                     <strong>6 donor records need details</strong>
                     <span>Review incomplete contact records</span>
@@ -823,7 +1129,12 @@ export default function FundraisingReferencePreview() {
                   <em>6</em>
                 </button>
 
-                <button type="button">
+                <button
+                  type="button"
+                  onClick={() =>
+                    navigateView("contributions")
+                  }
+                >
                   <div>
                     <strong>4 thank-you notes queued</strong>
                     <span>Recent contribution follow-up</span>
@@ -851,7 +1162,7 @@ export default function FundraisingReferencePreview() {
                 <button
                   type="button"
                   onClick={() =>
-                    setActiveView("donors")
+                    navigateView("donors")
                   }
                 >
                   <Users size={18} />
@@ -861,7 +1172,7 @@ export default function FundraisingReferencePreview() {
                 <button
                   type="button"
                   onClick={() =>
-                    setActiveView("goals")
+                    navigateView("goals")
                   }
                 >
                   <HeartHandshake size={18} />
@@ -899,12 +1210,21 @@ export default function FundraisingReferencePreview() {
           <footer className={styles.previewNote}>
             <FileText size={16} />
             <span>
-              V70 uses local preview data only. Shared
+              V71 uses local preview data only. Shared
               fundraising storage, payment processing, and
               external delivery are not connected yet.
             </span>
           </footer>
         </div>
+
+        <FundraisingDetailDrawer
+          detailState={detailState}
+          contribution={selectedContribution}
+          donor={selectedDonor}
+          pledge={selectedPledge}
+          onClose={closeDetail}
+          onOpenDonor={openDonor}
+        />
 
         {contributionModalOpen ? (
           <div
@@ -1019,7 +1339,7 @@ export default function FundraisingReferencePreview() {
                 <Clock3 size={17} />
 
                 <span>
-                  This V70 form records data only in the
+                  This V71 form records data only in the
                   current browser session.
                 </span>
               </div>
@@ -1050,11 +1370,311 @@ export default function FundraisingReferencePreview() {
   );
 }
 
+
+function FundraisingDetailDrawer({
+  detailState,
+  contribution,
+  donor,
+  pledge,
+  onClose,
+  onOpenDonor,
+}) {
+  if (!detailState) {
+    return null;
+  }
+
+  const hasRecord =
+    Boolean(contribution) ||
+    Boolean(donor) ||
+    Boolean(pledge);
+
+  let eyebrow = "Fundraising details";
+  let title = "Record unavailable";
+  let subtitle =
+    "This preview record is not available in the current browser session.";
+
+  if (contribution) {
+    eyebrow = "Contribution details";
+    title = contribution.donor;
+    subtitle =
+      `${contribution.date} · ${contribution.time}`;
+  } else if (donor) {
+    eyebrow = "Donor relationship";
+    title = donor.name;
+    subtitle = donor.segment;
+  } else if (pledge) {
+    eyebrow = "Pledge details";
+    title = pledge.donor;
+    subtitle = pledge.status;
+  }
+
+  return (
+    <div
+      className={styles.detailScrim}
+      role="presentation"
+      onMouseDown={(event) => {
+        if (event.target === event.currentTarget) {
+          onClose();
+        }
+      }}
+    >
+      <aside
+        className={styles.detailDrawer}
+        role="dialog"
+        aria-modal="true"
+        aria-label={eyebrow}
+      >
+        <header className={styles.detailHeader}>
+          <div>
+            <span>{eyebrow}</span>
+            <h2>{title}</h2>
+            <p>{subtitle}</p>
+          </div>
+
+          <button
+            type="button"
+            aria-label="Close fundraising details"
+            onClick={onClose}
+          >
+            <X size={22} />
+          </button>
+        </header>
+
+        {!hasRecord ? (
+          <div className={styles.detailBody}>
+            <section className={styles.detailEmpty}>
+              <FileText size={28} />
+              <h3>Preview record unavailable</h3>
+              <p>
+                This URL points to local preview data that is
+                not present in this browser session.
+              </p>
+
+              <button
+                type="button"
+                onClick={onClose}
+              >
+                Return to fundraising
+              </button>
+            </section>
+          </div>
+        ) : null}
+
+        {contribution ? (
+          <div className={styles.detailBody}>
+            <section className={styles.detailHero}>
+              <span className={styles.detailStatus}>
+                <CheckCircle2 size={15} />
+                {contribution.status}
+              </span>
+
+              <strong>
+                {money(contribution.amount)}
+              </strong>
+
+              <p>
+                Recorded for {contribution.campaign}
+              </p>
+            </section>
+
+            <section className={styles.detailGrid}>
+              <div>
+                <small>Donor</small>
+                <strong>{contribution.donor}</strong>
+              </div>
+
+              <div>
+                <small>Contribution type</small>
+                <strong>{contribution.type}</strong>
+              </div>
+
+              <div>
+                <small>Date</small>
+                <strong>{contribution.date}</strong>
+              </div>
+
+              <div>
+                <small>Time</small>
+                <strong>{contribution.time}</strong>
+              </div>
+
+              <div>
+                <small>Campaign</small>
+                <strong>{contribution.campaign}</strong>
+              </div>
+
+              <div>
+                <small>Status</small>
+                <strong>{contribution.status}</strong>
+              </div>
+            </section>
+
+            <section className={styles.detailSection}>
+              <div>
+                <span className={styles.sectionIcon}>
+                  <Mail size={18} />
+                </span>
+
+                <div>
+                  <h3>Receipt & follow-up</h3>
+                  <p>
+                    Contribution acknowledgement is represented
+                    by preview data only in V71.
+                  </p>
+                </div>
+              </div>
+            </section>
+
+            <button
+              type="button"
+              className={styles.detailAction}
+              onClick={() =>
+                onOpenDonor(contribution.donor)
+              }
+            >
+              <Users size={18} />
+              Open donor relationship
+            </button>
+          </div>
+        ) : null}
+
+        {donor ? (
+          <div className={styles.detailBody}>
+            <section className={styles.detailHero}>
+              <span className={styles.detailStatus}>
+                <Users size={15} />
+                {donor.segment}
+              </span>
+
+              <strong>{donor.lifetime}</strong>
+
+              <p>Lifetime recorded giving</p>
+            </section>
+
+            <section className={styles.detailGrid}>
+              <div>
+                <small>Donor</small>
+                <strong>{donor.name}</strong>
+              </div>
+
+              <div>
+                <small>Segment</small>
+                <strong>{donor.segment}</strong>
+              </div>
+
+              <div>
+                <small>Lifetime giving</small>
+                <strong>{donor.lifetime}</strong>
+              </div>
+
+              <div>
+                <small>Recorded gifts</small>
+                <strong>{donor.gifts}</strong>
+              </div>
+
+              <div>
+                <small>Last contribution</small>
+                <strong>{donor.last}</strong>
+              </div>
+
+              <div>
+                <small>Record type</small>
+                <strong>Campaign donor</strong>
+              </div>
+            </section>
+
+            <section className={styles.detailSection}>
+              <div>
+                <span className={styles.sectionIcon}>
+                  <HeartHandshake size={18} />
+                </span>
+
+                <div>
+                  <h3>Relationship record</h3>
+                  <p>
+                    Giving history and segmentation are local
+                    preview records in this V71 workspace.
+                  </p>
+                </div>
+              </div>
+            </section>
+          </div>
+        ) : null}
+
+        {pledge ? (
+          <div className={styles.detailBody}>
+            <section className={styles.detailHero}>
+              <span className={styles.detailStatus}>
+                <Clock3 size={15} />
+                {pledge.status}
+              </span>
+
+              <strong>{pledge.amount}</strong>
+
+              <p>Open fundraising pledge</p>
+            </section>
+
+            <section className={styles.detailGrid}>
+              <div>
+                <small>Donor</small>
+                <strong>{pledge.donor}</strong>
+              </div>
+
+              <div>
+                <small>Amount</small>
+                <strong>{pledge.amount}</strong>
+              </div>
+
+              <div>
+                <small>Due</small>
+                <strong>{pledge.due}</strong>
+              </div>
+
+              <div>
+                <small>Owner</small>
+                <strong>{pledge.owner}</strong>
+              </div>
+
+              <div>
+                <small>Status</small>
+                <strong>{pledge.status}</strong>
+              </div>
+
+              <div>
+                <small>Record type</small>
+                <strong>Campaign pledge</strong>
+              </div>
+            </section>
+
+            <section className={styles.detailSection}>
+              <div>
+                <span className={styles.sectionIcon}>
+                  <HeartHandshake size={18} />
+                </span>
+
+                <div>
+                  <h3>Follow-up required</h3>
+                  <p>
+                    Keep the pledge visible until the campaign
+                    records the next fundraising action.
+                  </p>
+                </div>
+              </div>
+            </section>
+          </div>
+        ) : null}
+      </aside>
+    </div>
+  );
+}
+
 function ContributionTable({
   contributions,
   title,
   subtitle,
   onViewAll,
+  onSelect,
+  selectedId,
 }) {
   return (
     <section className={styles.tablePanel}>
@@ -1073,13 +1693,19 @@ function ContributionTable({
         </button>
       </header>
 
-      <ContributionRows contributions={contributions} />
+      <ContributionRows
+        contributions={contributions}
+        onSelect={onSelect}
+        selectedId={selectedId}
+      />
     </section>
   );
 }
 
 function ContributionRows({
   contributions,
+  onSelect,
+  selectedId,
 }) {
   return (
     <div className={styles.contributionTable}>
@@ -1093,7 +1719,31 @@ function ContributionRows({
       </div>
 
       {contributions.map((contribution) => (
-        <article key={contribution.id}>
+        <article
+          key={contribution.id}
+          role={onSelect ? "button" : undefined}
+          tabIndex={onSelect ? 0 : undefined}
+          className={
+            selectedId === contribution.id
+              ? styles.rowSelected
+              : onSelect
+                ? styles.clickableRow
+                : undefined
+          }
+          onClick={() =>
+            onSelect?.(contribution)
+          }
+          onKeyDown={(event) => {
+            if (!onSelect) {
+              return;
+            }
+
+            handleInteractiveKey(
+              event,
+              () => onSelect(contribution),
+            );
+          }}
+        >
           <div className={styles.personCell}>
             <span>{contribution.initials}</span>
 
