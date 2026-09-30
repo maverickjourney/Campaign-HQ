@@ -90,7 +90,7 @@ const INITIAL_CONTRIBUTIONS = [
   },
 ];
 
-const DONORS = [
+const INITIAL_DONORS = [
   {
     name: "Susan Miller",
     initials: "SM",
@@ -187,6 +187,17 @@ function money(value) {
       maximumFractionDigits: 0,
     },
   ).format(value);
+}
+
+function numberFromMoney(value) {
+  const amount = Number(
+    String(value || "")
+      .replace(/[^0-9.-]+/g, ""),
+  );
+
+  return Number.isFinite(amount)
+    ? amount
+    : 0;
 }
 
 function initialsFor(name) {
@@ -305,8 +316,18 @@ export default function FundraisingReferencePreview() {
   ] = useState(INITIAL_CONTRIBUTIONS);
 
   const [
+    donors,
+    setDonors,
+  ] = useState(INITIAL_DONORS);
+
+  const [
     contributionModalOpen,
     setContributionModalOpen,
+  ] = useState(false);
+
+  const [
+    donorModalOpen,
+    setDonorModalOpen,
   ] = useState(false);
 
   const [
@@ -322,6 +343,16 @@ export default function FundraisingReferencePreview() {
     amount: "",
     type: "Online",
     campaign: "General Fund",
+  });
+
+  const [
+    donorForm,
+    setDonorForm,
+  ] = useState({
+    name: "",
+    email: "",
+    phone: "",
+    segment: "Active",
   });
 
   const [
@@ -431,6 +462,7 @@ export default function FundraisingReferencePreview() {
       setActiveView(next.view);
       setDetailState(next.detail);
       setContributionModalOpen(false);
+      setDonorModalOpen(false);
     };
 
     window.addEventListener(
@@ -501,7 +533,7 @@ export default function FundraisingReferencePreview() {
 
   const selectedDonor =
     detailState?.type === "donor"
-      ? DONORS.find(
+      ? donors.find(
           (donor) =>
             fundraisingKey(donor.name) ===
             detailState.id,
@@ -516,6 +548,61 @@ export default function FundraisingReferencePreview() {
             detailState.id,
         ) || null
       : null;
+
+  const handleAddDonor = (event) => {
+    event.preventDefault();
+
+    const name = donorForm.name.trim();
+
+    if (!name) {
+      return;
+    }
+
+    const existingDonor = donors.find(
+      (donor) =>
+        fundraisingKey(donor.name) ===
+        fundraisingKey(name),
+    );
+
+    if (existingDonor) {
+      setDonorModalOpen(false);
+      openDonor(existingDonor);
+      setActivityMessage(
+        `${existingDonor.name} already has a donor relationship record.`,
+      );
+      return;
+    }
+
+    const newDonor = {
+      name,
+      initials: initialsFor(name),
+      lifetime: money(0),
+      gifts: "0",
+      last: "No gifts yet",
+      segment: donorForm.segment,
+      email: donorForm.email.trim(),
+      phone: donorForm.phone.trim(),
+    };
+
+    setDonors((current) => [
+      newDonor,
+      ...current,
+    ]);
+
+    setDonorForm({
+      name: "",
+      email: "",
+      phone: "",
+      segment: "Active",
+    });
+
+    setDonorModalOpen(false);
+    openDonor(newDonor);
+
+    setActivityMessage(
+      `${name} added to donor relationships in this browser preview.`,
+    );
+  };
 
   const handleRecordContribution = (event) => {
     event.preventDefault();
@@ -544,6 +631,48 @@ export default function FundraisingReferencePreview() {
       ...current,
     ]);
 
+    setDonors((current) => {
+      const donorKey = fundraisingKey(donor);
+
+      const existingIndex = current.findIndex(
+        (record) =>
+          fundraisingKey(record.name) === donorKey,
+      );
+
+      if (existingIndex === -1) {
+        return [
+          {
+            name: donor,
+            initials: initialsFor(donor),
+            lifetime: money(amount),
+            gifts: "1",
+            last: "Sep 29",
+            segment: "New",
+            email: "",
+            phone: "",
+          },
+          ...current,
+        ];
+      }
+
+      return current.map((record, index) => {
+        if (index !== existingIndex) {
+          return record;
+        }
+
+        return {
+          ...record,
+          lifetime: money(
+            numberFromMoney(record.lifetime) + amount,
+          ),
+          gifts: String(
+            Number(record.gifts || 0) + 1,
+          ),
+          last: "Sep 29",
+        };
+      });
+    });
+
     setContributionForm({
       donor: "",
       amount: "",
@@ -566,6 +695,7 @@ export default function FundraisingReferencePreview() {
         className={styles.main}
         data-fundraising-command-center="true"
         data-fundraising-deep-links="true"
+        data-fundraising-donor-workflows="true"
       >
         <div className={styles.canvas}>
           <section className={styles.hero}>
@@ -695,7 +825,9 @@ export default function FundraisingReferencePreview() {
 
               <span>
                 <small>Active donors</small>
-                <strong>318</strong>
+                <strong>
+                  {318 + donors.length - INITIAL_DONORS.length}
+                </strong>
                 <em>124 new this cycle</em>
               </span>
             </button>
@@ -933,9 +1065,7 @@ export default function FundraisingReferencePreview() {
                       type="button"
                       className={styles.smallPrimary}
                       onClick={() =>
-                        setActivityMessage(
-                          "Add donor workflow is staged for the next fundraising pass.",
-                        )
+                        setDonorModalOpen(true)
                       }
                     >
                       <UserPlus size={16} />
@@ -952,7 +1082,7 @@ export default function FundraisingReferencePreview() {
                       <span>Segment</span>
                     </div>
 
-                    {DONORS.map((donor) => (
+                    {donors.map((donor) => (
                       <article
                         key={donor.name}
                         role="button"
@@ -1183,7 +1313,7 @@ export default function FundraisingReferencePreview() {
                   type="button"
                   onClick={() =>
                     setActivityMessage(
-                      "Fundraising report export is preview-only in V70.",
+                      "Fundraising report export is preview-only in V72.",
                     )
                   }
                 >
@@ -1210,9 +1340,11 @@ export default function FundraisingReferencePreview() {
           <footer className={styles.previewNote}>
             <FileText size={16} />
             <span>
-              V71 uses local preview data only. Shared
-              fundraising storage, payment processing, and
-              external delivery are not connected yet.
+              V72 uses local preview data only. Donor
+              relationships now update with contribution
+              activity, but shared fundraising storage,
+              payment processing, and external delivery are
+              not connected yet.
             </span>
           </footer>
         </div>
@@ -1225,6 +1357,137 @@ export default function FundraisingReferencePreview() {
           onClose={closeDetail}
           onOpenDonor={openDonor}
         />
+
+        {donorModalOpen ? (
+          <div
+            className={styles.modalScrim}
+            role="presentation"
+            onMouseDown={(event) => {
+              if (event.target === event.currentTarget) {
+                setDonorModalOpen(false);
+              }
+            }}
+          >
+            <form
+              className={styles.modal}
+              onSubmit={handleAddDonor}
+            >
+              <header>
+                <div>
+                  <span>Donor relationships</span>
+                  <h2>Add donor</h2>
+                </div>
+
+                <button
+                  type="button"
+                  aria-label="Close donor form"
+                  onClick={() =>
+                    setDonorModalOpen(false)
+                  }
+                >
+                  <X size={20} />
+                </button>
+              </header>
+
+              <label>
+                Donor name
+                <input
+                  type="text"
+                  value={donorForm.name}
+                  placeholder="Full name"
+                  required
+                  autoFocus
+                  onChange={(event) =>
+                    setDonorForm((current) => ({
+                      ...current,
+                      name: event.target.value,
+                    }))
+                  }
+                />
+              </label>
+
+              <div className={styles.modalGrid}>
+                <label>
+                  Email
+                  <input
+                    type="email"
+                    value={donorForm.email}
+                    placeholder="name@example.com"
+                    onChange={(event) =>
+                      setDonorForm((current) => ({
+                        ...current,
+                        email: event.target.value,
+                      }))
+                    }
+                  />
+                </label>
+
+                <label>
+                  Phone
+                  <input
+                    type="tel"
+                    value={donorForm.phone}
+                    placeholder="(561) 555-0000"
+                    onChange={(event) =>
+                      setDonorForm((current) => ({
+                        ...current,
+                        phone: event.target.value,
+                      }))
+                    }
+                  />
+                </label>
+              </div>
+
+              <label>
+                Relationship segment
+                <select
+                  value={donorForm.segment}
+                  onChange={(event) =>
+                    setDonorForm((current) => ({
+                      ...current,
+                      segment: event.target.value,
+                    }))
+                  }
+                >
+                  <option>Active</option>
+                  <option>Recurring</option>
+                  <option>Frequent</option>
+                  <option>Prospect</option>
+                  <option>New</option>
+                </select>
+              </label>
+
+              <div className={styles.modalInfo}>
+                <Clock3 size={17} />
+
+                <span>
+                  V72 donor records remain local to this
+                  browser preview. Shared fundraising storage
+                  is not connected yet.
+                </span>
+              </div>
+
+              <footer>
+                <button
+                  type="button"
+                  onClick={() =>
+                    setDonorModalOpen(false)
+                  }
+                >
+                  Cancel
+                </button>
+
+                <button
+                  type="submit"
+                  className={styles.modalSubmit}
+                >
+                  <UserPlus size={17} />
+                  Add donor
+                </button>
+              </footer>
+            </form>
+          </div>
+        ) : null}
 
         {contributionModalOpen ? (
           <div
@@ -1339,7 +1602,7 @@ export default function FundraisingReferencePreview() {
                 <Clock3 size={17} />
 
                 <span>
-                  This V71 form records data only in the
+                  This V72 form records data only in the
                   current browser session.
                 </span>
               </div>
@@ -1519,7 +1782,7 @@ function FundraisingDetailDrawer({
                   <h3>Receipt & follow-up</h3>
                   <p>
                     Contribution acknowledgement is represented
-                    by preview data only in V71.
+                    by preview data only in V72.
                   </p>
                 </div>
               </div>
@@ -1581,6 +1844,20 @@ function FundraisingDetailDrawer({
                 <small>Record type</small>
                 <strong>Campaign donor</strong>
               </div>
+
+              <div>
+                <small>Email</small>
+                <strong>
+                  {donor.email || "Not recorded"}
+                </strong>
+              </div>
+
+              <div>
+                <small>Phone</small>
+                <strong>
+                  {donor.phone || "Not recorded"}
+                </strong>
+              </div>
             </section>
 
             <section className={styles.detailSection}>
@@ -1593,7 +1870,7 @@ function FundraisingDetailDrawer({
                   <h3>Relationship record</h3>
                   <p>
                     Giving history and segmentation are local
-                    preview records in this V71 workspace.
+                    preview records in this V72 workspace.
                   </p>
                 </div>
               </div>
