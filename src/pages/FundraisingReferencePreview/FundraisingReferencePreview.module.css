@@ -1358,3 +1358,83 @@
     display: none;
   }
 }
+
+
+/* V73B live fundraising storage */
+
+.liveStorageStatus {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: fit-content;
+  margin-top: 15px;
+  padding: 8px 11px;
+  border: 1px solid #bfe4d2;
+  border-radius: 999px;
+  color: #177754;
+  background: #f0faf5;
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.liveStorageStatus[data-state="loading"] {
+  border-color: #cbdde9;
+  color: #416783;
+  background: #f4f8fb;
+}
+
+.liveStorageStatus[data-state="error"] {
+  border-color: #efc3c7;
+  color: #b4323d;
+  background: #fff4f5;
+}
+
+.liveStorageStatus[data-state="loading"] svg {
+  animation: fundraisingLiveSpin 900ms linear infinite;
+}
+
+@keyframes fundraisingLiveSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.tableEmpty {
+  display: grid;
+  min-height: 150px;
+  place-items: center;
+  align-content: center;
+  gap: 7px;
+  padding: 28px;
+  color: #8195a7;
+  text-align: center;
+}
+
+.tableEmpty strong,
+.emptyPanel strong {
+  color: #173a58;
+  font-size: 14px;
+}
+
+.tableEmpty span,
+.emptyPanel span {
+  max-width: 430px;
+  color: #8195a7;
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+.emptyPanel {
+  grid-column: 1 / -1;
+  display: grid;
+  min-height: 170px;
+  place-items: center;
+  align-content: center;
+  gap: 8px;
+  padding: 30px;
+  border: 1px dashed #cadbe7;
+  border-radius: 15px;
+  color: #718ca2;
+  background: rgba(255, 255, 255, 0.72);
+  text-align: center;
+}

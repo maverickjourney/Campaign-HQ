@@ -30,6 +30,15 @@ import {
   CampaignWorkspaceShell,
 } from "../../components/CampaignWorkspaceShell/CampaignWorkspaceShell";
 
+import {
+  useFundraisingWorkspace,
+} from "../../hooks/useFundraisingWorkspace";
+
+import {
+  getCurrentUser,
+  getCurrentWorkspace,
+} from "../../utils/campaignSession";
+
 import styles from "./FundraisingReferencePreview.module.css";
 
 const INITIAL_CONTRIBUTIONS = [
@@ -296,6 +305,45 @@ function handleInteractiveKey(event, action) {
 }
 
 export default function FundraisingReferencePreview() {
+  const demoMode =
+    typeof window !== "undefined" &&
+    new URL(
+      window.location.href,
+    )
+      .searchParams
+      .get(
+        "fundraising-demo",
+      ) ===
+      "1";
+
+  const workspace =
+    getCurrentWorkspace();
+
+  const currentUser =
+    getCurrentUser();
+
+  const liveFundraising =
+    useFundraisingWorkspace({
+      enabled:
+        !demoMode,
+
+      workspaceId:
+        workspace?.id ||
+        "",
+
+      timezone:
+        workspace?.timezone ||
+        "America/New_York",
+
+      currentUserId:
+        currentUser?.id ||
+        "",
+
+      currentUserName:
+        currentUser?.name ||
+        "",
+    });
+
   const [
     activeView,
     setActiveView,
@@ -311,14 +359,42 @@ export default function FundraisingReferencePreview() {
   );
 
   const [
-    contributions,
-    setContributions,
-  ] = useState(INITIAL_CONTRIBUTIONS);
+    previewContributions,
+    setPreviewContributions,
+  ] = useState(
+    INITIAL_CONTRIBUTIONS,
+  );
 
   const [
-    donors,
-    setDonors,
-  ] = useState(INITIAL_DONORS);
+    previewDonors,
+    setPreviewDonors,
+  ] = useState(
+    INITIAL_DONORS,
+  );
+
+  const contributions =
+    demoMode
+      ? previewContributions
+      : liveFundraising
+          .contributions;
+
+  const donors =
+    demoMode
+      ? previewDonors
+      : liveFundraising
+          .donors;
+
+  const goals =
+    demoMode
+      ? GOALS
+      : liveFundraising
+          .goals;
+
+  const pledges =
+    demoMode
+      ? PLEDGES
+      : liveFundraising
+          .pledges;
 
   const [
     contributionModalOpen,
@@ -342,7 +418,10 @@ export default function FundraisingReferencePreview() {
     donor: "",
     amount: "",
     type: "Online",
-    campaign: "General Fund",
+    campaign:
+      demoMode
+        ? "General Fund"
+        : "",
   });
 
   const [
@@ -425,11 +504,25 @@ export default function FundraisingReferencePreview() {
         ? donorOrName
         : donorOrName?.name;
 
+    const donorId =
+      typeof donorOrName === "string"
+        ? fundraisingKey(
+            donorName,
+          )
+        : (
+            donorOrName?.id ||
+            donorOrName
+              ?.contactId ||
+            fundraisingKey(
+              donorName,
+            )
+          );
+
     applyFundraisingLocation(
       "donors",
       {
         type: "donor",
-        id: fundraisingKey(donorName),
+        id: donorId,
       },
     );
   };
@@ -439,7 +532,11 @@ export default function FundraisingReferencePreview() {
       "goals",
       {
         type: "pledge",
-        id: fundraisingKey(pledge?.donor),
+        id:
+          pledge?.id ||
+          fundraisingKey(
+            pledge?.donor,
+          ),
       },
     );
   };
@@ -481,22 +578,114 @@ export default function FundraisingReferencePreview() {
 
   const addedTotal = useMemo(
     () =>
-      contributions
-        .slice(INITIAL_CONTRIBUTIONS.length)
-        .reduce(
-          (sum, contribution) =>
-            sum + Number(contribution.amount || 0),
-          0,
-        ),
-    [contributions],
+      demoMode
+        ? previewContributions
+            .slice(
+              INITIAL_CONTRIBUTIONS.length,
+            )
+            .reduce(
+              (sum, contribution) =>
+                sum +
+                Number(
+                  contribution.amount ||
+                  0,
+                ),
+              0,
+            )
+        : 0,
+    [
+      demoMode,
+      previewContributions,
+    ],
   );
 
-  const totalRaised = 142680 + addedTotal;
-  const fundraisingGoal = 220000;
-  const progressPercent = Math.min(
-    100,
-    Math.round((totalRaised / fundraisingGoal) * 100),
-  );
+  const totalRaised =
+    demoMode
+      ? 142680 +
+        addedTotal
+      : liveFundraising
+          .metrics
+          .totalRaised;
+
+  const fundraisingGoal =
+    demoMode
+      ? 220000
+      : liveFundraising
+          .metrics
+          .fundraisingGoal;
+
+  const progressPercent =
+    fundraisingGoal >
+      0
+      ? Math.min(
+          100,
+          Math.round(
+            (
+              totalRaised /
+              fundraisingGoal
+            ) *
+            100,
+          ),
+        )
+      : 0;
+
+  const contributionCount =
+    demoMode
+      ? 482 +
+        previewContributions.length -
+        INITIAL_CONTRIBUTIONS.length
+      : contributions.length;
+
+  const activeDonorCount =
+    demoMode
+      ? 318 +
+        previewDonors.length -
+        INITIAL_DONORS.length
+      : donors.length;
+
+  const recurringDonorCount =
+    demoMode
+      ? 86
+      : liveFundraising
+          .metrics
+          .recurringDonorCount;
+
+  const recurringDonorCopy =
+    demoMode
+      ? "$18,640 monthly"
+      : `${money(
+          liveFundraising
+            .metrics
+            .recurringRaised,
+        )} recorded recurring`;
+
+  const pledgeAttentionCount =
+    demoMode
+      ? 3
+      : liveFundraising
+          .metrics
+          .openPledges;
+
+  const donorAttentionCount =
+    demoMode
+      ? 6
+      : liveFundraising
+          .metrics
+          .incompleteDonors;
+
+  const receiptAttentionCount =
+    demoMode
+      ? 4
+      : liveFundraising
+          .metrics
+          .pendingReceipts;
+
+  const receiptActivityCount =
+    demoMode
+      ? 12
+      : liveFundraising
+          .metrics
+          .sentReceipts;
 
   const visibleContributions = useMemo(() => {
     const needle = searchTerm.trim().toLowerCase();
@@ -535,21 +724,31 @@ export default function FundraisingReferencePreview() {
     detailState?.type === "donor"
       ? donors.find(
           (donor) =>
-            fundraisingKey(donor.name) ===
-            detailState.id,
+            donor.id ===
+              detailState.id ||
+            donor.contactId ===
+              detailState.id ||
+            fundraisingKey(
+              donor.name,
+            ) ===
+              detailState.id,
         ) || null
       : null;
 
   const selectedPledge =
     detailState?.type === "pledge"
-      ? PLEDGES.find(
+      ? pledges.find(
           (pledge) =>
-            fundraisingKey(pledge.donor) ===
-            detailState.id,
+            pledge.id ===
+              detailState.id ||
+            fundraisingKey(
+              pledge.donor,
+            ) ===
+              detailState.id,
         ) || null
       : null;
 
-  const handleAddDonor = (event) => {
+  const handleAddDonor = async (event) => {
     event.preventDefault();
 
     const name = donorForm.name.trim();
@@ -573,6 +772,52 @@ export default function FundraisingReferencePreview() {
       return;
     }
 
+    if (!demoMode) {
+      try {
+        const newDonor =
+          await liveFundraising
+            .addDonor({
+              name,
+              email:
+                donorForm.email,
+              phone:
+                donorForm.phone,
+              segment:
+                donorForm.segment,
+            });
+
+        setDonorForm({
+          name: "",
+          email: "",
+          phone: "",
+          segment: "Active",
+        });
+
+        setDonorModalOpen(false);
+        openDonor(newDonor);
+
+        setActivityMessage(
+          `${name} saved to the live campaign donor directory.`,
+        );
+      } catch (
+        donorError
+      ) {
+        console.error(
+          "[Fundraising] donor save failed",
+          donorError,
+        );
+
+        setActivityMessage(
+          `Unable to save donor: ${
+            donorError?.message ||
+            "campaign access denied"
+          }`,
+        );
+      }
+
+      return;
+    }
+
     const newDonor = {
       name,
       initials: initialsFor(name),
@@ -584,7 +829,7 @@ export default function FundraisingReferencePreview() {
       phone: donorForm.phone.trim(),
     };
 
-    setDonors((current) => [
+    setPreviewDonors((current) => [
       newDonor,
       ...current,
     ]);
@@ -604,13 +849,66 @@ export default function FundraisingReferencePreview() {
     );
   };
 
-  const handleRecordContribution = (event) => {
+  const handleRecordContribution = async (event) => {
     event.preventDefault();
 
     const donor = contributionForm.donor.trim();
     const amount = Number(contributionForm.amount);
 
     if (!donor || !Number.isFinite(amount) || amount <= 0) {
+      return;
+    }
+
+    if (!demoMode) {
+      try {
+        const savedContribution =
+          await liveFundraising
+            .recordContribution({
+              donorName:
+                donor,
+
+              amount,
+
+              type:
+                contributionForm.type,
+
+              goalId:
+                contributionForm.campaign ||
+                null,
+            });
+
+        setContributionForm({
+          donor: "",
+          amount: "",
+          type: "Online",
+          campaign: "",
+        });
+
+        setContributionModalOpen(false);
+
+        openContribution(
+          savedContribution,
+        );
+
+        setActivityMessage(
+          `${money(amount)} contribution from ${donor} saved to the live campaign ledger.`,
+        );
+      } catch (
+        contributionError
+      ) {
+        console.error(
+          "[Fundraising] contribution save failed",
+          contributionError,
+        );
+
+        setActivityMessage(
+          `Unable to save contribution: ${
+            contributionError?.message ||
+            "campaign access denied"
+          }`,
+        );
+      }
+
       return;
     }
 
@@ -626,12 +924,12 @@ export default function FundraisingReferencePreview() {
       status: "Completed",
     };
 
-    setContributions((current) => [
+    setPreviewContributions((current) => [
       newContribution,
       ...current,
     ]);
 
-    setDonors((current) => {
+    setPreviewDonors((current) => {
       const donorKey = fundraisingKey(donor);
 
       const existingIndex = current.findIndex(
@@ -696,6 +994,11 @@ export default function FundraisingReferencePreview() {
         data-fundraising-command-center="true"
         data-fundraising-deep-links="true"
         data-fundraising-donor-workflows="true"
+        data-fundraising-storage={
+          demoMode
+            ? "preview"
+            : "live"
+        }
       >
         <div className={styles.canvas}>
           <section className={styles.hero}>
@@ -717,11 +1020,27 @@ export default function FundraisingReferencePreview() {
               <button
                 className={styles.secondaryButton}
                 type="button"
-                onClick={() =>
+                onClick={async () => {
+                  if (
+                    demoMode
+                  ) {
+                    setActivityMessage(
+                      "Fundraising preview refreshed.",
+                    );
+
+                    return;
+                  }
+
+                  const refreshed =
+                    await liveFundraising
+                      .refresh();
+
                   setActivityMessage(
-                    "Fundraising preview refreshed.",
-                  )
-                }
+                    refreshed
+                      ? "Live fundraising workspace refreshed."
+                      : "Unable to refresh live fundraising records.",
+                  );
+                }}
               >
                 <RefreshCw size={18} />
                 Refresh
@@ -739,6 +1058,35 @@ export default function FundraisingReferencePreview() {
               </button>
             </div>
           </section>
+
+          {!demoMode ? (
+            <div
+              className={styles.liveStorageStatus}
+              data-state={
+                liveFundraising.error
+                  ? "error"
+                  : liveFundraising.loading
+                    ? "loading"
+                    : "ready"
+              }
+            >
+              {liveFundraising.loading ? (
+                <RefreshCw size={16} />
+              ) : liveFundraising.error ? (
+                <X size={16} />
+              ) : (
+                <CheckCircle2 size={16} />
+              )}
+
+              <span>
+                {liveFundraising.loading
+                  ? "Loading live campaign fundraising records…"
+                  : liveFundraising.error
+                    ? liveFundraising.error
+                    : "Live Campaign Seat fundraising storage connected"}
+              </span>
+            </div>
+          ) : null}
 
           {activityMessage ? (
             <div
@@ -781,7 +1129,14 @@ export default function FundraisingReferencePreview() {
                 <small>Total raised</small>
                 <strong>{money(totalRaised)}</strong>
                 <em>
-                  {progressPercent}% of {money(fundraisingGoal)}
+                  {
+                    !demoMode &&
+                    fundraisingGoal <= 0
+                      ? "No active fundraising goal yet"
+                      : `${progressPercent}% of ${money(
+                          fundraisingGoal,
+                        )}`
+                  }
                 </em>
               </span>
             </button>
@@ -803,8 +1158,12 @@ export default function FundraisingReferencePreview() {
 
               <span>
                 <small>Contributions</small>
-                <strong>{482 + contributions.length - INITIAL_CONTRIBUTIONS.length}</strong>
-                <em>Campaign-to-date records</em>
+                <strong>{contributionCount}</strong>
+                <em>
+                  {demoMode
+                    ? "Campaign-to-date records"
+                    : "Live workspace records"}
+                </em>
               </span>
             </button>
 
@@ -826,9 +1185,13 @@ export default function FundraisingReferencePreview() {
               <span>
                 <small>Active donors</small>
                 <strong>
-                  {318 + donors.length - INITIAL_DONORS.length}
+                  {activeDonorCount}
                 </strong>
-                <em>124 new this cycle</em>
+                <em>
+                  {demoMode
+                    ? "124 new this cycle"
+                    : `${donors.length} donor relationship records`}
+                </em>
               </span>
             </button>
 
@@ -849,8 +1212,12 @@ export default function FundraisingReferencePreview() {
 
               <span>
                 <small>Recurring donors</small>
-                <strong>86</strong>
-                <em>$18,640 monthly</em>
+                <strong>
+                  {recurringDonorCount}
+                </strong>
+                <em>
+                  {recurringDonorCopy}
+                </em>
               </span>
             </button>
           </section>
@@ -979,8 +1346,9 @@ export default function FundraisingReferencePreview() {
                         {progressPercent}% complete
                       </span>
                       <span>
-                        86 recurring donors contributing
-                        monthly
+                        {demoMode
+                          ? "86 recurring donors contributing monthly"
+                          : `${recurringDonorCount} recurring donor relationships`}
                       </span>
                     </div>
                   </section>
@@ -1082,15 +1450,24 @@ export default function FundraisingReferencePreview() {
                       <span>Segment</span>
                     </div>
 
-                    {donors.map((donor) => (
+                    {donors.length ? (
+                      donors.map((donor) => (
                       <article
                         key={donor.name}
                         role="button"
                         tabIndex={0}
                         className={
                           detailState?.type === "donor" &&
-                          detailState.id ===
-                            fundraisingKey(donor.name)
+                          (
+                            detailState.id ===
+                              donor.id ||
+                            detailState.id ===
+                              donor.contactId ||
+                            detailState.id ===
+                              fundraisingKey(
+                                donor.name,
+                              )
+                          )
                             ? styles.rowSelected
                             : styles.clickableRow
                         }
@@ -1121,7 +1498,20 @@ export default function FundraisingReferencePreview() {
 
                         <em>{donor.segment}</em>
                       </article>
-                    ))}
+                      ))
+                    ) : (
+                      <div className={styles.tableEmpty}>
+                        <Users size={24} />
+
+                        <strong>
+                          No donor relationships yet
+                        </strong>
+
+                        <span>
+                          Add the first donor or record a contribution to begin the live fundraising history.
+                        </span>
+                      </div>
+                    )}
                   </div>
                 </section>
               ) : null}
@@ -1129,8 +1519,9 @@ export default function FundraisingReferencePreview() {
               {activeView === "goals" ? (
                 <>
                   <section className={styles.goalGrid}>
-                    {GOALS.map((goal) => (
-                      <article key={goal.name}>
+                    {goals.length ? (
+                      goals.map((goal) => (
+                      <article key={goal.id || goal.name}>
                         <header>
                           <span>
                             <WalletCards size={18} />
@@ -1154,10 +1545,25 @@ export default function FundraisingReferencePreview() {
 
                         <footer>
                           <span>{goal.progress}% funded</span>
-                          <span>Active</span>
+                          <span>
+                            {goal.status || "Active"}
+                          </span>
                         </footer>
                       </article>
-                    ))}
+                      ))
+                    ) : (
+                      <div className={styles.emptyPanel}>
+                        <WalletCards size={25} />
+
+                        <strong>
+                          No fundraising goals yet
+                        </strong>
+
+                        <span>
+                          The live fundraising foundation is connected and ready for goal setup.
+                        </span>
+                      </div>
+                    )}
                   </section>
 
                   <section className={styles.tablePanel}>
@@ -1180,15 +1586,22 @@ export default function FundraisingReferencePreview() {
                         <span>Status</span>
                       </div>
 
-                      {PLEDGES.map((pledge) => (
+                      {pledges.length ? (
+                        pledges.map((pledge) => (
                         <article
-                          key={pledge.donor}
+                          key={pledge.id || pledge.donor}
                           role="button"
                           tabIndex={0}
                           className={
                             detailState?.type === "pledge" &&
-                            detailState.id ===
-                              fundraisingKey(pledge.donor)
+                            (
+                              detailState.id ===
+                                pledge.id ||
+                              detailState.id ===
+                                fundraisingKey(
+                                  pledge.donor,
+                                )
+                            )
                               ? styles.rowSelected
                               : styles.clickableRow
                           }
@@ -1208,7 +1621,20 @@ export default function FundraisingReferencePreview() {
                           <span>{pledge.owner}</span>
                           <em>{pledge.status}</em>
                         </article>
-                      ))}
+                        ))
+                      ) : (
+                        <div className={styles.tableEmpty}>
+                          <HeartHandshake size={24} />
+
+                          <strong>
+                            No open pledges
+                          </strong>
+
+                          <span>
+                            Live campaign pledges will appear here when they are created.
+                          </span>
+                        </div>
+                      )}
                     </div>
                   </section>
                 </>
@@ -1238,11 +1664,21 @@ export default function FundraisingReferencePreview() {
                   }
                 >
                   <div>
-                    <strong>3 pledges need follow-up</strong>
-                    <span>Next due Oct 2</span>
+                    <strong>
+                      {pledgeAttentionCount} pledges need follow-up
+                    </strong>
+                    <span>
+                      {demoMode
+                        ? "Next due Oct 2"
+                        : liveFundraising.metrics.nextPledgeDue
+                          ? `Next due ${liveFundraising.metrics.nextPledgeDue}`
+                          : "No pledge follow-up currently due"}
+                    </span>
                   </div>
 
-                  <em>3</em>
+                  <em>
+                    {pledgeAttentionCount}
+                  </em>
                 </button>
 
                 <button
@@ -1252,11 +1688,17 @@ export default function FundraisingReferencePreview() {
                   }
                 >
                   <div>
-                    <strong>6 donor records need details</strong>
-                    <span>Review incomplete contact records</span>
+                    <strong>
+                      {donorAttentionCount} donor records need details
+                    </strong>
+                    <span>
+                      Review incomplete contact records
+                    </span>
                   </div>
 
-                  <em>6</em>
+                  <em>
+                    {donorAttentionCount}
+                  </em>
                 </button>
 
                 <button
@@ -1266,11 +1708,17 @@ export default function FundraisingReferencePreview() {
                   }
                 >
                   <div>
-                    <strong>4 thank-you notes queued</strong>
-                    <span>Recent contribution follow-up</span>
+                    <strong>
+                      {receiptAttentionCount} acknowledgements queued
+                    </strong>
+                    <span>
+                      Contribution receipt follow-up
+                    </span>
                   </div>
 
-                  <em>4</em>
+                  <em>
+                    {receiptAttentionCount}
+                  </em>
                 </button>
               </section>
 
@@ -1313,7 +1761,9 @@ export default function FundraisingReferencePreview() {
                   type="button"
                   onClick={() =>
                     setActivityMessage(
-                      "Fundraising report export is preview-only in V72.",
+                      demoMode
+                        ? "Fundraising report export is preview-only in V73B demo mode."
+                        : "Fundraising export is not connected yet; live ledger data remains in Campaign Seat.",
                     )
                   }
                 >
@@ -1330,7 +1780,7 @@ export default function FundraisingReferencePreview() {
                 <div>
                   <strong>Receipt activity</strong>
                   <p>
-                    12 acknowledgements recorded today.
+                    {receiptActivityCount} acknowledgements recorded.
                   </p>
                 </div>
               </section>
@@ -1340,11 +1790,9 @@ export default function FundraisingReferencePreview() {
           <footer className={styles.previewNote}>
             <FileText size={16} />
             <span>
-              V72 uses local preview data only. Donor
-              relationships now update with contribution
-              activity, but shared fundraising storage,
-              payment processing, and external delivery are
-              not connected yet.
+              {demoMode
+                ? "V73B demo mode uses local preview data only."
+                : "V73B is reading and writing live Campaign Seat fundraising records. Payment processing and external receipt delivery remain disconnected."}
             </span>
           </footer>
         </div>
@@ -1356,6 +1804,7 @@ export default function FundraisingReferencePreview() {
           pledge={selectedPledge}
           onClose={closeDetail}
           onOpenDonor={openDonor}
+          liveMode={!demoMode}
         />
 
         {donorModalOpen ? (
@@ -1461,9 +1910,9 @@ export default function FundraisingReferencePreview() {
                 <Clock3 size={17} />
 
                 <span>
-                  V72 donor records remain local to this
-                  browser preview. Shared fundraising storage
-                  is not connected yet.
+                  {demoMode
+                    ? "Demo donor records remain local to this browser preview."
+                    : "This donor will be saved to the live campaign Contacts donor directory."}
                 </span>
               </div>
 
@@ -1590,10 +2039,29 @@ export default function FundraisingReferencePreview() {
                       }))
                     }
                   >
-                    <option>General Fund</option>
-                    <option>Field Program</option>
-                    <option>Digital Outreach</option>
-                    <option>Monthly Support</option>
+                    {demoMode ? (
+                      <>
+                        <option>General Fund</option>
+                        <option>Field Program</option>
+                        <option>Digital Outreach</option>
+                        <option>Monthly Support</option>
+                      </>
+                    ) : (
+                      <>
+                        <option value="">
+                          Unassigned
+                        </option>
+
+                        {goals.map((goal) => (
+                          <option
+                            key={goal.id}
+                            value={goal.id}
+                          >
+                            {goal.name}
+                          </option>
+                        ))}
+                      </>
+                    )}
                   </select>
                 </label>
               </div>
@@ -1602,8 +2070,9 @@ export default function FundraisingReferencePreview() {
                 <Clock3 size={17} />
 
                 <span>
-                  This V72 form records data only in the
-                  current browser session.
+                  {demoMode
+                    ? "This demo contribution stays in the current browser session."
+                    : "This contribution will be written to the live Campaign Seat fundraising ledger."}
                 </span>
               </div>
 
@@ -1641,6 +2110,7 @@ function FundraisingDetailDrawer({
   pledge,
   onClose,
   onOpenDonor,
+  liveMode,
 }) {
   if (!detailState) {
     return null;
@@ -1654,7 +2124,9 @@ function FundraisingDetailDrawer({
   let eyebrow = "Fundraising details";
   let title = "Record unavailable";
   let subtitle =
-    "This preview record is not available in the current browser session.";
+    liveMode
+      ? "This live fundraising record is not available or is outside your current campaign access."
+      : "This preview record is not available in the current browser session.";
 
   if (contribution) {
     eyebrow = "Contribution details";
@@ -1709,8 +2181,9 @@ function FundraisingDetailDrawer({
               <FileText size={28} />
               <h3>Preview record unavailable</h3>
               <p>
-                This URL points to local preview data that is
-                not present in this browser session.
+                {liveMode
+                  ? "This URL does not resolve to a live fundraising record available to your campaign role."
+                  : "This URL points to local preview data that is not present in this browser session."}
               </p>
 
               <button
@@ -1781,8 +2254,9 @@ function FundraisingDetailDrawer({
                 <div>
                   <h3>Receipt & follow-up</h3>
                   <p>
-                    Contribution acknowledgement is represented
-                    by preview data only in V72.
+                    {liveMode
+                      ? `Receipt status: ${contribution.receiptStatus || "pending"}. External delivery is not connected yet.`
+                      : "Contribution acknowledgement is represented by preview data only."}
                   </p>
                 </div>
               </div>
@@ -1792,7 +2266,13 @@ function FundraisingDetailDrawer({
               type="button"
               className={styles.detailAction}
               onClick={() =>
-                onOpenDonor(contribution.donor)
+                onOpenDonor({
+                  id:
+                    contribution.donorContactId ||
+                    "",
+                  name:
+                    contribution.donor,
+                })
               }
             >
               <Users size={18} />
@@ -1869,8 +2349,9 @@ function FundraisingDetailDrawer({
                 <div>
                   <h3>Relationship record</h3>
                   <p>
-                    Giving history and segmentation are local
-                    preview records in this V72 workspace.
+                    {liveMode
+                      ? "Giving history is calculated from the live Campaign Seat contribution ledger."
+                      : "Giving history and segmentation are local preview records in this demo workspace."}
                   </p>
                 </div>
               </div>
@@ -2043,6 +2524,20 @@ function ContributionRows({
           <em>{contribution.status}</em>
         </article>
       ))}
+
+      {!contributions.length ? (
+        <div className={styles.tableEmpty}>
+          <HandCoins size={24} />
+
+          <strong>
+            No contributions yet
+          </strong>
+
+          <span>
+            Record the first contribution to begin this campaign's live fundraising ledger.
+          </span>
+        </div>
+      ) : null}
     </div>
   );
 }
