@@ -34,6 +34,8 @@ import {
 
 import FundraisingReferencePreview from "../FundraisingReferencePreview/FundraisingReferencePreview";
 
+import EventsReferencePreview from "../EventsReferencePreview/EventsReferencePreview";
+
 import styles from "./CampaignToolComingSoon.module.css";
 
 const GENERIC_TOOL_CONFIG = {
@@ -3045,7 +3047,7 @@ export default function CampaignToolComingSoon({
   }
 
   if (toolKey === "events") {
-    return <EventsPreview />;
+    return <EventsReferencePreview />;
   }
 
   if (toolKey === "social-media") {
