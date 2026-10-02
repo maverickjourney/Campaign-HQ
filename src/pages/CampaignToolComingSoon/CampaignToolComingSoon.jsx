@@ -36,6 +36,8 @@ import FundraisingReferencePreview from "../FundraisingReferencePreview/Fundrais
 
 import EventsReferencePreview from "../EventsReferencePreview/EventsReferencePreview";
 
+import SocialMediaReferencePreview from "../SocialMediaReferencePreview/SocialMediaReferencePreview";
+
 import styles from "./CampaignToolComingSoon.module.css";
 
 const GENERIC_TOOL_CONFIG = {
@@ -3051,7 +3053,15 @@ export default function CampaignToolComingSoon({
   }
 
   if (toolKey === "social-media") {
-    return <SocialMediaPreview />;
+    const socialDemoMode =
+      typeof window !== "undefined" &&
+      new URL(window.location.href)
+        .searchParams
+        .get("social-demo") === "1";
+
+    return socialDemoMode
+      ? <SocialMediaPreview />
+      : <SocialMediaReferencePreview />;
   }
 
   if (toolKey === "media-center") {
