@@ -36,6 +36,8 @@ import {
   getCurrentWorkspace,
 } from "../../utils/campaignSession";
 
+import PlanUsageCommandCenter from "./PlanUsageCommandCenter";
+
 import styles from "./PlanUsage.module.css";
 
 function numberValue(value) {
@@ -253,7 +255,7 @@ function UsageMeter({
   );
 }
 
-export default function PlanUsage() {
+function PlanUsageClassic() {
   const workspace =
     getCurrentWorkspace();
 
@@ -1127,4 +1129,23 @@ export default function PlanUsage() {
       </SeatPage>
     </CampaignWorkspaceShell>
   );
+}
+
+
+export default function PlanUsage() {
+  const classicMode =
+    typeof window !==
+      "undefined" &&
+    new URL(
+      window.location.href,
+    )
+      .searchParams
+      .get(
+        "usage-classic",
+      ) ===
+      "1";
+
+  return classicMode
+    ? <PlanUsageClassic />
+    : <PlanUsageCommandCenter />;
 }
