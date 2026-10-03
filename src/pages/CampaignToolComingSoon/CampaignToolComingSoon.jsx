@@ -38,6 +38,8 @@ import EventsReferencePreview from "../EventsReferencePreview/EventsReferencePre
 
 import SocialMediaReferencePreview from "../SocialMediaReferencePreview/SocialMediaReferencePreview";
 
+import MediaCenterReferencePreview from "../MediaCenterReferencePreview/MediaCenterReferencePreview";
+
 import styles from "./CampaignToolComingSoon.module.css";
 
 const GENERIC_TOOL_CONFIG = {
@@ -3065,7 +3067,15 @@ export default function CampaignToolComingSoon({
   }
 
   if (toolKey === "media-center") {
-    return <MediaCenterPreview />;
+    const mediaDemoMode =
+      typeof window !== "undefined" &&
+      new URL(window.location.href)
+        .searchParams
+        .get("media-demo") === "1";
+
+    return mediaDemoMode
+      ? <MediaCenterPreview />
+      : <MediaCenterReferencePreview />;
   }
 
   if (toolKey === "reports-analytics") {
