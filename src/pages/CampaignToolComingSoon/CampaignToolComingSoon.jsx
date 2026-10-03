@@ -40,6 +40,8 @@ import SocialMediaReferencePreview from "../SocialMediaReferencePreview/SocialMe
 
 import MediaCenterReferencePreview from "../MediaCenterReferencePreview/MediaCenterReferencePreview";
 
+import ReportsAnalyticsReferencePreview from "../ReportsAnalyticsReferencePreview/ReportsAnalyticsReferencePreview";
+
 import styles from "./CampaignToolComingSoon.module.css";
 
 const GENERIC_TOOL_CONFIG = {
@@ -3079,7 +3081,15 @@ export default function CampaignToolComingSoon({
   }
 
   if (toolKey === "reports-analytics") {
-    return <ReportsAnalyticsPreview />;
+    const reportsDemoMode =
+      typeof window !== "undefined" &&
+      new URL(window.location.href)
+        .searchParams
+        .get("reports-demo") === "1";
+
+    return reportsDemoMode
+      ? <ReportsAnalyticsPreview />
+      : <ReportsAnalyticsReferencePreview />;
   }
 
   return <GenericPreview toolKey={toolKey} />;
