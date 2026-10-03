@@ -26,6 +26,8 @@ import {
   getCurrentWorkspace,
 } from "../../utils/campaignSession";
 
+import SupportCommandCenter from "./SupportCommandCenter";
+
 import styles from "./Support.module.css";
 
 const SUPPORT_EMAIL =
@@ -159,7 +161,7 @@ function buildRequestText({
   ].join("\n");
 }
 
-export default function Support() {
+function SupportClassic() {
   const location = useLocation();
 
   const returnPath = useMemo(
@@ -645,4 +647,36 @@ export default function Support() {
       </footer>
     </div>
   );
+}
+
+
+export default function Support() {
+  const user =
+    getCurrentUser();
+
+  const hasCampaignSession =
+    Boolean(
+      user.id ||
+      user.email ||
+      user.workspaceId,
+    );
+
+  const classicMode =
+    !hasCampaignSession ||
+    (
+      typeof window !==
+        "undefined" &&
+      new URL(
+        window.location.href,
+      )
+        .searchParams
+        .get(
+          "support-classic",
+        ) ===
+        "1"
+    );
+
+  return classicMode
+    ? <SupportClassic />
+    : <SupportCommandCenter />;
 }
