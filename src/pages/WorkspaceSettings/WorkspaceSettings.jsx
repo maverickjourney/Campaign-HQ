@@ -41,6 +41,8 @@ import {
 } from "../../hooks/useWorkspaceSettings";
 
 import shellStyles from "../Team/Team.module.css";
+import WorkspaceSettingsCommandCenter from "./WorkspaceSettingsCommandCenter";
+
 import styles from "./WorkspaceSettings.module.css";
 
 function formatTime(value) {
@@ -142,7 +144,7 @@ function getDaysUntilElection(
   );
 }
 
-export default function WorkspaceSettings() {
+function WorkspaceSettingsClassic() {
   const [
     sessionWorkspace,
   ] = useState(
@@ -1052,4 +1054,23 @@ export default function WorkspaceSettings() {
       </div>
     </div>
   );
+}
+
+
+export default function WorkspaceSettings() {
+  const classicMode =
+    typeof window !==
+      "undefined" &&
+    new URL(
+      window.location.href,
+    )
+      .searchParams
+      .get(
+        "settings-classic",
+      ) ===
+      "1";
+
+  return classicMode
+    ? <WorkspaceSettingsClassic />
+    : <WorkspaceSettingsCommandCenter />;
 }
