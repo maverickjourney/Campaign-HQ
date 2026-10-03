@@ -41,6 +41,8 @@ import {
   getCurrentWorkspace,
 } from "../../utils/campaignSession";
 
+import IntegrationsCommandCenter from "./IntegrationsCommandCenter";
+
 import styles from "./Integrations.module.css";
 
 const ATTENTION_STATUSES = new Set([
@@ -309,7 +311,7 @@ function IntegrationCard({
   );
 }
 
-export default function Integrations() {
+function IntegrationsClassic() {
   const navigate =
     useNavigate();
 
@@ -1128,4 +1130,23 @@ export default function Integrations() {
       </SeatPage>
     </CampaignWorkspaceShell>
   );
+}
+
+
+export default function Integrations() {
+  const classicMode =
+    typeof window !==
+      "undefined" &&
+    new URL(
+      window.location.href,
+    )
+      .searchParams
+      .get(
+        "integrations-classic",
+      ) ===
+      "1";
+
+  return classicMode
+    ? <IntegrationsClassic />
+    : <IntegrationsCommandCenter />;
 }
