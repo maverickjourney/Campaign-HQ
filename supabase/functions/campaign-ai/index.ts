@@ -632,6 +632,95 @@ function usageNumber(
   );
 }
 
+
+function structuredTaskStatus(
+  value: unknown,
+) {
+  const text =
+    clean(
+      value,
+    ).toLowerCase();
+
+  if (
+    !/\btasks?\b/.test(
+      text,
+    )
+  ) {
+    return "";
+  }
+
+  if (
+    /\b(in[\s-]?progress|underway)\b/.test(
+      text,
+    )
+  ) {
+    return "in_progress";
+  }
+
+  if (
+    /\b(completed|complete|done|finished)\b/.test(
+      text,
+    )
+  ) {
+    return "completed";
+  }
+
+  if (
+    /\bopen\b/.test(
+      text,
+    )
+  ) {
+    return "open";
+  }
+
+  return "";
+}
+
+
+function structuredTaskSource(
+  task: Record<
+    string,
+    unknown
+  >,
+) {
+  return {
+    result_type:
+      "task",
+
+    result_id:
+      task.id,
+
+    title:
+      task.title,
+
+    subtitle:
+      [
+        clean(
+          task.category,
+        ),
+
+        clean(
+          task.priority,
+        ),
+      ]
+        .filter(Boolean)
+        .join(" · "),
+
+    detail:
+      task.description,
+
+    status:
+      task.status,
+
+    result_date:
+      task.due_at ||
+      task.updated_at,
+
+    route:
+      "/tasks",
+  };
+}
+
 Deno.serve(
   async (
     request: Request,
@@ -766,6 +855,12 @@ Deno.serve(
         body.retrievalQuery,
       ) ||
       question;
+
+    const taskStatusFilter =
+      structuredTaskStatus(
+        question,
+      );
+
 
     if (!workspaceId) {
       return jsonResponse(
@@ -971,7 +1066,8 @@ Deno.serve(
     }
 
     if (
-      searchResult.error
+      searchResult.error &&
+      !taskStatusFilter
     ) {
       return jsonResponse(
         request,
@@ -981,6 +1077,85 @@ Deno.serve(
             "Campaign HQ could not retrieve supporting campaign records.",
         },
       );
+    }
+
+    let structuredTaskRows:
+      Record<
+        string,
+        unknown
+      >[] = [];
+
+    if (
+      taskStatusFilter
+    ) {
+      const {
+        data:
+          taskData,
+        error:
+          taskError,
+      } =
+        await userClient
+          .from(
+            "tasks",
+          )
+          .select(
+            [
+              "id",
+              "title",
+              "description",
+              "category",
+              "priority",
+              "status",
+              "due_at",
+              "updated_at",
+            ].join(","),
+          )
+          .eq(
+            "workspace_id",
+            workspaceId,
+          )
+          .eq(
+            "status",
+            taskStatusFilter,
+          )
+          .eq(
+            "is_sample",
+            false,
+          )
+          .is(
+            "archived_at",
+            null,
+          )
+          .order(
+            "updated_at",
+            {
+              ascending:
+                false,
+            },
+          )
+          .limit(
+            MAX_SOURCE_COUNT,
+          );
+
+      if (
+        taskError
+      ) {
+        return jsonResponse(
+          request,
+          500,
+          {
+            error:
+              "Campaign HQ could not retrieve the requested task status.",
+          },
+        );
+      }
+
+      structuredTaskRows =
+        Array.isArray(
+          taskData,
+        )
+          ? taskData
+          : [];
     }
 
     const preferredProvider =
@@ -1040,11 +1215,22 @@ Deno.serve(
       );
 
     const rawSources =
-      Array.isArray(
-        searchResult.data,
-      )
-        ? searchResult.data
-        : [];
+      taskStatusFilter
+        ? structuredTaskRows.map(
+            (
+              task,
+            ) =>
+              structuredTaskSource(
+                task,
+              ),
+          )
+        : (
+            Array.isArray(
+              searchResult.data,
+            )
+              ? searchResult.data
+              : []
+          );
 
     const sources =
       rawSources
@@ -1286,8 +1472,29 @@ Deno.serve(
         providerSources,
     };
 
+    const structuredTaskInstruction =
+      taskStatusFilter
+        ? [
+            `This is a structured task-status request for exact status "${taskStatusFilter}".`,
+
+            `Campaign Seat deterministically retrieved ${structuredTaskRows.length} matching non-sample, non-archived task records before provider synthesis.`,
+
+            "Use only the supplied Task sources for the requested task list.",
+
+            "Do not substitute tasks with another status.",
+
+            "Do not say there are no matching tasks when matching Task sources are supplied.",
+
+            "When listing tasks, cite every task you mention using that task's exact [S#] source key.",
+          ].join(
+            " ",
+          )
+        : "";
+
     const instructions = [
       "You are Ask Campaign HQ, Campaign Seat's internal operational assistant.",
+
+      structuredTaskInstruction,
 
       "Use the supplied Campaign Seat workspace context and retrieved campaign records for workspace-specific factual claims.",
 
@@ -1312,6 +1519,8 @@ Deno.serve(
       "Never expose credentials, API keys, private tokens, secret values, or internal database identifiers.",
 
       "Keep answers direct, useful, and operational.",
+
+      "Do not use Markdown heading markers such as #, ##, or ###. Use concise prose or simple list items instead.",
     ].join("\n");
 
     const providerInput =
@@ -1364,7 +1573,9 @@ Deno.serve(
                 max_output_tokens:
                   clampInteger(
                     body.maxOutputTokens,
-                    900,
+                    taskStatusFilter
+                      ? 550
+                      : 900,
                     200,
                     1800,
                   ),
@@ -1480,6 +1691,86 @@ Deno.serve(
         answer,
       );
 
+    let structuredCitationFallbackUsed =
+      false;
+
+    if (
+      taskStatusFilter &&
+      structuredTaskRows.length >
+        0
+    ) {
+      const structuredTaskSources =
+        providerSources.filter(
+          (source) =>
+            clean(
+              source.type,
+            ).toLowerCase() ===
+              "task",
+        );
+
+      const structuredTaskSourceKeys =
+        new Set(
+          structuredTaskSources.map(
+            (source) =>
+              clean(
+                source.source_key,
+              ),
+          ),
+        );
+
+      const allStructuredTasksCited =
+        structuredTaskSources.length >
+          0 &&
+        [
+          ...structuredTaskSourceKeys,
+        ].every(
+          (sourceKey) =>
+            citedSourceKeys.has(
+              sourceKey,
+            ),
+        );
+
+      if (
+        !allStructuredTasksCited
+      ) {
+        const statusLabel =
+          taskStatusFilter ===
+            "in_progress"
+            ? "in-progress"
+            : taskStatusFilter;
+
+        answer =
+          structuredTaskSources.length
+            ? [
+                `I found ${structuredTaskSources.length} ${statusLabel} ${
+                  structuredTaskSources.length ===
+                    1
+                    ? "task"
+                    : "tasks"
+                }:`,
+                ...structuredTaskSources.map(
+                  (source) =>
+                    `- ${clean(
+                      source.title,
+                    )} [${clean(
+                      source.source_key,
+                    )}]`,
+                ),
+              ].join(
+                "\n",
+              )
+            : `No ${statusLabel} tasks are currently available in the supplied Campaign Seat records.`;
+
+        citedSourceKeys =
+          extractCitedSourceKeys(
+            answer,
+          );
+
+        structuredCitationFallbackUsed =
+          true;
+      }
+    }
+
     /*
      * Some correct answers legitimately need no campaign
      * citation: explicit unsupported-information answers
@@ -1551,6 +1842,7 @@ Deno.serve(
       );
 
     const citationRepairRequired =
+      !taskStatusFilter &&
       settings
         .require_source_citations !==
         false &&
@@ -1873,6 +2165,18 @@ Deno.serve(
     const metadata = {
       provider_request_id:
         providerRequestId,
+
+      structured_task_status:
+        taskStatusFilter ||
+        null,
+
+      structured_task_source_count:
+        taskStatusFilter
+          ? structuredTaskRows.length
+          : 0,
+
+      structured_citation_fallback_used:
+        structuredCitationFallbackUsed,
 
       retrieved_source_count:
         sources.length,

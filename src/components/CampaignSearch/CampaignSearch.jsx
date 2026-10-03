@@ -212,6 +212,8 @@ const STOP_WORDS =
     "this",
     "to",
     "with",
+    "workspace",
+    "workspaces",
   ]);
 
 function getResultIcon(type) {
@@ -296,10 +298,30 @@ function formatDate(value) {
 function renderAnswer(
   value,
 ) {
-  const parts =
+  const normalizedValue =
     String(
       value || "",
     )
+      .replace(
+        /^\s*#{1,6}\s+/gm,
+        "",
+      )
+      .replace(
+        /\n+\s*[-*]\s+/g,
+        " • ",
+      )
+      .replace(
+        /\n+/g,
+        " ",
+      )
+      .replace(
+        /\s{2,}/g,
+        " ",
+      )
+      .trim();
+
+  const parts =
+    normalizedValue
       .split(
         /(\*\*[^*]+\*\*|\[S\d+\])/g,
       )
@@ -373,6 +395,13 @@ function normalizeQuestion(
       ? entityMatches[0]
           .type
       : "";
+
+  const openTask =
+    entityType ===
+      "task" &&
+    /\b(open|not started|ready to begin)\b/.test(
+      lower,
+    );
 
   const pending =
     /\b(waiting|pending|needs approval|awaiting|to review)\b/.test(
@@ -459,6 +488,9 @@ function normalizeQuestion(
     "newest",
     "most recent",
     "waiting",
+    "open",
+    "not started",
+    "ready to begin",
     "pending",
     "awaiting",
     "to review",
@@ -506,6 +538,7 @@ function normalizeQuestion(
     searchText,
     entityType,
     pending,
+    openTask,
     completed,
     scheduled,
     followUp,
@@ -547,6 +580,19 @@ function filterResults(
           ].includes(
             row.status,
           ),
+      );
+  }
+
+  if (
+    intent.openTask
+  ) {
+    next =
+      next.filter(
+        (row) =>
+          row.result_type ===
+            "task" &&
+          row.status ===
+            "open",
       );
   }
 
@@ -908,6 +954,7 @@ export function CampaignSearch() {
 
               retrievalQuery:
                 intent.searchText ||
+                intent.entityType ||
                 trimmed,
             });
 
@@ -995,7 +1042,9 @@ export function CampaignSearch() {
           const rows =
             await searchCampaign({
               query:
-                intent.searchText,
+                intent.searchText ||
+                intent.entityType ||
+                trimmed,
 
               limit: 100,
             });
