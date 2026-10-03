@@ -1,4 +1,5 @@
 import {
+  useEffect,
   useMemo,
   useRef,
   useState,
@@ -20,6 +21,10 @@ import {
   ShieldAlert,
   Wrench,
 } from "lucide-react";
+
+import {
+  restoreCampaignSession,
+} from "../../services/auth";
 
 import {
   getCurrentUser,
@@ -651,32 +656,140 @@ function SupportClassic() {
 
 
 export default function Support() {
-  const user =
-    getCurrentUser();
+  const classicRequested =
+    typeof window !==
+      "undefined" &&
+    new URL(
+      window.location.href,
+    )
+      .searchParams
+      .get(
+        "support-classic",
+      ) ===
+      "1";
 
-  const hasCampaignSession =
-    Boolean(
-      user.id ||
-      user.email ||
-      user.workspaceId,
+  const [
+    sessionState,
+    setSessionState,
+  ] =
+    useState(
+      () => {
+        const user =
+          getCurrentUser();
+
+        return Boolean(
+          user.id ||
+          user.email ||
+          user.workspaceId,
+        )
+          ? "authenticated"
+          : "checking";
+      },
     );
 
-  const classicMode =
-    !hasCampaignSession ||
-    (
-      typeof window !==
-        "undefined" &&
-      new URL(
-        window.location.href,
+  useEffect(
+    () => {
+      if (
+        classicRequested ||
+        sessionState !==
+          "checking"
+      ) {
+        return undefined;
+      }
+
+      let mounted =
+        true;
+
+      void restoreCampaignSession()
+        .then(
+          (
+            authentication,
+          ) => {
+            if (!mounted) {
+              return;
+            }
+
+            setSessionState(
+              authentication
+                ?.status ===
+                "ready"
+                ? "authenticated"
+                : "anonymous",
+            );
+          },
+        )
+        .catch(
+          (
+            restoreError,
+          ) => {
+            console.error(
+              "Support session restoration failed:",
+              restoreError,
+            );
+
+            if (
+              mounted
+            ) {
+              setSessionState(
+                "anonymous",
+              );
+            }
+          },
+        );
+
+      return () => {
+        mounted =
+          false;
+      };
+    },
+    [
+      classicRequested,
+      sessionState,
+    ],
+  );
+
+  if (
+    classicRequested
+  ) {
+    return (
+      <SupportClassic />
+    );
+  }
+
+  if (
+    sessionState ===
+    "checking"
+  ) {
+    return (
+      <div
+        style={{
+          display:
+            "grid",
+          minHeight:
+            "100vh",
+          placeItems:
+            "center",
+          color:
+            "#173956",
+          background:
+            "#f4f7fb",
+          fontFamily:
+            "inherit",
+          fontWeight:
+            800,
+        }}
+      >
+        Restoring Campaign Seat support…
+      </div>
+    );
+  }
+
+  return sessionState ===
+    "authenticated"
+    ? (
+        <SupportCommandCenter />
       )
-        .searchParams
-        .get(
-          "support-classic",
-        ) ===
-        "1"
-    );
-
-  return classicMode
-    ? <SupportClassic />
-    : <SupportCommandCenter />;
+    : (
+        <SupportClassic />
+      );
 }
