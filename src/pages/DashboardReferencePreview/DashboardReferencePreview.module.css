@@ -24467,3 +24467,1026 @@ small {
 }
 
 /* CAMPAIGN SEAT HQ COMMAND BRIEF — END */
+
+
+/* ============================================================
+   V84 DASHBOARD HIERARCHY RESET
+   Operational work first. Campaign identity remains context.
+   ============================================================ */
+
+.main[data-dashboard-hierarchy="v84"] {
+  padding:
+    12px
+    14px
+    16px !important;
+}
+
+
+/* ------------------------------------------------------------
+   COMPACT CAMPAIGN COMMAND BRIEF
+   ------------------------------------------------------------ */
+
+.hqCommandBrief {
+  width: 100%;
+  min-width: 0;
+  overflow: hidden;
+
+  border:
+    1px
+    solid
+    #d9e3eb;
+
+  border-radius:
+    16px;
+
+  background:
+    #ffffff;
+
+  box-shadow:
+    0
+    10px
+    26px
+    rgba(
+      15,
+      48,
+      83,
+      0.055
+    );
+}
+
+.hqCommandBriefHeader {
+  display: grid;
+
+  grid-template-columns:
+    minmax(0, 1fr)
+    auto;
+
+  align-items: center;
+
+  gap: 18px;
+
+  padding:
+    14px
+    16px;
+}
+
+.hqCommandBriefTitle {
+  min-width: 0;
+}
+
+.hqCommandBriefTitle > span {
+  display: inline-flex;
+
+  align-items: center;
+
+  gap: 6px;
+
+  color: #cf2d3a;
+
+  font-size: 0.67rem;
+  font-weight: 900;
+  letter-spacing: 0.09em;
+  line-height: 1;
+
+  text-transform: uppercase;
+}
+
+.hqCommandBriefTitle h1 {
+  margin:
+    7px
+    0
+    0;
+
+  color: #153858;
+
+  font-size:
+    clamp(
+      1.12rem,
+      1.45vw,
+      1.42rem
+    );
+
+  font-weight: 880;
+  line-height: 1.05;
+  letter-spacing: -0.025em;
+}
+
+.hqCommandBriefTitle p {
+  max-width: 680px;
+
+  margin:
+    5px
+    0
+    0;
+
+  color: #6b8195;
+
+  font-size: 0.73rem;
+  line-height: 1.4;
+}
+
+.hqCommandBriefMetrics {
+  display: grid;
+
+  grid-template-columns:
+    repeat(
+      4,
+      minmax(
+        66px,
+        82px
+      )
+    );
+
+  gap: 7px;
+}
+
+.hqCommandBriefMetrics > span {
+  display: grid;
+
+  min-height: 54px;
+
+  place-content: center;
+
+  padding:
+    6px
+    7px;
+
+  border:
+    1px
+    solid
+    #e0e7ed;
+
+  border-radius:
+    11px;
+
+  background:
+    #f8fafc;
+
+  text-align: center;
+}
+
+.hqCommandBriefMetrics strong {
+  color: #173b60;
+
+  font-size: 1rem;
+  line-height: 1;
+}
+
+.hqCommandBriefMetrics small {
+  margin-top: 5px;
+
+  color: #75899c;
+
+  font-size: 0.58rem;
+  font-weight: 720;
+  line-height: 1.1;
+}
+
+.hqBriefMetricDanger {
+  border-color:
+    #efcbd0 !important;
+
+  background:
+    #fff5f5 !important;
+}
+
+.hqBriefMetricDanger strong {
+  color:
+    #c62836 !important;
+}
+
+.hqCommandBriefClear {
+  display: flex;
+
+  min-height: 48px;
+
+  align-items: center;
+
+  gap: 10px;
+
+  padding:
+    10px
+    16px;
+
+  border-top:
+    1px
+    solid
+    #e7edf2;
+
+  color: #2d7153;
+
+  background:
+    #f6fbf8;
+}
+
+.hqCommandBriefClear > svg {
+  flex: 0 0 auto;
+}
+
+.hqCommandBriefClear span {
+  min-width: 0;
+}
+
+.hqCommandBriefClear strong,
+.hqCommandBriefClear small {
+  display: block;
+}
+
+.hqCommandBriefClear strong {
+  color: #285f49;
+
+  font-size: 0.76rem;
+}
+
+.hqCommandBriefClear small {
+  margin-top: 2px;
+
+  color: #769184;
+
+  font-size: 0.66rem;
+}
+
+.hqCommandBriefList {
+  display: grid;
+
+  grid-template-columns:
+    repeat(
+      2,
+      minmax(0, 1fr)
+    );
+
+  gap: 8px;
+
+  padding:
+    0
+    14px
+    12px;
+}
+
+.hqCommandBriefList > button {
+  display: grid;
+
+  min-width: 0;
+  min-height: 72px;
+
+  grid-template-columns:
+    auto
+    minmax(0, 1fr)
+    auto
+    auto;
+
+  align-items: center;
+
+  gap: 9px;
+
+  padding:
+    10px;
+
+  border:
+    1px
+    solid
+    #e0e7ed;
+
+  border-radius:
+    11px;
+
+  color: #274a69;
+
+  background: #fafcfd;
+
+  text-align: left;
+}
+
+.hqCommandBriefIcon {
+  display: grid;
+
+  width: 32px;
+  height: 32px;
+
+  place-items: center;
+
+  border-radius: 9px;
+
+  color: #276da8;
+
+  background: #edf5fb;
+}
+
+.hqCommandBriefCopy {
+  min-width: 0;
+}
+
+.hqCommandBriefCopy small,
+.hqCommandBriefCopy strong,
+.hqCommandBriefCopy p {
+  display: block;
+
+  margin: 0;
+}
+
+.hqCommandBriefCopy small {
+  color: #8192a3;
+
+  font-size: 0.55rem;
+  font-weight: 850;
+
+  text-transform: uppercase;
+}
+
+.hqCommandBriefCopy strong {
+  margin-top: 3px;
+
+  overflow: hidden;
+
+  color: #173b60;
+
+  font-size: 0.7rem;
+
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.hqCommandBriefCopy p {
+  overflow: hidden;
+
+  margin-top: 3px;
+
+  color: #72869a;
+
+  font-size: 0.61rem;
+
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.hqCommandBriefStatus {
+  color: #617a90;
+
+  font-size: 0.59rem;
+  font-weight: 800;
+
+  white-space: nowrap;
+}
+
+.hqCommandBriefFooter {
+  display: flex;
+
+  min-height: 36px;
+
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 12px;
+
+  padding:
+    7px
+    14px;
+
+  border-top:
+    1px
+    solid
+    #e5ebf0;
+
+  color: #70859a;
+
+  background: #f8fafc;
+
+  font-size: 0.62rem;
+}
+
+.hqCommandBriefFooter > div {
+  display: flex;
+
+  align-items: center;
+
+  gap: 10px;
+}
+
+.hqCommandBriefFooter button {
+  display: inline-flex;
+
+  align-items: center;
+
+  gap: 5px;
+
+  color: #24639b;
+
+  background: transparent;
+
+  font-size: 0.62rem;
+  font-weight: 850;
+}
+
+/*
+ * When the queue is clear, strip the brief down to one compact
+ * command band instead of spending an entire viewport section.
+ */
+
+.hqCommandBrief:has(.hqCommandBriefClear)
+  .hqCommandBriefTitle
+  p {
+  display: none;
+}
+
+.hqCommandBrief:has(.hqCommandBriefClear)
+  .hqCommandBriefHeader {
+  padding:
+    11px
+    16px;
+}
+
+.hqCommandBrief:has(.hqCommandBriefClear)
+  .hqCommandBriefTitle
+  h1 {
+  margin-top: 5px;
+
+  font-size:
+    1.12rem;
+}
+
+.hqCommandBrief:has(.hqCommandBriefClear)
+  .hqCommandBriefFooter {
+  display: none;
+}
+
+
+/* ------------------------------------------------------------
+   PRIMARY OPERATIONS ROW
+   ------------------------------------------------------------ */
+
+.heroGrid {
+  display: grid !important;
+
+  grid-template-columns:
+    minmax(0, 1.9fr)
+    minmax(330px, 0.9fr)
+    !important;
+
+  align-items: stretch !important;
+
+  gap: 12px !important;
+
+  margin-top: 12px !important;
+}
+
+.heroGrid > .heroPriorityCard,
+.heroGrid > .scheduleCard {
+  box-sizing: border-box !important;
+
+  width: 100% !important;
+
+  height: 270px !important;
+  min-height: 270px !important;
+  max-height: 270px !important;
+
+  border-radius: 15px !important;
+}
+
+.heroGrid > .heroPriorityCard {
+  order: 1 !important;
+
+  padding:
+    16px
+    17px !important;
+
+  overflow: hidden !important;
+}
+
+.heroGrid > .scheduleCard {
+  order: 2 !important;
+
+  padding:
+    16px !important;
+}
+
+.heroGrid
+  .heroPriorityCard
+  > .cardHeading,
+.heroGrid
+  .scheduleCard
+  > .cardHeading {
+  position: static !important;
+
+  padding-bottom: 0 !important;
+
+  background: transparent !important;
+}
+
+.heroGrid .taskExecutionMetric {
+  display: flex;
+
+  min-height: 44px;
+
+  align-items: baseline;
+
+  gap: 9px;
+
+  margin-top: 13px;
+}
+
+.heroGrid .taskExecutionMetric strong {
+  color: #123556;
+
+  font-size: 2rem;
+  line-height: 1;
+}
+
+.heroGrid .taskExecutionMetric span {
+  color: #6b8297;
+
+  font-size: 0.78rem;
+  font-weight: 720;
+}
+
+.heroGrid .taskExecutionStats {
+  display: grid !important;
+
+  grid-template-columns:
+    repeat(
+      3,
+      minmax(0, 1fr)
+    ) !important;
+
+  gap: 8px !important;
+
+  margin-top: 9px !important;
+}
+
+.heroGrid .taskExecutionStat {
+  display: grid;
+
+  min-height: 48px;
+
+  align-content: center;
+
+  padding:
+    7px
+    10px;
+
+  border:
+    1px
+    solid
+    #e0e7ed;
+
+  border-radius:
+    10px;
+
+  background:
+    #f8fafc;
+}
+
+.heroGrid .taskExecutionStat strong {
+  color: #173b60;
+
+  font-size: 0.9rem;
+}
+
+.heroGrid .taskExecutionStat > span {
+  margin-top: 3px;
+
+  color: #71869a;
+
+  font-size: 0.62rem;
+}
+
+.heroGrid .taskExecutionNext {
+  min-height: 79px !important;
+
+  margin-top: 10px !important;
+}
+
+.heroGrid .taskExecutionNextCopy > span {
+  overflow: hidden;
+
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.heroGrid .taskExecutionMore {
+  margin-top: 5px !important;
+}
+
+.heroGrid .scheduleTimeline {
+  min-height: 0 !important;
+}
+
+.heroGrid
+  .scheduleCard
+  .emptyState {
+  min-height: 150px !important;
+}
+
+
+/* ------------------------------------------------------------
+   SIX PRIMARY OPERATIONAL CARDS
+   ------------------------------------------------------------ */
+
+.decisionGrid {
+  grid-template-columns:
+    repeat(
+      3,
+      minmax(0, 1fr)
+    ) !important;
+
+  grid-template-rows:
+    repeat(
+      2,
+      minmax(220px, auto)
+    ) !important;
+
+  gap: 12px !important;
+
+  margin-top: 12px !important;
+}
+
+.decisionGrid > article {
+  min-height: 220px !important;
+
+  border-radius: 15px !important;
+}
+
+
+/* ------------------------------------------------------------
+   CAMPAIGN CONTEXT IS SECONDARY, NOT THE DASHBOARD HERO
+   ------------------------------------------------------------ */
+
+.campaignContextSection {
+  width: 100%;
+  min-width: 0;
+
+  margin-top: 12px;
+}
+
+.campaignContextSection
+  .centerHeroStack {
+  display: grid !important;
+
+  width: 100% !important;
+  min-width: 0 !important;
+
+  height: 220px !important;
+  min-height: 220px !important;
+  max-height: 220px !important;
+
+  grid-template-columns:
+    minmax(0, 1fr)
+    320px !important;
+
+  grid-template-rows:
+    220px !important;
+
+  gap: 12px !important;
+
+  margin: 0 !important;
+}
+
+.campaignContextSection
+  .centerHeroStack
+  .simpleSpotlight {
+  width: 100% !important;
+
+  height: 220px !important;
+  min-height: 220px !important;
+  max-height: 220px !important;
+
+  grid-template-columns:
+    minmax(0, 1.5fr)
+    minmax(210px, 0.6fr)
+    !important;
+
+  border-radius: 15px !important;
+}
+
+.campaignContextSection
+  .simpleSpotlightCopy {
+  height: 220px !important;
+  min-height: 220px !important;
+  max-height: 220px !important;
+
+  padding:
+    14px
+    16px
+    12px !important;
+}
+
+.campaignContextSection
+  .simpleSpotlightMessage
+  h2 {
+  max-width: none !important;
+
+  font-size:
+    clamp(
+      1.05rem,
+      1.25vw,
+      1.28rem
+    ) !important;
+}
+
+.campaignContextSection
+  .simpleSpotlightMessage
+  h2
+  strong {
+  max-width: none !important;
+
+  margin-top: 3px !important;
+
+  font-size:
+    clamp(
+      1rem,
+      1.2vw,
+      1.22rem
+    ) !important;
+}
+
+.campaignContextSection
+  .simpleSpotlightInfoStack {
+  grid-template-columns:
+    repeat(
+      3,
+      minmax(0, 1fr)
+    ) !important;
+
+  gap: 6px !important;
+
+  margin-top: 10px !important;
+}
+
+.campaignContextSection
+  .simpleSpotlightInfoCard,
+.campaignContextSection
+  .simpleSpotlightWeatherCard {
+  min-height: 48px !important;
+}
+
+.campaignContextSection
+  .simpleSpotlightInfoCard {
+  grid-template-columns:
+    30px
+    minmax(0, 1fr) !important;
+
+  gap: 7px !important;
+
+  padding:
+    5px
+    7px !important;
+}
+
+.campaignContextSection
+  .simpleSpotlightInfoIcon {
+  width: 30px !important;
+  height: 30px !important;
+}
+
+.campaignContextSection
+  .simpleSpotlightInfoBody
+  strong {
+  margin-top: 3px !important;
+
+  font-size: 0.78rem !important;
+}
+
+.campaignContextSection
+  .simpleSpotlightCustomize {
+  min-height: 33px !important;
+
+  margin-top: auto !important;
+
+  padding-top: 7px !important;
+}
+
+.campaignContextSection
+  .simpleSpotlightCustomizeCopy
+  span {
+  display: none !important;
+}
+
+.campaignContextSection
+  .simpleSpotlightCustomizeCopy
+  small {
+  font-size: 0.65rem !important;
+}
+
+.campaignContextSection
+  .simpleSpotlightMedia,
+.campaignContextSection
+  .simpleSpotlightPortrait {
+  height: 220px !important;
+  min-height: 220px !important;
+  max-height: 220px !important;
+}
+
+.campaignContextSection
+  .campaignAiPanel {
+  box-sizing: border-box !important;
+
+  display: grid !important;
+
+  width: 100% !important;
+
+  height: 220px !important;
+  min-height: 220px !important;
+  max-height: 220px !important;
+
+  grid-template-columns:
+    1fr !important;
+
+  grid-template-rows:
+    auto
+    auto
+    auto !important;
+
+  align-content: center !important;
+  justify-items: stretch !important;
+
+  gap: 12px !important;
+
+  margin: 0 !important;
+
+  padding:
+    18px !important;
+
+  border-radius: 15px !important;
+
+  text-align: center;
+}
+
+.campaignContextSection
+  .campaignAiIcon {
+  justify-self: center !important;
+}
+
+.campaignContextSection
+  .campaignAiCopy {
+  align-items: center !important;
+
+  text-align: center;
+}
+
+.campaignContextSection
+  .campaignAiLive {
+  justify-content: center !important;
+}
+
+.campaignContextSection
+  .campaignAiCopy
+  strong {
+  white-space: normal !important;
+}
+
+.campaignContextSection
+  .campaignAiAction {
+  width: 100% !important;
+  max-width: none !important;
+}
+
+.campaignContextSection
+  .campaignAiLauncher {
+  min-height: 46px !important;
+}
+
+
+/* ------------------------------------------------------------
+   RESPONSIVE
+   ------------------------------------------------------------ */
+
+@media (max-width: 1180px) {
+  .hqCommandBriefHeader {
+    grid-template-columns:
+      1fr;
+  }
+
+  .hqCommandBriefMetrics {
+    grid-template-columns:
+      repeat(
+        4,
+        minmax(0, 1fr)
+      );
+  }
+
+  .heroGrid {
+    grid-template-columns:
+      1fr !important;
+  }
+
+  .heroGrid > .heroPriorityCard,
+  .heroGrid > .scheduleCard {
+    height: auto !important;
+    min-height: 250px !important;
+    max-height: none !important;
+  }
+
+  .decisionGrid {
+    grid-template-columns:
+      repeat(
+        2,
+        minmax(0, 1fr)
+      ) !important;
+
+    grid-template-rows:
+      repeat(
+        3,
+        minmax(220px, auto)
+      ) !important;
+  }
+
+  .campaignContextSection
+    .centerHeroStack {
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+
+    grid-template-columns:
+      1fr !important;
+
+    grid-template-rows:
+      auto
+      auto !important;
+  }
+
+  .campaignContextSection
+    .centerHeroStack
+    .simpleSpotlight,
+  .campaignContextSection
+    .simpleSpotlightCopy {
+    height: 250px !important;
+    min-height: 250px !important;
+    max-height: 250px !important;
+  }
+
+  .campaignContextSection
+    .simpleSpotlightMedia,
+  .campaignContextSection
+    .simpleSpotlightPortrait {
+    height: 250px !important;
+    min-height: 250px !important;
+    max-height: 250px !important;
+  }
+
+  .campaignContextSection
+    .campaignAiPanel {
+    height: auto !important;
+    min-height: 130px !important;
+    max-height: none !important;
+  }
+}
+
+@media (max-width: 760px) {
+  .hqCommandBriefMetrics {
+    grid-template-columns:
+      repeat(
+        2,
+        minmax(0, 1fr)
+      );
+  }
+
+  .hqCommandBriefList {
+    grid-template-columns:
+      1fr;
+  }
+
+  .decisionGrid {
+    grid-template-columns:
+      1fr !important;
+
+    grid-template-rows:
+      none !important;
+
+    grid-auto-rows:
+      auto !important;
+  }
+
+  .campaignContextSection
+    .centerHeroStack
+    .simpleSpotlight {
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+
+    grid-template-columns:
+      1fr !important;
+  }
+
+  .campaignContextSection
+    .simpleSpotlightCopy {
+    height: auto !important;
+    min-height: 230px !important;
+    max-height: none !important;
+  }
+
+  .campaignContextSection
+    .simpleSpotlightInfoStack {
+    grid-template-columns:
+      1fr !important;
+  }
+
+  .campaignContextSection
+    .simpleSpotlightMedia,
+  .campaignContextSection
+    .simpleSpotlightPortrait {
+    height: 245px !important;
+    min-height: 245px !important;
+    max-height: 245px !important;
+  }
+}
+
+/* V84 DASHBOARD HIERARCHY RESET — END */

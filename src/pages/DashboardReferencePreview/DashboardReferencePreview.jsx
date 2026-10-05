@@ -3973,6 +3973,13 @@ const [
         "in_progress",
     ).length;
 
+  const taskExecutionOpenCount =
+    taskExecutionQueue.filter(
+      (task) =>
+        task.status ===
+        "open",
+    ).length;
+
   const taskExecutionPrimary =
     taskExecutionQueue[
       0
@@ -8787,7 +8794,10 @@ const [
     <CampaignWorkspaceShell
       activeItem="HQ"
     >
-      <main className={styles.main}>
+      <main
+        className={styles.main}
+        data-dashboard-hierarchy="v84"
+      >
           {error && (
             <div className={styles.errorBanner}>
               <AlertCircle size={16} />
@@ -9074,8 +9084,8 @@ const [
                 <strong>{taskExecutionQueue.length}</strong>
                 <span>
                   {taskExecutionQueue.length === 1
-                    ? "Open task"
-                    : "Open tasks"}
+                    ? "Active task"
+                    : "Active tasks"}
                 </span>
               </div>
 
@@ -9084,18 +9094,18 @@ const [
                 aria-label="Today&apos;s task execution summary"
               >
                 <span className={styles.taskExecutionStat}>
-                  <strong>{taskExecutionOverdueCount}</strong>
-                  <span>Overdue</span>
-                </span>
-
-                <span className={styles.taskExecutionStat}>
-                  <strong>{taskExecutionDueTodayCount}</strong>
-                  <span>Due today</span>
+                  <strong>{taskExecutionOpenCount}</strong>
+                  <span>Open</span>
                 </span>
 
                 <span className={styles.taskExecutionStat}>
                   <strong>{taskExecutionInProgressCount}</strong>
                   <span>In progress</span>
+                </span>
+
+                <span className={styles.taskExecutionStat}>
+                  <strong>{taskExecutionOverdueCount}</strong>
+                  <span>Overdue</span>
                 </span>
               </div>
 
@@ -9153,8 +9163,8 @@ const [
                     <div className={styles.taskExecutionMore}>
                       {taskExecutionRemainingCount} more{" "}
                       {taskExecutionRemainingCount === 1
-                        ? "open task"
-                        : "open tasks"}
+                        ? "active task"
+                        : "active tasks"}
                     </div>
                   ) : null}
                 </>
@@ -9165,405 +9175,12 @@ const [
                   <span>
                     <strong>Task board clear</strong>
                     <small>
-                      No open campaign tasks currently need execution.
+                      No active campaign tasks currently need execution.
                     </small>
                   </span>
                 </div>
               )}
             </article>
-            <div className={styles.centerHeroStack}>
-              <article
-                className={`${styles.heroCard} ${styles.simpleSpotlight}`}
-              >
-                <div className={styles.simpleSpotlightCopy}>
-                  <div className={styles.simpleSpotlightMessage}>
-                    <h2>
-                      Building momentum for
-                      <strong>
-                        {workspace.description ||
-                          workspace.name ||
-                          "your campaign"}
-                      </strong>
-                    </h2>
-
-                    <p>
-                      {workspace.location ||
-                        "Campaign workspace"}
-                    </p>
-                  </div>
-
-                  <div className={styles.simpleSpotlightInfoStack}>
-                    <div className={styles.simpleSpotlightInfoCard}>
-                      <span
-                        className={
-                          styles.simpleSpotlightInfoIcon
-                        }
-                      >
-                        <CalendarDays size={18} />
-                      </span>
-
-                      <div
-                        className={
-                          styles.simpleSpotlightInfoBody
-                        }
-                      >
-                        <small>
-                          {workspace.electionLabel ||
-                            "Election day"}
-                        </small>
-
-                        <strong>
-                          {workspace.electionDate ||
-                            "Date pending"}
-                        </strong>
-                      </div>
-                    </div>
-
-                    <div className={styles.simpleSpotlightInfoCard}>
-                      <span
-                        className={
-                          styles.simpleSpotlightInfoIcon
-                        }
-                      >
-                        <Clock3 size={18} />
-                      </span>
-
-                      <div
-                        className={
-                          styles.simpleSpotlightInfoBody
-                        }
-                      >
-                        <small>
-                          Countdown
-                        </small>
-
-                        <strong>
-                          {daysUntilElection}{" "}
-                          {daysUntilElection === 1
-                            ? "day"
-                            : "days"}
-                        </strong>
-                      </div>
-                    </div>
-
-                    <div
-                      className={
-                        styles.simpleSpotlightWeatherCard
-                      }
-                    >
-                      <CampaignConditions
-                        workspace={workspace}
-                        variant="hero"
-                      />
-                    </div>
-
-
-                  </div>
-
-                  <div className={styles.simpleSpotlightCustomize}>
-                    <div
-                      className={
-                        styles.simpleSpotlightCustomizeCopy
-                      }
-                    >
-                      <small>
-                        Customize your HQ
-                      </small>
-
-                      <span>
-                        Choose up to 6 cards below to shape
-                        the information you see first.
-                      </span>
-                    </div>
-
-                    <div className={styles.heroShortcutArea}>
-                      <button
-                        className={
-                          styles.editShortcutsButton
-                        }
-                        type="button"
-                        aria-expanded={
-                          isEditingSpotlightShortcuts
-                        }
-                        onClick={() =>
-                          setIsEditingSpotlightShortcuts(
-                            (current) => !current,
-                          )
-                        }
-                      >
-                        <Settings size={13} />
-                        Customize HQ
-                      </button>
-
-                      {isEditingSpotlightShortcuts && (
-                        <div
-                          className={styles.shortcutEditor}
-                          role="dialog"
-                          aria-modal="true"
-                          aria-label="Edit Dashboard HQ shortcuts"
-                        >
-                          <div
-                            className={
-                              styles.shortcutEditorHeader
-                            }
-                          >
-                            <div>
-                              <strong>
-                                Your HQ cards
-                              </strong>
-
-                              <small>
-                                Choose up to 6 items to
-                                appear on your main HQ.
-                              </small>
-                            </div>
-
-                            <button
-                              type="button"
-                              aria-label="Close shortcut editor"
-                              onClick={() =>
-                                setIsEditingSpotlightShortcuts(
-                                  false,
-                                )
-                              }
-                            >
-                              <X size={16} />
-                            </button>
-                          </div>
-
-                          <div
-                            className={
-                              styles.shortcutOptions
-                            }
-                          >
-                            {SPOTLIGHT_SHORTCUT_OPTIONS.map(
-                              (option) => {
-                                const Icon =
-                                  option.icon;
-
-                                const isSelected =
-                                  activeSpotlightShortcutKeys.includes(
-                                    option.key,
-                                  );
-
-                                return (
-                                  <button
-                                    key={option.key}
-                                    type="button"
-                                    aria-pressed={
-                                      isSelected
-                                    }
-                                    disabled={
-                                      !isSelected &&
-                                      activeSpotlightShortcutKeys.length >=
-                                        HQ_SHORTCUT_LIMIT
-                                    }
-                                    className={
-                                      isSelected
-                                        ? styles.selectedShortcut
-                                        : ""
-                                    }
-                                    onClick={() =>
-                                      toggleSpotlightShortcut(
-                                        option.key,
-                                      )
-                                    }
-                                  >
-                                    <Icon size={15} />
-
-                                    <span>
-                                      {option.label}
-                                    </span>
-
-                                    {isSelected && (
-                                      <CheckCircle2
-                                        size={14}
-                                      />
-                                    )}
-                                  </button>
-                                );
-                              },
-                            )}
-                          </div>
-
-                          <div
-                            className={
-                              styles.shortcutEditorFooter
-                            }
-                          >
-                            <span>
-                              {
-                                activeSpotlightShortcutKeys.length
-                              }
-                              /{HQ_SHORTCUT_LIMIT} selected
-                              {" · "}
-                              {activeSpotlightShortcutKeys.length >=
-                              HQ_SHORTCUT_LIMIT
-                                ? "Remove one to choose another"
-                                : "Choose your HQ cards"}
-                            </span>
-
-                            <button
-                              type="button"
-                              onClick={
-                                resetSpotlightShortcuts
-                              }
-                            >
-                              Reset recommended
-                            </button>
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                </div>
-
-                <div
-                  className={styles.simpleSpotlightMedia}
-                  data-candidate-photo-frame="hq"
-                >
-                  {dashboardCandidatePhotoUrl ? (
-                    <img
-                      className={
-                        styles.simpleSpotlightBackdrop
-                      }
-                      src={
-                        dashboardCandidatePhotoUrl
-                      }
-                      alt=""
-                      aria-hidden="true"
-                      data-candidate-photo="hq-backdrop"
-                      decoding="async"
-                      draggable="false"
-                    />
-                  ) : (
-                    <div
-                      className={
-                        styles.simpleSpotlightPhotoFallback
-                      }
-                      aria-label="Candidate photo not uploaded"
-                    >
-                      <strong>
-                        {getUserInitials(
-                          dashboardCandidateProfile
-                            ?.candidateName ||
-                          workspace.name,
-                        )}
-                      </strong>
-
-                      <span>
-                        Upload candidate photo
-                      </span>
-                    </div>
-                  )}
-
-                  <div
-                    className={
-                      styles.simpleSpotlightMediaShade
-                    }
-                    aria-hidden="true"
-                  />
-
-                  {dashboardCandidatePhotoUrl ? (
-                    <img
-                      className={
-                        styles.simpleSpotlightPortrait
-                      }
-                      src={
-                        dashboardCandidatePhotoUrl
-                      }
-                      alt={
-                        dashboardCandidateProfile
-                          ?.candidateName ||
-                        workspace.name
-                      }
-                      data-candidate-photo="hq-portrait"
-                      decoding="async"
-                      loading="eager"
-                      fetchPriority="high"
-                      draggable="false"
-                    />
-                  ) : null}
-                </div>
-              </article>
-
-              <section
-                className={styles.campaignAiPanel}
-                aria-label="Ask Campaign HQ"
-
-              data-campaign-ai-panel="true"
-            >
-                <span className={styles.campaignAiIcon}>
-                  <Sparkles size={18} />
-                </span>
-
-                <div className={styles.campaignAiCopy}>
-      <span className={styles.campaignAiLive}>
-        <i aria-hidden="true" />
-        Live campaign intelligence
-      </span>
-
-                  <strong>Insights, answers &amp; next steps</strong>
-
-                </div>
-
-                <div className={styles.campaignAiAction}>
-                  <button
-                    className={styles.campaignAiLauncher}
-                    type="button"
-                    aria-label="Open Ask Campaign HQ"
-                    onClick={() => {
-                      const aiPanel =
-                        document.querySelector(
-                          '[data-campaign-ai-panel="true"]',
-                        );
-
-                      const globalLauncher =
-                        Array.from(
-                          document.querySelectorAll("button"),
-                        ).find((button) => {
-                          if (aiPanel?.contains(button)) {
-                            return false;
-                          }
-
-                          const label = [
-                            button.getAttribute("aria-label") || "",
-                            button.textContent || "",
-                          ]
-                            .join(" ")
-                            .replace(/\s+/g, " ")
-                            .trim()
-                            .toLowerCase();
-
-                          return label.includes(
-                            "ask campaign hq",
-                          );
-                        });
-
-                      if (globalLauncher) {
-                        globalLauncher.click();
-                        return;
-                      }
-
-                      window.dispatchEvent(
-                        new KeyboardEvent("keydown", {
-                          key: "k",
-                          code: "KeyK",
-                          metaKey: true,
-                          ctrlKey: true,
-                          bubbles: true,
-                        }),
-                      );
-                    }}
-                  >
-                    <Sparkles size={18} />
-                    <span>Ask Campaign HQ</span>
-                    <kbd>⌘K</kbd>
-                  </button>
-                </div>
-              </section>
-            </div>
-
             <article
               className={styles.scheduleCard}
               tabIndex={0}
@@ -13635,6 +13252,408 @@ const [
               })}
           </section>
           {/* CAMPAIGN SEAT DECISION GRID — END */}
+
+          {/* V84 CAMPAIGN CONTEXT — START */}
+          <section
+            className={styles.campaignContextSection}
+            aria-label="Campaign context"
+          >
+            <div className={styles.centerHeroStack}>
+              <article
+                className={`${styles.heroCard} ${styles.simpleSpotlight}`}
+              >
+                <div className={styles.simpleSpotlightCopy}>
+                  <div className={styles.simpleSpotlightMessage}>
+                    <h2>
+                      Building momentum for
+                      <strong>
+                        {workspace.description ||
+                          workspace.name ||
+                          "your campaign"}
+                      </strong>
+                    </h2>
+
+                    <p>
+                      {workspace.location ||
+                        "Campaign workspace"}
+                    </p>
+                  </div>
+
+                  <div className={styles.simpleSpotlightInfoStack}>
+                    <div className={styles.simpleSpotlightInfoCard}>
+                      <span
+                        className={
+                          styles.simpleSpotlightInfoIcon
+                        }
+                      >
+                        <CalendarDays size={18} />
+                      </span>
+
+                      <div
+                        className={
+                          styles.simpleSpotlightInfoBody
+                        }
+                      >
+                        <small>
+                          {workspace.electionLabel ||
+                            "Election day"}
+                        </small>
+
+                        <strong>
+                          {workspace.electionDate ||
+                            "Date pending"}
+                        </strong>
+                      </div>
+                    </div>
+
+                    <div className={styles.simpleSpotlightInfoCard}>
+                      <span
+                        className={
+                          styles.simpleSpotlightInfoIcon
+                        }
+                      >
+                        <Clock3 size={18} />
+                      </span>
+
+                      <div
+                        className={
+                          styles.simpleSpotlightInfoBody
+                        }
+                      >
+                        <small>
+                          Countdown
+                        </small>
+
+                        <strong>
+                          {daysUntilElection}{" "}
+                          {daysUntilElection === 1
+                            ? "day"
+                            : "days"}
+                        </strong>
+                      </div>
+                    </div>
+
+                    <div
+                      className={
+                        styles.simpleSpotlightWeatherCard
+                      }
+                    >
+                      <CampaignConditions
+                        workspace={workspace}
+                        variant="hero"
+                      />
+                    </div>
+
+
+                  </div>
+
+                  <div className={styles.simpleSpotlightCustomize}>
+                    <div
+                      className={
+                        styles.simpleSpotlightCustomizeCopy
+                      }
+                    >
+                      <small>
+                        Customize your HQ
+                      </small>
+
+                      <span>
+                        Choose up to 6 cards below to shape
+                        the information you see first.
+                      </span>
+                    </div>
+
+                    <div className={styles.heroShortcutArea}>
+                      <button
+                        className={
+                          styles.editShortcutsButton
+                        }
+                        type="button"
+                        aria-expanded={
+                          isEditingSpotlightShortcuts
+                        }
+                        onClick={() =>
+                          setIsEditingSpotlightShortcuts(
+                            (current) => !current,
+                          )
+                        }
+                      >
+                        <Settings size={13} />
+                        Customize HQ
+                      </button>
+
+                      {isEditingSpotlightShortcuts && (
+                        <div
+                          className={styles.shortcutEditor}
+                          role="dialog"
+                          aria-modal="true"
+                          aria-label="Edit Dashboard HQ shortcuts"
+                        >
+                          <div
+                            className={
+                              styles.shortcutEditorHeader
+                            }
+                          >
+                            <div>
+                              <strong>
+                                Your HQ cards
+                              </strong>
+
+                              <small>
+                                Choose up to 6 items to
+                                appear on your main HQ.
+                              </small>
+                            </div>
+
+                            <button
+                              type="button"
+                              aria-label="Close shortcut editor"
+                              onClick={() =>
+                                setIsEditingSpotlightShortcuts(
+                                  false,
+                                )
+                              }
+                            >
+                              <X size={16} />
+                            </button>
+                          </div>
+
+                          <div
+                            className={
+                              styles.shortcutOptions
+                            }
+                          >
+                            {SPOTLIGHT_SHORTCUT_OPTIONS.map(
+                              (option) => {
+                                const Icon =
+                                  option.icon;
+
+                                const isSelected =
+                                  activeSpotlightShortcutKeys.includes(
+                                    option.key,
+                                  );
+
+                                return (
+                                  <button
+                                    key={option.key}
+                                    type="button"
+                                    aria-pressed={
+                                      isSelected
+                                    }
+                                    disabled={
+                                      !isSelected &&
+                                      activeSpotlightShortcutKeys.length >=
+                                        HQ_SHORTCUT_LIMIT
+                                    }
+                                    className={
+                                      isSelected
+                                        ? styles.selectedShortcut
+                                        : ""
+                                    }
+                                    onClick={() =>
+                                      toggleSpotlightShortcut(
+                                        option.key,
+                                      )
+                                    }
+                                  >
+                                    <Icon size={15} />
+
+                                    <span>
+                                      {option.label}
+                                    </span>
+
+                                    {isSelected && (
+                                      <CheckCircle2
+                                        size={14}
+                                      />
+                                    )}
+                                  </button>
+                                );
+                              },
+                            )}
+                          </div>
+
+                          <div
+                            className={
+                              styles.shortcutEditorFooter
+                            }
+                          >
+                            <span>
+                              {
+                                activeSpotlightShortcutKeys.length
+                              }
+                              /{HQ_SHORTCUT_LIMIT} selected
+                              {" · "}
+                              {activeSpotlightShortcutKeys.length >=
+                              HQ_SHORTCUT_LIMIT
+                                ? "Remove one to choose another"
+                                : "Choose your HQ cards"}
+                            </span>
+
+                            <button
+                              type="button"
+                              onClick={
+                                resetSpotlightShortcuts
+                              }
+                            >
+                              Reset recommended
+                            </button>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                <div
+                  className={styles.simpleSpotlightMedia}
+                  data-candidate-photo-frame="hq"
+                >
+                  {dashboardCandidatePhotoUrl ? (
+                    <img
+                      className={
+                        styles.simpleSpotlightBackdrop
+                      }
+                      src={
+                        dashboardCandidatePhotoUrl
+                      }
+                      alt=""
+                      aria-hidden="true"
+                      data-candidate-photo="hq-backdrop"
+                      decoding="async"
+                      draggable="false"
+                    />
+                  ) : (
+                    <div
+                      className={
+                        styles.simpleSpotlightPhotoFallback
+                      }
+                      aria-label="Candidate photo not uploaded"
+                    >
+                      <strong>
+                        {getUserInitials(
+                          dashboardCandidateProfile
+                            ?.candidateName ||
+                          workspace.name,
+                        )}
+                      </strong>
+
+                      <span>
+                        Upload candidate photo
+                      </span>
+                    </div>
+                  )}
+
+                  <div
+                    className={
+                      styles.simpleSpotlightMediaShade
+                    }
+                    aria-hidden="true"
+                  />
+
+                  {dashboardCandidatePhotoUrl ? (
+                    <img
+                      className={
+                        styles.simpleSpotlightPortrait
+                      }
+                      src={
+                        dashboardCandidatePhotoUrl
+                      }
+                      alt={
+                        dashboardCandidateProfile
+                          ?.candidateName ||
+                        workspace.name
+                      }
+                      data-candidate-photo="hq-portrait"
+                      decoding="async"
+                      loading="eager"
+                      fetchPriority="high"
+                      draggable="false"
+                    />
+                  ) : null}
+                </div>
+              </article>
+
+              <section
+                className={styles.campaignAiPanel}
+                aria-label="Ask Campaign HQ"
+
+              data-campaign-ai-panel="true"
+            >
+                <span className={styles.campaignAiIcon}>
+                  <Sparkles size={18} />
+                </span>
+
+                <div className={styles.campaignAiCopy}>
+      <span className={styles.campaignAiLive}>
+        <i aria-hidden="true" />
+        Live campaign intelligence
+      </span>
+
+                  <strong>Insights, answers &amp; next steps</strong>
+
+                </div>
+
+                <div className={styles.campaignAiAction}>
+                  <button
+                    className={styles.campaignAiLauncher}
+                    type="button"
+                    aria-label="Open Ask Campaign HQ"
+                    onClick={() => {
+                      const aiPanel =
+                        document.querySelector(
+                          '[data-campaign-ai-panel="true"]',
+                        );
+
+                      const globalLauncher =
+                        Array.from(
+                          document.querySelectorAll("button"),
+                        ).find((button) => {
+                          if (aiPanel?.contains(button)) {
+                            return false;
+                          }
+
+                          const label = [
+                            button.getAttribute("aria-label") || "",
+                            button.textContent || "",
+                          ]
+                            .join(" ")
+                            .replace(/\s+/g, " ")
+                            .trim()
+                            .toLowerCase();
+
+                          return label.includes(
+                            "ask campaign hq",
+                          );
+                        });
+
+                      if (globalLauncher) {
+                        globalLauncher.click();
+                        return;
+                      }
+
+                      window.dispatchEvent(
+                        new KeyboardEvent("keydown", {
+                          key: "k",
+                          code: "KeyK",
+                          metaKey: true,
+                          ctrlKey: true,
+                          bubbles: true,
+                        }),
+                      );
+                    }}
+                  >
+                    <Sparkles size={18} />
+                    <span>Ask Campaign HQ</span>
+                    <kbd>⌘K</kbd>
+                  </button>
+                </div>
+              </section>
+            </div>
+
+          </section>
+          {/* V84 CAMPAIGN CONTEXT — END */}
+
 
           <footer className={styles.footer}>
             <span>
