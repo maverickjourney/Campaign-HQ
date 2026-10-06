@@ -714,13 +714,23 @@ export default function TeamReferencePreview() {
   ] = useState("");
 
   /*
-   * TEAM_MEMBER_DEEP_LINK_V66
+   * V95A TEAM MEMBER BROWSER HISTORY
    *
-   * Keep the exact member address in the URL while preserving
-   * unrelated state such as team-demo=1.
+   * Opening a member from the Team list creates a real browser
+   * history entry. Back closes the drawer and Forward reopens
+   * the same member.
+   *
+   * Direct ?member=<uuid> addresses remain supported. A marker
+   * stored in React Router history state distinguishes a member
+   * opened from the list from a directly addressed deep link.
    */
   const setMemberRoute =
-    (memberId) => {
+    (
+      memberId,
+      {
+        replace = false,
+      } = {},
+    ) => {
       const params =
         new URLSearchParams(
           location.search,
@@ -738,6 +748,22 @@ export default function TeamReferencePreview() {
       const nextSearch =
         params.toString();
 
+      const nextState = {
+        ...(
+          location.state ||
+          {}
+        ),
+      };
+
+      delete nextState
+        .campaignSeatTeamMemberId;
+
+      if (memberId) {
+        nextState
+          .campaignSeatTeamMemberId =
+          memberId;
+      }
+
       navigate(
         {
           pathname:
@@ -748,14 +774,37 @@ export default function TeamReferencePreview() {
               : "",
         },
         {
-          replace: true,
+          replace,
+          state:
+            nextState,
         },
       );
     };
 
   const closeMemberDetails =
     () => {
-      setMemberRoute("");
+      const historyMemberId =
+        String(
+          location.state
+            ?.campaignSeatTeamMemberId ||
+            "",
+        );
+
+      if (
+        requestedMemberId &&
+        historyMemberId ===
+          requestedMemberId
+      ) {
+        navigate(-1);
+        return;
+      }
+
+      setMemberRoute(
+        "",
+        {
+          replace: true,
+        },
+      );
     };
 
   const [
@@ -812,22 +861,30 @@ export default function TeamReferencePreview() {
       ? demoInvitations
       : invitationCommand.invitations;
 
+  /*
+   * V95A LIVE TEAM ORGANIZATION SOURCES
+   *
+   * Demo organization records are only valid in explicit
+   * team-demo mode. An empty live table must remain empty;
+   * never substitute sample departments or teams into the
+   * authenticated campaign workspace.
+   */
   const roles =
-    invitationCommand.roles.length
-      ? invitationCommand.roles
-      : DEMO_ROLES;
+    demoMode
+      ? DEMO_ROLES
+      : invitationCommand.roles;
 
   const departments =
-    invitationCommand.departments
-      .length
-      ? invitationCommand
-          .departments
-      : DEMO_DEPARTMENTS;
+    demoMode
+      ? DEMO_DEPARTMENTS
+      : invitationCommand
+          .departments;
 
   const campaignTeams =
-    invitationCommand.teams.length
-      ? invitationCommand.teams
-      : DEMO_TEAMS;
+    demoMode
+      ? DEMO_TEAMS
+      : invitationCommand
+          .teams;
 
   const roleMap = useMemo(
     () =>
