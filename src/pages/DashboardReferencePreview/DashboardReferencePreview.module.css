@@ -25490,3 +25490,176 @@ small {
 }
 
 /* V84 DASHBOARD HIERARCHY RESET — END */
+
+/* ============================================================
+   V87C DASHBOARD CONTEXT FIT REPAIR
+   Keeps Campaign Context secondary while preventing clipping.
+   ============================================================ */
+
+@media (min-width: 1181px) {
+  /*
+   * V84 made this context intentionally compact, but 220px
+   * was too short for the two campaign metrics, conditions,
+   * and Customize HQ footer.
+   */
+
+  .campaignContextSection
+    .centerHeroStack {
+    height: 260px !important;
+    min-height: 260px !important;
+    max-height: 260px !important;
+
+    grid-template-rows:
+      260px !important;
+  }
+
+  .campaignContextSection
+    .centerHeroStack
+    .simpleSpotlight {
+    height: 260px !important;
+    min-height: 260px !important;
+    max-height: 260px !important;
+  }
+
+  .campaignContextSection
+    .simpleSpotlightCopy {
+    height: 260px !important;
+    min-height: 260px !important;
+    max-height: 260px !important;
+
+    padding:
+      15px
+      16px
+      14px !important;
+  }
+
+  /*
+   * Restore the proven Election Day | Countdown geometry.
+   * The V84 3-column override made the election date too narrow.
+   */
+
+  .campaignContextSection
+    .simpleSpotlightInfoStack {
+    grid-template-columns:
+      minmax(0, 1.28fr)
+      minmax(0, 0.82fr)
+      !important;
+
+    grid-auto-rows:
+      max-content !important;
+
+    gap:
+      8px !important;
+
+    margin-top:
+      10px !important;
+  }
+
+  .campaignContextSection
+    .simpleSpotlightInfoCard {
+    height: 60px !important;
+    min-height: 60px !important;
+
+    grid-template-columns:
+      34px
+      minmax(0, 1fr)
+      !important;
+
+    gap:
+      8px !important;
+
+    padding:
+      8px
+      10px !important;
+  }
+
+  .campaignContextSection
+    .simpleSpotlightInfoIcon {
+    width: 34px !important;
+    height: 34px !important;
+    min-width: 34px !important;
+  }
+
+  .campaignContextSection
+    .simpleSpotlightInfoBody {
+    min-width: 0 !important;
+
+    overflow:
+      visible !important;
+  }
+
+  .campaignContextSection
+    .simpleSpotlightInfoBody
+    strong {
+    width: auto !important;
+    max-width: none !important;
+
+    overflow:
+      visible !important;
+
+    font-size:
+      0.78rem !important;
+
+    text-overflow:
+      clip !important;
+
+    white-space:
+      nowrap !important;
+  }
+
+  /*
+   * Current Conditions belongs under both compact metrics.
+   */
+
+  .campaignContextSection
+    .simpleSpotlightWeatherCard {
+    grid-column:
+      1 / -1 !important;
+
+    height: 84px !important;
+    min-height: 84px !important;
+
+    padding:
+      8px
+      11px !important;
+  }
+
+  /*
+   * Keep Customize HQ visible rather than letting it fall
+   * below the fixed-height blue panel.
+   */
+
+  .campaignContextSection
+    .simpleSpotlightCustomize {
+    min-height: 38px !important;
+
+    margin-top:
+      9px !important;
+
+    padding-top:
+      9px !important;
+  }
+
+  /*
+   * Keep photo and AI control visually aligned with the
+   * corrected campaign-context height.
+   */
+
+  .campaignContextSection
+    .simpleSpotlightMedia,
+  .campaignContextSection
+    .simpleSpotlightPortrait {
+    height: 260px !important;
+    min-height: 260px !important;
+    max-height: 260px !important;
+  }
+
+  .campaignContextSection
+    .campaignAiPanel {
+    height: 260px !important;
+    min-height: 260px !important;
+    max-height: 260px !important;
+  }
+}
+
+/* V87C DASHBOARD CONTEXT FIT REPAIR — END */
