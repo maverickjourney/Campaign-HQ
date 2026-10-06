@@ -625,13 +625,25 @@ export default function CommitmentsReferencePreview() {
   ] = useState("");
 
   /*
-   * COMMITMENT_DEEP_LINK_V65
+   * V97A COMMITMENT BROWSER HISTORY
    *
-   * The URL is the durable address of the open commitment.
-   * Existing query parameters, including demo mode, survive.
+   * Commitment details are canonical URL state.
+   *
+   * Opening from the list pushes ?commitment=<id>, allowing
+   * browser Back to close the details panel and Forward to
+   * restore the same commitment.
+   *
+   * Direct deep links remain supported. A history-state marker
+   * lets the X button return to the prior list entry only when
+   * this commitment was opened from inside the application.
    */
   const setCommitmentRoute = useCallback(
-    (commitmentId) => {
+    (
+      commitmentId,
+      {
+        replace = false,
+      } = {},
+    ) => {
       const params =
         new URLSearchParams(
           location.search,
@@ -649,6 +661,22 @@ export default function CommitmentsReferencePreview() {
       const nextSearch =
         params.toString();
 
+      const nextState = {
+        ...(
+          location.state ||
+          {}
+        ),
+      };
+
+      delete nextState
+        .campaignSeatCommitmentId;
+
+      if (commitmentId) {
+        nextState
+          .campaignSeatCommitmentId =
+          commitmentId;
+      }
+
       navigate(
         {
           pathname:
@@ -659,16 +687,38 @@ export default function CommitmentsReferencePreview() {
               : "",
         },
         {
-          replace: true,
+          replace,
+          state:
+            nextState,
         },
       );
     },
     [
       location.pathname,
       location.search,
+      location.state,
       navigate,
     ],
   );
+
+  const clearCommitmentDetailsInPlace =
+    useCallback(
+      () => {
+        setSelectedCommitmentId(
+          "",
+        );
+
+        setCommitmentRoute(
+          "",
+          {
+            replace: true,
+          },
+        );
+      },
+      [
+        setCommitmentRoute,
+      ],
+    );
 
   const openCommitmentDetails =
     useCallback(
@@ -677,19 +727,50 @@ export default function CommitmentsReferencePreview() {
           return;
         }
 
+        if (
+          requestedCommitmentId ===
+          commitmentId
+        ) {
+          return;
+        }
+
         setCommitmentRoute(
           commitmentId,
         );
       },
-      [setCommitmentRoute],
+      [
+        requestedCommitmentId,
+        setCommitmentRoute,
+      ],
     );
 
   const closeCommitmentDetails =
     useCallback(
       () => {
-        setCommitmentRoute("");
+        const historyCommitmentId =
+          String(
+            location.state
+              ?.campaignSeatCommitmentId ||
+              "",
+          );
+
+        if (
+          requestedCommitmentId &&
+          historyCommitmentId ===
+            requestedCommitmentId
+        ) {
+          navigate(-1);
+          return;
+        }
+
+        clearCommitmentDetailsInPlace();
       },
-      [setCommitmentRoute],
+      [
+        clearCommitmentDetailsInPlace,
+        location.state,
+        navigate,
+        requestedCommitmentId,
+      ],
     );
 
   const [modalMode, setModalMode] =
@@ -1240,7 +1321,7 @@ export default function CommitmentsReferencePreview() {
 
   const chooseTab = (tab) => {
     setActiveTab(tab);
-    closeCommitmentDetails();
+    clearCommitmentDetailsInPlace();
     setSearch("");
     setOwnerFilter("all");
     setSortMode("due");
@@ -1288,7 +1369,7 @@ export default function CommitmentsReferencePreview() {
   };
 
   const openCreateModal = () => {
-    closeCommitmentDetails();
+    clearCommitmentDetailsInPlace();
 
     setFormData({
       ...EMPTY_FORM,
@@ -1596,7 +1677,7 @@ export default function CommitmentsReferencePreview() {
     };
 
   const handleRefresh = () => {
-    closeCommitmentDetails();
+    clearCommitmentDetailsInPlace();
 
     if (demoMode) {
       setDemoCommitments(
@@ -2056,11 +2137,13 @@ export default function CommitmentsReferencePreview() {
                               <button
                                 className={styles.commitmentName}
                                 type="button"
-                                onClick={() =>
-                                  setSelectedCommitmentId(
+                                onClick={(event) => {
+                                  event.stopPropagation();
+
+                                  openCommitmentDetails(
                                     record.id,
-                                  )
-                                }
+                                  );
+                                }}
                               >
                                 <strong>
                                   {record.title}
