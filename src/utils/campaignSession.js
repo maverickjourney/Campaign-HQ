@@ -958,12 +958,90 @@ export function getUserInitials(name = "") {
   }`.toUpperCase();
 }
 
+/*
+ * CAMPAIGN HQ PARTIAL WORKSPACE SESSION MERGE
+ *
+ * Workspace-save callers may provide only the fields they changed.
+ * Preserve all unspecified active-workspace metadata instead of
+ * rebuilding the session from fallback defaults.
+ *
+ * Supabase rows may use snake_case while the in-memory workspace
+ * uses camelCase. Explicit snake_case updates must therefore
+ * override the corresponding current camelCase values.
+ */
+const WORKSPACE_SESSION_ALIASES = [
+  ["electionDateRaw", "election_date"],
+  ["electionLabel", "election_label"],
+  ["candidateName", "candidate_name"],
+  ["candidatePhotoPath", "candidate_photo_path"],
+  ["officeSought", "office_sought"],
+  ["districtLabel", "district_label"],
+  ["jurisdictionName", "jurisdiction_name"],
+  ["primaryElectionDate", "primary_election_date"],
+  ["generalElectionDate", "general_election_date"],
+  ["countryCode", "country_code"],
+  ["stateRegion", "state_region"],
+  ["countyName", "county_name"],
+  ["municipalityName", "municipality_name"],
+  ["postalCode", "postal_code"],
+  ["locationContext", "location_context"],
+  ["recommendedTheme", "recommended_theme"],
+  ["activeTheme", "active_theme"],
+  ["themeSource", "theme_source"],
+  ["themePrimaryColor", "theme_primary_color"],
+  ["themeAccentColor", "theme_accent_color"],
+  ["politicalParty", "political_party"],
+];
+
 export function saveWorkspace(
   workspace = getCurrentWorkspace(),
 ) {
+  const currentWorkspace =
+    getCurrentWorkspace();
+
+  const workspaceUpdate =
+    workspace &&
+    typeof workspace === "object"
+      ? workspace
+      : {};
+
+  const mergedWorkspace = {
+    ...currentWorkspace,
+    ...workspaceUpdate,
+  };
+
+  for (
+    const [
+      camelKey,
+      snakeKey,
+    ] of WORKSPACE_SESSION_ALIASES
+  ) {
+    if (
+      Object.prototype.hasOwnProperty.call(
+        workspaceUpdate,
+        camelKey,
+      )
+    ) {
+      mergedWorkspace[camelKey] =
+        workspaceUpdate[camelKey];
+
+      continue;
+    }
+
+    if (
+      Object.prototype.hasOwnProperty.call(
+        workspaceUpdate,
+        snakeKey,
+      )
+    ) {
+      mergedWorkspace[camelKey] =
+        workspaceUpdate[snakeKey];
+    }
+  }
+
   const normalized =
     normalizeWorkspace(
-      workspace,
+      mergedWorkspace,
     );
 
   campaignMemoryStore.setItem(
