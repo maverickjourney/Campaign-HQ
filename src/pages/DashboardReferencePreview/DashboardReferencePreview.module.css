@@ -25663,3 +25663,206 @@ small {
 }
 
 /* V87C DASHBOARD CONTEXT FIT REPAIR — END */
+/* ============================================================
+   V89 DASHBOARD CONTEXT POLISH
+   Adds breathing room without changing dashboard hierarchy.
+   ============================================================ */
+
+@media (min-width: 1181px) {
+
+  /*
+   * The V87C geometry fixed clipping, but the 260px context
+   * row still sat too tightly against its own CTA and the
+   * page footer. Give this secondary module enough room to
+   * feel intentional rather than compressed.
+   */
+
+  .campaignContextSection {
+    margin-top:
+      14px !important;
+
+    margin-bottom:
+      18px !important;
+  }
+
+  .campaignContextSection
+    .centerHeroStack {
+    height:
+      286px !important;
+
+    min-height:
+      286px !important;
+
+    max-height:
+      286px !important;
+
+    grid-template-rows:
+      286px !important;
+  }
+
+  .campaignContextSection
+    .centerHeroStack
+    .simpleSpotlight {
+    height:
+      286px !important;
+
+    min-height:
+      286px !important;
+
+    max-height:
+      286px !important;
+  }
+
+  /*
+   * The blue content pane gets more bottom room and uses
+   * flex spacing so the Customize HQ band stays anchored
+   * cleanly instead of being squeezed beneath conditions.
+   */
+
+  .campaignContextSection
+    .simpleSpotlightCopy {
+    box-sizing:
+      border-box !important;
+
+    display:
+      flex !important;
+
+    height:
+      286px !important;
+
+    min-height:
+      286px !important;
+
+    max-height:
+      286px !important;
+
+    flex-direction:
+      column !important;
+
+    padding:
+      16px
+      18px
+      15px !important;
+  }
+
+  .campaignContextSection
+    .simpleSpotlightInfoStack {
+    flex:
+      0
+      0
+      auto !important;
+
+    margin-top:
+      11px !important;
+  }
+
+  /*
+   * Slightly separate conditions from the CTA band.
+   */
+
+  .campaignContextSection
+    .simpleSpotlightWeatherCard {
+    height:
+      88px !important;
+
+    min-height:
+      88px !important;
+  }
+
+  /*
+   * Treat Customize HQ like an actual footer strip.
+   */
+
+  .campaignContextSection
+    .simpleSpotlightCustomize {
+    box-sizing:
+      border-box !important;
+
+    min-height:
+      48px !important;
+
+    align-items:
+      center !important;
+
+    margin-top:
+      auto !important;
+
+    padding-top:
+      12px !important;
+
+    padding-bottom:
+      1px !important;
+  }
+
+  .campaignContextSection
+    .simpleSpotlightCustomizeCopy
+    small {
+    font-size:
+      0.69rem !important;
+
+    line-height:
+      1.15 !important;
+  }
+
+  .campaignContextSection
+    .simpleSpotlightCustomize
+    .editShortcutsButton {
+    min-height:
+      34px !important;
+
+    padding:
+      0
+      12px !important;
+  }
+
+  /*
+   * Keep all three visual columns exactly aligned.
+   */
+
+  .campaignContextSection
+    .simpleSpotlightMedia,
+  .campaignContextSection
+    .simpleSpotlightPortrait {
+    height:
+      286px !important;
+
+    min-height:
+      286px !important;
+
+    max-height:
+      286px !important;
+  }
+
+  .campaignContextSection
+    .campaignAiPanel {
+    height:
+      286px !important;
+
+    min-height:
+      286px !important;
+
+    max-height:
+      286px !important;
+
+    padding:
+      20px !important;
+  }
+
+  /*
+   * Give the AI launcher a little more vertical presence so
+   * the right-hand panel no longer feels visually underfilled.
+   */
+
+  .campaignContextSection
+    .campaignAiLauncher {
+    min-height:
+      50px !important;
+  }
+}
+
+/*
+ * V89 deliberately leaves tablet/mobile rules unchanged.
+ * Existing V84/V87C responsive behavior remains authoritative.
+ */
+
+/* V89 DASHBOARD CONTEXT POLISH — END */
