@@ -863,24 +863,190 @@ export default function ApprovalsReferencePreview() {
     });
 
   /*
+   * V96A APPROVAL BROWSER HISTORY
+   *
+   * Approval details are canonical URL state.
+   *
+   * Opening from the list pushes ?approval=<id>, so Back
+   * closes the drawer and Forward restores the same approval.
+   * Direct deep links remain supported. A history-state marker
+   * distinguishes a list-opened drawer from a directly entered
+   * approval URL so X can behave safely in both cases.
+   */
+  const requestedApprovalId =
+    useMemo(
+      () =>
+        new URLSearchParams(
+          location.search,
+        ).get("approval") ||
+        "",
+      [
+        location.search,
+      ],
+    );
+
+  const setApprovalRoute =
+    (
+      approvalId,
+      {
+        replace = false,
+        clearHandoff =
+          false,
+      } = {},
+    ) => {
+      const params =
+        new URLSearchParams(
+          location.search,
+        );
+
+      if (clearHandoff) {
+        [
+          "new",
+          "source",
+          "sourceFileId",
+          "sourceFileName",
+          "sourceFileCategory",
+        ].forEach(
+          (key) =>
+            params.delete(
+              key,
+            ),
+        );
+      }
+
+      if (approvalId) {
+        params.set(
+          "approval",
+          approvalId,
+        );
+      } else {
+        params.delete(
+          "approval",
+        );
+      }
+
+      const nextState = {
+        ...(
+          location.state ||
+          {}
+        ),
+      };
+
+      delete nextState
+        .campaignSeatApprovalId;
+
+      if (approvalId) {
+        nextState
+          .campaignSeatApprovalId =
+          approvalId;
+      }
+
+      const nextSearch =
+        params.toString();
+
+      navigate(
+        {
+          pathname:
+            location.pathname,
+
+          search:
+            nextSearch
+              ? `?${nextSearch}`
+              : "",
+        },
+        {
+          replace,
+          state:
+            nextState,
+        },
+      );
+    };
+
+  const openApprovalDetails =
+    (approvalId) => {
+      if (!approvalId) {
+        return;
+      }
+
+      setDrawerTab(
+        "overview",
+      );
+
+      setExpanded(false);
+
+      setApprovalRoute(
+        approvalId,
+      );
+    };
+
+  const closeApprovalDetails =
+    () => {
+      const historyApprovalId =
+        String(
+          location.state
+            ?.campaignSeatApprovalId ||
+            "",
+        );
+
+      if (
+        requestedApprovalId &&
+        historyApprovalId ===
+          requestedApprovalId
+      ) {
+        navigate(-1);
+        return;
+      }
+
+      setSelectedApprovalId(
+        "",
+      );
+
+      setExpanded(false);
+
+      setApprovalRoute(
+        "",
+        {
+          replace: true,
+        },
+      );
+    };
+
+  /*
    * DOCUMENT_REVERSE_APPROVAL_LINK_V584
    *
    * Documents can deep-link back to the exact approval
    * record that references the selected campaign file.
    */
   useEffect(() => {
-    const requestedApprovalId =
-      new URLSearchParams(
-        location.search,
-      ).get("approval");
+    if (
+      !requestedApprovalId
+    ) {
+      if (
+        selectedApprovalId
+      ) {
+        setSelectedApprovalId(
+          "",
+        );
+
+        setExpanded(false);
+      }
+
+      return;
+    }
 
     if (
-      !requestedApprovalId ||
       !approvals.some(
         (approval) =>
           approval.id ===
           requestedApprovalId,
       )
+    ) {
+      return;
+    }
+
+    if (
+      selectedApprovalId ===
+      requestedApprovalId
     ) {
       return;
     }
@@ -896,7 +1062,8 @@ export default function ApprovalsReferencePreview() {
     );
   }, [
     approvals,
-    location.search,
+    requestedApprovalId,
+    selectedApprovalId,
   ]);
 
   const team = useMemo(() => {
@@ -1477,8 +1644,7 @@ export default function ApprovalsReferencePreview() {
       }
 
       if (selectedApprovalId) {
-        setSelectedApprovalId("");
-        setExpanded(false);
+        closeApprovalDetails();
       }
     };
 
@@ -1500,6 +1666,7 @@ export default function ApprovalsReferencePreview() {
     navigate,
     reviewOpen,
     selectedApprovalId,
+    requestedApprovalId,
   ]);
 
   const selectSummary =
@@ -1772,7 +1939,6 @@ export default function ApprovalsReferencePreview() {
             );
         }
 
-        clearDocumentHandoffParams();
         setEditorOpen(false);
         setForm(EMPTY_FORM);
 
@@ -1780,9 +1946,22 @@ export default function ApprovalsReferencePreview() {
           setDrawerTab(
             "overview",
           );
-          setSelectedApprovalId(
+
+          setExpanded(false);
+
+          setApprovalRoute(
             savedApproval.id,
+            {
+              replace:
+                requestedApprovalId ===
+                savedApproval.id,
+
+              clearHandoff:
+                true,
+            },
           );
+        } else {
+          clearDocumentHandoffParams();
         }
       } catch (saveError) {
         setActionError(
@@ -1933,6 +2112,13 @@ export default function ApprovalsReferencePreview() {
 
         setSelectedApprovalId("");
         setExpanded(false);
+
+        setApprovalRoute(
+          "",
+          {
+            replace: true,
+          },
+        );
       } catch (deleteError) {
         setActionError(
           deleteError?.message ||
@@ -2489,14 +2675,11 @@ export default function ApprovalsReferencePreview() {
                       }`}
                       type="button"
                       key={approval.id}
-                      onClick={() => {
-                        setDrawerTab(
-                          "overview",
-                        );
-                        setSelectedApprovalId(
+                      onClick={() =>
+                        openApprovalDetails(
                           approval.id,
-                        );
-                      }}
+                        )
+                      }
                     >
                       <span
                         className={
@@ -2657,12 +2840,9 @@ export default function ApprovalsReferencePreview() {
             }
             type="button"
             aria-label="Close approval details"
-            onClick={() => {
-              setSelectedApprovalId(
-                "",
-              );
-              setExpanded(false);
-            }}
+            onClick={
+              closeApprovalDetails
+            }
           />
 
           <aside
@@ -2747,12 +2927,9 @@ export default function ApprovalsReferencePreview() {
                 <button
                   type="button"
                   title="Close details"
-                  onClick={() => {
-                    setSelectedApprovalId(
-                      "",
-                    );
-                    setExpanded(false);
-                  }}
+                  onClick={
+                    closeApprovalDetails
+                  }
                 >
                   <X size={20} />
                 </button>
