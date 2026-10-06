@@ -977,10 +977,26 @@ export default function Inventory() {
       ],
     );
 
+  /*
+   * V94A INVENTORY BROWSER HISTORY
+   *
+   * Opening an inventory detail must create a real history
+   * entry so browser Back closes the drawer and Forward
+   * reopens the same item.
+   *
+   * Direct ?item=<uuid> loads remain supported. If an item
+   * was opened from the Inventory list we mark that history
+   * entry so the drawer close button can safely return to the
+   * prior list entry. A direct deep link is closed in place
+   * instead of navigating the user away from Campaign Seat.
+   */
   const syncItemQuery =
     useCallback(
       (
         nextItemId,
+        {
+          replace = false,
+        } = {},
       ) => {
         const url =
           new URL(
@@ -998,8 +1014,28 @@ export default function Inventory() {
           );
         }
 
-        window.history.replaceState(
-          {},
+        const nextState = {
+          ...(
+            window.history.state ||
+            {}
+          ),
+        };
+
+        delete nextState
+          .campaignSeatInventoryItemId;
+
+        if (nextItemId) {
+          nextState
+            .campaignSeatInventoryItemId =
+            nextItemId;
+        }
+
+        window.history[
+          replace
+            ? "replaceState"
+            : "pushState"
+        ](
+          nextState,
           "",
           `${url.pathname}${url.search}${url.hash}`,
         );
@@ -1014,6 +1050,13 @@ export default function Inventory() {
           return;
         }
 
+        if (
+          selectedItemId ===
+          item.id
+        ) {
+          return;
+        }
+
         setSelectedItemId(
           item.id,
         );
@@ -1022,14 +1065,50 @@ export default function Inventory() {
           item.id,
         );
       },
-      [syncItemQuery],
+      [
+        selectedItemId,
+        syncItemQuery,
+      ],
     );
 
   const closeItemDetails =
     useCallback(
       () => {
+        const url =
+          new URL(
+            window.location.href,
+          );
+
+        const currentItemId =
+          url.searchParams.get(
+            "item",
+          ) ||
+          "";
+
+        const historyItemId =
+          String(
+            window.history.state
+              ?.campaignSeatInventoryItemId ||
+              "",
+          );
+
+        if (
+          currentItemId &&
+          historyItemId ===
+            currentItemId
+        ) {
+          window.history.back();
+          return;
+        }
+
         setSelectedItemId("");
-        syncItemQuery("");
+
+        syncItemQuery(
+          "",
+          {
+            replace: true,
+          },
+        );
       },
       [syncItemQuery],
     );
