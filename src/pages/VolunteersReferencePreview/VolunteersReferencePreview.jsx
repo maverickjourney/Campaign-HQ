@@ -42,6 +42,8 @@ import {
   CampaignWorkspaceShell,
 } from "../../components/CampaignWorkspaceShell/CampaignWorkspaceShell";
 
+import VolunteersCommandCenter from "./VolunteersCommandCenter";
+
 import styles from "./VolunteersReferencePreview.module.css";
 
 const STORAGE_PREFIX =
@@ -1171,7 +1173,7 @@ function PhotoCountButton({
   );
 }
 
-export default function VolunteersReferencePreview() {
+function VolunteersDemoPreview() {
   const [activeTab, setActiveTab] =
     useState(
       () =>
@@ -5522,4 +5524,28 @@ export default function VolunteersReferencePreview() {
       </main>
     </CampaignWorkspaceShell>
   );
+}
+
+
+/*
+ * V93 LIVE VOLUNTEERS COMMAND CENTER
+ *
+ * Normal /volunteers uses live Supabase records.
+ * The former rich sample workspace is retained only when
+ * explicitly requested with ?volunteers-demo=1.
+ */
+export default function VolunteersReferencePreview() {
+  const demoMode =
+    typeof window !== "undefined" &&
+    new URL(
+      window.location.href,
+    )
+      .searchParams
+      .get(
+        "volunteers-demo",
+      ) === "1";
+
+  return demoMode
+    ? <VolunteersDemoPreview />
+    : <VolunteersCommandCenter />;
 }
