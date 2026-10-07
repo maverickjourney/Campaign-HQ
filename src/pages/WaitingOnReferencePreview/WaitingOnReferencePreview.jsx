@@ -1460,19 +1460,104 @@ export default function WaitingOnReferencePreview() {
       : null;
 
   /*
-   * WAITING_ON_DEEP_LINK_V60
+   * V98A WAITING ON BROWSER HISTORY
    *
-   * Keep the selected approval/task in the URL while its
-   * Waiting On details are open. This makes approval
-   * follow-through directly addressable and prevents the
-   * same dev-remount issue already fixed on Tasks.
+   * Waiting On detail state is canonical URL state.
+   *
+   * Opening a task or approval from the list pushes a history
+   * entry. Browser Back removes the deep-link parameter and
+   * closes details; Forward restores the same record.
+   *
+   * Direct deep links remain supported. A React Router state
+   * marker distinguishes a list-opened record from an address
+   * entered directly, allowing X to behave safely in both cases.
    */
+  const clearWaitingDetailsInPlace =
+    useCallback(
+      () => {
+        setSelectedRecordKey(
+          "",
+        );
+
+        const params =
+          new URLSearchParams(
+            location.search,
+          );
+
+        const hadDeepLink =
+          params.has(
+            "approval",
+          ) ||
+          params.has(
+            "task",
+          );
+
+        if (!hadDeepLink) {
+          return;
+        }
+
+        params.delete(
+          "approval",
+        );
+
+        params.delete(
+          "task",
+        );
+
+        const nextState = {
+          ...(
+            location.state ||
+            {}
+          ),
+        };
+
+        delete nextState
+          .campaignSeatWaitingRecordKey;
+
+        navigate(
+          {
+            pathname:
+              location.pathname,
+
+            search:
+              params.toString()
+                ? `?${params.toString()}`
+                : "",
+          },
+          {
+            replace: true,
+            state:
+              nextState,
+          },
+        );
+      },
+      [
+        location.pathname,
+        location.search,
+        location.state,
+        navigate,
+      ],
+    );
+
   const openWaitingRecord =
     useCallback(
       (record) => {
         if (
           !record?.id ||
-          !record?.kind
+          !record?.kind ||
+          !record?.key
+        ) {
+          return;
+        }
+
+        const currentKey =
+          getRequestedWaitingRecordKey(
+            location.search,
+          );
+
+        if (
+          currentKey ===
+          record.key
         ) {
           return;
         }
@@ -1511,13 +1596,24 @@ export default function WaitingOnReferencePreview() {
               `?${params.toString()}`,
           },
           {
-            replace: true,
+            replace: false,
+
+            state: {
+              ...(
+                location.state ||
+                {}
+              ),
+
+              campaignSeatWaitingRecordKey:
+                record.key,
+            },
           },
         );
       },
       [
         location.pathname,
         location.search,
+        location.state,
         navigate,
       ],
     );
@@ -1525,53 +1621,33 @@ export default function WaitingOnReferencePreview() {
   const closeWaitingDetails =
     useCallback(
       () => {
-        setSelectedRecordKey(
-          "",
-        );
-
-        const params =
-          new URLSearchParams(
+        const requestedKey =
+          getRequestedWaitingRecordKey(
             location.search,
           );
 
-        const hadDeepLink =
-          params.has(
-            "approval",
-          ) ||
-          params.has(
-            "task",
+        const historyRecordKey =
+          String(
+            location.state
+              ?.campaignSeatWaitingRecordKey ||
+              "",
           );
 
-        if (!hadDeepLink) {
+        if (
+          requestedKey &&
+          historyRecordKey ===
+            requestedKey
+        ) {
+          navigate(-1);
           return;
         }
 
-        params.delete(
-          "approval",
-        );
-
-        params.delete(
-          "task",
-        );
-
-        navigate(
-          {
-            pathname:
-              location.pathname,
-
-            search:
-              params.toString()
-                ? `?${params.toString()}`
-                : "",
-          },
-          {
-            replace: true,
-          },
-        );
+        clearWaitingDetailsInPlace();
       },
       [
-        location.pathname,
+        clearWaitingDetailsInPlace,
         location.search,
+        location.state,
         navigate,
       ],
     );
@@ -1582,10 +1658,19 @@ export default function WaitingOnReferencePreview() {
         location.search,
       );
 
+    if (!requestedKey) {
+      if (selectedRecordKey) {
+        setSelectedRecordKey(
+          "",
+        );
+      }
+
+      return;
+    }
+
     if (
-      requestedKey &&
       requestedKey !==
-        selectedRecordKey
+      selectedRecordKey
     ) {
       setSelectedRecordKey(
         requestedKey,
@@ -1739,7 +1824,7 @@ export default function WaitingOnReferencePreview() {
         ? "resolved"
         : "due",
     );
-    closeWaitingDetails();
+    clearWaitingDetailsInPlace();
   };
 
   const chooseSummary = (key) => {
@@ -1757,7 +1842,7 @@ export default function WaitingOnReferencePreview() {
         ? "resolved"
         : "due",
     );
-    closeWaitingDetails();
+    clearWaitingDetailsInPlace();
   };
 
   const clearFilters = () => {
@@ -1778,6 +1863,8 @@ export default function WaitingOnReferencePreview() {
   };
 
   const openCreateModal = () => {
+    clearWaitingDetailsInPlace();
+
     setFormData({
       ...EMPTY_FORM,
       assignedTo:
@@ -2004,9 +2091,12 @@ export default function WaitingOnReferencePreview() {
             ],
           );
 
-          setSelectedRecordKey(
-            `task:${id}`,
-          );
+          openWaitingRecord({
+            id,
+            kind: "task",
+            key:
+              `task:${id}`,
+          });
         }
       } else if (
         modalMode === "edit" &&
@@ -2024,9 +2114,14 @@ export default function WaitingOnReferencePreview() {
           );
 
         if (created?.id) {
-          setSelectedRecordKey(
-            `task:${created.id}`,
-          );
+          openWaitingRecord({
+            id:
+              created.id,
+            kind:
+              "task",
+            key:
+              `task:${created.id}`,
+          });
         }
       }
 
@@ -2220,7 +2315,7 @@ export default function WaitingOnReferencePreview() {
     };
 
   const handleRefresh = () => {
-    closeWaitingDetails();
+    clearWaitingDetailsInPlace();
 
     if (demoMode) {
       setDemoTasks(
