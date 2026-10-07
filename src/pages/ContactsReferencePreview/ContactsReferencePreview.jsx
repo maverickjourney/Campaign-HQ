@@ -34,7 +34,10 @@ import {
 
 import * as XLSX from "xlsx";
 
-import { useLocation } from "react-router-dom";
+import {
+  useLocation,
+  useNavigate,
+} from "react-router-dom";
 
 import {
   CampaignWorkspaceShell,
@@ -1066,9 +1069,21 @@ function ActivityIcon({ kind }) {
 
 export default function ContactsReferencePreview() {
   const location = useLocation();
+  const navigate = useNavigate();
   const user = getCurrentUser();
   const workspace = getCurrentWorkspace();
   const demoMode = new URLSearchParams(location.search).get("contacts-demo") === "1";
+
+  const requestedContactId =
+    useMemo(
+      () =>
+        new URLSearchParams(
+          location.search,
+        )
+          .get("contact")
+          ?.trim() || "",
+      [location.search],
+    );
 
   const [demoContacts, setDemoContacts] = useState(() => buildDemoContacts(user, workspace));
   const [selectedContactId, setSelectedContactId] = useState("");
@@ -1651,31 +1666,196 @@ export default function ContactsReferencePreview() {
     };
 
 
-  const openContactDetails = (
+  /*
+   * V99A CONTACT BROWSER HISTORY
+   *
+   * Contact details are canonical URL state.
+   *
+   * Opening a contact from the directory pushes ?contact=<id>.
+   * Browser Back closes the details panel and Forward restores
+   * the same contact.
+   *
+   * Direct deep links remain supported. A React Router state
+   * marker distinguishes a contact opened from the directory
+   * from an address entered directly.
+   */
+  const setContactRoute = (
     contactId,
+    {
+      replace = false,
+    } = {},
   ) => {
-    setSelectedContactId(
-      contactId,
+    const params =
+      new URLSearchParams(
+        location.search,
+      );
+
+    if (contactId) {
+      params.set(
+        "contact",
+        contactId,
+      );
+    } else {
+      params.delete(
+        "contact",
+      );
+    }
+
+    const nextState = {
+      ...(
+        location.state ||
+        {}
+      ),
+    };
+
+    delete nextState
+      .campaignSeatContactId;
+
+    if (contactId) {
+      nextState
+        .campaignSeatContactId =
+        contactId;
+    }
+
+    const nextSearch =
+      params.toString();
+
+    navigate(
+      {
+        pathname:
+          location.pathname,
+
+        search:
+          nextSearch
+            ? `?${nextSearch}`
+            : "",
+      },
+      {
+        replace,
+        state:
+          nextState,
+      },
     );
+  };
+
+  const clearContactDetailsInPlace = () => {
+    setSelectedContactId("");
+
     setDetailsTab(
       "overview",
     );
+
     setDetailsExpanded(
       false,
+    );
+
+    setContactRoute(
+      "",
+      {
+        replace: true,
+      },
+    );
+  };
+
+  const openContactDetails = (
+    contactId,
+  ) => {
+    if (!contactId) {
+      return;
+    }
+
+    if (
+      requestedContactId ===
+      contactId
+    ) {
+      return;
+    }
+
+    setDetailsTab(
+      "overview",
+    );
+
+    setDetailsExpanded(
+      false,
+    );
+
+    setContactRoute(
+      contactId,
     );
   };
 
   const closeContactDetails = () => {
-    setSelectedContactId("");
-    setDetailsTab(
-      "overview",
-    );
-    setDetailsExpanded(
-      false,
-    );
+    const historyContactId =
+      String(
+        location.state
+          ?.campaignSeatContactId ||
+          "",
+      );
+
+    if (
+      requestedContactId &&
+      historyContactId ===
+        requestedContactId
+    ) {
+      navigate(-1);
+      return;
+    }
+
+    clearContactDetailsInPlace();
   };
 
+  useEffect(() => {
+    if (!requestedContactId) {
+      if (selectedContactId) {
+        setSelectedContactId(
+          "",
+        );
+
+        setDetailsTab(
+          "overview",
+        );
+
+        setDetailsExpanded(
+          false,
+        );
+      }
+
+      return;
+    }
+
+    const requestedExists =
+      contacts.some(
+        (contact) =>
+          contact.id ===
+          requestedContactId,
+      );
+
+    if (
+      requestedExists &&
+      selectedContactId !==
+        requestedContactId
+    ) {
+      setSelectedContactId(
+        requestedContactId,
+      );
+
+      setDetailsTab(
+        "overview",
+      );
+
+      setDetailsExpanded(
+        false,
+      );
+    }
+  }, [
+    contacts,
+    requestedContactId,
+    selectedContactId,
+  ]);
+
   const openNew = () => {
+    clearContactDetailsInPlace();
+
     setForm({
       ...EMPTY_FORM,
       assignedTo: user.id || "",
@@ -1723,10 +1903,18 @@ export default function ContactsReferencePreview() {
           ? current.map((contact) => contact.id === existing.id ? nextContact : contact)
           : [nextContact, ...current],
         );
-        setSelectedContactId(nextContact.id);
+
+        openContactDetails(
+          nextContact.id,
+        );
       } else {
         const saved = await saveContact(savePayload(form));
-        if (saved?.id) setSelectedContactId(saved.id);
+
+        if (saved?.id) {
+          openContactDetails(
+            saved.id,
+          );
+        }
       }
 
       setEditorOpen(false);
@@ -1758,7 +1946,7 @@ export default function ContactsReferencePreview() {
   };
 
   const handleRefresh = () => {
-    setSelectedContactId("");
+    clearContactDetailsInPlace();
     setSelectedIds([]);
     if (demoMode) {
       setDemoContacts(buildDemoContacts(user, workspace));
@@ -2255,7 +2443,7 @@ export default function ContactsReferencePreview() {
                   type="button"
                   onClick={() => {
                     setActiveTab(key);
-                    setSelectedContactId("");
+                    clearContactDetailsInPlace();
                     clearDirectoryFilters();
                   }}
                 >
@@ -2312,7 +2500,14 @@ export default function ContactsReferencePreview() {
                         />
                       </td>
                       <td>
-                        <button className={styles.contactIdentity} type="button" onClick={() => openContactDetails(contact.id)}>
+                        <button
+                          className={styles.contactIdentity}
+                          type="button"
+                          onClick={(event) => {
+                            event.stopPropagation();
+                            openContactDetails(contact.id);
+                          }}
+                        >
                           <span className={styles.avatar}>{getUserInitials(contact.full_name)}</span>
                           <span>
                             <strong>{contact.full_name}</strong>
