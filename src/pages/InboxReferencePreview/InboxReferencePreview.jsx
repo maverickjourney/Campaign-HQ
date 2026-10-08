@@ -1,4 +1,5 @@
 import {
+  useCallback,
   useEffect,
   useMemo,
   useRef,
@@ -7,6 +8,11 @@ import {
 import {
   createPortal,
 } from "react-dom";
+
+import {
+  useLocation,
+  useNavigate,
+} from "react-router-dom";
 import {
   Archive,
   ArrowLeft,
@@ -2916,8 +2922,43 @@ function getChannelLabel(channel) {
 }
 
 export default function InboxReferencePreview() {
+  const location = useLocation();
+  const navigate = useNavigate();
+
   const user = getCurrentUser();
   const workspace = getCurrentWorkspace();
+
+  const requestedProviderThreadId =
+    useMemo(
+      () =>
+        String(
+          new URLSearchParams(
+            location.search,
+          ).get(
+            "thread_id",
+          ) ||
+          "",
+        ).trim(),
+      [
+        location.search,
+      ],
+    );
+
+  const requestedConversationId =
+    useMemo(
+      () =>
+        String(
+          new URLSearchParams(
+            location.search,
+          ).get(
+            "conversation",
+          ) ||
+          "",
+        ).trim(),
+      [
+        location.search,
+      ],
+    );
 
   const {
     contacts: liveContacts,
@@ -3115,6 +3156,125 @@ export default function InboxReferencePreview() {
         mailboxConversations,
         outreachConversations,
         previewConversations,
+      ],
+    );
+
+  /*
+   * V100A INBOX CONVERSATION BROWSER HISTORY
+   *
+   * Provider email threads keep the existing thread_id address.
+   * Campaign Seat/internal conversations use conversation=<id>.
+   *
+   * User selections push history. Automatic selection caused by
+   * filters/source changes replaces the current address.
+   */
+  const setConversationRoute =
+    useCallback(
+      (
+        conversation,
+        {
+          replace = false,
+        } = {},
+      ) => {
+        if (!conversation?.id) {
+          return;
+        }
+
+        const params =
+          new URLSearchParams(
+            location.search,
+          );
+
+        const nextProviderThreadId =
+          String(
+            conversation
+              ?.providerThreadId ||
+            "",
+          ).trim();
+
+        const currentProviderThreadId =
+          String(
+            params.get(
+              "thread_id",
+            ) ||
+            "",
+          ).trim();
+
+        const currentConversationId =
+          String(
+            params.get(
+              "conversation",
+            ) ||
+            "",
+          ).trim();
+
+        if (
+          (
+            nextProviderThreadId &&
+            currentProviderThreadId ===
+              nextProviderThreadId
+          ) ||
+          (
+            !nextProviderThreadId &&
+            currentConversationId ===
+              conversation.id
+          )
+        ) {
+          return;
+        }
+
+        params.delete(
+          "thread_id",
+        );
+
+        params.delete(
+          "conversation",
+        );
+
+        if (nextProviderThreadId) {
+          params.set(
+            "thread_id",
+            nextProviderThreadId,
+          );
+        } else {
+          params.set(
+            "conversation",
+            conversation.id,
+          );
+        }
+
+        navigate(
+          {
+            pathname:
+              location.pathname,
+
+            search:
+              `?${params.toString()}`,
+
+            hash:
+              location.hash,
+          },
+          {
+            replace,
+
+            state: {
+              ...(
+                location.state ||
+                {}
+              ),
+
+              campaignSeatInboxConversationId:
+                conversation.id,
+            },
+          },
+        );
+      },
+      [
+        location.hash,
+        location.pathname,
+        location.search,
+        location.state,
+        navigate,
       ],
     );
 
@@ -4241,6 +4401,9 @@ export default function InboxReferencePreview() {
    * V45 exact-thread deep link state.
    */
   const threadDeepLinkHandledRef =
+    useRef("");
+
+  const inboxRouteSelectionRef =
     useRef("");
 
   const [replyAllThreadId, setReplyAllThreadId] =
@@ -5847,6 +6010,162 @@ export default function InboxReferencePreview() {
   ]);
 
   useEffect(() => {
+    if (requestedProviderThreadId) {
+      inboxRouteSelectionRef.current =
+        `thread:${requestedProviderThreadId}`;
+
+      return;
+    }
+
+    if (requestedConversationId) {
+      inboxRouteSelectionRef.current =
+        `conversation:${requestedConversationId}`;
+
+      const requestedConversation =
+        conversations.find(
+          (conversation) =>
+            conversation.id ===
+            requestedConversationId,
+        );
+
+      if (
+        !requestedConversation ||
+        selectedId ===
+          requestedConversation.id
+      ) {
+        return;
+      }
+
+      setSelectedAccountKeys(
+        [],
+      );
+
+      setActiveChannel(
+        "all",
+      );
+
+      setActiveFilter(
+        "",
+      );
+
+      setActiveTag(
+        "",
+      );
+
+      setActiveCommandFilter(
+        "",
+      );
+
+      setQuery(
+        "",
+      );
+
+      setNewMessageMode(
+        false,
+      );
+
+      setReplyComposerOpen(
+        false,
+      );
+
+      setReplyAllThreadId(
+        "",
+      );
+
+      setReplyText(
+        "",
+      );
+
+      setPendingAttachments(
+        [],
+      );
+
+      setAttachmentError(
+        "",
+      );
+
+      setThreadExpanded(
+        false,
+      );
+
+      setActiveThreadTab(
+        "conversation",
+      );
+
+      setSelectedId(
+        requestedConversation.id,
+      );
+
+      setMobileConversationActive(
+        true,
+      );
+
+      return;
+    }
+
+    if (
+      !inboxRouteSelectionRef.current
+    ) {
+      return;
+    }
+
+    inboxRouteSelectionRef.current =
+      "";
+
+    threadDeepLinkHandledRef.current =
+      "";
+
+    if (
+      newMessageMode ||
+      !filteredConversations.length
+    ) {
+      return;
+    }
+
+    const nextConversation =
+      filteredConversations[0];
+
+    setSelectedId(
+      nextConversation.id,
+    );
+
+    setMobileConversationActive(
+      false,
+    );
+
+    setReplyComposerOpen(
+      false,
+    );
+
+    setReplyAllThreadId(
+      "",
+    );
+
+    setReplyText(
+      "",
+    );
+
+    setPendingAttachments(
+      [],
+    );
+
+    setAttachmentError(
+      "",
+    );
+
+    setActiveThreadTab(
+      "conversation",
+    );
+  }, [
+    conversations,
+    filteredConversations,
+    newMessageMode,
+    requestedConversationId,
+    requestedProviderThreadId,
+    selectedId,
+  ]);
+
+  useEffect(() => {
     const campaignSeatSourceSelectionSync =
       window.requestAnimationFrame(
         () => {
@@ -5873,6 +6192,13 @@ export default function InboxReferencePreview() {
 
           setSelectedId(
             nextConversation.id,
+          );
+
+          setConversationRoute(
+            nextConversation,
+            {
+              replace: true,
+            },
           );
 
           setReplyComposerOpen(
@@ -5910,6 +6236,7 @@ export default function InboxReferencePreview() {
     filteredConversations,
     newMessageMode,
     selectedId,
+    setConversationRoute,
   ]);
 
   const getChannelCount = (channelId) => {
@@ -6688,21 +7015,17 @@ export default function InboxReferencePreview() {
       return undefined;
     }
 
-    const params =
-      new URLSearchParams(
-        window.location.search,
-      );
-
     const providerThreadId =
-      String(
-        params.get(
-          "thread_id",
-        ) ||
-        "",
-      ).trim();
+      requestedProviderThreadId;
+
+    if (!providerThreadId) {
+      threadDeepLinkHandledRef.current =
+        "";
+
+      return undefined;
+    }
 
     if (
-      !providerThreadId ||
       threadDeepLinkHandledRef
         .current ===
         providerThreadId
@@ -6787,27 +7110,16 @@ export default function InboxReferencePreview() {
             conversation.id,
           );
 
-          params.delete(
-            "thread_id",
+          setMobileConversationActive(
+            true,
           );
 
-          const remaining =
-            params.toString();
-
-          window.history.replaceState(
-            window.history.state,
-            "",
-            `${
-              window.location.pathname
-            }${
-              remaining
-                ? `?${remaining}`
-                : ""
-            }${
-              window.location.hash ||
-              ""
-            }`,
-          );
+          /*
+           * V100A:
+           * Keep thread_id in the URL. It is the durable address
+           * of this exact provider conversation and powers
+           * browser Back / Forward restoration.
+           */
         } catch (
           threadError
         ) {
@@ -6833,6 +7145,7 @@ export default function InboxReferencePreview() {
   }, [
     ensureMailboxThread,
     liveMailboxEnabled,
+    requestedProviderThreadId,
   ]);
 
 
@@ -7805,6 +8118,23 @@ export default function InboxReferencePreview() {
           conversation.id ===
           id,
       );
+
+    if (!conversationToOpen) {
+      return;
+    }
+
+    if (
+      conversationToOpen
+        .providerThreadId
+    ) {
+      threadDeepLinkHandledRef.current =
+        conversationToOpen
+          .providerThreadId;
+    }
+
+    setConversationRoute(
+      conversationToOpen,
+    );
 
     setSelectedId(id);
     setMobileConversationActive(true);
@@ -9927,6 +10257,10 @@ export default function InboxReferencePreview() {
       newConversation,
       ...current,
     ]);
+
+    setConversationRoute(
+      newConversation,
+    );
 
     setSelectedId(newConversation.id);
     setNewMessageMode(false);
