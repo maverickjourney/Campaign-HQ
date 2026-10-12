@@ -3000,19 +3000,29 @@ export default function InboxReferencePreview() {
   ] = useState("");
 
   /*
-   * LOCAL LIVE INBOX
+   * V100A1 SAFE LOCAL INBOX PREVIEW
    *
-   * The Inbox development workspace on localhost uses the real
-   * connected campaign mailbox by default. The explicit query
-   * parameter remains supported for other development hosts.
+   * localhost normally uses the real connected mailbox.
+   * ?mailbox-preview=1 explicitly disables provider mailbox
+   * access for browser-history QA while preserving the same
+   * authenticated localhost origin.
    */
-  const liveMailboxEnabled =
-    !import.meta.env.DEV ||
-    window.location.hostname === "127.0.0.1" ||
-    window.location.hostname === "localhost" ||
+  const mailboxPreviewMode =
+    import.meta.env.DEV &&
     new URLSearchParams(
-      window.location.search,
-    ).get("mailbox-live") === "enabled";
+      location.search,
+    ).get("mailbox-preview") === "1";
+
+  const liveMailboxEnabled =
+    !mailboxPreviewMode &&
+    (
+      !import.meta.env.DEV ||
+      window.location.hostname === "127.0.0.1" ||
+      window.location.hostname === "localhost" ||
+      new URLSearchParams(
+        location.search,
+      ).get("mailbox-live") === "enabled"
+    );
 
   /*
    * Campaign Seat workflow state is separate from
@@ -3026,7 +3036,7 @@ export default function InboxReferencePreview() {
    *   follow-up and linked Tasks.
    */
   const inboxWorkflowRuntimeEnabled =
-    true;
+    !mailboxPreviewMode;
 
   const {
     rows:
