@@ -5,6 +5,11 @@ import {
 } from "react";
 
 import {
+  useLocation,
+  useNavigate,
+} from "react-router-dom";
+
+import {
   AlertTriangle,
   CalendarClock,
   CalendarDays,
@@ -3383,6 +3388,25 @@ function timeInputFromEpochInZone(
 }
 
 export default function CalendarReferencePreview() {
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  const requestedEventId =
+    useMemo(
+      () =>
+        String(
+          new URLSearchParams(
+            location.search,
+          ).get(
+            "event",
+          ) ||
+          "",
+        ).trim(),
+      [
+        location.search,
+      ],
+    );
+
   const initialNow = useMemo(
     () => new Date(),
     [],
@@ -3909,6 +3933,194 @@ export default function CalendarReferencePreview() {
     eventCancelling,
     setEventCancelling,
   ] = useState(false);
+
+  /*
+   * V101A CALENDAR EVENT BROWSER HISTORY
+   *
+   * Event details are canonical at ?event=<uuid>.
+   * User event clicks push browser history.
+   * Direct deep links open the exact event.
+   */
+  const openCalendarEvent =
+    (
+      event,
+      {
+        replace = false,
+      } = {},
+    ) => {
+      if (!event?.id) {
+        return;
+      }
+
+      setSelectedEvent(
+        event,
+      );
+
+      setEditEventOpen(
+        false,
+      );
+
+      const params =
+        new URLSearchParams(
+          location.search,
+        );
+
+      if (
+        params.get(
+          "event",
+        ) ===
+        event.id
+      ) {
+        return;
+      }
+
+      params.set(
+        "event",
+        event.id,
+      );
+
+      navigate(
+        {
+          pathname:
+            location.pathname,
+
+          search:
+            `?${params.toString()}`,
+
+          hash:
+            location.hash,
+        },
+        {
+          replace,
+
+          state: {
+            ...(
+              location.state ||
+              {}
+            ),
+
+            campaignSeatCalendarEventId:
+              event.id,
+          },
+        },
+      );
+    };
+
+  const closeCalendarEvent =
+    () => {
+      if (!selectedEvent) {
+        return;
+      }
+
+      const openedByCalendar =
+        requestedEventId ===
+          selectedEvent.id &&
+        location.state
+          ?.campaignSeatCalendarEventId ===
+          selectedEvent.id;
+
+      setEditEventOpen(
+        false,
+      );
+
+      setSelectedEvent(
+        null,
+      );
+
+      if (openedByCalendar) {
+        navigate(
+          -1,
+        );
+
+        return;
+      }
+
+      const params =
+        new URLSearchParams(
+          location.search,
+        );
+
+      params.delete(
+        "event",
+      );
+
+      const remaining =
+        params.toString();
+
+      navigate(
+        {
+          pathname:
+            location.pathname,
+
+          search:
+            remaining
+              ? `?${remaining}`
+              : "",
+
+          hash:
+            location.hash,
+        },
+        {
+          replace:
+            true,
+
+          state: {
+            ...(
+              location.state ||
+              {}
+            ),
+
+            campaignSeatCalendarEventId:
+              null,
+          },
+        },
+      );
+    };
+
+  useEffect(() => {
+    if (!requestedEventId) {
+      if (selectedEvent) {
+        setSelectedEvent(
+          null,
+        );
+
+        setEditEventOpen(
+          false,
+        );
+      }
+
+      return;
+    }
+
+    const requestedEvent =
+      events.find(
+        (event) =>
+          event.id ===
+          requestedEventId,
+      ) ||
+      null;
+
+    if (!requestedEvent) {
+      return;
+    }
+
+    if (
+      selectedEvent?.id !==
+      requestedEvent.id
+    ) {
+      setSelectedEvent(
+        requestedEvent,
+      );
+
+      setEditEventOpen(
+        false,
+      );
+    }
+  }, [
+    events,
+    requestedEventId,
+    selectedEvent,
+  ]);
 
   const [
     guestDraft,
@@ -8352,7 +8564,7 @@ export default function CalendarReferencePreview() {
             setViewDate(date);
             setViewMode("day");
           }}
-          onEventClick={setSelectedEvent}
+          onEventClick={openCalendarEvent}
         />
       );
     }
@@ -8366,7 +8578,7 @@ export default function CalendarReferencePreview() {
             eventReadinessById
           }
           now={now}
-          onEventClick={setSelectedEvent}
+          onEventClick={openCalendarEvent}
         />
       );
     }
@@ -8381,7 +8593,7 @@ export default function CalendarReferencePreview() {
         events={visibleEvents}
         tasks={focusedTasks}
         now={now}
-        onEventClick={setSelectedEvent}
+        onEventClick={openCalendarEvent}
         onTaskClick={
           openTaskDeadlineEditor
         }
@@ -9161,10 +9373,10 @@ export default function CalendarReferencePreview() {
                           }
                           type="button"
                           onClick={() =>
-                            setSelectedEvent(
-                              event,
-                            )
-                          }
+                          openCalendarEvent(
+                            event,
+                          )
+                        }
                         >
                           <i
                             className={
@@ -9970,7 +10182,7 @@ export default function CalendarReferencePreview() {
                 event.target ===
                 event.currentTarget
               ) {
-                setSelectedEvent(null);
+                closeCalendarEvent();
               }
             }}
           >
@@ -9994,8 +10206,8 @@ export default function CalendarReferencePreview() {
                 <button
                   type="button"
                   aria-label="Close event details"
-                  onClick={() =>
-                    setSelectedEvent(null)
+                  onClick={
+                    closeCalendarEvent
                   }
                 >
                   <X size={20} />
