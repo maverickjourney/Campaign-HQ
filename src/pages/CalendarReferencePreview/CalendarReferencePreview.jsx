@@ -6301,7 +6301,7 @@ export default function CalendarReferencePreview() {
          * the background.
          */
         if (normalizedSavedEvent) {
-          setSelectedEvent({
+          openCalendarEvent({
             ...normalizedSavedEvent,
 
             providerSyncState:
@@ -7655,13 +7655,7 @@ export default function CalendarReferencePreview() {
           );
         }
 
-        setEditEventOpen(
-          false,
-        );
-
-        setSelectedEvent(
-          null,
-        );
+        closeCalendarEvent();
       } catch (
         cancelError
       ) {
@@ -8499,6 +8493,15 @@ export default function CalendarReferencePreview() {
       ],
     );
 
+  /*
+   * V101A1 CALENDAR ROUTING COMPLETION
+   *
+   * Every user-facing event opener must go through
+   * openCalendarEvent so Calendar history stays canonical.
+   */
+  const calendarEventHistoryReady =
+    true;
+
   const handleLinkTaskToSelectedEvent =
     async () => {
       if (
@@ -9181,7 +9184,7 @@ export default function CalendarReferencePreview() {
                                 if (
                                   item.event
                                 ) {
-                                  setSelectedEvent(
+                                  openCalendarEvent(
                                     item.event,
                                   );
 
@@ -9571,7 +9574,7 @@ export default function CalendarReferencePreview() {
                           }
                           type="button"
                           onClick={() =>
-                            setSelectedEvent(
+                            openCalendarEvent(
                               event,
                             )
                           }
