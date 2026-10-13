@@ -1089,10 +1089,42 @@ const canCreateTasks =
    * the component. The query is now cleared only when the
    * user explicitly closes the task drawer.
    */
+  /* V102 TASK HISTORY: route all task openers through the URL. */
+  const openTaskDetails = (taskId) => {
+    if (!taskId) {
+      return;
+    }
+
+    const nextId = String(taskId);
+    const url = new URL(window.location.href);
+
+    if (url.searchParams.get("task") !== nextId) {
+      url.searchParams.set("task", nextId);
+      window.history.pushState(
+        window.history.state,
+        "",
+        `${url.pathname}${url.search}${url.hash}`,
+      );
+    }
+
+    setSelectedTaskId(nextId);
+  };
+
   const closeTaskDetails = () => {
     setSelectedTaskId("");
     clearRequestedTaskId();
   };
+
+  useEffect(() => {
+    const handleTaskHistoryChange = () => {
+      setSelectedTaskId(getRequestedTaskId());
+    };
+
+    window.addEventListener("popstate", handleTaskHistoryChange);
+    return () => {
+      window.removeEventListener("popstate", handleTaskHistoryChange);
+    };
+  }, []);
 
   const [viewMode, setViewMode] = useState("list");
   const [search, setSearch] = useState("");
@@ -1112,6 +1144,25 @@ const canCreateTasks =
   // CAMPAIGN HQ CLICKABLE TASK SUMMARY FILTERS
   const [summaryFilter, setSummaryFilter] =
     useState("");
+
+  // Filtering the collection must not leave a stale task deep link.
+  const taskFilterSnapshot = JSON.stringify([
+    search,
+    statusFilter,
+    priorityFilter,
+    assigneeFilter,
+    categoryFilter,
+    summaryFilter,
+    viewMode,
+  ]);
+  const previousTaskFilterSnapshot = useRef(taskFilterSnapshot);
+  useEffect(() => {
+    if (previousTaskFilterSnapshot.current === taskFilterSnapshot) {
+      return;
+    }
+    previousTaskFilterSnapshot.current = taskFilterSnapshot;
+    closeTaskDetails();
+  }, [taskFilterSnapshot]);
   // CAMPAIGN SEAT TASK BULK ACTIONS
   const [
     selectedTaskIds,
@@ -3206,7 +3257,7 @@ const canCreateTasks =
         const createdTask =
           await createTask(taskData);
 
-        setSelectedTaskId(createdTask.id);
+        openTaskDetails(createdTask.id);
 
         if (
           draftChecklistItems.length
@@ -3329,7 +3380,7 @@ const canCreateTasks =
         );
 
         setArchiveConfirmOpen(false);
-        setSelectedTaskId("");
+        closeTaskDetails();
       } catch (archiveError) {
         console.error(
           "Task could not be archived:",
@@ -4512,7 +4563,7 @@ const canCreateTasks =
         taskSubtaskOverview={
           taskSubtaskOverview
         }
-        onOpen={setSelectedTaskId}
+        onOpen={openTaskDetails}
         onStatusChange={handleStatusChange}
         isSelected={
           selectedTaskIdSet.has(
@@ -6613,9 +6664,7 @@ const canCreateTasks =
                                   styles.taskDependencyOpen
                                 }
                                 onClick={() =>
-                                  setSelectedTaskId(
-                                    task.id,
-                                  )
+                                  openTaskDetails(task.id)
                                 }
                               >
                                 <span
@@ -6912,9 +6961,7 @@ const canCreateTasks =
                                 styles.taskDependencyOpen
                               }
                               onClick={() =>
-                                setSelectedTaskId(
-                                  task.id,
-                                )
+                                openTaskDetails(task.id)
                               }
                             >
                               <span
