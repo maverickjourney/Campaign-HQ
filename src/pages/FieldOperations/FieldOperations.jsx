@@ -34,6 +34,10 @@ import {
 import {
   useState,
 } from "react";
+import {
+  useLocation,
+  useNavigate,
+} from "react-router-dom";
 
 import {
   CampaignSidebar,
@@ -2538,10 +2542,48 @@ export default function FieldOperations() {
     setSidebarOpen,
   ] = useState(false);
 
-  const [
-    selectedAssignmentId,
-    setSelectedAssignmentId,
-  ] = useState("");
+  /*
+   * V103 FIELD OPERATIONS ASSIGNMENT HISTORY
+   * The URL is authoritative for explicit assignments. The
+   * original first-visible default remains when no ID is given.
+   * React Router's location changes on Back and Forward.
+   */
+  const location = useLocation();
+  const navigate = useNavigate();
+  const selectedAssignmentId =
+    new URLSearchParams(
+      location.search,
+    ).get("assignment") || "";
+
+  const setSelectedAssignmentId =
+    (assignmentId, { replace = false } = {}) => {
+      const nextId = String(assignmentId || "").trim();
+      const params = new URLSearchParams(location.search);
+      const oldId = params.get("assignment") || "";
+
+      if (
+        oldId === nextId &&
+        (nextId || !params.has("assignment"))
+      ) {
+        return;
+      }
+
+      if (nextId) {
+        params.set("assignment", nextId);
+      } else {
+        params.delete("assignment");
+      }
+
+      const search = params.toString();
+      navigate(
+        {
+          pathname: location.pathname,
+          search: search ? `?${search}` : "",
+          hash: location.hash,
+        },
+        { replace },
+      );
+    };
 
   const [
     searchTerm,
@@ -2993,14 +3035,14 @@ export default function FieldOperations() {
     })();
 
   const selectedAssignment =
-    assignments.find(
-      (assignment) =>
-        assignment.id ===
-        selectedAssignmentId,
-    ) ||
-    filteredAssignments[0] ||
-    assignments[0] ||
-    null;
+    selectedAssignmentId
+      ? assignments.find(
+          (assignment) =>
+            assignment.id === selectedAssignmentId,
+        ) || null
+      : filteredAssignments[0] ||
+        assignments[0] ||
+        null;
 
   const selectedVolunteer =
     selectedAssignment
@@ -5968,9 +6010,7 @@ export default function FieldOperations() {
           assignment.id,
         );
 
-        setSelectedAssignmentId(
-          "",
-        );
+        setSelectedAssignmentId("", { replace: true });
       } catch {
         // Hook displays the error.
       }
@@ -7524,22 +7564,20 @@ export default function FieldOperations() {
               <input
                 type="search"
                 value={searchTerm}
-                onChange={(event) =>
-                  setSearchTerm(
-                    event.target.value,
-                  )
-                }
+                onChange={(event) => {
+                  setSearchTerm(event.target.value);
+                  setSelectedAssignmentId("", { replace: true });
+                }}
                 placeholder="Search volunteer, precinct, turf or assignment"
               />
             </label>
 
             <select
               value={statusFilter}
-              onChange={(event) =>
-                setStatusFilter(
-                  event.target.value,
-                )
-              }
+              onChange={(event) => {
+                setStatusFilter(event.target.value);
+                setSelectedAssignmentId("", { replace: true });
+              }}
               aria-label="Filter assignments by status"
             >
               <option value="active">
@@ -7735,13 +7773,14 @@ export default function FieldOperations() {
                 <div className={styles.detailEmpty}>
                   <Route size={36} />
                   <strong>
-                    Select or create an
-                    assignment
+                    {selectedAssignmentId && !assignmentsLoading
+                      ? "Assignment unavailable"
+                      : "Select or create an assignment"}
                   </strong>
                   <p>
-                    Assignment details,
-                    routes and stops will
-                    appear here.
+                    {selectedAssignmentId && !assignmentsLoading
+                      ? "This assignment does not exist or is not accessible in the current workspace."
+                      : "Assignment details, routes and stops will appear here."}
                   </p>
                 </div>
               ) : (
