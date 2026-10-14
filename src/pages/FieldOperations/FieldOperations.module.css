@@ -5699,3 +5699,115 @@
     width: 100%;
   }
 }
+
+/* V103A1 — Field Operations uses the canonical Campaign Seat workspace shell.
+ * The shell owns navigation, header and the only page scrollbar. This page
+ * keeps assignment cards, route/stops, modal layers and business logic.
+ */
+.modernPage {
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  min-height: 100%;
+  color: #17263b;
+  background: #f4f7fa;
+}
+
+.modernPage .main {
+  box-sizing: border-box;
+  display: block;
+  width: min(1480px, 100%);
+  max-width: 100%;
+  min-width: 0 !important;
+  min-height: 0 !important;
+  height: auto !important;
+  margin: 0 auto;
+  padding: 24px clamp(14px, 2vw, 30px) 42px;
+  flex: none !important;
+  overflow: visible !important;
+  scrollbar-gutter: auto;
+}
+
+.modernPage .pageHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 14px 22px;
+}
+
+.modernPage .pageHeader > div:first-child {
+  flex: 1 1 250px;
+  min-width: 0;
+  max-width: 620px;
+}
+
+.modernPage .pageHeader h1 {
+  font-size: clamp(28px, 2.7vw, 38px);
+  line-height: 1.12;
+  letter-spacing: -0.036em;
+}
+
+.modernPage .pageHeader p {
+  max-width: 610px;
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.modernPage .headerActions {
+  display: flex;
+  flex: 1 1 520px;
+  align-self: flex-end;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 8px;
+  min-width: 0;
+  max-width: 100%;
+}
+
+.modernPage .headerActions button {
+  min-width: 0;
+  min-height: 42px;
+  white-space: normal;
+}
+
+@media (max-width: 1200px) {
+  .modernPage .headerActions {
+    flex-basis: 100%;
+    justify-content: flex-start;
+  }
+}
+
+@media (max-width: 700px) {
+  .modernPage .main {
+    padding: 18px 12px 32px;
+  }
+
+  .modernPage .pageHeader > div:first-child {
+    flex-basis: 100%;
+  }
+
+  .modernPage .headerActions {
+    flex-basis: 100%;
+    justify-content: flex-start;
+  }
+
+  .modernPage .headerActions button {
+    flex: 1 1 145px;
+    min-height: 44px;
+  }
+
+  .modernPage .summaryGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 430px) {
+  .modernPage .headerActions button {
+    flex-basis: 100%;
+  }
+
+  .modernPage .summaryGrid {
+    grid-template-columns: 1fr;
+  }
+}

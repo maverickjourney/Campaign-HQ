@@ -16,7 +16,6 @@ import {
   House,
   LoaderCircle,
   MapPin,
-  Menu,
   MessageSquareText,
   Navigation,
   Plus,
@@ -40,11 +39,8 @@ import {
 } from "react-router-dom";
 
 import {
-  CampaignSidebar,
-} from "../../components/CampaignSidebar/CampaignSidebar";
-import {
-  CampaignDateTime,
-} from "../../components/CampaignDateTime/CampaignDateTime";
+  CampaignWorkspaceShell,
+} from "../../components/CampaignWorkspaceShell/CampaignWorkspaceShell";
 import {
   FieldStopBulkImport,
 } from "../../components/FieldStopBulkImport/FieldStopBulkImport";
@@ -62,7 +58,6 @@ import {
   getCurrentWorkspace,
 } from "../../utils/campaignSession";
 
-import shellStyles from "../Team/Team.module.css";
 import styles from "./FieldOperations.module.css";
 
 const EMPTY_ASSIGNMENT = {
@@ -2536,11 +2531,6 @@ export default function FieldOperations() {
 
   const workspace =
     getCurrentWorkspace();
-
-  const [
-    sidebarOpen,
-    setSidebarOpen,
-  ] = useState(false);
 
   /*
    * V103 FIELD OPERATIONS ASSIGNMENT HISTORY
@@ -7292,59 +7282,8 @@ export default function FieldOperations() {
     };
 
   return (
-    <div className={styles.app}>
-      <CampaignSidebar
-        activePage="Field operations"
-        sidebarOpen={
-          sidebarOpen
-        }
-        onClose={() =>
-          setSidebarOpen(false)
-        }
-        styles={
-          shellStyles
-        }
-        showLeadership
-        adminAccent
-      />
-
-      <div className={styles.workspace}>
-        <header className={styles.topbar}>
-          <div className={styles.topbarLeft}>
-            <button
-              className={styles.menuButton}
-              type="button"
-              onClick={() =>
-                setSidebarOpen(true)
-              }
-              aria-label="Open navigation"
-            >
-              <Menu size={21} />
-            </button>
-
-            <div>
-              <span>
-                Campaign HQ
-                <ChevronRight size={13} />
-                Field operations
-              </span>
-
-              <strong>
-                Field Operations Center
-              </strong>
-            </div>
-          </div>
-
-          <div className={styles.topbarRight}>
-            <CampaignDateTime />
-
-            <span className={styles.secureBadge}>
-              <ShieldCheck size={15} />
-              Leadership only
-            </span>
-          </div>
-        </header>
-
+    <CampaignWorkspaceShell activeItem="Field Operations">
+      <div className={styles.modernPage}>
         <main className={styles.main}>
           <section className={styles.pageHeader}>
             <div>
@@ -15401,7 +15340,7 @@ export default function FieldOperations() {
           </section>
         </div>
       )}
-    </div>
+    </CampaignWorkspaceShell>
   );
 }
 
