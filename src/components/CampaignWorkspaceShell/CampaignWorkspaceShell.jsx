@@ -25,6 +25,7 @@ import {
   LifeBuoy,
   Link2,
   Mail,
+  MapPin,
   MessageSquare,
   Plus,
   Settings,
@@ -57,6 +58,7 @@ import {
 } from "../../lib/supabase";
 
 import {
+  getCampaignExperience,
   getCurrentUser,
   getCurrentWorkspace,
   getRoleLabel,
@@ -137,6 +139,16 @@ const PRIMARY_NAVIGATION =
   createNavigation(
     getSeatCoreModules(),
   );
+
+/* V104: leadership-only navigation; the existing router enforces access. */
+const FIELD_OPERATIONS_NAVIGATION = [
+  {
+    key: "field_operations",
+    label: "Field Operations",
+    route: "/field-operations",
+    icon: MapPin,
+  },
+];
 
 const CAMPAIGN_TOOLS =
   createNavigation(
@@ -221,6 +233,10 @@ export function CampaignWorkspaceShell({
   const user = getCurrentUser();
   const workspace = getCurrentWorkspace();
   const roleLabel = getRoleLabel();
+  const canNavigateFieldOperations =
+    ["owner", "candidate", "manager"].includes(
+      getCampaignExperience().key,
+    );
   const initials = getUserInitials(user.name);
 
   const workspaceTheme =
@@ -765,6 +781,11 @@ export function CampaignWorkspaceShell({
           {renderNavigation(
             PRIMARY_NAVIGATION,
           )}
+
+          {canNavigateFieldOperations &&
+            renderNavigation(
+              FIELD_OPERATIONS_NAVIGATION,
+            )}
 
           <span
             className={
