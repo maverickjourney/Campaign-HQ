@@ -181,17 +181,23 @@
 }
 
 .logoutButton {
-  display: grid;
-  width: 38px;
+  display: flex;
+  min-width: 106px;
   height: 38px;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
   margin-left: 5px;
-  place-items: center;
+  padding: 0 12px;
   border:
     1px solid #dce3ec;
   border-radius: 10px;
   color: #607087;
   background: #ffffff;
   cursor: pointer;
+  font-size: 12px;
+  font-weight: 800;
+  white-space: nowrap;
   transition:
     border-color 0.2s ease,
     color 0.2s ease,
@@ -1344,3 +1350,17 @@
 }
 
 /* LIVE WORKSPACE BRANDING — END */
+
+
+/* Keep workspace sign-out accessible on compact screens. */
+@media (max-width: 720px) {
+  .logoutButton {
+    min-width: 38px;
+    width: 38px;
+    padding: 0;
+  }
+
+  .logoutButton span {
+    display: none;
+  }
+}

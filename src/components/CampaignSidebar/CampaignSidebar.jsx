@@ -15,7 +15,7 @@ import {
   LayoutDashboard,
   LifeBuoy,
   Link2,
-  LogOut,
+  ArrowLeft,
   MapPin,
   MessageSquareText,
   PackageOpen,
@@ -30,7 +30,6 @@ import {
 } from "lucide-react";
 
 import {
-  clearCampaignSession,
   getCampaignExperience,
   getCurrentUser,
   getCurrentWorkspace,
@@ -268,16 +267,10 @@ export function CampaignSidebar({
       onClose();
     };
 
-  const handleLogout =
-    async () => {
-      await clearCampaignSession();
-
-      navigate(
-        "/",
-        {
-          replace: true,
-        },
-      );
+  const handleReturnToWorkspaces =
+    () => {
+      navigate("/workspaces");
+      onClose();
     };
 
   return (
@@ -707,12 +700,12 @@ export function CampaignSidebar({
 
             <button
               type="button"
-              onClick={handleLogout}
-              aria-label="Sign out of Campaign HQ"
-              title="Sign out"
-              data-sidebar-signout="true"
+              onClick={handleReturnToWorkspaces}
+              aria-label="Back to workspaces"
+              title="Back to workspaces"
+              data-sidebar-return-workspaces="true"
             >
-              <LogOut size={18} />
+              <ArrowLeft size={18} />
             </button>
           </div>
         </div>

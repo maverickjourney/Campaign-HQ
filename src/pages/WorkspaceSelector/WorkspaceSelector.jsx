@@ -597,11 +597,13 @@ export default function WorkspaceSelector() {
                 type="button"
                 onClick={handleLogout}
                 aria-label="Sign out"
+                title="Sign out"
               >
                 <LogOut
                   size={18}
                   strokeWidth={1.9}
                 />
+                <span>Sign out</span>
               </button>
             </div>
           </div>

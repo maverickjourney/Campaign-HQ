@@ -227,7 +227,7 @@ aside[data-campaign-party="democratic"] [data-candidate-role="true"] {
   background: rgba(215, 25, 32, 0.96);
 }
 
-aside[data-campaign-party] [data-sidebar-signout="true"] {
+aside[data-campaign-party] [data-sidebar-return-workspaces="true"] {
   display: flex !important;
   width: 100% !important;
   min-height: 40px;
@@ -243,7 +243,7 @@ aside[data-campaign-party] [data-sidebar-signout="true"] {
   font-weight: 850;
 }
 
-aside[data-campaign-party] [data-sidebar-signout="true"]:hover {
+aside[data-campaign-party] [data-sidebar-return-workspaces="true"]:hover {
   color: #ffffff !important;
   background: rgba(255, 255, 255, 0.12) !important;
 }
@@ -367,7 +367,7 @@ aside[data-campaign-party]
 
 aside[data-campaign-party]
   [data-signed-in-row="true"]
-  [data-sidebar-signout="true"] {
+  [data-sidebar-return-workspaces="true"] {
   display: grid !important;
   width: 36px !important;
   min-height: 36px;
