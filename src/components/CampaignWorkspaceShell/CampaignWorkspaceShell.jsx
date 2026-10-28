@@ -10,6 +10,7 @@ import {
 } from "react-router-dom";
 
 import {
+  ArrowLeft,
   BarChart3,
   CalendarDays,
   CheckCircle2,
@@ -886,15 +887,14 @@ export function CampaignWorkspaceShell({
 
         <button
           data-profile-settings="true"
+          data-sidebar-workspaces-return="true"
           className={
             dashboardStyles.sidebarProfile
           }
           type="button"
-          onClick={() =>
-            navigate(
-              "/workspace/settings",
-            )
-          }
+          aria-label="Back to workspaces"
+          title="Back to workspaces"
+          onClick={() => navigate("/workspaces")}
         >
           <span
             className={
@@ -927,7 +927,7 @@ export function CampaignWorkspaceShell({
             <span>{roleLabel}</span>
           </div>
 
-          <ChevronDown size={15} />
+          <ArrowLeft size={18} />
         </button>
       </aside>
 
