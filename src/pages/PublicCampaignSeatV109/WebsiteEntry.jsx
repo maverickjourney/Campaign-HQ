@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import { createRoot } from "react-dom/client";
 import MarketingHomeV109 from "./MarketingHome.jsx";
 import PublicCampaignSeat from "../PublicCampaignSeat/PublicCampaignSeat.jsx";
+import styles from "./MarketingHome.module.css";
 import "../../styles/globals.css";
 
 class PublicSiteErrorBoundary extends Component {
@@ -31,7 +32,7 @@ function PublicWebsite() {
     "/terms": "terms",
     "/sms-consent": "sms-consent",
   })[path];
-  return page ? <PublicCampaignSeat page={page} /> : <MarketingHomeV109 />;
+  return page ? <div className={styles.legalWrapper}><PublicCampaignSeat page={page} /></div> : <MarketingHomeV109 />;
 }
 
 createRoot(document.getElementById("root")).render(
