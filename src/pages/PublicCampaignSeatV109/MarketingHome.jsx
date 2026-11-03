@@ -1,324 +1,154 @@
 import { useEffect, useState } from 'react';
 import {
-  ArrowRight, ArrowUpRight, Activity, Bell, CalendarDays, Check, CheckCircle2,
-  ChevronDown, ClipboardCheck, FileText, BarChart3, Package, Flag, Settings, CreditCard, CircleHelp, Megaphone, Radio, Clock3, CalendarCheck, HeartHandshake, Target,
-  FolderClosed, History, Inbox, LayoutDashboard, LockKeyhole, Mail, Menu,
-  MessageCircle, MessageSquareText, MoreHorizontal, PanelLeft, Search, Shield,
-  ShieldCheck, Sparkles, Users, X,
+  Activity, ArrowRight, ArrowUpRight, BarChart3, Bell, CalendarCheck, CalendarDays,
+  Check, CheckCircle2, ChevronDown, CircleDollarSign, CircleHelp, ClipboardCheck,
+  Clock3, CreditCard, FileCheck2, FileText, Flag, FolderClosed, HeartHandshake,
+  History, Inbox, LayoutDashboard, Link2, LockKeyhole, Mail, MapPin, Megaphone,
+  Menu, MessageCircle, MessageSquare, Package, Radio, Search, Settings, ShieldCheck,
+  Sparkles, Target, Users, UserCog, Vote, X,
 } from 'lucide-react';
 import styles from './MarketingHome.module.css';
 
 const SUPPORT_EMAIL = 'support@ccinnovationgroupllc.com';
-const DEMO_EMAIL = `mailto:${SUPPORT_EMAIL}?subject=${encodeURIComponent('Campaign Seat — Private beta walkthrough')}&body=${encodeURIComponent('Hello Campaign Seat team,\n\nI would like a walkthrough of Campaign Seat for our campaign or organization.\n\nOrganization / campaign:\nYour name:\nBest way to contact you:\n\nThank you.')}`;
-
-const tourGroups = [
-  {id:'workspace',label:'Everyday workspace', short:'Daily work'},
-  {id:'campaign',label:'Campaign operations',short:'Campaign tools'},
-  {id:'platform',label:'Platform & account',short:'Platform'},
+const DEMO_EMAIL = `mailto:${SUPPORT_EMAIL}?subject=${encodeURIComponent('Campaign Seat | Request a private walkthrough')}&body=${encodeURIComponent('Hello Campaign Seat team,\n\nI would like to see a walkthrough of Campaign Seat.\n\nCampaign or organization:\nMy name:\nContact phone (optional):\nWhat we want to organize:\n\nThank you.')}`;
+const categories = [
+  { id: 'workspace', label: 'Everyday workspace', short: 'WORKSPACE' },
+  { id: 'campaign', label: 'Campaign tools', short: 'CAMPAIGN TOOLS' },
+  { id: 'platform', label: 'Platform', short: 'PLATFORM' },
 ];
-
-// Sections mirror the Campaign Seat navigation. Descriptions explain the intended
-// purpose of each area; all examples below are illustrative, not live account data.
-const views = [
-  {id:'hq',group:'workspace',title:'Campaign HQ',label:'HQ',icon:LayoutDashboard,desc:'See priorities, follow-ups, and campaign activity in one command view.'},
-  {id:'inbox',group:'workspace',title:'Inbox',label:'Inbox',icon:Inbox,desc:'Keep internal messages and communication context accessible to your team.'},
-  {id:'calendar',group:'workspace',title:'Calendar',label:'Calendar',icon:CalendarDays,desc:'See upcoming meetings, events and important dates.',examples:['Campaign transition meeting','Community partner check-in','Team planning session']},
-  {id:'tasks',group:'workspace',title:'Tasks',label:'Tasks',icon:ClipboardCheck,desc:'Assign next steps, deadlines and follow-through to the right people.'},
-  {id:'commitments',group:'workspace',title:'Commitments',label:'Commitments',icon:CheckCircle2,desc:'Keep promises and obligations visible until they are fulfilled.',examples:['Send follow-up summary','Share requested resources','Confirm next meeting']},
-  {id:'waiting',group:'workspace',title:'Waiting On',label:'Waiting On',icon:Clock3,desc:'See who you are waiting to hear from and what is still unresolved.',examples:['Response from community partner','Document approval from team','Meeting confirmation']},
-  {id:'contacts',group:'workspace',title:'Contacts & history',label:'Contacts',icon:Users,desc:'Connect each person to their relationship and communication history.'},
-  {id:'documents',group:'workspace',title:'Documents',label:'Documents',icon:FolderClosed,desc:'Keep important files with the work and people they support.',examples:['Post-election transition notes','Partner outreach briefing','Team handoff documents']},
-  {id:'approvals',group:'workspace',title:'Approvals',label:'Approvals',icon:ClipboardCheck,desc:'Organize requests, decisions and review status.',examples:['Communications review','Document sign-off','Operations request']},
-  {id:'team',group:'workspace',title:'Team',label:'Team',icon:Users,desc:'Understand team responsibilities, access and working relationships.',examples:['Campaign administrator','Team coordinator','Volunteer collaborator']},
-  {id:'inventory',group:'workspace',title:'Inventory',label:'Inventory',icon:Package,desc:'Keep track of campaign materials and resource handoffs.',examples:['Remaining signs and supplies','Materials handoff','Storage and inventory notes']},
-  {id:'field',group:'workspace',title:'Field Operations',label:'Field Operations',icon:Target,desc:'Coordinate assignments, updates and field-team handoffs.',examples:['Field assignment','Team completion update','Operations follow-up']},
-  {id:'candidate',group:'campaign',title:'Candidate',label:'Candidate',icon:Flag,desc:'Keep candidate and campaign identity details organized.',examples:['Campaign profile','Public-facing details','Candidate materials']},
-  {id:'volunteers',group:'campaign',title:'Volunteers',label:'Volunteers',icon:HeartHandshake,desc:'Coordinate volunteer relationships and assignments.',examples:['Volunteer directory','Availability and roles','Volunteer follow-up']},
-  {id:'fundraising',group:'campaign',title:'Fundraising',label:'Fundraising',icon:BarChart3,desc:'Keep fundraising-related work, relationships and follow-ups visible.',examples:['Fundraising follow-up','Donor relationship notes','Team action items']},
-  {id:'events',group:'campaign',title:'Events',label:'Events',icon:CalendarCheck,desc:'Organize event planning, participation and team responsibilities.',examples:['Event schedule','Team assignments','Post-event follow-through']},
-  {id:'social',group:'campaign',title:'Social Media',label:'Social Media',icon:Megaphone,desc:'Coordinate content ideas, ownership and campaign messaging work.',examples:['Content to review','Upcoming post planning','Team notes']},
-  {id:'media',group:'campaign',title:'Media Center',label:'Media Center',icon:Radio,desc:'Keep press materials, media contacts and communications work together.',examples:['Press inquiry notes','Approved media materials','Media follow-up']},
-  {id:'reports',group:'campaign',title:'Reports & Analytics',label:'Reports & Analytics',icon:BarChart3,desc:'Review the information your team records to understand progress.',examples:['Open follow-ups overview','Team workflow status','Activity summary']},
-  {id:'integrations',group:'platform',title:'Integrations',label:'Integrations',icon:PanelLeft,desc:'Review supported connections and available account integrations.',examples:['Connected account review','Supported channel settings','Integration status']},
-  {id:'plan',group:'platform',title:'Plan & Usage',label:'Plan & Usage',icon:CreditCard,desc:'Find workspace plan details and usage information.',examples:['Workspace plan','Account usage','Plan information']},
-  {id:'settings',group:'platform',title:'Settings',label:'Settings',icon:Settings,desc:'Manage profile, workspace preferences and account security.',examples:['Profile preferences','Notification settings','Security and access']},
-  {id:'support',group:'platform',title:'Support',label:'Support',icon:CircleHelp,desc:'Find help and assistance when your team needs it.',examples:['Contact support','Account guidance','Product questions']},
+// These are the live portal's navigation areas. Examples use fictional data, not real customer records.
+const modules = [
+  { id:'hq', group:'workspace', label:'HQ', title:'Campaign HQ', icon:LayoutDashboard, eyebrow:'CAMPAIGN COMMAND BRIEF', what:'See what needs attention today across your campaign.', how:'A leadership snapshot connects work, people, decisions, deadlines and recent activity.', benefit:'Start with the priorities instead of checking ten separate tools.', metric:['9','Active tasks'], items:['Prepare team transition briefing','Follow up with a community partner','Review two pending decisions'] },
+  { id:'inbox', group:'workspace', label:'Inbox', title:'Inbox & communications', icon:Inbox, eyebrow:'COMMUNICATION WORKSPACE', what:'Keep team conversations and relevant communication activity in view.', how:'Review conversation context, related contacts, connected channels when configured, and the next action.', benefit:'Less hunting through scattered inboxes and handoffs.', metric:['3','Recent conversations'], items:['Jordan Ellis — recap of our call','Operations team — transition notes','Partner outreach — follow-up request'] },
+  { id:'calendar', group:'workspace', label:'Calendar', title:'Calendar & schedule', icon:CalendarDays, eyebrow:'TEAM CALENDAR', what:'Keep meetings, events and important dates visible to the team.', how:'Coordinate who is involved, what is scheduled and what preparation is due.', benefit:'Maintain continuity as team calendars and priorities change.', metric:['4','Upcoming items'], items:['Post-election planning session','Community partner check-in','Operations handoff meeting'] },
+  { id:'tasks', group:'workspace', label:'Tasks', title:'Tasks & assignments', icon:CheckCircle2, eyebrow:'TODAY\'S EXECUTION', what:'Assign work, give it an owner, and track whether it gets finished.', how:'Organize open, in-progress and completed tasks with priorities and due dates.', benefit:'No more guessing who owns the next step.', metric:['9','Active tasks'], items:['Compile campaign communications summary','Send partner follow-up','Organize transition documents'] },
+  { id:'commitments', group:'workspace', label:'Commitments', title:'Commitments & promises', icon:Target, eyebrow:'COMMITMENTS & FOLLOW-UPS', what:'Keep a record of promises your team made to other people.', how:'Connect a commitment to its owner, deadline, relationship and completion status.', benefit:'Follow through on what was promised, even when staff changes.', metric:['5','Tracked commitments'], items:['Share requested community resources','Send the meeting summary','Introduce partner to new point of contact'] },
+  { id:'waiting', group:'workspace', label:'Waiting On', title:'Waiting On', icon:Clock3, eyebrow:'WAITING ON', what:'See what is pending from someone else.', how:'Track expected responses, handoffs and blockers so open loops are not forgotten.', benefit:'Know where work is stalled without searching old messages.', metric:['4','Open responses'], items:['Partner confirmation','Media materials approval','Follow-up availability from team'] },
+  { id:'contacts', group:'workspace', label:'Contacts', title:'Contacts & relationship history', icon:Users, eyebrow:'CONTACTS COMMAND CENTER', what:'Keep each important relationship and its background in one place.', how:'Organize people, organizations, contact details, notes, history, categories and next follow-ups.', benefit:'A relationship belongs to the campaign, not only to one person\'s phone.', metric:['48','Contact records'], items:['Jordan Ellis — community partner','Alex Morgan — former field lead','Riley Brooks — local organization'] },
+  { id:'documents', group:'workspace', label:'Documents', title:'Documents & records', icon:FolderClosed, eyebrow:'CAMPAIGN DOCUMENTS', what:'Keep essential files connected to the work they support.', how:'Organize shared documents, supporting materials and handoff records in the workspace.', benefit:'Help the next team find the right version and the context behind it.', metric:['16','Organized files'], items:['Post-election transition notes','Partner outreach briefing','Team handoff documents'] },
+  { id:'approvals', group:'workspace', label:'Approvals', title:'Approvals & decisions', icon:FileCheck2, eyebrow:'DECISIONS FOR REVIEW', what:'Make reviews, authorizations and decisions trackable.', how:'Submit an item, identify the reviewer and follow the decision through to resolution.', benefit:'Decisions do not have to vanish into reply-all threads.', metric:['2','Awaiting review'], items:['Communications review','Document sign-off','Operations request'] },
+  { id:'team', group:'workspace', label:'Team', title:'Team & access', icon:UserCog, eyebrow:'TEAM MANAGEMENT', what:'Organize your team and who can access what.', how:'Invite people into defined roles, manage memberships and keep responsibilities visible.', benefit:'Institutional knowledge can stay available to authorized people when personnel changes.', metric:['8','Team members'], items:['Campaign administrator','Team coordinator','Volunteer collaborator'] },
+  { id:'inventory', group:'workspace', label:'Inventory', title:'Inventory & materials', icon:Package, eyebrow:'RESOURCE INVENTORY', what:'Track physical campaign materials and resource movement.', how:'Keep stock, reservations, adjustments and handoffs organized.', benefit:'Know what is still available and who has it.', metric:['12','Tracked items'], items:['Remaining yard signs','Supply storage and counts','Equipment handoff'] },
+  { id:'field', group:'workspace', label:'Field Operations', title:'Field operations', icon:MapPin, eyebrow:'FIELD OPERATIONS', what:'Coordinate field assignments and the progress they generate.', how:'Organize field activity, team handoffs and completion updates where available to authorized roles.', benefit:'A clearer operational record even after field teams have dispersed.', metric:['3','Field updates'], items:['Assignment review','Field team completion report','Final operations handoff'] },
+  { id:'candidate', group:'campaign', label:'Candidate', title:'Candidate & campaign identity', icon:Vote, eyebrow:'CANDIDATE MANAGEMENT', what:'Keep candidate and campaign information consistent.', how:'Manage identity details, campaign profile materials and related work in one place.', benefit:'One reliable reference for campaign information.', metric:['1','Candidate profile'], items:['Candidate biography and office','Public-facing campaign details','Campaign contact information'] },
+  { id:'volunteers', group:'campaign', label:'Volunteers', title:'Volunteers', icon:HeartHandshake, eyebrow:'VOLUNTEER COORDINATION', what:'Maintain volunteer relationships and assignments.', how:'Organize team responsibilities, follow-ups and working history across the campaign.', benefit:'Keep the people who helped connected for what comes next.', metric:['24','Volunteer records'], items:['Volunteer directory','Team availability and responsibilities','Post-event volunteer follow-up'] },
+  { id:'fundraising', group:'campaign', label:'Fundraising', title:'Fundraising work', icon:CircleDollarSign, eyebrow:'FUNDRAISING WORKSPACE', what:'Organize fundraising-related relationships and work.', how:'Track follow-ups, assignments and supporting notes for authorized campaign teams.', benefit:'Bring clarity to the work around fundraising relationships.', metric:['5','Open follow-ups'], items:['Donor relationship notes','Fundraising team next actions','Meeting follow-up'] },
+  { id:'events', group:'campaign', label:'Events', title:'Events & participation', icon:CalendarCheck, eyebrow:'EVENT COORDINATION', what:'Coordinate the work before, during and after campaign events.', how:'Keep planning notes, people, assignments and follow-through together.', benefit:'Event history becomes useful context, not a forgotten calendar entry.', metric:['4','Scheduled activities'], items:['Event planning checklist','Volunteer event assignments','Post-event follow-up'] },
+  { id:'social', group:'campaign', label:'Social Media', title:'Social media workflow', icon:Megaphone, eyebrow:'SOCIAL MEDIA', what:'Organize campaign content work and its approvals.', how:'Track ideas, planned communications, ownership and relevant review notes.', benefit:'Make message planning easier to coordinate across staff.', metric:['7','Content items'], items:['Draft message review','Upcoming post planning','Team copy feedback'] },
+  { id:'media', group:'campaign', label:'Media Center', title:'Media center', icon:Radio, eyebrow:'MEDIA & PRESS WORK', what:'Keep media-related materials and communication work organized.', how:'Record inquiries, files, contacts and follow-ups in a shared work area.', benefit:'The next spokesperson can understand what happened before.', metric:['6','Media records'], items:['Press inquiry summary','Approved media materials','Media contact follow-up'] },
+  { id:'reports', group:'campaign', label:'Reports & Analytics', title:'Reports & analytics', icon:BarChart3, eyebrow:'REPORTS & INSIGHTS', what:'Understand progress based on campaign records and work activity.', how:'Review activity, open items and workflow summaries across available modules.', benefit:'See patterns without assembling a new spreadsheet for every question.', metric:['4','Available views'], items:['Team workflow overview','Open follow-up report','Campaign activity summary'] },
+  { id:'integrations', group:'platform', label:'Integrations', title:'Integrations', icon:Link2, eyebrow:'CONNECTED SERVICES', what:'Review supported external connections for your workspace.', how:'See configured integrations and connection status for available services.', benefit:'Work with the tools your team already uses where supported.', metric:['2','Example connections'], items:['Connected email account','Calendar connection status','Provider configuration'] },
+  { id:'plan', group:'platform', label:'Plan & Usage', title:'Plan & usage', icon:CreditCard, eyebrow:'WORKSPACE PLAN', what:'Find plan information and account usage.', how:'Review available seat, subscription and utilization details as supported by the workspace.', benefit:'Give administrators a central view of the account.', metric:['1','Workspace plan'], items:['Plan overview','Usage information','Workspace access summary'] },
+  { id:'settings', group:'platform', label:'Settings', title:'Profile & settings', icon:Settings, eyebrow:'ACCOUNT COMMAND CENTER', what:'Control profile, notifications and account security.', how:'Manage preferences and security settings through your individual account.', benefit:'A more accountable workspace with individual identities and role-aware access.', metric:['4','Settings areas'], items:['Personal profile','Security and MFA','Notifications and preferences'] },
+  { id:'support', group:'platform', label:'Support', title:'Support & assistance', icon:CircleHelp, eyebrow:'SUPPORT CENTER', what:'Find help when your team needs it.', how:'Access guidance, support resources and available assistance for your Campaign Seat workspace.', benefit:'Make it easier for teams to get unblocked.', metric:['1','Help center'], items:['Product questions','Account assistance','Support request'] },
 ];
-
-const people = [
-  { initials: 'JE', name: 'Jordan Ellis', role: 'Community partner', type: 'Partner', color: 'blue', note: 'Meeting follow-up recorded', date: 'Today' },
-  { initials: 'AM', name: 'Alex Morgan', role: 'Former field lead', type: 'Team', color: 'purple', note: 'Call notes added to record', date: 'Yesterday' },
-  { initials: 'RB', name: 'Riley Brooks', role: 'Local organization', type: 'Organization', color: 'gold', note: 'Next check-in scheduled', date: 'Nov 1' },
-  { initials: 'TS', name: 'Taylor Smith', role: 'Campaign advisor', type: 'Advisor', color: 'green', note: 'Document shared with team', date: 'Oct 30' },
+const moduleById = Object.fromEntries(modules.map(item => [item.id, item]));
+const navItems = [
+  {name:'Platform',href:'#platform'}, {name:'Product tour',href:'#tour'},
+  {name:'Who it\'s for',href:'#teams'}, {name:'How it works',href:'#how'},
+  {name:'Security',href:'#security'}, {name:'FAQ',href:'#faq'}
 ];
-
-function Initials({ value, color = 'blue' }) {
-  return <span className={`${styles.avatar} ${styles[`avatar_${color}`]}`} aria-hidden="true">{value}</span>;
-}
 
 function Brand({ light = false }) {
-  return <a href="/" className={`${styles.brand} ${light ? styles.brandLight : ''}`} aria-label="Campaign Seat home">
-    <span className={styles.brandSymbol} aria-hidden="true"><span>C</span><i /></span>
-    <span className={styles.brandName}>CAMPAIGN <b>SEAT</b></span>
-  </a>;
+  return <a href="/" className={`${styles.brand} ${light ? styles.brandLight : ''}`} aria-label="Campaign Seat homepage"><span className={styles.brandMark}>C<i/></span><span className={styles.brandWord}>CAMPAIGN SEAT</span></a>;
 }
-
-function CTA({ children, dark = false, className = '' }) {
-  return <a href={DEMO_EMAIL} className={`${styles.button} ${dark ? styles.buttonDark : ''} ${className}`}>
-    {children}<ArrowUpRight size={17} strokeWidth={2.1} aria-hidden="true" />
-  </a>;
+function CTA({ children = 'Request a walkthrough', variant = 'primary' }) {
+  return <a href={DEMO_EMAIL} className={`${styles.cta} ${variant==='nav'?styles.ctaNav:variant==='light'?styles.ctaLight:''}`}>{children}<ArrowUpRight size={17}/></a>;
 }
-
-function MiniMetric({ number, label, note, accent }) {
-  return <div className={styles.metric}><div className={styles.metricLabel}>{label}</div><strong>{number}</strong><span className={accent ? styles.metricAccent : ''}>{note}</span></div>;
-}
-
-function HQScreen() {
-  return <div className={styles.screenContent}>
-    <div className={styles.screenHeading}><div><span className={styles.screenKicker}>OVERVIEW</span><h4>Your team's next chapter, organized.</h4><p>One place to see what matters and what comes next.</p></div><span className={styles.pill}><i /> Workspace active</span></div>
-    <div className={styles.metrics}><MiniMetric number="12" label="Active follow-ups" note="3 due this week" accent /><MiniMetric number="48" label="Contact records" note="Organized by relationship" /><MiniMetric number="6" label="Team updates" note="Across your workspace" /></div>
-    <div className={styles.screenColumns}>
-      <div className={styles.panel}>
-        <div className={styles.panelTitle}><strong>What needs attention</strong><span>THIS WEEK</span></div>
-        <div className={styles.activityRow}><span className={`${styles.activityIcon} ${styles.iconRed}`}><MessageCircle size={15} /></span><div><strong>Follow up with Jordan Ellis</strong><small>Conversation recorded · Due tomorrow</small></div><span className={styles.rowPriority}>Due soon</span></div>
-        <div className={styles.activityRow}><span className={`${styles.activityIcon} ${styles.iconBlue}`}><ClipboardCheck size={15} /></span><div><strong>Review transition notes</strong><small>Assigned to campaign operations</small></div><CheckCircle2 size={16} color="#81a3ba" /></div>
-        <div className={styles.activityRow}><span className={`${styles.activityIcon} ${styles.iconGold}`}><FileText size={15} /></span><div><strong>Organize post-election records</strong><small>Documents · 4 linked items</small></div><span className={styles.rowTag}>In progress</span></div>
-      </div>
-      <div className={styles.panel}>
-        <div className={styles.panelTitle}><strong>Recent team activity</strong><span>HISTORY</span></div>
-        {[
-          ['A note was added to a contact', '3 min ago'],
-          ['A follow-up was assigned', 'Earlier today'],
-          ['A document was organized', 'Yesterday'],
-        ].map(([name, time]) => <div className={styles.timelineRow} key={name}><span className={styles.timelineDot}/><div><strong>{name}</strong><small>{time}</small></div></div>)}
-      </div>
-    </div>
-  </div>;
-}
-
-function ContactsScreen() {
-  return <div className={styles.screenContent}>
-    <div className={styles.screenHeading}><div><span className={styles.screenKicker}>CONTACT WORKSPACE</span><h4>Know the person. Remember the context.</h4><p>Relationships become more valuable when the history stays with them.</p></div><span className={styles.countPill}>48 contacts</span></div>
-    <div className={styles.contactLayout}>
-      <div className={`${styles.panel} ${styles.contactList}`}>
-        <div className={styles.fakeSearch}><Search size={13}/> Search contacts and organizations</div>
-        {people.map((p,i)=><div className={`${styles.contactRow} ${i===0 ? styles.selectedContact : ''}`} key={p.name}><Initials value={p.initials} color={p.color}/><div><strong>{p.name}</strong><small>{p.role}</small></div><span>{p.date}</span></div>)}
-      </div>
-      <div className={`${styles.panel} ${styles.contactDetail}`}>
-        <div className={styles.contactIdentity}><Initials value="JE" color="blue"/><div><strong>Jordan Ellis</strong><small>Community partner · Active contact</small></div><span className={styles.rowTag}>Partner</span></div>
-        <div className={styles.detailLabel}><History size={13}/> COMMUNICATION HISTORY</div>
-        <div className={styles.recordEntry}><span className={styles.recordTrack}/><strong>Phone conversation</strong><small>Today · Summary documented</small><p>Discussed ongoing community relationships and next steps after the election.</p></div>
-        <div className={styles.recordEntry}><span className={styles.recordTrack}/><strong>Meeting notes</strong><small>Oct 29 · Added by campaign team</small><p>Shared resources and future collaboration opportunities.</p></div>
-        <div className={styles.detailNext}><CheckCircle2 size={15}/> Follow-up assigned for tomorrow</div>
-      </div>
-    </div>
-  </div>;
-}
-
-function InboxScreen() {
-  return <div className={styles.screenContent}>
-    <div className={styles.screenHeading}><div><span className={styles.screenKicker}>COMMUNICATION HUB</span><h4>Less searching. More continuity.</h4><p>Conversations, decisions and context belong together.</p></div><span className={styles.countPill}>Team workspace</span></div>
-    <div className={styles.inboxLayout}>
-      <div className={`${styles.panel} ${styles.threadList}`}>
-        <div className={styles.panelTitle}><strong>Recent conversations</strong><MoreHorizontal size={16}/></div>
-        {[
-          ['JE','Jordan Ellis','Follow-up after our call','Today','blue'],
-          ['AM','Operations team','Transition planning','Yesterday','purple'],
-          ['RB','Riley Brooks','Community partnership notes','Oct 30','gold'],
-        ].map(([initials,name,sub,time,color],i)=><div className={`${styles.threadRow} ${i===0 ? styles.selectedThread : ''}`} key={name}><Initials value={initials} color={color}/><div><strong>{name}</strong><small>{sub}</small></div><em>{time}</em></div>)}
-      </div>
-      <div className={`${styles.panel} ${styles.threadDetail}`}>
-        <div className={styles.threadHead}><strong>Follow-up after our call</strong><span>Jordan Ellis</span></div>
-        <div className={styles.messageBubble}><span>Recorded context</span><p>Our team connected about continued community initiatives. We agreed to share a resource summary and reconnect next week.</p></div>
-        <div className={styles.threadAction}><Check size={14}/> Linked to Jordan's contact record</div>
-        <div className={styles.threadAction}><ClipboardCheck size={14}/> Follow-up tracked for the team</div>
-      </div>
-    </div>
-  </div>;
-}
-
-function TasksScreen() {
-  return <div className={styles.screenContent}>
-    <div className={styles.screenHeading}><div><span className={styles.screenKicker}>FOLLOW-UP WORK</span><h4>A conversation is only the beginning.</h4><p>Turn important next steps into visible, accountable work.</p></div><span className={styles.countPill}>12 active</span></div>
-    <div className={styles.taskBoard}>
-      {[
-        {name:'TO DO',count:4,items:[['Schedule partner follow-up','Jordan Ellis · Nov 5'],['Archive field team handoff','Campaign operations · Nov 7']]},
-        {name:'IN PROGRESS',count:5,items:[['Organize communication notes','Records team · This week'],['Prepare transition brief','Campaign manager · Nov 6']]},
-        {name:'COMPLETED',count:3,items:[['Confirm team access','Completed today'],['Review contact updates','Completed yesterday']]},
-      ].map((col,i)=><div className={styles.taskCol} key={col.name}><div className={styles.taskColTitle}><span><i className={`${styles.taskStatus} ${styles[`taskStatus${i}`]}`}/>{col.name}</span><b>{col.count}</b></div>{col.items.map(([title,sub])=><div className={styles.taskItem} key={title}><span className={styles.taskItemIcon}>{i===2?<Check size={13}/>:<ClipboardCheck size={13}/>}</span><strong>{title}</strong><small>{sub}</small></div>)}</div>)}
-    </div>
-  </div>;
-}
-
-const screenNodes = { hq: HQScreen, contacts: ContactsScreen, inbox: InboxScreen, tasks: TasksScreen };
-
-function ModuleScreen({ view }) {
-  return <div className={styles.screenContent}>
-    <div className={styles.screenHeading}>
-      <div><span className={styles.screenKicker}>WORKSPACE AREA · ILLUSTRATIVE VIEW</span>
-        <h4>{view.title}</h4><p>{view.desc}</p></div>
-      <span className={styles.countPill}>Example</span>
-    </div>
-    <div className={styles.genericFrame}>
-      <div className={styles.genericPrimary}>
-        <div className={styles.panelTitle}><strong>What this area helps you organize</strong><span>EXAMPLE WORKFLOW</span></div>
-        {(view.examples || []).map((item, i)=><div className={styles.genericRow} key={item}>
-          <span className={styles.genericRowIcon}>{i===0?<ClipboardCheck size={15}/>:i===1?<History size={15}/>:<CheckCircle2 size={15}/>}</span>
-          <div><strong>{item}</strong><small>{i===0?'Bring the context together':i===1?'Keep the team informed':'Know what happens next'}</small></div>
-          <ArrowRight size={14} aria-hidden="true"/>
-        </div>)}
-      </div>
-      <div className={styles.genericAside}>
-        <span className={styles.genericAsideIcon}><view.icon size={28}/></span>
-        <small>CONNECTED CAMPAIGN WORK</small>
-        <h5>{view.title}</h5>
-        <p>{view.desc}</p>
-        <div><ShieldCheck size={15}/> Your team's roles shape what they can access.</div>
-      </div>
-    </div>
-  </div>;
-}
-
-function ProductBrowser({ active, setActive, compact = false }) {
-  const selected = views.find(v=>v.id===active) || views[0];
-  const Screen = screenNodes[active];
-  const sideViews = compact ? views.slice(0,4) : views;
-  return <div className={`${styles.productBrowser} ${compact ? styles.browserCompact : ''}`}>
-    <div className={styles.browserChrome}><span className={styles.browserDots}><i/><i/><i/></span><span className={styles.browserAddress}><Shield size={12}/> Campaign Seat · interface walkthrough</span><span className={styles.browserChromeRight}><LockKeyhole size={12}/> ILLUSTRATIVE PREVIEW</span></div>
-    <div className={styles.browserApp}>
-      <aside className={styles.appSide} aria-label="Example portal navigation">
-        <div className={styles.sideBrand}>CS<span>Campaign Seat</span></div>
-        {!compact && <small>PORTAL SECTIONS</small>}
-        {sideViews.map(v=><button key={v.id} type="button" className={`${styles.sideItem} ${active===v.id?styles.sideItemActive:''}`} onClick={()=>setActive(v)} aria-label={`Preview ${v.title}`} aria-pressed={active===v.id}><v.icon size={14}/><span>{v.label}</span></button>)}
-        {compact && <div className={styles.sideBottom}><ShieldCheck size={13}/> Role-aware access</div>}
-      </aside>
-      <div className={styles.browserMain}>
-        <div className={styles.appTopBar}><div><span>EXAMPLE CAMPAIGN WORKSPACE</span><strong>Illustrative team portal</strong></div><div className={styles.topRight}><span><Sparkles size={13}/> Campaign intelligence</span><span className={styles.topBell}><Bell size={14}/></span><span className={styles.topProfile}>EC</span></div></div>
-        {Screen?<Screen/>:<ModuleScreen view={selected}/>}
-      </div>
-    </div>
-    <div className={styles.previewNote}><span><CheckCircle2 size={12}/> Based on Campaign Seat portal sections</span><span>Illustrative examples · No real contact records</span></div>
-  </div>;
-}
-
-const featureCards = [
-  {icon:History,number:'01',title:'Keep the whole conversation',text:'Connect notes, meeting context, contact history and next steps instead of leaving the story in separate inboxes.'},
-  {icon:Users,number:'02',title:'Remember every relationship',text:'Give the team more than a name and phone number: preserve the background and context that make relationships useful.'},
-  {icon:ClipboardCheck,number:'03',title:'Turn context into follow-through',text:'Track commitments, assignments and waiting-on items so important conversations lead to accountable action.'},
-  {icon:ShieldCheck,number:'04',title:'Keep knowledge with the team',text:'Individual accounts, role-aware access and leadership MFA help preserve continuity when team members change.'},
-];
-
-const faq = [
-  ['Does Campaign Seat replace our email or text messaging?', 'No. It complements the channels your team already uses. You can document important conversations and context in Campaign Seat. Connected communication features depend on the services configured for each workspace.'],
-  ['Is this only for campaigns that won?', 'No. Whether a campaign wins, loses or transitions into another chapter, its contacts, decisions, documents and relationship history still matter.'],
-  ['Can we import all of our past conversations automatically?', 'Not automatically from every service. During a walkthrough, we review the tools you use and the supported options for getting relevant information into your campaign workspace.'],
-  ['How do we get access?', 'Campaign Seat is in a limited private beta. Request a walkthrough and our team can discuss whether the current version fits your workflows.'],
-];
-
 function SiteHeader() {
-  const [opened,setOpened]=useState(false);
+  const [open,setOpen] = useState(false);
+  useEffect(() => { if(open) {const onKey=(e)=>{if(e.key==='Escape') setOpen(false);};window.addEventListener('keydown',onKey);return()=>window.removeEventListener('keydown',onKey);} },[open]);
   return <>
-    <div className={styles.announcement}><span className={styles.announcementDot}/> CAMPAIGN SEAT PRIVATE BETA <span className={styles.announcementDivider}>/</span> <a href="#contact">Explore the platform and request a walkthrough <ArrowRight size={13}/></a></div>
-    <header className={styles.nav}>
-      <div className={styles.navInner}>
-        <Brand/>
-        <nav className={styles.desktopNav} aria-label="Website navigation"><a href="#why">Why it matters</a><a href="#benefits">What makes it different</a><a href="#tour">Explore the portal</a><a href="#faq">FAQ</a></nav>
-        <div className={styles.navActions}><CTA dark>Request a walkthrough</CTA></div>
-        <button type="button" className={styles.mobileToggle} aria-label={opened?'Close menu':'Open menu'} aria-expanded={opened} onClick={()=>setOpened(!opened)}>{opened?<X size={23}/>:<Menu size={23}/>}</button>
+    <div className={styles.eyebrowBar}><span className={styles.statusDot}/> CAMPAIGN SEAT <span className={styles.barDivider}>/</span> PRIVATE BETA <span className={styles.barNote}>A smarter home for campaign work and relationships</span></div>
+    <header className={styles.header}>
+      <div className={styles.headerInner}><Brand/>
+        <nav className={styles.desktopNav} aria-label="Main navigation">{navItems.map(item=><a href={item.href} key={item.href}>{item.name}</a>)}</nav>
+        <div className={styles.navCTA}><CTA variant="nav"/></div>
+        <button type="button" className={styles.mobileMenuButton} onClick={()=>setOpen(v=>!v)} aria-label={open?'Close menu':'Open menu'} aria-expanded={open}>{open?<X size={24}/>:<Menu size={24}/>}</button>
       </div>
-      {opened&&<nav className={styles.mobileNav} aria-label="Mobile navigation" onClick={()=>setOpened(false)}><a href="#why">Why it matters</a><a href="#benefits">What makes it different</a><a href="#tour">Explore the portal</a><a href="#faq">FAQ</a><a href="#contact">Request a walkthrough</a></nav>}
+      {open && <nav className={styles.mobileMenu} aria-label="Mobile navigation">{navItems.map(item=><a href={item.href} key={item.href} onClick={()=>setOpen(false)}>{item.name}<ArrowRight size={15}/></a>)}<a href={DEMO_EMAIL} onClick={()=>setOpen(false)}>Request a walkthrough <ArrowUpRight size={15}/></a></nav>}
     </header>
   </>;
 }
+function BlockIcon({ icon:Icon, color = 'blue' }) { return <span className={`${styles.blockIcon} ${styles[`blockIcon_${color}`]}`}><Icon size={18}/></span>; }
+
+function DashboardPanel({ compact=false }) {
+  return <div className={styles.demoDash}>
+    <div className={styles.dashPanelTop}><div><span className={styles.dashKicker}><Sparkles size={12}/> CAMPAIGN COMMAND BRIEF</span><h4>What needs attention now</h4></div><div className={styles.dashPills}><span><b>2</b> Follow-ups</span><span><b>1</b> Decision</span></div></div>
+    <div className={styles.dashGreen}><CheckCircle2 size={17}/><div><strong>Stay ahead of what matters.</strong><span>See the team's most important work in one place.</span></div></div>
+    <div className={styles.dashTwoCols}>
+      <div className={styles.mockPanel}><div className={styles.mockPanelHead}><strong>TODAY'S EXECUTION</strong><span>View tasks</span></div><div className={styles.mockBigStat}><b>9</b> Active tasks</div><div className={styles.mockMiniGrid}><span><strong>5</strong> Open</span><span><strong>4</strong> In progress</span><span><strong>1</strong> Due soon</span></div><div className={styles.mockSelected}><BlockIcon icon={ClipboardCheck}/><div><strong>Prepare campaign transition briefing</strong><small>Assigned to campaign operations</small></div><ArrowRight size={13}/></div></div>
+      <div className={styles.mockPanel}><div className={styles.mockPanelHead}><strong>PEOPLE TO CONTACT</strong><span>View contacts</span></div><div className={styles.mockBigStat}><b>3</b> Relationships to follow up</div><div className={styles.mockListItem}><span className={styles.demoAvatar}>JE</span><div><strong>Jordan Ellis</strong><small>Community partner · Follow up tomorrow</small></div></div><div className={styles.mockListItem}><span className={styles.demoAvatar}>AM</span><div><strong>Alex Morgan</strong><small>Former field lead · Update requested</small></div></div><div className={styles.mockListItem}><span className={styles.demoAvatar}>RB</span><div><strong>Riley Brooks</strong><small>Partner conversation recorded</small></div></div></div>
+    </div>
+    {!compact && <div className={styles.dashBottomCards}><div><BlockIcon icon={Inbox}/><strong>Messages for you</strong><span>No important replies missed</span></div><div><BlockIcon icon={FileCheck2}/><strong>Decisions for you</strong><span>Reviews and approvals in view</span></div><div><BlockIcon icon={Activity}/><strong>Team brief</strong><span>Recent updates, all together</span></div></div>}
+  </div>;
+}
+function ContactPanel() {
+  const contacts=[['JE','Jordan Ellis','Community partner','Call follow-up · Today'],['AM','Alex Morgan','Former field lead','Team notes · Yesterday'],['RB','Riley Brooks','Local organization','Meeting planned · Nov 6']];
+  return <div className={styles.contactSplit}><div className={styles.mockPanel}><div className={styles.mockPanelHead}><strong>CONTACTS</strong><span><Search size={13}/> Search</span></div>{contacts.map(([ini,name,role,note],i)=><div key={name} className={`${styles.mockListItem} ${i===0?styles.contactActive:''}`}><span className={styles.demoAvatar}>{ini}</span><div><strong>{name}</strong><small>{role}</small></div><ArrowRight size={13}/></div>)}</div><div className={styles.mockPanel}><div className={styles.contactTitle}><span className={styles.demoAvatar}>JE</span><div><strong>Jordan Ellis</strong><small>Community partner · Relationship active</small></div></div><div className={styles.panelSection}><strong>RELATIONSHIP HISTORY</strong><span>Nov 3 · Call recap recorded</span><p>Discussed ongoing community partnerships and next steps after the election.</p><span>Oct 29 · Meeting notes</span><p>Shared resources and future collaboration opportunities.</p></div><div className={styles.contactFollow}><CheckCircle2 size={14}/> Follow-up assigned for tomorrow</div></div></div>;
+}
+function InboxPanel() {
+  const threads=[['Jordan Ellis','Follow-up after our call','Today'],['Operations team','Transition planning notes','Yesterday'],['Riley Brooks','Partner check-in','Oct 30']];
+  return <div className={styles.contactSplit}><div className={styles.mockPanel}><div className={styles.mockPanelHead}><strong>CONVERSATIONS</strong><span>Recent</span></div>{threads.map(([name,sub,date],i)=><div key={name} className={`${styles.mockListItem} ${i===0?styles.contactActive:''}`}><BlockIcon icon={MessageSquare}/><div><strong>{name}</strong><small>{sub}</small></div><span className={styles.listDate}>{date}</span></div>)}</div><div className={styles.mockPanel}><div className={styles.mockPanelHead}><strong>FOLLOW-UP AFTER OUR CALL</strong><span>Context</span></div><div className={styles.messageQuote}><span>RECORDED CONTEXT</span><p>Our team discussed continued community initiatives. We agreed to share a summary and reconnect next week.</p></div><div className={styles.contactFollow}><Users size={14}/> Linked to contact record</div><div className={styles.contactFollow}><ClipboardCheck size={14}/> Follow-up tracked for the team</div></div></div>;
+}
+function TasksPanel() {
+  const cols=[{label:'OPEN',items:['Schedule partner follow-up','Organize communication notes']},{label:'IN PROGRESS',items:['Prepare transition brief','Consolidate contact details']},{label:'COMPLETE',items:['Review team access','Confirm records handoff']}];
+  return <div className={styles.taskColumns}>{cols.map((col,i)=><div className={styles.mockPanel} key={col.label}><div className={styles.mockPanelHead}><strong>{col.label}</strong><span>{col.items.length}</span></div>{col.items.map((item,j)=><div className={styles.taskCard} key={item}><span className={styles.taskCheck}>{i===2?<Check size={13}/>:<ClipboardCheck size={13}/>}</span><strong>{item}</strong><small>{i===2?'Completed':j===0?'Campaign team':'Due this week'}</small></div>)}</div>)}</div>;
+}
+function ModulePanel({ module }) {
+  return <div className={styles.customModule}>
+    <div className={styles.mockPanel}><div className={styles.mockPanelHead}><strong>{module.eyebrow}</strong><span><ArrowRight size={13}/> Explore area</span></div><div className={styles.moduleMetric}><span>{module.metric[1]}</span><strong>{module.metric[0]}</strong><small>Illustrative workspace</small></div><div className={styles.moduleDivider}/><div className={styles.mockPanelHead}><strong>EXAMPLE WORKFLOW</strong><span>RECENT</span></div>{module.items.map((item,i)=><div className={styles.moduleRow} key={item}><BlockIcon icon={i===0?ClipboardCheck:i===1?History:CheckCircle2} color={i===0?'blue':i===1?'red':'green'}/><div><strong>{item}</strong><small>{i===0?'Keep the work organized':i===1?'Preserve the context':'Track the next step'}</small></div><ArrowRight size={14}/></div>)}</div>
+    <div className={styles.moduleDetail}><span className={styles.detailTag}>CONNECTED CAMPAIGN WORK</span><BlockIcon icon={module.icon} color="light"/><h4>{module.title}</h4><p>{module.what}</p><div><CheckCircle2 size={15}/> {module.benefit}</div></div>
+  </div>;
+}
+function WorkspaceDemo({ activeId='hq', onChoose=null, compact=false }) {
+  const module = moduleById[activeId]||modules[0];
+  const customView = module.id==='hq'?<DashboardPanel compact={compact}/>:module.id==='contacts'?<ContactPanel/>:module.id==='inbox'?<InboxPanel/>:module.id==='tasks'?<TasksPanel/>:<ModulePanel module={module}/>;
+  return <div className={`${styles.workspaceDemo} ${compact?styles.workspaceCompact:''}`}>
+    <div className={styles.demoBrowser}><span className={styles.browserDots}><i/><i/><i/></span><span className={styles.demoAddress}><ShieldCheck size={12}/> app.campaignseat.com</span><span className={styles.demoLabel}><LockKeyhole size={12}/> PRODUCT TOUR · SAMPLE DATA</span></div>
+    <div className={styles.demoBody}>
+      <aside className={styles.workspaceSidebar} aria-label="Campaign Seat portal example navigation">
+        <div className={styles.sidebarTitle}><small>CAMPAIGN WORKSPACE</small><strong>Example Campaign</strong><span>Illustrative organization</span><ChevronDown size={14}/></div>
+        <div className={styles.sidebarScroll}>
+          {compact ? modules.slice(0,5).map(item=><div key={item.id} className={`${styles.demoSideItem} ${item.id===activeId?styles.demoSideActive:''}`}><item.icon size={15}/><span>{item.label}</span></div>) : categories.map(cat=><div key={cat.id} className={styles.navGroup}><span className={styles.navGroupLabel}>{cat.short}</span>{modules.filter(item=>item.group===cat.id).map(item=><button key={item.id} type="button" onClick={()=>onChoose?.(item.id)} aria-label={`Show ${item.title}`} aria-pressed={item.id===activeId} className={`${styles.demoSideItem} ${item.id===activeId?styles.demoSideActive:''}`}><item.icon size={15}/><span>{item.label}</span></button>)}</div>)}
+        </div><div className={styles.sidebarUser}><span>EC</span><div><strong>Example User</strong><small>Campaign member</small></div></div>
+      </aside>
+      <div className={styles.demoMain}>
+        <div className={styles.workspaceTopbar}><div><small>CAMPAIGN WORKSPACE</small><strong>Example Campaign <span>· Team workspace</span></strong></div><div className={styles.topbarUtilities}><span><CalendarDays size={14}/> Campaign calendar</span><span><Sparkles size={14}/> Ask Campaign HQ</span><span><Bell size={15}/></span></div></div>
+        <div className={styles.demoPage}><div className={styles.demoSectionHead}><div><span>{module.eyebrow}</span><h3>{module.title}</h3><p>{module.what}</p></div><div className={styles.demoSecure}><ShieldCheck size={14}/> Role-aware workspace</div></div>{customView}</div>
+      </div>
+    </div><div className={styles.demoFooter}><span><ShieldCheck size={12}/> Designed after the Campaign Seat interface</span><span>Illustrative records; not a live account</span></div>
+  </div>;
+}
+function Feature({ num, icon:Icon, title, text }){return <article className={styles.featureCard}><div className={styles.featureIcon}><Icon size={19}/></div><div><span>{num} / BUILT-IN ADVANTAGE</span><h3>{title}</h3><p>{text}</p></div></article>;}
+const faqs=[
+  ['Is Campaign Seat only useful during an election?', 'No. The platform is built for campaign activity and continuity, including the work that happens after Election Day: organizing relationships, records, team activity and follow-ups.'],
+  ['Does Campaign Seat automatically pull every email, text and call?', 'No. Not every communication channel is automatically connected. Teams can record important context directly, and supported email or calendar connections depend on each workspace’s configuration. We review those options during a walkthrough.'],
+  ['Can someone outside our team view our records?', 'Campaign Seat uses private workspaces, individual accounts and role-aware permissions. Leadership accounts require multi-factor authentication. Access depends on the user’s assigned role and current workspace configuration.'],
+  ['Can we bring in existing contacts and campaign history?', 'The Contacts workspace supports contact records and import workflows. Bringing in other history depends on the source, format, permissions and supported features, which we can review in a guided walkthrough.'],
+  ['How do we get access?', 'We are currently onboarding selected teams through a private beta. Request a walkthrough so we can understand your needs and review the workflows available to your organization.'],
+];
+function FAQ() {return <div className={styles.faqList}>{faqs.map(([q,a])=><details key={q}><summary>{q}<ChevronDown size={17}/></summary><p>{a}</p></details>)}</div>}
 
 export default function MarketingHomeV109() {
   const [active,setActive]=useState('hq');
-  const [tourGroup,setTourGroup]=useState('workspace');
-  const visibleViews=views.filter(v=>v.group===tourGroup);
-  const selected=views.find(v=>v.id===active)||views[0];
-  function chooseGroup(groupId) {
-    setTourGroup(groupId);
-    const first=views.find(v=>v.group===groupId);
-    if(first) setActive(first.id);
-  }
-  function chooseView(view) { setActive(view.id); setTourGroup(view.group); }
-  useEffect(()=>{
-    document.title='Campaign Seat | Every conversation. One shared campaign record.';
-    const content='Campaign Seat keeps your team’s contacts, conversation history, follow-ups, documents and work connected in one campaign workspace. Explore the portal and request a private walkthrough.';
-    let tag=document.querySelector('meta[name="description"]');
-    if(!tag){tag=document.createElement('meta');tag.name='description';document.head.appendChild(tag)}
-    tag.content=content;
-  },[]);
+  const [group,setGroup]=useState('workspace');
+  const selected=moduleById[active];
+  const selectGroup=(next)=>{setGroup(next);setActive(modules.find(item=>item.group===next)?.id||'hq')};
+  const selectModule=(id)=>{setActive(id);setGroup(moduleById[id].group)};
   return <div className={styles.site}>
     <SiteHeader/>
     <main>
-      <section className={styles.hero} id="top">
-        <div className={styles.heroGlow} aria-hidden="true"/>
-        <div className={styles.heroContent}>
-          <div className={styles.heroCopy}>
-            <span className={styles.eyebrow}><span className={styles.eyebrowDash}/> THE CAMPAIGN KNOWLEDGE WORKSPACE</span>
-            <h1>Every conversation matters.<br/><em>Keep the whole story.</em></h1>
-            <p className={styles.heroDescription}>Contacts, communication history, decisions, documents and follow-ups—connected in one organized home. So when the election ends or the team changes, the important context stays.</p>
-            <div className={styles.heroActions}><CTA>Request a walkthrough</CTA><a href="#tour" className={styles.heroSecondary}>Explore the portal <ArrowRight size={17}/></a></div>
-            <div className={styles.heroProof}><span><History size={17}/> Communication history</span><span><Users size={17}/> Shared team knowledge</span><span><ShieldCheck size={17}/> Role-aware access</span></div>
-          </div>
-          <div className={styles.heroVisual} aria-label="Illustrative campaign portal preview">
-            <div className={styles.visualBackplate}/>
-            <div className={styles.heroWindow}><ProductBrowser active={active} setActive={chooseView} compact /></div>
-            <div className={styles.floatCard}><span><History size={18}/></span><div><small>THE DETAILS MATTER</small><strong>People, history, next steps. Together.</strong></div></div>
-          </div>
-        </div>
-      </section>
-
-      <section className={styles.reframe} id="why">
-        <div className={styles.container}>
-          <div className={styles.valueIntro}>
-            <span className={styles.sectionEyebrow}>WHY CAMPAIGN SEAT EXISTS</span>
-            <h2>Scattered communications make teams start from scratch.</h2>
-            <p>Emails in one inbox. Texts on another phone. Notes in a spreadsheet. Commitments in somebody's memory. Campaign Seat creates a shared record of the important context, so your team can find it and act on it.</p>
-          </div>
-          <div className={styles.differenceStrip}>
-            <div><span><MessageCircle size={18}/></span><strong>Beyond the message</strong><small>Keep context attached to the contact, not just a thread.</small></div>
-            <div><span><History size={18}/></span><strong>Beyond Election Day</strong><small>Keep the history when the next chapter begins.</small></div>
-            <div><span><ClipboardCheck size={18}/></span><strong>Beyond a spreadsheet</strong><small>Connect the conversation to its owner and next step.</small></div>
-          </div>
-        </div>
-      </section>
-
-      <section className={styles.platform} id="benefits"><div className={styles.container}>
-        <div className={styles.valueHeader}><div><span className={styles.sectionEyebrow}>MORE THAN A TOOL FOR ELECTION DAY</span><h2>What makes Campaign Seat different.</h2></div><p>Most teams already have ways to message, schedule and store files. Campaign Seat is built to keep the <strong>relationship, history and next action</strong> connected across that work.</p></div>
-        <div className={styles.featureGrid}>{featureCards.map(f=><article className={styles.featureCard} key={f.number}><div className={styles.featureTop}><span className={styles.featureIcon}><f.icon size={23} strokeWidth={1.75}/></span><span className={styles.featureNumber}>{f.number}</span></div><h3>{f.title}</h3><p>{f.text}</p></article>)}</div>
-      </div></section>
-
-      <section className={styles.tourSection} id="tour"><div className={styles.container}>
-        <div className={styles.tourHeading}><div><span className={styles.sectionEyebrow}>INSIDE THE CAMPAIGN SEAT PORTAL</span><h2>Explore the whole workspace.</h2></div><p>Choose a portal area to see how it helps your team. Examples are illustrative; access and availability vary by workspace.</p></div>
-        <div className={styles.tourGroupTabs} role="group" aria-label="Portal section groups">
-          {tourGroups.map(g=><button type="button" key={g.id} className={tourGroup===g.id?styles.tourGroupActive:''} aria-pressed={tourGroup===g.id} onClick={()=>chooseGroup(g.id)}>{g.label}<span>{views.filter(v=>v.group===g.id).length}</span></button>)}
-        </div>
-        <div className={styles.tourControls} role="tablist" aria-label="Preview portal areas">
-          {visibleViews.map(v=><button key={v.id} id={`tour-tab-${v.id}`} role="tab" aria-selected={active===v.id} aria-controls="tour-panel" type="button" onClick={()=>chooseView(v)} className={`${styles.tourTab} ${active===v.id?styles.tourTabActive:''}`}><v.icon size={15}/>{v.title}</button>)}
-        </div>
-        <div className={styles.tourFrame} id="tour-panel" role="tabpanel" aria-labelledby={`tour-tab-${active}`}>
-          <div className={styles.tourIntro}><div><span>YOU'RE VIEWING <ArrowRight size={13}/></span><strong>{selected.title}</strong></div><p>{selected.desc}</p></div>
-          <ProductBrowser active={active} setActive={chooseView}/>
-        </div>
-        <div className={styles.tourFoot}><span><ShieldCheck size={16}/> Illustrative portal tour · Fictional records only</span><a href={DEMO_EMAIL}>Walk through the real app with us <ArrowUpRight size={16}/></a></div>
-      </div></section>
-
-      <section className={styles.stepsSection} id="how-it-works"><div className={styles.container}>
-        <div className={styles.workflowIntro}><span className={styles.sectionEyebrow}>A SIMPLE WAY TO WORK</span><h2>Capture the context. Connect the people. Know what's next.</h2></div>
-        <div className={styles.stepsGrid}>
-          <div><span>01 / RECORD</span><h3>Keep the conversation</h3><p>Document calls, meetings and the information worth remembering.</p></div>
-          <div><span>02 / CONNECT</span><h3>Give it context</h3><p>Link notes and documents to the right contacts and team work.</p></div>
-          <div><span>03 / FOLLOW THROUGH</span><h3>Make it actionable</h3><p>Assign tasks, follow-ups, commitments and waiting-on items.</p></div>
-        </div>
-        <p className={styles.workflowSecurity}><ShieldCheck size={17}/> Individual accounts · Role-aware workspace access · Leadership MFA</p>
-      </div></section>
-
-      <section className={styles.faqSection} id="faq"><div className={styles.container}><div><span className={styles.sectionEyebrow}>BEFORE YOUR WALKTHROUGH</span><h2>Good questions.<br/>Clear answers.</h2><p>We focus on the workflows your team actually needs—not promises about unsupported integrations.</p></div><div className={styles.faqList}>{faq.map(([q,a])=><details key={q}><summary>{q}<ChevronDown size={19} aria-hidden="true"/></summary><p>{a}</p></details>)}</div></div></section>
-
-      <section className={styles.beta} id="contact"><div className={styles.container}><div className={styles.betaBadge}><span/> LIMITED PRIVATE BETA</div><h2>Keep what your<br/><i>campaign has built.</i></h2><p>See how Campaign Seat can help your team organize communication history, relationships and the work that follows.</p><div className={styles.betaActions}><CTA>Request a private walkthrough</CTA></div><div className={styles.betaFine}>Access is invitation-only · A walkthrough is the first step</div></div></section>
+      <section className={styles.hero} id="top"><div className={styles.shell}><div className={styles.heroGrid}><div className={styles.heroContent}><div className={styles.heroEyebrow}><span/> THE CAMPAIGN KNOWLEDGE PLATFORM</div><h1>Everything your campaign knows.<br/><em>All in one place.</em></h1><p>Contacts. Conversations. Decisions. Documents. Follow-ups. Campaign Seat connects the information behind your team's work — so it stays useful long after Election Day.</p><div className={styles.heroButtons}><CTA/><a className={styles.heroLink} href="#tour">Explore the real interface <ArrowRight size={17}/></a></div><div className={styles.heroTrust}><span><History size={14}/> Complete context</span><span><Users size={14}/> Connected teams</span><span><ShieldCheck size={14}/> Role-aware access</span></div></div><div className={styles.heroProduct}><div className={styles.heroBacking}/><WorkspaceDemo compact/><div className={styles.heroCallout}><span><History size={17}/></span><div><small>THE DIFFERENCE</small><strong>One relationship. One connected history.</strong></div></div></div></div></div></section>
+      <section className={styles.proofStrip}><div className={styles.shell}><div><strong>One workspace</strong><span>Keep important campaign work connected</span></div><div><strong>One shared record</strong><span>Preserve the story behind each relationship</span></div><div><strong>Clear next steps</strong><span>Give people ownership and accountability</span></div></div></section>
+      <section className={styles.valueSection} id="platform"><div className={styles.shell}><div className={styles.sectionLead}><div><span className={styles.overline}>THE CAMPAIGN SEAT ADVANTAGE</span><h2>More than a contact list.<br/>More than a task board.</h2></div><p>Most teams already have ways to send messages and store files. The missing piece is the shared context: <strong>who said what, why it mattered and what comes next.</strong></p></div><div className={styles.features} id="benefits"><Feature num="01" icon={History} title="Keep the conversation" text="Bring contact notes, meeting context, communication records and decisions into an organized history."/><Feature num="02" icon={Users} title="Keep the relationship" text="Make important context available to authorized teammates, not just the person who had the conversation."/><Feature num="03" icon={ClipboardCheck} title="Keep the momentum" text="Turn information into tasks, commitments, approvals and follow-ups with clear ownership."/><Feature num="04" icon={ShieldCheck} title="Keep the continuity" text="Maintain a shared workspace with role-aware permissions as staff, volunteers and priorities change."/></div></div></section>
+      <section className={styles.tourSection} id="tour"><div className={styles.shell}><div className={styles.sectionLead}><div><span className={styles.overline}>EXPLORE THE PLATFORM</span><h2>See how the work<br/>actually comes together.</h2></div><p>A guided view inspired by the live Campaign Seat portal. Choose any area below to see the familiar dashboard layout and learn what that module is designed to do.</p></div><div className={styles.tourControls}><div className={styles.categoryTabs} role="group" aria-label="Portal areas">{categories.map(cat=><button type="button" key={cat.id} aria-pressed={cat.id===group} className={cat.id===group?styles.categoryActive:''} onClick={()=>selectGroup(cat.id)}>{cat.label}<b>{modules.filter(v=>v.group===cat.id).length}</b></button>)}</div><div className={styles.moduleTabs} role="tablist" aria-label="Campaign Seat portal modules">{modules.filter(item=>item.group===group).map(item=><button type="button" key={item.id} role="tab" aria-selected={item.id===active} aria-controls="portal-explanation" onClick={()=>selectModule(item.id)} className={item.id===active?styles.moduleTabActive:''}><item.icon size={15}/>{item.label}</button>)}</div></div><div className={styles.tourWorkspace}><div className={styles.tourPreview} aria-label={`Illustrative preview of ${selected.title}`}><WorkspaceDemo activeId={active} onChoose={selectModule}/></div><div className={styles.tourExplain} id="portal-explanation" role="tabpanel"><div className={styles.explainHeading}><span className={styles.overline}>INSIDE THE PORTAL</span><span className={styles.explainCounter}>{modules.findIndex(v=>v.id===active)+1} / {modules.length}</span></div><div className={styles.explainIcon}><selected.icon size={21}/></div><h3>{selected.title}</h3><strong>What this area does</strong><p>{selected.what}</p><strong>How your team uses it</strong><p>{selected.how}</p><div className={styles.explainBenefit}><CheckCircle2 size={18}/><div><b>Why it matters</b><span>{selected.benefit}</span></div></div><a href={DEMO_EMAIL} className={styles.explainCTA}>See it with your team <ArrowUpRight size={15}/></a></div></div><div className={styles.tourDisclosure}><ShieldCheck size={15}/> Interface-inspired illustrations with fictional examples. Features and integrations vary by workspace and beta configuration.</div></div></section>
+      <section className={styles.teamsSection} id="teams"><div className={styles.shell}><div className={styles.sectionLead}><div><span className={styles.overline}>BUILT FOR THE ENTIRE CAMPAIGN LIFECYCLE</span><h2>The election is a moment.<br/>The relationships last.</h2></div><p>Campaign Seat supports the work before, during and after an election — with context that stays organized when the next chapter begins.</p></div><div className={styles.teamCards}><div><span className={styles.teamIcon}><CalendarDays size={21}/></span><h3>Running a campaign</h3><p>Bring team tasks, contacts, deadlines, messages and decisions into a shared workspace.</p></div><div><span className={styles.teamIcon}><History size={21}/></span><h3>Closing out an election</h3><p>Organize what happened, preserve important notes and prepare clean handoffs.</p></div><div><span className={styles.teamIcon}><Users size={21}/></span><h3>Planning what comes next</h3><p>Keep valuable relationships and follow-ups accessible to the authorized team.</p></div></div></div></section>
+      <section className={styles.howSection} id="how"><div className={styles.shell}><div className={styles.howHeader}><span className={styles.overline}>A SIMPLE WAY TO WORK</span><h2>Capture it. Connect it. Follow through.</h2></div><div className={styles.howGrid}><div><span>01</span><h3>Record the context</h3><p>Save the details that make calls, meetings, messages and decisions meaningful.</p></div><ArrowRight className={styles.howArrow} size={20}/><div><span>02</span><h3>Link the relationship</h3><p>Connect the information to the right person, workspace, record or team action.</p></div><ArrowRight className={styles.howArrow} size={20}/><div><span>03</span><h3>Know the next move</h3><p>Track owners, commitments, responses and follow-ups without starting over.</p></div></div></div></section>
+      <section className={styles.securitySection} id="security"><div className={styles.shell}><div className={styles.securityTitle}><span className={styles.securityMark}><ShieldCheck size={23}/></span><div><span className={styles.overline}>DESIGNED FOR RESPONSIBLE ACCESS</span><h2>Shared knowledge. Individual accountability.</h2><p>Each person uses their own account. Role-aware access and required leadership MFA help keep campaign work available to the right people.</p></div></div><div className={styles.securityChecks}><span><Check size={16}/> Private campaign workspaces</span><span><Check size={16}/> Individual team accounts</span><span><Check size={16}/> Role-based permissions</span><span><Check size={16}/> Leadership MFA</span></div></div></section>
+      <section className={styles.faqSection} id="faq"><div className={styles.shell}><div className={styles.faqLeft}><span className={styles.overline}>COMMON QUESTIONS</span><h2>Everything you need<br/>to get oriented.</h2><p>Have a question about a specific communication workflow? We'll walk through your actual use case.</p><a href={DEMO_EMAIL}>Ask about your team's workflow <ArrowUpRight size={16}/></a></div><FAQ/></div></section>
+      <section className={styles.contactSection} id="contact"><div className={styles.shell}><span className={styles.overline}>CAMPAIGN SEAT PRIVATE BETA</span><h2>Give your campaign's<br/><em>knowledge a future.</em></h2><p>See how one shared workspace can make your team's communications, relationships and next steps easier to manage. We're welcoming a limited number of teams into a guided private beta.</p><CTA variant="light">Request a private walkthrough</CTA><span className={styles.contactSmall}>No public signup. Access is provided by invitation after a walkthrough.</span></div></section>
     </main>
-    <footer className={styles.footer}><div className={styles.container}><div className={styles.footerMain}><div><Brand light/><p>One home for your campaign's people, conversations and next chapter.</p></div><div className={styles.footerLinks}><div><strong>Explore</strong><a href="#why">Why Campaign Seat</a><a href="#benefits">What makes it different</a><a href="#tour">Full portal tour</a></div><div><strong>Information</strong><a href="/privacy/">Privacy policy</a><a href="/terms/">Terms & conditions</a><a href="/sms-consent/">SMS consent</a></div><div><strong>Contact</strong><a href={DEMO_EMAIL}>Request a walkthrough</a><a href={`mailto:${SUPPORT_EMAIL}`}>Support</a><a href="https://ccinnovationgroupllc.com/" target="_blank" rel="noreferrer">CC Innovation Group <ArrowUpRight size={12}/></a></div></div></div><div className={styles.footerBottom}><span>© {new Date().getFullYear()} CC INNOVATION GROUP LLC. Campaign Seat is operated by CC INNOVATION GROUP LLC.</span><span>Keep the history. Move forward.</span></div></div></footer>
+    <footer className={styles.footer}><div className={styles.shell}><div className={styles.footerTop}><div><Brand light/><p>Keep the history. Know the next step.<br/>Move the whole team forward.</p></div><div className={styles.footerLinks}><div><b>Explore</b><a href="#platform">Why Campaign Seat</a><a href="#tour">Portal walkthrough</a><a href="#teams">Who it's for</a><a href="#security">Security</a></div><div><b>Information</b><a href="/privacy/">Privacy Policy</a><a href="/terms/">Terms & Conditions</a><a href="/sms-consent/">SMS Consent</a></div><div><b>Contact</b><a href={DEMO_EMAIL}>Request a walkthrough</a><a href={`mailto:${SUPPORT_EMAIL}`}>Customer support</a><a href="https://ccinnovationgroupllc.com/" target="_blank" rel="noreferrer">CC Innovation Group <ArrowUpRight size={12}/></a></div></div></div><div className={styles.footerBottom}><span>© {new Date().getFullYear()} CC INNOVATION GROUP LLC. Campaign Seat is a product operated by CC INNOVATION GROUP LLC.</span><span>Marketing previews use fictional records; not a live campaign workspace.</span></div></div></footer>
   </div>;
 }
