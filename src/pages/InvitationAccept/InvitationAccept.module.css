@@ -8,7 +8,11 @@
 
 .page {
   display: grid;
+  height: 100dvh;
   min-height: 100dvh;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior-y: contain;
   grid-template-columns:
     minmax(330px, 0.82fr)
     minmax(520px, 1.18fr);
