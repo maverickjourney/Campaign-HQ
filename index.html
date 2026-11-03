@@ -3,47 +3,32 @@
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <link rel="manifest" href="/manifest.webmanifest" />
     <link rel="apple-touch-icon" href="/pwa/apple-touch-icon.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-    <meta name="theme-color" content="#a5151d" />
-    <meta name="application-name" content="Campaign HQ" />
-    <meta name="apple-mobile-web-app-capable" content="yes" />
-    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-    <meta name="apple-mobile-web-app-title" content="Campaign HQ" />
-    <title>Campaign HQ</title>
+    <meta name="theme-color" content="#0a2038" />
+    <meta name="application-name" content="Campaign Seat" />
+    <meta name="apple-mobile-web-app-title" content="Campaign Seat" />
+    <meta name="description" content="Campaign Seat organizes campaign contacts, communication histories, team work, files, and follow-ups into one secure workspace. Keep the history. Move forward." />
+    <link rel="canonical" href="https://campaignseat.com/" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Campaign Seat" />
+    <meta property="og:title" content="Campaign Seat | Keep the history. Move forward." />
+    <meta property="og:description" content="Your campaign moves on. Your knowledge shouldn't. One home for the contacts, conversations and next steps that matter." />
+    <meta property="og:url" content="https://campaignseat.com/" />
+    <title>Campaign Seat | Keep the history. Move forward.</title>
   </head>
   <body>
     <div id="root"></div>
-    <script type="module" src="/src/main.jsx"></script>
+    <script type="module" src="/src/pages/PublicCampaignSeatV109/WebsiteEntry.jsx"></script>
     <script>
-      window.__campaignHQInstallPrompt = null;
-
-      window.addEventListener(
-        "beforeinstallprompt",
-        (event) => {
-          event.preventDefault();
-          window.__campaignHQInstallPrompt = event;
-          window.dispatchEvent(
-            new Event("campaignhq-install-ready"),
-          );
-        },
-      );
-
-      if ("serviceWorker" in navigator) {
-        window.addEventListener(
-          "load",
-          () => {
-            navigator.serviceWorker
-              .register("/campaign-hq-sw.js")
-              .catch((error) => {
-                console.error(
-                  "Campaign HQ service worker registration failed:",
-                  error,
-                );
-              });
-          },
-        );
+      // Retire stale app/PWA service workers on the public website only.
+      if ("serviceWorker" in navigator &&
+          (location.hostname === "campaignseat.com" || location.hostname === "www.campaignseat.com")) {
+        window.addEventListener("load", () => {
+          navigator.serviceWorker.getRegistrations()
+            .then((regs) => Promise.all(regs.map((reg) => reg.unregister())))
+            .catch(() => {});
+        });
       }
     </script>
   </body>
