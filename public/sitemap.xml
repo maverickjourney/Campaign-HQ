@@ -1,6 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
  <url><loc>https://campaignseat.com/</loc></url>
+ <url><loc>https://campaignseat.com/platform/</loc></url>
+  <url><loc>https://campaignseat.com/communications/</loc></url>
+ <url><loc>https://campaignseat.com/who-its-for/</loc></url>
+ <url><loc>https://campaignseat.com/trust/</loc></url>
+ <url><loc>https://campaignseat.com/about/</loc></url>
+ <url><loc>https://campaignseat.com/walkthrough/</loc></url>
  <url><loc>https://campaignseat.com/privacy/</loc></url>
  <url><loc>https://campaignseat.com/terms/</loc></url>
  <url><loc>https://campaignseat.com/sms-consent/</loc></url>

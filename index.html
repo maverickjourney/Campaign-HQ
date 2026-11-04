@@ -5,28 +5,28 @@
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="apple-touch-icon" href="/pwa/apple-touch-icon.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-    <meta name="theme-color" content="#0a2038" />
+    <meta name="theme-color" content="#0d293e" />
     <meta name="application-name" content="Campaign Seat" />
     <meta name="apple-mobile-web-app-title" content="Campaign Seat" />
-    <meta name="description" content="Campaign Seat brings your campaign contacts, conversations, decisions, documents and follow-ups into one role-aware workspace. Explore all 23 portal areas and request a guided walkthrough." />
+    <meta name="description" content="Campaign Seat helps political campaigns manage internal communications, marketing coordination, contacts, team assignments, approvals and follow-through. Request a private walkthrough." />
     <link rel="canonical" href="https://campaignseat.com/" />
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="Campaign Seat" />
-    <meta property="og:title" content="Campaign Seat | Everything your campaign knows, in one place." />
-    <meta property="og:description" content="Everything your campaign knows, all in one place. A shared home for campaign relationships, communication history and what comes next." />
+    <meta property="og:title" content="Campaign Seat | Campaign Communications, Team Coordination & Knowledge" />
+    <meta property="og:description" content="Keep your campaign connected. Organize relationships, communications, marketing work and follow-ups without losing the important context." />
     <meta property="og:url" content="https://campaignseat.com/" />
-    <title>Campaign Seat | Everything your campaign knows, in one place.</title>
+    <title>Campaign Seat | Campaign Communications, Team Coordination & Knowledge</title>
   </head>
   <body>
     <div id="root"></div>
     <script type="module" src="/src/pages/PublicCampaignSeatV109/WebsiteEntry.jsx"></script>
     <script>
-      // Retire stale app/PWA service workers on the public website only.
-      if ("serviceWorker" in navigator &&
-          (location.hostname === "campaignseat.com" || location.hostname === "www.campaignseat.com")) {
-        window.addEventListener("load", () => {
+      // Marketing site only: retire stale app service workers from this public hostname.
+      if ('serviceWorker' in navigator &&
+        (location.hostname === 'campaignseat.com' || location.hostname === 'www.campaignseat.com')) {
+        window.addEventListener('load', () => {
           navigator.serviceWorker.getRegistrations()
-            .then((regs) => Promise.all(regs.map((reg) => reg.unregister())))
+            .then(registrations => Promise.all(registrations.map(registration => registration.unregister())))
             .catch(() => {});
         });
       }
