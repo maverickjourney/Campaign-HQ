@@ -8,7 +8,7 @@ import {
 } from 'lucide-react';
 import styles from './Site.module.css';
 
-const EMAIL = 'support@ccinnovationgroupllc.com';
+const EMAIL = 'support@campaignseat.com';
 const COMPANY_URL = 'https://ccinnovationgroupllc.com/';
 // V114: public copy explains outcomes and verified modules; it never exposes the private portal.
 const ROUTES = [
@@ -38,8 +38,9 @@ const PILLARS = [
 
 function Brand({ light = false }) {
   return <a className={`${styles.brand} ${light ? styles.brandOnDark : ''}`} href="/" aria-label="Campaign Seat home">
-    <span className={styles.brandIcon}>C<span /></span>
-    <span className={styles.brandName}>CAMPAIGN <b>SEAT</b></span>
+    <img className={styles.officialWordmark}
+      src={light ? '/brand/campaignseat-wordmark-white.png' : '/brand/campaignseat-wordmark-black.png'}
+      width="1833" height="328" alt="Campaign Seat" decoding="async" />
   </a>;
 }
 
@@ -81,7 +82,7 @@ function Footer() {
         <div className={styles.footerLinks}>
           <div><strong>Explore</strong><a href="/platform/">The platform & tools</a><a href="/communications/">Communications & marketing</a><a href="/who-its-for/">Who it's for</a><a href="/trust/">Trust & security</a><a href="/about/">Our mission</a></div>
           <div><strong>Information</strong><a href="/privacy/">Privacy policy</a><a href="/terms/">Terms & conditions</a><a href="/sms-consent/">SMS consent</a></div>
-          <div><strong>Connect</strong><a href="/walkthrough/">Request a walkthrough</a><a href={`mailto:${EMAIL}`}>Contact support</a><a href="/about/">The Campaign Seat mission <ArrowUpRight size={12}/></a></div>
+          <div><strong>Connect</strong><a href="/walkthrough/">Request a walkthrough</a><a href={`mailto:${EMAIL}`}><Mail size={14} aria-hidden="true" /> {EMAIL}</a><a href="/about/">The Campaign Seat mission <ArrowUpRight size={12}/></a></div>
         </div>
       </div>
       <div className={styles.footerBottom}><span>© {new Date().getFullYear()} CC INNOVATION GROUP LLC. All rights reserved.</span><span>Campaign Seat · Invitation-only private beta</span></div>
@@ -97,7 +98,7 @@ function KnowledgeVisual({ compact = false }) {
   return <div className={`${styles.visual} ${compact ? styles.visualCompact : ''}`} aria-label="Conceptual illustration showing people, communication context and next actions organized together" role="img">
     <div className={styles.visualBack} />
     <div className={styles.visualCard}>
-      <div className={styles.visualTop}><span className={styles.visualMonogram}>C<span /></span><span className={styles.visualWordmark}>CAMPAIGN SEAT</span><span className={styles.visualPrivate}><ShieldCheck size={13}/> PRIVATE WORKSPACE</span></div>
+      <div className={styles.visualTop}><img className={styles.officialVisualWordmark} src="/brand/campaignseat-wordmark-black.png" alt="Campaign Seat" width="1833" height="328" decoding="async" /><span className={styles.visualPrivate}><ShieldCheck size={13}/> PRIVATE WORKSPACE</span></div>
       <div className={styles.visualContent}>
         <span className={styles.visualKicker}>THE BIGGER PICTURE</span>
         <h3>One relationship.<br/>The context that matters.</h3>
@@ -290,46 +291,109 @@ function Walkthrough() {
   const [startedAt] = useState(() => Date.now());
   const [fields,setFields] = useState({ name:'',email:'',organization:'',role:'',priority:'',message:'',website:'' });
   const [agreed,setAgreed] = useState(false);
+  const [turnstileToken,setTurnstileToken] = useState('');
+  const [verificationStatus,setVerificationStatus] = useState('loading');
   const statusRef = useRef(null);
-  const onField = e => setFields(prev=>({...prev,[e.target.name]:e.target.value}));
+  const captchaContainer = useRef(null);
+  const captchaWidget = useRef(null);
+  const requestId = useRef(null);
+  const siteKey = import.meta.env.VITE_CAMPAIGN_SEAT_TURNSTILE_SITE_KEY || '';
+  const onlineReady = import.meta.env.VITE_CAMPAIGN_SEAT_FORM_DELIVERY === 'enabled' && Boolean(siteKey);
+  const onField = e => {
+    requestId.current = null; // A different request needs a different Resend idempotency key.
+    setFields(prev=>({...prev,[e.target.name]:e.target.value}));
+  };
   useEffect(()=>{if(state.status!=='idle')statusRef.current?.focus();},[state.status]);
+  useEffect(() => {
+    if (!onlineReady) return;
+    let mounted = true;
+    const renderCaptcha = () => {
+      if (!mounted || !captchaContainer.current || !window.turnstile?.render || captchaWidget.current !== null) return;
+      captchaWidget.current = window.turnstile.render(captchaContainer.current, {
+        sitekey: siteKey,
+        action: 'campaignseat_walkthrough',
+        callback: token => { if (mounted) {setTurnstileToken(token);setVerificationStatus('verified');} },
+        'expired-callback': () => {if (mounted) {setTurnstileToken('');setVerificationStatus('expired');}},
+        'error-callback': () => {if (mounted) {setTurnstileToken('');setVerificationStatus('error');}},
+      });
+    };
+    const scriptId = 'campaign-seat-walkthrough-turnstile';
+    let script = document.getElementById(scriptId);
+    if (!script) {
+      script = document.createElement('script');
+      script.id = scriptId;
+      script.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit';
+      script.async = true;
+      script.defer = true;
+      document.head.appendChild(script);
+    }
+    script.addEventListener('load',renderCaptcha);
+    if (window.turnstile?.render) renderCaptcha();
+    return () => {
+      mounted=false;
+      script.removeEventListener('load',renderCaptcha);
+      if (captchaWidget.current !== null && window.turnstile?.remove) {
+        window.turnstile.remove(captchaWidget.current);
+        captchaWidget.current = null;
+      }
+    };
+  },[onlineReady,siteKey]);
+  const mailto = `mailto:${EMAIL}?subject=${encodeURIComponent('Campaign Seat — private walkthrough inquiry')}&body=${encodeURIComponent(`Hello Campaign Seat team,\n\nI'd like to request a walkthrough.\n\nName: ${fields.name}\nEmail: ${fields.email}\nOrganization: ${fields.organization}\nRole: ${fields.role}\nPriority: ${fields.priority}\n\n${fields.message}`)}`;
+  const resetCaptcha = () => {
+    setTurnstileToken('');
+    if (captchaWidget.current !== null && window.turnstile?.reset) window.turnstile.reset(captchaWidget.current);
+  };
   const send = async e => {
     e.preventDefault();
     if (!agreed) {setState({status:'error',error:'Please acknowledge the privacy notice before preparing your request.'});return;}
-    // Direct email is the verified preview workflow. Do not claim an API inquiry was delivered.
-    if (import.meta.env.VITE_CAMPAIGN_SEAT_FORM_DELIVERY !== 'enabled') {
+    // Fail closed: with no verified delivery configuration, open an explicit email draft.
+    if (!onlineReady) {
       window.location.href = mailto;
       setState({status:'email-draft',error:''});
       return;
     }
+    if (!turnstileToken) {
+      setState({status:'error',error:'Complete the security verification before submitting.'});
+      return;
+    }
+    if (!requestId.current) requestId.current = window.crypto?.randomUUID?.();
+    if (!requestId.current) {setState({status:'error',error:'Secure request preparation failed. Please use the direct email option.'});return;}
     setState({status:'sending',error:''});
     try {
-      const response = await fetch('/api/request-walkthrough',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({...fields,startedAt,privacyAccepted:agreed})});
-      let result={}; try{result=await response.json();}catch{ /* response is not JSON */ }
-      if(!response.ok||!result.ok) throw new Error(result.message||'The request could not be delivered. Please use the email option below.');
+      const response = await fetch('/api/request-walkthrough',{
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({...fields,startedAt,privacyAccepted:agreed,turnstileToken,requestId:requestId.current}),
+      });
+      let result={};try{result=await response.json();}catch{ /* not JSON */ }
+      if(!response.ok||result.ok!==true) throw new Error(result.message||'Your request was not confirmed. Please use the email option below.');
       setState({status:'sent',error:''});
-    } catch(error) {setState({status:'error',error:error.message||'We could not send the request. Please contact us directly.'});}
+    } catch(error) {
+      resetCaptcha();
+      setState({status:'error',error:error.message||'Your request was not confirmed. Please contact us directly.'});
+    }
   };
-  const mailto = `mailto:${EMAIL}?subject=${encodeURIComponent('Campaign Seat — private walkthrough inquiry')}&body=${encodeURIComponent(`Hello Campaign Seat team,\n\nI'd like to request a walkthrough.\n\nName: ${fields.name}\nEmail: ${fields.email}\nOrganization: ${fields.organization}\nRole: ${fields.role}\nPriority: ${fields.priority}\n\n${fields.message}`)}`;
   return <>
     <section className={styles.contactHero}><div className={styles.wrap}><Eyebrow dark>PERSONAL PRODUCT WALKTHROUGH</Eyebrow><h1>Let's see what matters<br/><em>to your team.</em></h1><p>Tell us a little about your campaign or organization. We'll discuss your goals and show the actual software privately.</p></div></section>
     <section className={styles.contactSection}><div className={`${styles.wrap} ${styles.contactGrid}`}>
       <div className={styles.contactInfo}><span className={styles.contactSmall}>WHAT TO EXPECT</span><h2>A conversation first. A walkthrough built around you.</h2>
         <div className={styles.contactSteps}><div><b>01</b><p><strong>Tell us what you're trying to organize.</strong><span>Communication context, relationships, next steps or team continuity.</span></p></div><div><b>02</b><p><strong>We'll discuss the right fit.</strong><span>We'll learn how your team works and which capabilities are relevant.</span></p></div><div><b>03</b><p><strong>Explore the software privately.</strong><span>Beta access is reviewed individually, not created through public signup.</span></p></div></div>
         <div className={styles.contactReassurance}><LockKeyhole size={18}/><span>No public portal access. No commitment to purchase. A personal introduction to Campaign Seat.</span></div>
+        <p className={styles.contactDirectEmail}>Prefer email? Write to <a href={`mailto:${EMAIL}`}>{EMAIL}</a></p>
       </div>
       <div className={styles.formCard}><div className={styles.formHeading}><span>PRIVATE BETA INQUIRY</span><h2>Request a walkthrough</h2><p>Fields marked * are required.</p></div>
       {state.status==='email-draft' && <div className={styles.v114EmailNotice} role="status" tabIndex={-1} ref={statusRef}><Mail size={19}/><span>Your email application should open with a prepared request. <strong>Review it and press Send</strong> to contact us. No inquiry has been submitted automatically.</span></div>}
-      {state.status==='sent'?<div className={styles.formSuccess} role="status" tabIndex={-1} ref={statusRef}><CheckCircle2 size={36}/><h3>Request received.</h3><p>Thank you for reaching out. The Campaign Seat team will review your inquiry and follow up using the details you provided.</p><a href="/">Back to homepage <ArrowRight size={16}/></a></div>:<form onSubmit={send} className={styles.formBody}>
+      {state.status==='sent'?<div className={styles.formSuccess} role="status" tabIndex={-1} ref={statusRef}><CheckCircle2 size={36}/><h3>Request submitted.</h3><p>The email service accepted your request for delivery to our team. We'll follow up using your contact details. Please keep a copy of your inquiry if you need immediate assistance.</p><a href="/">Back to homepage <ArrowRight size={16}/></a></div>:<form onSubmit={send} className={styles.formBody}>
         <div className={styles.formRow}><label>Full name *<input name="name" value={fields.name} onChange={onField} required minLength={2} maxLength={100} autoComplete="name" placeholder="Your name"/></label><label>Work email *<input name="email" value={fields.email} onChange={onField} required type="email" maxLength={180} autoComplete="email" placeholder="you@organization.com"/></label></div>
         <label>Campaign or organization *<input name="organization" value={fields.organization} onChange={onField} required maxLength={160} placeholder="Organization name" autoComplete="organization"/></label>
         <div className={styles.formRow}><label>Your role *<select required name="role" value={fields.role} onChange={onField}><option value="">Select a role</option><option>Campaign leadership</option><option value="Communications">Communications / marketing</option><option>Operations / staff</option><option>Candidate</option><option>Other</option></select></label><label>Most interested in *<select required name="priority" value={fields.priority} onChange={onField}><option value="">Select an area</option><option>Communication history</option><option>Contact relationships</option><option>Team coordination</option><option>Post-election continuity</option><option>A complete walkthrough</option></select></label></div>
         <label>What would you like to improve? <span className={styles.optional}>(optional)</span><textarea rows={4} maxLength={1500} name="message" value={fields.message} onChange={onField} placeholder="A few sentences about your team or workflow"/></label>
         <div className={styles.honeypot} aria-hidden="true"><label>Website<input tabIndex={-1} autoComplete="off" name="website" value={fields.website} onChange={onField} /></label></div>
+        {onlineReady && <div className={styles.turnstileArea}><div ref={captchaContainer}/><span role="status">{verificationStatus === 'verified' ? 'Security check complete.' : verificationStatus === 'expired' ? 'Security check expired. Please complete it again.' : verificationStatus === 'error' ? 'Security check unavailable. Please use the direct email option if this continues.' : 'Security verification is required to submit online.'}</span></div>}
         <label className={styles.formConsent}><input type="checkbox" checked={agreed} onChange={e=>setAgreed(e.target.checked)} required/><span>I understand Campaign Seat may use these details to respond to my request, as described in the <a href="/privacy/" target="_blank" rel="noopener noreferrer">Privacy Policy</a>.</span></label>
         {state.status==='error'&&<div className={styles.formError} role="alert" tabIndex={-1} ref={statusRef}>{state.error}</div>}
-        <button className={styles.formButton} type="submit" disabled={state.status==='sending'}>{state.status==='sending'?'Sending…':import.meta.env.VITE_CAMPAIGN_SEAT_FORM_DELIVERY === 'enabled'?'Send my request':'Prepare email request'}<ArrowRight size={18}/></button>
-        <p className={styles.formFallback}>Requests currently open in your email app; please press Send to deliver. Prefer a direct email? <a href={mailto}>Contact the Campaign Seat team directly <ArrowUpRight size={13}/></a></p>
+        <button className={styles.formButton} type="submit" disabled={state.status==='sending'}>{state.status==='sending'?'Submitting…':onlineReady?'Send walkthrough request':'Prepare email request'}<ArrowRight size={18}/></button>
+        <p className={styles.formFallback}>{onlineReady?'Online requests are submitted securely after verification. If confirmation fails, you can still email us directly.':'This button prepares an email draft, not a completed submission. Review it and press Send in your email application.'} <a href={mailto}>Email {EMAIL} <ArrowUpRight size={13}/></a></p>
         <small className={styles.formDisclosure}>This website accepts no account credentials or campaign contact lists. Please do not include sensitive campaign information in this form.</small>
       </form>}
       </div>
